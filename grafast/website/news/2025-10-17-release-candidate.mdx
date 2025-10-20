@@ -5,7 +5,7 @@ description:
   we need your help to finish the docs ahead of the 1.0 final.
 slug: 2025-10-17-grafast-v1-release-candidate
 authors: [benjie, jem]
-tags: [Release candidate]
+tags: [0.1, RC]
 hide_table_of_contents: false
 toc_max_heading_level: 2
 ---
@@ -24,16 +24,16 @@ remains is to finish the documentation and tighten the TypeScript experience.
 ## From working group sketches to a stable execution engine
 
 We debuted Gra*fast* in 2020 as an answer to the limits of resolver-driven
-execution. The working group codified a plan-first mental model: every field
+execution. The working group crystallized a plan-first mental model: every field
 should describe the graph of steps it requires, and the planner is responsible
 for weaving those graphs into a reusable dataflow that the runtime can execute
 efficiently. Four epics stood between that vision and a stable 1.0:
 
-- ✅ **Global dependencies → unary dependencies**: we rewrote the planning
+- ✅ **Global dependencies**: we rewrote the planning
   infrastructure so shared inputs (like database connections) are explicitly
   marked as unary. Plan diagrams now make it obvious when a value is reused
   across the batch, and the engine can enforce those guarantees automatically.
-- ✅ **Early exit controls → flags**: instead of scattering manual branching
+- ✅ **Early exit controls**: instead of scattering manual branching
   logic through plan resolvers, Gra*fast* now propagates inhibition flags along
   the dataflow. Downstream steps see a clean graph with the noisy branches
   already pruned.
@@ -47,17 +47,17 @@ efficiently. Four epics stood between that vision and a stable 1.0:
   even when unions or interfaces are involved.
 
 Together these projects solidify the [“thinking in plans”](/grafast/flow) model:
-describe your desired dataflow once, let Gra*fast* optimise it, and rely on the
+describe your desired dataflow once, let Gra*fast* optimize it, and rely on the
 engine to reuse that plan across every matching request.
 
 <!-- truncate-->
 
 Delivering those shifts meant rewriting plan resolvers to embrace the new unary
-contracts, teaching the SQL layers to build queries at execute-time, and
-validating the diagrams against real production workloads inside PostGraphile
-V5. The payoff is a planning engine that exposes the entire dataflow, keeps
+contracts, teaching the SQL layers to build queries at execution, and
+validating the diagrams against real production workloads inside [PostGraphile
+V5](https://postgraphile.org). The payoff is a planning engine that exposes the entire dataflow, keeps
 resolution ergonomic, and still lets Gra*fast* squeeze out every possible
-optimisation.
+optimization.
 
 ## What does release candidate mean for Gra*fast*?
 
