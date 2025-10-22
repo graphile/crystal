@@ -59,6 +59,7 @@ export function postgraphile(
         oldSchemaResult.resolve(schemaResult);
       }
       if (server) {
+        await server.ready();
         try {
           await server.setPreset(schemaResult.resolvedPreset);
           server.setSchema(schemaResult.schema);
