@@ -51,9 +51,7 @@ export type {
 } from "./interfaces.js";
 
 /** @deprecated Use EventStreamHandlerResult instead */
-export type {
-  EventStreamHandlerResult as EventStreamHeandlerResult,
-} from "./interfaces.js";
+export type { EventStreamHandlerResult as EventStreamHeandlerResult } from "./interfaces.js";
 export { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "./middleware/graphql.js";
 export { defaultMaskError } from "./options.js";
 export {
