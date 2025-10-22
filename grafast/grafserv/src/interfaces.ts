@@ -204,10 +204,12 @@ export interface EventStreamEvent {
   /** integer number of milliseconds indicating how long to wait before reconnecting if connection is lost */
   retry?: number;
 }
-export interface EventStreamHeandlerResult extends IHandlerResult {
+export interface EventStreamHandlerResult extends IHandlerResult {
   type: "event-stream";
   payload: AsyncIterable<EventStreamEvent>;
 }
+/** @deprecated Use EventStreamHandlerResult instead */
+export type EventStreamHeandlerResult = EventStreamHandlerResult;
 export interface NotFoundResult extends IHandlerResult {
   type: "notFound";
   payload?: Buffer;
@@ -223,7 +225,7 @@ export type HandlerResult =
   | GraphQLHandlerResult
   | GraphQLIncrementalHandlerResult
   | TextHandlerResult
-  | EventStreamHeandlerResult
+  | EventStreamHandlerResult
   | NoContentHandlerResult
   | NotFoundResult
   | RawHandlerResult;

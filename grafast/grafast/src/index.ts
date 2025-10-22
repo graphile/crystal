@@ -430,7 +430,6 @@ export {
   InputObjectTypeBakedResolver,
   InputObjectTypeSpec,
   inspect,
-  AbstractTypePlan as InterfaceOrUnionPlans,
   InterfacePlan,
   isDev,
   isExecutableStep,
@@ -693,11 +692,6 @@ exportAsMany("grafast", {
 
 export { hookArgs } from "./args.js";
 export { version } from "./version.js";
-
-/** @deprecated Renamed to 'applyTransforms' */
-export const deepEval = applyTransforms;
-/** @deprecated Renamed to 'ApplyTransformsStep' */
-export const DeepEvalStep = ApplyTransformsStep;
 
 declare global {
   namespace Grafast {

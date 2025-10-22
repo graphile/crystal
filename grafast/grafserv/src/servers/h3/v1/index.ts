@@ -25,7 +25,7 @@ import {
   processHeaders,
 } from "../../../index.js";
 import type {
-  EventStreamHeandlerResult,
+  EventStreamHandlerResult,
   GrafservBodyBuffer,
   GrafservConfig,
   RequestDigest,
@@ -121,7 +121,7 @@ export class H3Grafserv extends GrafservBase {
   public async handleEventStreamEvent(event: H3Event) {
     const digest = getDigest(event);
 
-    const handlerResult: EventStreamHeandlerResult = {
+    const handlerResult: EventStreamHandlerResult = {
       type: "event-stream",
       request: normalizeRequest(digest),
       dynamicOptions: this.dynamicOptions,

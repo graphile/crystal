@@ -1,6 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
-#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> extends: ["postgraphile/presets/relay:PostGraphileRelayPreset"]
 mutation {
   updateLeftArm(
     input: {

@@ -1,7 +1,7 @@
 ## expect(errors).toBeFalsy()
 #> schema: ["polymorphic"]
 #> simpleCollections: "both"
-#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> extends: ["postgraphile/presets/relay:PostGraphileRelayPreset"]
 
 query {
   allRelationalItems {

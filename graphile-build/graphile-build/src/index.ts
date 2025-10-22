@@ -166,11 +166,9 @@ function pluginNamespace(plugin: GraphileConfig.Plugin): string {
  */
 const gatherBase = (
   preset: GraphileConfig.Preset,
-  {
-    inflection,
-  }: {
-    inflection: GraphileBuild.Inflection;
-  } = { inflection: buildInflection(preset) },
+  { inflection }: { inflection: GraphileBuild.Inflection } = {
+    inflection: buildInflection(preset),
+  },
 ) => {
   const resolvedPreset = resolvePreset(preset);
   const options = resolvedPreset.gather || {};
@@ -296,14 +294,14 @@ const gatherBase = (
       gather: GraphileBuild.BuildInput | null,
       error: Error | undefined,
       retry: () => void,
-    ) => void,
+    ) => PromiseOrDirect<void>,
   ): Promise<() => void> {
     let stopped = false;
     const unlisten: Array<() => void> = [];
     let runAgain = false;
     let runInProgress = true;
     let counter = 0;
-    const handleChange = () => {
+    const handleChange = (): void => {
       if (stopped) {
         return;
       }
@@ -311,37 +309,25 @@ const gatherBase = (
         runAgain = true;
         return;
       }
-      ++counter;
+      const currentCounter = ++counter;
       runAgain = false;
       runInProgress = true;
-      run().then(
-        (v) => {
-          runInProgress = false;
-          if (stopped) return;
-          try {
-            callback(v, undefined, makeRetry(counter));
-          } catch {
-            // ERRORS: this indicates a bug in user code; how to handle?
-            /*nom nom nom*/
-          }
-          if (runAgain) handleChange();
-        },
-        (e) => {
-          runInProgress = false;
-          if (stopped) return;
-          try {
-            callback(null, e, makeRetry(counter));
-          } catch {
-            // ERRORS: this indicates a bug in user code; how to handle?
-            /*nom nom nom*/
-          }
-          if (runAgain) handleChange();
-        },
-      );
+      promiseToCallback(run(), async (e, v) => {
+        if (stopped) return;
+        try {
+          await callback(v ?? null, e, makeRetry(currentCounter));
+        } catch {
+          // ERRORS: this indicates a bug in user code; how to handle?
+          /*nom nom nom*/
+        }
+
+        runInProgress = false;
+        if (runAgain) handleChange();
+      });
     };
     const makeRetry = (currentCounter: number): (() => void) => {
       return () => {
-        if (currentCounter === counter) {
+        if (counter === currentCounter) {
           handleChange();
         } else {
           // Another change was already registered; ignore
@@ -388,6 +374,16 @@ const gatherBase = (
   };
 };
 
+function promiseToCallback<T, U>(
+  promise: Promise<T>,
+  callback: (e: undefined | any, t: T | undefined) => PromiseOrDirect<U>,
+): PromiseOrDirect<U> {
+  return promise.then(
+    (v) => callback(undefined, v),
+    (e) => callback(e, undefined),
+  );
+}
+
 /**
  * One-time gather. See `watchGather` for watch mode.
  */
@@ -411,16 +407,12 @@ export const gather = (
  */
 export const watchGather = (
   preset: GraphileConfig.Preset,
-  helpers:
-    | {
-        inflection: GraphileBuild.Inflection;
-      }
-    | undefined,
+  helpers: { inflection: GraphileBuild.Inflection } | undefined,
   callback: (
     gather: GraphileBuild.BuildInput | null,
     error: Error | undefined,
     retry: () => void,
-  ) => void,
+  ) => PromiseOrDirect<void>,
 ): Promise<() => void> => {
   const { watch } = gatherBase(preset, helpers);
   return watch(callback);
@@ -661,7 +653,10 @@ async function sleepFromRetryOnInitFail(
  */
 export async function watchSchema(
   preset: GraphileConfig.Preset,
-  callback: (fatalError: Error | null, params?: SchemaResult) => void,
+  callback: (
+    fatalError: Error | null,
+    params?: SchemaResult,
+  ) => PromiseOrDirect<void>,
 ): Promise<() => void> {
   const resolvedPreset = resolvePreset(preset);
   const shared = { inflection: buildInflection(resolvedPreset) };
@@ -670,16 +665,23 @@ export async function watchSchema(
   let attempts = 0;
   let haveHadSuccess = false;
 
-  const handleErrorWithRetry = (error: Error, retry: () => void) => {
+  const handleErrorWithRetry = async (error: Error, retry: () => void) => {
     if (retryOnInitFail) {
-      sleepFromRetryOnInitFail(retryOnInitFail, "GATHER", attempts, error).then(
-        retry,
-        callback,
-      );
+      try {
+        await sleepFromRetryOnInitFail(
+          retryOnInitFail,
+          "GATHER",
+          attempts,
+          error,
+        );
+        retry();
+      } catch (e) {
+        await callback(e);
+      }
     } else {
       if (!haveHadSuccess) {
         // Inability to gather is fatal - database connection issue?
-        callback(error);
+        await callback(error);
       } else {
         console.error(`Error occurred during watch gather: ${error}`);
       }
@@ -689,12 +691,20 @@ export async function watchSchema(
   const stopWatching = await watchGather(
     resolvedPreset,
     shared,
-    (input, error, retry) => {
+    async (input, error, retry) => {
       ++attempts;
       if (error) {
         // An error here could be a database connectivity issue or similar
         // issue, if retryOnInitFail is set we should automatically retry.
-        handleErrorWithRetry(error, retry);
+        try {
+          await handleErrorWithRetry(error, retry);
+        } catch (e) {
+          console.error(
+            `Error occurred in the error handler callback to watchSchema: `,
+            e,
+            error,
+          );
+        }
       } else {
         if (attempts > 1) {
           console.warn(`Gather completed successfully on attempt ${attempts}.`);
@@ -703,7 +713,7 @@ export async function watchSchema(
         haveHadSuccess = true;
         try {
           const schema = buildSchema(resolvedPreset, input!, shared);
-          callback(null, { schema, resolvedPreset });
+          await callback(null, { schema, resolvedPreset });
         } catch (e) {
           // Retrying this on its own is pointless, we need the gather phase to
           // give us more data so we can just await regular watch for that.

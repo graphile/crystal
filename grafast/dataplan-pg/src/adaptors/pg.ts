@@ -444,9 +444,6 @@ interface CommonPgAdaptorAndServiceSettings {
   superuserConnectionString?: string;
 }
 
-/** @deprecated Use PgAdaptorSettings instead. */
-export type PgAdaptorOptions = PgAdaptorSettings;
-
 export function createWithPgClient(
   options: PgAdaptorSettings = Object.create(null),
   variant?: "SUPERUSER" | string | null,
