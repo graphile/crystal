@@ -15,5 +15,7 @@ Tighten our public API surface by:
 - dropping the long-deprecated Grafast exports `InterfaceOrUnionPlans`,
   `deepEval` and `DeepEvalStep`
 - removing the `PgAdaptorOptions` alias in favour of `PgAdaptorSettings`
-- deleting the PostGraphile preset aliases `postgraphilePresetAmber` and
-  `PgRelayPreset`, and updating all first-party usage to the canonical names
+- deleting the PostGraphile preset aliases `postgraphilePresetAmber` should be
+  `PostGraphileAmberPreset`) and `PgRelayPreset` (should be
+  `PostGraphileRelayPreset`), and updating all first-party usage to the
+  canonical names
