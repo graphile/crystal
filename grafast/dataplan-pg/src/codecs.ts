@@ -541,13 +541,13 @@ function makeRecordExpression(
         return sql`(${expr})::text`;
       }
     }),
-    ", ",
+    ",\n",
   );
   if (attributeDefs.length <= 100) {
-    return sql`json_build_array(${csl})`;
+    return sql`json_build_array(${sql.indent(csl)})`;
   } else {
     // if (attributeDefs.length <= 16383) {
-    return sql`to_json(array[${csl}])`;
+    return sql`to_json(array[${sql.indent(csl)}])`;
   }
 }
 
