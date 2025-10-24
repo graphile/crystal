@@ -1,4 +1,4 @@
-/* eslint-disable graphile-export/export-methods  */
+/* eslint-disable graphile-export/export-methods, graphile-export/export-plans */
 import type { GraphQLType } from "grafast/graphql";
 import {
   GraphQLInputObjectType,

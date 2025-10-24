@@ -5,7 +5,10 @@ select
   __frmcdc_user_update_content__."img_url" as "3",
   (case when (__frmcdc_user_update_content__."lines") is not distinct from null then null::text else array(
     select array(
-      select case when (__base_user_update_content_line_node__) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node__)."line_node_type"))::text, ((__base_user_update_content_line_node__)."line_node_text"))::text end
+      select case when (__base_user_update_content_line_node__) is not distinct from null then null::text else json_build_array(
+        (((__base_user_update_content_line_node__)."line_node_type"))::text,
+        ((__base_user_update_content_line_node__)."line_node_text")
+      )::text end
       from unnest(__user_update_content_line_node_array_item__) __base_user_update_content_line_node__
     )::text
     from unnest(__frmcdc_user_update_content__."lines") __user_update_content_line_node_array_item__
@@ -16,7 +19,10 @@ select
       __frmcdc_user_update_content_2."img_url",
       (case when (__frmcdc_user_update_content_2."lines") is not distinct from null then null::text else array(
         select array(
-          select case when (__base_user_update_content_line_node_2) is not distinct from null then null::text else json_build_array((((__base_user_update_content_line_node_2)."line_node_type"))::text, ((__base_user_update_content_line_node_2)."line_node_text"))::text end
+          select case when (__base_user_update_content_line_node_2) is not distinct from null then null::text else json_build_array(
+            (((__base_user_update_content_line_node_2)."line_node_type"))::text,
+            ((__base_user_update_content_line_node_2)."line_node_text")
+          )::text end
           from unnest(__user_update_content_line_node_array_item_2) __base_user_update_content_line_node_2
         )::text
         from unnest(__frmcdc_user_update_content_2."lines") __user_update_content_line_node_array_item_2

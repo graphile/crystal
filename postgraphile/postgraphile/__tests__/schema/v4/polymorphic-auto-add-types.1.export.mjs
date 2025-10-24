@@ -2288,6 +2288,1000 @@ const spec_relationalItems = {
   }
 };
 const relationalItemsCodec = recordCodec(spec_relationalItems);
+const collectionsIdentifier = sql.identifier("polymorphic", "collections");
+const spec_collections = {
+  name: "collections",
+  identifier: collectionsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    type: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    episodes: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    recommendations: {
+      description: undefined,
+      codec: TYPES.jsonb,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_001: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_002: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_003: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_004: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_005: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_006: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_007: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_008: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_009: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_010: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_011: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_012: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_013: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_014: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_015: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_016: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_017: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_018: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_019: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_020: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_021: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_022: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_023: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_024: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_025: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_026: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_027: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_028: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_029: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_030: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_031: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_032: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_033: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_034: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_035: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_036: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_037: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_038: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_039: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_040: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_041: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_042: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_043: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_044: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_045: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_046: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_047: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_048: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_049: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_050: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_051: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_052: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_053: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_054: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_055: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_056: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_057: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_058: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_059: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_060: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_061: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_062: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_063: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_064: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_065: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_066: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_067: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_068: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_069: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_070: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_071: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_072: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_073: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_074: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_075: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_076: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_077: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_078: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_079: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_080: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_081: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_082: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_083: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_084: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_085: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_086: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_087: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_088: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_089: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_090: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_091: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_092: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_093: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_094: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_095: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_096: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_097: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_098: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_099: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_100: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    created_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "collections"
+    },
+    tags: {
+      __proto__: null,
+      interface: "mode:single type:type",
+      type: ["movie name:MovieCollection", "series name:SeriesCollection"]
+    }
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "single",
+    commonAttributes: ["id", "name", "type", "episodes", "recommendations", "col_001", "col_002", "col_003", "col_004", "col_005", "col_006", "col_007", "col_008", "col_009", "col_010", "col_011", "col_012", "col_013", "col_014", "col_015", "col_016", "col_017", "col_018", "col_019", "col_020", "col_021", "col_022", "col_023", "col_024", "col_025", "col_026", "col_027", "col_028", "col_029", "col_030", "col_031", "col_032", "col_033", "col_034", "col_035", "col_036", "col_037", "col_038", "col_039", "col_040", "col_041", "col_042", "col_043", "col_044", "col_045", "col_046", "col_047", "col_048", "col_049", "col_050", "col_051", "col_052", "col_053", "col_054", "col_055", "col_056", "col_057", "col_058", "col_059", "col_060", "col_061", "col_062", "col_063", "col_064", "col_065", "col_066", "col_067", "col_068", "col_069", "col_070", "col_071", "col_072", "col_073", "col_074", "col_075", "col_076", "col_077", "col_078", "col_079", "col_080", "col_081", "col_082", "col_083", "col_084", "col_085", "col_086", "col_087", "col_088", "col_089", "col_090", "col_091", "col_092", "col_093", "col_094", "col_095", "col_096", "col_097", "col_098", "col_099", "col_100", "created_at"],
+    typeAttributes: ["type"],
+    types: {
+      __proto__: null,
+      movie: {
+        name: "MovieCollection",
+        attributes: []
+      },
+      series: {
+        name: "SeriesCollection",
+        attributes: []
+      }
+    }
+  }
+};
+const collectionsCodec = recordCodec(spec_collections);
 const spec_Vulnerability = {
   name: "Vulnerability",
   identifier: sql.identifier("polymorphic", "vulnerabilities"),
@@ -3272,6 +4266,16 @@ const registryConfig_pgResources_relational_items_relational_items = {
 const all_relational_items_fnFunctionIdentifer = sql.identifier("polymorphic", "all_relational_items_fn");
 const relational_item_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_item_by_id_fn");
 const relational_topics_parent_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topics_parent_fn");
+const collectionsUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig = {
   pgExecutors: {
     __proto__: null,
@@ -3310,6 +4314,8 @@ const registryConfig = {
     itemType: itemTypeCodec,
     int8: TYPES.bigint,
     relationalItems: relationalItemsCodec,
+    collections: collectionsCodec,
+    jsonb: TYPES.jsonb,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     Vulnerability: recordCodec(spec_Vulnerability),
@@ -3995,7 +5001,32 @@ const registryConfig = {
         tags: {}
       },
       description: undefined
-    })
+    }),
+    collections: {
+      executor: executor,
+      name: "collections",
+      identifier: "main.polymorphic.collections",
+      from: collectionsIdentifier,
+      codec: collectionsCodec,
+      uniques: collectionsUniques,
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "collections"
+        },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
+        tags: {
+          interface: "mode:single type:type",
+          type: spec_collections.extensions.tags.type
+        }
+      }
+    }
   },
   pgRelations: {
     __proto__: null,
@@ -5232,6 +6263,15 @@ const resource_relational_postsPgResource = registry.pgResources["relational_pos
 const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
 const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
 const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
+const resource_collectionsPgResource = registry.pgResources["collections"];
+const Collection_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("Collection", spec_collections.polymorphism);
 const argDetailsSimple_relational_topic_by_id_fn = [{
   graphqlArgName: "id",
   postgresArgName: "id",
@@ -8959,6 +9999,338 @@ type RelationalChecklistItem implements RelationalItem {
   ): RelationalItemRelationCompositePksConnection!
 }
 
+type MovieCollection implements Collection {
+  id: String!
+  name: String!
+  type: String!
+  episodes: Int
+  recommendations: JSON
+  col001: String
+  col002: String
+  col003: String
+  col004: String
+  col005: String
+  col006: String
+  col007: String
+  col008: String
+  col009: String
+  col010: String
+  col011: String
+  col012: String
+  col013: String
+  col014: String
+  col015: String
+  col016: String
+  col017: String
+  col018: String
+  col019: String
+  col020: String
+  col021: String
+  col022: String
+  col023: String
+  col024: String
+  col025: String
+  col026: String
+  col027: String
+  col028: String
+  col029: String
+  col030: String
+  col031: String
+  col032: String
+  col033: String
+  col034: String
+  col035: String
+  col036: String
+  col037: String
+  col038: String
+  col039: String
+  col040: String
+  col041: String
+  col042: String
+  col043: String
+  col044: String
+  col045: String
+  col046: String
+  col047: String
+  col048: String
+  col049: String
+  col050: String
+  col051: String
+  col052: String
+  col053: String
+  col054: String
+  col055: String
+  col056: String
+  col057: String
+  col058: String
+  col059: String
+  col060: String
+  col061: String
+  col062: String
+  col063: String
+  col064: String
+  col065: String
+  col066: String
+  col067: String
+  col068: String
+  col069: String
+  col070: String
+  col071: String
+  col072: String
+  col073: String
+  col074: String
+  col075: String
+  col076: String
+  col077: String
+  col078: String
+  col079: String
+  col080: String
+  col081: String
+  col082: String
+  col083: String
+  col084: String
+  col085: String
+  col086: String
+  col087: String
+  col088: String
+  col089: String
+  col090: String
+  col091: String
+  col092: String
+  col093: String
+  col094: String
+  col095: String
+  col096: String
+  col097: String
+  col098: String
+  col099: String
+  col100: String
+  createdAt: Datetime
+}
+
+interface Collection {
+  id: String!
+  name: String!
+  type: String!
+  episodes: Int
+  recommendations: JSON
+  col001: String
+  col002: String
+  col003: String
+  col004: String
+  col005: String
+  col006: String
+  col007: String
+  col008: String
+  col009: String
+  col010: String
+  col011: String
+  col012: String
+  col013: String
+  col014: String
+  col015: String
+  col016: String
+  col017: String
+  col018: String
+  col019: String
+  col020: String
+  col021: String
+  col022: String
+  col023: String
+  col024: String
+  col025: String
+  col026: String
+  col027: String
+  col028: String
+  col029: String
+  col030: String
+  col031: String
+  col032: String
+  col033: String
+  col034: String
+  col035: String
+  col036: String
+  col037: String
+  col038: String
+  col039: String
+  col040: String
+  col041: String
+  col042: String
+  col043: String
+  col044: String
+  col045: String
+  col046: String
+  col047: String
+  col048: String
+  col049: String
+  col050: String
+  col051: String
+  col052: String
+  col053: String
+  col054: String
+  col055: String
+  col056: String
+  col057: String
+  col058: String
+  col059: String
+  col060: String
+  col061: String
+  col062: String
+  col063: String
+  col064: String
+  col065: String
+  col066: String
+  col067: String
+  col068: String
+  col069: String
+  col070: String
+  col071: String
+  col072: String
+  col073: String
+  col074: String
+  col075: String
+  col076: String
+  col077: String
+  col078: String
+  col079: String
+  col080: String
+  col081: String
+  col082: String
+  col083: String
+  col084: String
+  col085: String
+  col086: String
+  col087: String
+  col088: String
+  col089: String
+  col090: String
+  col091: String
+  col092: String
+  col093: String
+  col094: String
+  col095: String
+  col096: String
+  col097: String
+  col098: String
+  col099: String
+  col100: String
+  createdAt: Datetime
+}
+
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type SeriesCollection implements Collection {
+  id: String!
+  name: String!
+  type: String!
+  episodes: Int
+  recommendations: JSON
+  col001: String
+  col002: String
+  col003: String
+  col004: String
+  col005: String
+  col006: String
+  col007: String
+  col008: String
+  col009: String
+  col010: String
+  col011: String
+  col012: String
+  col013: String
+  col014: String
+  col015: String
+  col016: String
+  col017: String
+  col018: String
+  col019: String
+  col020: String
+  col021: String
+  col022: String
+  col023: String
+  col024: String
+  col025: String
+  col026: String
+  col027: String
+  col028: String
+  col029: String
+  col030: String
+  col031: String
+  col032: String
+  col033: String
+  col034: String
+  col035: String
+  col036: String
+  col037: String
+  col038: String
+  col039: String
+  col040: String
+  col041: String
+  col042: String
+  col043: String
+  col044: String
+  col045: String
+  col046: String
+  col047: String
+  col048: String
+  col049: String
+  col050: String
+  col051: String
+  col052: String
+  col053: String
+  col054: String
+  col055: String
+  col056: String
+  col057: String
+  col058: String
+  col059: String
+  col060: String
+  col061: String
+  col062: String
+  col063: String
+  col064: String
+  col065: String
+  col066: String
+  col067: String
+  col068: String
+  col069: String
+  col070: String
+  col071: String
+  col072: String
+  col073: String
+  col074: String
+  col075: String
+  col076: String
+  col077: String
+  col078: String
+  col079: String
+  col080: String
+  col081: String
+  col082: String
+  col083: String
+  col084: String
+  col085: String
+  col086: String
+  col087: String
+  col088: String
+  col089: String
+  col090: String
+  col091: String
+  col092: String
+  col093: String
+  col094: String
+  col095: String
+  col096: String
+  col097: String
+  col098: String
+  col099: String
+  col100: String
+  createdAt: Datetime
+}
+
 """The root query type which gives access points into the data universe."""
 type Query {
   """
@@ -9586,6 +10958,35 @@ type Query {
     """The method to use when ordering \`RelationalItem\`."""
     orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection
+
+  """Reads and enables pagination through a set of \`Collection\`."""
+  allCollections(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CollectionCondition
+
+    """The method to use when ordering \`Collection\`."""
+    orderBy: [CollectionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CollectionsConnection
 }
 
 """
@@ -10289,6 +11690,575 @@ enum RelationalPostsOrderBy {
   ARCHIVED_AT_DESC
 }
 
+"""A connection to a list of \`Collection\` values."""
+type CollectionsConnection {
+  """A list of \`Collection\` objects."""
+  nodes: [Collection]!
+
+  """
+  A list of edges which contains the \`Collection\` and cursor to aid in pagination.
+  """
+  edges: [CollectionsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Collection\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Collection\` edge in the connection."""
+type CollectionsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Collection\` at the end of the edge."""
+  node: Collection
+}
+
+"""
+A condition to be used against \`Collection\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input CollectionCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: String
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: String
+
+  """Checks for equality with the object’s \`episodes\` field."""
+  episodes: Int
+
+  """Checks for equality with the object’s \`recommendations\` field."""
+  recommendations: JSON
+
+  """Checks for equality with the object’s \`col001\` field."""
+  col001: String
+
+  """Checks for equality with the object’s \`col002\` field."""
+  col002: String
+
+  """Checks for equality with the object’s \`col003\` field."""
+  col003: String
+
+  """Checks for equality with the object’s \`col004\` field."""
+  col004: String
+
+  """Checks for equality with the object’s \`col005\` field."""
+  col005: String
+
+  """Checks for equality with the object’s \`col006\` field."""
+  col006: String
+
+  """Checks for equality with the object’s \`col007\` field."""
+  col007: String
+
+  """Checks for equality with the object’s \`col008\` field."""
+  col008: String
+
+  """Checks for equality with the object’s \`col009\` field."""
+  col009: String
+
+  """Checks for equality with the object’s \`col010\` field."""
+  col010: String
+
+  """Checks for equality with the object’s \`col011\` field."""
+  col011: String
+
+  """Checks for equality with the object’s \`col012\` field."""
+  col012: String
+
+  """Checks for equality with the object’s \`col013\` field."""
+  col013: String
+
+  """Checks for equality with the object’s \`col014\` field."""
+  col014: String
+
+  """Checks for equality with the object’s \`col015\` field."""
+  col015: String
+
+  """Checks for equality with the object’s \`col016\` field."""
+  col016: String
+
+  """Checks for equality with the object’s \`col017\` field."""
+  col017: String
+
+  """Checks for equality with the object’s \`col018\` field."""
+  col018: String
+
+  """Checks for equality with the object’s \`col019\` field."""
+  col019: String
+
+  """Checks for equality with the object’s \`col020\` field."""
+  col020: String
+
+  """Checks for equality with the object’s \`col021\` field."""
+  col021: String
+
+  """Checks for equality with the object’s \`col022\` field."""
+  col022: String
+
+  """Checks for equality with the object’s \`col023\` field."""
+  col023: String
+
+  """Checks for equality with the object’s \`col024\` field."""
+  col024: String
+
+  """Checks for equality with the object’s \`col025\` field."""
+  col025: String
+
+  """Checks for equality with the object’s \`col026\` field."""
+  col026: String
+
+  """Checks for equality with the object’s \`col027\` field."""
+  col027: String
+
+  """Checks for equality with the object’s \`col028\` field."""
+  col028: String
+
+  """Checks for equality with the object’s \`col029\` field."""
+  col029: String
+
+  """Checks for equality with the object’s \`col030\` field."""
+  col030: String
+
+  """Checks for equality with the object’s \`col031\` field."""
+  col031: String
+
+  """Checks for equality with the object’s \`col032\` field."""
+  col032: String
+
+  """Checks for equality with the object’s \`col033\` field."""
+  col033: String
+
+  """Checks for equality with the object’s \`col034\` field."""
+  col034: String
+
+  """Checks for equality with the object’s \`col035\` field."""
+  col035: String
+
+  """Checks for equality with the object’s \`col036\` field."""
+  col036: String
+
+  """Checks for equality with the object’s \`col037\` field."""
+  col037: String
+
+  """Checks for equality with the object’s \`col038\` field."""
+  col038: String
+
+  """Checks for equality with the object’s \`col039\` field."""
+  col039: String
+
+  """Checks for equality with the object’s \`col040\` field."""
+  col040: String
+
+  """Checks for equality with the object’s \`col041\` field."""
+  col041: String
+
+  """Checks for equality with the object’s \`col042\` field."""
+  col042: String
+
+  """Checks for equality with the object’s \`col043\` field."""
+  col043: String
+
+  """Checks for equality with the object’s \`col044\` field."""
+  col044: String
+
+  """Checks for equality with the object’s \`col045\` field."""
+  col045: String
+
+  """Checks for equality with the object’s \`col046\` field."""
+  col046: String
+
+  """Checks for equality with the object’s \`col047\` field."""
+  col047: String
+
+  """Checks for equality with the object’s \`col048\` field."""
+  col048: String
+
+  """Checks for equality with the object’s \`col049\` field."""
+  col049: String
+
+  """Checks for equality with the object’s \`col050\` field."""
+  col050: String
+
+  """Checks for equality with the object’s \`col051\` field."""
+  col051: String
+
+  """Checks for equality with the object’s \`col052\` field."""
+  col052: String
+
+  """Checks for equality with the object’s \`col053\` field."""
+  col053: String
+
+  """Checks for equality with the object’s \`col054\` field."""
+  col054: String
+
+  """Checks for equality with the object’s \`col055\` field."""
+  col055: String
+
+  """Checks for equality with the object’s \`col056\` field."""
+  col056: String
+
+  """Checks for equality with the object’s \`col057\` field."""
+  col057: String
+
+  """Checks for equality with the object’s \`col058\` field."""
+  col058: String
+
+  """Checks for equality with the object’s \`col059\` field."""
+  col059: String
+
+  """Checks for equality with the object’s \`col060\` field."""
+  col060: String
+
+  """Checks for equality with the object’s \`col061\` field."""
+  col061: String
+
+  """Checks for equality with the object’s \`col062\` field."""
+  col062: String
+
+  """Checks for equality with the object’s \`col063\` field."""
+  col063: String
+
+  """Checks for equality with the object’s \`col064\` field."""
+  col064: String
+
+  """Checks for equality with the object’s \`col065\` field."""
+  col065: String
+
+  """Checks for equality with the object’s \`col066\` field."""
+  col066: String
+
+  """Checks for equality with the object’s \`col067\` field."""
+  col067: String
+
+  """Checks for equality with the object’s \`col068\` field."""
+  col068: String
+
+  """Checks for equality with the object’s \`col069\` field."""
+  col069: String
+
+  """Checks for equality with the object’s \`col070\` field."""
+  col070: String
+
+  """Checks for equality with the object’s \`col071\` field."""
+  col071: String
+
+  """Checks for equality with the object’s \`col072\` field."""
+  col072: String
+
+  """Checks for equality with the object’s \`col073\` field."""
+  col073: String
+
+  """Checks for equality with the object’s \`col074\` field."""
+  col074: String
+
+  """Checks for equality with the object’s \`col075\` field."""
+  col075: String
+
+  """Checks for equality with the object’s \`col076\` field."""
+  col076: String
+
+  """Checks for equality with the object’s \`col077\` field."""
+  col077: String
+
+  """Checks for equality with the object’s \`col078\` field."""
+  col078: String
+
+  """Checks for equality with the object’s \`col079\` field."""
+  col079: String
+
+  """Checks for equality with the object’s \`col080\` field."""
+  col080: String
+
+  """Checks for equality with the object’s \`col081\` field."""
+  col081: String
+
+  """Checks for equality with the object’s \`col082\` field."""
+  col082: String
+
+  """Checks for equality with the object’s \`col083\` field."""
+  col083: String
+
+  """Checks for equality with the object’s \`col084\` field."""
+  col084: String
+
+  """Checks for equality with the object’s \`col085\` field."""
+  col085: String
+
+  """Checks for equality with the object’s \`col086\` field."""
+  col086: String
+
+  """Checks for equality with the object’s \`col087\` field."""
+  col087: String
+
+  """Checks for equality with the object’s \`col088\` field."""
+  col088: String
+
+  """Checks for equality with the object’s \`col089\` field."""
+  col089: String
+
+  """Checks for equality with the object’s \`col090\` field."""
+  col090: String
+
+  """Checks for equality with the object’s \`col091\` field."""
+  col091: String
+
+  """Checks for equality with the object’s \`col092\` field."""
+  col092: String
+
+  """Checks for equality with the object’s \`col093\` field."""
+  col093: String
+
+  """Checks for equality with the object’s \`col094\` field."""
+  col094: String
+
+  """Checks for equality with the object’s \`col095\` field."""
+  col095: String
+
+  """Checks for equality with the object’s \`col096\` field."""
+  col096: String
+
+  """Checks for equality with the object’s \`col097\` field."""
+  col097: String
+
+  """Checks for equality with the object’s \`col098\` field."""
+  col098: String
+
+  """Checks for equality with the object’s \`col099\` field."""
+  col099: String
+
+  """Checks for equality with the object’s \`col100\` field."""
+  col100: String
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+}
+
+"""Methods to use when ordering \`Collection\`."""
+enum CollectionsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  TYPE_ASC
+  TYPE_DESC
+  EPISODES_ASC
+  EPISODES_DESC
+  RECOMMENDATIONS_ASC
+  RECOMMENDATIONS_DESC
+  COL_001_ASC
+  COL_001_DESC
+  COL_002_ASC
+  COL_002_DESC
+  COL_003_ASC
+  COL_003_DESC
+  COL_004_ASC
+  COL_004_DESC
+  COL_005_ASC
+  COL_005_DESC
+  COL_006_ASC
+  COL_006_DESC
+  COL_007_ASC
+  COL_007_DESC
+  COL_008_ASC
+  COL_008_DESC
+  COL_009_ASC
+  COL_009_DESC
+  COL_010_ASC
+  COL_010_DESC
+  COL_011_ASC
+  COL_011_DESC
+  COL_012_ASC
+  COL_012_DESC
+  COL_013_ASC
+  COL_013_DESC
+  COL_014_ASC
+  COL_014_DESC
+  COL_015_ASC
+  COL_015_DESC
+  COL_016_ASC
+  COL_016_DESC
+  COL_017_ASC
+  COL_017_DESC
+  COL_018_ASC
+  COL_018_DESC
+  COL_019_ASC
+  COL_019_DESC
+  COL_020_ASC
+  COL_020_DESC
+  COL_021_ASC
+  COL_021_DESC
+  COL_022_ASC
+  COL_022_DESC
+  COL_023_ASC
+  COL_023_DESC
+  COL_024_ASC
+  COL_024_DESC
+  COL_025_ASC
+  COL_025_DESC
+  COL_026_ASC
+  COL_026_DESC
+  COL_027_ASC
+  COL_027_DESC
+  COL_028_ASC
+  COL_028_DESC
+  COL_029_ASC
+  COL_029_DESC
+  COL_030_ASC
+  COL_030_DESC
+  COL_031_ASC
+  COL_031_DESC
+  COL_032_ASC
+  COL_032_DESC
+  COL_033_ASC
+  COL_033_DESC
+  COL_034_ASC
+  COL_034_DESC
+  COL_035_ASC
+  COL_035_DESC
+  COL_036_ASC
+  COL_036_DESC
+  COL_037_ASC
+  COL_037_DESC
+  COL_038_ASC
+  COL_038_DESC
+  COL_039_ASC
+  COL_039_DESC
+  COL_040_ASC
+  COL_040_DESC
+  COL_041_ASC
+  COL_041_DESC
+  COL_042_ASC
+  COL_042_DESC
+  COL_043_ASC
+  COL_043_DESC
+  COL_044_ASC
+  COL_044_DESC
+  COL_045_ASC
+  COL_045_DESC
+  COL_046_ASC
+  COL_046_DESC
+  COL_047_ASC
+  COL_047_DESC
+  COL_048_ASC
+  COL_048_DESC
+  COL_049_ASC
+  COL_049_DESC
+  COL_050_ASC
+  COL_050_DESC
+  COL_051_ASC
+  COL_051_DESC
+  COL_052_ASC
+  COL_052_DESC
+  COL_053_ASC
+  COL_053_DESC
+  COL_054_ASC
+  COL_054_DESC
+  COL_055_ASC
+  COL_055_DESC
+  COL_056_ASC
+  COL_056_DESC
+  COL_057_ASC
+  COL_057_DESC
+  COL_058_ASC
+  COL_058_DESC
+  COL_059_ASC
+  COL_059_DESC
+  COL_060_ASC
+  COL_060_DESC
+  COL_061_ASC
+  COL_061_DESC
+  COL_062_ASC
+  COL_062_DESC
+  COL_063_ASC
+  COL_063_DESC
+  COL_064_ASC
+  COL_064_DESC
+  COL_065_ASC
+  COL_065_DESC
+  COL_066_ASC
+  COL_066_DESC
+  COL_067_ASC
+  COL_067_DESC
+  COL_068_ASC
+  COL_068_DESC
+  COL_069_ASC
+  COL_069_DESC
+  COL_070_ASC
+  COL_070_DESC
+  COL_071_ASC
+  COL_071_DESC
+  COL_072_ASC
+  COL_072_DESC
+  COL_073_ASC
+  COL_073_DESC
+  COL_074_ASC
+  COL_074_DESC
+  COL_075_ASC
+  COL_075_DESC
+  COL_076_ASC
+  COL_076_DESC
+  COL_077_ASC
+  COL_077_DESC
+  COL_078_ASC
+  COL_078_DESC
+  COL_079_ASC
+  COL_079_DESC
+  COL_080_ASC
+  COL_080_DESC
+  COL_081_ASC
+  COL_081_DESC
+  COL_082_ASC
+  COL_082_DESC
+  COL_083_ASC
+  COL_083_DESC
+  COL_084_ASC
+  COL_084_DESC
+  COL_085_ASC
+  COL_085_DESC
+  COL_086_ASC
+  COL_086_DESC
+  COL_087_ASC
+  COL_087_DESC
+  COL_088_ASC
+  COL_088_DESC
+  COL_089_ASC
+  COL_089_DESC
+  COL_090_ASC
+  COL_090_DESC
+  COL_091_ASC
+  COL_091_DESC
+  COL_092_ASC
+  COL_092_DESC
+  COL_093_ASC
+  COL_093_DESC
+  COL_094_ASC
+  COL_094_DESC
+  COL_095_ASC
+  COL_095_DESC
+  COL_096_ASC
+  COL_096_DESC
+  COL_097_ASC
+  COL_097_DESC
+  COL_098_ASC
+  COL_098_DESC
+  COL_099_ASC
+  COL_099_DESC
+  COL_100_ASC
+  COL_100_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+}
+
 type FirstPartyVulnerability implements Vulnerability {
   cvssScoreInt: Int
   id: Int!
@@ -10526,6 +12496,36 @@ export const objects = {
             } else {
               $union.apply(lambda($ltt, limitToTypes));
             }
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      allCollections: {
+        plan() {
+          return connection(resource_collectionsPgResource.find());
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
           },
           orderBy(parent, $connection, value) {
             const $select = $connection.getSubplan();
@@ -11366,6 +13366,14 @@ export const objects = {
       return members_0_resource_aws_applicationsPgResource.get(spec);
     }
   },
+  CollectionsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
   FirstPartyVulnerability: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11637,6 +13645,314 @@ export const objects = {
         spec[pkCol] = get2($specifier, pkCol);
       }
       return otherSource_log_entriesPgResource.get(spec);
+    }
+  },
+  MovieCollection: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      col001($record) {
+        return $record.get("col_001");
+      },
+      col002($record) {
+        return $record.get("col_002");
+      },
+      col003($record) {
+        return $record.get("col_003");
+      },
+      col004($record) {
+        return $record.get("col_004");
+      },
+      col005($record) {
+        return $record.get("col_005");
+      },
+      col006($record) {
+        return $record.get("col_006");
+      },
+      col007($record) {
+        return $record.get("col_007");
+      },
+      col008($record) {
+        return $record.get("col_008");
+      },
+      col009($record) {
+        return $record.get("col_009");
+      },
+      col010($record) {
+        return $record.get("col_010");
+      },
+      col011($record) {
+        return $record.get("col_011");
+      },
+      col012($record) {
+        return $record.get("col_012");
+      },
+      col013($record) {
+        return $record.get("col_013");
+      },
+      col014($record) {
+        return $record.get("col_014");
+      },
+      col015($record) {
+        return $record.get("col_015");
+      },
+      col016($record) {
+        return $record.get("col_016");
+      },
+      col017($record) {
+        return $record.get("col_017");
+      },
+      col018($record) {
+        return $record.get("col_018");
+      },
+      col019($record) {
+        return $record.get("col_019");
+      },
+      col020($record) {
+        return $record.get("col_020");
+      },
+      col021($record) {
+        return $record.get("col_021");
+      },
+      col022($record) {
+        return $record.get("col_022");
+      },
+      col023($record) {
+        return $record.get("col_023");
+      },
+      col024($record) {
+        return $record.get("col_024");
+      },
+      col025($record) {
+        return $record.get("col_025");
+      },
+      col026($record) {
+        return $record.get("col_026");
+      },
+      col027($record) {
+        return $record.get("col_027");
+      },
+      col028($record) {
+        return $record.get("col_028");
+      },
+      col029($record) {
+        return $record.get("col_029");
+      },
+      col030($record) {
+        return $record.get("col_030");
+      },
+      col031($record) {
+        return $record.get("col_031");
+      },
+      col032($record) {
+        return $record.get("col_032");
+      },
+      col033($record) {
+        return $record.get("col_033");
+      },
+      col034($record) {
+        return $record.get("col_034");
+      },
+      col035($record) {
+        return $record.get("col_035");
+      },
+      col036($record) {
+        return $record.get("col_036");
+      },
+      col037($record) {
+        return $record.get("col_037");
+      },
+      col038($record) {
+        return $record.get("col_038");
+      },
+      col039($record) {
+        return $record.get("col_039");
+      },
+      col040($record) {
+        return $record.get("col_040");
+      },
+      col041($record) {
+        return $record.get("col_041");
+      },
+      col042($record) {
+        return $record.get("col_042");
+      },
+      col043($record) {
+        return $record.get("col_043");
+      },
+      col044($record) {
+        return $record.get("col_044");
+      },
+      col045($record) {
+        return $record.get("col_045");
+      },
+      col046($record) {
+        return $record.get("col_046");
+      },
+      col047($record) {
+        return $record.get("col_047");
+      },
+      col048($record) {
+        return $record.get("col_048");
+      },
+      col049($record) {
+        return $record.get("col_049");
+      },
+      col050($record) {
+        return $record.get("col_050");
+      },
+      col051($record) {
+        return $record.get("col_051");
+      },
+      col052($record) {
+        return $record.get("col_052");
+      },
+      col053($record) {
+        return $record.get("col_053");
+      },
+      col054($record) {
+        return $record.get("col_054");
+      },
+      col055($record) {
+        return $record.get("col_055");
+      },
+      col056($record) {
+        return $record.get("col_056");
+      },
+      col057($record) {
+        return $record.get("col_057");
+      },
+      col058($record) {
+        return $record.get("col_058");
+      },
+      col059($record) {
+        return $record.get("col_059");
+      },
+      col060($record) {
+        return $record.get("col_060");
+      },
+      col061($record) {
+        return $record.get("col_061");
+      },
+      col062($record) {
+        return $record.get("col_062");
+      },
+      col063($record) {
+        return $record.get("col_063");
+      },
+      col064($record) {
+        return $record.get("col_064");
+      },
+      col065($record) {
+        return $record.get("col_065");
+      },
+      col066($record) {
+        return $record.get("col_066");
+      },
+      col067($record) {
+        return $record.get("col_067");
+      },
+      col068($record) {
+        return $record.get("col_068");
+      },
+      col069($record) {
+        return $record.get("col_069");
+      },
+      col070($record) {
+        return $record.get("col_070");
+      },
+      col071($record) {
+        return $record.get("col_071");
+      },
+      col072($record) {
+        return $record.get("col_072");
+      },
+      col073($record) {
+        return $record.get("col_073");
+      },
+      col074($record) {
+        return $record.get("col_074");
+      },
+      col075($record) {
+        return $record.get("col_075");
+      },
+      col076($record) {
+        return $record.get("col_076");
+      },
+      col077($record) {
+        return $record.get("col_077");
+      },
+      col078($record) {
+        return $record.get("col_078");
+      },
+      col079($record) {
+        return $record.get("col_079");
+      },
+      col080($record) {
+        return $record.get("col_080");
+      },
+      col081($record) {
+        return $record.get("col_081");
+      },
+      col082($record) {
+        return $record.get("col_082");
+      },
+      col083($record) {
+        return $record.get("col_083");
+      },
+      col084($record) {
+        return $record.get("col_084");
+      },
+      col085($record) {
+        return $record.get("col_085");
+      },
+      col086($record) {
+        return $record.get("col_086");
+      },
+      col087($record) {
+        return $record.get("col_087");
+      },
+      col088($record) {
+        return $record.get("col_088");
+      },
+      col089($record) {
+        return $record.get("col_089");
+      },
+      col090($record) {
+        return $record.get("col_090");
+      },
+      col091($record) {
+        return $record.get("col_091");
+      },
+      col092($record) {
+        return $record.get("col_092");
+      },
+      col093($record) {
+        return $record.get("col_093");
+      },
+      col094($record) {
+        return $record.get("col_094");
+      },
+      col095($record) {
+        return $record.get("col_095");
+      },
+      col096($record) {
+        return $record.get("col_096");
+      },
+      col097($record) {
+        return $record.get("col_097");
+      },
+      col098($record) {
+        return $record.get("col_098");
+      },
+      col099($record) {
+        return $record.get("col_099");
+      },
+      col100($record) {
+        return $record.get("col_100");
+      },
+      createdAt($record) {
+        return $record.get("created_at");
+      }
     }
   },
   Organization: {
@@ -13489,6 +15805,314 @@ export const objects = {
       }
     }
   },
+  SeriesCollection: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      col001($record) {
+        return $record.get("col_001");
+      },
+      col002($record) {
+        return $record.get("col_002");
+      },
+      col003($record) {
+        return $record.get("col_003");
+      },
+      col004($record) {
+        return $record.get("col_004");
+      },
+      col005($record) {
+        return $record.get("col_005");
+      },
+      col006($record) {
+        return $record.get("col_006");
+      },
+      col007($record) {
+        return $record.get("col_007");
+      },
+      col008($record) {
+        return $record.get("col_008");
+      },
+      col009($record) {
+        return $record.get("col_009");
+      },
+      col010($record) {
+        return $record.get("col_010");
+      },
+      col011($record) {
+        return $record.get("col_011");
+      },
+      col012($record) {
+        return $record.get("col_012");
+      },
+      col013($record) {
+        return $record.get("col_013");
+      },
+      col014($record) {
+        return $record.get("col_014");
+      },
+      col015($record) {
+        return $record.get("col_015");
+      },
+      col016($record) {
+        return $record.get("col_016");
+      },
+      col017($record) {
+        return $record.get("col_017");
+      },
+      col018($record) {
+        return $record.get("col_018");
+      },
+      col019($record) {
+        return $record.get("col_019");
+      },
+      col020($record) {
+        return $record.get("col_020");
+      },
+      col021($record) {
+        return $record.get("col_021");
+      },
+      col022($record) {
+        return $record.get("col_022");
+      },
+      col023($record) {
+        return $record.get("col_023");
+      },
+      col024($record) {
+        return $record.get("col_024");
+      },
+      col025($record) {
+        return $record.get("col_025");
+      },
+      col026($record) {
+        return $record.get("col_026");
+      },
+      col027($record) {
+        return $record.get("col_027");
+      },
+      col028($record) {
+        return $record.get("col_028");
+      },
+      col029($record) {
+        return $record.get("col_029");
+      },
+      col030($record) {
+        return $record.get("col_030");
+      },
+      col031($record) {
+        return $record.get("col_031");
+      },
+      col032($record) {
+        return $record.get("col_032");
+      },
+      col033($record) {
+        return $record.get("col_033");
+      },
+      col034($record) {
+        return $record.get("col_034");
+      },
+      col035($record) {
+        return $record.get("col_035");
+      },
+      col036($record) {
+        return $record.get("col_036");
+      },
+      col037($record) {
+        return $record.get("col_037");
+      },
+      col038($record) {
+        return $record.get("col_038");
+      },
+      col039($record) {
+        return $record.get("col_039");
+      },
+      col040($record) {
+        return $record.get("col_040");
+      },
+      col041($record) {
+        return $record.get("col_041");
+      },
+      col042($record) {
+        return $record.get("col_042");
+      },
+      col043($record) {
+        return $record.get("col_043");
+      },
+      col044($record) {
+        return $record.get("col_044");
+      },
+      col045($record) {
+        return $record.get("col_045");
+      },
+      col046($record) {
+        return $record.get("col_046");
+      },
+      col047($record) {
+        return $record.get("col_047");
+      },
+      col048($record) {
+        return $record.get("col_048");
+      },
+      col049($record) {
+        return $record.get("col_049");
+      },
+      col050($record) {
+        return $record.get("col_050");
+      },
+      col051($record) {
+        return $record.get("col_051");
+      },
+      col052($record) {
+        return $record.get("col_052");
+      },
+      col053($record) {
+        return $record.get("col_053");
+      },
+      col054($record) {
+        return $record.get("col_054");
+      },
+      col055($record) {
+        return $record.get("col_055");
+      },
+      col056($record) {
+        return $record.get("col_056");
+      },
+      col057($record) {
+        return $record.get("col_057");
+      },
+      col058($record) {
+        return $record.get("col_058");
+      },
+      col059($record) {
+        return $record.get("col_059");
+      },
+      col060($record) {
+        return $record.get("col_060");
+      },
+      col061($record) {
+        return $record.get("col_061");
+      },
+      col062($record) {
+        return $record.get("col_062");
+      },
+      col063($record) {
+        return $record.get("col_063");
+      },
+      col064($record) {
+        return $record.get("col_064");
+      },
+      col065($record) {
+        return $record.get("col_065");
+      },
+      col066($record) {
+        return $record.get("col_066");
+      },
+      col067($record) {
+        return $record.get("col_067");
+      },
+      col068($record) {
+        return $record.get("col_068");
+      },
+      col069($record) {
+        return $record.get("col_069");
+      },
+      col070($record) {
+        return $record.get("col_070");
+      },
+      col071($record) {
+        return $record.get("col_071");
+      },
+      col072($record) {
+        return $record.get("col_072");
+      },
+      col073($record) {
+        return $record.get("col_073");
+      },
+      col074($record) {
+        return $record.get("col_074");
+      },
+      col075($record) {
+        return $record.get("col_075");
+      },
+      col076($record) {
+        return $record.get("col_076");
+      },
+      col077($record) {
+        return $record.get("col_077");
+      },
+      col078($record) {
+        return $record.get("col_078");
+      },
+      col079($record) {
+        return $record.get("col_079");
+      },
+      col080($record) {
+        return $record.get("col_080");
+      },
+      col081($record) {
+        return $record.get("col_081");
+      },
+      col082($record) {
+        return $record.get("col_082");
+      },
+      col083($record) {
+        return $record.get("col_083");
+      },
+      col084($record) {
+        return $record.get("col_084");
+      },
+      col085($record) {
+        return $record.get("col_085");
+      },
+      col086($record) {
+        return $record.get("col_086");
+      },
+      col087($record) {
+        return $record.get("col_087");
+      },
+      col088($record) {
+        return $record.get("col_088");
+      },
+      col089($record) {
+        return $record.get("col_089");
+      },
+      col090($record) {
+        return $record.get("col_090");
+      },
+      col091($record) {
+        return $record.get("col_091");
+      },
+      col092($record) {
+        return $record.get("col_092");
+      },
+      col093($record) {
+        return $record.get("col_093");
+      },
+      col094($record) {
+        return $record.get("col_094");
+      },
+      col095($record) {
+        return $record.get("col_095");
+      },
+      col096($record) {
+        return $record.get("col_096");
+      },
+      col097($record) {
+        return $record.get("col_097");
+      },
+      col098($record) {
+        return $record.get("col_098");
+      },
+      col099($record) {
+        return $record.get("col_099");
+      },
+      col100($record) {
+        return $record.get("col_100");
+      },
+      createdAt($record) {
+        return $record.get("created_at");
+      }
+    }
+  },
   SingleTableChecklist: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -14812,6 +17436,25 @@ export const interfaces = {
       };
     }
   },
+  Collection: {
+    toSpecifier(step) {
+      return object(Object.fromEntries(collectionsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+    },
+    planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      const $record = $inStep instanceof PgSelectSingleStep ? $inStep : resource_collectionsPgResource.get(Object.fromEntries(collectionsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+      const $typeVal = get2($record, "type");
+      const $__typename = lambda($typeVal, Collection_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType() {
+          return $record;
+        }
+      };
+    }
+  },
   RelationalItem: {
     toSpecifier(step) {
       if (step instanceof PgSelectSingleStep &&
@@ -14993,6 +17636,964 @@ export const inputObjects = {
         $condition.where({
           type: "attribute",
           attribute: "name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
+    }
+  },
+  CollectionCondition: {
+    plans: {
+      col001($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_001",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col002($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_002",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col003($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_003",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col004($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_004",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col005($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_005",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col006($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_006",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col007($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_007",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col008($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_008",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col009($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_009",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col010($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_010",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col011($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_011",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col012($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_012",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col013($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_013",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col014($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_014",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col015($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_015",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col016($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_016",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col017($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_017",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col018($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_018",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col019($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_019",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col020($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_020",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col021($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_021",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col022($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_022",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col023($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_023",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col024($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_024",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col025($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_025",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col026($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_026",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col027($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_027",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col028($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_028",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col029($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_029",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col030($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_030",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col031($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_031",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col032($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_032",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col033($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_033",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col034($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_034",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col035($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_035",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col036($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_036",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col037($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_037",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col038($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_038",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col039($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_039",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col040($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_040",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col041($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_041",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col042($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_042",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col043($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_043",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col044($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_044",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col045($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_045",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col046($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_046",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col047($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_047",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col048($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_048",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col049($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_049",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col050($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_050",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col051($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_051",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col052($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_052",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col053($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_053",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col054($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_054",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col055($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_055",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col056($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_056",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col057($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_057",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col058($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_058",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col059($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_059",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col060($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_060",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col061($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_061",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col062($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_062",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col063($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_063",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col064($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_064",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col065($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_065",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col066($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_066",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col067($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_067",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col068($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_068",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col069($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_069",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col070($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_070",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col071($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_071",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col072($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_072",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col073($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_073",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col074($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_074",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col075($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_075",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col076($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_076",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col077($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_077",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col078($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_078",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col079($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_079",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col080($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_080",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col081($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_081",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col082($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_082",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col083($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_083",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col084($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_084",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col085($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_085",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col086($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_086",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col087($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_087",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col088($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_088",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col089($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_089",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col090($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_090",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col091($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_091",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col092($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_092",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col093($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_093",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col094($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_094",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col095($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_095",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col096($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_096",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col097($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_097",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col098($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_098",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col099($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_099",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      col100($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col_100",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      createdAt($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "created_at",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+          }
+        });
+      },
+      episodes($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "episodes",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      recommendations($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "recommendations",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
+          }
+        });
+      },
+      type($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "type",
           callback(expression) {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
           }
@@ -15913,6 +19514,21 @@ export const scalars = {
       }
       return ast.value;
     }
+  },
+  JSON: {
+    serialize(value) {
+      return JSON.stringify(value);
+    },
+    parseValue(value) {
+      return JSON.parse(value);
+    },
+    parseLiteral(ast, _variables) {
+      if (ast.kind === Kind.STRING) {
+        return JSON.parse(ast.value);
+      } else {
+        return undefined;
+      }
+    }
   }
 };
 export const enums = {
@@ -15951,6 +19567,1302 @@ export const enums = {
       NAME_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name",
+          direction: "DESC"
+        });
+      }
+    }
+  },
+  CollectionsOrderBy: {
+    values: {
+      COL_001_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_001",
+          direction: "ASC"
+        });
+      },
+      COL_001_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_001",
+          direction: "DESC"
+        });
+      },
+      COL_002_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_002",
+          direction: "ASC"
+        });
+      },
+      COL_002_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_002",
+          direction: "DESC"
+        });
+      },
+      COL_003_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_003",
+          direction: "ASC"
+        });
+      },
+      COL_003_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_003",
+          direction: "DESC"
+        });
+      },
+      COL_004_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_004",
+          direction: "ASC"
+        });
+      },
+      COL_004_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_004",
+          direction: "DESC"
+        });
+      },
+      COL_005_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_005",
+          direction: "ASC"
+        });
+      },
+      COL_005_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_005",
+          direction: "DESC"
+        });
+      },
+      COL_006_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_006",
+          direction: "ASC"
+        });
+      },
+      COL_006_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_006",
+          direction: "DESC"
+        });
+      },
+      COL_007_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_007",
+          direction: "ASC"
+        });
+      },
+      COL_007_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_007",
+          direction: "DESC"
+        });
+      },
+      COL_008_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_008",
+          direction: "ASC"
+        });
+      },
+      COL_008_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_008",
+          direction: "DESC"
+        });
+      },
+      COL_009_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_009",
+          direction: "ASC"
+        });
+      },
+      COL_009_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_009",
+          direction: "DESC"
+        });
+      },
+      COL_010_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_010",
+          direction: "ASC"
+        });
+      },
+      COL_010_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_010",
+          direction: "DESC"
+        });
+      },
+      COL_011_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_011",
+          direction: "ASC"
+        });
+      },
+      COL_011_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_011",
+          direction: "DESC"
+        });
+      },
+      COL_012_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_012",
+          direction: "ASC"
+        });
+      },
+      COL_012_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_012",
+          direction: "DESC"
+        });
+      },
+      COL_013_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_013",
+          direction: "ASC"
+        });
+      },
+      COL_013_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_013",
+          direction: "DESC"
+        });
+      },
+      COL_014_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_014",
+          direction: "ASC"
+        });
+      },
+      COL_014_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_014",
+          direction: "DESC"
+        });
+      },
+      COL_015_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_015",
+          direction: "ASC"
+        });
+      },
+      COL_015_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_015",
+          direction: "DESC"
+        });
+      },
+      COL_016_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_016",
+          direction: "ASC"
+        });
+      },
+      COL_016_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_016",
+          direction: "DESC"
+        });
+      },
+      COL_017_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_017",
+          direction: "ASC"
+        });
+      },
+      COL_017_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_017",
+          direction: "DESC"
+        });
+      },
+      COL_018_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_018",
+          direction: "ASC"
+        });
+      },
+      COL_018_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_018",
+          direction: "DESC"
+        });
+      },
+      COL_019_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_019",
+          direction: "ASC"
+        });
+      },
+      COL_019_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_019",
+          direction: "DESC"
+        });
+      },
+      COL_020_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_020",
+          direction: "ASC"
+        });
+      },
+      COL_020_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_020",
+          direction: "DESC"
+        });
+      },
+      COL_021_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_021",
+          direction: "ASC"
+        });
+      },
+      COL_021_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_021",
+          direction: "DESC"
+        });
+      },
+      COL_022_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_022",
+          direction: "ASC"
+        });
+      },
+      COL_022_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_022",
+          direction: "DESC"
+        });
+      },
+      COL_023_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_023",
+          direction: "ASC"
+        });
+      },
+      COL_023_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_023",
+          direction: "DESC"
+        });
+      },
+      COL_024_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_024",
+          direction: "ASC"
+        });
+      },
+      COL_024_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_024",
+          direction: "DESC"
+        });
+      },
+      COL_025_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_025",
+          direction: "ASC"
+        });
+      },
+      COL_025_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_025",
+          direction: "DESC"
+        });
+      },
+      COL_026_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_026",
+          direction: "ASC"
+        });
+      },
+      COL_026_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_026",
+          direction: "DESC"
+        });
+      },
+      COL_027_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_027",
+          direction: "ASC"
+        });
+      },
+      COL_027_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_027",
+          direction: "DESC"
+        });
+      },
+      COL_028_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_028",
+          direction: "ASC"
+        });
+      },
+      COL_028_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_028",
+          direction: "DESC"
+        });
+      },
+      COL_029_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_029",
+          direction: "ASC"
+        });
+      },
+      COL_029_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_029",
+          direction: "DESC"
+        });
+      },
+      COL_030_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_030",
+          direction: "ASC"
+        });
+      },
+      COL_030_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_030",
+          direction: "DESC"
+        });
+      },
+      COL_031_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_031",
+          direction: "ASC"
+        });
+      },
+      COL_031_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_031",
+          direction: "DESC"
+        });
+      },
+      COL_032_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_032",
+          direction: "ASC"
+        });
+      },
+      COL_032_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_032",
+          direction: "DESC"
+        });
+      },
+      COL_033_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_033",
+          direction: "ASC"
+        });
+      },
+      COL_033_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_033",
+          direction: "DESC"
+        });
+      },
+      COL_034_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_034",
+          direction: "ASC"
+        });
+      },
+      COL_034_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_034",
+          direction: "DESC"
+        });
+      },
+      COL_035_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_035",
+          direction: "ASC"
+        });
+      },
+      COL_035_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_035",
+          direction: "DESC"
+        });
+      },
+      COL_036_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_036",
+          direction: "ASC"
+        });
+      },
+      COL_036_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_036",
+          direction: "DESC"
+        });
+      },
+      COL_037_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_037",
+          direction: "ASC"
+        });
+      },
+      COL_037_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_037",
+          direction: "DESC"
+        });
+      },
+      COL_038_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_038",
+          direction: "ASC"
+        });
+      },
+      COL_038_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_038",
+          direction: "DESC"
+        });
+      },
+      COL_039_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_039",
+          direction: "ASC"
+        });
+      },
+      COL_039_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_039",
+          direction: "DESC"
+        });
+      },
+      COL_040_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_040",
+          direction: "ASC"
+        });
+      },
+      COL_040_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_040",
+          direction: "DESC"
+        });
+      },
+      COL_041_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_041",
+          direction: "ASC"
+        });
+      },
+      COL_041_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_041",
+          direction: "DESC"
+        });
+      },
+      COL_042_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_042",
+          direction: "ASC"
+        });
+      },
+      COL_042_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_042",
+          direction: "DESC"
+        });
+      },
+      COL_043_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_043",
+          direction: "ASC"
+        });
+      },
+      COL_043_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_043",
+          direction: "DESC"
+        });
+      },
+      COL_044_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_044",
+          direction: "ASC"
+        });
+      },
+      COL_044_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_044",
+          direction: "DESC"
+        });
+      },
+      COL_045_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_045",
+          direction: "ASC"
+        });
+      },
+      COL_045_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_045",
+          direction: "DESC"
+        });
+      },
+      COL_046_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_046",
+          direction: "ASC"
+        });
+      },
+      COL_046_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_046",
+          direction: "DESC"
+        });
+      },
+      COL_047_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_047",
+          direction: "ASC"
+        });
+      },
+      COL_047_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_047",
+          direction: "DESC"
+        });
+      },
+      COL_048_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_048",
+          direction: "ASC"
+        });
+      },
+      COL_048_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_048",
+          direction: "DESC"
+        });
+      },
+      COL_049_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_049",
+          direction: "ASC"
+        });
+      },
+      COL_049_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_049",
+          direction: "DESC"
+        });
+      },
+      COL_050_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_050",
+          direction: "ASC"
+        });
+      },
+      COL_050_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_050",
+          direction: "DESC"
+        });
+      },
+      COL_051_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_051",
+          direction: "ASC"
+        });
+      },
+      COL_051_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_051",
+          direction: "DESC"
+        });
+      },
+      COL_052_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_052",
+          direction: "ASC"
+        });
+      },
+      COL_052_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_052",
+          direction: "DESC"
+        });
+      },
+      COL_053_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_053",
+          direction: "ASC"
+        });
+      },
+      COL_053_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_053",
+          direction: "DESC"
+        });
+      },
+      COL_054_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_054",
+          direction: "ASC"
+        });
+      },
+      COL_054_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_054",
+          direction: "DESC"
+        });
+      },
+      COL_055_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_055",
+          direction: "ASC"
+        });
+      },
+      COL_055_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_055",
+          direction: "DESC"
+        });
+      },
+      COL_056_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_056",
+          direction: "ASC"
+        });
+      },
+      COL_056_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_056",
+          direction: "DESC"
+        });
+      },
+      COL_057_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_057",
+          direction: "ASC"
+        });
+      },
+      COL_057_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_057",
+          direction: "DESC"
+        });
+      },
+      COL_058_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_058",
+          direction: "ASC"
+        });
+      },
+      COL_058_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_058",
+          direction: "DESC"
+        });
+      },
+      COL_059_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_059",
+          direction: "ASC"
+        });
+      },
+      COL_059_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_059",
+          direction: "DESC"
+        });
+      },
+      COL_060_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_060",
+          direction: "ASC"
+        });
+      },
+      COL_060_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_060",
+          direction: "DESC"
+        });
+      },
+      COL_061_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_061",
+          direction: "ASC"
+        });
+      },
+      COL_061_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_061",
+          direction: "DESC"
+        });
+      },
+      COL_062_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_062",
+          direction: "ASC"
+        });
+      },
+      COL_062_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_062",
+          direction: "DESC"
+        });
+      },
+      COL_063_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_063",
+          direction: "ASC"
+        });
+      },
+      COL_063_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_063",
+          direction: "DESC"
+        });
+      },
+      COL_064_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_064",
+          direction: "ASC"
+        });
+      },
+      COL_064_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_064",
+          direction: "DESC"
+        });
+      },
+      COL_065_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_065",
+          direction: "ASC"
+        });
+      },
+      COL_065_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_065",
+          direction: "DESC"
+        });
+      },
+      COL_066_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_066",
+          direction: "ASC"
+        });
+      },
+      COL_066_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_066",
+          direction: "DESC"
+        });
+      },
+      COL_067_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_067",
+          direction: "ASC"
+        });
+      },
+      COL_067_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_067",
+          direction: "DESC"
+        });
+      },
+      COL_068_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_068",
+          direction: "ASC"
+        });
+      },
+      COL_068_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_068",
+          direction: "DESC"
+        });
+      },
+      COL_069_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_069",
+          direction: "ASC"
+        });
+      },
+      COL_069_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_069",
+          direction: "DESC"
+        });
+      },
+      COL_070_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_070",
+          direction: "ASC"
+        });
+      },
+      COL_070_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_070",
+          direction: "DESC"
+        });
+      },
+      COL_071_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_071",
+          direction: "ASC"
+        });
+      },
+      COL_071_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_071",
+          direction: "DESC"
+        });
+      },
+      COL_072_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_072",
+          direction: "ASC"
+        });
+      },
+      COL_072_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_072",
+          direction: "DESC"
+        });
+      },
+      COL_073_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_073",
+          direction: "ASC"
+        });
+      },
+      COL_073_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_073",
+          direction: "DESC"
+        });
+      },
+      COL_074_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_074",
+          direction: "ASC"
+        });
+      },
+      COL_074_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_074",
+          direction: "DESC"
+        });
+      },
+      COL_075_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_075",
+          direction: "ASC"
+        });
+      },
+      COL_075_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_075",
+          direction: "DESC"
+        });
+      },
+      COL_076_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_076",
+          direction: "ASC"
+        });
+      },
+      COL_076_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_076",
+          direction: "DESC"
+        });
+      },
+      COL_077_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_077",
+          direction: "ASC"
+        });
+      },
+      COL_077_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_077",
+          direction: "DESC"
+        });
+      },
+      COL_078_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_078",
+          direction: "ASC"
+        });
+      },
+      COL_078_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_078",
+          direction: "DESC"
+        });
+      },
+      COL_079_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_079",
+          direction: "ASC"
+        });
+      },
+      COL_079_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_079",
+          direction: "DESC"
+        });
+      },
+      COL_080_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_080",
+          direction: "ASC"
+        });
+      },
+      COL_080_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_080",
+          direction: "DESC"
+        });
+      },
+      COL_081_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_081",
+          direction: "ASC"
+        });
+      },
+      COL_081_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_081",
+          direction: "DESC"
+        });
+      },
+      COL_082_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_082",
+          direction: "ASC"
+        });
+      },
+      COL_082_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_082",
+          direction: "DESC"
+        });
+      },
+      COL_083_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_083",
+          direction: "ASC"
+        });
+      },
+      COL_083_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_083",
+          direction: "DESC"
+        });
+      },
+      COL_084_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_084",
+          direction: "ASC"
+        });
+      },
+      COL_084_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_084",
+          direction: "DESC"
+        });
+      },
+      COL_085_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_085",
+          direction: "ASC"
+        });
+      },
+      COL_085_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_085",
+          direction: "DESC"
+        });
+      },
+      COL_086_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_086",
+          direction: "ASC"
+        });
+      },
+      COL_086_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_086",
+          direction: "DESC"
+        });
+      },
+      COL_087_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_087",
+          direction: "ASC"
+        });
+      },
+      COL_087_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_087",
+          direction: "DESC"
+        });
+      },
+      COL_088_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_088",
+          direction: "ASC"
+        });
+      },
+      COL_088_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_088",
+          direction: "DESC"
+        });
+      },
+      COL_089_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_089",
+          direction: "ASC"
+        });
+      },
+      COL_089_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_089",
+          direction: "DESC"
+        });
+      },
+      COL_090_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_090",
+          direction: "ASC"
+        });
+      },
+      COL_090_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_090",
+          direction: "DESC"
+        });
+      },
+      COL_091_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_091",
+          direction: "ASC"
+        });
+      },
+      COL_091_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_091",
+          direction: "DESC"
+        });
+      },
+      COL_092_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_092",
+          direction: "ASC"
+        });
+      },
+      COL_092_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_092",
+          direction: "DESC"
+        });
+      },
+      COL_093_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_093",
+          direction: "ASC"
+        });
+      },
+      COL_093_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_093",
+          direction: "DESC"
+        });
+      },
+      COL_094_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_094",
+          direction: "ASC"
+        });
+      },
+      COL_094_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_094",
+          direction: "DESC"
+        });
+      },
+      COL_095_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_095",
+          direction: "ASC"
+        });
+      },
+      COL_095_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_095",
+          direction: "DESC"
+        });
+      },
+      COL_096_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_096",
+          direction: "ASC"
+        });
+      },
+      COL_096_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_096",
+          direction: "DESC"
+        });
+      },
+      COL_097_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_097",
+          direction: "ASC"
+        });
+      },
+      COL_097_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_097",
+          direction: "DESC"
+        });
+      },
+      COL_098_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_098",
+          direction: "ASC"
+        });
+      },
+      COL_098_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_098",
+          direction: "DESC"
+        });
+      },
+      COL_099_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_099",
+          direction: "ASC"
+        });
+      },
+      COL_099_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_099",
+          direction: "DESC"
+        });
+      },
+      COL_100_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_100",
+          direction: "ASC"
+        });
+      },
+      COL_100_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col_100",
+          direction: "DESC"
+        });
+      },
+      CREATED_AT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "created_at",
+          direction: "ASC"
+        });
+      },
+      CREATED_AT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "created_at",
+          direction: "DESC"
+        });
+      },
+      EPISODES_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "episodes",
+          direction: "ASC"
+        });
+      },
+      EPISODES_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "episodes",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        collectionsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        collectionsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      RECOMMENDATIONS_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "recommendations",
+          direction: "ASC"
+        });
+      },
+      RECOMMENDATIONS_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "recommendations",
+          direction: "DESC"
+        });
+      },
+      TYPE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "type",
+          direction: "ASC"
+        });
+      },
+      TYPE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "type",
           direction: "DESC"
         });
       }

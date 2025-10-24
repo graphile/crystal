@@ -32,8 +32,39 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
     from unnest(__types__."interval_array") __entry__
   )::text as "23",
   __types__."money"::numeric::text as "24",
-  case when (__types__."compound_type") is not distinct from null then null::text else json_build_array((((__types__."compound_type")."a"))::text, ((__types__."compound_type")."b"), (((__types__."compound_type")."c"))::text, ((__types__."compound_type")."d"), (((__types__."compound_type")."e"))::text, (((__types__."compound_type")."f"))::text, to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."compound_type")."foo_bar"))::text)::text end as "25",
-  case when (__types__."nested_compound_type") is not distinct from null then null::text else json_build_array(case when (((__types__."nested_compound_type")."a")) is not distinct from null then null::text else json_build_array((((((__types__."nested_compound_type")."a"))."a"))::text, ((((__types__."nested_compound_type")."a"))."b"), (((((__types__."nested_compound_type")."a"))."c"))::text, ((((__types__."nested_compound_type")."a"))."d"), (((((__types__."nested_compound_type")."a"))."e"))::text, (((((__types__."nested_compound_type")."a"))."f"))::text, to_char(((((__types__."nested_compound_type")."a"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nested_compound_type")."a"))."foo_bar"))::text)::text end, case when (((__types__."nested_compound_type")."b")) is not distinct from null then null::text else json_build_array((((((__types__."nested_compound_type")."b"))."a"))::text, ((((__types__."nested_compound_type")."b"))."b"), (((((__types__."nested_compound_type")."b"))."c"))::text, ((((__types__."nested_compound_type")."b"))."d"), (((((__types__."nested_compound_type")."b"))."e"))::text, (((((__types__."nested_compound_type")."b"))."f"))::text, to_char(((((__types__."nested_compound_type")."b"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((((__types__."nested_compound_type")."b"))."foo_bar"))::text)::text end, (((__types__."nested_compound_type")."baz_buz"))::text)::text end as "26",
+  case when (__types__."compound_type") is not distinct from null then null::text else json_build_array(
+    (((__types__."compound_type")."a"))::text,
+    ((__types__."compound_type")."b"),
+    (((__types__."compound_type")."c"))::text,
+    ((__types__."compound_type")."d"),
+    (((__types__."compound_type")."e"))::text,
+    (((__types__."compound_type")."f"))::text,
+    to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+    (((__types__."compound_type")."foo_bar"))::text
+  )::text end as "25",
+  case when (__types__."nested_compound_type") is not distinct from null then null::text else json_build_array(
+    case when (((__types__."nested_compound_type")."a")) is not distinct from null then null::text else json_build_array(
+      (((((__types__."nested_compound_type")."a"))."a"))::text,
+      ((((__types__."nested_compound_type")."a"))."b"),
+      (((((__types__."nested_compound_type")."a"))."c"))::text,
+      ((((__types__."nested_compound_type")."a"))."d"),
+      (((((__types__."nested_compound_type")."a"))."e"))::text,
+      (((((__types__."nested_compound_type")."a"))."f"))::text,
+      to_char(((((__types__."nested_compound_type")."a"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      (((((__types__."nested_compound_type")."a"))."foo_bar"))::text
+    )::text end,
+    case when (((__types__."nested_compound_type")."b")) is not distinct from null then null::text else json_build_array(
+      (((((__types__."nested_compound_type")."b"))."a"))::text,
+      ((((__types__."nested_compound_type")."b"))."b"),
+      (((((__types__."nested_compound_type")."b"))."c"))::text,
+      ((((__types__."nested_compound_type")."b"))."d"),
+      (((((__types__."nested_compound_type")."b"))."e"))::text,
+      (((((__types__."nested_compound_type")."b"))."f"))::text,
+      to_char(((((__types__."nested_compound_type")."b"))."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      (((((__types__."nested_compound_type")."b"))."foo_bar"))::text
+    )::text end,
+    (((__types__."nested_compound_type")."baz_buz"))::text
+  )::text end as "26",
   __types__."point"::text as "27",
   __types__."nullablePoint"::text as "28",
   __types__."inet"::text as "29",
@@ -87,7 +118,21 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."last_login_from_ip"::text as "5",
   __person__."last_login_from_subnet"::text as "6",
   __person__."user_mac"::text as "7",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "8";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "8";
 
 select
   __person__."id"::text as "0",
@@ -163,7 +208,21 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."last_login_from_ip"::text as "5",
   __person__."last_login_from_subnet"::text as "6",
   __person__."user_mac"::text as "7",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "8";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "8";
 
 select
   __person__."id"::text as "0",
@@ -266,7 +325,21 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   __person__."last_login_from_ip"::text as "5",
   __person__."last_login_from_subnet"::text as "6",
   __person__."user_mac"::text as "7",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "8";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "8";
 
 select
   __person__."id"::text as "0",
@@ -334,7 +407,21 @@ select
 from (select ($2::"c"."person").*) as __person__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "0";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "0";
 
 select
   ("c"."person_exists"(
@@ -352,7 +439,10 @@ insert into "a"."post" as __post__ ("headline", "comptypes") values ($1::"text",
   __post__."id"::text as "0",
   __post__."headline" as "1",
   (case when (__post__."comptypes") is not distinct from null then null::text else array(
-    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(
+      to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      (((__comptype__)."is_optimised"))::text
+    )::text end
     from unnest(__post__."comptypes") __comptype__
   )::text end) as "2";
 
@@ -367,7 +457,10 @@ insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values
   __post__."author_id"::text as "1",
   __post__."headline" as "2",
   (case when (__post__."comptypes") is not distinct from null then null::text else array(
-    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(
+      to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      (((__comptype__)."is_optimised"))::text
+    )::text end
     from unnest(__post__."comptypes") __comptype__
   )::text end) as "3";
 

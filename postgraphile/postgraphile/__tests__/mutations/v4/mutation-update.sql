@@ -3,7 +3,21 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"
@@ -26,7 +40,21 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "email
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"
@@ -49,7 +77,21 @@ update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"
@@ -72,7 +114,21 @@ update "c"."person" as __person__ set "about" = $1::"text" where (__person__."id
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"
@@ -95,7 +151,21 @@ update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "about
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"
@@ -118,7 +188,21 @@ update "c"."person" as __person__ set "about" = $1::"text" where (__person__."em
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"
@@ -204,7 +288,21 @@ update "c"."person" as __person__ set "email" = $1::"b"."email" where (__person_
   __person__."person_full_name" as "1",
   __person__."email" as "2",
   __person__."about" as "3",
-  case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "4";
+  case when (__person__) is not distinct from null then null::text else json_build_array(
+    (((__person__)."id"))::text,
+    ((__person__)."person_full_name"),
+    (((__person__)."aliases"))::text,
+    ((__person__)."about"),
+    ((__person__)."email"),
+    case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(
+      ((((__person__)."site"))."url")
+    )::text end,
+    (((__person__)."config"))::text,
+    (((__person__)."last_login_from_ip"))::text,
+    (((__person__)."last_login_from_subnet"))::text,
+    (((__person__)."user_mac"))::text,
+    to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text)
+  )::text end as "4";
 
 select
   __person__."id"::text as "0"

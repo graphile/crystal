@@ -1,0 +1,77 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for queries/polymorphic/manyColumnsTable"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 13, 14, 25, 27, 29, 32, 15, 28, 31<br />2: PgSelect[12]<br />3: PgSelectRows[17]<br />ᐳ: 16, 18, 19, 20, 21<br />4: PgSelect[22]<br />5: Connection[24]<br />ᐳ: Object[33]<br />6: ConnectionItems[34]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ34ᐳ[37]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />__typename: Lambda[41]<br />Deps: 41, 39, 42"):::bucket
+    end
+    Bucket0 --> Bucket2
+    Bucket2 --> Bucket3
+
+    %% plan dependencies
+    PgSelect22[["PgSelect[22∈0] ➊<br />ᐸcollectionsᐳ"]]:::plan
+    Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Lambda21{{"Lambda[21∈0] ➊<br />ᐸuniqᐳ"}}:::plan
+    Coalesce28{{"Coalesce[28∈0] ➊<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[27]"}}:::plan
+    Lambda31{{"Lambda[31∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    Object15 & Lambda21 & Coalesce28 & Lambda31 --> PgSelect22
+    Connection24[["Connection[24∈0] ➊<br />ᐸ22ᐳ"]]:::plan
+    PgSelect22 & Coalesce28 & Lambda31 --> Connection24
+    PgSelect12[["PgSelect[12∈0] ➊<br />ᐸcollectionsᐳ"]]:::plan
+    Access6{{"Access[6∈0] ➊<br />ᐸ0.collectionIdᐳ"}}:::plan
+    Object15 & Access6 --> PgSelect12
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access13 & Access14 --> Object15
+    Access25{{"Access[25∈0] ➊<br />ᐸ0.input.pagination.firstᐳ"}}:::plan
+    Access25 -->|trapInhibited| Coalesce28
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
+    __Value0 --> Access6
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access13
+    __Value2 --> Access14
+    First16{{"First[16∈0] ➊"}}:::plan
+    PgSelectRows17[["PgSelectRows[17∈0] ➊"]]:::plan
+    PgSelectRows17 --> First16
+    PgSelect12 --> PgSelectRows17
+    PgSelectSingle18{{"PgSelectSingle[18∈0] ➊<br />ᐸcollectionsᐳ"}}:::plan
+    First16 --> PgSelectSingle18
+    PgClassExpression19{{"PgClassExpression[19∈0] ➊<br />ᐸ__collecti...endations”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression19
+    Access20{{"Access[20∈0] ➊<br />ᐸ19.itemsᐳ"}}:::plan
+    PgClassExpression19 --> Access20
+    Access20 --> Lambda21
+    __Value0 --> Access25
+    Access29{{"Access[29∈0] ➊<br />ᐸ0.input.pagination.afterᐳ"}}:::plan
+    __Value0 --> Access29
+    Access29 --> Lambda31
+    ConnectionItems34[["ConnectionItems[34∈0] ➊"]]:::plan
+    Connection24 --> ConnectionItems34
+    __Item37[/"__Item[37∈2]<br />ᐸ34ᐳ"\]:::itemplan
+    ConnectionItems34 ==> __Item37
+    PgSelectSingle38{{"PgSelectSingle[38∈2]<br />ᐸcollectionsᐳ"}}:::plan
+    __Item37 --> PgSelectSingle38
+    PgClassExpression39{{"PgClassExpression[39∈2]<br />ᐸ__collections__ᐳ"}}:::plan
+    PgSelectSingle38 --> PgClassExpression39
+    PgClassExpression40{{"PgClassExpression[40∈2]<br />ᐸ(__collect...__).”type”ᐳ"}}:::plan
+    PgSelectSingle38 --> PgClassExpression40
+    Lambda41{{"Lambda[41∈2]<br />ᐸrecommendationTypeNameFromTypeᐳ"}}:::plan
+    PgClassExpression40 --> Lambda41
+    PgClassExpression42{{"PgClassExpression[42∈2]<br />ᐸ(__collections__).”id”ᐳ"}}:::plan
+    PgClassExpression39 o--o PgClassExpression42
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value2,Access6,PgSelect12,Access13,Access14,Object15,First16,PgSelectRows17,PgSelectSingle18,PgClassExpression19,Access20,Lambda21,PgSelect22,Connection24,Access25,Coalesce28,Access29,Lambda31,ConnectionItems34 bucket0
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item37,PgSelectSingle38,PgClassExpression39,PgClassExpression40,Lambda41,PgClassExpression42 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+

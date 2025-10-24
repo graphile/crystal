@@ -109,7 +109,16 @@ where (
 );
 
 select
-  case when (__types__."compound_type") is not distinct from null then null::text else json_build_array((((__types__."compound_type")."a"))::text, ((__types__."compound_type")."b"), (((__types__."compound_type")."c"))::text, ((__types__."compound_type")."d"), (((__types__."compound_type")."e"))::text, (((__types__."compound_type")."f"))::text, to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."compound_type")."foo_bar"))::text)::text end as "0",
+  case when (__types__."compound_type") is not distinct from null then null::text else json_build_array(
+    (((__types__."compound_type")."a"))::text,
+    ((__types__."compound_type")."b"),
+    (((__types__."compound_type")."c"))::text,
+    ((__types__."compound_type")."d"),
+    (((__types__."compound_type")."e"))::text,
+    (((__types__."compound_type")."f"))::text,
+    to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+    (((__types__."compound_type")."foo_bar"))::text
+  )::text end as "0",
   __frmcdc_compound_type__."a"::text as "1",
   __frmcdc_compound_type__."foo_bar"::text as "2",
   ("c"."compound_type_computed_field"(__frmcdc_compound_type__))::text as "3",

@@ -5,6 +5,7 @@ import type { ESLint, Linter, Rule } from "eslint";
 import { ExhaustiveDeps } from "./ExhaustiveDeps.js";
 import { ExportInstances } from "./ExportInstances.js";
 import { ExportMethods } from "./ExportMethods.js";
+import { ExportPlans } from "./ExportPlans.js";
 import { ExportSubclasses } from "./ExportSubclasses.js";
 import { NoNested } from "./NoNested.js";
 
@@ -54,6 +55,12 @@ export const configs = {
           disableAutofix: false,
         },
       ],
+      "graphile-export/export-plans": [
+        "error",
+        {
+          disableAutofix: false,
+        },
+      ],
       "graphile-export/export-subclasses": [
         "error",
         {
@@ -78,6 +85,7 @@ export const rules = {
   "exhaustive-deps": ExhaustiveDeps,
   "export-methods": ExportMethods,
   "export-instances": ExportInstances,
+  "export-plans": ExportPlans,
   "export-subclasses": ExportSubclasses,
   "no-nested": NoNested,
 } satisfies Record<string, Rule.RuleModule>;

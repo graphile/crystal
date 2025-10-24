@@ -1,4 +1,4 @@
-/* eslint-disable graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses */
+/* eslint-disable graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses */
 import {
   makePgResourceOptions,
   makeRegistryBuilder,
