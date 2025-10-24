@@ -333,6 +333,9 @@ export class StepTracker {
   ): number {
     const $dependent = sudo(raw$dependent);
     const $dependency = sudo(options.step);
+    if ($dependent === $dependency) {
+      throw new Error(`Step ${$dependent} cannot depend on itself!`);
+    }
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted! Explanation: https://err.red/gasdd#phase=${this.operationPlan.phase}&dependency=${encodeURIComponent(String($dependency))}&dependent=${encodeURIComponent(String($dependent))}&deleted=dependent`,
@@ -383,13 +386,23 @@ export class StepTracker {
           );
         }
         if (stepADependsOnStepB($dependency, $dependent)) {
-          if (
-            $dependency.implicitSideEffectStep &&
-            stepADependsOnStepB($dependency.implicitSideEffectStep, $dependent)
-          ) {
-            throw new Error(
-              `${$dependent} may not depend on ${$dependency} as the latter was created after ${$dependency.implicitSideEffectStep} (has side effects) which already depends on ${$dependent}; this would form a cycle.`,
-            );
+          if ($dependency.implicitSideEffectStep) {
+            const reason = `This is likely an ordering issue in your plan resolver's code; be sure to create all steps that will be dependencies of a side effect step before creating the side effect step itself.`;
+            if ($dependent === $dependency.implicitSideEffectStep) {
+              throw new Error(
+                `${$dependent} has side effects, so it may not depend on step ${$dependency} which was created afterwards and thus is implicitly dependent on it - this would form a cycle. ${reason}`,
+              );
+            }
+            if (
+              stepADependsOnStepB(
+                $dependency.implicitSideEffectStep,
+                $dependent,
+              )
+            ) {
+              throw new Error(
+                `${$dependent} may not depend on ${$dependency} as the latter was created after ${$dependency.implicitSideEffectStep} (has side effects) which already depends on ${$dependent}; this would form a cycle. ${reason}`,
+              );
+            }
           }
           throw new Error(
             `${$dependent} may not depend on ${$dependency}, as doing so would form a dependency cycle.`,
