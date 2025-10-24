@@ -801,7 +801,7 @@ const ItemResolver = {
       },
     };
   },
-} as InterfacePlan<Step<ItemSpec>>;
+} as InterfacePlan<ItemSpec>;
 
 function getCreator($source: Step<{ creator?: number }>) {
   const $db = context().get("dccDb");
