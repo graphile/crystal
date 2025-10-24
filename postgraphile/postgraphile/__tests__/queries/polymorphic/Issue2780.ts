@@ -81,38 +81,84 @@ const extensionsPlugin = extendSchema((build) => {
     objects: {
       Query: {
         plans: {
-          collectionRecommendation(
-            _,
-            { $collectionId, $input: { $pagination } },
-          ) {
-            const $collection = collections.get({ id: $collectionId });
-            const $items = get(get($collection, "recommendations"), "items");
-            const $uniqItems = lambda($items, uniq, true);
+          collectionRecommendation: EXPORTABLE(
+            (
+              DEFAULT_PAGE_SIZE,
+              coalesce,
+              collections,
+              connection,
+              constant,
+              get,
+              lambda,
+              object,
+              sql,
+              textArray,
+              uniq,
+            ) =>
+              function collectionRecommendation(
+                _,
+                { $collectionId, $input: { $pagination } },
+              ) {
+                const $collection = collections.get({ id: $collectionId });
+                const $items = get(
+                  get($collection, "recommendations"),
+                  "items",
+                );
+                const $uniqItems = lambda($items, uniq, true);
 
-            const $list = collections.find();
-            const sqlUniqIds = $list.placeholder($uniqItems, textArray);
-            $list.where(sql`${$list.alias}.id = ANY(${sqlUniqIds})`);
+                const $list = collections.find();
+                const sqlUniqIds = $list.placeholder($uniqItems, textArray);
+                $list.where(sql`${$list.alias}.id = ANY(${sqlUniqIds})`);
 
-            const $conn = connection($list);
-            $conn.setFirst(
-              coalesce(get($pagination, "first"), constant(DEFAULT_PAGE_SIZE)),
-            );
-            $conn.setAfter(get($pagination, "after"));
+                const $conn = connection($list);
+                $conn.setFirst(
+                  coalesce(
+                    get($pagination, "first"),
+                    constant(DEFAULT_PAGE_SIZE),
+                  ),
+                );
+                $conn.setAfter(get($pagination, "after"));
 
-            return object({ clusterId: constant(""), __conn: $conn });
-          },
+                return object({ clusterId: constant(""), __conn: $conn });
+              },
+            [
+              DEFAULT_PAGE_SIZE,
+              coalesce,
+              collections,
+              connection,
+              constant,
+              get,
+              lambda,
+              object,
+              sql,
+              textArray,
+              uniq,
+            ],
+          ),
         },
       },
       Recommendation: {
         plans: {
-          items($parent: ObjectStep<{ __conn: ConnectionStep<any> }>) {
-            const $connection = get($parent, "__conn");
-            return $connection.nodes();
-          },
-          pageInfo($parent: ObjectStep<{ __conn: ConnectionStep<any> }>) {
-            const $connection = get($parent, "__conn");
-            return $connection.pageInfo();
-          },
+          items: EXPORTABLE(
+            (get) =>
+              function items(
+                $parent: ObjectStep<{ __conn: ConnectionStep<any> }>,
+              ) {
+                const $connection = get($parent, "__conn");
+                return $connection.nodes();
+              },
+            [get],
+          ),
+          pageInfo: EXPORTABLE(
+            (get) =>
+              function pageInfo(
+                $parent: ObjectStep<{ __conn: ConnectionStep<any> }>,
+              ) {
+                const $connection = get($parent, "__conn");
+                return $connection.pageInfo();
+              },
+            [get],
+          ),
         },
       },
     },
