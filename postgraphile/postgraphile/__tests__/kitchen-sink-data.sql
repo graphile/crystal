@@ -56,6 +56,7 @@ delete from polymorphic.priorities cascade;
 delete from polymorphic.log_entries cascade;
 delete from polymorphic.people cascade;
 delete from polymorphic.organizations cascade;
+delete from polymorphic.collections cascade;
 
 delete from js_reserved.relational_status cascade;
 delete from js_reserved.relational_topics cascade;
@@ -821,6 +822,11 @@ insert into polymorphic.gcp_application_third_party_vulnerabilities (gcp_applica
   (4, 2),
   (5, 5),
   (5, 4);
+
+insert into polymorphic.collections (id, name, "type", episodes, recommendations)
+values ('id-1', 'The Matrix', 'movie', null, '{"items": ["id-2"]}'),
+        ('id-2', 'The Witcher', 'series', 5, '{"items": ["id-1"]}'),
+        ('id-3', 'Inception', 'movie', null, '{"items": []}');
 
 --------------------------------------------------------------------------------
 
