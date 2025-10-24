@@ -300,6 +300,7 @@ const oldConfig = {
       rules: {
         "graphile-export/exhaustive-deps": 0,
         "graphile-export/export-methods": 0,
+        "graphile-export/export-plans": 0,
         "graphile-export/export-instances": 0,
         "graphile-export/export-subclasses": 0,
         "graphile-export/no-nested": 0,
