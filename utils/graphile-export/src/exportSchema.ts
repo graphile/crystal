@@ -2185,7 +2185,7 @@ async function format(
   }
 }
 
-const HEADER = `/* eslint-disable graphile-export/export-instances, graphile-export/export-methods, graphile-export/exhaustive-deps */\n`;
+const HEADER = `/* eslint-disable graphile-export/export-instances, graphile-export/export-methods, graphile-export/export-plans, graphile-export/exhaustive-deps */\n`;
 
 export async function exportSchema(
   schema: GraphQLSchema,
