@@ -11,8 +11,9 @@ const LOOKUP: Record<string, string | undefined> = {
 };
 const recommendationTypeNameFromType = EXPORTABLE(
   (LOOKUP) =>
-    (type: unknown): string | null =>
-      LOOKUP[String(type)] ?? null,
+    function recommendationTypeNameFromType(type: unknown): string | null {
+      return LOOKUP[String(type)] ?? null;
+    },
   [LOOKUP],
 );
 
