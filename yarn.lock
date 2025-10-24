@@ -13867,7 +13867,7 @@ __metadata:
     graphql-http: "npm:^1.22.4"
     graphql-ws: "npm:^6.0.5"
     h3: "npm:^1.15.3"
-    hono: "npm:^4.10.2"
+    hono: "npm:^4.10.3"
     jest: "npm:^30.0.4"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^3.0.3"
@@ -14579,10 +14579,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^4.10.2":
-  version: 4.10.2
-  resolution: "hono@npm:4.10.2"
-  checksum: 10/92223307d2340fdb25c657363908b4ee679e28a2b9fae3767201a5b923d8a71f5588ec8f9d041ebd4876f8eb06c0a8f5044990ce290b8e5bc37b25a371de393d
+"hono@npm:^4.10.3":
+  version: 4.10.3
+  resolution: "hono@npm:4.10.3"
+  checksum: 10/0b5aa2296ac52ec9519108df1603388637e3df66e2fa9391281c8320a052bcae2d3a9b73123c8c69d90a35931840cdfbb9a5ef45a6d110436f76b925541a4c87
   languageName: node
   linkType: hard
 
