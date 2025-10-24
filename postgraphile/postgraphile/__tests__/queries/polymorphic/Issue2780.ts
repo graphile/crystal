@@ -52,8 +52,12 @@ const extensionsPlugin = extendSchema((build) => {
     interfaces: {
       RecommendationItem: {
         planType: EXPORTABLE(
-          (get, lambda, recommendationTypeNameFromType) =>
-            function planType($specifier: Step<{ type: string }>) {
+          (collections, get, lambda, recommendationTypeNameFromType) =>
+            function planType(
+              $specifier: Step<{ id: string; type: string }>,
+              info,
+            ) {
+              const { $original } = info;
               const $type = get($specifier, "type");
               const $__typename = lambda(
                 $type,
@@ -61,9 +65,16 @@ const extensionsPlugin = extendSchema((build) => {
                 true,
               );
 
-              return { $__typename };
+              return {
+                $__typename,
+                planForType() {
+                  return (
+                    $original ?? collections.get({ id: get($specifier, "id") })
+                  );
+                },
+              };
             },
-          [get, lambda, recommendationTypeNameFromType],
+          [collections, get, lambda, recommendationTypeNameFromType],
         ),
       },
     },
