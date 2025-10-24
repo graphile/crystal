@@ -52,12 +52,11 @@ const extensionsPlugin = extendSchema((build) => {
     interfaces: {
       RecommendationItem: {
         planType: EXPORTABLE(
-          (collections, get, lambda, recommendationTypeNameFromType) =>
+          (get, lambda, recommendationTypeNameFromType) =>
             function planType(
               $specifier: Step<{ id: string; type: string }>,
-              info,
+              _info,
             ) {
-              const { $original } = info;
               const $type = get($specifier, "type");
               const $__typename = lambda(
                 $type,
@@ -67,14 +66,15 @@ const extensionsPlugin = extendSchema((build) => {
 
               return {
                 $__typename,
-                planForType() {
-                  return (
-                    $original ?? collections.get({ id: get($specifier, "id") })
-                  );
-                },
+                // Implementing this would make the test much more efficient:
+                // planForType() {
+                //   return (
+                //     _info.$original ?? collections.get({ id: get($specifier, "id") })
+                //   );
+                // },
               };
             },
-          [collections, get, lambda, recommendationTypeNameFromType],
+          [get, lambda, recommendationTypeNameFromType],
         ),
       },
     },
