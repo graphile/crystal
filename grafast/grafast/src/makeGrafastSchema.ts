@@ -15,6 +15,7 @@ import type {
   FieldPlanResolver,
   InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
+  PlanTypeInfo,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
@@ -119,10 +120,13 @@ export interface InputObjectPlan {
 
 /**
  * The plan config for an interface or union type.
+ *
+ * @param TSource - A step representing the data at the abstract position
+ * @param TSpecifier - The runtime data that specifies which concrete type the abstract step relates to
  */
 export interface AbstractTypePlan<
-  TSource extends Step = any,
-  TSpecifier extends Step = TSource,
+  TSource extends Step = Step,
+  TSpecifier = any,
 > {
   /**
    * Runtime. If the polymorphic data just needs resolving to a type name, this
@@ -141,7 +145,7 @@ export interface AbstractTypePlan<
    * step's own `.toSpecifier()` will be used, if present, otherwise the
    * step's own `.toRecord()`, and failing that the step itself.
    */
-  toSpecifier?($step: TSource): TSpecifier;
+  toSpecifier?($step: TSource): Step<TSpecifier>;
 
   /**
    * Plantime. `$specifier` is either a step returned from a field or list
@@ -152,7 +156,10 @@ export interface AbstractTypePlan<
    * `planForType` method which, when called, should return the step for the
    * given type.
    */
-  planType?: ($specifier: TSpecifier) => AbstractTypePlanner;
+  planType?: (
+    $specifier: Step<TSpecifier>,
+    info: PlanTypeInfo<TSource>,
+  ) => AbstractTypePlanner;
 }
 export interface InterfacePlan<
   TSource extends Step = any,
