@@ -437,6 +437,7 @@ import type { Overrides } from './dcc-type-overrides.ts';
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
 type ListOfStep<TStep extends Step> = StepRepresentingList<TStep extends Step<infer U> ? U : any, TStep>;
+type StepData<TStep extends Step> = TStep extends Step<infer U> ? U : never;
 
 type Get<
   TTypeName extends string,
@@ -659,45 +660,45 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
   interfaces?: {
     Character?: InterfacePlan<
       Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>,
-      Get<"Character", "specifier", Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>>
+      Get<"Character", "specifier", StepData<Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>>>
     >;
     Crawler?: InterfacePlan<
       Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>,
-      Get<"Crawler", "specifier", Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>>
+      Get<"Crawler", "specifier", StepData<Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>>>
     >;
     Created?: InterfacePlan<
       Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>,
-      Get<"Created", "specifier", Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>>
+      Get<"Created", "specifier", StepData<Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>>>
     >;
     HasContents?: InterfacePlan<
       Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>,
-      Get<"HasContents", "specifier", Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>>
+      Get<"HasContents", "specifier", StepData<Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>>>
     >;
     HasInventory?: InterfacePlan<
       Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>,
-      Get<"HasInventory", "specifier", Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>>
+      Get<"HasInventory", "specifier", StepData<Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>>>
     >;
     Item?: InterfacePlan<
       Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>,
-      Get<"Item", "specifier", Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>>
+      Get<"Item", "specifier", StepData<Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>>>
     >;
     Location?: InterfacePlan<
       Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>,
-      Get<"Location", "specifier", Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>>
+      Get<"Location", "specifier", StepData<Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>>>
     >;
     NPC?: InterfacePlan<
       Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>,
-      Get<"NPC", "specifier", Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>>
+      Get<"NPC", "specifier", StepData<Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>>>
     >;
   }
   unions?: {
     ClubStock?: UnionPlan<
       Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>,
-      Get<"ClubStock", "specifier", Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>>
+      Get<"ClubStock", "specifier", StepData<Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>>>
     >;
     SafeRoomStock?: UnionPlan<
       Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>,
-      Get<"SafeRoomStock", "specifier", Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>>
+      Get<"SafeRoomStock", "specifier", StepData<Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>>>
     >;
   }
   inputObjects?: {
