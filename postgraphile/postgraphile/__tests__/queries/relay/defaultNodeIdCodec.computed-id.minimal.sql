@@ -1,5 +1,8 @@
 select
-  case when (__spectacles__) is not distinct from null then null::text else json_build_array((((__spectacles__)."id"))::text, ((__spectacles__)."model_number"))::text end as "0",
+  case when (__spectacles__) is not distinct from null then null::text else json_build_array(
+    (((__spectacles__)."id"))::text,
+    ((__spectacles__)."model_number")
+  )::text end as "0",
   __spectacles__."id"::text as "1"
 from "relay"."spectacles" as __spectacles__
 where (

@@ -1,6 +1,12 @@
 select
   __authenticate_payload__."id"::text as "0",
-  case when (__authenticate_payload__."jwt") is not distinct from null then null::text else json_build_array(((__authenticate_payload__."jwt")."role"), (((__authenticate_payload__."jwt")."exp"))::text, (((__authenticate_payload__."jwt")."a"))::text, (((__authenticate_payload__."jwt")."b"))::text, (((__authenticate_payload__."jwt")."c"))::text)::text end as "1",
+  case when (__authenticate_payload__."jwt") is not distinct from null then null::text else json_build_array(
+    ((__authenticate_payload__."jwt")."role"),
+    (((__authenticate_payload__."jwt")."exp"))::text,
+    (((__authenticate_payload__."jwt")."a"))::text,
+    (((__authenticate_payload__."jwt")."b"))::text,
+    (((__authenticate_payload__."jwt")."c"))::text
+  )::text end as "1",
   __authenticate_payload__."admin"::text as "2",
   (not (__authenticate_payload__ is null))::text as "3"
 from "b"."authenticate_payload"(
@@ -18,6 +24,12 @@ where (
 );
 
 select
-  case when (__frmcdc_jwt_token__) is not distinct from null then null::text else json_build_array(((__frmcdc_jwt_token__)."role"), (((__frmcdc_jwt_token__)."exp"))::text, (((__frmcdc_jwt_token__)."a"))::text, (((__frmcdc_jwt_token__)."b"))::text, (((__frmcdc_jwt_token__)."c"))::text)::text end as "0",
+  case when (__frmcdc_jwt_token__) is not distinct from null then null::text else json_build_array(
+    ((__frmcdc_jwt_token__)."role"),
+    (((__frmcdc_jwt_token__)."exp"))::text,
+    (((__frmcdc_jwt_token__)."a"))::text,
+    (((__frmcdc_jwt_token__)."b"))::text,
+    (((__frmcdc_jwt_token__)."c"))::text
+  )::text end as "0",
   (not (__frmcdc_jwt_token__ is null))::text as "1"
 from (select ($1::"b"."jwt_token").*) as __frmcdc_jwt_token__;

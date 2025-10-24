@@ -214,7 +214,10 @@ select
   __post_many__."id"::text as "0",
   __post_many__."headline" as "1",
   (case when (__post_many__."comptypes") is not distinct from null then null::text else array(
-    select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
+    select case when (__comptype__) is not distinct from null then null::text else json_build_array(
+      to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      (((__comptype__)."is_optimised"))::text
+    )::text end
     from unnest(__post_many__."comptypes") __comptype__
   )::text end) as "2"
 from "a"."post_many"($1::"a"."post"[]) as __post_many__;
