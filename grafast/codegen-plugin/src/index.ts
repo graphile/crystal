@@ -88,8 +88,8 @@ class GrafastGenerator {
       if (!isInterfaceType(type)) continue;
       lines.push(`\
     ${type.name}?: InterfacePlan<
-      ${this.source(type)},
-      ${this.specifier(type)}
+      ${this.specifier(type)},
+      ${this.source(type)}
     >;`);
     }
     return lines;
@@ -101,8 +101,8 @@ class GrafastGenerator {
       if (!isUnionType(type)) continue;
       lines.push(`\
     ${type.name}?: UnionPlan<
-      ${this.source(type)},
-      ${this.specifier(type)}
+      ${this.specifier(type)},
+      ${this.source(type)}
     >;`);
     }
     return lines;

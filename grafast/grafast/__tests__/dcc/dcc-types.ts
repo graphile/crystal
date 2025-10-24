@@ -659,46 +659,46 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
   }
   interfaces?: {
     Character?: InterfacePlan<
-      Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>,
-      Get<"Character", "specifier", StepData<Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>>>
+      Get<"Character", "specifier", StepData<Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>>>,
+      Get<"Character", "source", NonNullStep<Get<"Character", "nullable", Step>>>
     >;
     Crawler?: InterfacePlan<
-      Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>,
-      Get<"Crawler", "specifier", StepData<Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>>>
+      Get<"Crawler", "specifier", StepData<Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>>>,
+      Get<"Crawler", "source", NonNullStep<Get<"Crawler", "nullable", Step>>>
     >;
     Created?: InterfacePlan<
-      Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>,
-      Get<"Created", "specifier", StepData<Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>>>
+      Get<"Created", "specifier", StepData<Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>>>,
+      Get<"Created", "source", NonNullStep<Get<"Created", "nullable", Step>>>
     >;
     HasContents?: InterfacePlan<
-      Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>,
-      Get<"HasContents", "specifier", StepData<Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>>>
+      Get<"HasContents", "specifier", StepData<Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>>>,
+      Get<"HasContents", "source", NonNullStep<Get<"HasContents", "nullable", Step>>>
     >;
     HasInventory?: InterfacePlan<
-      Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>,
-      Get<"HasInventory", "specifier", StepData<Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>>>
+      Get<"HasInventory", "specifier", StepData<Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>>>,
+      Get<"HasInventory", "source", NonNullStep<Get<"HasInventory", "nullable", Step>>>
     >;
     Item?: InterfacePlan<
-      Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>,
-      Get<"Item", "specifier", StepData<Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>>>
+      Get<"Item", "specifier", StepData<Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>>>,
+      Get<"Item", "source", NonNullStep<Get<"Item", "nullable", Step>>>
     >;
     Location?: InterfacePlan<
-      Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>,
-      Get<"Location", "specifier", StepData<Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>>>
+      Get<"Location", "specifier", StepData<Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>>>,
+      Get<"Location", "source", NonNullStep<Get<"Location", "nullable", Step>>>
     >;
     NPC?: InterfacePlan<
-      Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>,
-      Get<"NPC", "specifier", StepData<Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>>>
+      Get<"NPC", "specifier", StepData<Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>>>,
+      Get<"NPC", "source", NonNullStep<Get<"NPC", "nullable", Step>>>
     >;
   }
   unions?: {
     ClubStock?: UnionPlan<
-      Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>,
-      Get<"ClubStock", "specifier", StepData<Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>>>
+      Get<"ClubStock", "specifier", StepData<Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>>>,
+      Get<"ClubStock", "source", NonNullStep<Get<"ClubStock", "nullable", Step>>>
     >;
     SafeRoomStock?: UnionPlan<
-      Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>,
-      Get<"SafeRoomStock", "specifier", StepData<Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>>>
+      Get<"SafeRoomStock", "specifier", StepData<Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>>>,
+      Get<"SafeRoomStock", "source", NonNullStep<Get<"SafeRoomStock", "nullable", Step>>>
     >;
   }
   inputObjects?: {

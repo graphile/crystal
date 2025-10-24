@@ -125,8 +125,8 @@ export interface InputObjectPlan {
  * @param TSpecifier - The runtime data that specifies which concrete type the abstract step relates to
  */
 export interface AbstractTypePlan<
-  TSource extends Step = Step,
   TSpecifier = any,
+  TSource extends Step = Step,
 > {
   /**
    * Runtime. If the polymorphic data just needs resolving to a type name, this
@@ -161,14 +161,10 @@ export interface AbstractTypePlan<
     info: PlanTypeInfo<TSource>,
   ) => AbstractTypePlanner;
 }
-export interface InterfacePlan<
-  TSource extends Step = any,
-  TSpecifier extends Step = TSource,
-> extends AbstractTypePlan<TSource, TSpecifier> {}
-export interface UnionPlan<
-  TSource extends Step = any,
-  TSpecifier extends Step = TSource,
-> extends AbstractTypePlan<TSource, TSpecifier> {}
+export interface InterfacePlan<TSpecifier = any, TSource extends Step = Step>
+  extends AbstractTypePlan<TSpecifier, TSource> {}
+export interface UnionPlan<TSpecifier = any, TSource extends Step = Step>
+  extends AbstractTypePlan<TSpecifier, TSource> {}
 
 export type DeprecatedUnionOrInterfacePlan = {
   [TKey in keyof AbstractTypePlan as `__${TKey}`]: AbstractTypePlan[TKey];
