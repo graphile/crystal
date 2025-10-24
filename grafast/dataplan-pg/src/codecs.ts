@@ -527,6 +527,29 @@ function listCastViaUnnest(
     return sql`(case when (${frag}) is not distinct from null then null::text else ${arraySql} end)`;
   }
 }
+function makeRecordExpression(
+  fragment: SQL,
+  attributeDefs: ReadonlyArray<[string, PgCodecAttribute]>,
+) {
+  /** comma-separated list */
+  const csl = sql.join(
+    attributeDefs.map(([attrName, attr]) => {
+      const expr = sql`((${fragment}).${sql.identifier(attrName)})`;
+      if (attr.codec.castFromPg) {
+        return attr.codec.castFromPg(expr, attr.codec.notNull);
+      } else {
+        return sql`(${expr})::text`;
+      }
+    }),
+    ", ",
+  );
+  if (attributeDefs.length <= 100) {
+    return sql`json_build_array(${csl})`;
+  } else {
+    // if (attributeDefs.length <= 16383) {
+    return sql`to_json(array[${csl}])`;
+  }
+}
 
 function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
   name: string,
@@ -534,19 +557,8 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
 ): Pick<PgCodec, "fromPg" | "toPg" | "castFromPg" | "listCastFromPg"> {
   const attributeDefs = realAttributeDefs(attributes);
   if (attributeDefs.some(([_attrName, attr]) => attr.codec.castFromPg)) {
-    const castFromPg = (fragment: SQL) => {
-      return sql`case when (${fragment}) is not distinct from null then null::text else json_build_array(${sql.join(
-        attributeDefs.map(([attrName, attr]) => {
-          const expr = sql`((${fragment}).${sql.identifier(attrName)})`;
-          if (attr.codec.castFromPg) {
-            return attr.codec.castFromPg(expr, attr.codec.notNull);
-          } else {
-            return sql`(${expr})::text`;
-          }
-        }),
-        ", ",
-      )})::text end`;
-    };
+    const castFromPg = (fragment: SQL) =>
+      sql`case when (${fragment}) is not distinct from null then null::text else ${makeRecordExpression(fragment, attributeDefs)}::text end`;
     return {
       castFromPg,
       listCastFromPg(frag, guaranteedNotNull) {
