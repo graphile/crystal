@@ -1,4 +1,4 @@
-import type { Expression, Identifier, Method, Property } from "@babel/types";
+import type { Expression, Method, Property } from "@babel/types";
 import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
