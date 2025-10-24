@@ -295,6 +295,8 @@ const oldConfig = {
         "**/vendor/**/__testUtils__/**/*.ts",
         "**/vendor/**/__testUtils__/**/*.tsx",
         "**/website/examples/**",
+        "**/website/**/*.example.*",
+        "grafast/grafserv/examples/**",
         "graphile-build/graphile-utils/__tests__/*Plugin.ts",
       ],
       rules: {

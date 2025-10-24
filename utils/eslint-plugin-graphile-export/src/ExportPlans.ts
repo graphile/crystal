@@ -5,8 +5,6 @@ import type { Node as ESTreeNode } from "estree";
 import { reportProblem } from "./common.js";
 import { hasExportableParent } from "./NoNested.js";
 
-const dev = process.env.GRAPHILE_ENV === "development";
-
 interface CommonOptions {
   disableAutofix: boolean;
 }
@@ -66,7 +64,6 @@ export const ExportPlans: Rule.RuleModule = {
             context,
             options,
             node as unknown as Property & Rule.NodeParentExtension,
-            (node.key as Identifier).name,
           );
         }
       },
@@ -81,7 +78,6 @@ export const ExportPlans: Rule.RuleModule = {
             context,
             options,
             node as unknown as Method & Rule.NodeParentExtension,
-            (node.key as Identifier).name,
           );
         }
       },
@@ -95,7 +91,6 @@ function processNode(
   node:
     | (Property & Rule.NodeParentExtension)
     | (Method & Rule.NodeParentExtension),
-  match: string,
 ) {
   if (hasExportableParent(node)) return;
 
