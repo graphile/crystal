@@ -296,8 +296,11 @@ const oldConfig = {
         "**/vendor/**/__testUtils__/**/*.tsx",
         "**/website/examples/**",
         "**/website/**/*.example.*",
+        "grafast/grafast/__tests__/**",
+        "grafast/grafserv/__tests__/**",
         "grafast/grafserv/examples/**",
-        "graphile-build/graphile-utils/__tests__/*Plugin.ts",
+        "grafast/dataplan-pg/src/examples/**",
+        "graphile-build/graphile-utils/__tests__/**",
       ],
       rules: {
         "graphile-export/exhaustive-deps": 0,
