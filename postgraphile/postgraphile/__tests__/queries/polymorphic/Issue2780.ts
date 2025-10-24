@@ -1,9 +1,20 @@
 import { ConnectionStep, ObjectStep, Step } from "grafast";
 import { listOfCodec, TYPES } from "postgraphile/@dataplan/pg";
 import { sql } from "postgraphile/pg-sql2";
-import { extendSchema, gql } from "postgraphile/utils";
+import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
 const DEFAULT_PAGE_SIZE = 24;
+
+const LOOKUP: Record<string, string | undefined> = {
+  movie: "MovieCollection",
+  series: "SeriesCollection",
+};
+const recommendationTypeNameFromType = EXPORTABLE(
+  (LOOKUP) =>
+    (type: unknown): string | null =>
+      LOOKUP[String(type)] ?? null,
+  [LOOKUP],
+);
 
 const extensionsPlugin = extendSchema((build) => {
   const {
@@ -81,7 +92,21 @@ const extensionsPlugin = extendSchema((build) => {
       Query: {
         plans: {
           collectionRecommendation: EXPORTABLE(
-            (DEFAULT_PAGE_SIZE, TYPES, coalesce, collections, connection, constant, get, lambda, listOfCodec, object, sql, uniq) => function collectionRecommendation(
+            (
+              DEFAULT_PAGE_SIZE,
+              TYPES,
+              coalesce,
+              collections,
+              connection,
+              constant,
+              get,
+              lambda,
+              listOfCodec,
+              object,
+              sql,
+              uniq,
+            ) =>
+              function collectionRecommendation(
                 _,
                 { $collectionId, $input: { $pagination } },
               ) {
@@ -108,7 +133,20 @@ const extensionsPlugin = extendSchema((build) => {
 
                 return object({ clusterId: constant(""), __conn: $conn });
               },
-            [DEFAULT_PAGE_SIZE, TYPES, coalesce, collections, connection, constant, get, lambda, listOfCodec, object, sql, uniq],
+            [
+              DEFAULT_PAGE_SIZE,
+              TYPES,
+              coalesce,
+              collections,
+              connection,
+              constant,
+              get,
+              lambda,
+              listOfCodec,
+              object,
+              sql,
+              uniq,
+            ],
           ),
         },
       },
@@ -144,11 +182,4 @@ function uniq<T>(list: T[]): T[] {
   return [...new Set(list)];
 }
 
-const LOOKUP: Record<string, string | undefined> = {
-  movie: "MovieCollection",
-  series: "SeriesCollection",
-};
-function recommendationTypeNameFromType(type: unknown): string | null {
-  return LOOKUP[String(type)] ?? null;
-}
 export const preset = { plugins: [extensionsPlugin] };
