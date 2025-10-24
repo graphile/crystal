@@ -12,7 +12,6 @@ const extensionsPlugin = extendSchema((build) => {
     grafast: { object, constant, get, connection, lambda, coalesce },
   } = build;
   const { collections } = pgRegistry.pgResources;
-  const textArray = listOfCodec(TYPES.text);
 
   return {
     typeDefs: gql`
@@ -82,20 +81,7 @@ const extensionsPlugin = extendSchema((build) => {
       Query: {
         plans: {
           collectionRecommendation: EXPORTABLE(
-            (
-              DEFAULT_PAGE_SIZE,
-              coalesce,
-              collections,
-              connection,
-              constant,
-              get,
-              lambda,
-              object,
-              sql,
-              textArray,
-              uniq,
-            ) =>
-              function collectionRecommendation(
+            (DEFAULT_PAGE_SIZE, TYPES, coalesce, collections, connection, constant, get, lambda, listOfCodec, object, sql, uniq) => function collectionRecommendation(
                 _,
                 { $collectionId, $input: { $pagination } },
               ) {
@@ -107,6 +93,7 @@ const extensionsPlugin = extendSchema((build) => {
                 const $uniqItems = lambda($items, uniq, true);
 
                 const $list = collections.find();
+                const textArray = listOfCodec(TYPES.text);
                 const sqlUniqIds = $list.placeholder($uniqItems, textArray);
                 $list.where(sql`${$list.alias}.id = ANY(${sqlUniqIds})`);
 
@@ -121,19 +108,7 @@ const extensionsPlugin = extendSchema((build) => {
 
                 return object({ clusterId: constant(""), __conn: $conn });
               },
-            [
-              DEFAULT_PAGE_SIZE,
-              coalesce,
-              collections,
-              connection,
-              constant,
-              get,
-              lambda,
-              object,
-              sql,
-              textArray,
-              uniq,
-            ],
+            [DEFAULT_PAGE_SIZE, TYPES, coalesce, collections, connection, constant, get, lambda, listOfCodec, object, sql, uniq],
           ),
         },
       },
