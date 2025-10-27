@@ -42,9 +42,9 @@ under-fetching, N+1 problems, and an explosion of promises) to declarative
 
 {{RESOLVER VS PLAN RESOLVER}}
 
-<!-- We knew that the ergonomics of these functions would be critical, so we
+{/* We knew that the ergonomics of these functions would be critical, so we
 spent a lot of time making sure that they felt and flowed right; and then
-literal years making them work.--> The various plan resolvers referenced by the
+literal years making them work. */} The various plan resolvers referenced by the
 operation would detail steps sufficient to satisfy their requirements, and these
 steps would be composed into an "operation plan" detailing the full requirements
 and data flows of the operation. This plan could then rewrite itself through
@@ -90,12 +90,12 @@ performance.
 
 <!-- truncate-->
 
-<!-- Delivering those shifts meant rewriting plan resolvers to embrace the new unary
+{/* Delivering those shifts meant rewriting plan resolvers to embrace the new unary
 contracts, teaching the SQL layers to build queries at execution, and
 validating the diagrams against real production workloads inside [PostGraphile
 V5](https://postgraphile.org). The payoff is a planning engine that exposes the entire dataflow, keeps
 resolution ergonomic, and still lets Gra*fast* squeeze out every possible
-optimization.-->
+optimization. */}
 
 ## What does release candidate mean for Gra*fast*?
 
