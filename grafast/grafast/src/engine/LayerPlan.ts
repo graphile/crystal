@@ -1009,8 +1009,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       // case "combined": See newCombinedBucket below
       case "subscription":
       case "defer": {
-        // TODO
-        throw new Error("TODO");
+        throw new Error(
+          "TODO<21572e56-600f-4cf6-9698-b020328386b4>: please create a reproduction of this and then file an issue",
+        );
       }
       case "subroutine": {
         throw new Error(
