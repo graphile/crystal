@@ -120,7 +120,6 @@ export class GraphQLResolverStep extends UnbatchedStep {
         },
       );
       const data = this.subscriber(source, args, context, resolveInfo);
-      // TODO: should apply flagErrorIfError to each value data yields
       return flagErrorIfErrorAsync(data);
     }
   }
