@@ -167,7 +167,6 @@ type NewTypeDef =
 interface TypeExtensions {
   GraphQLSchema: {
     directives: Array<DirectiveDefinitionNode>;
-    types: Array<any>;
   };
   GraphQLInputObjectType: {
     [name: string]: InputObjectTypeExtensionNode[];
@@ -287,8 +286,7 @@ export function extendSchema(
 
           const typeExtensions: TypeExtensions = {
             GraphQLSchema: {
-              directives: [] as Array<any>,
-              types: [] as Array<any>,
+              directives: [],
             },
             GraphQLInputObjectType: {},
             GraphQLObjectType: {},
@@ -942,7 +940,6 @@ export function extendSchema(
             ],
             types: [
               ...(schema.types || []),
-              ...typeExtensions.GraphQLSchema.types,
               ...[
                 build.getTypeByName(inflection.builtin("Query")),
                 build.getTypeByName(inflection.builtin("Mutation")),
