@@ -2854,6 +2854,7 @@ function buildTheQueryCore<
 
   const meta = info.meta;
   const queryBuilder: PgSelectQueryBuilder = {
+    mode: info.mode,
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
@@ -3982,6 +3983,7 @@ function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
 export interface PgSelectQueryBuilder<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends PgQueryBuilder {
+  mode: PgSelectMode;
   /** Instruct to add another order */
   orderBy(spec: PgOrderSpec): void;
   /** Inform that the resulting order is now unique */
