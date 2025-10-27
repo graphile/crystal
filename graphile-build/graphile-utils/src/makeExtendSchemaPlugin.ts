@@ -166,7 +166,7 @@ type NewTypeDef =
 
 interface TypeExtensions {
   GraphQLSchema: {
-    directives: Array<any>;
+    directives: Array<DirectiveDefinitionNode>;
     types: Array<any>;
   };
   GraphQLInputObjectType: {
@@ -185,7 +185,7 @@ declare global {
     interface Build {
       makeExtendSchemaPlugin: {
         [uniquePluginName: string]: {
-          typeExtensions: any;
+          typeExtensions: TypeExtensions;
           newTypes: Array<NewTypeDef>;
           resolvers: Resolvers;
           plans: Plans;
@@ -896,22 +896,9 @@ export function extendSchema(
                 uniquePluginName,
               );
             } else if (def.type === GraphQLDirective) {
-              const definition = def.definition as DirectiveDefinitionNode;
-              // https://github.com/graphql/graphql-js/blob/3c54315ab13c6b9d337fb7c33ad7e27b92ca4a40/src/type/directives.js#L106-L113
-              const name = getName(definition.name);
-              const description = getDescription(definition.description);
-              const locations = definition.locations.map(
-                getName,
-              ) as DirectiveLocation[];
-              const args = getArguments(definition.arguments, build);
-              // Ignoring isRepeatable and astNode for now
-              const directive = new GraphQLDirective({
-                name,
-                locations,
-                args,
-                ...(description ? { description } : null),
-              });
-              typeExtensions.GraphQLSchema.directives.push(directive);
+              typeExtensions.GraphQLSchema.directives.push(
+                def.definition as DirectiveDefinitionNode,
+              );
             } else {
               throw new Error(
                 `We have no code to build an object of type '${def.type}'; it should not have reached this area of the code.`,
@@ -923,16 +910,35 @@ export function extendSchema(
 
         GraphQLSchema(schema, build, _context) {
           const {
+            graphql: { GraphQLDirective },
             inflection,
             makeExtendSchemaPlugin: {
               [uniquePluginName]: { typeExtensions, newTypes },
             },
           } = build;
+          const newDirectives: GraphQLDirective[] = [];
+          for (const definition of typeExtensions.GraphQLSchema.directives) {
+            // https://github.com/graphql/graphql-js/blob/3c54315ab13c6b9d337fb7c33ad7e27b92ca4a40/src/type/directives.js#L106-L113
+            const name = getName(definition.name);
+            const description = getDescription(definition.description);
+            const locations = definition.locations.map(
+              getName,
+            ) as DirectiveLocation[];
+            const args = getArguments(definition.arguments, build);
+            // Ignoring isRepeatable and astNode for now
+            const directive = new GraphQLDirective({
+              name,
+              locations,
+              args,
+              ...(description ? { description } : null),
+            });
+            newDirectives.push(directive);
+          }
           return {
             ...schema,
             directives: [
               ...(schema.directives || build.graphql.specifiedDirectives),
-              ...typeExtensions.GraphQLSchema.directives,
+              ...newDirectives,
             ],
             types: [
               ...(schema.types || []),
