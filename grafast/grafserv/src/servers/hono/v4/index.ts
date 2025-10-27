@@ -1,5 +1,6 @@
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { Context as Ctx, Hono, MiddlewareHandler } from "hono";
+import { stream } from 'hono/streaming';
 import type { StatusCode } from "hono/utils/http-status";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
 
@@ -235,20 +236,31 @@ export class HonoGrafserv extends GrafservBase {
         return ctx.body(null);
       }
       case "bufferStream": {
-        // TODO : handle bufferStream?
-        console.log("bufferStream is not handled yet");
+        const { statusCode, headers, lowLatency, bufferIterator } = result;
 
-        // Force the iterator to close
-        const { bufferIterator } = result;
-        if (bufferIterator.return) {
-          bufferIterator.return();
-        } else if (bufferIterator.throw) {
-          bufferIterator.throw(new Error("Unimplemented"));
+        /*
+         * Hono doesn't expose direct socket control in the same way as Koa,
+         * but these optimizations are handled by the underlying runtime.
+         * The `ctx.env.incoming` check is specific to `@hono/node-server`
+         * adapter and won't be available in other runtimes like Bun.
+         */
+        if (ctx.env?.incoming && lowLatency) {
+          const socket = ctx.env.incoming.socket;
+          if (socket) {
+            socket.setTimeout(0);
+            socket.setNoDelay(true);
+            socket.setKeepAlive(true);
+          }
         }
 
-        this.setResponseHeaders(ctx, { "Content-Type": "text/plain" });
-        ctx.status(501);
-        return ctx.text("Server hasn't implemented this yet");
+        this.setResponseHeaders(ctx, headers);
+        ctx.status(statusCode as StatusCode);
+
+        return stream(ctx, async (stream) => {
+          for await (const buffer of bufferIterator) {
+            await stream.write(buffer);
+          }
+        });
       }
       default: {
         const never: never = result;
