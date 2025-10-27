@@ -944,10 +944,10 @@ export function extendSchema(
                 build.getTypeByName(inflection.builtin("Query")),
                 build.getTypeByName(inflection.builtin("Mutation")),
                 build.getTypeByName(inflection.builtin("Subscription")),
-              ].filter((_) => _),
-              ...newTypes.map(({ definition }) =>
-                build.getTypeByName(definition.name.value),
-              ),
+                ...newTypes.map(({ definition }) =>
+                  build.getTypeByName(definition.name.value),
+                ),
+              ].filter((_) => _ != null),
             ],
           };
         },
