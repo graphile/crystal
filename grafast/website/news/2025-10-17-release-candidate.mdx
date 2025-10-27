@@ -4,7 +4,7 @@ description:
   Grafast v1 is functionally complete and already powering production workloads,
   now we need your help to finish the docs and build out examples ahead of the
   1.0 release.
-slug: 2025-10-27-grafast-v1-release-candidate
+slug: 2025-10-28-grafast-v1-release-candidate
 authors: [benjie, jem]
 tags: [Releases]
 hide_table_of_contents: false
@@ -18,97 +18,128 @@ import styles from "@site/src/css/common.module.css";
 The Gra*fast* v1.0 release candidate is now available. The engine has stabilized, the
 epic milestones are complete, and the runtime has been hardened by more than a year of
 production use through PostGraphile V5 and standalone adopters. All that
-remains is to finish the documentation and tighten the TypeScript experience.
+remains is to finish the documentation, tighten the TypeScript experience, and
+create more examples!
 
 </div>
 
-## From working group sketches to a stable execution engine
+_PostGraphile user? You may want to read the [PostGraphile RC
+post](https://postgraphile.org/news/2025-10-28-release-candidate) instead._
 
-We debuted Gra*fast* in 2020 as an answer to the limits of resolver-driven
-execution. The working group crystallized a plan-first mental model: every field
-should describe the graph of steps it requires, and the planner is responsible
-for weaving those graphs into a reusable dataflow that the runtime can execute
-efficiently. Four epics stood between that vision and a stable 1.0:
+## From sketches and a dream to a stable execution engine
 
-- ✅ **Global dependencies**: we rewrote the planning
-  infrastructure so shared inputs (like database connections) are explicitly
-  marked as unary. Plan diagrams now make it obvious when a value is reused
-  across the batch, and the engine can enforce those guarantees automatically.
-- ✅ **Early exit controls**: instead of scattering manual branching
-  logic through plan resolvers, Gra*fast* now propagates inhibition flags along
-  the dataflow. Downstream steps see a clean graph with the noisy branches
-  already pruned.
+We came up with the initial seed for Gra*fast* in 2020, having been frustrated
+by the limitations, caveats and inefficiencies of traditional resolver-driven
+GraphQL execution, along with the messiness and inefficiency of previous
+attempts to solve these problems (such as digging through `GraphQLResolveInfo`).
+
+The building block we came up with, our holy grail, was the "plan resolver": a
+function that looks deceptively similar to traditional resolvers, but changes
+the GraphQL resolution from procedural (field-by-field, layer-by-layer, with
+just in time discovery of data requirements leading to over-fetching,
+under-fetching, N+1 problems, and an explosion of promises) to declarative
+(holistic planning of the request, followed by optimal execution).
+
+{{RESOLVER VS PLAN RESOLVER}}
+
+<!-- We knew that the ergonomics of these functions would be critical, so we
+spent a lot of time making sure that they felt and flowed right; and then
+literal years making them work.--> The various plan resolvers referenced by the
+operation would detail steps sufficient to satisfy their requirements, and these
+steps would be composed into an "operation plan" detailing the full requirements
+and data flows of the operation. This plan could then rewrite itself through
+principled communication between its constituent steps before being executed -
+the code that finally executes might no longer reflect the shape of the GraphQL
+request, leveraging advanced capabilities of the underlying business logic.
+
+## Working with the group
+
+In 2023, we presented an early version of Grafast at GraphQLConf, and sought
+feedback from anyone who wished to get involved. Together, the Grafast working
+group identified four epics stood between this proof of concept and a stable
+1.0:
+
+- ✅ **Global dependencies**: initially everything was batched, but we
+  identified that steps which would always have exactly one value in a request
+  (such as field arguments, user credentials, and API clients) should be marked as
+  such - "unary". The planning infrastructure was rewritten to accomodate this,
+  and it's now much easier to write custom step classes that rely on these kinds
+  of values!
+- ✅ **Early exit**: Grafast is about _data flow_, and branching should be
+  handled inside business logic (i.e. inside the steps themselves, not within plan
+  resolvers). However, sometimes a plan resolver wants to "exit early" either with
+  an error or a null, so these needs now have first-class support. 
 - ✅ **Plan-time evaluation removal**: we eliminated `$step.eval*()` and other
-  hooks that mutated the plan mid-build. Today, plan resolvers stay declarative;
-  all decision making happens in step execution where it belongs, so the same
-  plan can be safely reused for every compatible request.
-- ✅ **Polymorphism convergence**: combined layer plans merge abstract-type
-  branches back together before the next layer is planned. That keeps the
-  mental model manageable: each layer still represents a single batch of work,
-  even when unions or interfaces are involved.
+  hooks that allowed "peeking" at the value of inputs at plan time, and thus
+  limited the reusability of the plan based on "constraints". Today, plan
+  resolvers stay declarative; all decision making happens in step execution where
+  it belongs, so plans can normally be reused for the same operation independent
+  of runtime values.
+- ✅ **Polymorphism convergence**: in the initial release of Grafast, the plan
+  would branch each time an abstract position was reached. This could lead to
+  exponential branching for highly polymorphic requests, causing excessive
+  planning time. By having polymorphic branches merge back together becure
+  branching out for the next layer of abstract types, Grafast has eliminated this
+  exponential planning hazard.
 
-Together these projects solidify the [“thinking in plans”](/grafast/flow) model:
-describe your desired dataflow once, let Gra*fast* optimize it, and rely on the
-engine to reuse that plan across every matching request.
+Ultimately this has helped us solidify the [“thinking in plans”](/grafast/flow)
+model: describe a simple dataflow for each field, let Gra*fast* orchestrate its
+optimization, and reap the rewards of declarative execution in the form of
+reduced resource utilisation, lower bills, and increased application
+performance.
 
 <!-- truncate-->
 
-Delivering those shifts meant rewriting plan resolvers to embrace the new unary
+<!-- Delivering those shifts meant rewriting plan resolvers to embrace the new unary
 contracts, teaching the SQL layers to build queries at execution, and
 validating the diagrams against real production workloads inside [PostGraphile
 V5](https://postgraphile.org). The payoff is a planning engine that exposes the entire dataflow, keeps
 resolution ergonomic, and still lets Gra*fast* squeeze out every possible
-optimization.
+optimization.-->
 
 ## What does release candidate mean for Gra*fast*?
 
-The runtime APIs, wire protocol, and behaviour have settled but the documentation
-needs to catch up, and some TypeScript types are still rough. An RC gives us
+The runtime APIs, behaviour, and mental model have settled and the software has
+proven stable in production, but the documentation needs to catch up (and some
+TypeScript types and comments still need to be brought in line). An RC gives us
 the space to focus entirely on quality before stamping the final 1.0 release.
 
-The teams running Gra*fast* in production have shipped upgrades for months without
-regressions. The project is stable enough that you should not expect further breaking
-changes to runtime behaviour. However, we will continue to refine TypeScript typings
-during the RC window. Most of the changes will be improvements to inference and generics,
-but they may require the occasional annotation tweak in your code. TSDoc comments are
-also lagging behind; treat them as a helpful hint, not a contract, until we finish the
-documentation refresh.
-
-Now is the perfect moment to validate that the “[plans as dataflow](/grafast/flow)” approach
-clicks for you: do the steps Gra*fast* produce line up with the dependencies you
-expect? Does the separation between execution and output plan match how you
-reason about your schema? Share your feedback in our [Discord](https://discord.gg/graphile).
+Now is the perfect moment to validate that the “[plans as
+dataflow](/grafast/flow)” approach clicks for you: do you understand the
+separation of "plan time" and "execution time"? Can you see how principled
+communication between the steps allows for optimization without needing to
+revisit plan resolvers? Help us improve our explanations here; share your
+feedback in our [Discord](https://discord.gg/graphile) or with GitHub issues and
+pull requests!
 
 ## Documentation: where we need you
 
 The code moved faster than the words that describe it. Parts of the docs are
 out of date, others are missing, and a few contradict the behaviour you see in
 practice. We need review, issue reports, and small patches. Your first-hand notes
-about what is unclear are invaluable.
+about what is unclear are invaluable. If something doesn't behave according to
+the docs, or of the docs are unclear, let us know!
 
 Feedback via [GitHub issues](https://github.com/graphile/crystal) or the
 [Discord server](https://discord.gg/graphile) is hugely appreciated.
 
 ## Try Gra*fast* v1 today
 
-Install the release candidate from npm, we are keeping it under the `@beta` tag to
-make transition as smooth as possible:
+Install the release candidate from npm:
 
 ```bash
-yarn add grafast@beta
+yarn add grafast
 ```
 
-If you are integrating Gra*fast* outside of PostGraphile, start with the
-updated examples in the repository and let us know what still feels rough. For
-PostGraphile users, this RC is the same engine that powers the V5 release
-candidate, so upgrading both together is the smoothest path.
+Start working your way through [the documentation](/grafast) and let us know
+what still feels rough.
 
 ## Sponsors make Gra*fast* possible
 
 Gra*fast* exists thanks to the companies and individuals who fund our work.
 Their backing lets us spend the time needed to invent, iterate, and polish the
 engine you are using today. If Gra*fast* helps you ship faster or operate more
-efficiently, please consider joining them at
+efficiently, please join them; find out more at
 [graphile.org/sponsor](https://graphile.org/sponsor).
 
 <figure>
