@@ -1,6 +1,6 @@
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { Context as Ctx, Hono, MiddlewareHandler } from "hono";
-import { stream } from 'hono/streaming';
+import { stream } from "hono/streaming";
 import type { StatusCode } from "hono/utils/http-status";
 import type { UpgradeWebSocket, WSContext } from "hono/ws";
 
