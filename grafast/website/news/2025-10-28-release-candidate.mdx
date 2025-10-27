@@ -26,12 +26,45 @@ create more examples!
 _PostGraphile user? You may want to read the [PostGraphile RC
 post](https://postgraphile.org/news/2025-10-28-release-candidate) instead._
 
+## What does release candidate mean for Gra*fast*?
+
+The runtime APIs, behaviour, and mental model have settled and the software has
+proven stable with some users having ran it in production for over a year;
+however, the documentation needs to catch up (and some TypeScript types and
+comments still need to be brought in line). The release candidate tag signals
+the stability of the software whilst leaving us the space to focus entirely on
+quality and documentation before stamping the final 1.0 release.
+
+Now is the perfect moment to validate that the “[plans as
+dataflow](/grafast/flow)” approach clicks for you: do you understand the
+separation of "plan time" and "execution time"? Can you see how principled
+communication between the steps allows for optimization without needing to
+revisit plan resolvers?
+
+If you don't get it, that's likely a failing of our documentation! Help us
+improve our explanations by sharing your feedback (whether confusion and
+frustration or success and praise!) in our
+[Discord](https://discord.gg/graphile) or with GitHub issues and pull requests!
+
+## Documentation: where we need you
+
+The code moved faster than the words that describe it. Parts of the docs are
+out of date, others are missing, and a few contradict the behaviour you see in
+practice. We need review, issue reports, and small patches. Your first-hand notes
+about what is unclear are invaluable. If something doesn't behave according to
+the docs, or of the docs are unclear, let us know!
+
+Feedback via [GitHub issues](https://github.com/graphile/crystal) or the
+[Discord server](https://discord.gg/graphile) is hugely appreciated.
+
 ## From sketches and a dream to a stable execution engine
 
 We came up with the initial seed for Gra*fast* in 2020, having been frustrated
 by the limitations, caveats and inefficiencies of traditional resolver-driven
 GraphQL execution, along with the messiness and inefficiency of previous
 attempts to solve these problems (such as digging through `GraphQLResolveInfo`).
+
+<!-- truncate -->
 
 The building block we came up with, our north star, was the "plan resolver": a
 function that looks deceptively similar to traditional resolvers, but changes
@@ -67,8 +100,6 @@ feedback from anyone who wished to get involved. Together, the Grafast working
 group identified four epics stood between this proof of concept and a stable
 1.0:
 
-<!-- truncate-->
-
 - ✅ **Global dependencies**: initially everything was batched, but we
   identified that steps which would always have exactly one value in a request
   (such as field arguments, user credentials, and API clients) should be marked as
@@ -97,33 +128,6 @@ model: describe a simple dataflow for each field, let Gra*fast* orchestrate its
 optimization, and reap the rewards of declarative execution in the form of
 reduced resource utilisation, lower bills, and increased application
 performance.
-
-
-## What does release candidate mean for Gra*fast*?
-
-The runtime APIs, behaviour, and mental model have settled and the software has
-proven stable in production, but the documentation needs to catch up (and some
-TypeScript types and comments still need to be brought in line). An RC gives us
-the space to focus entirely on quality before stamping the final 1.0 release.
-
-Now is the perfect moment to validate that the “[plans as
-dataflow](/grafast/flow)” approach clicks for you: do you understand the
-separation of "plan time" and "execution time"? Can you see how principled
-communication between the steps allows for optimization without needing to
-revisit plan resolvers? Help us improve our explanations here; share your
-feedback in our [Discord](https://discord.gg/graphile) or with GitHub issues and
-pull requests!
-
-## Documentation: where we need you
-
-The code moved faster than the words that describe it. Parts of the docs are
-out of date, others are missing, and a few contradict the behaviour you see in
-practice. We need review, issue reports, and small patches. Your first-hand notes
-about what is unclear are invaluable. If something doesn't behave according to
-the docs, or of the docs are unclear, let us know!
-
-Feedback via [GitHub issues](https://github.com/graphile/crystal) or the
-[Discord server](https://discord.gg/graphile) is hugely appreciated.
 
 ## Try Gra*fast* v1 today
 
