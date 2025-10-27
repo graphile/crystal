@@ -1236,6 +1236,7 @@ function buildTheQuery<
 
   const meta = Object.create(null);
   const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> = {
+    mode: info.mode,
     alias: info.alias,
     [$$toSQL]() {
       return info.alias;
@@ -2047,6 +2048,7 @@ export interface PgUnionAllQueryBuilder<
   TAttributes extends string = string,
   _TTypeNames extends string = string,
 > extends PgQueryBuilder {
+  mode: PgUnionAllMode;
   /** Instruct to add another order */
   orderBy(spec: PgUnionAllStepOrder<TAttributes>): void;
   /** Inform that the resulting order is now unique */
