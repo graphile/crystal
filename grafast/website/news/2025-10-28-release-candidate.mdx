@@ -40,11 +40,19 @@ just in time discovery of data requirements leading to over-fetching,
 under-fetching, N+1 problems, and an explosion of promises) to declarative
 (holistic planning of the request, followed by optimal execution).
 
-{{RESOLVER VS PLAN RESOLVER}}
+<figure>
 
-{/* We knew that the ergonomics of these functions would be critical, so we
-spent a lot of time making sure that they felt and flowed right; and then
-literal years making them work. */} The various plan resolvers referenced by the
+[![A comparison between a traditional resolver and a plan resolver. The plan resolver is about the same length and mirrors the shape of the traditional resolver, but the key difference is it describes how to get the data rather than actually fetching it.](../static/img/news/2023-10-13-plan-resolvers.png)](../static/img/news/2023-10-13-plan-resolvers.png)
+
+<figcaption>
+
+Plan resolvers are a declarative replacement for traditional resolvers, they
+describe HOW to get the data rather than actually fetching it.
+
+</figcaption>
+</figure>
+
+The various plan resolvers referenced by the
 operation would detail steps sufficient to satisfy their requirements, and these
 steps would be composed into an "operation plan" detailing the full requirements
 and data flows of the operation. This plan could then rewrite itself through
@@ -58,6 +66,8 @@ In 2023, we presented an early version of Grafast at GraphQLConf, and sought
 feedback from anyone who wished to get involved. Together, the Grafast working
 group identified four epics stood between this proof of concept and a stable
 1.0:
+
+<!-- truncate-->
 
 - ✅ **Global dependencies**: initially everything was batched, but we
   identified that steps which would always have exactly one value in a request
@@ -88,14 +98,6 @@ optimization, and reap the rewards of declarative execution in the form of
 reduced resource utilisation, lower bills, and increased application
 performance.
 
-<!-- truncate-->
-
-{/* Delivering those shifts meant rewriting plan resolvers to embrace the new unary
-contracts, teaching the SQL layers to build queries at execution, and
-validating the diagrams against real production workloads inside [PostGraphile
-V5](https://postgraphile.org). The payoff is a planning engine that exposes the entire dataflow, keeps
-resolution ergonomic, and still lets Gra*fast* squeeze out every possible
-optimization. */}
 
 ## What does release candidate mean for Gra*fast*?
 
