@@ -183,73 +183,62 @@ function releaseUnusedIterators(
 }
 
 const finalize = (
-  data: JSONValue | null | undefined | AsyncIterable<any>,
+  data: JSONValue | null | undefined,
   ctx: OutputPlanContext,
   extensions: any,
   outputDataAsString: boolean,
 ): ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void> => {
-  if (isAsyncIterable(data)) {
-    // It's a subscription! Batch execute the child bucket for
-    // each entry in the stream, and then the output plan for that.
-    assert.strictEqual(
-      ctx.root.queue.length,
-      0,
-      "Subscription cannot also queue",
-    );
-    throw new Error("TODO<172acb34-c9d4-48f5-a26f-1b37260ecc14>: subscription");
-  } else {
-    if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
-      // Return an async iterator
-      let _alive = true;
-      const iterator: ResultIterator = newIterator(() => {
-        // ENHANCE: AbortSignal or similar, feed into `processRoot`?
-        _alive = false;
-      });
-      const payload = Object.create(null);
-      if (data !== undefined) {
-        payload.data = data;
-      }
-      const errors = ctx.root.errors;
-      if (errors.length > 0) {
-        payload.errors = errors;
-      }
-      if (extensions != null) {
-        payload.extensions = extensions;
-      }
-      payload.hasNext = true;
-      iterator.push(payload);
-
-      const promise = processRoot(ctx, iterator, outputDataAsString);
-      if (isPromiseLike(promise)) {
-        promise.then(
-          () => {
-            iterator.push({ hasNext: false });
-            iterator.return(undefined);
-          },
-          (e) => {
-            iterator.throw(e);
-          },
-        );
-      } else {
-        iterator.push({ hasNext: false });
-        iterator.return(undefined);
-      }
-
-      return iterator;
-    } else {
-      const result = Object.create(null);
-      if (data !== undefined) {
-        result.data = data;
-      }
-      const errors = ctx.root.errors;
-      if (errors.length > 0) {
-        result.errors = errors;
-      }
-      if (extensions !== undefined) {
-        result.extensions = extensions;
-      }
-      return result;
+  if (ctx.root.streams.length > 0 || ctx.root.queue.length > 0) {
+    // Return an async iterator
+    let _alive = true;
+    const iterator: ResultIterator = newIterator(() => {
+      // ENHANCE: AbortSignal or similar, feed into `processRoot`?
+      _alive = false;
+    });
+    const payload = Object.create(null);
+    if (data !== undefined) {
+      payload.data = data;
     }
+    const errors = ctx.root.errors;
+    if (errors.length > 0) {
+      payload.errors = errors;
+    }
+    if (extensions != null) {
+      payload.extensions = extensions;
+    }
+    payload.hasNext = true;
+    iterator.push(payload);
+
+    const promise = processRoot(ctx, iterator, outputDataAsString);
+    if (isPromiseLike(promise)) {
+      promise.then(
+        () => {
+          iterator.push({ hasNext: false });
+          iterator.return(undefined);
+        },
+        (e) => {
+          iterator.throw(e);
+        },
+      );
+    } else {
+      iterator.push({ hasNext: false });
+      iterator.return(undefined);
+    }
+
+    return iterator;
+  } else {
+    const result = Object.create(null);
+    if (data !== undefined) {
+      result.data = data;
+    }
+    const errors = ctx.root.errors;
+    if (errors.length > 0) {
+      result.errors = errors;
+    }
+    if (extensions !== undefined) {
+      result.extensions = extensions;
+    }
+    return result;
   }
 };
 
