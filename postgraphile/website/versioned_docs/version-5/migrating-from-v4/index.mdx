@@ -98,6 +98,55 @@ const preset = {
 export default preset;
 ```
 
+### Common plugins
+
+V5 plugins use the `@rc` tag on npm during the release candidate phase. Also many are
+now technically "presets" rather than "plugins" - plugins go into the `plugins`
+list, but presets go into the `extends` list:
+
+```ts title="graphile.config.ts"
+const preset: GraphileConfig.Preset = {
+  extends: [
+    makeV4Preset({ /* ... */ }),
+    SomePreset,
+  ],
+  plugins: [
+    SomePlugin,
+  ]
+};
+export default preset;
+```
+
+Ported:
+
+- `import { PgAggregatesPreset } from '@graphile/pg-aggregates';`
+- `import { PgManyToManyPreset } from '@graphile-contrib/pg-many-to-many';`
+- `import { PgOmitArchivedPlugin } from '@graphile-contrib/pg-omit-archived';`
+- `import { PgOrderByRelatedPlugin } from '@graphile-contrib/pg-order-by-related';`
+- `import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';`
+- `import { PostGraphileFulltextFilterPlugin } from '@graphile-contrib/postgraphile-plugin-fulltext-filter';`
+
+Changed:
+
+- ~~`@graphile/pg-pubsub`~~ is now built in; see [the subscriptions
+  docs](../subscriptions.mdx) for more details. Users of the V4 preset can use
+  `simpleSubscriptions: true` as before; those not using it can use the
+  [PgV4SimpleSubscriptionsPlugin](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/src/plugins/PgV4SimpleSubscriptionsPlugin.ts).
+- ~~`@graphile-contrib/pg-simplify-inflector`~~ is renamed:  
+  `import { PgSimplifyInflectionPreset } from '@graphile/simplify-inflection';`
+
+Not yet ported:
+
+- `@graphile/postgis`
+- `@graphile/operation-hooks`
+
+:::tip[Get in touch!]
+
+Need more plugins ported? We need financial support! I'm sure there's a mutually
+beneficial agreement to be found...
+
+:::
+
 ### Larger example
 
 Here's a larger documented preset with more details:
@@ -546,7 +595,7 @@ You can try ruru out against any GraphQL API (not only those made by
 PostGraphile) via:
 
 ```bash
-npx ruru@beta -PSe http://localhost:5678/graphql
+npx ruru -PSe http://localhost:5678/graphql
 ```
 
 ## Plugins
@@ -632,9 +681,8 @@ actually running it, and can improve the debugging messages when things go
 wrong.
 
 Keep in mind that we no longer have the lookahead system so
-`addArgDataGenerator` and its ilk no longer exist, instead we declare a
-[Gra*fast* `applyPlan`](https://grafast.org/grafast/plan-resolvers/#applyplan-plan-resolvers)
-or similar plan resolver.
+`addArgDataGenerator` and its ilk no longer exist, instead we declare
+[Gra*fast* plan resolvers](https://grafast.org/grafast/plan-resolvers).
 
 ## Plans, not resolvers
 

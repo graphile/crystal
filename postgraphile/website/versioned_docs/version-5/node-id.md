@@ -160,3 +160,43 @@ rather than the GraphQL type name.)
 Thus, using globally unique IDs **does not** make your primary keys unobtainable, and
 doing so is not a goal of globally unique IDs. Should you need your primary keys to
 be meaningless, you should use an approach like UUIDv4 or a Feistel cipher.
+
+### Decoding Node IDs
+
+When you need to turn a Node ID back into the identifiers that your database
+expects, use the Gra*fast* helper `specFromNodeId()`. Every GraphQL type that
+implements the `Node` interface registers a handler; you can retrieve it via
+`build.getNodeIdHandler(typeName)` inside `extendSchema()`. The
+[mutation example](./extend-schema.md#mutation-example-with-node-id) shows this
+in context.
+
+```ts
+import { specFromNodeId } from "postgraphile/grafast";
+
+const handler = build.getNodeIdHandler("Item");
+const $nodeId = fieldArgs.getRaw(["input", "id"]);
+const spec = specFromNodeId(handler, $nodeId);
+const $item = build.pgResources.items.get(spec);
+```
+
+The specifier is often an object such as `{ id: Step<string> }`, but the
+shape depends on the handler. Pass the specifier to the relevant resource or
+loader to continue working with the record.
+
+```ts
+const { organization_id: $organizationId, issue_id: $issueId } = specFromNodeId(
+  handler,
+  $nodeId,
+);
+```
+
+See [specFromNodeId documentation][spec-from-node] for more.
+
+:::note
+
+If the Node ID does not decode for the specified handler, the resulting steps
+resolve to `null`. Guard accordingly before continuing.
+
+:::
+
+[spec-from-node]: https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid

@@ -4,12 +4,12 @@ title: Introduction
 
 # PostGraphile Introduction
 
-:::warning[Use the `@beta` tag]
+:::warning[Use the `@rc` tag]
 
-This software is in beta, please be sure to use the `@beta` tag when installing any of the related modules, for example:
+This software is in release candidate stage, please be sure to use the `@rc` tag when installing any of the related modules, for example:
 
 ```sh
-yarn add postgraphile-plugin-connection-filter@beta
+yarn add postgraphile-plugin-connection-filter@rc
 ```
 
 :::
@@ -127,7 +127,7 @@ The easiest way to get started is with the [CLI interface](./usage-cli); if you
 have `npx` installed you can try it out with:
 
 ```shell
-npx pgl@beta -P pgl/amber -e -c 'postgres:///mydb'
+npx pgl -P pgl/amber -e -c 'postgres:///mydb'
 ```
 
 _(Replace the connection string with a PostgreSQL connection string to your

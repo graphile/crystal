@@ -17,6 +17,14 @@ disposal:
 - configuration (via presets)
 - extension (via plugins)
 
+:::tip[Extending in JavaScript]
+
+If you want to add fields or types from JavaScript or TypeScript, start by
+learning [`extendSchema`](./extend-schema). It is the go-to plugin factory
+for schema additions.
+
+:::
+
 This page provides an overview of those topics.
 
 ## Database objects

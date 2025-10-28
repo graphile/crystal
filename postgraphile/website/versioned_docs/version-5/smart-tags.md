@@ -587,6 +587,20 @@ See [Polymorphism](./polymorphism)
 
 See [Polymorphism](./polymorphism)
 
+### @partitionExpose
+
+By default, if you're using table partitioning, PostGraphile will only expose
+the root partitioned table. You may change this globally with the
+`preset.schema.pgDefaultPartitionedTableExpose` option, or on a per-table basis
+using the `@partitionExpose` smart tag:
+
+- `@partitionExpose parent` - only expose the parent (partitioned) table, not
+  the children (partitions)
+- `@partitionExpose child` - only expose the children (partitions), not
+  the parent partitioned table
+- `@partitionExpose both` - expose both the parent (partitioned) table and all
+  of its partitions
+
 ## Deprecated tags
 
 These tags are only available if you're using the V4 preset, and have been replaced by better methods.

@@ -101,12 +101,12 @@ If you want to store your tags in a different file (e.g.
 a custom plugin instead:
 
 ```js title="graphile.config.mjs"
-import { makePgSmartTagsFromFilePlugin } from "postgraphile/utils";
+import { pgSmartTagsFromFile } from "postgraphile/utils";
 
 export default {
   // ...
   plugins: [
-    makePgSmartTagsFromFilePlugin(
+    pgSmartTagsFromFile(
       // JSON and JSONC are also JSON5 compatible, so you can use these extensions if you prefer:
       "/path/to/my/tags.file.json",
     ),
@@ -119,9 +119,9 @@ then building and loading a basic smart tags plugin that doesn't read from the
 file system might look something like this:
 
 ```js title="graphile.config.mjs"
-import { makeJSONPgSmartTagsPlugin } from "postgraphile/utils";
+import { jsonPgSmartTags } from "postgraphile/utils";
 
-const MySmartTagsPlugin = makeJSONPgSmartTagsPlugin({
+const MySmartTagsPlugin = jsonPgSmartTags({
   version: 1,
   config: {
     class: {

@@ -233,7 +233,7 @@ For example:
 import { extendSchema } from "postgraphile/utils";
 
 const schema = extendSchema((build) => {
-  const { users } = build.input.pgRegistry.pgResources;
+  const { users } = build.pgResources;
   return {
     typeDefs: /* GraphQL */ `
       type MyObject {
@@ -307,12 +307,12 @@ const $userId = context().get("userId");
 ```
 
 Data from the database can be retrieved using “resources.” Resources can be
-found on `build.input.pgRegistry.pgResources`, keyed by their name. For
+found on `build.pgResources`, keyed by their name. For
 example, if you have `organizations`, `users` and `channels` tables, you can
 get the resources for them via:
 
 ```ts
-const { organizations, users, channels } = build.input.pgRegistry.pgResources;
+const { organizations, users, channels } = build.pgResources;
 ```
 
 Now that you have a reference to the `users` resource, inside a plan resolver
@@ -354,7 +354,7 @@ import { extendSchema } from "postgraphile/utils";
 import { context } from "postgraphile/grafast";
 
 export const MyChannelsPlugin = extendSchema((build) => {
-  const { users, channels } = build.input.pgRegistry.pgResources;
+  const { users, channels } = build.pgResources;
   return {
     typeDefs: /* GraphQL */ `
       extend type Query {
@@ -415,11 +415,75 @@ with our own custom logic, so long as the result of the plan resolver is still
 a `PgSelectStep` representing a set of rows.
 
 One way to issue arbitrary SQL queries against the database is to use the
-`withPgClient` step, or its cousin `withPgClientTransaction`. These both accept
-an “executor” as the first argument, a step representing arbitrary data as the
-second argument, and an asynchronous callback as the third argument. The callback
-will be called with a `PgClient` instance and the resolved data from the step
-in the second argument.
+[`loadOneWithPgClient`](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient#loadonewithpgclientexecutor-lookup-loader)
+step, or its cousin
+[`loadManyWithPgClient`](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient#loadmanywithpgclientexecutor-lookup-loader).
+These both accept an “executor” as the first argument, a step representing
+arbitrary data as the second argument, and an asynchronous callback as the third
+argument. The callback will be called with a `PgClient` instance and the list of
+resolved data from the step in the second argument, and must return a list of
+values related to the input data.
+
+```ts
+import { normalizePhone } from "@localrepo/normalize-phone-numbers";
+
+export const MyPlugin = extendSchema((build) => {
+  const { pgExecutor } = build;
+  return {
+    typeDefs: /* GraphQL */ `
+      extend type User {
+        e164PhoneNumbers: [String]
+      }
+    `,
+    objects: {
+      User: {
+        plans: {
+          e164PhoneNumbers($user) {
+            const $userId = get($user, "id");
+            return loadManyWithPgClient(
+              pgExecutor,
+              $userId,
+              async (pgClient, userIds) => {
+                // NOTE: We're doing batched processing across all the userIds,
+                // fetching all their phone numbers at once and converting them.
+
+                // Step 1 - load the user's phone numbers
+                const { rows: userContacts } = await pgClient.query<{
+                  user_id: string;
+                  phone: string;
+                }>({
+                  text: `
+                    select user_id, phone
+                    from user_contacts
+                    where user_id = any($1::int[]);
+                  `,
+                  values: [userIds],
+                });
+
+                // Step 2 - normalize the phone numbers
+                const phoneNumbersByUserId: Record<string, string[]> = {};
+                for (const row of userContacts) {
+                  const { user_id: userId, phone: rawPhone } = row;
+                  const normalized = normalizePhone(rawPhone);
+                  (phoneNumbersByUserId[userId] ??= []).push(normalized);
+                }
+
+                // Optionally: query pgClient again using these normalized phone numbers
+
+                // Finally - match each input to its corresponding data to form
+                // the output
+                return userIds.map(
+                  (userId) => phoneNumbersByUserId[userId] ?? [],
+                );
+              },
+            );
+          },
+        },
+      },
+    },
+  };
+});
+```
 
 :::info[`PgClient` is an abstraction]
 
@@ -448,83 +512,29 @@ database.
 
 **How do I get an executor?**
 
-Executors are available in the registry; by default there’s one executor called
-`main` which you can access like this:
-
-```ts
-const executor = build.input.pgRegistry.pgExecutors.main;
-```
-
-However, PostGraphile can handle multiple sources, or custom source/executor
-names, via `preset.pgServices`. If you don’t know the name of the executor but
-you do have a resource representing the target database, you can extract the
-executor for that DB from the resource, for example:
+Typically you would want to extract the executor from the resource that you are
+dealing with, for example:
 
 ```ts
 const executor = channels.executor;
 ```
 
-### Example
-
-Here’s the previous example again, this time rewritten to use `withPgClient` to
-retrieve the `organization_id` rather than the user resource:
+This is the safest approach. However, if you're not specifically dealing with a
+resource and wish to communicate with the database directly (e.g. for
+`loadOneWithPgClient()`), then you can access the default/primary/main executor via:
 
 ```ts
-import { extendSchema } from "postgraphile/utils";
-import { context } from "postgraphile/grafast";
-// highlight-next-line
-import { withPgClient } from "postgraphile/@dataplan/pg";
+const executor = build.pgExecutor;
+```
 
-export const MyChannelsPlugin = extendSchema((build) => {
-  const { channels } = build.input.pgRegistry.pgResources;
-  const executor = build.input.pgRegistry.pgExecutors.main;
-  // or: `const executor = channels.executor;`
+PostGraphile has support for multiple Postgres databases and custom
+source/executor names via `preset.pgServices`. All executors are available via
+the registry; typically (if a user did not rename the default) there’s an
+executor called `main` which you can access like this:
 
-  return {
-    typeDefs: /* GraphQL */ `
-      extend type Query {
-        myChannels: [Channel]
-      }
-    `,
-    objects: {
-      Query: {
-        plans: {
-          myChannels() {
-            const $userId = context().get("userId");
-            // highlight-start
-            const $orgId = withPgClient(
-              executor,
-              $userId,
-              async (
-                // The PgClient instance, with all of the "claims" (if any) already set:
-                pgClient,
-                // This is the runtime data that the `$userId` step represented
-                userId,
-              ) => {
-                if (!userId) return null;
-
-                // Here we're using the standard `pgClient.query` function that
-                // all adaptors must provide, but if you're using an adaptor
-                // related to your ORM of choice, you could likely use its
-                // various methods to retrieve this value instead.
-                const result = await pgClient.query<{ id: number }>({
-                  text: `select id from get_organization_for_user_id($1)`,
-                  values: [userId],
-                });
-
-                // Return the 'id' value from the first (and only) row, if it exists:
-                return result.rows[0]?.id;
-              },
-            );
-            // highlight-end
-            const $channels = channels.find({ organization_id: $orgId });
-            return $channels;
-          },
-        },
-      },
-    },
-  };
-});
+```ts
+// Normally equivalent to `build.pgExecutor`:
+const executor = build.input.pgRegistry.pgExecutors.main;
 ```
 
 <!-- TODO: update the above with an exitEarly once that functionality has been implemented -->
@@ -621,7 +631,7 @@ import { extendSchema } from "postgraphile/utils";
 import { connection } from "postgraphile/grafast";
 
 export const MyProductReviewsPlugin = extendSchema((build) => {
-  const { reviews } = build.input.pgRegistry.pgResources;
+  const { reviews } = build.pgResources;
 
   return {
     typeDefs: /* GraphQL */ `
@@ -647,6 +657,38 @@ export const MyProductReviewsPlugin = extendSchema((build) => {
 });
 ```
 
+## Updating `pgSettings` in a mutation
+
+If your mutation changes the authorization posture of the user (e.g. `login`,
+`register`, `logout`, `viewAsUser`, `sudo`, etc), you may need to update the
+`pgSettings` the database connection uses in order to ensure that subsequent
+fields (such as those on the mutation payload object) resolve with the expected
+identity and permissions.
+
+To update `pgSettings`, use a step with side effects (such as a `sideEffect()`
+step) to modify the object. An example mutation plan might contain something
+like:
+
+```ts
+// Or: `import { context, sideEffect } from "postgraphile/grafast";`
+const { context, sideEffect } = build.grafast;
+
+// Create the step(s) for your mutation work
+const $user = login(/*...*/);
+
+// Then plan to update the GraphQL context with the latest pgSettings
+const $ctx = context();
+const $userId = get($user, "id");
+sideEffect([$ctx, $userId], ([ctx, userId]) => {
+  ctx.pgSettings["jwt.claims.user_id"] = userId;
+});
+```
+
+With these changes, the next time a `pgSelect()` or similar database step
+executes, it will do so using the new `pgSettings` claims; the result:
+RLS-protected resources queried in subsequent fields will reflect the correct
+post-mutation permissions.
+
 ## Mutation Example
 
 You might want to add a custom `registerUser` mutation which inserts the new
@@ -658,10 +700,12 @@ import { access, constant, object } from "postgraphile/grafast";
 import { sideEffectWithPgClientTransaction } from "postgraphile/@dataplan/pg";
 
 export const MyRegisterUserMutationPlugin = extendSchema((build) => {
-  const { sql } = build;
-  const { users } = build.input.pgRegistry.pgResources;
+  const { sql, pgResources } = build;
+
+  // Get the executor from the "users" DB table:
+  const { users } = pgResources;
   const { executor } = users;
-  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
+
   return {
     typeDefs: /* GraphQL */ `
       input RegisterUserInput {
@@ -684,10 +728,11 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
         plans: {
           registerUser(_, fieldArgs) {
             const $input = fieldArgs.getRaw("input");
+            const $ctx = context();
             const $user = sideEffectWithPgClientTransaction(
               executor,
-              $input,
-              async (pgClient, input) => {
+              [$input, $ctx],
+              async (pgClient, [input, ctx]) => {
                 // Our custom logic to register the user:
                 const {
                   rows: [user],
@@ -707,6 +752,10 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
                   "Welcome to my site",
                   `You're user ${user.id} - thanks for being awesome`,
                 );
+
+                // Update the pgSettings to use for subsequent fields to reflect
+                // the user is logged in:
+                ctx.pgSettings["jwt.claims.user_id"] = user.id;
 
                 // Return the newly created user
                 return user;
@@ -759,16 +808,16 @@ check that the user performing the soft-delete is the owner of the record.
 ```ts
 import { extendSchema } from "postgraphile/utils";
 import { context, list, specFromNodeId } from "postgraphile/grafast";
-import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
+import { sideEffectWithPgClientTransaction } from "postgraphile/@dataplan/pg";
 
 const DeleteItemByNodeIdPlugin = extendSchema((build) => {
   // We need the nodeId handler for the Item type so that we can decode the ID.
   const handler = build.getNodeIdHandler("Item")!;
 
   // Extract the executor from the items resource
-  const { items } = build.input.pgRegistry.pgResources;
-  const { executor } = items;
-  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
+  const executor = build.pgResources.items.executor;
+  // Or `build.pgExecutor` if you know you only have one DB
+  // Or `build.input.pgRegistry.pgExecutors.main` for a named executor
 
   return {
     typeDefs: /* GraphQL */ `
@@ -797,7 +846,7 @@ const DeleteItemByNodeIdPlugin = extendSchema((build) => {
             const spec = specFromNodeId(handler, $nodeId);
             const $itemId = spec.id;
 
-            const $success = withPgClientTransaction(
+            const $success = sideEffectWithPgClientTransaction(
               executor,
               // Passing a `list` step allows us to pass more than one dependency
               // through to our callback:
@@ -841,7 +890,7 @@ transaction (in which case the transaction will be rolled back) and if they are
 the known, supported, errors then it will return the given error type.
 
 ```ts
-import { withPgClient } from "@dataplan/pg";
+import { sideEffectWithPgClientTransaction } from "@dataplan/pg";
 import { extendSchema } from "postgraphile/utils";
 import {
   ObjectStep,
@@ -854,7 +903,7 @@ import {
 import { DatabaseError } from "pg";
 
 export const RegisterUserPlugin = extendSchema((build) => {
-  const { users } = build.input.pgRegistry.pgResources;
+  const { users } = build.pgResources;
   const { executor } = users;
   // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
   return {
@@ -889,36 +938,34 @@ export const RegisterUserPlugin = extendSchema((build) => {
       Mutation: {
         plans: {
           registerUser(_, { $input: { $username, $email } }) {
-            const $result = withPgClient(
+            const $result = sideEffectWithPgClientTransaction(
               executor,
               list([$username, $email]),
               async (pgClient, [username, email]) => {
                 try {
-                  return await pgClient.withTransaction(async (pgClient) => {
-                    const {
-                      rows: [user],
-                    } = await pgClient.query<{
-                      id: string;
-                      username: string;
-                    }>({
-                      text: `
-                      insert into app_public.users (username)
-                      values ($1)
-                      returning *`,
-                      values: [username],
-                    });
-
-                    await pgClient.query({
-                      text: `
-                      insert into app_public.user_emails(user_id, email)
-                      values ($1, $2)`,
-                      values: [user.id, email],
-                    });
-
-                    await sendEmail(email, "Welcome!");
-
-                    return { id: user.id };
+                  const {
+                    rows: [user],
+                  } = await pgClient.query<{
+                    id: string;
+                    username: string;
+                  }>({
+                    text: `
+                    insert into app_public.users (username)
+                    values ($1)
+                    returning *`,
+                    values: [username],
                   });
+
+                  await pgClient.query({
+                    text: `
+                    insert into app_public.user_emails(user_id, email)
+                    values ($1, $2)`,
+                    values: [user.id, email],
+                  });
+
+                  await sendEmail(email, "Welcome!");
+
+                  return { id: user.id };
                 } catch (e) {
                   if (e instanceof DatabaseError && e.code === "23505") {
                     if (e.constraint === "unique_user_username") {

@@ -90,11 +90,16 @@ https://grafast.org/grafast/step-library/dataplan-pg/registry/relations
 The registry is the container for codecs, resources, and relations. When you're
 writing a plugin, if you have a reference to the `build` object then you can
 access the registry via `build.input.pgRegistry`. It contains the properties
-`pgCodecs`, `pgResources` and `pgRelations`. If you had a `users` table then,
-depending on the inflectors you're using, it's codec might be
-`build.input.pgRegistry.pgCodecs.users`, its resource
-`build.input.pgRegistry.pgResources.users` and its relations a keyed object
-(hash/map/record) stored at `build.input.pgRegistry.pgRelations.users`.
+`pgExecutor`, `pgCodecs`, `pgResources` and `pgRelations`.
+
+For improved DX, some shortcuts are added to the `build` object:
+`build.pgExecutor` (the primary executor; most schemas only have one),
+`build.pgCodecs`, `build.pgResources`, and `build.pgRelations`.
+
+If you had a `users` table then, depending on the inflectors you're using, it's
+codec might be `build.pgCodecs.users`, its resource `build.pgResources.users`
+and its relations a keyed object (hash/map/record) stored at
+`build.pgRelations.users`.
 
 You can read more about the registry in the `@dataplan/pg` documentation:
 https://grafast.org/grafast/step-library/dataplan-pg/registry/

@@ -10,6 +10,15 @@ function. You can even bypass the RLS and GRANT checks, should you so choose, by
 tagging your function as `SECURITY DEFINER` — but be very careful when you do
 so!
 
+:::tip[Prefer JavaScript?]
+
+If you want to script your mutation in JavaScript/TypeScript, you can model it
+directly with [`extendSchema`](./extend-schema). This lets you build the exact
+GraphQL schema you want using ergonomic GraphQL SDL, and lets you control
+exactly what mutation logic will be executed via Gra*fast* plans.
+
+:::
+
 ### Rules
 
 To create a function that PostGraphile will recognise as a custom mutation, it

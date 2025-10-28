@@ -105,7 +105,7 @@ import { context, lambda, listen } from "postgraphile/grafast";
 import { jsonParse } from "postgraphile/@dataplan/json";
 
 const MySubscriptionPlugin = extendSchema((build) => {
-  const { messages } = build.input.pgRegistry.pgResources;
+  const { messages } = build.pgResources;
   return {
     typeDefs: /* GraphQL */ `
       extend type Subscription {

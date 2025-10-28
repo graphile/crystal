@@ -4,132 +4,55 @@ title: JWK Verification (e.g. Auth0)
 
 # PostGraphile JWT/JWK Verification Quickstart
 
-:::warning
+This guide adapts [Auth0’s Node (Express)
+quickstart](https://auth0.com/docs/quickstart/backend/nodejs/01-authorization)
+so that the verified JWT payload is forwarded to PostgreSQL through
+[`pgSettings`](./config#pgsettings). It assumes you are running PostGraphile
+using the Express adaptor (`postgraphile/grafserv/express/v4`), but similar will
+apply for alternative servers.
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+Terms:
+
+- [JWT Access Token](https://auth0.com/docs/tokens/concepts/jwts)
+- [JWKS (JSON Web Key Set)](https://auth0.com/docs/jwks)
+
+:::info[Processing a JWT is a middleware concern]
+
+Your web framework middleware will handle verification, refresh tokens,
+revocation lists, and other security concerns - the logic here is not specific
+to PostGraphile. Once you have a set of trusted claims you can expose them to
+PostgreSQL through PostGraphile's [`pgSettings`
+function](./config.mdx#pgsettings). See the [JWT guide](./jwt-guide.mdx) for
+the bigger picture and the
+[PostgreSQL JWT specification](./jwt-specification.md) for how claims map onto
+PostgreSQL session settings.
 
 :::
 
-This guide is an adaption of the official quickstart tutorial for Node (Express)
-provided by
-[Auth0](https://auth0.com/docs/quickstart/backend/nodejs/01-authorization). The
-code illustrates how to intercept and verify a
-[JWT Access Token](https://auth0.com/docs/tokens/concepts/jwts) via a
-[JWKS (JSON Web Key Set)](https://auth0.com/docs/jwks) using
-[Auth0](https://auth0.com/).
+## Dependencies
 
-Although this code should work, we make no claims as to its validity or fit for
-production use. We disclaim all liability.
+This walkthrough uses Express and the Auth0-maintained helpers:
 
-### Dependencies
+- [`express`](https://www.npmjs.com/package/express)
+- [`express-jwt`](https://github.com/auth0/express-jwt)
+- [`jwks-rsa`](https://github.com/auth0/node-jwks-rsa)
 
-This guide uses the [`express`](https://www.npmjs.com/package/express) HTTP
-framework and supporting Node packages authored and maintained by Auth0:
+Install them with the package manager of your choice:
 
-- [`express-jwt`](https://github.com/auth0/express-jwt) - _Middleware that
-  validates a JWT and copies its contents to `req.user`_
-- [`jwks-rsa`](https://github.com/auth0/node-jwks-rsa) - _A library to retrieve
-  RSA public keys from a JWKS (JSON Web Key Set) endpoint_
-
-```bash
-yarn add express express-jwt jwks-rsa
-# Or:
+```bash npm2yarn
 npm install --save express express-jwt jwks-rsa
 ```
 
-### Prior Knowledge & Context
+## Configure `express-jwt`
 
-As a developer, the three essential aspects of Auth0 are:
+`express-jwt` verifies the Bearer token and populates `req.auth` with the JWT
+payload. Configure it with your Auth0 details and JWKS endpoint:
 
-- [_APIs_](https://auth0.com/docs/apis) and
-  [_Applications_](https://auth0.com/docs/applications)
-- [_JWT types_](https://auth0.com/docs/tokens) (e.g. _ID Token_ vs. _Access
-  Token_)
-- Authentication and Authorization [_Flows_](https://auth0.com/docs/flows)
+```ts title="auth0.ts"
+import jwt from "express-jwt";
+import jwksRsa from "jwks-rsa";
 
-To keep it simple, in this guide we will be dealing with an
-[Access Token](https://auth0.com/docs/tokens/overview-access-tokens) granted by
-an API which we will need to verify.
-
-## Getting Started
-
-You will need two values from your Auth0 configuration: The Auth0 _tenant domain
-name_, and the API _identifier._
-
-```javascript {1-2,20,24-25}
-const jwt = require("express-jwt");
-const jwksRsa = require("jwks-rsa");
-
-// ...
-
-// Authentication middleware. When used, the
-// Access Token must exist and be verified against
-// the Auth0 JSON Web Key Set.
-// On successful verification, the payload of the
-// decrypted Access Token is appended to the
-// request (`req`) as a `user` parameter.
-const checkJwt = jwt({
-  // Dynamically provide a signing key
-  // based on the `kid` in the header and
-  // the signing keys provided by the JWKS endpoint.
-  secret: jwksRsa.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: `https://YOUR_DOMAIN/.well-known/jwks.json`,
-  }),
-
-  // Validate the audience and the issuer.
-  audience: "YOUR_API_IDENTIFIER",
-  issuer: `https://YOUR_DOMAIN/`,
-  algorithms: ["RS256"],
-});
-```
-
-(note: if we were processing an
-[ID Token](https://auth0.com/docs/tokens/id-token) instead of an Access Token,
-the _audience_ would be the _Client ID_ instead)
-
-Remember that a JWT has
-[three _period-separated_ sections](https://jwt.io/introduction/): header,
-payload, and signature. On successful verification, the payload will be
-available for us to save inside the PostGraphile request via the
-[`pgSettings`](./config#pgsettings) function.
-
-Let's look at an example payload:
-
-```json {8}
-{
-  "iss": "https://YOUR_DOMAIN/",
-  "sub": "CLIENT_ID@clients",
-  "aud": "YOUR_API_IDENTIFIER",
-  "iat": 1555808706,
-  "exp": 1555895106,
-  "azp": "CLIENT_ID",
-  "scope": "read:schema", // scopes a.k.a. permissions
-  "gty": "client-credentials"
-}
-```
-
-In this example payload, we can see that the only scope the API has made
-available is `read:schema`. Our user can perform no mutations, nor can they
-perform any queries, they are limited to fetching the schema. Not all tokens
-will have such simple payloads, but, in this example, the only meaningful data
-is in the `scope` value.
-
-Now let's make use of the `checkJwt` middleware function:
-
-```javascript {23-24,28-36}
-const express = require("express");
-const { postgraphile } = require("postgraphile");
-
-const jwt = require("express-jwt");
-const jwksRsa = require("jwks-rsa");
-
-// ...
-
-const checkJwt = jwt({
+export const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -140,74 +63,130 @@ const checkJwt = jwt({
   issuer: `https://YOUR_DOMAIN/`,
   algorithms: ["RS256"],
 });
+```
 
-const app = express();
+## Surface trusted claims to PostgreSQL
 
-// Apply checkJwt to our graphql endpoint
-app.use("/graphql", checkJwt);
+Inside `preset.grafast.context` copy whichever details you need into
+`pgSettings`. Only forward the fields your policies rely on.
 
-app.use(
-  postgraphile(process.env.DATABASE_URL, process.env.DB_SCHEMA, {
-    pgSettings: (req) => {
-      const settings = {};
-      if (req.auth) {
-        settings["user.permissions"] = req.auth.scope;
+```ts title="graphile.config.ts"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+
+  grafast: {
+    async context(requestContext, args) {
+      const req = requestContext.expressv4?.req;
+      const pgSettings = {
+        ...args.contextValue?.pgSettings,
+      } as Record<string, string>;
+
+      const claims = req?.auth;
+      if (claims && typeof claims === "object") {
+        if (typeof claims.scope === "string") {
+          pgSettings["jwt.claims.scope"] = claims.scope;
+        }
+        if (typeof claims.sub === "string") {
+          pgSettings["jwt.claims.sub"] = claims.sub;
+        }
+        if (Array.isArray(claims.permissions)) {
+          pgSettings["jwt.claims.permissions"] = claims.permissions.join(" ");
+        }
       }
-      return settings;
+
+      return {
+        ...args.contextValue,
+        pgSettings,
+      };
     },
-    // any other PostGraphile options go here
-  }),
-);
-```
-
-PostGraphile applies everything returned by
-[`pgSettings`](./config#pgsettings) to the
-[current session](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-ADMIN-SET)
-with `set_config($key, $value, true)`. So inside Postgres we can read the
-current value of `user.permissions` by
-`select current_setting('user.permissions', true)::text;`.
-
-## Basic Error Handling
-
-By default, if there is an error in the JWT verification process, the
-`express-jwt` package will send a 401 status with an HTML-formatted error
-message as a response. Instead, we want to follow the pattern of PostGraphile
-and return errors properly formatted in a
-[GraphQL-compliant](http://graphql.github.io/graphql-spec/June2018/#sec-Errors)
-JSON response.
-
-Let's create a basic Express middleware for handling the errors which our
-`checkJwt` function will throw:
-
-```javascript
-const authErrors = (err, req, res, next) => {
-  if (err.name === "UnauthorizedError") {
-    console.log(err); // You will still want to log the error...
-    // but we don't want to send back internal operation details
-    // like a stack trace to the client!
-    res.status(err.status).json({ errors: [{ message: err.message }] });
-    res.end();
-  }
+  },
 };
 
-// Apply error handling to the graphql endpoint
-app.use("/graphql", authErrors);
+export default preset;
 ```
 
-So, now, for example, if someone tries to connect to our GraphQL service without
-any token at all, we still get a 401 status, but with the appropriate and
-succinct response:
+You can use alternative Postgres settings names, but ensure that you include at
+least one and at most two `.` characters, and that the text before the first `.`
+is not a scope reserved by PostgreSQL. Historically no-one has raised an issue
+with the `jwt.claims` prefix, so it seems to be a good choice.
 
-```json
-{
-  "errors": [
-    {
-      "message": "No authorization token was found"
-    }
-  ]
+## Wire Express to Grafserv
+
+Use the Auth0 middleware before adding PostGraphile to your express app.
+
+```ts title="server.ts"
+import express from "express";
+import { createServer } from "node:http";
+import { grafserv } from "postgraphile/grafserv/express/v4";
+import { postgraphile } from "postgraphile";
+
+import preset from "./graphile.config.ts";
+import { checkJwt } from "./auth0.ts";
+import { authErrors } from "./auth-errors.ts";
+
+const app = express();
+const server = createServer(app);
+server.on("error", (e) => void console.error(e));
+app.use("/graphql", checkJwt, authErrors);
+
+const pgl = postgraphile(preset);
+const serv = pgl.createServ(grafserv);
+serv
+  .addTo(app, server)
+  .then(() => {
+    const port = preset.grafserv?.port ?? 5678;
+    server.listen(port);
+    console.log(`GraphQL running at http://localhost:${port}/graphql`);
+  })
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+```
+
+## Error handling
+
+By default `express-jwt` sends HTML-formatted error pages. To keep errors inside
+the GraphQL response surface the `UnauthorizedError` as JSON:
+
+```ts title="auth-errors.ts"
+import type { Request, Response, NextFunction } from "express";
+
+export function authErrors(
+  err: any,
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  if (err?.name === "UnauthorizedError") {
+    res.status(err.status ?? 401).json({ errors: [{ message: err.message }] });
+    return;
+  }
+  next(err);
 }
 ```
+
+## Using the claims in PostgreSQL
+
+Anything placed in `pgSettings` is available inside PostgreSQL via
+`current_setting(...)`. For example:
+
+```sql
+create function current_subject() returns text as $$
+  select nullif(current_setting('jwt.claims.sub', true), '');
+$$ language sql stable;
+```
+
+You can reference the helper inside Row Level Security policies or use it in
+functions. Adjust the key names to match whatever you added to `pgSettings`.
+
+Once everything is wired up, PostGraphile simply consumes the claims you provide
+and enforces your database policies accordingly.
 
 ---
 
-_This article was written by [BR](http://gitlab.com/benjamin-rood)._
+_This article was originally written by
+[BR](http://gitlab.com/benjamin-rood), but has since been heavily modified and
+updated._

@@ -70,7 +70,7 @@ deals in concrete runtime values).
 The (simplified) new signatures are:
 
 ```ts
-export function makeAddPgTableOrderByPlugin(
+export function addPgTableOrderBy(
   match: {
     serviceName?: string;
     schemaName: string;
@@ -140,7 +140,7 @@ const OrderByAveragePetIdPlugin = makeAddPgTableOrderByPlugin(
 V5:
 
 ```ts
-const OrderByAveragePetIdPlugin = makeAddPgTableOrderByPlugin(
+const OrderByAveragePetIdPlugin = addPgTableOrderBy(
   { schemaName: "graphile_utils", tableName: "users" },
   (build) => {
     const { sql } = build;
@@ -194,7 +194,7 @@ const OrderByMemberNamePlugin = makeAddPgTableOrderByPlugin(
 V5:
 
 ```ts
-const OrderByMemberNamePlugin = makeAddPgTableOrderByPlugin(
+const OrderByMemberNamePlugin = addPgTableOrderBy(
   { schemaName: "app_public", tableName: "organization_memberships" },
   ({ sql }) => {
     const sqlIdentifier = sql.identifier(Symbol("member"));
@@ -221,7 +221,7 @@ const OrderByMemberNamePlugin = makeAddPgTableOrderByPlugin(
 V5 (alternative solution, using joins which were not possible in V4):
 
 ```ts
-const OrderByMemberNamePlugin = makeAddPgTableOrderByPlugin(
+const OrderByMemberNamePlugin = addPgTableOrderBy(
   { schemaName: "app_public", tableName: "organization_memberships" },
   (build) => {
     const {

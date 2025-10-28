@@ -28,13 +28,89 @@ confusion!
 
 :::
 
-**If you’re coming from PostGraphile V4** you may then want to add your own
-V4-themed preset with the `makeV4Preset()` factory — see the [V4 migration
-docs](./migrating-from-v4) for more information.
+## PostGraphile presets
 
-If your schema is meant to be consumed by Relay, you may add the
-`postgraphile/presets/relay` preset which enables behaviors and plugins
-optimized for Relay consumption.
+PostGraphile ships a small set of presets that are designed to be composed;
+pick the foundational crystal preset that matches your starting point, and
+layer feature presets as needed.
+
+### `postgraphile/presets/amber`
+
+```ts
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+```
+
+Amber is the current baseline preset. It wires in the Graphile Build and
+Graphile Build PG default plugin lists and sensible options and inflection for
+new PostGraphile users. Every production schema should include Amber either
+directly or transitively.
+
+### `postgraphile/presets/v4`
+
+```ts
+import { makeV4Preset } from "postgraphile/presets/v4";
+```
+
+`makeV4Preset()` extends Amber and restores many PostGraphile V4 behaviours and
+inflection rules. Use it when upgrading an existing V4 project so that the
+generated schema and runtime defaults stay aligned with what your clients
+already expect. The [V4 migration docs](./migrating-from-v4) cover this path in
+more detail.
+
+### `postgraphile/presets/relay`
+
+```ts
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
+```
+
+`PostGraphileRelayPreset` layers additional behaviours on top of your existing
+foundation to produce a Relay-focussed schema. It prefers connections over
+lists, hides primary-key columns that are surfaced via `nodeId`, and adjusts
+inflection so that `id` fields follow Relay conventions. Combine it with Amber
+or another foundational preset. The preset is currently marked experimental, so
+expect refinements between releases.
+
+:::warning[Where did my fields go?]
+
+The Relay preset tries to do away with primary key fields and fields that
+reference them as much as possible, opting instead for using the Node `ID` in as
+many places as possible. If you're coming from V4, probably stick with the v4
+preset unless you really want to make some significant changes to your schema.
+
+:::
+
+### `postgraphile/presets/lazy-jwt`
+
+```ts
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
+```
+
+`PgLazyJWTPreset` enables a convenience flow that verifies bearer JWTs inside
+Grafserv requests and populates `pgSettings` from the claims. It relies on the
+Grafserv adaptor (such as `grafserv/node`) and is intentionally limited; use
+your own `preset.grafast.context` if you need finer-grained control. Remember to
+extend Amber alongside it. For guidance on managing JWTs yourself, see the
+[JWT guide](./jwt-guide.mdx).
+
+### Third-party preset bundles
+
+Many contrib plugins now publish presets (for example,
+`postgraphile-plugin-connection-filter` and
+`@graphile-contrib/pg-many-to-many`). These presets generally expose the plugin
+with some sensible defaults. They do not pull in a foundation preset for you, so
+include Amber (or whichever crystal preset you started with) before them.
+
+:::tip[Stay on your crystal]
+
+We expect to ship more crystal-themed foundational presets over time as the
+recommended defaults evolve. When you adopt a foundational preset, plan to stay
+on it for the life of that project unless you explicitly opt into the next
+crystal. New projects should take whichever foundational preset we recommend at
+the time; existing projects can continue extending the one they started with.
+
+Right now there is only one crystal: amber.
+
+:::
 
 ## Creating your configuration file
 
@@ -140,7 +216,7 @@ import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 // More presets you might want to mix in
 import { makeV4Preset } from "postgraphile/presets/v4";
-import { PgRelayPreset } from "postgraphile/presets/relay";
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
 
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
@@ -159,7 +235,8 @@ const preset: GraphileConfig.Preset = {
       graphiql: true,
       graphiqlRoute: "/",
     }),
-    PgRelayPreset,
+    // Uncomment this to opt into a smaller Relay-focussed schema
+    //PostGraphileRelayPreset,
   ],
 
   plugins: [
@@ -302,8 +379,8 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   warning below.
 - `adaptor: PgAdaptor` - the module to use as the postgres adaptor; e.g. the
   result of `import("@dataplan/pg/adaptors/pg")` for the `pg` module
-- `adaptorSettings` - options to pass to the adaptor, these are different for
-  each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
+- `adaptorSettings` - internal configuration object specific to the adaptor
+  (automatically created by `makePgService()`, see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
 - `pgSettings: (requestContext: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
@@ -327,7 +404,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   `pgSubscriber` if `name` is `"main"` (the default), or `${name}_pgSubscriber`
   otherwise."
 
-```js title="Example manual configuration"
+```js title="Example manual configuration (advanced, usually not needed)"
 import * as pg from "pg";
 import * as adaptor from "@dataplan/pg/adaptors/pg";
 
@@ -340,11 +417,21 @@ const pgServices = [
     adaptor,
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
-      // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+      superuserPool: new pg.Pool({
+        connectionString: process.env.SUPERUSER_DATABASE_URL,
+      }),
     },
   },
 ];
 ```
+
+:::info
+
+The manual configuration approach above is advanced and usually not needed.
+Most users should use `makePgService()` as shown in the next example, which
+is simpler and handles the configuration for you.
+
+:::
 
 :::warning[Don’t set `name` unless you need to!]
 
@@ -393,6 +480,13 @@ common set of optional configuration parameters:
   - `pgSubscriber`
   - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
 
+The `postgraphile/adaptors/pg` adaptor additionally accepts these options:
+
+- `pool` - pass your own pre-built `pg.Pool` instance to use, in which case `connectionString` and `poolConfig` will be ignored. You are responsible for releasing this pool!
+- `poolConfig` - additional configuration options (options other than `connectionString`) to pass through to `pg.Pool`; see the [pg.Pool options](https://node-postgres.com/apis/pool) which inherit the [pg.Client options](https://node-postgres.com/apis/client).
+- `superuserPool` - as `pool`, but for superuser connections (only used to install the watch fixtures in watch mode)
+- `superuserPoolConfig` - as `poolConfig`, but for superuser connections (only used to install the watch fixtures in watch mode)
+
 :::info
 
 These common options are those that the `postgraphile` CLI might pass, which is
@@ -416,7 +510,7 @@ we might want to add to core in future).
 inclusion into the `pgServices` array in your `graphile.config.mjs` (or similar)
 file.
 
-```js title="Example configuration via makePgService"
+```js title="Example configuration via makePgService (recommended)"
 import { makePgService } from "postgraphile/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
@@ -433,8 +527,19 @@ const preset = {
       // Enable LISTEN/NOTIFY:
       pubsub: true,
 
+      // Optional: additional pg.Pool configuration
+      poolConfig: {
+        max: 10,
+        idleTimeoutMillis: 30000,
+      },
+
       // Optional, only needed for `--watch` mode:
       superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+
+      // Optional: additional superuser pg.Pool configuration
+      superuserPoolConfig: {
+        max: 2,
+      },
     }),
   ],
 };
@@ -442,7 +547,14 @@ const preset = {
 
 #### `adaptorSettings`
 
-Each adaptor has its own adaptor-specific settings.
+The `adaptorSettings` property is an internal configuration object that is
+created automatically when you use `makePgService()`. In general, **you
+should not configure this directly.** Instead, pass the configuration options
+directly to `makePgService()` as shown in the examples above.
+
+If for some advanced reason you need to manually configure `pgServices`
+(rather than using `makePgService()`), then you would need to provide
+`adaptorSettings` with whatever the adaptor requires.
 
 ##### `postgraphile/adaptors/pg`
 
@@ -511,6 +623,11 @@ to determine the options that they offer.
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
+- `exportSchemaSDLPath: string | undefined` - when set, writes the latest
+  GraphQL schema definition (SDL) to the given path every time the schema is
+  rebuilt.
+- `exportSchemaIntrospectionResultPath: string | undefined` - when set, writes
+  the GraphQL introspection JSON to the given path alongside SDL exports.
 - `jsonScalarAsString: boolean` - if true, JSON values will be stringified
   rather than returned as “dynamic” objects.
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions
@@ -523,6 +640,8 @@ to determine the options that they offer.
   the default ordering
 - `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
   `MacAddress` and similar types for PostgreSQL network scalars.
+- `sortExport: boolean` - if true (default: `false`), sorts exported SDL and
+  introspection output for stable diffs.
 
 ### `grafast` options
 
@@ -638,6 +757,17 @@ GraphQL context using the key set in that services’ `pgSettingsKey`.
 Presets may also add values to `pgSettings`, for example
 `postgraphile/presets/lazy-jwt` parses the `Authorization` header and adds the
 claims from the JWT to `pgSettings`.
+
+:::warning[`lazy-jwt` is intentionally minimal]
+
+`postgraphile/presets/lazy-jwt` is a stopgap for teams that are still wiring up
+their own authentication. It only supports Bearer tokens, expects a shared
+secret unless you override the verification options, and cannot help with
+common production concerns such as refresh tokens, revocation, or key rotation.
+Plan to replace it with middleware in your application framework that verifies
+credentials and then share that information with PostgreSQL through `pgSettings`.
+
+:::
 
 For most PostGraphile users there’s only one pgService, and the default
 `pgSettingsKey` is `"pgSettings"`, so rather than configuring pgSettings via
