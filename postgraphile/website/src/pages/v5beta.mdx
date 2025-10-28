@@ -81,17 +81,17 @@ To help us shape the final release, you can:
 
 ## Try the release candidate today
 
-Install the release candidate from npm, we are still using the `@beta` tag to
-make the transition as smooth as possible:
+Install the release candidate from npm, be sure to use the `@rc` tag for all
+related modules:
 
 ```bash
-yarn add postgraphile@beta
+yarn add postgraphile@rc
 ```
 
 You can also try the bundled CLI without installing:
 
 ```bash
-npx pgl@beta -P pgl/amber -e -c postgres:///my_db -s public
+npx pgl -P pgl/amber -e -c postgres:///my_db -s public
 ```
 
 Replace the connection string and schema with your own values. If you are
@@ -112,18 +112,22 @@ and let us know where it can be improved.
 ## Epics - COMPLETE!
 
 With the help of the community, we identified four major issues in our new
-planning engine, Gra*fast*. These issues related to ergonomics, edge cases, or efficiency;
-they all required changes to user code (“plan resolvers”), so addressing
-them before release was vital.
+planning engine, Gra*fast*. These issues related to ergonomics, edge cases, or
+efficiency; they all required changes to user code (“plan resolvers”), so
+addressing them before release was vital.
 
 Since fixing these issues required fundamental changes to the way the system
-works &mdash; re-architectures that took many months to complete &mdash; we called them
-“epics”. All four are now complete, hurrah!
+works &mdash; re-architectures that took many months to complete &mdash; we
+called them “epics”. All four are now complete, hurrah!
 
-- ✅ Global dependencies (solved via “unary” steps that represent exactly one value)
-- ✅ Early exit (solved via value “flags” tracking when a value should inhibit dependents)
-- ✅ Stop branching due to planning of nested input values (aka [remove `$step.eval*()`](https://github.com/graphile/crystal/issues/2060))
-- ✅ Avoid excessive polymorphic branching (achieved June 2025)
+- ✅ "Everything is batched" makes ergonomic accommodations for "unary" values
+  (variables, context, etc).
+- ✅ Early termination of field execution with a `null` now has first-class
+  support.
+- ✅ Plan-time "peeking" at runtime values is now forbidden, improving plan
+  re-use (aka [remove `$step.eval*()`](https://github.com/graphile/crystal/issues/2060)).
+- ✅ The exponential polymorphic branching hazard is now eradicated by
+  converging before branching (achieved June 2025).
 
 ## Milestone releases
 
