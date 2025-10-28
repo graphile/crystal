@@ -67,7 +67,7 @@ function HomepageHeader() {
                 className={clsx(
                   "button button--secondary button--lg margin-left--md",
                 )}
-                to="/news/2025-10-17-grafast-v1-release-candidate/"
+                to="/news/2025-10-28-grafast-v1-release-candidate/"
               >
                 Read the RC announcement
               </Link>
