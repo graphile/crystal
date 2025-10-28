@@ -5,7 +5,7 @@ description:
   release of PostGraphile V5!
 slug: 2025-10-28-v5-release-candidate
 authors: [benjie, jem]
-tags: [Releases]
+tags: [releases, v5]
 hide_table_of_contents: false
 toc_max_heading_level: 2
 ---
@@ -14,7 +14,7 @@ import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
 
-After 38 canaries, 20 alphas, 49 betas, and 4 Gra*fast* epics, PostGraphile V5
+After over 100 releases, PostGraphile V5
 has finally reached **release candidate** status! 🎉 Assuming no issues are found,
 this software, these APIs, are what will make up the final PostGraphile v5.0
 release! The runtime is ready, many of you are already using it in production,
@@ -32,11 +32,10 @@ engine](https://grafast.org). Since January 2023 we have shipped 38 pre-alpha,
 tricky edge cases, and ultimately solved the four Gra*fast* epics that blocked a
 stable release:
 
-- ✅ "Everything is batched" now makes ergonomic accommodations for "unary"
-  values (variables, context, etc).
+- ✅ Everything is batched, but “unary” values (variables, context, etc) are now treated as a special case.
 - ✅ Early termination of field execution with a `null` now has first-class
   support.
-- ✅ Plan-time "peeking" at runtime values is now forbidden, improving plan
+- ✅ Plan-time “peeking” at runtime values is now forbidden, improving plan
   re-use.
 - ✅ The exponential polymorphic branching hazard is now eradicated by
   converging before branching again.
@@ -89,7 +88,7 @@ yarn add postgraphile@rc
 ```
 
 You can also try the bundled CLI without installing (no tag needed here since
-it's new!):
+it’s new!):
 
 ```bash
 npx pgl -P pgl/amber -e -c postgres:///my_db -s public
@@ -103,8 +102,8 @@ If you are upgrading from V4, follow the [migration
 guide](/postgraphile/5/migrating-from-v4) and let us know where it can be
 improved.
 
-We're particularly interested to hear how you get on, and what tools help with
-your migration. If you're using AI code assistants, what instructions did you
+We’re particularly interested to hear how you get on, and what tools help with
+your migration. If you’re using AI code assistants, what instructions did you
 give? Can we clarify anything in the migration guide so they have greater
 success?
 

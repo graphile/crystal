@@ -28,7 +28,7 @@ One of the key concepts to understand is that Gra*fast* is **declarative**, not
 procedural. A plan resolver function is responsible for creating the graph of
 steps necessary to support resolution of that individual field, and this graph
 is combined with the graph for every other requested field to form the draft
-execution plan — the DAG through which the values will flow at execution time.
+execution plan — the DAG through which the values will flow at execution-time.
 
 The steps in our graph are fluid; plan resolver functions only specify the order
 of operations in the form of dependencies and side effects between these steps,

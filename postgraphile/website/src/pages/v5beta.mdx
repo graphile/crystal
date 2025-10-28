@@ -120,11 +120,10 @@ Since fixing these issues required fundamental changes to the way the system
 works &mdash; re-architectures that took many months to complete &mdash; we
 called them “epics”. All four are now complete, hurrah!
 
-- ✅ "Everything is batched" makes ergonomic accommodations for "unary" values
-  (variables, context, etc).
+- ✅ Everything is batched, but “unary” values (variables, context, etc) are now treated as a special case.
 - ✅ Early termination of field execution with a `null` now has first-class
   support.
-- ✅ Plan-time "peeking" at runtime values is now forbidden, improving plan
+- ✅ Plan-time “peeking” at runtime values is now forbidden, improving plan
   re-use (aka [remove `$step.eval*()`](https://github.com/graphile/crystal/issues/2060)).
 - ✅ The exponential polymorphic branching hazard is now eradicated by
   converging before branching again (achieved June 2025).
