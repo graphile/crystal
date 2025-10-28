@@ -55,6 +55,14 @@
   background-color: var(--ifm-color-primary-dark);
 }
 
+.progressLink {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .progressLink {
+  color: var(--ifm-color-primary-darker);
+}
+
 .releasesTable thead tr,
 .releasesTable thead th,
 .releasesTable tfoot td,

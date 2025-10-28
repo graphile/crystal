@@ -157,7 +157,7 @@ const config = {
       announcementBar: {
         id: "announcementBar-2",
         content:
-          '<a href="/caveats">Read the pre-release caveats!</a> Documentation is not complete; PRs welcome ♥',
+          '<a href="/news/2025-10-28-grafast-v1-release-candidate"><strong>Try out the Release Candidate!</strong></a> Documentation is not complete; PRs welcome ♥',
         //backgroundColor: "#fafbfc",
         //textColor: "#091E42",
         isCloseable: false,
