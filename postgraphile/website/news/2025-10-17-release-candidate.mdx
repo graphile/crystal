@@ -1,11 +1,11 @@
 ---
-title: PostGraphile V5 release candidate is ready for review
+title: PostGraphile V5 release candidate! 🎉
 description:
-  The code is done, the docs are behind. Help us polish the final release of
-  PostGraphile V5.
-slug: 2025-10-17-v5-release-candidate
+  The code is done, the docs and types need some love. Help us prepare for the
+  release of PostGraphile V5!
+slug: 2025-10-28-v5-release-candidate
 authors: [benjie, jem]
-tags: [RC]
+tags: [Releases]
 hide_table_of_contents: false
 toc_max_heading_level: 2
 ---
@@ -14,61 +14,55 @@ import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
 
-After five and a half years of work, countless beta drops, and four Gra*fast*
-epics, PostGraphile V5 has now reached **release candidate** status. This is
-the last checkpoint before the final release. The runtime is ready, many of you
-are already shipping it in production, and now we urgently need your feedback.
-The release candidate includes some quality of life improvements, and the APIs are
-stable, ready for you to try V5 today.
+After five and a half years of work, 38 canaries, 20 alphas, 49 betas, and 4
+Gra*fast* epics, PostGraphile V5 has finally reached **release candidate**
+status. Assuming no issues are found, this software, these APIs, are what will
+make up the final PostGraphile v5.0.0 release! The runtime is ready, many of you
+are already using it in production, but the types and docs are a little behind.
+Help us get ready for release: try it out, tell us where the gaps are, and maybe
+help fill them!
 
 </div>
 
 ## Four epics, countless lessons
 
-In February 2020 we kicked off the journey that became PostGraphile V5 and the
-[Gra*fast* execution engine](https://grafast.org). Since then we have shipped 38 pre-alpha, 20 alpha,
-and 49 beta releases. Every stage refined the ergonomics, uncovered tricky edge
-cases, and ultimately solved the four Gra*fast* epics that blocked a stable
-release.
+After a couple false starts, in February 2020 we kicked off the journey that
+would ultimately become PostGraphile V5 and the [Gra*fast* execution
+engine](https://grafast.org). Since January 2023 we have shipped 38 pre-alpha,
+20 alpha, and 49 beta releases. Every stage refined the ergonomics, uncovered
+tricky edge cases, and ultimately solved the four Gra*fast* epics that blocked a
+stable release:
 
-- ✅ Global dependencies are now tidy unary steps.
-- ✅ Early exits are handled with flags that avoid wasted work.
-- ✅ Eval is eradicated, enabling safer and simpler planning.
-- ✅ Polymorphic plans now converge without exponential branching.
+- ✅ "Everything is batched" now makes ergonomic accommodations for "unary"
+  values (variables, context, etc).
+- ✅ Early termination of field execution with a `null` now has first-class
+  support.
+- ✅ Plan-time "peeking" at runtime values is now forbidden, improving plan
+  re-use.
+- ✅ The exponential polymorphic branching hazard is now eradicated by
+  converging before branching.
 
-The result is a platform that is faster, more expressive, and easier to extend
-than anything we have shipped before.
+The result is a platform that is faster, more expressive, more configurable, and
+easier to extend than anything we have shipped before.
 
 <!-- truncate-->
 
-## Fresh polish in the RC
-
-While the new features are largely locked down, the RC includes a few quality
-of life improvements:
-
-- Partitioned tables can now expose their child partitions via smart tags or a
-  global option, making it easier to target specific shards in GraphQL.
-- Enum table domains from V4 return, so PostgreSQL functions can accept and
-  return enum-backed domain values without custom glue code.
-- The simple subscriptions plugin better matches V4’s behaviour, smoothing websocket migrations.
-- `@dataplan/pg` now forwards the `pg-sql2` helpers, so plan resolvers can rely
-  on a single import for PostgreSQL-aware SQL building.
-
-If you bump into rough edges while trying these changes, please raise an issue
-in the [Crystal repo](https://github.com/graphile/crystal) so we can address it before the final release.
-
 ## Why this is still a release candidate
 
-We do not anticipate more breaking changes to the runtime behaviour. Numerous
+We do not anticipate breaking changes to the runtime behaviour. Numerous
 teams have already trusted beta builds in production for over a year and the
 feedback has been excellent. The remaining work is polish: verifying the docs,
 catching stray rough edges, and ensuring that migration guidance reflects the
 software as it exists today.
 
 You can expect the occasional breaking change in TypeScript typings as we close
-gaps and simplify generics. The runtime APIs will remain compatible, but you
-may need to adjust type annotations while we tighten things up. Likewise, some
-TSDoc comments are behind reality; we will update them alongside the docs.
+gaps and fix inaccuracies. The runtime APIs will remain compatible, but you may
+need to adjust type annotations while we tighten things up. Likewise, some TSDoc
+comments are behind reality; we will update them alongside the docs.
+
+If you bump into rough edges while trying V5, please raise an issue in the
+[Crystal repo](https://github.com/graphile/crystal) so we can address it before
+the final release.
 
 ## Help us finish the documentation
 
@@ -83,27 +77,37 @@ about what is unclear are invaluable.
 - Help us verify CLI reference pages against the current defaults.
 
 Please [open issues or pull requests](https://github.com/graphile/crystal) and
-talk to us on [Discord](https://discord.gg/graphile). We are prioritizing doc
-fixes above new features during the RC period.
+talk to us on [Discord](https://discord.gg/graphile). We are prioritizing
+documentation and type improvements above new features during the RC period.
 
 ## Try the release candidate today
 
-Install the release candidate from npm, we are still using the `@beta` tag to
-make the transition as smooth as possible:
+Install the release candidate from npm; you should use the `@rc` tag with all of
+our modules to get the V5 version:
 
 ```bash
-yarn add postgraphile@beta
+yarn add postgraphile@rc
 ```
 
-You can also try the bundled CLI without installing:
+You can also try the bundled CLI without installing (no tag needed here since
+it's new!):
 
 ```bash
-npx pgl@beta -P pgl/amber -e -c postgres:///my_db -s public
+npx pgl -P pgl/amber -e -c postgres:///my_db -s public
 ```
 
-Replace the connection string and schema with your own values. If you are
-upgrading from V4, follow the [migration guide](/postgraphile/5/migrating-from-v4)
-and let us know where it can be improved.
+Replace the connection string and schema with your own values.
+
+## Migrating from V4?
+
+If you are upgrading from V4, follow the [migration
+guide](/postgraphile/5/migrating-from-v4) and let us know where it can be
+improved.
+
+We're particularly interested to hear how you get on, and what tools help with
+your migration. If you're using AI code assistants, what instructions did you
+give? Can we clarify anything in the migration guide so they have greater
+success?
 
 ## Thank you sponsors!
 
