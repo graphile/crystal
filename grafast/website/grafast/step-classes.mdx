@@ -614,7 +614,7 @@ const Animal = new GraphQLInterfaceType({
     // Call .toSpecifier() if it exists, otherwise use the step directly
     return $step.toSpecifier?.() ?? $step;
   },
-  planType($specifier) {
+  planType($specifier, info) {
     // Extract the property that indicates the type from above
     const $__typename = get($specifier, "__typename");
     return { $__typename };
@@ -627,7 +627,7 @@ const Cat = new GraphQLObjectType({
   // ... fields ...
   extensions: {
     grafast: {
-      planType($specifier) {
+      planType($stepOrSpecifier) {
         const $id = get($specifier, "id");
         return cats.get({ id: $id });
       },

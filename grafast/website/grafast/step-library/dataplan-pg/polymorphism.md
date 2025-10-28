@@ -150,7 +150,7 @@ const singleTableSchema = makeGrafastSchema({
   interfaces: {
     // Our abstract (interface) type
     Item: {
-      planType($id: Step<number>) {
+      planType($id: Step<number>, info) {
         // Load the item
         const $item = singleTableItems.get({ id: $id });
         // Get its type (e.g. CHECKLIST_ITEM)
@@ -292,7 +292,7 @@ const relationalSchema = makeGrafastSchema({
   },
   interfaces: {
     Item: {
-      planType($id: Step<number>) {
+      planType($id: Step<number>, info) {
         // Load the base item
         const $item = relationalItems.get({ id: $id });
         // Get its type (e.g. CHECKLIST_ITEM)
@@ -406,7 +406,7 @@ const objects = {
 };
 const unions = {
   Entity: {
-    planType($specifier) {
+    planType($specifier, info) {
       const $personId = $specifier.get("person_id");
       const $postId = $specifier.get("post_id");
       const $commentId = $specifier.get("comment_id");
@@ -503,7 +503,7 @@ const objects = {
 const unions = {
   Entity: {
     // The same planType as the previous example
-    planType($specifier) {
+    planType($specifier, info) {
       const $personId = $specifier.get("person_id");
       const $postId = $specifier.get("post_id");
       const $commentId = $specifier.get("comment_id");
@@ -560,7 +560,7 @@ const objects = {
 };
 const unions = {
   PersonOrOrganization: {
-    planType($spec) {
+    planType($spec, info) {
       // PgUnionAllSingleStep has a `toSpecifier` method, so we know the object
       // will already have the right shape.
       const $__typename = get($spec, "__typename");

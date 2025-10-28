@@ -78,16 +78,10 @@ declare module "grafast" {
   > {
     scope?: Omit<GraphileBuild.ScopeObjectFieldsField, "fieldName">;
   }
-  interface UnionPlan<
-    TSource extends Step = any,
-    TSpecifier extends Step = TSource,
-  > {
+  interface UnionPlan<TSpecifier = any, TSource extends Step = Step> {
     scope?: GraphileBuild.ScopeUnion;
   }
-  interface InterfacePlan<
-    TSource extends Step = any,
-    TSpecifier extends Step = TSource,
-  > {
+  interface InterfacePlan<TSpecifier = any, TSource extends Step = Step> {
     scope?: GraphileBuild.ScopeInterface;
     fields?: {
       [fieldName: string]: {

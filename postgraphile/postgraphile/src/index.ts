@@ -20,7 +20,6 @@ export interface PostGraphileInstance {
   getResolvedPreset(): GraphileConfig.ResolvedPreset;
   release(): PromiseOrDirect<void>;
 }
-function noop() {}
 
 export function postgraphile(
   preset: GraphileConfig.Preset,
@@ -35,13 +34,17 @@ export function postgraphile(
   let server: GrafservBase | undefined;
   if (resolvedPreset.grafserv?.watch) {
     schemaResult = defer<SchemaResult>();
-    stopWatchingPromise = watchSchema(preset, (error, newParams) => {
+    stopWatchingPromise = watchSchema(preset, async (error, newParams) => {
       if (error || !newParams) {
         console.error("Watch error: ", error);
         if (!released) {
           released = true;
           if (server) {
-            server.release().then(null, noop);
+            try {
+              await server.release();
+            } catch (e) {
+              console.error(`Failed to release server: `, e);
+            }
           }
         }
         return;
@@ -56,9 +59,9 @@ export function postgraphile(
         oldSchemaResult.resolve(schemaResult);
       }
       if (server) {
+        await server.ready();
         try {
-          // TODO: `setPreset` should go in a queue
-          server.setPreset(schemaResult.resolvedPreset);
+          await server.setPreset(schemaResult.resolvedPreset);
           server.setSchema(schemaResult.schema);
         } catch (e) {
           console.error(

@@ -167,7 +167,7 @@ const schema = makeGrafastSchema({
   `,
   interfaces: {
     Animal: {
-      planType($specifier) {
+      planType($specifier, info) {
         /* ... */
       },
       // Also: toSpecifier($step)
@@ -175,7 +175,7 @@ const schema = makeGrafastSchema({
   },
   unions: {
     Entity: {
-      planType($specifier) {
+      planType($specifier, info) {
         /* ... */
       },
       // Also: toSpecifier($step)
@@ -195,7 +195,7 @@ const Animal = new GraphQLInterfaceType({
   },
   extensions: {
     grafast: {
-      planType($specifier) {
+      planType($specifier, info) {
         /* ... */
       },
       // Also: toSpecifier($step)
@@ -207,7 +207,7 @@ const Entity = new GraphQLUnionType({
   types: [Animal /* , ... */],
   extensions: {
     grafast: {
-      planType($specifier) {
+      planType($specifier, info) {
         /* ... */
       },
       // Also: toSpecifier($step)
@@ -216,10 +216,10 @@ const Entity = new GraphQLUnionType({
 });
 ```
 
-However you add it, `planType` accepts two parameters: the specifier step, and
-an `info` object, which you can find out more about in [“Advanced”](#advanced) below. The function
-must return an `AbstractTypePlanner` object, which is an object with two
-entries:
+However you add it, `planType` accepts two parameters: the specifier step (the
+combined data described above) and an `info` object (see
+[“Advanced”](#advanced)). The function must return an `AbstractTypePlanner`
+object, which is an object with two entries:
 
 - `$__typename` (required): a step representing the name of the resolved
   concrete object type.
@@ -231,7 +231,10 @@ entries:
 In our fetch-to-type example from before, `planType` might look like this:
 
 ```ts
-function planType($specifier: Step<number>): AbstractTypePlanner {
+function planType(
+  $specifier: Step<number>,
+  info: PlanTypeInfo,
+): AbstractTypePlanner {
   // Fetch the database record for this $specifier
   const $record = animals.get({ id: $specifier });
   // Extract the type from the relevant column
@@ -260,7 +263,10 @@ However, in our type-to-fetch example, `planType` would perform more logic
 inside the `planForType` method, and needs less work to find the type name:
 
 ```ts
-function planType($specifier: Step<string>): AbstractTypePlanner {
+function planType(
+  $specifier: Step<string>,
+  info: PlanTypeInfo,
+): AbstractTypePlanner {
   // Parse the NodeID into a typename and identifier
   const $parsed = lambda($specifier, parseNodeId, true);
   // Extract the type name:
@@ -273,12 +279,12 @@ function planType($specifier: Step<string>): AbstractTypePlanner {
       switch (t.name) {
         // This is the 'User' type, so extract the ID and fetch the user:
         case "User": {
-          const $id = get(parsed, "id");
+          const $id = get($parsed, "id");
           return users.get({ id: $id });
         }
         // Resolving other types may work in similar or different ways:
         case "Organization": {
-          const $id = get(parsed, "id");
+          const $id = get($parsed, "id");
           return organizations.get({ organizationId: $id });
         }
         default: {
@@ -414,7 +420,7 @@ const schema = makeGrafastSchema({
         // A simple data object with just the ID, perfect for accumulating
         return object({ id: get($step, "id") });
       },
-      planType($obj) {
+      planType($obj, info) {
         // Extract the ID
         const $id = get($obj, "id");
         // Fetch the record (same for all types)

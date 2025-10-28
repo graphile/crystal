@@ -1,0 +1,9 @@
+{
+  collectionRecommendation: {
+    items: [
+      {
+        id: "id-2",
+      },
+    ],
+  },
+}

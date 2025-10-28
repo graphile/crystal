@@ -3,7 +3,7 @@
 ## expect(errors[0].message).toEqual("Invalid node identifier for 'Person'")
 ## expect(errors[0].path).toEqual(['z_invalidAuthorId'])
 #> schema: ["d"]
-#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> extends: ["postgraphile/presets/relay:PostGraphileRelayPreset"]
 query Q(
   $alice: ID! = "WyJwZW9wbGUiLDNd"
   $post3: ID! = "WyJwb3N0cyIsM10="

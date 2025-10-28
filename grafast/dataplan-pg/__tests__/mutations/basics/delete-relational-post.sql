@@ -1,6 +1,11 @@
 delete from interfaces_and_unions.relational_posts as __relational_posts__ where (__relational_posts__."id" = $1::"int4") returning
   __relational_posts__."id"::text as "0",
-  case when (__relational_posts__) is not distinct from null then null::text else json_build_array((((__relational_posts__)."id"))::text, ((__relational_posts__)."title"), ((__relational_posts__)."description"), ((__relational_posts__)."note"))::text end as "1";
+  case when (__relational_posts__) is not distinct from null then null::text else json_build_array(
+    (((__relational_posts__)."id"))::text,
+    ((__relational_posts__)."title"),
+    ((__relational_posts__)."description"),
+    ((__relational_posts__)."note")
+  )::text end as "1";
 
 select
   __relational_posts__."id"::text as "0",
@@ -41,4 +46,9 @@ where (
 
 delete from interfaces_and_unions.relational_posts as __relational_posts__ where (__relational_posts__."id" = $1::"int4") returning
   __relational_posts__."id"::text as "0",
-  case when (__relational_posts__) is not distinct from null then null::text else json_build_array((((__relational_posts__)."id"))::text, ((__relational_posts__)."title"), ((__relational_posts__)."description"), ((__relational_posts__)."note"))::text end as "1";
+  case when (__relational_posts__) is not distinct from null then null::text else json_build_array(
+    (((__relational_posts__)."id"))::text,
+    ((__relational_posts__)."title"),
+    ((__relational_posts__)."description"),
+    ((__relational_posts__)."note")
+  )::text end as "1";

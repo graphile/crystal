@@ -61,7 +61,4 @@ export const PostGraphileAmberPreset: GraphileConfig.Preset = {
   plugins: [SwallowErrorsPlugin],
 };
 
-/** @deprecated use PostGraphileAmberPreset instead */
-export const postgraphilePresetAmber = PostGraphileAmberPreset;
-
 export default PostGraphileAmberPreset;

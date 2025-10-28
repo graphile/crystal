@@ -1,4 +1,4 @@
-/* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
+/* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
 import type {
@@ -801,7 +801,7 @@ const ItemResolver = {
       },
     };
   },
-} as InterfacePlan<Step<ItemSpec>>;
+} as InterfacePlan<ItemSpec>;
 
 function getCreator($source: Step<{ creator?: number }>) {
   const $db = context().get("dccDb");

@@ -1,4 +1,4 @@
-/* eslint-disable graphile-export/export-methods */
+/* eslint-disable graphile-export/export-methods, graphile-export/export-plans */
 import type { ServerType } from "@hono/node-server";
 import { serve } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";

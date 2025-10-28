@@ -116,7 +116,23 @@ export class GrafservBase {
     this.graphqlHandler = this.waitForGraphqlHandler;
     this.graphiqlHandler = this.waitForGraphiqlHandler;
     this.graphiqlStaticHandler = this.waitForGraphiqlStaticHandler;
-    this.setPreset(this.resolvedPreset);
+    this.readyTask(this.setPreset(this.resolvedPreset));
+  }
+
+  private readyPromise: PromiseOrDirect<void> = undefined;
+  private readyTask(task: PromiseOrDirect<void>) {
+    if (!task) return;
+    const prom = this.readyPromise ? this.readyPromise.then(() => task) : task;
+    const prom2 = Promise.resolve(prom).finally(() => {
+      if (this.readyPromise === prom2) {
+        this.readyPromise = undefined;
+      }
+    });
+    this.readyPromise = prom2;
+  }
+
+  public ready(): PromiseOrDirect<void> {
+    return this.readyPromise;
   }
 
   /** @internal */

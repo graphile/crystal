@@ -4,7 +4,7 @@
 ## expect(errors[0].path).toEqual(['z_invalidAuthorId'])
 #> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
 #> schema: ["d"]
-#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> extends: ["postgraphile/presets/relay:PostGraphileRelayPreset"]
 query Q(
   $alice: ID! = "people|3"
   $post3: ID! = "posts|3"

@@ -13,7 +13,12 @@ where (
 order by __relational_posts__."id" asc;
 
 select
-  case when (__relational_posts__) is not distinct from null then null::text else json_build_array((((__relational_posts__)."id"))::text, ((__relational_posts__)."title"), ((__relational_posts__)."description"), ((__relational_posts__)."note"))::text end as "0",
+  case when (__relational_posts__) is not distinct from null then null::text else json_build_array(
+    (((__relational_posts__)."id"))::text,
+    ((__relational_posts__)."title"),
+    ((__relational_posts__)."description"),
+    ((__relational_posts__)."note")
+  )::text end as "0",
   __relational_posts__."id"::text as "1"
 from interfaces_and_unions.insert_post($1::"int4", $2::"text") as __relational_posts__
 where (

@@ -11,7 +11,7 @@ import {
   processHeaders,
 } from "../../../index.js";
 import type {
-  EventStreamHeandlerResult,
+  EventStreamHandlerResult,
   GrafservBodyJSON,
   GrafservConfig,
   RequestDigest,
@@ -187,7 +187,7 @@ export class HonoGrafserv extends GrafservBase {
   public async handleEventStreamEvent(ctx: Ctx) {
     const digest = getDigest(ctx);
 
-    const handlerResult: EventStreamHeandlerResult = {
+    const handlerResult: EventStreamHandlerResult = {
       type: "event-stream",
       request: normalizeRequest(digest),
       dynamicOptions: this.dynamicOptions,

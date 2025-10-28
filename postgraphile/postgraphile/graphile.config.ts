@@ -25,7 +25,7 @@ import type {} from "postgraphile/grafserv/node";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
-import { PgRelayPreset } from "postgraphile/presets/relay";
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 // import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
@@ -651,7 +651,7 @@ const preset: GraphileConfig.Preset = {
     }),
     // PgManyToManyPreset,
     // PostGraphileConnectionFilterPreset,
-    PgRelayPreset,
+    PostGraphileRelayPreset,
     PgLazyJWTPreset,
   ],
   ruru: {

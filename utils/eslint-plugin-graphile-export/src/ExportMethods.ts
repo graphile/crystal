@@ -52,6 +52,7 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   // pgSelect args
   "name",
 
+  "plans",
   "assertStep",
   "idempotent",
   "inputPlan",
@@ -103,6 +104,8 @@ export const ExportMethods: Rule.RuleModule = {
       "inputPlan",
       "applyPlan",
       "assertStep",
+      "planType",
+      "toSpecifier",
     ];
 
     const options: CommonOptions = {

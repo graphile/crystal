@@ -9,7 +9,7 @@ import { PostGraphileAmberPreset } from "pgl/amber";
 import { context, listen, object } from "pgl/grafast";
 import type {} from "pgl/grafserv/node";
 import { StreamDeferPlugin } from "pgl/graphile-build";
-import { PgRelayPreset } from "pgl/relay";
+import { PostGraphileRelayPreset } from "pgl/relay";
 import { makeV4Preset } from "pgl/v4";
 
 import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
@@ -120,21 +120,29 @@ const preset: GraphileConfig.Preset = {
       objects: {
         Query: {
           plans: {
-            mol() {
-              return context().get("mol");
-            },
+            mol: EXPORTABLE(
+              (context) =>
+                function mol() {
+                  return context().get("mol");
+                },
+              [context],
+            ),
           },
         },
         Subscription: {
           plans: {
             // Test via SQL: `NOTIFY test, '{"a":40}';`
-            sub(_$root, args) {
-              const $topic = args.getRaw("topic");
-              const $pgSubscriber = context().get("pgSubscriber");
-              return listen($pgSubscriber, $topic, ($payload) =>
-                object({ sub: jsonParse($payload).get("a" as never) }),
-              );
-            },
+            sub: EXPORTABLE(
+              (context, jsonParse, listen, object) =>
+                function sub(_$root, args) {
+                  const $topic = args.getRaw("topic");
+                  const $pgSubscriber = context().get("pgSubscriber");
+                  return listen($pgSubscriber, $topic, ($payload) =>
+                    object({ sub: jsonParse($payload).get("a" as never) }),
+                  );
+                },
+              [context, jsonParse, listen, object],
+            ),
             gql: {
               resolve: EXPORTABLE(
                 () =>
@@ -174,7 +182,7 @@ const preset: GraphileConfig.Preset = {
     }),
     PgManyToManyPreset,
     PostGraphileConnectionFilterPreset,
-    PgRelayPreset,
+    PostGraphileRelayPreset,
   ],
   ruru: {
     htmlParts: {

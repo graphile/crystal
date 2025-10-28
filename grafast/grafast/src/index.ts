@@ -430,7 +430,6 @@ export {
   InputObjectTypeBakedResolver,
   InputObjectTypeSpec,
   inspect,
-  AbstractTypePlan as InterfaceOrUnionPlans,
   InterfacePlan,
   isDev,
   isExecutableStep,
@@ -694,11 +693,6 @@ exportAsMany("grafast", {
 export { hookArgs } from "./args.js";
 export { version } from "./version.js";
 
-/** @deprecated Renamed to 'applyTransforms' */
-export const deepEval = applyTransforms;
-/** @deprecated Renamed to 'ApplyTransformsStep' */
-export const DeepEvalStep = ApplyTransformsStep;
-
 declare global {
   namespace Grafast {
     type ExecutionArgs = Pick<
@@ -801,18 +795,15 @@ declare global {
       toSpecifier?($step: Step): Step;
 
       /**
-       * Plantime. `$stepOrSpecifier` is either a step returned from a field or
-       * list position with an abstract type, or a `__ValueStep` that
-       * represents the combined values of such steps (to prevent unbounded
-       * plan branching). `planType` must then construct a step that
-       * represents the `__typename` related to this given specifier (or `null`
-       * if no match can be found) and a `planForType` method which, when
-       * called, should return the step for the given type.
+       * Plantime. `$specifier` is a step representing the data in an abstract
+       * position (not necessarily the underlying step class because it could
+       * be the combination of data through multiple polymorphic paths).
+       * `planType` must then construct a step that represents the `__typename`
+       * related to this given specifier (or `null` if no match can be found)
+       * and a `planForType` method which, when called, should return the step
+       * for the given type.
        */
-      planType?(
-        $stepOrSpecifier: Step,
-        info: PlanTypeInfo,
-      ): AbstractTypePlanner;
+      planType?($specifier: Step, info: PlanTypeInfo): AbstractTypePlanner;
     }
 
     interface UnionTypeExtensions {
@@ -825,18 +816,15 @@ declare global {
       toSpecifier?($step: Step): Step;
 
       /**
-       * Plantime. `$stepOrSpecifier` is either a step returned from a field or
-       * list position with an abstract type, or a `__ValueStep` that
-       * represents the combined values of such steps (to prevent unbounded
-       * plan branching). `planType` must then construct a step that
-       * represents the `__typename` related to this given specifier (or `null`
-       * if no match can be found) and a `planForType` method which, when
-       * called, should return the step for the given type.
+       * Plantime. `$specifier` is a step representing the data in an abstract
+       * position (not necessarily the underlying step class because it could
+       * be the combination of data through multiple polymorphic paths).
+       * `planType` must then construct a step that represents the `__typename`
+       * related to this given specifier (or `null` if no match can be found)
+       * and a `planForType` method which, when called, should return the step
+       * for the given type.
        */
-      planType?(
-        $stepOrSpecifier: Step,
-        info: PlanTypeInfo,
-      ): AbstractTypePlanner;
+      planType?($specifier: Step, info: PlanTypeInfo): AbstractTypePlanner;
     }
 
     interface EnumTypeExtensions {

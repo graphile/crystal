@@ -69,7 +69,7 @@ class GrafastGenerator {
     );
   }
   private specifier(type: GraphQLNamedType) {
-    return this._get(type, "specifier", this.source(type));
+    return this._get(type, "specifier", `StepData<${this.source(type)}>`);
   }
 
   private expect(type: GraphQLOutputType): string {
@@ -88,8 +88,8 @@ class GrafastGenerator {
       if (!isInterfaceType(type)) continue;
       lines.push(`\
     ${type.name}?: InterfacePlan<
-      ${this.source(type)},
-      ${this.specifier(type)}
+      ${this.specifier(type)},
+      ${this.source(type)}
     >;`);
     }
     return lines;
@@ -101,8 +101,8 @@ class GrafastGenerator {
       if (!isUnionType(type)) continue;
       lines.push(`\
     ${type.name}?: UnionPlan<
-      ${this.source(type)},
-      ${this.specifier(type)}
+      ${this.specifier(type)},
+      ${this.source(type)}
     >;`);
     }
     return lines;
@@ -199,6 +199,7 @@ type Overrides = {}`,
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
 type ListOfStep<TStep extends Step> = StepRepresentingList<TStep extends Step<infer U> ? U : any, TStep>;
+type StepData<TStep extends Step> = TStep extends Step<infer U> ? U : never;
 
 type Get<
   TTypeName extends string,

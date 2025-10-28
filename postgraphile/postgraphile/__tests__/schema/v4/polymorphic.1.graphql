@@ -252,6 +252,689 @@ strings and not numbers.
 """
 scalar BigInt
 
+interface Collection implements Node {
+  col001: String
+  col002: String
+  col003: String
+  col004: String
+  col005: String
+  col006: String
+  col007: String
+  col008: String
+  col009: String
+  col010: String
+  col011: String
+  col012: String
+  col013: String
+  col014: String
+  col015: String
+  col016: String
+  col017: String
+  col018: String
+  col019: String
+  col020: String
+  col021: String
+  col022: String
+  col023: String
+  col024: String
+  col025: String
+  col026: String
+  col027: String
+  col028: String
+  col029: String
+  col030: String
+  col031: String
+  col032: String
+  col033: String
+  col034: String
+  col035: String
+  col036: String
+  col037: String
+  col038: String
+  col039: String
+  col040: String
+  col041: String
+  col042: String
+  col043: String
+  col044: String
+  col045: String
+  col046: String
+  col047: String
+  col048: String
+  col049: String
+  col050: String
+  col051: String
+  col052: String
+  col053: String
+  col054: String
+  col055: String
+  col056: String
+  col057: String
+  col058: String
+  col059: String
+  col060: String
+  col061: String
+  col062: String
+  col063: String
+  col064: String
+  col065: String
+  col066: String
+  col067: String
+  col068: String
+  col069: String
+  col070: String
+  col071: String
+  col072: String
+  col073: String
+  col074: String
+  col075: String
+  col076: String
+  col077: String
+  col078: String
+  col079: String
+  col080: String
+  col081: String
+  col082: String
+  col083: String
+  col084: String
+  col085: String
+  col086: String
+  col087: String
+  col088: String
+  col089: String
+  col090: String
+  col091: String
+  col092: String
+  col093: String
+  col094: String
+  col095: String
+  col096: String
+  col097: String
+  col098: String
+  col099: String
+  col100: String
+  createdAt: Datetime
+  episodes: Int
+  id: String!
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  recommendations: JSON
+  type: String!
+}
+
+"""
+A condition to be used against `Collection` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input CollectionCondition {
+  """Checks for equality with the object’s `col001` field."""
+  col001: String
+
+  """Checks for equality with the object’s `col002` field."""
+  col002: String
+
+  """Checks for equality with the object’s `col003` field."""
+  col003: String
+
+  """Checks for equality with the object’s `col004` field."""
+  col004: String
+
+  """Checks for equality with the object’s `col005` field."""
+  col005: String
+
+  """Checks for equality with the object’s `col006` field."""
+  col006: String
+
+  """Checks for equality with the object’s `col007` field."""
+  col007: String
+
+  """Checks for equality with the object’s `col008` field."""
+  col008: String
+
+  """Checks for equality with the object’s `col009` field."""
+  col009: String
+
+  """Checks for equality with the object’s `col010` field."""
+  col010: String
+
+  """Checks for equality with the object’s `col011` field."""
+  col011: String
+
+  """Checks for equality with the object’s `col012` field."""
+  col012: String
+
+  """Checks for equality with the object’s `col013` field."""
+  col013: String
+
+  """Checks for equality with the object’s `col014` field."""
+  col014: String
+
+  """Checks for equality with the object’s `col015` field."""
+  col015: String
+
+  """Checks for equality with the object’s `col016` field."""
+  col016: String
+
+  """Checks for equality with the object’s `col017` field."""
+  col017: String
+
+  """Checks for equality with the object’s `col018` field."""
+  col018: String
+
+  """Checks for equality with the object’s `col019` field."""
+  col019: String
+
+  """Checks for equality with the object’s `col020` field."""
+  col020: String
+
+  """Checks for equality with the object’s `col021` field."""
+  col021: String
+
+  """Checks for equality with the object’s `col022` field."""
+  col022: String
+
+  """Checks for equality with the object’s `col023` field."""
+  col023: String
+
+  """Checks for equality with the object’s `col024` field."""
+  col024: String
+
+  """Checks for equality with the object’s `col025` field."""
+  col025: String
+
+  """Checks for equality with the object’s `col026` field."""
+  col026: String
+
+  """Checks for equality with the object’s `col027` field."""
+  col027: String
+
+  """Checks for equality with the object’s `col028` field."""
+  col028: String
+
+  """Checks for equality with the object’s `col029` field."""
+  col029: String
+
+  """Checks for equality with the object’s `col030` field."""
+  col030: String
+
+  """Checks for equality with the object’s `col031` field."""
+  col031: String
+
+  """Checks for equality with the object’s `col032` field."""
+  col032: String
+
+  """Checks for equality with the object’s `col033` field."""
+  col033: String
+
+  """Checks for equality with the object’s `col034` field."""
+  col034: String
+
+  """Checks for equality with the object’s `col035` field."""
+  col035: String
+
+  """Checks for equality with the object’s `col036` field."""
+  col036: String
+
+  """Checks for equality with the object’s `col037` field."""
+  col037: String
+
+  """Checks for equality with the object’s `col038` field."""
+  col038: String
+
+  """Checks for equality with the object’s `col039` field."""
+  col039: String
+
+  """Checks for equality with the object’s `col040` field."""
+  col040: String
+
+  """Checks for equality with the object’s `col041` field."""
+  col041: String
+
+  """Checks for equality with the object’s `col042` field."""
+  col042: String
+
+  """Checks for equality with the object’s `col043` field."""
+  col043: String
+
+  """Checks for equality with the object’s `col044` field."""
+  col044: String
+
+  """Checks for equality with the object’s `col045` field."""
+  col045: String
+
+  """Checks for equality with the object’s `col046` field."""
+  col046: String
+
+  """Checks for equality with the object’s `col047` field."""
+  col047: String
+
+  """Checks for equality with the object’s `col048` field."""
+  col048: String
+
+  """Checks for equality with the object’s `col049` field."""
+  col049: String
+
+  """Checks for equality with the object’s `col050` field."""
+  col050: String
+
+  """Checks for equality with the object’s `col051` field."""
+  col051: String
+
+  """Checks for equality with the object’s `col052` field."""
+  col052: String
+
+  """Checks for equality with the object’s `col053` field."""
+  col053: String
+
+  """Checks for equality with the object’s `col054` field."""
+  col054: String
+
+  """Checks for equality with the object’s `col055` field."""
+  col055: String
+
+  """Checks for equality with the object’s `col056` field."""
+  col056: String
+
+  """Checks for equality with the object’s `col057` field."""
+  col057: String
+
+  """Checks for equality with the object’s `col058` field."""
+  col058: String
+
+  """Checks for equality with the object’s `col059` field."""
+  col059: String
+
+  """Checks for equality with the object’s `col060` field."""
+  col060: String
+
+  """Checks for equality with the object’s `col061` field."""
+  col061: String
+
+  """Checks for equality with the object’s `col062` field."""
+  col062: String
+
+  """Checks for equality with the object’s `col063` field."""
+  col063: String
+
+  """Checks for equality with the object’s `col064` field."""
+  col064: String
+
+  """Checks for equality with the object’s `col065` field."""
+  col065: String
+
+  """Checks for equality with the object’s `col066` field."""
+  col066: String
+
+  """Checks for equality with the object’s `col067` field."""
+  col067: String
+
+  """Checks for equality with the object’s `col068` field."""
+  col068: String
+
+  """Checks for equality with the object’s `col069` field."""
+  col069: String
+
+  """Checks for equality with the object’s `col070` field."""
+  col070: String
+
+  """Checks for equality with the object’s `col071` field."""
+  col071: String
+
+  """Checks for equality with the object’s `col072` field."""
+  col072: String
+
+  """Checks for equality with the object’s `col073` field."""
+  col073: String
+
+  """Checks for equality with the object’s `col074` field."""
+  col074: String
+
+  """Checks for equality with the object’s `col075` field."""
+  col075: String
+
+  """Checks for equality with the object’s `col076` field."""
+  col076: String
+
+  """Checks for equality with the object’s `col077` field."""
+  col077: String
+
+  """Checks for equality with the object’s `col078` field."""
+  col078: String
+
+  """Checks for equality with the object’s `col079` field."""
+  col079: String
+
+  """Checks for equality with the object’s `col080` field."""
+  col080: String
+
+  """Checks for equality with the object’s `col081` field."""
+  col081: String
+
+  """Checks for equality with the object’s `col082` field."""
+  col082: String
+
+  """Checks for equality with the object’s `col083` field."""
+  col083: String
+
+  """Checks for equality with the object’s `col084` field."""
+  col084: String
+
+  """Checks for equality with the object’s `col085` field."""
+  col085: String
+
+  """Checks for equality with the object’s `col086` field."""
+  col086: String
+
+  """Checks for equality with the object’s `col087` field."""
+  col087: String
+
+  """Checks for equality with the object’s `col088` field."""
+  col088: String
+
+  """Checks for equality with the object’s `col089` field."""
+  col089: String
+
+  """Checks for equality with the object’s `col090` field."""
+  col090: String
+
+  """Checks for equality with the object’s `col091` field."""
+  col091: String
+
+  """Checks for equality with the object’s `col092` field."""
+  col092: String
+
+  """Checks for equality with the object’s `col093` field."""
+  col093: String
+
+  """Checks for equality with the object’s `col094` field."""
+  col094: String
+
+  """Checks for equality with the object’s `col095` field."""
+  col095: String
+
+  """Checks for equality with the object’s `col096` field."""
+  col096: String
+
+  """Checks for equality with the object’s `col097` field."""
+  col097: String
+
+  """Checks for equality with the object’s `col098` field."""
+  col098: String
+
+  """Checks for equality with the object’s `col099` field."""
+  col099: String
+
+  """Checks for equality with the object’s `col100` field."""
+  col100: String
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `episodes` field."""
+  episodes: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: String
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `recommendations` field."""
+  recommendations: JSON
+
+  """Checks for equality with the object’s `type` field."""
+  type: String
+}
+
+"""A connection to a list of `Collection` values."""
+type CollectionsConnection {
+  """
+  A list of edges which contains the `Collection` and cursor to aid in pagination.
+  """
+  edges: [CollectionsEdge]!
+
+  """A list of `Collection` objects."""
+  nodes: [Collection]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Collection` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Collection` edge in the connection."""
+type CollectionsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Collection` at the end of the edge."""
+  node: Collection
+}
+
+"""Methods to use when ordering `Collection`."""
+enum CollectionsOrderBy {
+  COL_001_ASC
+  COL_001_DESC
+  COL_002_ASC
+  COL_002_DESC
+  COL_003_ASC
+  COL_003_DESC
+  COL_004_ASC
+  COL_004_DESC
+  COL_005_ASC
+  COL_005_DESC
+  COL_006_ASC
+  COL_006_DESC
+  COL_007_ASC
+  COL_007_DESC
+  COL_008_ASC
+  COL_008_DESC
+  COL_009_ASC
+  COL_009_DESC
+  COL_010_ASC
+  COL_010_DESC
+  COL_011_ASC
+  COL_011_DESC
+  COL_012_ASC
+  COL_012_DESC
+  COL_013_ASC
+  COL_013_DESC
+  COL_014_ASC
+  COL_014_DESC
+  COL_015_ASC
+  COL_015_DESC
+  COL_016_ASC
+  COL_016_DESC
+  COL_017_ASC
+  COL_017_DESC
+  COL_018_ASC
+  COL_018_DESC
+  COL_019_ASC
+  COL_019_DESC
+  COL_020_ASC
+  COL_020_DESC
+  COL_021_ASC
+  COL_021_DESC
+  COL_022_ASC
+  COL_022_DESC
+  COL_023_ASC
+  COL_023_DESC
+  COL_024_ASC
+  COL_024_DESC
+  COL_025_ASC
+  COL_025_DESC
+  COL_026_ASC
+  COL_026_DESC
+  COL_027_ASC
+  COL_027_DESC
+  COL_028_ASC
+  COL_028_DESC
+  COL_029_ASC
+  COL_029_DESC
+  COL_030_ASC
+  COL_030_DESC
+  COL_031_ASC
+  COL_031_DESC
+  COL_032_ASC
+  COL_032_DESC
+  COL_033_ASC
+  COL_033_DESC
+  COL_034_ASC
+  COL_034_DESC
+  COL_035_ASC
+  COL_035_DESC
+  COL_036_ASC
+  COL_036_DESC
+  COL_037_ASC
+  COL_037_DESC
+  COL_038_ASC
+  COL_038_DESC
+  COL_039_ASC
+  COL_039_DESC
+  COL_040_ASC
+  COL_040_DESC
+  COL_041_ASC
+  COL_041_DESC
+  COL_042_ASC
+  COL_042_DESC
+  COL_043_ASC
+  COL_043_DESC
+  COL_044_ASC
+  COL_044_DESC
+  COL_045_ASC
+  COL_045_DESC
+  COL_046_ASC
+  COL_046_DESC
+  COL_047_ASC
+  COL_047_DESC
+  COL_048_ASC
+  COL_048_DESC
+  COL_049_ASC
+  COL_049_DESC
+  COL_050_ASC
+  COL_050_DESC
+  COL_051_ASC
+  COL_051_DESC
+  COL_052_ASC
+  COL_052_DESC
+  COL_053_ASC
+  COL_053_DESC
+  COL_054_ASC
+  COL_054_DESC
+  COL_055_ASC
+  COL_055_DESC
+  COL_056_ASC
+  COL_056_DESC
+  COL_057_ASC
+  COL_057_DESC
+  COL_058_ASC
+  COL_058_DESC
+  COL_059_ASC
+  COL_059_DESC
+  COL_060_ASC
+  COL_060_DESC
+  COL_061_ASC
+  COL_061_DESC
+  COL_062_ASC
+  COL_062_DESC
+  COL_063_ASC
+  COL_063_DESC
+  COL_064_ASC
+  COL_064_DESC
+  COL_065_ASC
+  COL_065_DESC
+  COL_066_ASC
+  COL_066_DESC
+  COL_067_ASC
+  COL_067_DESC
+  COL_068_ASC
+  COL_068_DESC
+  COL_069_ASC
+  COL_069_DESC
+  COL_070_ASC
+  COL_070_DESC
+  COL_071_ASC
+  COL_071_DESC
+  COL_072_ASC
+  COL_072_DESC
+  COL_073_ASC
+  COL_073_DESC
+  COL_074_ASC
+  COL_074_DESC
+  COL_075_ASC
+  COL_075_DESC
+  COL_076_ASC
+  COL_076_DESC
+  COL_077_ASC
+  COL_077_DESC
+  COL_078_ASC
+  COL_078_DESC
+  COL_079_ASC
+  COL_079_DESC
+  COL_080_ASC
+  COL_080_DESC
+  COL_081_ASC
+  COL_081_DESC
+  COL_082_ASC
+  COL_082_DESC
+  COL_083_ASC
+  COL_083_DESC
+  COL_084_ASC
+  COL_084_DESC
+  COL_085_ASC
+  COL_085_DESC
+  COL_086_ASC
+  COL_086_DESC
+  COL_087_ASC
+  COL_087_DESC
+  COL_088_ASC
+  COL_088_DESC
+  COL_089_ASC
+  COL_089_DESC
+  COL_090_ASC
+  COL_090_DESC
+  COL_091_ASC
+  COL_091_DESC
+  COL_092_ASC
+  COL_092_DESC
+  COL_093_ASC
+  COL_093_DESC
+  COL_094_ASC
+  COL_094_DESC
+  COL_095_ASC
+  COL_095_DESC
+  COL_096_ASC
+  COL_096_DESC
+  COL_097_ASC
+  COL_097_DESC
+  COL_098_ASC
+  COL_098_DESC
+  COL_099_ASC
+  COL_099_DESC
+  COL_100_ASC
+  COL_100_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  EPISODES_ASC
+  EPISODES_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  RECOMMENDATIONS_ASC
+  RECOMMENDATIONS_DESC
+  TYPE_ASC
+  TYPE_DESC
+}
+
 """All input for the create `AwsApplication` mutation."""
 input CreateAwsApplicationInput {
   """The `AwsApplication` to be created by this mutation."""
@@ -1693,6 +2376,11 @@ enum ItemType {
   TOPIC
 }
 
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 """A connection to a list of `LogEntry` values."""
 type LogEntriesConnection {
   """
@@ -1790,6 +2478,120 @@ input LogEntryPatch {
   organizationId: Int
   personId: Int
   text: String
+}
+
+type MovieCollection implements Collection & Node {
+  col001: String
+  col002: String
+  col003: String
+  col004: String
+  col005: String
+  col006: String
+  col007: String
+  col008: String
+  col009: String
+  col010: String
+  col011: String
+  col012: String
+  col013: String
+  col014: String
+  col015: String
+  col016: String
+  col017: String
+  col018: String
+  col019: String
+  col020: String
+  col021: String
+  col022: String
+  col023: String
+  col024: String
+  col025: String
+  col026: String
+  col027: String
+  col028: String
+  col029: String
+  col030: String
+  col031: String
+  col032: String
+  col033: String
+  col034: String
+  col035: String
+  col036: String
+  col037: String
+  col038: String
+  col039: String
+  col040: String
+  col041: String
+  col042: String
+  col043: String
+  col044: String
+  col045: String
+  col046: String
+  col047: String
+  col048: String
+  col049: String
+  col050: String
+  col051: String
+  col052: String
+  col053: String
+  col054: String
+  col055: String
+  col056: String
+  col057: String
+  col058: String
+  col059: String
+  col060: String
+  col061: String
+  col062: String
+  col063: String
+  col064: String
+  col065: String
+  col066: String
+  col067: String
+  col068: String
+  col069: String
+  col070: String
+  col071: String
+  col072: String
+  col073: String
+  col074: String
+  col075: String
+  col076: String
+  col077: String
+  col078: String
+  col079: String
+  col080: String
+  col081: String
+  col082: String
+  col083: String
+  col084: String
+  col085: String
+  col086: String
+  col087: String
+  col088: String
+  col089: String
+  col090: String
+  col091: String
+  col092: String
+  col093: String
+  col094: String
+  col095: String
+  col096: String
+  col097: String
+  col098: String
+  col099: String
+  col100: String
+  createdAt: Datetime
+  episodes: Int
+  id: String!
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  recommendations: JSON
+  type: String!
 }
 
 """
@@ -2939,6 +3741,35 @@ type Query implements Node {
     orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationsConnection
 
+  """Reads and enables pagination through a set of `Collection`."""
+  allCollections(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CollectionCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Collection`."""
+    orderBy: [CollectionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CollectionsConnection
+
   """
   Reads and enables pagination through a set of `FirstPartyVulnerability`.
   """
@@ -3611,6 +4442,14 @@ type Query implements Node {
   """Get a single `LogEntry`."""
   logEntryById(id: Int!): LogEntry
 
+  """Reads a single `MovieCollection` using its globally unique `ID`."""
+  movieCollection(
+    """
+    The globally unique `ID` to be used in selecting a single `MovieCollection`.
+    """
+    nodeId: ID!
+  ): MovieCollection
+
   """Fetches an object given its globally unique `ID`."""
   node(
     """The globally unique `ID`."""
@@ -3750,6 +4589,14 @@ type Query implements Node {
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Reads a single `SeriesCollection` using its globally unique `ID`."""
+  seriesCollection(
+    """
+    The globally unique `ID` to be used in selecting a single `SeriesCollection`.
+    """
+    nodeId: ID!
+  ): SeriesCollection
 
   """Reads a single `SingleTableChecklist` using its globally unique `ID`."""
   singleTableChecklist(
@@ -5704,6 +6551,120 @@ enum RelationalTopicsOrderBy {
   TYPE_DESC
   UPDATED_AT_ASC
   UPDATED_AT_DESC
+}
+
+type SeriesCollection implements Collection & Node {
+  col001: String
+  col002: String
+  col003: String
+  col004: String
+  col005: String
+  col006: String
+  col007: String
+  col008: String
+  col009: String
+  col010: String
+  col011: String
+  col012: String
+  col013: String
+  col014: String
+  col015: String
+  col016: String
+  col017: String
+  col018: String
+  col019: String
+  col020: String
+  col021: String
+  col022: String
+  col023: String
+  col024: String
+  col025: String
+  col026: String
+  col027: String
+  col028: String
+  col029: String
+  col030: String
+  col031: String
+  col032: String
+  col033: String
+  col034: String
+  col035: String
+  col036: String
+  col037: String
+  col038: String
+  col039: String
+  col040: String
+  col041: String
+  col042: String
+  col043: String
+  col044: String
+  col045: String
+  col046: String
+  col047: String
+  col048: String
+  col049: String
+  col050: String
+  col051: String
+  col052: String
+  col053: String
+  col054: String
+  col055: String
+  col056: String
+  col057: String
+  col058: String
+  col059: String
+  col060: String
+  col061: String
+  col062: String
+  col063: String
+  col064: String
+  col065: String
+  col066: String
+  col067: String
+  col068: String
+  col069: String
+  col070: String
+  col071: String
+  col072: String
+  col073: String
+  col074: String
+  col075: String
+  col076: String
+  col077: String
+  col078: String
+  col079: String
+  col080: String
+  col081: String
+  col082: String
+  col083: String
+  col084: String
+  col085: String
+  col086: String
+  col087: String
+  col088: String
+  col089: String
+  col090: String
+  col091: String
+  col092: String
+  col093: String
+  col094: String
+  col095: String
+  col096: String
+  col097: String
+  col098: String
+  col099: String
+  col100: String
+  createdAt: Datetime
+  episodes: Int
+  id: String!
+  name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  recommendations: JSON
+  type: String!
 }
 
 type SingleTableChecklist implements Node & SingleTableItem {

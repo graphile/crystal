@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> extends: ["./Issue2780.ts:preset"]
+#> variableValues: { "collectionId": "id-1", "input": { "pagination": { "first": 10 } } }
+
+query MyQuery($collectionId: String!, $input: ContentInput!) {
+  collectionRecommendation(collectionId: $collectionId, input: $input) {
+    items {
+      id
+    }
+  }
+}

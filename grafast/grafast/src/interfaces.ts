@@ -840,8 +840,9 @@ export interface ExecuteStepEvent {
   step: Step;
   executeDetails: ExecutionDetails;
 }
-export interface PlanTypeInfo {
+export interface PlanTypeInfo<TOriginalStep extends Step = Step> {
   abstractType: GraphQLUnionType | GraphQLInterfaceType;
+  /** @internal */
   resolverEmulation: boolean;
   /**
    * If this polymorphic position was represented by exactly one source step,
@@ -849,7 +850,7 @@ export interface PlanTypeInfo {
    * planType. If more than one step was combined as input to this
    * polymorphism, this will be null.
    */
-  $original: Step | null;
+  $original: TOriginalStep | null;
 }
 
 /**

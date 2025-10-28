@@ -2,7 +2,7 @@
 #> dontLogErrors: true
 ## expect(errors[0].message).toMatch(/invalid node identifier/i);
 #> schema: ["a", "b", "c"]
-#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> extends: ["postgraphile/presets/relay:PostGraphileRelayPreset"]
 #> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
 mutation {
   updateLeftArm(
