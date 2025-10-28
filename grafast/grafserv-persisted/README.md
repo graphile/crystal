@@ -41,8 +41,8 @@ And please give some love to our featured sponsors 🤩:
 ## Installation
 
 ```sh
-yarn add @grafserv/persisted@rc
-# or: npm install --save @grafserv/persisted@rc
+yarn add @grafserv/persisted
+# or: npm install --save @grafserv/persisted
 ```
 
 ## Usage

@@ -390,7 +390,7 @@ nvm use
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@rc @graphile/simplify-inflection@rc
+npm install --save express postgraphile@rc @graphile/simplify-inflection
 npm install --save-dev typescript @tsconfig/node24 @types/express @types/node
 ```
 
