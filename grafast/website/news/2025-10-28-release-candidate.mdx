@@ -100,34 +100,30 @@ feedback from anyone who wished to get involved. Together, the Grafast working
 group identified four epics stood between this proof of concept and a stable
 1.0:
 
-- ✅ **Global dependencies**: initially everything was batched, but we
-  identified that steps which would always have exactly one value in a request
-  (such as field arguments, user credentials, and API clients) should be marked as
-  such - "unary". The planning infrastructure was rewritten to accomodate this,
-  and it's now much easier to write custom step classes that rely on these kinds
-  of values!
+- ✅ **Global dependencies**: Grafast integrates batching as a core concept, but
+  batching steps which would always have exactly one value in a request (such as
+  field arguments, user credentials, API clients) was awkward. We now mark these
+  as "unary" which makes them significantly easier to handle in custom steps.
 - ✅ **Early exit**: Grafast is about _data flow_, and branching should be
-  handled inside business logic (i.e. inside the steps themselves, not within plan
+  handled inside business logic (i.e. inside step classes, not within plan
   resolvers). However, sometimes a plan resolver wants to "exit early" either with
   an error or a null, so these needs now have first-class support. 
-- ✅ **Plan-time evaluation removal**: we eliminated `$step.eval*()` and other
-  hooks that allowed "peeking" at the value of inputs at plan time, and thus
-  limited the reusability of the plan based on "constraints". Today, plan
-  resolvers stay declarative; all decision making happens in step execution where
-  it belongs, so plans can normally be reused for the same operation independent
-  of runtime values.
-- ✅ **Polymorphism convergence**: in the initial release of Grafast, the plan
-  would branch each time an abstract position was reached. This could lead to
-  exponential branching for highly polymorphic requests, causing excessive
-  planning time. By having polymorphic branches merge back together becure
-  branching out for the next layer of abstract types, Grafast has eliminated this
-  exponential planning hazard.
+- ✅ **Plan-time evaluation removal**: "peeking" at the value of inputs at plan
+  time added "constraints" which limited the reusability of the plan. This
+  "peeking" (`$step.eval*()`) has been removed from all public interfaces so today
+  plan resolvers stay declarative; all decision making happens in step execution
+  where it belongs, and there are far fewer constraints on when an operation plans
+  can be reused leading to much less time spent planning.
+- ✅ **Polymorphism convergence**: previously, the operation plan would create a
+  branch for each abstract type at each abstract position, leading to excessive
+  planning time. This exponential branching hazard was eliminated by merging
+  polymorphic branches back together before branching out for the next layer of
+  abstract types.
 
-Ultimately this has helped us solidify the [“thinking in plans”](/grafast/flow)
-model: describe a simple dataflow for each field, let Gra*fast* orchestrate its
-optimization, and reap the rewards of declarative execution in the form of
-reduced resource utilisation, lower bills, and increased application
-performance.
+We have also solidified the [“thinking in plans”](/grafast/flow) model: describe
+a simple dataflow for each field, let Gra*fast* orchestrate its optimization,
+and reap the rewards of declarative execution in the form of reduced resource
+utilization, lower bills, and increased application performance.
 
 ## Try Gra*fast* v1 today
 
