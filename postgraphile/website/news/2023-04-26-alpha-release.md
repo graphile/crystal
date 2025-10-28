@@ -3,7 +3,7 @@ title: PostGraphile V5 alpha is here!
 description: PostGraphile Version 5 is now ready to run in some production environments!
 slug: 2023-04-26-version-5-alpha
 authors: [benjie, jem]
-tags: [Alpha]
+tags: [alpha, releases, v5]
 hide_table_of_contents: false
 ---
 

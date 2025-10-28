@@ -6,7 +6,7 @@ description:
   1.0 release.
 slug: 2025-10-28-grafast-v1-release-candidate
 authors: [benjie, jem]
-tags: [Releases]
+tags: [releases, v1]
 hide_table_of_contents: false
 toc_max_heading_level: 2
 ---
@@ -37,11 +37,11 @@ quality and documentation before stamping the final 1.0 release.
 
 Now is the perfect moment to validate that the “[plans as
 dataflow](/grafast/flow)” approach clicks for you: do you understand the
-separation of "plan time" and "execution time"? Can you see how principled
+separation of “plan-time” and “execution-time”? Can you see how principled
 communication between the steps allows for optimization without needing to
 revisit plan resolvers?
 
-If you don't get it, that's likely a failing of our documentation! Help us
+If you don’t understand it, that’s likely a failing of our documentation! Help us
 improve our explanations by sharing your feedback (whether confusion and
 frustration or success and praise!) in our
 [Discord](https://discord.gg/graphile) or with GitHub issues and pull requests!
@@ -51,8 +51,8 @@ frustration or success and praise!) in our
 The code moved faster than the words that describe it. Parts of the docs are
 out of date, others are missing, and a few contradict the behaviour you see in
 practice. We need review, issue reports, and small patches. Your first-hand notes
-about what is unclear are invaluable. If something doesn't behave according to
-the docs, or of the docs are unclear, let us know!
+about what is unclear are invaluable. If something doesn’t behave according to
+the docs, or if the docs are unclear, let us know!
 
 Feedback via [GitHub issues](https://github.com/graphile/crystal) or the
 [Discord server](https://discord.gg/graphile) is hugely appreciated.
@@ -64,14 +64,14 @@ by the limitations, caveats and inefficiencies of traditional resolver-driven
 GraphQL execution, along with the messiness and inefficiency of previous
 attempts to solve these problems (such as digging through `GraphQLResolveInfo`).
 
-<!-- truncate -->
-
-The building block we came up with, our north star, was the "plan resolver": a
+The building block we came up with, our north star, was the “plan resolver”: a
 function that looks deceptively similar to traditional resolvers, but changes
 the GraphQL resolution from procedural (field-by-field, layer-by-layer, with
-just in time discovery of data requirements leading to over-fetching,
+just-in-time discovery of data requirements leading to over-fetching,
 under-fetching, N+1 problems, and an explosion of promises) to declarative
 (holistic planning of the request, followed by optimal execution).
+
+<!-- truncate -->
 
 <figure>
 
@@ -87,30 +87,30 @@ describe HOW to get the data rather than actually fetching it.
 
 The various plan resolvers referenced by the
 operation would detail steps sufficient to satisfy their requirements, and these
-steps would be composed into an "operation plan" detailing the full requirements
+steps would be composed into an “operation plan” detailing the full requirements
 and data flows of the operation. This plan could then rewrite itself through
-principled communication between its constituent steps before being executed -
+principled communication between its constituent steps before being executed —
 the code that finally executes might no longer reflect the shape of the GraphQL
 request, leveraging advanced capabilities of the underlying business logic.
 
 ## Working with the group
 
-In 2023, we presented an early version of Grafast at GraphQLConf, and sought
-feedback from anyone who wished to get involved. Together, the Grafast working
+In 2023, [we presented an early version of Gra*fast* at GraphQLConf](https://graphql.org/conf/2023/sessions/275443caa2eda5df06699b724efa533c/), and sought
+feedback from anyone who wished to get involved. Together, the Gra*fast* working
 group identified four epics stood between this proof of concept and a stable
 1.0:
 
-- ✅ **Global dependencies**: Grafast integrates batching as a core concept, but
+- ✅ **Global dependencies**: Gra*fast* integrates batching as a core concept, but
   batching steps which would always have exactly one value in a request (such as
   field arguments, user credentials, API clients) was awkward. We now mark these
-  as "unary" which makes them significantly easier to handle in custom steps.
-- ✅ **Early exit**: Grafast is about _data flow_, and branching should be
+  as “unary” which makes them significantly easier to handle in custom steps.
+- ✅ **Early exit**: Gra*fast* is about _data flow_, and branching should be
   handled inside business logic (i.e. inside step classes, not within plan
-  resolvers). However, sometimes a plan resolver wants to "exit early" either with
-  an error or a null, so these needs now have first-class support. 
-- ✅ **Plan-time evaluation removal**: "peeking" at the value of inputs at plan
-  time added "constraints" which limited the reusability of the plan. This
-  "peeking" (`$step.eval*()`) has been removed from all public interfaces so today
+  resolvers). However, sometimes a plan resolver wants to “exit early” either with
+  an error or a null, so these needs now have first-class support.
+- ✅ **Plan-time evaluation removal**: “peeking” at the value of inputs at plan
+  time added “constraints” which limited the reusability of the plan. This
+  “peeking” (`$step.eval*()`) has been removed from all public interfaces so today
   plan resolvers stay declarative; all decision making happens in step execution
   where it belongs, and there are far fewer constraints on when an operation plans
   can be reused leading to much less time spent planning.
