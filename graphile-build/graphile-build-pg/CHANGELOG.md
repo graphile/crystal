@@ -1,5 +1,52 @@
 # graphile-build-pg
 
+## 5.0.0-rc.1
+
+### Patch Changes
+
+- [#2752](https://github.com/graphile/crystal/pull/2752)
+  [`92781a1`](https://github.com/graphile/crystal/commit/92781a183b3548902ed92b152ae915d597d62b97)
+  Thanks [@benjie](https://github.com/benjie)! - Softens the requirements for a
+  column/relation to be treated as "indexed" to reflect the optimizations in
+  Postgres v18+. (This may result in more fields, filters, orders and relations
+  appearing in your PostGraphile schema - you can use
+  `@behavior -filterBy -orderBy` on columns and
+  `@behavior -select -list -connection -single -manyToMany` on foreign key
+  constraints to remove them again.)
+
+- [#2758](https://github.com/graphile/crystal/pull/2758)
+  [`eb39702`](https://github.com/graphile/crystal/commit/eb3970215a61a78e18359e6ebb473c2cb3991bd7)
+  Thanks [@benjie](https://github.com/benjie)! - Apply `pgOrderByNullsLast` to
+  computed columns too.
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
+- Updated dependencies
+  [[`9797500`](https://github.com/graphile/crystal/commit/9797500071f4bbd0cc1b73c74e7f402cb1bb687f),
+  [`be318e6`](https://github.com/graphile/crystal/commit/be318e666c18ee06e62291d3e7ed7d0d1345eb3b),
+  [`abb623d`](https://github.com/graphile/crystal/commit/abb623d59e517c0949f0fef5440b817103c685bf),
+  [`31b388c`](https://github.com/graphile/crystal/commit/31b388c6d5546640af7dcf4e6021643e47892ed1),
+  [`930240a`](https://github.com/graphile/crystal/commit/930240a4a7d3373f5691d495df752bb8fedac2af),
+  [`7b86454`](https://github.com/graphile/crystal/commit/7b864546fa81803ce0e573a2efa2e7f0905b2040),
+  [`42a0785`](https://github.com/graphile/crystal/commit/42a0785ddabf58812a22d764eeddfde9362974e5),
+  [`d196d60`](https://github.com/graphile/crystal/commit/d196d60664fbc9ffd410c11645db27554b22ac0b),
+  [`982c1a5`](https://github.com/graphile/crystal/commit/982c1a566da21706f85c7bfb0adda210e251e6e1),
+  [`6a4e3b9`](https://github.com/graphile/crystal/commit/6a4e3b9ec182f7d066600aee0f8cc21d451b0ae2),
+  [`c6cbe61`](https://github.com/graphile/crystal/commit/c6cbe6175b0f1f034db59d42cbe594e7d329aba6),
+  [`d4ac603`](https://github.com/graphile/crystal/commit/d4ac603da7df6ea01aaa483a7cb29b1e514a90cd),
+  [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327),
+  [`ea0135f`](https://github.com/graphile/crystal/commit/ea0135fac3f43850b65828f2ff2b01a34cfdff15),
+  [`91b8376`](https://github.com/graphile/crystal/commit/91b83765f9ded133031c1de53d6b3926c8011bf5),
+  [`b6821f5`](https://github.com/graphile/crystal/commit/b6821f5f4dc13abd0b605be7396c1b3c36e66177)]:
+  - @dataplan/pg@1.0.0-rc.1
+  - grafast@1.0.0-rc.1
+  - pg-sql2@5.0.0-rc.1
+  - graphile-build@5.0.0-rc.1
+  - pg-introspection@1.0.0-rc.1
+  - graphile-config@1.0.0-rc.1
+  - tamedevil@0.1.0-rc.1
+
 ## 5.0.0-beta.47
 
 ### Patch Changes

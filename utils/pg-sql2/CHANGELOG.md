@@ -1,5 +1,25 @@
 # pg-sql2
 
+## 5.0.0-rc.1
+
+### Patch Changes
+
+- [#2740](https://github.com/graphile/crystal/pull/2740)
+  [`31b388c`](https://github.com/graphile/crystal/commit/31b388c6d5546640af7dcf4e6021643e47892ed1)
+  Thanks [@benjie](https://github.com/benjie)! - Support more comment strings.
+
+- [#2746](https://github.com/graphile/crystal/pull/2746)
+  [`930240a`](https://github.com/graphile/crystal/commit/930240a4a7d3373f5691d495df752bb8fedac2af)
+  Thanks [@jemgillam](https://github.com/jemgillam)! - New:
+  `sql.comment("...", true)` forces comments to be included, even in production.
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
+- Updated dependencies
+  [[`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)]:
+  - @graphile/lru@5.0.0-rc.1
+
 ## 5.0.0-beta.9
 
 ### Patch Changes

@@ -1,5 +1,79 @@
 # grafast
 
+## 1.0.0-rc.1
+
+### Patch Changes
+
+- [#2744](https://github.com/graphile/crystal/pull/2744)
+  [`abb623d`](https://github.com/graphile/crystal/commit/abb623d59e517c0949f0fef5440b817103c685bf)
+  Thanks [@benjie](https://github.com/benjie)! - Implement
+  `fieldArgs.getBaked(path)` and standardize some argument/type names.
+
+- [#2736](https://github.com/graphile/crystal/pull/2736)
+  [`7b86454`](https://github.com/graphile/crystal/commit/7b864546fa81803ce0e573a2efa2e7f0905b2040)
+  Thanks [@benjie](https://github.com/benjie)! - Add new
+  `fieldArgs.autoApply($target)` method to allow user to control when the
+  fieldArgs are auto-applied - useful if you're wrapping plan resolvers in
+  additional middleware functions.
+
+- [#2784](https://github.com/graphile/crystal/pull/2784)
+  [`42a0785`](https://github.com/graphile/crystal/commit/42a0785ddabf58812a22d764eeddfde9362974e5)
+  Thanks [@benjie](https://github.com/benjie)! - Improve error message when a
+  side effect attempts to depend on a step created after it
+
+- [#2755](https://github.com/graphile/crystal/pull/2755)
+  [`d196d60`](https://github.com/graphile/crystal/commit/d196d60664fbc9ffd410c11645db27554b22ac0b)
+  Thanks [@benjie](https://github.com/benjie)! - Tweak some TSDoc comments and
+  optimize `nodeIdFromNode` plan.
+
+- [#2777](https://github.com/graphile/crystal/pull/2777)
+  [`c6cbe61`](https://github.com/graphile/crystal/commit/c6cbe6175b0f1f034db59d42cbe594e7d329aba6)
+  Thanks [@benjie](https://github.com/benjie)! - Tighten our public API surface
+  by:
+  - renaming `EventStreamHeandlerResult` to the correctly spelt
+    `EventStreamHandlerResult` (and keeping only a deprecated alias for the old
+    name)
+  - dropping the long-deprecated Grafast exports `InterfaceOrUnionPlans` (use
+    `InterfacePlan` or `UnionPlan` as appropriate), `deepEval` (should be
+    `applyTransforms`) and `DeepEvalStep` (should be `ApplyTransformsStep`)
+  - removing the `PgAdaptorOptions` alias in favour of `PgAdaptorSettings`
+  - deleting the PostGraphile preset aliases `postgraphilePresetAmber` should be
+    `PostGraphileAmberPreset`) and `PgRelayPreset` (should be
+    `PostGraphileRelayPreset`), and updating all first-party usage to the
+    canonical names
+
+- [#2736](https://github.com/graphile/crystal/pull/2736)
+  [`d4ac603`](https://github.com/graphile/crystal/commit/d4ac603da7df6ea01aaa483a7cb29b1e514a90cd)
+  Thanks [@benjie](https://github.com/benjie)! - Throw error earlier if an
+  invalid plan heirarchy is detected. Also make the error more helpful.
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
+- [#2755](https://github.com/graphile/crystal/pull/2755)
+  [`ea0135f`](https://github.com/graphile/crystal/commit/ea0135fac3f43850b65828f2ff2b01a34cfdff15)
+  Thanks [@benjie](https://github.com/benjie)! - Get rid of the `node()` step...
+  we don't use it and it has no tests.
+
+- [#2785](https://github.com/graphile/crystal/pull/2785)
+  [`b6821f5`](https://github.com/graphile/crystal/commit/b6821f5f4dc13abd0b605be7396c1b3c36e66177)
+  Thanks [@benjie](https://github.com/benjie)! - Fix types for abstract type's
+  `planType` method:
+  1. `AbtractTypePlan`'s `TSpecifier` generic is now the first generic parameter
+     (previously second) and now represents the specifier _data_, not the
+     _step_.
+  2. Existence of `planType`'s second parameter (`info`) is now reflected in the
+     types.
+  3. The same changes are made for `UnionPlan` and `InterfacePlan`.
+
+  If you were using `graphql-codegen-grafast`, be sure to update to the latest
+  version and regenerate the types so these changes are reflected.
+
+- Updated dependencies
+  [[`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)]:
+  - graphile-config@1.0.0-rc.1
+  - @graphile/lru@5.0.0-rc.1
+
 ## 0.1.1-beta.27
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # graphql-codegen-grafast
 
+## 1.0.0-rc.1
+
+### Patch Changes
+
+- [#2785](https://github.com/graphile/crystal/pull/2785)
+  [`641222b`](https://github.com/graphile/crystal/commit/641222b999e0401f76886ffd09aebc27488b1ba1)
+  Thanks [@benjie](https://github.com/benjie)! - Fix generation for abstract
+  types to reflect Grafast type changes. Specifically, `source` and `specifier`
+  have reversed order, and `specifier` is generated as the _data_ type rather
+  than the _step_ type. If you had `specifier: ...` in your type overrides file
+  (unlikely), please ensure this change is reflected: `specifier: Step<T>`
+  should now be `specifier: T`.
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
 ## 0.0.1-beta.3
 
 ### Patch Changes

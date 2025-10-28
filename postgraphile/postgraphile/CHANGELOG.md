@@ -1,5 +1,123 @@
 # postgraphile
 
+## 5.0.0-rc.1
+
+### Patch Changes
+
+- [#2767](https://github.com/graphile/crystal/pull/2767)
+  [`9797500`](https://github.com/graphile/crystal/commit/9797500071f4bbd0cc1b73c74e7f402cb1bb687f)
+  Thanks [@benjie](https://github.com/benjie)! - Use tuple comparison for cursor
+  pagination when possible.
+
+- [#2736](https://github.com/graphile/crystal/pull/2736)
+  [`3fb7111`](https://github.com/graphile/crystal/commit/3fb71118462ba2d97f045023c715e4b0a447766a)
+  Thanks [@benjie](https://github.com/benjie)! - `wrapPlans()` now automatically
+  applies `fieldArgs` when you call the underlying `plan()`, so your wrapper
+  applies _after_ field args have been applied. This helps address invalid plan
+  heirarchy issues due to side effects your plan wrappers may wish to add and
+  similar. Opt out via
+  `{ autoApplyFieldArgs: false, plan(plan, $parent, fieldArgs) { ... } }`.
+
+- [#2752](https://github.com/graphile/crystal/pull/2752)
+  [`92781a1`](https://github.com/graphile/crystal/commit/92781a183b3548902ed92b152ae915d597d62b97)
+  Thanks [@benjie](https://github.com/benjie)! - Softens the requirements for a
+  column/relation to be treated as "indexed" to reflect the optimizations in
+  Postgres v18+. (This may result in more fields, filters, orders and relations
+  appearing in your PostGraphile schema - you can use
+  `@behavior -filterBy -orderBy` on columns and
+  `@behavior -select -list -connection -single -manyToMany` on foreign key
+  constraints to remove them again.)
+
+- [#2745](https://github.com/graphile/crystal/pull/2745)
+  [`71adb87`](https://github.com/graphile/crystal/commit/71adb87f21069f70df1c1f8b90146bd176bd30fe)
+  Thanks [@benjie](https://github.com/benjie)! - V4 compat with smart tags: only
+  add behavior if non-empty.
+
+- [#2756](https://github.com/graphile/crystal/pull/2756)
+  [`982c1a5`](https://github.com/graphile/crystal/commit/982c1a566da21706f85c7bfb0adda210e251e6e1)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug with parsing arrays
+  that use alternative delimeters (e.g. `;` instead of `,`) - for example
+  `box[]`.
+
+- [#2777](https://github.com/graphile/crystal/pull/2777)
+  [`6a4e3b9`](https://github.com/graphile/crystal/commit/6a4e3b9ec182f7d066600aee0f8cc21d451b0ae2)
+  Thanks [@benjie](https://github.com/benjie)! - Implement queue for
+  `watchGather`/`watchSchema`/etc and integrate with grafserv's `setPreset`
+  middleware. Promises returned by such now delay schema application, preventing
+  growing concurrent work.
+
+- [#2758](https://github.com/graphile/crystal/pull/2758)
+  [`eb39702`](https://github.com/graphile/crystal/commit/eb3970215a61a78e18359e6ebb473c2cb3991bd7)
+  Thanks [@benjie](https://github.com/benjie)! - Apply `pgOrderByNullsLast` to
+  computed columns too.
+
+- [#2777](https://github.com/graphile/crystal/pull/2777)
+  [`c6cbe61`](https://github.com/graphile/crystal/commit/c6cbe6175b0f1f034db59d42cbe594e7d329aba6)
+  Thanks [@benjie](https://github.com/benjie)! - Tighten our public API surface
+  by:
+  - renaming `EventStreamHeandlerResult` to the correctly spelt
+    `EventStreamHandlerResult` (and keeping only a deprecated alias for the old
+    name)
+  - dropping the long-deprecated Grafast exports `InterfaceOrUnionPlans` (use
+    `InterfacePlan` or `UnionPlan` as appropriate), `deepEval` (should be
+    `applyTransforms`) and `DeepEvalStep` (should be `ApplyTransformsStep`)
+  - removing the `PgAdaptorOptions` alias in favour of `PgAdaptorSettings`
+  - deleting the PostGraphile preset aliases `postgraphilePresetAmber` should be
+    `PostGraphileAmberPreset`) and `PgRelayPreset` (should be
+    `PostGraphileRelayPreset`), and updating all first-party usage to the
+    canonical names
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
+- [#2785](https://github.com/graphile/crystal/pull/2785)
+  [`b6821f5`](https://github.com/graphile/crystal/commit/b6821f5f4dc13abd0b605be7396c1b3c36e66177)
+  Thanks [@benjie](https://github.com/benjie)! - Fix types for abstract type's
+  `planType` method:
+  1. `AbtractTypePlan`'s `TSpecifier` generic is now the first generic parameter
+     (previously second) and now represents the specifier _data_, not the
+     _step_.
+  2. Existence of `planType`'s second parameter (`info`) is now reflected in the
+     types.
+  3. The same changes are made for `UnionPlan` and `InterfacePlan`.
+
+  If you were using `graphql-codegen-grafast`, be sure to update to the latest
+  version and regenerate the types so these changes are reflected.
+
+- Updated dependencies
+  [[`9797500`](https://github.com/graphile/crystal/commit/9797500071f4bbd0cc1b73c74e7f402cb1bb687f),
+  [`be318e6`](https://github.com/graphile/crystal/commit/be318e666c18ee06e62291d3e7ed7d0d1345eb3b),
+  [`abb623d`](https://github.com/graphile/crystal/commit/abb623d59e517c0949f0fef5440b817103c685bf),
+  [`3fb7111`](https://github.com/graphile/crystal/commit/3fb71118462ba2d97f045023c715e4b0a447766a),
+  [`31b388c`](https://github.com/graphile/crystal/commit/31b388c6d5546640af7dcf4e6021643e47892ed1),
+  [`8a852d2`](https://github.com/graphile/crystal/commit/8a852d21c80c7b06f2b3dd9fa01727e2d8a5522b),
+  [`92781a1`](https://github.com/graphile/crystal/commit/92781a183b3548902ed92b152ae915d597d62b97),
+  [`930240a`](https://github.com/graphile/crystal/commit/930240a4a7d3373f5691d495df752bb8fedac2af),
+  [`7b86454`](https://github.com/graphile/crystal/commit/7b864546fa81803ce0e573a2efa2e7f0905b2040),
+  [`42a0785`](https://github.com/graphile/crystal/commit/42a0785ddabf58812a22d764eeddfde9362974e5),
+  [`d196d60`](https://github.com/graphile/crystal/commit/d196d60664fbc9ffd410c11645db27554b22ac0b),
+  [`982c1a5`](https://github.com/graphile/crystal/commit/982c1a566da21706f85c7bfb0adda210e251e6e1),
+  [`6a4e3b9`](https://github.com/graphile/crystal/commit/6a4e3b9ec182f7d066600aee0f8cc21d451b0ae2),
+  [`eb39702`](https://github.com/graphile/crystal/commit/eb3970215a61a78e18359e6ebb473c2cb3991bd7),
+  [`c6cbe61`](https://github.com/graphile/crystal/commit/c6cbe6175b0f1f034db59d42cbe594e7d329aba6),
+  [`d4ac603`](https://github.com/graphile/crystal/commit/d4ac603da7df6ea01aaa483a7cb29b1e514a90cd),
+  [`f23e0e0`](https://github.com/graphile/crystal/commit/f23e0e0da9105a973dd8ac76f8ae519345d0a5b1),
+  [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327),
+  [`ea0135f`](https://github.com/graphile/crystal/commit/ea0135fac3f43850b65828f2ff2b01a34cfdff15),
+  [`91b8376`](https://github.com/graphile/crystal/commit/91b83765f9ded133031c1de53d6b3926c8011bf5),
+  [`b6821f5`](https://github.com/graphile/crystal/commit/b6821f5f4dc13abd0b605be7396c1b3c36e66177)]:
+  - @dataplan/pg@1.0.0-rc.1
+  - grafast@1.0.0-rc.1
+  - graphile-utils@5.0.0-rc.1
+  - pg-sql2@5.0.0-rc.1
+  - graphile-build-pg@5.0.0-rc.1
+  - graphile-build@5.0.0-rc.1
+  - grafserv@1.0.0-rc.1
+  - @dataplan/json@1.0.0-rc.1
+  - graphile-config@1.0.0-rc.1
+  - tamedevil@0.1.0-rc.1
+  - @graphile/lru@5.0.0-rc.1
+
 ## 5.0.0-beta.49
 
 ### Patch Changes

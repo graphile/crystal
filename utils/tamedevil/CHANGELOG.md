@@ -1,5 +1,16 @@
 # tamedevil
 
+## 0.1.0-rc.1
+
+### Patch Changes
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
+- Updated dependencies
+  [[`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)]:
+  - @graphile/lru@5.0.0-rc.1
+
 ## 0.0.0-beta.9
 
 ### Patch Changes
