@@ -68,12 +68,12 @@ If you’re a V4 user then now is an excellent time to take V5 for a spin and le
 
 You can read all about the new features in V5 in our new series [Intro to V5](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0) or if you prefer to just read the highlights, check out the migration guide’s [new feature summary](https://postgraphile.org/postgraphile/5/migrating-from-v4/v5-new-feature-summary) and be sure to expand the bullets that have more details!
 
-All the packages are published under the `@beta` tag, so you'll need to ensure you include that when issuing install instructions (e.g. `yarn add postgraphile@beta`).
+All the packages are published under the `@rc` tag, so you'll need to ensure you include that when issuing install instructions (e.g. `yarn add postgraphile@rc`).
 
 The fastest way to try PostGraphile V5 is with our new `pgl` command which you don’t even have to install:
 
 ```
-npx pgl@beta -P pgl/amber -e -c postgres:///my_db -s public
+npx pgl -P pgl/amber -e -c postgres:///my_db -s public
 ```
 
 (Replace the connection string and schema name with your database connection string and schema name(s).)

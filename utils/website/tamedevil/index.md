@@ -42,11 +42,11 @@ hood.
 ## Installation
 
 ```
-yarn add tamedevil@beta
+yarn add tamedevil
 ```
 
 or
 
 ```
-npm install --save tamedevil@beta
+npm install --save tamedevil
 ```

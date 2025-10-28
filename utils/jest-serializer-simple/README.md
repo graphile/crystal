@@ -35,7 +35,7 @@ And please give some love to our featured sponsors 🤩:
 ## Usage:
 
 ```
-yarn add jest-serializer-simple@beta
+yarn add jest-serializer-simple@rc
 ```
 
 Then add it to your Jest config:

@@ -9,6 +9,7 @@
   "supportForTags": {
     "@alpha": true,
     "@beta": true,
+    "@rc": true,
     "@defaultValue": true,
     "@decorator": true,
     "@deprecated": true,

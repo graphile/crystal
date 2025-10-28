@@ -2,7 +2,7 @@
 set -e -x
 
 BUILD_DIR=crystal/builds
-TAG=beta
+TAG=rc
 
 PACKAGES=(
   #"$BUILD_DIR/graphile__lru.tgz"
