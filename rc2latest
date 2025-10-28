@@ -1,0 +1,26 @@
+#!/bin/bash
+echo "Enter OTP code:"
+read otp
+export NPM_CONFIG_OTP=$otp
+function rc2latest {
+  V=$(npm info $1 dist-tags.rc | xargs)
+  npm dist-tags add $1@$V latest
+}
+rc2latest @dataplan/json
+rc2latest @dataplan/pg
+rc2latest @grafserv/persisted
+rc2latest @graphile/simplify-inflection
+rc2latest eslint-plugin-graphile-export
+rc2latest grafast
+rc2latest grafserv
+rc2latest graphile
+rc2latest graphile-config
+rc2latest graphile-export
+rc2latest jest-serializer-graphql-schema
+rc2latest jest-serializer-simple
+rc2latest pg-introspection
+rc2latest pgl
+rc2latest ruru
+rc2latest ruru-components
+rc2latest tamedevil
+

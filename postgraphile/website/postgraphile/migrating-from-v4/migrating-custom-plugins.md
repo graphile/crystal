@@ -87,9 +87,9 @@ a `prepack` script to compile your TypeScript:
 
 ### Upgrade to V5 dependencies
 
-At time of writing, V5 is still in beta, so you should use the `@beta` tag to
+At time of writing, V5 is in release candidate status, so you should use the `@rc` tag to
 install devDependencies. Go through each PostGraphile V4 related package
-referenced in package.json and install the `@beta` version of it, for example:
+referenced in package.json and install the `@rc` version of it, for example:
 
 ```json title="package.json before"
 {
@@ -104,10 +104,10 @@ referenced in package.json and install the `@beta` version of it, for example:
 
 ```bash
 yarn add --dev \
-  graphile-build@beta \
-  graphile-build-pg@beta \
-  postgraphile@beta \
-  postgraphile-plugin-connection-filter@beta
+  graphile-build@rc \
+  graphile-build-pg@rc \
+  postgraphile@rc \
+  postgraphile-plugin-connection-filter@rc
 ```
 
 ```json title="package.json after"

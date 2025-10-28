@@ -146,7 +146,7 @@ npm init -y
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@beta
+npm install --save express postgraphile@rc
 ```
 
 ### Environment variables
@@ -390,7 +390,7 @@ nvm use
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@beta @graphile/simplify-inflection@beta
+npm install --save express postgraphile@rc @graphile/simplify-inflection
 npm install --save-dev typescript @tsconfig/node24 @types/express @types/node
 ```
 

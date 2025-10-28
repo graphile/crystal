@@ -100,7 +100,7 @@ export default preset;
 
 ### Common plugins
 
-V5 plugins often use the `@beta` tag on npm during the beta phase. Also many are
+V5 plugins use the `@rc` tag on npm during the release candidate phase. Also many are
 now technically "presets" rather than "plugins" - plugins go into the `plugins`
 list, but presets go into the `extends` list:
 
@@ -595,7 +595,7 @@ You can try ruru out against any GraphQL API (not only those made by
 PostGraphile) via:
 
 ```bash
-npx ruru@beta -PSe http://localhost:5678/graphql
+npx ruru -PSe http://localhost:5678/graphql
 ```
 
 ## Plugins
