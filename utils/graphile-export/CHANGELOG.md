@@ -1,5 +1,27 @@
 # graphile-export
 
+## 1.0.0-rc.1
+
+### Patch Changes
+
+- [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327)
+  Thanks [@benjie](https://github.com/benjie)! - Bump to release candidate
+
+- Updated dependencies
+  [[`abb623d`](https://github.com/graphile/crystal/commit/abb623d59e517c0949f0fef5440b817103c685bf),
+  [`31b388c`](https://github.com/graphile/crystal/commit/31b388c6d5546640af7dcf4e6021643e47892ed1),
+  [`930240a`](https://github.com/graphile/crystal/commit/930240a4a7d3373f5691d495df752bb8fedac2af),
+  [`7b86454`](https://github.com/graphile/crystal/commit/7b864546fa81803ce0e573a2efa2e7f0905b2040),
+  [`42a0785`](https://github.com/graphile/crystal/commit/42a0785ddabf58812a22d764eeddfde9362974e5),
+  [`d196d60`](https://github.com/graphile/crystal/commit/d196d60664fbc9ffd410c11645db27554b22ac0b),
+  [`c6cbe61`](https://github.com/graphile/crystal/commit/c6cbe6175b0f1f034db59d42cbe594e7d329aba6),
+  [`d4ac603`](https://github.com/graphile/crystal/commit/d4ac603da7df6ea01aaa483a7cb29b1e514a90cd),
+  [`8a5a7c5`](https://github.com/graphile/crystal/commit/8a5a7c536fc4b9b702600c5cc3d413724670c327),
+  [`ea0135f`](https://github.com/graphile/crystal/commit/ea0135fac3f43850b65828f2ff2b01a34cfdff15),
+  [`b6821f5`](https://github.com/graphile/crystal/commit/b6821f5f4dc13abd0b605be7396c1b3c36e66177)]:
+  - grafast@1.0.0-rc.1
+  - pg-sql2@5.0.0-rc.1
+
 ## 0.0.2-beta.31
 
 ### Patch Changes
