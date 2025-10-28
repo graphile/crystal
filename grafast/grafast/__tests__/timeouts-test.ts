@@ -24,7 +24,7 @@ const schema = makeGrafastSchema({
             null,
             () =>
               new Promise((resolve) =>
-                setTimeout(() => resolve({ name: "Query.delayed" }), 2),
+                setTimeout(() => resolve({ name: "Query.delayed" }), 10),
               ),
           );
         },
@@ -40,7 +40,7 @@ const schema = makeGrafastSchema({
             $o,
             () =>
               new Promise((resolve) =>
-                setTimeout(() => resolve({ name: "Delayed.delayed" }), 2),
+                setTimeout(() => resolve({ name: "Delayed.delayed" }), 10),
               ),
           );
         },
