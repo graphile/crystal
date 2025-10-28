@@ -46,6 +46,7 @@ import type { Overrides } from './schema-manual-types.mts';
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
 type ListOfStep<TStep extends Step> = StepRepresentingList<TStep extends Step<infer U> ? U : any, TStep>;
+type StepData<TStep extends Step> = TStep extends Step<infer U> ? U : never;
 
 type Get<
   TTypeName extends string,
