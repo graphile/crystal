@@ -50,7 +50,7 @@ const config = {
           versions: {
             latest: { label: "Current" },
             4: { label: "v4 (current)", banner: "none" },
-            5: { label: "v5 (beta)", banner: "unreleased" },
+            5: { label: "v5 (rc)", banner: "unreleased" },
             current: { label: "Draft" },
           },
         },
@@ -76,7 +76,7 @@ const config = {
         versions: {
           latest: { label: "Current" },
           4: { label: "v4 (current)", banner: "none" },
-          5: { label: "v5 (beta)", banner: "unreleased" },
+          5: { label: "v5 (rc)", banner: "unreleased" },
           current: { label: "Draft" },
         },
       },
