@@ -1029,10 +1029,23 @@ export function stepADependsOnStepB(
   stepA: Step,
   stepB: Step,
   sansSideEffects = false,
+) {
+  return _stepADependsOnStepB(stepA, stepB, sansSideEffects, new Set());
+}
+
+/** @internal */
+function _stepADependsOnStepB(
+  stepA: Step,
+  stepB: Step,
+  sansSideEffects: boolean,
+  visited: Set<Step>,
 ): boolean {
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
+
+  if (visited.has(stepA)) return false;
+  visited.add(stepA);
 
   // PERF: bredth-first might be better.
 
@@ -1052,13 +1065,18 @@ export function stepADependsOnStepB(
     ) {
       return false;
     }
-    if (stepADependsOnStepB(dep, stepB)) {
+    if (_stepADependsOnStepB(dep, stepB, false, visited)) {
       return true;
     }
   }
   if (stepA.implicitSideEffectStep) {
     if (stepA.implicitSideEffectStep === stepB) return true;
-    return stepADependsOnStepB(stepA.implicitSideEffectStep, stepB);
+    return _stepADependsOnStepB(
+      stepA.implicitSideEffectStep,
+      stepB,
+      false,
+      visited,
+    );
   } else {
     return false;
   }
