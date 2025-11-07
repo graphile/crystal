@@ -210,6 +210,12 @@ export function extendSchema(
   return {
     name: uniquePluginName,
     version: "0.0.0",
+    after: [
+      "NodePlugin",
+      "RegisterQueryNodePlugin",
+      "PgTableNodePlugin",
+      "PgPolymorphismPlugin"
+    ],
     schema: {
       hooks: {
         build(build) {
