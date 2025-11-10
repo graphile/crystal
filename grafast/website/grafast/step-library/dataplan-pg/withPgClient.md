@@ -91,8 +91,8 @@ You need to pass three arguments to `sideEffectWithPgClient`:
   database client and the data from your `$data` step
 
 `sideEffectWithPgClient` will grab a client from the context, call your callback and wait
-for it to return, and then release the client again, ultimately resolving to
-the return result of your callback.
+for it to return, and then release the client again, ultimately yielding the
+return result of your callback.
 
 ```ts
 import { sideEffectWithPgClient } from "@dataplan/pg";

@@ -71,7 +71,7 @@ $users.where(sql`${tbl}.username = 'Benjie'`);
 ### $pgSelect.single()
 
 If this plan may only return one record, you can use `$pgSelect.single()` to
-return a plan that resolves to either that record (in the case of composite
+return a plan that yields either that record (in the case of composite
 types) or the underlying scalar (in the case of a resource whose codec has no
 attributes).
 

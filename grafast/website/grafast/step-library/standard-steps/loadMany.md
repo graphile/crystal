@@ -343,7 +343,8 @@ one result collection per lookup value. Each
 collection may be an array or an async iterable; items may be `null`:
 `PromiseOrDirect<ReadonlyArray<Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>>>>`.
 
-The lookups argument is a readonly array of resolved lookup values.
+The `lookups` argument is a readonly array of the lookup values yielded by the
+upstream lookup steps.
 
 The `info` argument contains additional metadata about the request:
 
@@ -351,7 +352,7 @@ The `info` argument contains additional metadata about the request:
   need
 - `params`: a map of params set via `.setParam(...)` (used to indicate
   pagination, filtering, etc)
-- `shared`: the resolved value from `loader.shared` (typically API/DB clients,
+- `shared`: the value yielded by `loader.shared` (typically API/DB clients,
   current user/session details, etc) - can only be populated if specified via a
   loader object
 
@@ -373,7 +374,7 @@ const loader = {
   // paginationSupport: { cursor: true, offset: true, reverse: true },
 
   async load(lookups, info) {
-    // lookups: readonly array of resolved lookup values
+    // lookups: readonly array of lookup values yielded by the lookup steps
 
     // info.attributes: readonly array of accessed keys (keyof TItem)
     const attributes = info.attributes;
@@ -382,7 +383,7 @@ const loader = {
     // Extract `paginationSupport`-related parameters:
     const { reverse, limit, offset, after } = info.params;
 
-    // info.shared: resolved shared value(s)
+    // info.shared: shared value(s) yielded by `loader.shared`
     const db = info.shared;
 
     const resultsByLookup = await db.lookUpTheThings(lookups, {

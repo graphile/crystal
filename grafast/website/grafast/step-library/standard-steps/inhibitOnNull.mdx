@@ -2,9 +2,8 @@ import Mermaid from "@theme/Mermaid";
 
 # inhibitOnNull
 
-Wrap a step such that it resolves to the same value as the original, but
-downstream works (dependents) are inhibited when that value is `null` or
-`undefined`.
+Wrap a step so that it yields the same values as the original, but downstream
+work (dependents) is inhibited when a yielded value is `null` or `undefined`.
 
 :::note[Declarative flow]
 
@@ -22,12 +21,12 @@ const $parentId = get($post, "parentId");
 const $parent = loadOne(inhibitOnNull($parentId), batchGetPostById);
 ```
 
-In the example above, when a value of `$parentId` resolves to `null`, the
-associated value for the `loadOne` step will automatically resolve with `null`
-(and be inhibited) without needing to execute. Only the uninhibited non-null
-values will be passed through to the `loadOne` step for execution. If all values
-for a step are inhibited then the step will not execute at all. When a value for
-`$parentId` is not nullish execution for that value proceeds as normal.
+In the example above, when the `$parentId` step yields `null`, the associated
+value for the `loadOne` step will automatically yield `null` (and be inhibited)
+without needing to execute. Only the uninhibited non-null values pass through to
+the `loadOne` step for execution. If all values for a step are inhibited then the
+step will not execute at all. When a value for `$parentId` is not nullish,
+execution for that value proceeds as normal.
 
 ## Trapping
 
@@ -55,8 +54,8 @@ from `Access` is `null`.
 
 `inhibitOnNull` accepts an optional condition step via `{ if: $cond }` (see
 [`condition`](./condition) for common conditions). When provided, the value is
-only inhibited if both the wrapped step resolves to `null` and `$cond` resolves
-to a truthy value:
+only inhibited if both the wrapped step yields `null` and `$cond` yields a
+truthy value:
 
 ```ts
 // Decode `$id` assuming it is the Node `ID` for a user:
@@ -65,7 +64,7 @@ const spec = specFromNodeId(userHandler, $id);
 const $userIdOrNull = spec.id;
 
 // If `$id` is `null`, we want a literal `null` here.
-// However, if `$id` is non-null, but `$userIdOrNull` evaluates to null
+// However, if `$id` is non-null, but `$userIdOrNull` yields `null`
 // (because, for example, an invalid ID or ID for a different type was passed),
 // then we want to inhibit all proceeding steps.
 const $validUserIdOrNull = inhibitOnNull($userIdOrNull, {

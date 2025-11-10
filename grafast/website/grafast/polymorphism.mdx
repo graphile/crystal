@@ -221,7 +221,7 @@ combined data described above) and an `info` object (see
 [“Advanced”](#advanced)). The function must return an `AbstractTypePlanner`
 object, which is an object with two entries:
 
-- `$__typename` (required): a step representing the name of the resolved
+- `$__typename` (required): a step representing the name of the matching
   concrete object type.
 - `planForType(t)` (optional): a function that is called for each possible
   concrete object type, `t`, and must return the step to use for that type (or

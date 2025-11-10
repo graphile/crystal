@@ -138,7 +138,7 @@ fields["or"] = {
     if (value == null) return;
     const orCondition = parent.orPlan();
     // Each list entry is added to `orCondition` only once the entry itself is
-    // fully resolved - if an individual entry produces many clauses, they must be
+    // fully processed - if an individual entry produces many clauses, they must be
     // joined with `AND` first before being incorporated into the `OR`.
     return () => orCondition.andPlan();
   },
