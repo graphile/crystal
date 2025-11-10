@@ -39,6 +39,20 @@ following optimization, the final execution plan will no longer resemble the
 shape of the GraphQL operation, but fortunately the output plan exists to format
 the result data back into the shape that GraphQL specifies.
 
+## Step vocabulary
+
+Steps act very differently at plan-time versus execution-time, so we describe
+them with two complementary verbs:
+
+- At plan-time, a step **represents** the value that will exist at that position
+  (e.g. `$id` represents a user identifier, even if the batch later fans out).
+- At execution-time, a step **yields** zero or more concrete values to its
+  dependants (e.g. when traversing a list, the same `$id` step yields an entry
+  per list item).
+
+Keeping this vocabulary consistent helps reinforce that steps are long-lived
+parts of the plan that channel many batches, not single-use promises.
+
 ## No plan-time branching
 
 There is no imperative branching inside the plan. Instead, values flow along the
