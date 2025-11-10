@@ -88,10 +88,11 @@ const $row = loadOne($id, {
 });
 ```
 
-Here, even though `$id` might represent hundreds of values when evaluated inside
-a list, `context()` and thus `context().get("db")` will only ever represent a
-single value—a unary value—so the same `db` client can be shared across the
-entire list of `ids` at runtime.
+Here, `$id` still represents a single user identifier in the plan. When the
+operation runs across a list, that step yields a batch of identifiers — one per
+list item. `context()` and thus `context().get("db")` continue to represent a
+single value. Because the database client stays unary, the same `db` instance
+can be shared across the entire batch at execution time.
 
 ## Batching
 
@@ -170,7 +171,7 @@ should delegate to external business logic.
 
 Most plan resolvers do not need any extra flow control beyond the standard
 dataflow described above. Values propagate naturally through the graph, and
-nulls usually resolve to nulls without additional intervention. The helpers in
+nulls usually yield nulls without additional intervention. The helpers in
 this section are for the edge cases — typically when you are working with global
 object identifiers ("Node IDs"), optional foreign keys, or other advanced
 scenarios where you need to suppress downstream work or turn those suppressions

@@ -55,8 +55,8 @@ are:
   decoded value.
 - `getSpec($decoded)` – converts the decoded value into whatever specifier your
   application expects. Useful for referencing a node without fetching it.
-- `get(spec)` – given the specifier from `getSpec`, returns a step that resolves
-  to the original node.
+- `get(spec)` – given the specifier from `getSpec`, returns a step that yields
+  the original node.
 - `plan($node)` – produces the value that will be passed to `codec.encode`.
   Feeding the result into `match` should yield `true`.
 - `deprecationReason` (optional) – indicates that the Node implementation is

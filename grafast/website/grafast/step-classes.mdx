@@ -575,7 +575,7 @@ For more information, see [handling complex inputs](./plan-resolvers/complex-inp
 toTypename($step: Step): Step<string>
 ```
 
-Enables a step to return a step resolving to the typename, used by the
+Enables a step to return a step that yields the typename, used by the
 `defaultPlanType` polymorphic type resolver function when the GraphQL union or
 interface type does not implement the `planType` method. If not implemented,
 this default function will fall back to `get($step, '__typename')`.
