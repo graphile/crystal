@@ -996,7 +996,7 @@ export function extendSchema(
 
         GraphQLObjectType_interfaces(interfaces, build, context: any) {
           const {
-            extend,
+            append,
             makeExtendSchemaPlugin: {
               [uniquePluginName]: { typeExtensions },
             },
@@ -1005,26 +1005,13 @@ export function extendSchema(
           if (typeExtensions.GraphQLObjectType[Self.name]) {
             const newInterfaces = typeExtensions.GraphQLObjectType[
               Self.name
-            ].reduce(
-              (
-                memo: GraphQLInterfaceType[],
-                extension: ObjectTypeExtensionNode,
-              ) => {
-                const moreInterfaces = getInterfaces(
-                  extension.interfaces,
-                  build,
-                );
-                return extend(
-                  memo,
-                  moreInterfaces,
-                  `Adding interfaces from ${uniquePluginName}`,
-                );
-              },
-              Object.create(null),
+            ].flatMap((extension: ObjectTypeExtensionNode) =>
+              getInterfaces(extension.interfaces, build),
             );
-            return extend(
+            return append(
               interfaces,
               newInterfaces,
+              "name",
               `Adding interfaces from ${uniquePluginName}`,
             );
           } else {
@@ -1116,7 +1103,7 @@ export function extendSchema(
 
         GraphQLInterfaceType_interfaces(interfaces, build, context: any) {
           const {
-            extend,
+            append,
             makeExtendSchemaPlugin: {
               [uniquePluginName]: { typeExtensions },
             },
@@ -1125,26 +1112,13 @@ export function extendSchema(
           if (typeExtensions.GraphQLInterfaceType[Self.name]) {
             const newInterfaces = typeExtensions.GraphQLInterfaceType[
               Self.name
-            ].reduce(
-              (
-                memo: GraphQLInterfaceType[],
-                extension: InterfaceTypeExtensionNode,
-              ) => {
-                const moreInterfaces = getInterfaces(
-                  extension.interfaces,
-                  build,
-                );
-                return extend(
-                  memo,
-                  moreInterfaces,
-                  `Adding interfaces from ${uniquePluginName}`,
-                );
-              },
-              Object.create(null),
+            ].flatMap((extension) =>
+              getInterfaces(extension.interfaces, build),
             );
-            return extend(
+            return append(
               interfaces,
               newInterfaces,
+              "name",
               `Adding interfaces from ${uniquePluginName}`,
             );
           } else {

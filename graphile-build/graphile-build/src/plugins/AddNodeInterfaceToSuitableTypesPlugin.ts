@@ -25,6 +25,7 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_interfaces(interfaces, build, context) {
         const {
+          append,
           getTypeByName,
           inflection,
           [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
@@ -45,7 +46,12 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
           return interfaces;
         }
 
-        return [...interfaces, NodeInterfaceType];
+        return append(
+          interfaces,
+          [NodeInterfaceType],
+          "name",
+          "Adding Node interface",
+        );
       },
 
       GraphQLObjectType_fields(fields, build, context) {

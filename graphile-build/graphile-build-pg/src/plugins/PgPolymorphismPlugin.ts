@@ -1685,7 +1685,7 @@ return function (access, inhibitOnNull) {
         return _;
       },
       GraphQLObjectType_interfaces(interfaces, build, context) {
-        const { inflection } = build;
+        const { append, inflection } = build;
         const {
           scope: { pgCodec, isPgClassType },
         } = context;
@@ -1703,7 +1703,12 @@ return function (access, inhibitOnNull) {
                 `'${interfaceName}' is not an interface type (it's a ${interfaceType.constructor.name})`,
               );
             } else {
-              interfaces.push(interfaceType);
+              interfaces = append(
+                interfaces,
+                [interfaceType],
+                "name",
+                `Adding ${interfaceName} from PgPolymorphismPlugin ('implements')`,
+              );
             }
           }
         }
@@ -1721,8 +1726,11 @@ return function (access, inhibitOnNull) {
           );
           if (typeNames.includes(context.Self.name)) {
             const interfaceTypeName = inflection.tableType(codec);
-            interfaces.push(
-              build.getTypeByName(interfaceTypeName) as GraphQLInterfaceType,
+            interfaces = append(
+              interfaces,
+              [build.getTypeByName(interfaceTypeName) as GraphQLInterfaceType],
+              "name",
+              `Adding ${interfaceTypeName} from PgPolymorphismPlugin (codec.polymorphism)`,
             );
           }
         }

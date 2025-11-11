@@ -532,6 +532,26 @@ declare global {
         behaviourOnConflict?: "throw" | "recoverable",
       ) => Obj1 & Obj2;
 
+      /**
+       * Appends the entries from `extra` into `base` tracking the `hint` as to
+       * when they were added. If a conflict is found (where `base` already has
+       * an entry with the same `identity(item)` as a new item) an error will
+       * be thrown describing what happened. The `hint` is provided so that in
+       * the case of a conflict a helpful error message can be raised - use
+       * `hint` to describe what you are doing and when a conflict occurs both
+       * hints will be logged helping users to figure out what went wrong.
+       */
+      append: <
+        T,
+        ID extends string | number | symbol = string | number | symbol,
+      >(
+        base: T[],
+        extra: ReadonlyArray<T>,
+        getIdentity: keyof T | ((entry: T) => ID),
+        hint: string,
+        behaviourOnConflict?: "throw" | "recoverable",
+      ) => T[];
+
       getAllTypes(): {
         [typeName: string]: GraphQLNamedType | null | undefined;
       };
