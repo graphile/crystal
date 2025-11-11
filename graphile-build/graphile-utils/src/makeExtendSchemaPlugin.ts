@@ -1005,23 +1005,8 @@ export function extendSchema(
           if (typeExtensions.GraphQLObjectType[Self.name]) {
             const newInterfaces = typeExtensions.GraphQLObjectType[
               Self.name
-            ].reduce(
-              (
-                memo: GraphQLInterfaceType[],
-                extension: ObjectTypeExtensionNode,
-              ) => {
-                const moreInterfaces = getInterfaces(
-                  extension.interfaces,
-                  build,
-                );
-                return append(
-                  memo,
-                  moreInterfaces,
-                  "name",
-                  `Adding interfaces from ${uniquePluginName} (type extension)`,
-                );
-              },
-              [],
+            ].flatMap((extension: ObjectTypeExtensionNode) =>
+              getInterfaces(extension.interfaces, build),
             );
             return append(
               interfaces,
@@ -1127,23 +1112,8 @@ export function extendSchema(
           if (typeExtensions.GraphQLInterfaceType[Self.name]) {
             const newInterfaces = typeExtensions.GraphQLInterfaceType[
               Self.name
-            ].reduce(
-              (
-                memo: GraphQLInterfaceType[],
-                extension: InterfaceTypeExtensionNode,
-              ) => {
-                const moreInterfaces = getInterfaces(
-                  extension.interfaces,
-                  build,
-                );
-                return append(
-                  memo,
-                  moreInterfaces,
-                  "name",
-                  `Adding interfaces from ${uniquePluginName} (interface extension)`,
-                );
-              },
-              Object.create(null),
+            ].flatMap((extension) =>
+              getInterfaces(extension.interfaces, build),
             );
             return append(
               interfaces,
