@@ -13,6 +13,7 @@ node_modules/
 /grafast/grafast/__tests__/dcc/dcc-types.ts
 /grafast/dataplan-pg/src/examples/smallExample/schema-generated.mts
 /grafast/dataplan-pg/scripts/exampleSchemaExport.mjs
+/grafast/ruru/bundle/ruru.min.js
 /grafast/ruru/ruru.html
 /grafast/ruru/static/
 /grafast/ruru/src/bundleCode.ts
