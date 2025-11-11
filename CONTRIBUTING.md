@@ -41,7 +41,19 @@ mode. Other options may or may not work - you may need to set `PGHOST`,
 > sudo apt update
 > sudo apt install postgresql
 > sudo -u postgres psql -c "create user $USER superuser;"
+> # Add 'local all graphilecrystaltest scram-sha-256' as the first line to your pg_hba.conf
+> sudo sed -i '1ilocal all graphilecrystaltest scram-sha-256' /etc/postgresql/*/main/pg_hba.conf
 > ```
+>
+> If you see an error like
+> `Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string`
+> then try again after running the following:
+>
+> ```bash
+> export PGHOST="/var/run/postgresql"
+> ```
+>
+> (consider adding this to your default shell configuration).
 
 If you don't have such a server, you can use docker to run it locally:
 
