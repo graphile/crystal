@@ -996,7 +996,7 @@ export function extendSchema(
 
         GraphQLObjectType_interfaces(interfaces, build, context: any) {
           const {
-            extend,
+            append,
             makeExtendSchemaPlugin: {
               [uniquePluginName]: { typeExtensions },
             },
@@ -1014,17 +1014,19 @@ export function extendSchema(
                   extension.interfaces,
                   build,
                 );
-                return extend(
+                return append(
                   memo,
                   moreInterfaces,
+                  "name",
                   `Adding interfaces from ${uniquePluginName}`,
                 );
               },
-              Object.create(null),
+              [],
             );
-            return extend(
+            return append(
               interfaces,
               newInterfaces,
+              "name",
               `Adding interfaces from ${uniquePluginName}`,
             );
           } else {
