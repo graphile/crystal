@@ -210,6 +210,15 @@ export function extendSchema(
   return {
     name: uniquePluginName,
     version: "0.0.0",
+    after: [
+      "QueryPlugin",
+      "MutationPlugin",
+      "SubscriptionPlugin",
+      "NodePlugin",
+      "RegisterQueryNodePlugin",
+      "PgRegistryPlugin",
+      "PgTableNodePlugin",
+    ],
     schema: {
       hooks: {
         build(build) {
