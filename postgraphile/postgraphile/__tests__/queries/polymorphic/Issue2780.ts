@@ -40,12 +40,8 @@ const extensionsPlugin = extendSchema((build) => {
         id: String!
       }
 
-      type MovieCollection implements RecommendationItem {
-        id: String!
-      }
-      type SeriesCollection implements RecommendationItem {
-        id: String!
-      }
+      extend type MovieCollection implements RecommendationItem
+      extend type SeriesCollection implements RecommendationItem
 
       type Recommendation {
         clusterId: String
