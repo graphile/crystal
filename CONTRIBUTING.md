@@ -33,6 +33,16 @@ We assume you have a local PostgreSQL server running in "trust" authentication
 mode. Other options may or may not work - you may need to set `PGHOST`,
 `PGUSER`, `PGPASSWORD` and/or similar config variables.
 
+> [!INFO]
+>
+> For Ubuntu, the following would get PostgreSQL up and running locally:
+>
+> ```bash
+> sudo apt update
+> sudo apt install postgresql
+> sudo -u postgres psql -c "create user $USER superuser;"
+> ```
+
 If you don't have such a server, you can use docker to run it locally:
 
 ```bash
