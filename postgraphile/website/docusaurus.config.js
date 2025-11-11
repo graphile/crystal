@@ -197,7 +197,7 @@ const config = {
                 to: "https://postgraphile.org",
               },
               {
-                html: '<a class="footer__link-item" href="/grafast">Gra<em>fast</em></a>',
+                html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
               },
               {
                 label: "Graphile Build",
