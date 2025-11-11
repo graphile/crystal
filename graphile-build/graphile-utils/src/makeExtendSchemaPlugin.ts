@@ -1018,7 +1018,7 @@ export function extendSchema(
                   memo,
                   moreInterfaces,
                   "name",
-                  `Adding interfaces from ${uniquePluginName}`,
+                  `Adding interfaces from ${uniquePluginName} (type extension)`,
                 );
               },
               [],
@@ -1118,7 +1118,7 @@ export function extendSchema(
 
         GraphQLInterfaceType_interfaces(interfaces, build, context: any) {
           const {
-            extend,
+            append,
             makeExtendSchemaPlugin: {
               [uniquePluginName]: { typeExtensions },
             },
@@ -1136,17 +1136,19 @@ export function extendSchema(
                   extension.interfaces,
                   build,
                 );
-                return extend(
+                return append(
                   memo,
                   moreInterfaces,
-                  `Adding interfaces from ${uniquePluginName}`,
+                  "name",
+                  `Adding interfaces from ${uniquePluginName} (interface extension)`,
                 );
               },
               Object.create(null),
             );
-            return extend(
+            return append(
               interfaces,
               newInterfaces,
+              "name",
               `Adding interfaces from ${uniquePluginName}`,
             );
           } else {
