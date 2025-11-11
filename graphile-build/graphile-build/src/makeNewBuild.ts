@@ -21,6 +21,7 @@ import {
 } from "grafast/graphql";
 import * as semver from "semver";
 
+import append from "./append.js";
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { stringTypeSpec, wrapDescription } from "./utils.js";
@@ -156,6 +157,18 @@ export default function makeNewBuild(
     extend(base, extra, hint, behaviorOnConflict = "throw") {
       try {
         return extend(base, extra, hint);
+      } catch (e) {
+        if (behaviorOnConflict === "recoverable") {
+          this.handleRecoverableError(e);
+          return base as any;
+        } else {
+          throw e;
+        }
+      }
+    },
+    append(base, extra, getIdentity, hint, behaviorOnConflict = "throw") {
+      try {
+        return append(base, extra, getIdentity, hint);
       } catch (e) {
         if (behaviorOnConflict === "recoverable") {
           this.handleRecoverableError(e);
