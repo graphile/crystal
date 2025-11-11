@@ -185,7 +185,7 @@ function expectCbTweaked<T>(cb: () => T) {
     try {
       return cb();
     } catch (e) {
-      throw new Error(e.message.replace(/[\[\]]/g, ""));
+      throw new Error(e.message.replace(/[[\]]/g, ""));
     }
   });
 }
