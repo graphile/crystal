@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { isDev } from "grafast";
 
 const INDENT = "  ";
 const $$hints = Symbol("hints");
@@ -22,6 +23,9 @@ export default function extend<
   Obj1 extends Record<string | number | symbol, any>,
   Obj2 extends Record<string | number | symbol, any>,
 >(base: Obj1, extra: Obj2, hint: string): Obj1 & Obj2 {
+  if (isDev && (Array.isArray(base) || Array.isArray(extra))) {
+    throw new Error(`Do not extend arrays!`);
+  }
   const hints = base[$$hints] || {};
 
   const keysB = Object.keys(extra);
