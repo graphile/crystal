@@ -21,75 +21,85 @@ document.
 
 **Gra*fast* is a radical new approach to executing GraphQL requests.**
 
-Traditional GraphQL servers execute the request layer-by-layer, field-by-field,
-object-by-object at runtime, resolving data needs on the fly and thereby
-inviting over-fetching, under-fetching, and the classic N+1 cascade (or the
-explosion of Promises needed to avoid it via [DataLoader][]).
+The GraphQL specification details execution via "resolvers": the value for each
+field is determined by calling the relevant (potentially asynchronous) function,
+passing the parent object and the field's arguments (if any). This localised
+reasoning is simple to specify and enforces the "graph" nature of GraphQL (the
+[value of a node is independent of the path through which it was
+fetched](https://benjie.dev/graphql/traversal)), but its short-sighted approach
+means the next layer of data requirements are discovered only after previous
+layer has executed. Furthermore, each entry in a list is processed separately,
+so for a list with N items, each descendent selection may produce N additional
+fetches from the backend - this is called the N+1 problem. This quickly
+multiplies up to be even more devastating in nested lists.
+
+Most GraphQL servers follow the GraphQL specification execution algorithm
+verbatim, recommending the [DataLoader][] pattern to avoid the N+1 cascade (but
+resulting in an explosion of Promises instead) and doing little to address the
+over-fetching and under-fetching problems that just-in-time requirements
+discovery leads to.
 
 &ZeroWidthSpace;<Grafast /> was designed from the ground up to eliminate these
-issues and more whilst maintaining pleasant APIs for developers to use. 
+issues and more whilst maintaining pleasant APIs for developers to use.
 
 ## Why Gra*fast*?
 
 Gra*fast* extends GraphQL's **declarative** aesthetic to execution, taking a
-holistic approach to understanding the incoming operation via planning, and
-thereby unlocking the potential for significant optimizations not previously
-achievable without a herculean effort.
+holistic approach to understanding the incoming request via planning. Batching
+is baked in so you never need to think about the N+1 problem again, simple
+optimizations such as field selection and work deduplication require almost no
+effort, and more advanced optimizations are now achievable without herculean
+effort.
 
 ### Extremely efficient
 
-Plan resolvers ergonomically describe each field's requirements, Gra*fast* walks
+Plan resolvers ergonomically describe each field's requirements. Gra*fast* walks
 the document and assembles these requirements into a draft execution plan, which
-it then optimizes before execution, with each step being executed in a batch.
-Thus, with Gra*fast*, you can:
+it then optimizes before execution. With Gra*fast*, you can:
 
+- **eliminate under-fetching** by eager loading when it makes sense, reducing
+  the round-trips required to your backend data stores;
 - **eliminate over-fetching** by only requesting what's needed from your
   business logic;
-- **eliminate under-fetching** by removing duplication and fusing related work,
-  reducing the round-trips required to your backend data stores;
+- **streamline** data pipelines by eliminating redundant work;
 - **eliminate the N+1 problem** by design, since Gra*fast* batch processes all
   values via a single `execute()` method[^1]; and
 - **reduce Promise usage by orders of magnitude** since, unlike [DataLoader][],
   Gra*fast*'s batching is built-in and does not need a promise for each
   individual item load.
 
-Because the plan covers the whole operation, the optimisations apply across the
-entire operation rather than being sprinkled field-by-field in resolvers.
+Because planning understands the entire request, optimisations apply
+operation-wide rather than being sprinkled field-by-field in resolvers. Plan
+resolvers can be written ergonomically in terms of data flow without needing to
+think about optimization patterns, which are handled at a broader level.
 
 [^1]:
-  Strictly speaking you can opt out of batch processing on a per-step
-  basis, and some steps such as `lambda()` and `sideEffect()` do this, but
-  Gra*fast*'s model is built around batching and unbatched execution is an
-  optimization for certain shapes of logic (typically transforms) - it's the
-  exception rather than the rule.
+  You can opt out of batch processing on a per-step basis (like `lambda()` and
+  `sideEffect()` do), but Gra*fast*'s model is built around batching. Unbatched
+  execution is an optimization for certain shapes of logic (typically
+  transforms) - it's the exception rather than the rule.
 
 ### Spec compliant
 
-Gra*fast* is 100% spec compliant[^2], written by [a member of the GraphQL
-Technical Steering Committee](https://github.com/graphql/graphql-wg/blob/main/GraphQL-TSC.md#tsc-members)!
+The GraphQL specification
+[notes](https://spec.graphql.org/draft/#sec-Conforming-Algorithms):
 
-[^2]:
-  The GraphQL specification describes how a GraphQL operation should be executed,
-  talking in terms of layer–by–layer resolution of data using "resolvers." But
-  critical to note is this sentence from the beginning of the specification:
+> _Conformance requirements [...] can be fulfilled [...] in any way as long as
+> the perceived result is equivalent._  
+> ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
 
-  > _Conformance requirements [...] can be fulfilled [...] in any way as long as
-  > the perceived result is equivalent._  
-  > ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
+Gra*fast* has been written very careful by a [GraphQL Technical Steering
+Committee](https://github.com/graphql/graphql-wg/blob/main/GraphQL-TSC.md#tsc-members)
+member to ensure that the perceived result is equivalent; thus, despite its
+drastically different execution algorithm, it is 100% spec compliant. 
 
-  Resolvers are straightforward to understand and implement the desired
-  behaviors from an observer's (client's) point of view, hence why they are the
-  chosen algorithm in the spec. However, when implemented naively on the server
-  they can very quickly result in the serious performance, efficiency and
-  scalability issues mentioned before.
-
-### Compatible with resolvers
+### Compatible with (most) resolvers
 
 Gra*fast* implements resolvers emulation, enabling the vast majority of
-GraphQL.js schema resolvers to be executed via <Grafast /> directly. Of course
-doing so will not reap the benefits of planning, but it does go to show that
-everything that can be done in a resolver can be done in a plan (since in
-<Grafast />, resolvers are emulated via plans themselves!).
+GraphQL.js schema resolvers to be executed via <Grafast /> directly. Doing so
+will not reap the benefits of planning, but it does go to show that everything
+that can be done in a resolver can be done in a plan (since in <Grafast />,
+resolvers are emulated via plans themselves!).
 
 Bring your existing schema, and port it to plans on a field-by-field basis!
 
@@ -101,40 +111,55 @@ schema can query any data source, service, or business logic that Node.js can
 query. We do have highly optimized steps available for particular data stores,
 but you can reap huge benefits from just switching from using DataLoader in
 resolvers to using [`loadOne()`](./step-library/standard-steps/loadOne.md) and
-[`loadMany()`](./step-library/standard-steps/loadMany.md) in plan resolvers.
+[`loadMany()`](./step-library/standard-steps/loadMany.md) in plan resolvers
+&mdash; and they can even use the same callback!
 
 ## Request lifecycle
 
 Gra*fast* expects the incoming document to be parsed and validated with
-`graphql-js` before planning — passing an unvalidated document may lead to
+`graphql-js` before planning; passing an unvalidated document may lead to
 unexpected behaviour. Gra*fast* only replaces execution, and can be used as a
 substitute for the GraphQL `execute` and `subscribe` methods in many servers.
+
+### Reusing an operation plan
 
 Once a validated operation arrives, Gra*fast* looks for an existing **operation
 plan** in its cache (keyed by schema, document, and operation name[^3]) and uses
 it for execution if found.
 
-To establish an operation plan for a never-seen-before operation, Gra*fast*
-walks the document in a breadth-first manner and calls the relevant **plan
-resolver** for each field, argument, and abstract type that it finds. For
-fields, Gra*fast* will call the field's plan resolver, which returns a **step**
-suitable to produce its desired output (the plan resolver may construct a graph
-of steps for this, but only one step is returned). Ultimately these steps form
-the **execution plan**, a directed acyclic graph (DAG) that details the flow of
-information during execution, and an **output plan** which details how to turn
-the result of this graph into a valid GraphQL response. This execution plan is
-then optimized via principled communication with and between the various steps
-therein: deduplicating redundant work, fusing related steps (e.g. joins and
-subqueries in a database, additional "includes" in REST APIs, etc), creating
-optimized data flows, and ultimately building the most optimal plan for
-execution that it can.
-
 [^3]: Currently, plan reuse also considers some additional constraints to
 support the `@skip` and `@include` directives, but these constraints are being
 phased out.
 
+### Establishing a new operation plan
+
+The time during which a new operation plan is being established is called
+"plan-time".
+
+To establish an operation plan for a never-seen-before operation, Gra*fast*
+walks the document in a breadth-first manner and calls the relevant **plan
+resolver** for each field, argument, and abstract type that it finds. A field'
+plan resolver may construct 0 or more steps and must return eactly one **step**
+suitable to produce its desired output.
+
+The steps from all of these plan resolvers are combined to form the **execution
+plan**, a directed acyclic graph (DAG) that details the flow of information
+during execution, and an **output plan** which details how to turn the result of
+this graph into a valid GraphQL response.
+
+The execution plan is optimized via principled communication with and between
+the various steps therein: deduplicating redundant work, fusing related steps
+(e.g. joins and subqueries in a database, additional "includes" in REST APIs,
+or similar forms of eager-loading), creating optimized data flows, and
+ultimately building the most optimal plan for execution that it can.
+
+### Execution
+
 Once the operation plan for a request has been established, the execution plan
 is executed, and formatted into the GraphQL response via the output plan.
+
+The time during which an established operation plan is being executed is called
+"execution-time".
 
 :::info[Thinking in plans]
 
@@ -148,15 +173,14 @@ Ready for a deeper dive into how the data flows between steps? Continue with
 _This is just an overview, for full documentation see
 [Plan Resolvers](./plan-resolvers)._
 
-In a traditional GraphQL schema each field has a resolver. In a <Grafast />
-schema, though resolvers are still supported, you are encouraged to instead use
-[**plan&nbsp;resolvers**](/grafast/plan-resolvers). These plan resolvers are
-generally small functions, like regular resolvers should be, but instead of
-being called many times during execution and dealing with concrete runtime
-values, they are called only once at planning time and they build and
-manipulate **steps** which are the building blocks of an [**execution
-plan**](/grafast/operation-plan#execution-plan) which details all the actions
-necessary to satisfy the GraphQL request.
+Though traditional resolvers are supported via emulation, you are encouraged to
+use native [**plan&nbsp;resolvers**](/grafast/plan-resolvers).
+
+Plan resolvers are small functions that are called at plan-time to produce
+**steps** (the building blocks of an [**execution
+plan**](/grafast/operation-plan#execution-plan)) to detail actions sufficient to
+produce the value for this field. The execution plan is the combination of all
+of these steps, and details actions sufficient to satisfy a GraphQL request.
 
 Imagine that we have this GraphQL schema:
 
@@ -224,7 +248,7 @@ const planResolvers = {
 As you can see, the shape of the logic is quite similar, but the <Grafast />
 plan resolvers are synchronous. <Grafast /> operates in two phases: planning
 (synchronous) and execution (asynchronous); plan resolvers are called during
-the planning phase.
+the planning phase (plan-time).
 
 :::info See the working example
 
@@ -234,19 +258,21 @@ example](https://github.com/graphile/crystal/tree/main/grafast/website/examples/
 
 :::
 
-The job of a plan resolver is not to retrieve data, it's to detail the
-**steps** necessary to retrieve it. Plan resolvers do not have access to any
-runtime data, they must describe what to do for arbitrary future data. For
-example, the `User.friends` Gra*fast* plan resolver cannot loop through the
-runtime data with a `map` function as in the resolver example (since there is
-not yet any data to loop over), instead it describes the plan to do so using an
-[`each` step](/grafast/step-library/standard-steps/each), detailing what to do
-with each item made available later.
+The job of a plan resolver is not to retrieve data, it's to detail the **steps**
+necessary to retrieve it. Plan resolvers do not have access to any request data,
+they must describe what to do for arbitrary future data. For example, the
+`User.friends` Gra*fast* plan resolver cannot loop through the data with a `map`
+function as in the resolver example (since there is not yet any data to loop
+over), instead it describes the plan to do so using an [`each`
+step](/grafast/step-library/standard-steps/each), detailing what to do with each
+item that will be seen at execution-time.
 
 :::tip The dollar convention
 
 By convention, when a variable represents a <Grafast /> step, the variable will
-be named starting with a `$` (dollar symbol).
+be named starting with a `$` (dollar symbol). This helps to indicate that the
+variable will never "resolve" to an execution-time value, but instead represents
+a unit of execution in the overall plan.
 
 :::
 
@@ -446,12 +472,14 @@ SQL — it would be safer to use an `escapeIdentifier()` call around these.)
 
 ### Step lifecycle
 
-The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you
-saw above is the final form of the plan, there were many intermediate states
-that it will have gone through in order to reach this most optimal form, made
+The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you saw
+above is the final form of the plan, there may have been many intermediate
+states that it went through in order to reach this most optimal form, made
 possible by <Grafast />'s lifecycle methods.
 
-:::info
+:::info Finding more information
+
+This is an overview, for full documentation see [lifecycle][lifecycle].
 
 For more information about understanding plan diagrams please see
 [Plan Diagrams](/grafast/plan-diagrams).
@@ -460,8 +488,6 @@ For a fully working implementation of the above schema, please see the
 ["users and friends" example](https://github.com/graphile/crystal/tree/main/grafast/website/examples/users-and-friends).
 
 :::
-
-_This is just an overview, for full documentation see [lifecycle][lifecycle]._
 
 All plan lifecycle methods are optional, and due to the always–batched nature
 of <Grafast /> plans you can get good performance without using any of them
