@@ -46,6 +46,8 @@ const config = {
           routeBasePath: "grafast",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
           remarkPlugins: [
             [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
           ],
