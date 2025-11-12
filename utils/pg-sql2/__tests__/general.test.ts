@@ -177,9 +177,22 @@ describe("sql.compile", () => {
   });
 });
 
+/**
+ * Deals with Node having changed the format of `inspect()` between majors
+ */
+function expectCbTweaked<T>(cb: () => T) {
+  return expect(() => {
+    try {
+      return cb();
+    } catch (e) {
+      throw new Error(e.message.replace(/[[\]]/g, ""));
+    }
+  });
+}
+
 describe("sqli", () => {
   it("subbing an object of similar layout", () => {
-    expect(() => {
+    expectCbTweaked(() => {
       sql`select ${sql.join(
         [
           { [Symbol("pg-sql2-type")]: "VALUE", v: 1 } as any,
@@ -193,7 +206,7 @@ describe("sqli", () => {
   });
 
   it("subbing in a scalar", () => {
-    expect(() => {
+    expectCbTweaked(() => {
       sql`select ${sql.join(
         [
           1 as any,
@@ -207,7 +220,7 @@ describe("sqli", () => {
   });
 
   it("including a join", () => {
-    expect(() => {
+    expectCbTweaked(() => {
       sql`select ${sql.join(
         [
           sql.value(1),
