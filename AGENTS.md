@@ -76,10 +76,10 @@ goals though!
 
 Otherwise, you must follow these rules:
 
-1. **Never install dependencies** unless the maintainer explicitly says
-   “Unlock VM mode”. In that mode you are in a dedicated disposable VM, and you
-   may install anything needed (package managers, OS packages, background
-   services) to complete the task—but keep installs focused on the work at hand.
+1. **Never install dependencies** unless the maintainer explicitly says “Unlock
+   VM mode”. In that mode you are in a dedicated disposable VM, and you may
+   install anything needed (package managers, OS packages, background services)
+   to complete the task—but keep installs focused on the work at hand.
 1. **Never edit `package.json`** files unless specifically instructed.
 1. **Avoid shell commands unless necessary.**
    - The user already runs compilation and websites in watch mode.
