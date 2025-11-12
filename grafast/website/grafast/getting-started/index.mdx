@@ -30,12 +30,26 @@ We recommend that you use TypeScript for the best experience - auto-completion,
 inline documentation, etc.
 
 You do not need to use TypeScript to use <Grafast />, but if you do then you
-must use a version from TypeScript v5.0.0 upward and configure it to support
-the `exports` property in `package.json`, you can do so by adding this to your
-TypeScript configuration:
+must use a version from TypeScript v5.0.0 upward and configure it to support the
+`exports` property in `package.json` by setting `moduleResolution` to `node16`
+or `nodenext`. If you already have a tsconfig.json, you can do so by adding
+this:
 
+```diff title="tsconfig.json (changes)"
+ {
+   "compilerOptions": {
++    "moduleResolution": "node16" // Or "nodenext"
+     "strict": true,
+     // ...
 ```
-    "moduleResolution": "node16", // Or "nodenext"
+
+Otherwise, a minimal tsconfig that enables this could use the
+[@tsconfig/node24](https://www.npmjs.com/package/@tsconfig/node24) module:
+
+```json title="tsconfig.json (minimal)"
+{
+  "extends": "@tsconfig/node24/tsconfig.json"
+}
 ```
 
 :::note
@@ -72,7 +86,58 @@ notifications. To stop this, you can add the following to `jsconfig.json`:
 
 Let's build a simple GraphQL schema powered by <Grafast /> plans and query it.
 
-:::info
+See https://github.com/grafast/getting-started for this project fully fleshed
+out.
+
+For the following example we're going to use Node v24's built in type stripping
+support along with the matching tsconfig.json configuration:
+
+```json title="tsconfig.json"
+{
+  "extends": [
+    "@tsconfig/node24/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ]
+}
+```
+
+And we're using ESM, so we add `"type": "module"` to our `package.json` file.
+
+```json title="package.json"
+{
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "grafast": "^1.0.0-rc.1",
+    "graphql": "^16.12.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node-ts": "^23.6.1",
+    "@tsconfig/node24": "^24.0.1",
+  }
+}
+```
+
+:::tip Adjusting for alternative setups
+
+Other setups may require helpers to run (for example `ts-node`, `tsx`, or
+compilation through `tsc` or similar), and may require slight modification of
+the source code (e.g. removal of file extensions).
+
+:::
+
+:::tip Try the playground!
+
+We have a [playground](/playground) you can use for experimenting with <Grafast />
+without having to install any software.
+
+:::
+
+Let's build an incredibly simple schema with a single field that adds together
+its two arguments. To build the schema, we can use the `makeGrafastSchema`
+helper which will stitch the `typeDefs` and the `plans` together.
+
+:::info Schema-first, code-first, database-first; the choice is yours!
 
 There are many ways to build a GraphQL schema, we're going to use the "schema
 first" approach in this example, but there's no reason that a <Grafast /> schema
@@ -80,81 +145,64 @@ couldn't be produced "code first" or "database first" or any other approach.
 
 :::
 
-:::tip
+Our schema is described via the GraphQL schema definition
+language (SDL) in `typeDefs`, and the `Query` object's plan for the
+`addTwoNumbers` field is provided alongside:
 
-We have a [playground](/playground) you can use for experimenting with <Grafast />
-without having to install any software.
+```ts title="src/schema.ts"
+import { makeGrafastSchema, lambda } from "grafast";
 
-:::
-
-First, lets define our GraphQL schema. We're going to go with an incredibly
-simple schema with a single field that adds together its two arguments:
-
-```ts
-const typeDefs = /* GraphQL */ `
-  type Query {
-    addTwoNumbers(a: Int!, b: Int!): Int
-  }
-`;
-```
-
-Now we need to define the `plans` for the schema. The plan for our
-`Query.addTwoNumbers` field is to [read the arguments][field args], then use the
-[lambda][] step to add them together. The lambda step takes a list of other
-steps, and then determines the result by calling the given callback for each set
-of resulting values.
-
-```ts
-const { lambda } = require("grafast");
-
-const objects = {
-  Query: {
-    plans: {
-      addTwoNumbers(_, fieldArgs) {
-        const { $a, $b } = fieldArgs;
-        return lambda([$a, $b], ([a, b]) => a + b);
+export const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      addTwoNumbers(a: Int!, b: Int!): Int
+    }
+  `,
+  objects: {
+    Query: {
+      plans: {
+        addTwoNumbers(_, fieldArgs) {
+          const { $a, $b } = fieldArgs;
+          return lambda([$a, $b], ([a, b]) => a + b);
+        },
       },
     },
   },
-};
-```
-
-:::tip
-
-`lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
-values rather than the batched processing that <Grafast /> prefers for efficiency.
-It can be handy as a utility function when batching would confer no benefit,
-but in general you should pick a [more suitable step][step library].
-
-:::
-
-:::tip
-
-Making the callback function to `lambda` a global (defined once) function
-would enable <Grafast/> to potentially detect multiple uses of it and
-deduplicate them. This is important for performance if a similar lambda
-callback is used in lots of places in a query.
-
-:::
-
-To turn this into a schema, we can use the `makeGrafastSchema` helper which will
-stitch the `typeDefs` and the `plans` together:
-
-```ts
-const { makeGrafastSchema } = require("grafast");
-
-const schema = makeGrafastSchema({
-  typeDefs,
-  objects,
 });
 ```
 
+The plan for our `Query.addTwoNumbers` field is to
+[read the arguments][field args], then use the [lambda][] step to add them
+together. The lambda step takes a list of other steps, and then determines the
+result by calling the given callback for each set of resulting values.
+
+:::tip Lambda is an escape hatch!
+
+`lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
+values rather than the batched processing that <Grafast /> prefers for
+efficiency. It can be handy as a utility function when batching would confer no
+benefit, but in general you should pick a [more suitable step][step library];
+for loading data from a remote source that would typically be `loadOne` or
+`loadMany`.
+
+:::
+
+:::tip Move callback functions to the root scope
+
+Making the callback function to `lambda` a global (defined once) function would
+enable <Grafast/> to potentially detect multiple uses of it and deduplicate
+them. This is important for performance if a similar callback is used in lots of
+places in a query.
+
+:::
+
 Finally, we can run our query:
 
-```ts
-const { grafastSync } = require("grafast");
+```ts title="src/main.ts"
+import { grafast } from "grafast";
+import { schema } from "./schema.ts";
 
-const result = grafastSync({
+const result = await grafast({
   schema,
   source: /* GraphQL */ `
     {
@@ -162,9 +210,11 @@ const result = grafastSync({
     }
   `,
 });
+
+console.log(JSON.stringify(result, null, 2));
 ```
 
-The result is what we'd expect:
+Calling `node src/main.ts` should produce:
 
 ```json
 {
@@ -173,16 +223,6 @@ The result is what we'd expect:
   }
 }
 ```
-
-:::info
-
-Our schema is so simple the query could be ran synchronously with
-`grafastSync(...)`, but most queries in the real world should be executed
-through `grafast(...)` and will return either the result, a promise to the
-result, or even an async iterable for `@stream`, `@defer`, subscriptions and
-similar!
-
-:::
 
 We could then [serve this schema over HTTP][servers] using a server such as
 [grafserv][] or any [envelop-capable server][envelop].
@@ -200,17 +240,21 @@ have the various lifecycle methods.
 Full details for doing so can be found in [Step classes][], but let's build
 ourselves a simple one now to replace the `lambda` usage above:
 
-```ts
-const { Step } = require("grafast");
+```ts title="src/steps/add.ts"
+import { Step, type ExecutionDetails } from "grafast";
 
-class AddStep extends Step {
-  constructor($a, $b) {
+class AddStep extends Step<number> {
+  constructor($a: Step<number>, $b: Step<number>) {
     super();
     this.addDependency($a);
     this.addDependency($b);
   }
 
-  execute({ indexMap, values: [aDep, bDep] }) {
+  execute(details: ExecutionDetails<[number, number]>) {
+    const {
+      indexMap,
+      values: [aDep, bDep],
+    } = details;
     return indexMap((i) => {
       const a = aDep.at(i);
       const b = bDep.at(i);
@@ -218,48 +262,54 @@ class AddStep extends Step {
     });
   }
 }
-```
 
-By convention, we always define a function that constructs an instance of our
-class:
-
-```ts
-function add($a, $b) {
+export function add($a: Step<number>, $b: Step<number>) {
   return new AddStep($a, $b);
 }
 ```
 
-:::note
+Note that by convention, we always define a function that constructs an instance
+of our class - in this case it's the `add()` function.
 
-There's multiple reasons for this, a simple one is to make the plan code
-easier to read: we won't see the `new` calls in our plan resolver functions,
-nor the redundant `Step` wording, resulting in a higher signal-to-noise ratio.
-More importantly, though, is that the small layer of indirection allows us to
-do some minor manipulations before handing off to the class constructor, and
-makes the APIs more future-proof since we can have the function return
-something different in future without having to refactor our plans in the
-schema. And remember that this cost is only incurred at planning time (which is
-generally cached and can be re-used for similar future requests), and each
-field is only planned once, so the overhead of an additional function call is
-negligible.
+:::info Why step functions?
+
+There's multiple reasons that we encourage the use of these step functions
+rather than using the step classes directly.
+
+A simple reason is to make the plan code easier to read: we won't see the `new`
+calls in our plan resolver functions, nor the redundant `Step` wording,
+resulting in a higher signal-to-noise ratio.
+
+More importantly, though, is that the small layer of indirection allows us to do
+manipulations before deferring to the class constructor. This makes the APIs
+more future-proof since we can have the function perform different actions or
+return something different (even a different step class) in future without
+having to refactor our plans in the schema.
+
+The additional cost of this function call is only incurred at plan-time, plans
+are cached and reused between requests, and each field in an operation is only
+planned once; so the overhead of an additional function call is negligible.
 
 :::
 
 Now we can use this function to add our numbers, rather than the lambda plan:
 
 ```diff
- const objects = {
-   Query: {
-     plan: {
-       addTwoNumbers(_, args) {
-         const $a = args.get("a");
-         const $b = args.get("b");
--        return lambda([$a, $b], ([a, b]) => a + b);
-+        return add($a, $b);
+@@ -1,4 +1,4 @@
+-import { lambda } from "grafast";
++import { add } from "./steps/add.ts";
+ import { typedMakeGrafastSchema } from "./schema-generated.ts";
+ 
+ export const schema = typedMakeGrafastSchema({
+@@ -12,7 +12,7 @@ export const schema = typedMakeGrafastSchema({
+       plans: {
+         addTwoNumbers(_, fieldArgs) {
+           const { $a, $b } = fieldArgs;
+-          return lambda([$a, $b], ([a, b]) => a + b);
++          return add($a, $b);
+         },
        },
      },
-   },
- };
 ```
 
 You may well be able to write an entire <Grafast /> schema using off-the-shelf step
