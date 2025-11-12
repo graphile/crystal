@@ -45,6 +45,7 @@ const config = {
           routeBasePath: "graphile-build",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          showLastUpdateTime: true,
           lastVersion: "latest",
           //includeCurrentVersion: false,
           versions: {
@@ -71,6 +72,7 @@ const config = {
         routeBasePath: "graphile-build-pg",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
         lastVersion: "latest",
         //includeCurrentVersion: false,
         versions: {

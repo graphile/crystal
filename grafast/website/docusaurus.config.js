@@ -46,6 +46,7 @@ const config = {
           routeBasePath: "grafast",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          showLastUpdateTime: true,
           remarkPlugins: [
             [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
           ],
@@ -72,6 +73,7 @@ const config = {
         routeBasePath: "grafserv",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
       },
     ],
     [
@@ -82,6 +84,7 @@ const config = {
         routeBasePath: "ruru",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
       },
     ],
     [
