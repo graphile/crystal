@@ -45,6 +45,7 @@ const config = {
           routeBasePath: "graphile-config",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          showLastUpdateTime: true,
         },
         blog: false,
         theme: {
@@ -63,6 +64,7 @@ const config = {
         routeBasePath: "graphile-export",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
       },
     ],
     [
@@ -73,6 +75,7 @@ const config = {
         routeBasePath: "pg-introspection",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
       },
     ],
     [
@@ -83,6 +86,7 @@ const config = {
         routeBasePath: "pg-sql2",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
       },
     ],
     [
@@ -93,6 +97,7 @@ const config = {
         routeBasePath: "tamedevil",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        showLastUpdateTime: true,
       },
     ],
 
