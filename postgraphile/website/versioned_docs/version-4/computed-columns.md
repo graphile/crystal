@@ -13,8 +13,12 @@ as [connections](./connections).
 
 :::tip[Performance Note]
 
-We inline these function calls into the original `SELECT`
-statement, so there's no N+1 issues - it's very efficient.
+We inline these function calls into the original `SELECT` statement for
+efficiency, so no additional SQL queries need to be issued to the database.
+That said, SQL function calls can have a performance overhead, which can build
+up if you’re doing this on thousands of rows. Although PostgreSQL might be able to [inline
+your SQL functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions)
+for great performance.
 
 :::
 
