@@ -25,8 +25,6 @@ business logic layer.
   underlying steps' values
 - [remapKeys][]: returns step that results in an object made up of the given renamed
   keys and values from another object step
-- [multistep][]: accepts a step, tuple, object, or thunk returning those and
-  returns a single step matching the same shape
 
 ## Operating on lists
 
@@ -46,6 +44,8 @@ business logic layer.
 - [constant][]: always returns the given value
 - [access][]: accesses the property at the given path for each value
 - [lambda][]: executes a lambda function for each set of values
+- [multistep][]: accepts a step, step tuple, or step map; returns a single step
+  with the same shape
 
 <!-- TODO: not a step! -->
 <!-- - [setter][]: a ModifierStep for setting given values onto a parent step -->

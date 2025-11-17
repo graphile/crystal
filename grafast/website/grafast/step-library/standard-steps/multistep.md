@@ -1,62 +1,69 @@
 # multistep
 
-`multistep(specOrThunk, stable?)` normalises a loose collection of steps into a
-single step that yields the same shape. Pass a step, tuple, object, `null`,
-`undefined`, or a thunk returning those values and you will always receive a
-step back. Tuples become a [`list`](./list.md), objects become an
-[`object`](./object.md), isolated steps are returned untouched, and
-`null`/`undefined` become [`constant`](./constant.md) steps.
+```ts
+export type Multistep =
+  | Step
+  | readonly [...(readonly Step[])]
+  | Record<string, Step>
+  | null
+  | undefined;
+```
 
-:::tip
+To improve developer ergonomics, some step functions accept as input a "Multistep"
+parameter that can take one of many forms:
 
-Declare tuple literals with `const` so that TypeScript keeps the tuple typing;
-otherwise they will be widened to arrays and Gra*fast* cannot detect the
-multistep tuple.
+- a step (`Step`)
+- a list (tuple) of steps (`Step[]`)
+- an object of steps (`Record<string, Step>`)
+- `null` or `undefined`
+- a thunk thereof (`() => Multistep`)
 
-:::
+You can see this in Gra*fast*'s native APIs that accept "step or multistep"
+arguments, such as `loadOne`, `loadMany`, `lambda`, and `sideEffect`.
 
-`multistep` is especially helpful when writing APIs that accept "step or
-multistep" arguments, such as `loadOne`, `loadMany`, `lambda`, and `sideEffect`.
-
-## Arguments
-
-- `specOrThunk` – the step, tuple, object, or thunk returning one of these
-  values. Thunks run once at plan-time to avoid constructing intermediate steps
-  when they are not needed.
-- `stable` (optional) – pass `true`, a string identifier, or a
-  `{ identifier, cacheSize }` object to forward cache metadata to the underlying
-  list/object step. Use this when the multistep has a stable structure so that
-  Gra*fast* can reuse cached plans.
+Under the hood, these step functions will use the
+`multistep(specOrThunk)` function to convert this loose collection of steps into
+a single step with the expected shape. Tuples become a [`list`](./list.md),
+objects become an [`object`](./object.md), isolated steps are returned
+untouched, and `null`/`undefined` become a [`constant`](./constant.md) step.
 
 ## Usage
 
-```ts
-import { constant, context, loadOne, multistep } from "grafast";
-import { usersByIdAndStatus } from "./loaders";
-
-export const objects = {
-  Query: {
-    plans: {
-      viewer() {
-        const $context = context();
-        const $viewerId = $context.get("viewerId");
-        const $lookup = multistep(
-          () => ({
-            id: $viewerId,
-            status: constant("active"),
-          }),
-          "userLookup",
-        );
-        return loadOne($lookup, usersByIdAndStatus);
-      },
-    },
-  },
-};
-```
-
-`multistep` can also be used to treat tuples as a single step, which is handy
-for parameter lists:
+<!-- See: https://www.typescriptlang.org/play/?#code/JYWwDg9gTgLgBAbzgZRgUzAGjiArgGxmAGd0w4BfOAMyghDgCIBzKAQ2rdMYCgYBPMGjgBBOAF5EbAFwA7XCABGaKBT6DhAIQmJF0uKSjBZzNTwD05lPWGkMxOPwi4cbfnADubWfBgQ4AMb0isZoPEGypHAAJDIoZAA8IgB8OmwAFACUANzhEJHw0XrxGAmaqZKKWbkWVgBKaDC4UJFwAAaxbXAAbiqKbEQgeQUxQUqhACYAjDp4hCRk6bE5tXBrcAB6APw8qw1NLQ5sBmRwUBjnxGg+xsxwMAAWwk1g+GERUdFjIbJoEwBMswIRDsYHSAG1YtgigBdOBcQL5UgrSzrTY7PaNZqyeEnDBnC5oK43Ez3J5wCCKABWaACMGGn2+kwAzED5qD0kg4lC4MUipQUVZ1ttdqj9tijoiCt56R9CkzfhMACxskGLeT4fCCtEi1YAFQeuFkAGsjvhiP4PNBjQz5cFJgBWVULDDpLISVKc+H6Hl8xQC7XCjFAA -->
 
 ```ts
-const $range = multistep(() => [$min, $max] as const, "range");
+// Some example steps to combine
+const $a: Step<A> = a();
+const $b: Step<B> = b();
+
+// Returns `$a` verbatim
+const $combined1 = multistep($a);
+//    ^? const $combined1: Step<A>
+
+// Returns a step representing the tuple
+const $combined2 = multistep([$a, $b] as const);
+//    ^? const $combined2: Step<readonly [A, B]>
+
+// Return a step representing the object
+const $combined3 = multistep({ a: $a, b: $b });
+//    ^? const $combined3: Step<{ readonly a: A; readonly b: B }>
+
+// Returns a constant
+const $combined4 = multistep(null);
+//    ^? const $combined4: Step<null>
+
+// Thunks also work
+const $combined5 = multistep(() => ({ a: $a, b: $b }));
+//    ^? const $combined5: Step<{ readonly a: A; readonly b: B }>
 ```
+
+:::tip[Improving types]
+
+Declare tuple literals with `as const` so that TypeScript keeps the tuple
+typing; otherwise they may be widened to arrays.
+
+```ts
+multistep([$a, $b] as const);
+```
+
+:::
