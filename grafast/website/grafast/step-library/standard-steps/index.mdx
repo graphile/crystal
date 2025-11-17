@@ -25,6 +25,8 @@ business logic layer.
   underlying steps' values
 - [remapKeys][]: returns step that results in an object made up of the given renamed
   keys and values from another object step
+- [multistep][]: accepts a step, tuple, object, or thunk returning those and
+  returns a single step matching the same shape
 
 ## Operating on lists
 
@@ -92,3 +94,4 @@ See [Flow control](../../flow.mdx#flow-control) for a conceptual overview.
 [object]: ./object
 [reverse]: ./reverse
 [setter]: ./setter
+[multistep]: ./multistep
