@@ -268,9 +268,12 @@ schema](../getting-started/existing-schema.md) for more details).
 
 Using traditional resolvers fails to capture the benefits of <Grafast /> (since
 traditional resolvers execute at execution time, we cannot optimize the
-operation at planning time) so it is discouraged for new schemas &mdash; if
-you're starting from scratch you should build a pure (plan-only) <Grafast />
-schema.
+operation at planning time) and the emulation creates additional overhead so it
+is discouraged for new schemas &mdash; if you're starting from scratch you
+should build a pure (plan-only) <Grafast /> schema.
+
+Remember: everything that can be done in a traditional resolver can be done
+instead via a step.
 
 :::
 
@@ -290,9 +293,10 @@ emulated.
 ## Specifying a field plan resolver
 
 When building a GraphQL schema programatically, plan resolvers are stored into
-`extensions.grafast.plan` of the field; for example:
+`extensions.grafast.plan` of the field; for a raw GraphQL.js object type this
+would look like:
 
-```ts {9-15}
+```ts
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt } from "graphql";
 import { constant } from "grafast";
 
@@ -301,6 +305,7 @@ const Query = new GraphQLObjectType({
   fields: {
     meaningOfLife: {
       type: GraphQLInt,
+      // highlight-start
       extensions: {
         grafast: {
           plan() {
@@ -308,6 +313,7 @@ const Query = new GraphQLObjectType({
           },
         },
       },
+      // highlight-end
     },
   },
 });
@@ -321,7 +327,7 @@ If you are using `makeGrafastSchema` then the field plan resolver for the field
 `fieldName` on the object type `typeName` would be indicated via the
 `objects[typeName].plans[fieldName]` property:
 
-```ts {12-14}
+```ts
 import { makeGrafastSchema, constant } from "grafast";
 
 export const schema = makeGrafastSchema({
@@ -332,11 +338,48 @@ export const schema = makeGrafastSchema({
   `,
   objects: {
     Query: {
+      // highlight-start
       plans: {
         meaningOfLife() {
           return constant(42);
         },
       },
+      // highlight-end
+    },
+  },
+});
+```
+
+For [GraphQL Modules](https://github.com/graphql-hive/graphql-modules) you must
+specify the resolver as an object, and then populate the `extensions` property:
+
+```ts
+import { createModule, gql } from 'graphql-modules';
+import { constant } from "grafast";;
+
+export const myModule = createModule({
+  id: 'my-module',
+  dirname: __dirname,
+  typeDefs: [
+    gql`
+      type Query {
+        meaningOfLife: Int!
+      }
+    `,
+  ],
+  resolvers: {
+    Query: {
+      // highlight-start
+      meaningOfLife: {
+        extensions: {
+          grafast: {
+            plan() {
+              return constant(42);
+            },
+          },
+        },
+      },
+      // highlight-end
     },
   },
 });
@@ -394,7 +437,7 @@ const schema = makeGrafastSchema({
 });
 ```
 
-Grafast will automatically call each of the arguments' plans once the field plan
+Gra*fast* will automatically call each of the arguments' plans once the field plan
 resolver has returned, passing the step yielded from the field plan as the
 `$target` for the arguments.
 
@@ -409,19 +452,22 @@ runtime (i.e. will be `undefined`) then it may choose to skip calling the
 ## Asserting an object type's step
 
 Sometimes a field plan resolver expects the source step to support specific
-methods. For example, imagine a `Post` type that represents a row from a `posts`
-database table. In the post list page on your website, you may want to fetch a
-truncated version of the post body to include with each post; to do this
-efficiently it's better to truncate in the database rather than fetch it all and
-truncate in the application layer; so you might use an SQL expression, requiring
-that the source step supports the ability to select SQL expressions. If an
-arbitrary step were passed in instead, the plan might fail at runtime because
-the method you expect doesn’t exist.
+methods.
 
-To guard against this, you can add an `assertStep` to your object type
+For example, imagine a `Post` type that represents a row from a `posts` database
+table. In the post list page on your website, you may want to fetch a truncated
+version of the post body to include with each post. Fetching the entire body for
+each post and truncating in the application layer would be inefficient; instead
+you might use a custom SQL expression via, for example,
+``$post.select(sql`left(body, 200)`)``. For this to work, `$post` must be a Step
+class that implements the `.select(SQL)` method. If a step without this method
+were passed, the plan resolver would throw an error.
+
+To ensure the steps passed to a particular object type are compatible with the
+expectations of the plan resolvers, you can add an `assertStep` method
 (`objectType.extensions.grafast.assertStep`). The value can either be a step
-class, in which case it will be asserted that each step is an `instanceof` this
-class, or an assertion function which will be called (and should throw an error
+class (in which case it will be asserted that each step is an `instanceof` this
+class) or an assertion function (which will be called and should throw an error
 if the step is not acceptable).
 
 :::tip[Optional but recommended]
@@ -438,6 +484,9 @@ Here `assertStep` asserts `$post` is a `PgSelectSingleStep`, therefore it's safe
 to use `.select()`:
 
 ```ts
+import { makeGrafastSchema } from "grafast";
+import { PgSelectSingleStep, sql, TYPES } from "@dataplan/pg";
+
 const schema = makeGrafastSchema({
   objects: {
     Post: {
@@ -465,6 +514,9 @@ Using an assertion function allows you to accept a wider range of steps, perform
 duck typing, or throw more helpful error messages.
 
 ```ts
+import { makeGrafastSchema } from "grafast";
+import { PgSelectSingleStep, sql, TYPES } from "@dataplan/pg";
+
 const schema = makeGrafastSchema({
   objects: {
     Post: {
@@ -522,11 +574,11 @@ const Post = new GraphQLObjectType({
 ## Execution order &amp; side effects
 
 Grafast is **declarative**: steps form a directed acyclic graph (DAG) and only
-dependencies determine order. There is no implicit procedural sequencing. Two
-rules matter:
+dependencies determine order &mdash; there is no implicit procedural sequencing. Two
+key rules:
 
 1. Dependencies before dependents.
-2. Steps **implicitly** depend on the previous side effect step, if any.
+2. Steps **implicitly** depend on the most recent side effect step, if any.
 
 This can be surprising during mutations: steps created before a mutation might
 execute **after** the mutation unless one of the rules above says otherwise.
