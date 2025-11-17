@@ -57,17 +57,8 @@ into 4 main categories based on the root folders, each of which have a
 
 ## Hard Guardrails (must follow)
 
-1. **Never install dependencies**.
-1. **Never edit `package.json`** files unless specifically instructed.
 1. **Never edit versioned docs:** files under `*/website/versioned_docs/**` are
    snapshots taken at release time. Edit the source (unversioned) doc instead.
-1. **Avoid shell commands unless necessary.**
-   - The user already runs compilation and websites in watch mode.
-   - The user would rather commit, rebase, and change branches themself - do not
-     do this for them.
-   - The user would generally rather that you don't run your own commands, but
-     you may do so if it is necessary to apply your automated changes to
-     code/docs.
 1. **Keep scope tight.**
    - Prefer many small PRs over one large PR.
    - Avoid large refactors without an issue/plan.
@@ -75,13 +66,36 @@ into 4 main categories based on the root folders, each of which have a
    - Avoid moving/renaming files/pages unless essential.
    - Avoid changing lockfiles or versions unless essential.
 
-## Allowed Actions
+## Non-VM Guardrails
+
+If the user says “Unlock VM mode”, these guardrails do not apply because you are
+running in a dedicated VM with limited credentials access, and you are thus
+cleared to run whatever local commands or installations are required to achieve
+your goals. Still keep in mind that changes should be minimal to achieve your
+goals though!
+
+Otherwise, you must follow these rules:
+
+1. **Never install dependencies** unless the maintainer explicitly says “Unlock
+   VM mode”. In that mode you are in a dedicated disposable VM, and you may
+   install anything needed (package managers, OS packages, background services)
+   to complete the task—but keep installs focused on the work at hand.
+1. **Never edit `package.json`** files unless specifically instructed.
+1. **Avoid shell commands unless necessary.**
+   - The user already runs compilation and websites in watch mode.
+   - The user would rather commit, rebase, and change branches themself - do not
+     do this for them.
+   - The user would generally rather that you don't run your own commands, but
+     you may do so if it is necessary to apply your automated changes to
+     code/docs.
+1. Suggest CI/test commands **in prose**; do not execute them.
+
+## Always Allowed Actions
 
 - Read files and make changes to markdown, TypeScript, and `*.test.*` files.
 - Write tests; update fixtures and test helpers.
 - Update docs (typically under the `<category>/website` folder).
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
-- Suggest CI/test commands **in prose**; do not execute them.
 
 ## Preferred Style
 
