@@ -1,6 +1,6 @@
 # last
 
-Resolves to the last entry in the array returned by the given step.
+Yields the last entry in the array the given step yields.
 
 Pass `false` as the second parameter to also handle iterables/async iterables.
 

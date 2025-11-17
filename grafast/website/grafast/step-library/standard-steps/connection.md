@@ -24,18 +24,22 @@ interface ConnectionParams {
 :::warning Wrapping a step in `connection()` may mutate the step!
 
 If your step implements `paginationSupport` and `applyPagination`, then
-`connection(step)` will call `step.applyPagination(...)`. If you reuse the same
-step elsewhere, the pagination limits may leak across.
+`connection(step)` will call `step.applyPagination(...)` (steps without
+`paginationSupport` are unaffected). If you reuse the same step elsewhere, the
+pagination limits may leak across.
 
-Create fresh steps for connections. Steps without `paginationSupport` are
-unaffected.
+Create fresh steps for connections, rely instead on deduplication for
+efficiency.
 
 :::
 
 ## `step.paginationSupport`
 
 If your underlying step can handle pagination directly, it should expose its
-capabilities via a `paginationSupport` object.
+capabilities via a `paginationSupport` object. When present and `full` is not
+set, `step.applyPagination($params)` will be called, passing through the
+relevant params based on the connection field arguments and indicated pagination
+support.
 
 If `paginationSupport` is present, support for `limit` is assumed. Support for
 other features is indicated via the flags:

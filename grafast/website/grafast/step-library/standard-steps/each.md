@@ -1,11 +1,14 @@
 # each
 
-Transforms a list by wrapping each element in the list with the given mapper.
+Transforms a list such that traversal of the list will result in the list item
+being transformed by the given (plan-time) callback. (If the result of this step
+is to be fed to another step directly, you must call `applyTransforms()` to
+force traversal of the list.)
 
 Usage:
 
 ```ts
-const $newList = each($oldList, ($listItem) => doSomethingWith($listItem));
+return each($oldList, ($listItem) => doSomethingWith($listItem));
 ```
 
 ## Example generating a list of objects
