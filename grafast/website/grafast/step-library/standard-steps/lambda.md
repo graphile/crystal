@@ -1,23 +1,34 @@
 # lambda
 
-Takes the input step (or array of steps, or nothing) as the first argument, a
+:::warning[`lambda` is an escape hatch!]
+
+Lambda does not perform batching (see [Warning: no
+batching!](#warning-no-batching)). It's highly suitable for usage when you just
+want to synchronously transform data (e.g. concatenating strings, mapping over
+arrays, etc) but is almost never well suited to asynchronous topics - you likely
+want [`loadOne()`](./loadOne.md) or [`loadMany()`](./loadMany.md) instead in
+those cases.
+
+:::
+
+Accepts a step (or [multistep](./multistep.md)) as the first argument, a
 callback as the second argument, and returns a step that represents the result
-of feeding each value (or array of values, or nothing) through the given
+of feeding each runtime value from the input through the given (execution-time)
 callback.
 
-The callback should perform a calculation, or may fetch data, but must not have
-side effects. If you need to do something with side effects use
-[`sideEffect()`](/grafast/step-library/standard-steps/sideEffect) instead
-(which has a very similar API).
+The callback must not have side effects. If you need to do something with side
+effects use [`sideEffect()`](/grafast/step-library/standard-steps/sideEffect)
+instead (which has a very similar API).
 
 If you are 100% certain that your callback function:
 
-1. does not do any asynchronous work (no promises),
+1. does not do any asynchronous work (no `Promise`s),
 2. does not have any side effects,
 3. will not throw an error
 
 then for the very best performance, you can pass the third argument,
-[`isSyncAndSafe`](../../step-classes.mdx#issyncandsafe), as the value `true`. Do not do this unless you are certain!
+[`isSyncAndSafe`](../../step-classes.mdx#issyncandsafe), as the value `true`. Do
+not do this unless you are certain!
 
 ## Single dependency version
 
