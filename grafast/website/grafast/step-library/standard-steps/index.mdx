@@ -5,57 +5,69 @@ sidebar_position: 6
 # Standard steps
 
 The following are built-in standard steps, provided to accomplish common tasks.
-Many of them are thin wrappers around an underlying step class, for example
-`loadOne` and `loadMany` both call in to the underlying `LoadStep` step class. These
-standard steps can be used as a foundation for your project, and are often
-sufficient enough for a schema's needs - particularly when integrating with an existing
-business logic layer.
+
+:::tip Never use `new` in plan resolvers
+
+Remember to use the _step function_ rather than the underlying _step class_;
+this allows for more ergonomic APIs and iteration of the produced steps without
+breaking changes to your plan resolvers.
+
+As a general rule of thumb, your plan resolvers should never contain the `new`
+keyword.
+
+:::
+
+These standard steps are built into the `grafast` module and can be used as a
+foundation for your project, and are often sufficient for a schema's needs
+&mdash; particularly when integrating with an existing business logic layer.
 
 ## Loading data
 
-- [loadOne][]: similar to DataLoader.load, batch loading of single values
-- [loadMany][]: similar to DataLoader.load, batch loading of lists of values
+- [loadOne][]: like an more powerful DataLoader.load &mdash; batch loading of single values
+- [loadMany][]: like a more powerful DataLoader.load &mdash; batch loading of lists of values
 
 ## Forming objects and lists
 
-- [list][]: takes a list of steps and turns it into a single step that yields a
-  list of the underlying steps' values
-- [object][]: takes an object, the keys of which are steps, and turns it into a
-  single step that yields an object where the values are the corresponding
-  underlying steps' values
+- [list][]: accepts a tuple (list) of steps and turns it into a single step that
+  yields a list of the underlying steps' values
+- [object][]: accepts an object with string keys and step values, and turns it
+  into a step that yields an object where the keys are retained and values are
+  those yielded from the underlying steps
 - [remapKeys][]: returns step that results in an object made up of the given renamed
-  keys and values from another object step
+  keys and values from another object step (useful during optimization when a
+  step inlines its work into an ancestor and wishest to replace itself with
+  access to specific properties therein)
 
 ## Operating on lists
 
-- [first][]: returns the first entry from a list
-- [last][]: returns the last entry from a list
-- [reverse][]: reverses the order of a list
-- [filter][]: returns only the entries in a list that satisfy a callback
-- [groupBy][]: Takes a single dimensional list plan and a mapper that returns a
-  grouping key. Returns a plan that results in a Map where the keys are the
-  grouping keys and the values are lists of the original entries that match
-  these grouping keys.
-- [each][]: Transforms a list by wrapping each element in the list with the
-  given mapper.
+- [first][]: returns a step representing the first entry from a list
+- [last][]: returns a step representing the last entry from a list
+- [reverse][]: returns a step representing a new list with reverse order
+- [filter][]: returns a step representing only the entries in a list that
+  satisfy a callback
+- [groupBy][]: accepts a single dimensional list plan and a mapper that returns
+  a grouping key. Returns a step that yields a Map where the keys are the grouping
+  keys and the values are lists of the original entries that match these grouping
+  keys
+- [each][]: accepts a step representing a list and returns a step representing
+  the same list but where traversal of the list will result in the list item being
+  transformed by the given (plan-time) callback
 
 ## Utility
 
-- [constant][]: always returns the given value
-- [access][]: accesses the property at the given path for each value
-- [lambda][]: executes a lambda function for each set of values
+- [constant][]: creates a step representing the raw JavaScript value (number, string, etc) passed in 
+- [access][]: returns a step representing accessing the property at the given path for each runtime value
+- [lambda][]: returns a step representing transforming each value with the given
+  (execution-time) callback
 - [multistep][]: accepts a step, step tuple, or step map; returns a single step
   with the same shape
 
-<!-- TODO: not a step! -->
-<!-- - [setter][]: a ModifierStep for setting given values onto a parent step -->
-
 ## GraphQL
 
-- [context][]: returns the GraphQL contextValue
-- [connection][]: wraps a list-returning plan with connection-related
-  capabilities such as PageInfo
-- [Node-related][node]: functions relating to the GraphQL Global Object Identification spec
+- [context][]: returns a step representing the GraphQL contextValue
+- [connection][]: wraps a step representing a list with connection-related
+  capabilities such as pagination
+- Also: [Node-related functions][node] (regarding the GraphQL Global Object Identification spec)
 
 ## Realtime
 
@@ -67,8 +79,8 @@ business logic layer.
 
 See [Flow control](../../flow.mdx#flow-control) for a conceptual overview.
 
-- [inhibitOnNull][]: inhibit dependent work when an input is null
-- [assertNotNull][]: raise an error when a value is unexpectedly null
+- [inhibitOnNull][]: inhibit dependent work when an input is null-ish
+- [assertNotNull][]: raise an error when a value is unexpectedly null-ish
 - [trap][]: turn inhibited or errored values back into usable data
 
 [access]: ./access
