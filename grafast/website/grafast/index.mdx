@@ -74,10 +74,10 @@ resolvers can be written ergonomically in terms of data flow without needing to
 think about optimization patterns, which are handled at a broader level.
 
 [^1]:
-  You can opt out of batch processing on a per-step basis (like `lambda()` and
-  `sideEffect()` do), but Gra*fast*'s model is built around batching. Unbatched
-  execution is an optimization for certain shapes of logic (typically
-  transforms) - it's the exception rather than the rule.
+    You can opt out of batch processing on a per-step basis (like `lambda()`
+    and `sideEffect()` do), but Gra*fast*'s model is built around batching.
+    Unbatched execution is an optimization for certain shapes of logic (typically
+    transforms) - it's the exception rather than the rule.
 
 ### Spec compliant
 
@@ -91,7 +91,7 @@ The GraphQL specification
 Gra*fast* has been written very careful by a [GraphQL Technical Steering
 Committee](https://github.com/graphql/graphql-wg/blob/main/GraphQL-TSC.md#tsc-members)
 member to ensure that the perceived result is equivalent; thus, despite its
-drastically different execution algorithm, it is 100% spec compliant. 
+drastically different execution algorithm, it is 100% spec compliant.
 
 ### Compatible with (most) resolvers
 
@@ -124,12 +124,13 @@ substitute for the GraphQL `execute` and `subscribe` methods in many servers.
 ### Reusing an operation plan
 
 Once a validated operation arrives, Gra*fast* looks for an existing **operation
-plan** in its cache (keyed by schema, document, and operation name[^3]) and uses
+plan** in its cache (keyed by schema, document, and operation name[^2]) and uses
 it for execution if found.
 
-[^3]: Currently, plan reuse also considers some additional constraints to
-support the `@skip` and `@include` directives, but these constraints are being
-phased out.
+[^2]:
+    Currently, plan reuse also considers some additional constraints to
+    support the `@skip` and `@include` directives, but these constraints are being
+    phased out.
 
 ### Establishing a new operation plan
 

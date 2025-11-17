@@ -2,14 +2,33 @@ import Mermaid from "@theme/Mermaid";
 
 # inhibitOnNull
 
-Wrap a step so that it yields the same values as the original, but downstream
-work (dependents) is inhibited when a yielded value is `null` or `undefined`.
+Return a step that yields the same values as the passed in step, but downstream
+work is inhibited  when a yielded value is `null` or `undefined`.
 
 :::note[Declarative flow]
 
 The inhibition only affects steps that depend on the wrapper step (and those
 that depend on those, and so on); steps depending on the original (unwrapped)
 step are not otherwise impacted.
+
+:::
+
+:::info[Under the hood: inhibition of downstream work]
+
+**For those curious only**, you don't need to understand this.
+
+The [execute method of a step class](../../step-classes.mdx#execute) is passed
+the batched `executionValue` (EV) for each step it depends on to provide the
+data needed for execution.
+
+If there is any inhibition, the step will instead be passed a derived set of new
+EVs which have the indices (indexes) that are inhibited in any EV removed from
+all EVs - i.e. those specific indices are "skipped" and the "batch size" is
+adjusted downwards to match. Once the step has executed, the result has these
+indices re-populated (with an inhibited value) such that the batch size remains
+consistent with other steps in the same _layer plan_.
+
+Should all indices be inhibited, the step will not execute at all.
 
 :::
 

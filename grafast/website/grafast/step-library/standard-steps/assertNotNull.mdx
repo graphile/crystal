@@ -2,6 +2,13 @@ import Mermaid from "@theme/Mermaid";
 
 # assertNotNull
 
+:::info Advanced
+
+It's rare that this is needed; most steps can handle a `null` input and know
+whether or not they should continue to process the value.
+
+:::
+
 Guard a step so that `null` values become execution errors. The returned step
 shares the same value as the original when it yields a non-null result. If the
 wrapped step yields `null`, Grafast raises a `SafeError`

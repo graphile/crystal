@@ -4,12 +4,17 @@ sidebar_position: 6
 
 # Handling complex inputs
 
-:::info[Optional helpers]
+:::info[Optional helpers for advanced tasks]
 
-It’s totally fine to just take the raw input values and handle them in a plan
-resolver however you like. The features on this page are optional: they’re
-provided for more advanced use cases where they can help keep your code clean,
-composable, and easier to reason about.
+It’s normal and recommended to take the raw input values (arguments) and pass
+them from plan resolvers directly into steps to be processed at execution time;
+and if you're doing this and it's not causing you any issues then you can likely
+skip this page.
+
+However, sometimes your input data is complex, and repeating your handling code
+can get untidy. If you're finding this, this page is for you: optional features
+for more advanced use cases, helping keep your code clean, composable, and
+easier to reason about.
 
 :::
 

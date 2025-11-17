@@ -1,7 +1,7 @@
 # access
 
 Creates a step representing a (potentially nested) property from the result of a
-source step _without informing the step you're accessing it_. In general, you
+source step _without informing the source step you're accessing it_. In general, you
 should prefer [`get()`](./get).
 
 :::danger[Prefer `get()` to `access()`]
@@ -26,7 +26,7 @@ Usage:
 
 ```ts
 const $userId = access($user, "id");
-const $firstPatchUserId = access($args.get("input"), [
+const $firstPatchUserId = access(fieldArgs.getRaw("input"), [
   "patches",
   0,
   "user",
@@ -34,7 +34,7 @@ const $firstPatchUserId = access($args.get("input"), [
 ]);
 ```
 
-:::danger
+:::danger Only access trusted paths!
 
 This could lead to unexpected results (which could introduce security issues) if
 it is not used carefully; only use it on JSON-like data, preferably where the

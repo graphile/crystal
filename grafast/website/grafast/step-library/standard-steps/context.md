@@ -8,12 +8,29 @@ Usage:
 const $context = context();
 ```
 
-The returned step has the following methods:
+## Example
 
-- `.get(key)` - gets the value for the key `key` assuming the parsed JSON value
-  was an object
-- `.at(index)` - gets the value at index `index` assuming the parsed JSON value
-  was an array
+Imagine you have a GraphQL context that indicates the current user's ID:
+
+```ts
+const preset: GraphileConfig.Preset = {
+  grafast: {
+    context(requestContext) {
+      // Extract the userId from your Express v4 middleware
+      const userId = requestContext?.expressv4?.req.user?.id;
+      return { userId };
+    },
+  },
+};
+```
+
+You can get a step representing the current user ID from context in a plan
+resolver:
+
+```ts
+const $context = context();
+const $userId = $context.get("userId");
+```
 
 ## TypeScript
 
@@ -25,12 +42,12 @@ plan resolvers. For example:
 declare global {
   namespace Grafast {
     interface Context {
-      currentUserId?: number;
+      userId?: number;
     }
   }
 }
 ```
 
-The code above would mean that `context().get("currentUserId")` returns
+The code above would mean that `context().get("userId")` returns
 `Step<number | undefined>`, thereby making its usage in plan resolvers type
 safe.

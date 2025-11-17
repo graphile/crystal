@@ -1,14 +1,14 @@
 # applyTransforms
 
 Takes a step as the first argument and returns a step that guarantees all
-`listItem` transforms (especially `each()`) have been applied.
+`listItem` transforms (especially [`each()`](./each.md)) have been applied.
 
 ## When to use
 
 It is rare that you need `applyTransforms()`; it is designed for use when
 another step needs to depend on the full transformed value of the step.
-Normally this kind of dependency wouldn't exist - you'd return your
-(transformed) list step from your plan resolver, and Grafast would handle the
+Normally this kind of dependency wouldn't exist &mdash; you'd return your
+(transformed) list step from your plan resolver, and Gra*fast* would handle the
 transforms when iterating over the resulting list.
 
 An example of where you might need `applyTransforms()` is transforming a list

@@ -10,16 +10,18 @@ import init from "../mermaid-init.mermaid?raw";
 
 :::info[Grafast operation plan recap]
 
-Before executing a GraphQL request, <Grafast /> plans the included operation
-(query, mutation, subscription), determining the actions ("steps") it will need
-to perform. To do so, it traverses the operation in a breadth-first manner,
-building out a tree of "steps" that form the beginnings of the "operation plan."
-This operation plan is then optimized, and finally executed.
+Before executing a GraphQL request, <Grafast /> must have an "_operation plan_"
+that details the actions ("_steps_") that are needed to satisfy the included
+operation (query, mutation, subscription). Plans are cached so they can be
+re-used for all sufficiently similar GraphQL requests in future &mdash; plan
+once, execute many times.
 
-This same operation plan can be used for all sufficiently similar GraphQL
-requests in future &mdash; plan once, execute many times &mdash; so to maximize
-reuse, planning does not have access to the raw input values, instead
-representing them as steps to be populated at execution time for each request.
+The first time <Grafast /> sees a particular operation, it traverses the
+operation in a breadth-first manner, calling the associated _plan resolvers_ and
+building out a tree of _steps_ that form the beginnings of the _operation plan_.
+This is then optimized, finalized, cached, and executed. To maximize plan reuse,
+planning does not have access to the raw input values, instead representing them
+as steps to be populated at execution time for each request.
 
 :::
 
@@ -29,8 +31,8 @@ representing them as steps to be populated at execution time for each request.
 // Simplified types
 type FieldPlanResolver = (
   $source: Step,
-  fieldArgs: FieldArgs,
-  info: FieldInfo,
+  fieldArgs: FieldArgs, // See "FieldArgs" below
+  info: FieldInfo, // See "FieldInfo" below
 ) => Step;
 ```
 
@@ -39,24 +41,41 @@ sufficient to resolve an individual field as part of the operation plan.
 
 When calling a field's plan resolver, <Grafast /> will pass:
 
-- the `$source` step representing data the field is being resolved against
-- a `fieldArgs` object to interact with the field's arguments
-- an `info` object with additional planning info
+- the [`$source` step](#source-step) representing the object the field belongs to
+- a [`FieldArgs`](#fieldargs) object to retrieve the field's arguments
+- a [`FieldInfo`](#fieldinfo) object with additional planning info (rarely
+  needed)
 
-The plan resolver must return a step that represents the result of the field.
+The plan resolver must return a `Step` that represents the result of the field.
+
+A field without a plan resolver will use the [default plan
+resolver](#default-plan-resolver).
 
 ### Source step
 
-The `$source` step represents the data from
-the object that the field is being resolved against (i.e. the GraphQL object
-type that owns the field). For the root selection set, the parent object
-represents either the GraphQL `rootValue` or the subscription event. For all
-other selection sets the source object will be derived from the parent field:
+The `$source` step represents the data from the object that the field is being
+resolved against (i.e. the GraphQL object type that the field belongs to). For
+the root selection set, the parent object represents either the GraphQL
+`rootValue`, or for subscription operations the event. For all other selection
+sets the source object will be derived from the parent field:
 
 - for a list type, the "source step" will represent an item in this list
 - for an object type, the "source step" is the step the parent field returned
 - for an abstract type, the "source step" will be the step representing the
   matching concrete object type
+
+### Default plan resolver
+
+If a field does not have a plan resolver (and [traditional resolvers](#traditional-resolvers) are not
+being emulated for the field) then the default plan resolver will apply:
+
+```ts
+const defaultPlanResolver: FieldPlanResolver = ($source, fieldArgs, info) =>
+  get($source, info.fieldName);
+```
+
+The default plan resolver uses [`get()`](../step-library/standard-steps/get.md)
+to access the property of the `$source` object with the same name as the field.
 
 ### FieldArgs
 
@@ -120,9 +139,14 @@ function bookCount($parent, fieldArgs) {
 }
 ```
 
-#### Triggering auto-application early
+#### Early auto-apply
 
-**ADVANCED**
+:::info[Advanced]
+
+This is an advanced topic typically useful for programmatic schema manipulation;
+if you're writing a schema by hand you're unlikely to need it.
+
+:::
 
 Arguments can have their own plan resolvers, see [argument plan
 resolvers](#argument-plan-resolvers) below. <Grafast /> will invoke these
@@ -154,7 +178,12 @@ usersField.extensions.grafast.plan = function ($source, fieldArgs, info) {
 
 #### Handling complex inputs
 
-**VERY ADVANCED**
+:::info[Very advanced]
+
+This is a very advanced topic typically useful for autogenerated schemas; if
+you're writing a schema by hand you're unlikely to need it.
+
+:::
 
 `.getBaked()` and `.apply()` are documented in the [Handling complex
 inputs](./complex-inputs.md) article - these are advanced features you're
@@ -185,19 +214,6 @@ but it's useful for libraries that generate plan resolvers or when using the
 same plan resolver with multiple fields, as in the case of the default plan
 resolver.
 
-### Default plan resolver
-
-In a pure <Grafast /> schema (no [traditional resolvers](#traditional-resolvers)),
-if a field doesn't have
-a plan resolver, a default plan resolver will be used that uses
-[`get()`](../step-library/standard-steps/get.md) to retrieve the property of the parent
-object with the same name as the field:
-
-```ts
-const defaultPlanResolver: FieldPlanResolver = ($source, fieldArgs, info) =>
-  get($source, info.fieldName);
-```
-
 ### Example
 
 Given the following schema fragment:
@@ -212,12 +228,19 @@ the plan resolver for the `User.friends` field might look like this:
 
 ```ts
 function User_friends_plan(
-  $parent: ExecutableStep,
+  $source: Step, // < Represents the User
   fieldArgs: FieldArgs,
-): ExecutableStep {
-  const $limit = fieldArgs.getRaw("limit");
-  const $friends = $parent.getRelation("friends");
-  $friends.limit($limit);
+): Step {
+  // Read the 'limit' argument
+  const { $limit } = fieldArgs;
+  // Get the user's ID from the source step
+  const $userId = get($source, "id");
+
+  // Load the friends for this user
+  const $friends = loadMany($userId, friendsByUserId);
+  // Tweak the `$friends` plan to apply the limit
+  $friends.setParam("limit", $limit);
+
   return $friends;
 }
 ```
@@ -245,9 +268,12 @@ schema](../getting-started/existing-schema.md) for more details).
 
 Using traditional resolvers fails to capture the benefits of <Grafast /> (since
 traditional resolvers execute at execution time, we cannot optimize the
-operation at planning time) so it is discouraged for new schemas &mdash; if
-you're starting from scratch you should build a pure (plan-only) <Grafast />
-schema.
+operation at planning time) and the emulation creates additional overhead so it
+is discouraged for new schemas &mdash; if you're starting from scratch you
+should build a pure (plan-only) <Grafast /> schema.
+
+Remember: everything that can be done in a traditional resolver can be done
+instead via a step.
 
 :::
 
@@ -267,9 +293,10 @@ emulated.
 ## Specifying a field plan resolver
 
 When building a GraphQL schema programatically, plan resolvers are stored into
-`extensions.grafast.plan` of the field; for example:
+`extensions.grafast.plan` of the field; for a raw GraphQL.js object type this
+would look like:
 
-```ts {9-15}
+```ts
 import { GraphQLSchema, GraphQLObjectType, GraphQLInt } from "graphql";
 import { constant } from "grafast";
 
@@ -278,6 +305,7 @@ const Query = new GraphQLObjectType({
   fields: {
     meaningOfLife: {
       type: GraphQLInt,
+      // highlight-start
       extensions: {
         grafast: {
           plan() {
@@ -285,6 +313,7 @@ const Query = new GraphQLObjectType({
           },
         },
       },
+      // highlight-end
     },
   },
 });
@@ -298,7 +327,7 @@ If you are using `makeGrafastSchema` then the field plan resolver for the field
 `fieldName` on the object type `typeName` would be indicated via the
 `objects[typeName].plans[fieldName]` property:
 
-```ts {12-14}
+```ts
 import { makeGrafastSchema, constant } from "grafast";
 
 export const schema = makeGrafastSchema({
@@ -309,11 +338,48 @@ export const schema = makeGrafastSchema({
   `,
   objects: {
     Query: {
+      // highlight-start
       plans: {
         meaningOfLife() {
           return constant(42);
         },
       },
+      // highlight-end
+    },
+  },
+});
+```
+
+For [GraphQL Modules](https://github.com/graphql-hive/graphql-modules) you must
+specify the resolver as an object, and then populate the `extensions` property:
+
+```ts
+import { createModule, gql } from 'graphql-modules';
+import { constant } from "grafast";;
+
+export const myModule = createModule({
+  id: 'my-module',
+  dirname: __dirname,
+  typeDefs: [
+    gql`
+      type Query {
+        meaningOfLife: Int!
+      }
+    `,
+  ],
+  resolvers: {
+    Query: {
+      // highlight-start
+      meaningOfLife: {
+        extensions: {
+          grafast: {
+            plan() {
+              return constant(42);
+            },
+          },
+        },
+      },
+      // highlight-end
     },
   },
 });
@@ -371,7 +437,7 @@ const schema = makeGrafastSchema({
 });
 ```
 
-Grafast will automatically call each of the arguments' plans once the field plan
+Gra*fast* will automatically call each of the arguments' plans once the field plan
 resolver has returned, passing the step yielded from the field plan as the
 `$target` for the arguments.
 
@@ -386,19 +452,22 @@ runtime (i.e. will be `undefined`) then it may choose to skip calling the
 ## Asserting an object type's step
 
 Sometimes a field plan resolver expects the source step to support specific
-methods. For example, imagine a `Post` type that represents a row from a `posts`
-database table. In the post list page on your website, you may want to fetch a
-truncated version of the post body to include with each post; to do this
-efficiently it's better to truncate in the database rather than fetch it all and
-truncate in the application layer; so you might use an SQL expression, requiring
-that the source step supports the ability to select SQL expressions. If an
-arbitrary step were passed in instead, the plan might fail at runtime because
-the method you expect doesn’t exist.
+methods.
 
-To guard against this, you can add an `assertStep` to your object type
+For example, imagine a `Post` type that represents a row from a `posts` database
+table. In the post list page on your website, you may want to fetch a truncated
+version of the post body to include with each post. Fetching the entire body for
+each post and truncating in the application layer would be inefficient; instead
+you might use a custom SQL expression via, for example,
+``$post.select(sql`left(body, 200)`)``. For this to work, `$post` must be a Step
+class that implements the `.select(SQL)` method. If a step without this method
+were passed, the plan resolver would throw an error.
+
+To ensure the steps passed to a particular object type are compatible with the
+expectations of the plan resolvers, you can add an `assertStep` method
 (`objectType.extensions.grafast.assertStep`). The value can either be a step
-class, in which case it will be asserted that each step is an `instanceof` this
-class, or an assertion function which will be called (and should throw an error
+class (in which case it will be asserted that each step is an `instanceof` this
+class) or an assertion function (which will be called and should throw an error
 if the step is not acceptable).
 
 :::tip[Optional but recommended]
@@ -415,6 +484,9 @@ Here `assertStep` asserts `$post` is a `PgSelectSingleStep`, therefore it's safe
 to use `.select()`:
 
 ```ts
+import { makeGrafastSchema } from "grafast";
+import { PgSelectSingleStep, sql, TYPES } from "@dataplan/pg";
+
 const schema = makeGrafastSchema({
   objects: {
     Post: {
@@ -442,6 +514,9 @@ Using an assertion function allows you to accept a wider range of steps, perform
 duck typing, or throw more helpful error messages.
 
 ```ts
+import { makeGrafastSchema } from "grafast";
+import { PgSelectSingleStep, sql, TYPES } from "@dataplan/pg";
+
 const schema = makeGrafastSchema({
   objects: {
     Post: {
@@ -499,11 +574,11 @@ const Post = new GraphQLObjectType({
 ## Execution order &amp; side effects
 
 Grafast is **declarative**: steps form a directed acyclic graph (DAG) and only
-dependencies determine order. There is no implicit procedural sequencing. Two
-rules matter:
+dependencies determine order &mdash; there is no implicit procedural sequencing. Two
+key rules:
 
 1. Dependencies before dependents.
-2. Steps **implicitly** depend on the previous side effect step, if any.
+2. Steps **implicitly** depend on the most recent side effect step, if any.
 
 This can be surprising during mutations: steps created before a mutation might
 execute **after** the mutation unless one of the rules above says otherwise.
