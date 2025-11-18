@@ -17,7 +17,7 @@ Generally speaking there are two methods of achieving this, used in unison:
    depending on it via the JavaScript scope, it should be passed at runtime via
    the GraphQL `context` and referenced from there (the third argument to a
    resolver, or via the
-   [context()](https://grafast.org/grafast/step-library/standard-steps/context)
+   [context()](https://grafast.org/grafast/standard-steps/context)
    step in Gra*fast*)
 
 :::info Pure functions

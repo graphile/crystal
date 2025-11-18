@@ -93,7 +93,7 @@ one.
 
 A `PgSubscriber` instance it typically referenced from the GraphQL context
 (e.g. via `context().get('pgSubscriber')`) and then used via the
-[`listen()`](/grafast/step-library/standard-steps/listen) step. PgSubscribers
+[`listen()`](/grafast/standard-steps/listen) step. PgSubscribers
 have the standard listening method, `subscribe(topic)`, which returns an async
 iterable yielding events from the topic. The subscription can be terminated by
 terminating the async iterable.

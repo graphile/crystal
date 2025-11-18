@@ -44,7 +44,7 @@ The easiest way to add subscription fields is by using
 [`extendSchema`](./extend-schema) to extend the
 `Subscription` type and add your field. Your subscription fields will typically
 leverage the Gra*fast*
-[`listen()`](https://grafast.org/grafast/step-library/standard-steps/listen)
+[`listen()`](https://grafast.org/grafast/standard-steps/listen)
 step to subscribe to events on a pubsub-capable entity.
 
 ### subscribePlan() and plan()
@@ -72,7 +72,7 @@ const $pgSubscriber = context().get("pgSubscriber");
 You can use any pubsub-capable provider with PostGraphile or Gra*fast*: redis,
 MQTT, EventEmitter, etc; all you need is an abstraction that conforms to the
 expected interface. See the [`listen()`
-documentation](https://grafast.org/grafast/step-library/standard-steps/listen)
+documentation](https://grafast.org/grafast/standard-steps/listen)
 for specifics.
 
 :::

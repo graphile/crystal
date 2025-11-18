@@ -61,7 +61,7 @@ const objects = {
 :::danger Callback must not have side effects
 
 The callback must not have side effects. If you need to do something with side
-effects use [`sideEffect()`](/grafast/step-library/standard-steps/sideEffect)
+effects use [`sideEffect()`](/grafast/standard-steps/sideEffect)
 instead (which has a very similar API).
 
 :::

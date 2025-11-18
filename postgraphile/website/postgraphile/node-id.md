@@ -199,4 +199,4 @@ resolve to `null`. Guard accordingly before continuing.
 
 :::
 
-[spec-from-node]: https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid
+[spec-from-node]: https://grafast.org/grafast/standard-steps/node#specfromnodeid

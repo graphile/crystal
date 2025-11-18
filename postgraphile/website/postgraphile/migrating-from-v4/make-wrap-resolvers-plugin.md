@@ -19,7 +19,7 @@ the very plan of what will be done!
 - No `context` (but you can retrieve it via the [`context()` step][context] if you
   need it)
 
-[context]: https://grafast.org/grafast/step-library/standard-steps/context
+[context]: https://grafast.org/grafast/standard-steps/context
 
 Now let's look at some of the things you might have used
 `makeWrapResolversPlugin` for in the past, and see how to map them into V5.

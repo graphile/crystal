@@ -5,7 +5,7 @@ representing calling the callback for each runtime value of the step.
 
 The callback is expected to have a side effect (change data or state on the
 backend), if your callback doesn't have any side effects then consider using
-[`lambda`](/grafast/step-library/standard-steps/lambda) instead, it has a very
+[`lambda`](/grafast/standard-steps/lambda) instead, it has a very
 similar API.
 
 :::danger[Side effects should be constrained to root mutation fields]
@@ -31,7 +31,7 @@ mutations, and mutations rarely batch.
 Almost any step can be made to be treated as having side effects by setting
 `$step.hasSideEffects = true`, so if you require batching in your mutations
 consider using an alternative step, such as
-[`loadOne()`](/grafast/step-library/standard-steps/loadOne) and explicitly
+[`loadOne()`](/grafast/standard-steps/loadOne) and explicitly
 marking it as having side effects:
 
 ```ts

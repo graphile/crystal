@@ -9,8 +9,8 @@ what the `\*WithPgClient` steps are there to help you with.
 ## loadManyWithPgClient(executor, lookup, loader)
 
 These work similar to Gra*fast*'s
-[`loadOne`](https://grafast.org/grafast/step-library/standard-steps/loadOne) and
-[`loadMany`](https://grafast.org/grafast/step-library/standard-steps/loadMany)
+[`loadOne`](https://grafast.org/grafast/standard-steps/loadOne) and
+[`loadMany`](https://grafast.org/grafast/standard-steps/loadMany)
 steps respectively, with the following differences:
 
 - There's an additional initial argument, the `executor` which details the

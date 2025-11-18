@@ -35,7 +35,7 @@ In a V5 plan you can simply `.get(...)` each of the columns from the parent
 plan.
 
 Here's an example from the V4 documentation converted to V5. It uses a
-[lambda step](https://grafast.org/grafast/step-library/standard-steps/lambda) to
+[lambda step](https://grafast.org/grafast/standard-steps/lambda) to
 convert the `price_in_us_cents` to AUD via the `convertUsdToAud` function.
 
 ```diff title="V4 -> V5 conversion"
@@ -78,7 +78,7 @@ convert the `price_in_us_cents` to AUD via the `convertUsdToAud` function.
 We've used `lambda` because the `convertUsdToAud` function converts one value at
 a time; however if we had a function capable of bulk converting many currency
 values at the same time it would be more efficient to call that function (once)
-via [`loadOne`](https://grafast.org/grafast/step-library/standard-steps/loadOne)
+via [`loadOne`](https://grafast.org/grafast/standard-steps/loadOne)
 rather than once-per-value as with `lambda`.
 
 :::
@@ -426,7 +426,7 @@ QueryBuilder no longer exists, instead you'll mostly be using the helpers on
 ## `build.getTypeAndIdentifiersFromNodeId`
 
 This helper has been replaced with
-[`specFromNodeId`](https://grafast.org/grafast/step-library/standard-steps/node).
+[`specFromNodeId`](https://grafast.org/grafast/standard-steps/node).
 Each GraphQL type that implements Node registers a "node ID handler"; if you
 know the `typeName` you're expecting you can get this via
 `build.getNodeIdHandler(typeName)`. From this, you can determine the "codec"

@@ -582,7 +582,7 @@ struggle from with PostgreSQL.
 
 We’ll retrieve the `price_in_us_cents` value from the database, and then use
 the [`loadOne`
-step](https://grafast.org/grafast/step-library/standard-steps/loadOne) to
+step](https://grafast.org/grafast/standard-steps/loadOne) to
 batch-convert these values from USD to AUD:
 
 ```js

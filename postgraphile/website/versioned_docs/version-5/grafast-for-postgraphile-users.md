@@ -168,7 +168,7 @@ sideEffect([$context, $userId], (context, userId) => {
 });
 ```
 
-Read more: [`context()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/context)
+Read more: [`context()` at grafast.org](https://grafast.org/grafast/standard-steps/context)
 
 ## loadOne
 
@@ -189,7 +189,7 @@ const $currentUserId = context().get("currentUserId");
 const $customer = loadOne($currentUserId, batchGetStripeCustomerByUserId);
 ```
 
-Read more: [`loadOne()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/loadOne)
+Read more: [`loadOne()` at grafast.org](https://grafast.org/grafast/standard-steps/loadOne)
 
 ## loadMany
 
@@ -203,7 +203,7 @@ const $stripeId = $customer.get("stripeId");
 const $invoices = loadMany($stripeId, batchGetInvoicesByStripeCustomerId);
 ```
 
-Read more: [`loadMany()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/loadMany)
+Read more: [`loadMany()` at grafast.org](https://grafast.org/grafast/standard-steps/loadMany)
 
 ## get
 
@@ -218,7 +218,7 @@ import { get } from "postgraphile/grafast";
 const $userId = get($user, "id");
 ```
 
-Read more: [`get()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/get)
+Read more: [`get()` at grafast.org](https://grafast.org/grafast/standard-steps/get)
 
 ## sideEffect
 
@@ -242,7 +242,7 @@ sideEffect($context, async (context) => {
 });
 ```
 
-Read more: [`sideEffect()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/sideEffect)
+Read more: [`sideEffect()` at grafast.org](https://grafast.org/grafast/standard-steps/sideEffect)
 
 ## constant
 
@@ -255,7 +255,7 @@ import { constant } from "postgraphile/grafast";
 const $true = constant(true);
 ```
 
-Read more: [`constant()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/constant)
+Read more: [`constant()` at grafast.org](https://grafast.org/grafast/standard-steps/constant)
 
 ## each
 
@@ -292,7 +292,7 @@ sideEffect(
 );
 ```
 
-Read more: [`each()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/each)
+Read more: [`each()` at grafast.org](https://grafast.org/grafast/standard-steps/each)
 
 ## lambda
 
@@ -314,7 +314,7 @@ const $fullName = lambda(
 );
 ```
 
-Read more: [`lambda()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/lambda)
+Read more: [`lambda()` at grafast.org](https://grafast.org/grafast/standard-steps/lambda)
 
 ## object
 
@@ -333,7 +333,7 @@ const $loaderInput = object({
 });
 ```
 
-Read more: [`object()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/object)
+Read more: [`object()` at grafast.org](https://grafast.org/grafast/standard-steps/object)
 
 ## connection
 
@@ -348,7 +348,7 @@ const $rows = reviews.find({ product_id: $productId });
 return connection($rows);
 ```
 
-Read more: [`connection()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/connection)
+Read more: [`connection()` at grafast.org](https://grafast.org/grafast/standard-steps/connection)
 
 ## list
 
@@ -371,7 +371,7 @@ const $jwtClaims = $context.get("jwtClaims");
 const $inputs = list([$jwtClaims, $itemId]);
 ```
 
-Read more: [`list()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/list)
+Read more: [`list()` at grafast.org](https://grafast.org/grafast/standard-steps/list)
 
 ## access
 
@@ -385,7 +385,7 @@ import { access } from "postgraphile/grafast";
 const $userId = access($user, "id");
 ```
 
-Read more: [`access()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/access)
+Read more: [`access()` at grafast.org](https://grafast.org/grafast/standard-steps/access)
 
 ## specFromNodeId
 
@@ -401,7 +401,7 @@ const $itemId = spec.id;
 const $item = items.get({ id: $itemId });
 ```
 
-Read more: [`specFromNodeId()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid)
+Read more: [`specFromNodeId()` at grafast.org](https://grafast.org/grafast/standard-steps/node#specfromnodeid)
 
 ## loadOneWithPgClient
 
