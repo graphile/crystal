@@ -1,10 +1,11 @@
 # node
 
-We don't current have a `node()` step... it's not needed since you can typically
+There is no `node()` step currently; it's not needed since you can typically
 just return the ID verbatim and rely on the `Node` interface's `planType()`
 method to resolve the type.
 
-But what we do have is:
+However, we do have other functions for helping work with GraphQL Global Object
+Identification (Node) identifiers:
 
 ## specFromNodeId
 

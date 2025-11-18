@@ -1,6 +1,7 @@
 # reverse
 
-Returns a new list that's in reverse order of the given list.
+Returns a step representing a list in reverse order of the list the passed in
+step represents.
 
 Usage:
 
