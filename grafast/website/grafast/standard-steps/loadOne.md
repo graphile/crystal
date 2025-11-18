@@ -247,10 +247,10 @@ that augment its behavior in Gra*fast*:
   responsible for loading the associated records
 - `shared` (optional) – a callback yielding a step or multistep to provide
   shared data/utilities to use across all inputs (e.g. database client, API
-  credentials, etc). See [Shared step usage](#shared-step-usage) below
+  credentials, etc). See [Shared step usage](#shared) below
 - `ioEquivalence` (optional, advanced) – a string, an array of strings, or a
   string-string object map used to indicate which attributes on output are
-  equivalent to those on input; see [ioEquivalence usage](#ioequivalence-usage)
+  equivalent to those on input; see [ioEquivalence usage](#ioequivalence)
   below
 
 ### Shared
