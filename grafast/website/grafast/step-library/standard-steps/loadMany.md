@@ -278,6 +278,19 @@ function loadMany(
 - `loader` – either a callback function or an object containing the callback and
   optional properties - see "Loader object" below.
 
+:::tip[Use multistep, not `list()` and `object()` steps]
+
+Rather than calling `loadMany(list([$a, $b]), loader)`, it's better to remove
+the `list()` wrapper and pass the [multistep](./multistep.md) tuple directly:
+`loadMany([$a, $b], loader)`. This multistep form is more ergonomic and concise,
+but more importantly the runtime lookup values are deduplicated using exact
+equality; loadMany's multistep support makes sure to return the same tuple for
+the same list of runtime values, enabling more thorough deduplication and less
+work for your business logic. The same goes for objects: prefer
+`{ a: $a, b: $b }` over `object({ a: $a, b: $b })`.
+
+:::
+
 :::info[`loader` should be defined in the root scope]
 
 The `loader` argument (either a callback function or a loader object) should be

@@ -7,8 +7,8 @@ import Mermaid from "@theme/Mermaid";
 # loadOne
 
 Similar to [DataLoader][]'s load method, uses the given callback function to
-read a single result from your business logic layer. To load a list, see
-[`loadMany`](./loadMany.md).
+read a single result (e.g. a user) from your business logic layer. To load a
+list (e.g. a user's friends), see [`loadMany`](./loadMany.md).
 
 ## Enhancements over DataLoader
 
@@ -17,11 +17,11 @@ are not possible in DataLoader.
 
 ### Attribute and parameter tracking
 
-A `loadOne` step (technically a `LoadedRecordStep`) keeps track of the
-attribute names accessed via `.get(attrName)` and any parameters set via
-`.setParam(key, value)`. This information will be passed through to your
-callback function such that you may make more optimal calls to your backend
-business logic, only retrieving the data you need.
+A `loadOne` step keeps track of the attribute names accessed via
+`.get(attrName)` and any parameters set via `.setParam(key, value)`. This
+information will be passed through to your callback function such that you may
+make more optimal calls to your backend business logic, only retrieving the data
+you need.
 
 ### Input/output equivalence
 
@@ -127,24 +127,26 @@ stateDiagram
 ## Usage
 
 ```ts
+// Simplified types
 function loadOne(
-  lookup: TLookup,
+  $lookup: Multistep,
   loader: LoadOneCallback | LoadOneLoader,
 ): Step;
 ```
 
 `loadOne` accepts two arguments (both required):
 
-- `lookup` – the step (or multistep) that specifies which records to load, or
-  `null` if no data is required.
+- `$lookup` – the step (or [multistep](./multistep.md)) that specifies which
+  records to load, or `null` if no data is required.
 - `loader` – either a callback function or an object containing the callback and
   optional properties - see "Loader object" below.
 
-:::info[`loader` should be a global variable]
+:::info[`loader` should be defined in the root scope]
 
 The `loader` argument (either a callback function or a loader object) should be
-passed as a reference from a global variable (such as an import), rather than
-being defined inline at the callsite. This is important for several reasons:
+defined in the root scope (i.e. a "global" variable, such as an import), rather
+than being defined inline at the callsite. This is important for several
+reasons:
 
 1. **Optimization via reference equality:** Grafast uses `===` checks to
    optimize and deduplicate calls. If you define the `load` function inline,
@@ -163,11 +165,75 @@ being defined inline at the callsite. This is important for several reasons:
 
 :::
 
-### Loader object
+### Passing multiple steps
+
+There are three ways to input steps to loadOne:
+
+- `$lookup` specifies the record to look up, e.g. via database identifiers
+- `loader.shared` specifies resources common across all lookups, for example details
+  of the currently logged in user, database or API clients, etc (these must be
+  [unary steps](../../index.mdx#unary-steps))
+- `$loadOne.setParam(key, $value)` allows you to pass additional data to the
+  load, such as filtering or ordering logic (`$value` must be a [unary step](../../index.mdx#unary-steps))
+
+Both `$lookup` and `loader.shared` support [multistep](./multistep.md), so if
+they need multiple resources, you may pass them as a tuple or object of steps:
 
 ```ts
-interface LoadOneLoader {
-  load: LoadOneCallback;
+const $organizationId = $org.get("id");
+const $membershipNumber = fieldArgs.get("membershipNumber");
+const $person = loadOne(
+  { orgId: $organizationId, num: $membershipNumber },
+  getPersonByOrganizationIdAndMembershipNumber,
+);
+```
+
+The callback might look something like:
+
+```ts
+async function getPersonByOrganizationIdAndMembershipNumber(lookups) {
+  // Batch fetch all results
+  const rows = await db.query(sql`
+    select *
+    from people
+    where (organization_id, membership_number) in (
+      select el->>'orgId', el->>'num'
+      from json_array_elements(${sql.value(JSON.stringify(lookups))}) el
+    )
+  `);
+  // Return the matching result for each tuple
+  return lookups.map((lookup) =>
+    rows.find(
+      (record) =>
+        record.organization_id === lookup.orgId &&
+        record.membership_number === lookup.num,
+    ),
+  );
+}
+```
+
+Params does not have multistep support (currently) but you can specify multiple
+parameters so it shouldn't be needed.
+
+:::tip[Use multistep, not `list()` and `object()` steps]
+
+Rather than calling `loadOne(list([$a, $b]), loader)`, it's better to remove
+the `list()` wrapper and pass the [multistep](./multistep.md) tuple directly:
+`loadOne([$a, $b], loader)`. This multistep form is more ergonomic and concise,
+but more importantly the runtime lookup values are deduplicated using exact
+equality; loadOne's multistep support makes sure to return the same tuple for
+the same list of runtime values, enabling more thorough deduplication and less
+work for your business logic. The same goes for objects: prefer
+`{ a: $a, b: $b }` over `object({ a: $a, b: $b })`.
+
+:::
+
+## Loader object
+
+```ts
+// Simplified types
+interface LoadOneLoader<TLookup> {
+  load: LoadOneCallback<TLookup>;
   name?: string;
   shared?: Thunk<TShared>;
   ioEquivalence?: IOEquivalence<TLookup>;
@@ -187,86 +253,7 @@ that augment its behavior in Grafast:
   equivalent to those on input; see [ioEquivalence usage](#ioequivalence-usage)
   below
 
-### Load callback
-
-```ts
-type LoadOneCallback = (
-  specs: TLookup[],
-  info: LoadOneInfo,
-) => PromiseOrDirect<TData[]>;
-
-interface LoadOneInfo {
-  shared: UnwrapMultistep<TShared>;
-  attributes: ReadonlyArray<keyof TItem>;
-  params: Partial<TParams>;
-}
-```
-
-The `load` callback function is called with two arguments, the first is a list
-of the values from the _specifier step_ `$spec` and the second is options that
-may affect the fetching of the records.
-
-:::tip
-
-For optimal results, we strongly recommend that the callback function is defined
-in a common location so that it can be reused over and over again, rather than
-defined inline. This will allow the underlying steps to optimize calls to this function.
-
-:::
-
-Within this definition of `callback`:
-
-- `specs` is the runtime values of each value that `$spec` represented
-- `options` is an object containing:
-  - `shared`: the runtime value that `$shared` (if any) represented
-  - `attributes`: the list of keys that have been accessed via
-    `$record.get('<key>')`
-  - `params`: the params set via `$record.setParam('<key>', <value>)`
-
-`specs` is deduplicated using strict equality; so it is best to keep `$spec`
-simple - typically it should only represent a single scalar value - which is
-why `$shared` exists.
-
-`options.shared` is very useful to keep specs simple (so that fetch
-deduplication can work optimally) whilst passing in global values that you may
-need such as a database or API client.
-
-`options.attributes` is useful for optimizing your fetch - e.g. if the user
-only ever requested `$record.get('id')` and `$record.get('avatarUrl')` then
-there's no need to fetch all the other attributes from your datasource.
-
-`options.params` can be used to pass additional context to your callback
-function, perhaps options like "should we include archived records" or "should
-we expand 'customer' into a full object rather than just returning the
-identifier".
-
-### Basic usage
-
-```ts
-const $userId = $post.get("author_id");
-const $user = loadOne($userId, batchGetUserById);
-```
-
-An example of the callback function might be:
-
-```ts
-async function batchGetUserById(ids, { attributes }) {
-  // Your business logic would be called here; e.g. this might be the same
-  // function that your DataLoaders would call, except we can pass additional
-  // information to it.
-
-  // For example, load from the database
-  const rows = await db.query(
-    sql`SELECT id, ${columnsToSql(attributes)} FROM users WHERE id = ANY($1);`,
-    [ids],
-  );
-
-  // Ensure you return the same number of results, and in the same order!
-  return ids.map((id) => rows.find((row) => row.id === id));
-}
-```
-
-### Shared step usage
+### Shared
 
 :::info
 
@@ -315,7 +302,7 @@ async function batchGetUserFromDbById(ids, { attributes, shared }) {
 }
 ```
 
-### ioEquivalence usage
+### ioEquivalence
 
 The `ioEquivalence` optional parameter can accept the following values:
 
@@ -361,48 +348,104 @@ const $member = loadOne(
 //   - Similarly `$member.get("user_id")` will return `$userId` directly
 ```
 
-### Passing multiple steps
-
-The [`list()`](./list) or [`object()`](./object) step can be used if you need
-to pass the value of more than one step into your callback:
+## Load callback
 
 ```ts
-const $isAdmin = $user.get("admin");
-const $stripeId = $customer.get("stripe_id");
-const $last4 = loadOne([$isAdmin, $stripeId], getLast4FromStripeIfAdmin);
-```
+// Simplified types
+type LoadOneCallback<TLookup, TItem> = (
+  lookups: TLookup[],
+  info: LoadOneInfo,
+) => PromiseOrDirect<TData[]>;
 
-The first argument to the `getLast4FromStripeIfAdmin` callback will then be an
-array of all the tuples of values from these plans:
-`ReadonlyArray<readonly [isAdmin: boolean, stripeId: string]>`.
-The callback might look something like:
-
-```ts
-async function getLast4FromStripeIfAdmin(tuples) {
-  const stripeIds = uniq(
-    tuples
-      .filter(([isAdmin, stripeId]) => isAdmin)
-      .map(([isAdmin, stripeId]) => stripeId),
-  );
-  const last4s = await getLast4FromStripeIds(stripeIds);
-
-  return tuples.map(([isAdmin, stripeId]) => {
-    if (!isAdmin) return null;
-    const index = stripeIds.indexOf(stripeId);
-    return last4s[index];
-  });
+interface LoadOneInfo {
+  shared: UnwrapMultistep<TShared>;
+  attributes: ReadonlyArray<keyof TItem>;
+  params: Partial<TParams>;
 }
 ```
 
-This technique can also be used with the shared step in advanced usage.
+The `load` callback function is called with two arguments, the first is a list
+of the values from the _specifier step_ `$lookup` and the second is options that
+may affect the fetching of the records.
 
-:::tip[Performance impact from using list/object]
+:::tip
 
-Using `list()` / `object()` like this will likely reduce the effectiveness of
-`loadOne`'s built in deduplication; to address this a stable object/list is
-required - please track this issue:
-https://github.com/graphile/crystal/issues/2170
+For optimal results, we strongly recommend that the callback function is defined
+in a common location so that it can be reused over and over again, rather than
+defined inline. This will allow the underlying steps to optimize calls to this function.
 
 :::
+
+Within this definition of `callback`:
+
+- `lookups` is the runtime values of each value that `$lookup` represented
+- `options` is an object containing:
+  - `shared`: the runtime value of the unary step that the `shared` callback
+    returned (if any)
+  - `attributes`: the list of keys that have been accessed via
+    `$record.get('<key>')`
+  - `params`: the params set via `$record.setParam('<key>', <value>)`
+
+`lookups` is deduplicated using strict equality; the tuple and object forms of
+[multistep](./multistep.md) will automatically generate the same lists/objects
+from the same input values, so deduplication should work with these forms. (Any
+unary values your load callback depends on should typically instead be passed
+via `loader.shared` or `$loadOne.setParams(key, $unary)` as appropriate.)
+
+`options.shared` is very useful to keep lookups simple (so that fetch
+deduplication can work optimally) whilst passing in global values that you may
+need such as a database or API client.
+
+`options.attributes` is useful for optimizing your fetch - e.g. if the user
+only ever requested `$record.get('id')` and `$record.get('avatarUrl')` then
+there's no need to fetch all the other attributes from your datasource.
+
+`options.params` can be used to pass additional context to your callback
+function, perhaps options like "should we include archived records" or "should
+we expand 'customer' into a full object rather than just returning the
+identifier".
+
+## Example
+
+```ts title="plan.ts"
+import { batchGetUserById } from "./businessLogic";
+
+export function Post_author($post) {
+  const $userId = get($post, "author_id");
+  return loadOne($userId, batchGetUserById);
+}
+```
+
+An example of the callback function might be:
+
+```ts title="businessLogic.ts"
+export const batchGetUserById = {
+  name: "batchGetUserById",
+
+  shared: () => ({ db: context().get("db") }),
+
+  // Your business logic would be called here; e.g. this might be the same
+  // function that your DataLoaders would call, except we can pass additional
+  // information to it.
+  async load(ids, { attributes, shared: { db } }) {
+    // loadOne knows which columns are needed:
+    const sqlColumns = columnsToSql(["id", ...attributes]);
+    // DataLoader would have to select everything
+    //  const sqlColumns = sql`*`
+
+    const rows = await db.query(
+      sql`
+        SELECT ${sqlColumns}
+        FROM users
+        WHERE id = ANY($1);
+      `,
+      [ids],
+    );
+
+    // Ensure you return the same number of results, and in the same order!
+    return ids.map((id) => rows.find((row) => row.id === id));
+  },
+};
+```
 
 [dataloader]: https://github.com/graphql/dataloader
