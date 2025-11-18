@@ -7,9 +7,9 @@ For more information see [step classes](../step-classes).
 
 A number of built-in standard step classes are provided for schemas to
 accomplish common tasks, these are documented in [Standard
-steps](./standard-steps). Often these built-in steps are enough for your schema's
-needs, especially when integrating with an existing business logic layer via
-steps such as [loadOne][] and [loadMany][].
+steps](../standard-steps/index.mdx). Often these built-in steps are enough for
+your schema's needs, especially when integrating with an existing business logic
+layer via steps such as [loadOne][] and [loadMany][].
 
 Should these standard steps prove insufficient (or should you wish to enable
 more advanced or custom optimizations), schema designers are encouraged to write
@@ -18,7 +18,7 @@ their own step classes and/or use step classes made available in other modules.
 If you're not using the advanced lifecycle hooks, writing a step class is
 generally not much more complicated than writing a DataLoader callback (and
 sometimes more straightforward, depending on what you're trying to do). See
-[step classes](../step-classes) for information on writing your own step
+[step classes](../step-classes.mdx) for information on writing your own step
 classes.
 
 The `@dataplan/*` modules contain step classes for particular specialised use
@@ -35,5 +35,5 @@ must not be used.
 
 :::
 
-[loadone]: ./standard-steps/loadOne
-[loadmany]: ./standard-steps/loadMany
+[loadone]: ../standard-steps/loadOne.md
+[loadmany]: ../standard-steps/loadMany.md

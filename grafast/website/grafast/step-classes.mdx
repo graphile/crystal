@@ -38,7 +38,7 @@ function getRandomNumber() {
 }
 ```
 
-:::tip Use prefixes on custom fields/methods.
+:::tip[Use prefixes on custom fields/methods.]
 
 If you add any custom fields or methods to your step classes we recommend that
 you prefix them with your initials or organization name to avoid naming
@@ -46,10 +46,17 @@ conflicts occurring.
 
 :::
 
-:::danger Don't subclass steps.
+:::danger[Don't subclass steps.]
 
 Don't subclass steps, this will make things very confusing for you. Always
 inherit directly from `Step`.
+
+:::
+
+:::warn[`__` prefix is reserved for internal usage]
+
+Step classes whose names start with two underscores (`__`) are internals and
+must not be used.
 
 :::
 
