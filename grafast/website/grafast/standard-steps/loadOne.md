@@ -172,9 +172,9 @@ There are three ways to input steps to loadOne:
 - `$lookup` specifies the record to look up, e.g. via database identifiers
 - `loader.shared` specifies resources common across all lookups, for example details
   of the currently logged in user, database or API clients, etc (these must be
-  [unary steps](../../index.mdx#unary-steps))
+  [unary steps](../index.mdx#unary-steps))
 - `$loadOne.setParam(key, $value)` allows you to pass additional data to the
-  load, such as filtering or ordering logic (`$value` must be a [unary step](../../index.mdx#unary-steps))
+  load, such as filtering or ordering logic (`$value` must be a [unary step](../index.mdx#unary-steps))
 
 Both `$lookup` and `loader.shared` support [multistep](./multistep.md), so if
 they need multiple resources, you may pass them as a tuple or object of steps:
@@ -263,7 +263,7 @@ A unary step is a step that only ever represents one value, e.g. simple derivati
 
 In addition to the forms seen in "Basic usage" above, you can pass an additional
 `shared` step to `loadOne`. This step must be a [**unary
-step**](../../step-classes.mdx#addunarydependency), meaning that it must
+step**](../step-classes.mdx#addunarydependency), meaning that it must
 represent exactly one value across the entire request (not a batch of values
 like most steps), and is useful for representing values from the GraphQL context
 or from input values (arguments, variables, etc).
