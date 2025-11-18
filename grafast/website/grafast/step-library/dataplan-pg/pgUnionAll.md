@@ -98,7 +98,7 @@ to ensure a stable ordering result.
 
 Limit/offset pagination can be accomplished via `.setFirst($n)` and
 `.setOffset($n)`. `pgUnionAll` also implements the relevant interfaces to
-support the [`connection`](../standard-steps/connection.md) step for cursor
+support the [`connection`](../../standard-steps/connection.md) step for cursor
 pagination.
 
 ## Example
