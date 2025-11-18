@@ -1,6 +1,6 @@
 # Step library
 
-A step class is a JavaScript class that extends `ExecutableStep` with an
+A step class is a JavaScript class that extends `Step` with an
 `execute` method. It may, optionally, implement other <Grafast /> lifecycle
 methods, and add other accessors and similar that child field plans may call.
 For more information see [step classes](../step-classes).

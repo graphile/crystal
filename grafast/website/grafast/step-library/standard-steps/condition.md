@@ -9,38 +9,38 @@ Usage:
 // value === null?
 function condition(
   operation: "null",
-  $value: ExecutableStep,
-): ExecutableStep<boolean>;
+  $value: Step,
+): Step<boolean>;
 
 // value !== null?
 function condition(
   operation: "not null",
-  $value: ExecutableStep,
-): ExecutableStep<boolean>;
+  $value: Step,
+): Step<boolean>;
 
 // value != null
 function condition(
   operation: "exists",
-  $value: ExecutableStep,
-): ExecutableStep<boolean>;
+  $value: Step,
+): Step<boolean>;
 
 // value == null
 function condition(
   operation: "not exists",
-  $value: ExecutableStep,
-): ExecutableStep<boolean>;
+  $value: Step,
+): Step<boolean>;
 
 // a === b
 function condition(
   operation: "===",
-  $a: ExecutableStep,
-  $b: ExecutableStep,
-): ExecutableStep<boolean>;
+  $a: Step,
+  $b: Step,
+): Step<boolean>;
 
 // a !== b
 function condition(
   operation: "!==",
-  $a: ExecutableStep,
-  $b: ExecutableStep,
-): ExecutableStep<boolean>;
+  $a: Step,
+  $b: Step,
+): Step<boolean>;
 ```

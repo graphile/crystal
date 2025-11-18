@@ -892,14 +892,7 @@ the known, supported, errors then it will return the given error type.
 ```ts
 import { sideEffectWithPgClientTransaction } from "@dataplan/pg";
 import { extendSchema } from "postgraphile/utils";
-import {
-  ObjectStep,
-  constant,
-  object,
-  ExecutableStep,
-  access,
-  list,
-} from "postgraphile/grafast";
+import { ObjectStep, constant, object, Step, access, list } from "postgraphile/grafast";
 import { DatabaseError } from "pg";
 
 export const RegisterUserPlugin = extendSchema((build) => {
@@ -1005,10 +998,10 @@ export const RegisterUserPlugin = extendSchema((build) => {
       UsernameConflict: {
         // Since User expects a step, our types must also expect a step. We
         // don't care what the step is though.
-        assertStep: ExecutableStep,
+        assertStep: Step,
       },
       EmailAddressConflict: {
-        assertStep: ExecutableStep,
+        assertStep: Step,
       },
     },
     unions: {

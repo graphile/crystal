@@ -56,7 +56,7 @@ const schema = makeGrafastSchema({ typeDefs, objects });
 ## Type
 
 ```ts
-function applyTransforms($step: ExecutableStep): ExecutableStep;
+function applyTransforms($step: Step): Step;
 ```
 
 ## Example
