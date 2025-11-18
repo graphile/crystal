@@ -3,11 +3,7 @@
 `connection()` wraps a collection fetch to provide the utilities for working
 with GraphQL cursor connections.
 
-The underlying collection step may yield:
-
-- an array,
-- an object with an `items` array (`{ items: any[] }`), or
-- support the `.items()` method.
+## Usage
 
 ```ts
 export function connection<...>(
@@ -19,6 +15,37 @@ interface ConnectionParams {
   fieldArgs?: FieldArgs;
   edgeDataPlan?: ($item: Step<any>) => Step;
 }
+```
+
+`step` represents a collection and may:
+
+- yield an array,
+- yield an object with an `items` array (`{ items: any[] }`), or
+- support the `.items()` method to get a step that does the above.
+
+When calling connection from inside a plan resolver, you may pass
+`{ fieldArgs }` as the second argument:
+
+```ts
+return connection($list, { fieldArgs });
+```
+
+Doing so automatically applies the standard pagination arguments (`first`,
+`last`, `before`, `after`, `offset`). Without this, you must call these methods
+manually passing the relevant options:
+
+```ts
+const $connection = connection($list);
+
+const { $first, $last, $before, $after, $offset } = fieldArgs;
+// Only call the arguments that your field actually has:
+if ($first) $connection.setFirst($first);
+if ($last) $connection.setLast($last);
+if ($before) $connection.setBefore($before);
+if ($after) $connection.setAfter($after);
+if ($offset) $connection.setOffset($offset);
+
+return $connection;
 ```
 
 :::warning Wrapping a step in `connection()` may mutate the step!

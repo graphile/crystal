@@ -3,7 +3,7 @@
 Subscribes to the given `pubsubOrPlan` to get realtime updates on a given topic
 (`topicOrPlan`), mapping the resulting event via the `itemPlan` callback.
 
-Usage:
+## Example
 
 ```ts
 const $pubsub = context().get("pubsub");

@@ -1,8 +1,9 @@
 # last
 
-Yields the last entry in the array the given step yields.
+Yields the last entry in the array yielded by the given step.
 
-Pass `false` as the second parameter to also handle iterables/async iterables.
+Pass `false` as the second parameter to handle iterables/async iterables in
+addition to simple arrays (has greater overhead).
 
 Usage:
 

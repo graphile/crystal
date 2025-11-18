@@ -45,7 +45,7 @@ async function friendsByUserId(userIds) {
 
 :::tip[Don't declare your `loader` inline]
 
-The `loader` function acts as a gateway between the Grafast plan execution and
+The `loader` function acts as a gateway between the Gra*fast* plan execution and
 your business logic; you should keep it in a centralized location so that it may
 be used by multiple plan resolvers easily. This also allows for equivalent calls
 to this same loader to be deduplicated for increased performance.
@@ -118,8 +118,13 @@ async function friendsByUserId(userIds, info) {
     inner join friendships on (friendships.user_id = u.id)
     inner join users f on (f.id = friendships.friend_id)
     where u.id = any(${sql.value(userIds)})
-    /* highlight-next-line */
-    and friendships.archived = ${sql.value(info.params.includeArchived ?? false)}
+    /* highlight-start */
+    and ${
+      info.params.includeArchived
+        ? sql`true` /* include all records */
+        : sql`friendships.archived = false` /* exclude archived */
+    }
+    /* highlight-end */
   `);
 
   return userIds.map((id) => rows.filter((r) => r._user_id === id));
@@ -259,24 +264,26 @@ stateDiagram
 ## Usage
 
 ```ts
+// Simplified types
 function loadMany(
-  lookup: TLookup,
+  $lookup: Multistep,
   loader: LoadManyCallback | LoadManyLoader,
 ): Step;
 ```
 
 `loadMany` accepts two arguments (both required):
 
-- `lookup` – the step (or multistep) that specifies which records to look up, or
-  `null` if no data is required.
+- `$lookup` – the step (or [multistep](./multistep.md)) that identifies the
+  records to look up, or `null` if no data is required.
 - `loader` – either a callback function or an object containing the callback and
   optional properties - see "Loader object" below.
 
-:::info[`loader` should be a global variable]
+:::info[`loader` should be defined in the root scope]
 
 The `loader` argument (either a callback function or a loader object) should be
-passed as a reference from a global variable (such as an import), rather than
-being defined inline at the callsite. This is important for several reasons:
+passed as a reference from a variable in the root scope (aka a global variable,
+including an import), rather than being defined inline at the callsite. This is
+important for several reasons:
 
 1. **Optimization via reference equality:** Grafast uses `===` checks to
    optimize and deduplicate calls. If you define the `load` function inline,
@@ -296,23 +303,25 @@ being defined inline at the callsite. This is important for several reasons:
 
 :::
 
-### Loader object
+## Loader object
 
 ```ts
-interface LoadManyLoader {
-  load: LoadManyCallback;
+// Simplified types
+interface LoadManyLoader<TLookup> {
+  load: LoadManyCallback<TLookup>;
   name?: string;
   shared?: Thunk<TShared>;
-  ioEquivalence?: IOEquivalence<TLookup>;
+  ioEquivalence?: IOEquivalence<TLookup>; // See "ioEquivalence"
   paginationSupport?: PaginationFeatures; // see "Pagination interop"
 }
 ```
 
-The loader object contains a `load` callback function and additional properties
-that augment its behavior in Grafast:
+The loader object contains a `load` callback function (see ["Load
+callback"](#load-callback) below) and additional properties that augment its
+behavior in Grafast:
 
-- `load` (required) – the callback function called with the values from lookup
-  responsible for loading the associated records
+- `load` (required) – the [load callback](#load-callback) function called with
+  the values from `$lookup` and responsible for loading the associated records
 - `shared` (optional) – a thunk (callback) yielding a step or multistep to
   provide shared data/utilities to use across all inputs (e.g. database client,
   API credentials, etc)
@@ -320,94 +329,17 @@ that augment its behavior in Grafast:
   string-string object map used to indicate which attributes on output are
   equivalent to those on input
 - `paginationSupport` (optional) – enables pagination interop with
-  `connection()`
-
-## Load callback
-
-```ts
-type LoadManyCallback = (
-  lookups: TLookup[],
-  info: LoadManyInfo,
-) => PromiseOrDirect<TResult[]>;
-
-interface LoadManyInfo {
-  shared: UnwrapMultistep<TShared>;
-  attributes: ReadonlyArray<keyof TItem>;
-  params: Partial<TParams>;
-}
-```
-
-Whether passed directly or specified in a loader object, the `load` callback
-will be passed two arguments: `lookups` and `info`, and it must return
-one result collection per lookup value. Each
-collection may be an array or an async iterable; items may be `null`:
-`PromiseOrDirect<ReadonlyArray<Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>>>>`.
-
-The `lookups` argument is a readonly array of the lookup values yielded by the
-upstream lookup steps.
-
-The `info` argument contains additional metadata about the request:
-
-- `attributes`: the set of accessed keys (`keyof TItem`) that our children
-  need
-- `params`: a map of params set via `.setParam(...)` (used to indicate
-  pagination, filtering, etc)
-- `shared`: the value yielded by `loader.shared` (typically API/DB clients,
-  current user/session details, etc) - can only be populated if specified via a
-  loader object
-
-## Loader object
-
-```ts
-const loader = {
-  // Purely cosmetic, for plan diagrams/debugging.
-  name: "myLoaderName",
-
-  // Optimization: if you know that parts of the output will be equivalent to
-  // parts of the input
-  ioEquivalence: null,
-
-  // Get access to any shared values your loader will need
-  shared: () => context().get("db"),
-
-  // Only set this if you actually support these features!
-  // paginationSupport: { cursor: true, offset: true, reverse: true },
-
-  async load(lookups, info) {
-    // lookups: readonly array of lookup values yielded by the lookup steps
-
-    // info.attributes: readonly array of accessed keys (keyof TItem)
-    const attributes = info.attributes;
-
-    // info.params: Partial<TParams> including any `.setParam(...)` and pagination params
-    // Extract `paginationSupport`-related parameters:
-    const { reverse, limit, offset, after } = info.params;
-
-    // info.shared: shared value(s) yielded by `loader.shared`
-    const db = info.shared;
-
-    const resultsByLookup = await db.lookUpTheThings(lookups, {
-      attributes,
-      pagination: {
-        reverse,
-        limit,
-        offset,
-        after,
-      },
-    });
-
-    return lookups.map((lookup) => resultsByLookup.get(lookup));
-  },
-};
-```
+  `connection()`; see
+  [connection's `step.paginationSupport`](./connection.md#steppaginationsupport) for details
 
 ### ioEquivalence
 
 ```ts
-type IOEquivalence<TSpec> =
+// Simplified types
+type IOEquivalence<TLookup> =
   | null
   | string
-  | { [key in Exclude<keyof TSpec, keyof any[]>]?: string | null };
+  | { [key in Exclude<keyof TLookup, keyof any[]>]?: string | null };
 ```
 
 The `ioEquivalence` optional parameter can accept the following values:
@@ -462,6 +394,84 @@ const memberPostsByOrganizationIdAndUserId = {
   ioEquivalence: { oid: "organization_id", uid: "user_id" },
 };
 ```
+
+### Example loader object
+
+```ts
+const loader = {
+  // Purely cosmetic, for plan diagrams/debugging.
+  name: "myLoaderName",
+
+  // Optimization: if you know that parts of the output will be equivalent to
+  // parts of the input
+  ioEquivalence: null,
+
+  // Get access to any shared values your loader will need
+  shared: () => context().get("db"),
+
+  // Only set this if you actually support these features!
+  //   paginationSupport: { cursor: true, offset: true, reverse: true },
+
+  // The load callback that does the work:
+  async load(lookups, info) {
+    // lookups: readonly array of lookup values yielded by the lookup steps
+
+    const {
+      // info.attributes: readonly array of accessed keys (keyof TItem)
+      attributes,
+
+      // info.params: Partial<TParams> including any `.setParam(...)` and
+      // pagination params.
+      params: { reverse, limit, offset, after },
+
+      // info.shared: shared value(s) yielded by `loader.shared`
+      shared: { db },
+    } = info;
+
+    const resultsByLookup = await db.lookUpTheThings(lookups, {
+      attributes,
+      pagination: { reverse, limit, offset, after },
+    });
+
+    return lookups.map((lookup) => resultsByLookup.get(lookup));
+  },
+};
+```
+
+## Load callback
+
+```ts
+// Simplified types
+type LoadManyCallback<TLookup> = (
+  lookups: TLookup[],
+  info: LoadManyInfo,
+) => PromiseOrDirect<TResult[]>;
+
+interface LoadManyInfo {
+  shared: UnwrapMultistep<TShared>;
+  attributes: ReadonlyArray<keyof TItem>;
+  params: Partial<TParams>;
+}
+```
+
+Whether passed directly or specified in a loader object, the `load` callback
+will be passed two arguments: `lookups` and `info`, and it must return
+one result collection per lookup value. Each
+collection may be an array or an async iterable; items may be `null`:
+`PromiseOrDirect<ReadonlyArray<Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>>>>`.
+
+The `lookups` argument is a readonly array of the lookup values yielded by the
+`$lookup` step/multistep.
+
+The `info` argument contains additional metadata about the request:
+
+- `attributes`: the set of accessed keys (`keyof TItem`) that our children
+  need
+- `params`: a map of params set via `.setParam(...)` (used to indicate
+  pagination, filtering, etc)
+- `shared`: the value yielded by `loader.shared` (typically API/DB clients,
+  current user/session details, etc) - only populated if specified by loader
+  object
 
 ## Pagination interop with `connection()`
 
