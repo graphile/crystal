@@ -2,6 +2,12 @@
 sidebar_position: 999999998
 ---
 
+:::info[Work in progress]
+
+Feel free to add more terms and/or definitions via pull requests!
+
+:::
+
 # Glossary
 
 ## `step`
