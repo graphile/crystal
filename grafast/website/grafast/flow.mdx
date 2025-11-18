@@ -117,12 +117,33 @@ a nullable position? Or encounters polymorphism?
 Any time the size of a batch might change, Gra*fast* creates a new "layer
 plan" and the following field plans have their steps planned there instead.
 
+### Execution value
+
 Gra*fast* executes each step in a plan diagram just once for every request[^1],
 even if that step is handling thousands of list values. For every dependency a
 step has, Gra*fast* takes the "execution value" that represents the list of
 values for that step, automatically filters out the entries that should not be
 executed (e.g. due to error or inhibition, see [flow control](#flow-control)),
 then passes the remaining values on to the step for processing.
+
+#### Flagged values
+
+Each value in an execution value has an associated bitmap of flags to indicate
+special properties of the value:
+
+- is it an error?
+- is it nullish?
+- is it inhibited? (see [inhibitOnNull](./step-library/standard-steps/inhibitOnNull.md))
+- is it skipped due to polymorphism? (i.e. the type doesn't match)
+- is it unrecoverably stopped?
+
+Gra*fast* assigns these flags automatically whilst processing the results from a
+step's execution. Any value flagged with skipped due to polymorphism or
+unrecoverably stopped will be filtered out from the execution values passed to
+future step execution. By default, any values flagged as error or inhibited will
+also be filtered out, but this can be overridden; e.g. the
+[`trap()`](./step-library/standard-steps/trap.md) step allows trapping errors or
+inhibits.
 
 [^1]:
     except for in incremental delivery with `@stream` and `@defer`; but you
