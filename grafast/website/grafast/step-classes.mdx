@@ -202,7 +202,7 @@ arguments, authentication credentials, database clients and the like.
 
 :::note[Batch vs unary execution values]
 
-Grafast tracks which steps will always represent exactly one value (e.g. the
+Gra*fast* tracks which steps will always represent exactly one value (e.g. the
 GraphQL context, and input values passed as field arguments), and which will
 represent a batch (e.g. values inside of a list). The former are stored in
 "unary execution values", and the latter in "batch execution values". For
@@ -587,7 +587,7 @@ toSpecifier($step: Step): Step
 ```
 
 This function name is reserved for convenience such that `$step.toSpecifier()`
-should mean the same as `abstractType.toSpecifier($step)`. Grafast does not
+should mean the same as `abstractType.toSpecifier($step)`. Gra*fast* does not
 actually use this method (currently), but it can be convenient for users so
 we reserve it for specifically this use case.
 
@@ -643,7 +643,7 @@ listItem($item: __ItemStep): Step
 ```
 
 If your step represents a list, it may implement `.listItem()` to wrap the
-Grafast internal `__ItemStep` that represents items of this list in a more
+Gra*fast* internal `__ItemStep` that represents items of this list in a more
 useful step for child [field plan resolvers](./plan-resolvers/index.mdx) to
 use.
 
@@ -745,7 +745,7 @@ input values are not).
 ### getDep
 
 Pass in the number of the dependency (`0` for the first dependency, `1` for the
-second, and so on) and Grafast will return the corresponding step. This should
+second, and so on) and Gra*fast* will return the corresponding step. This should
 only be used before or during the `optimize` phase.
 
 For example in the `AddStep` example above we might have:
@@ -832,7 +832,7 @@ sideEffect($step, (value) => void console.log(value));
 return $step;
 ```
 
-If you're looking for the equivalent of a "pure function" in Grafast, the
+If you're looking for the equivalent of a "pure function" in Gra*fast*, the
 closest is a step that `isSyncAndSafe`...
 
 :::

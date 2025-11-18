@@ -298,7 +298,7 @@ passed as a reference from a variable in the root scope (aka a global variable,
 including an import), rather than being defined inline at the callsite. This is
 important for several reasons:
 
-1. **Optimization via reference equality:** Grafast uses `===` checks to
+1. **Optimization via reference equality:** Gra*fast* uses `===` checks to
    optimize and deduplicate calls. If you define the `load` function inline,
    each call will have a different function reference, preventing optimization.
    By referencing a global function, multiple `loadMany` steps using the same
@@ -331,7 +331,7 @@ interface LoadManyLoader<TLookup> {
 
 The loader object contains a `load` callback function (see ["Load
 callback"](#load-callback) below) and additional properties that augment its
-behavior in Grafast:
+behavior in Gra*fast*:
 
 - `load` (required) – the [load callback](#load-callback) function called with
   the values from `$lookup` and responsible for loading the associated records

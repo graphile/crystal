@@ -136,7 +136,7 @@ const id = userHandler.codec.encode(planResult); // "WyJVc2VyIiwxMjNd"
 `NodeIdCodec` objects are responsible for converting a specifier to a string and
 back again. Implement `{ name, encode, decode }` and set
 `encode.isSyncAndSafe = true` / `decode.isSyncAndSafe = true` when the
-operations are synchronous and side-effect free so Grafast can inline them.
+operations are synchronous and side-effect free so Gra*fast* can inline them.
 
 Typically the same codec will be used for all IDs across your schema, but that
 is not a requirement. If in doubt, `base64JSONCodec` is a good default.

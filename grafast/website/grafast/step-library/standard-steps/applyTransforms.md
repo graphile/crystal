@@ -29,7 +29,7 @@ return performRemoteRequestWithUsernames($usernames);
 ```
 
 You should **not** use `applyTransforms()` when returning a list step from a
-plan resolver for a list field. Grafast will automatically apply the transforms
+plan resolver for a list field. Gra*fast* will automatically apply the transforms
 when it iterates over the list, to `applyTransforms()` beforehand would force
 this iteration to execute twice, which is inefficient.
 

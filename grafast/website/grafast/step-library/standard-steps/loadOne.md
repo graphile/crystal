@@ -148,7 +148,7 @@ defined in the root scope (i.e. a "global" variable, such as an import), rather
 than being defined inline at the callsite. This is important for several
 reasons:
 
-1. **Optimization via reference equality:** Grafast uses `===` checks to
+1. **Optimization via reference equality:** Gra*fast* uses `===` checks to
    optimize and deduplicate calls. If you define the `load` function inline,
    each call will have a different function reference, preventing optimization.
    By referencing a global function, multiple `loadOne` steps using the same
@@ -241,7 +241,7 @@ interface LoadOneLoader<TLookup> {
 ```
 
 The loader object contains a `load` callback function and additional properties
-that augment its behavior in Grafast:
+that augment its behavior in Gra*fast*:
 
 - `load` (required) – the callback function called with the values from lookup
   responsible for loading the associated records
