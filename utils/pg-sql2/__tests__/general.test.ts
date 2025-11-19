@@ -19,6 +19,14 @@ it("sql.value(nr)", () => {
   });
 });
 
+it("sql.json(obj)", () => {
+  const node = sql.json({ a: 1, b: true, three: "three" }) as SQLQuery;
+  expect(node.n).toEqual([
+    { [$$type]: "VALUE", v: '{"a":1,"b":true,"three":"three"}' },
+    { [$$type]: "RAW", t: "::json" },
+  ]);
+});
+
 describe("sql.identifier", () => {
   it("one", () => {
     const node = sql.identifier("foo");
