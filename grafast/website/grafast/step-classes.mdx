@@ -757,11 +757,11 @@ class AddStep extends Step {
 
 :::danger Steps are ephemeral, never store a reference to a step.
 
-You must never store a reference to another step directly (or indirectly) in
+You must never store an instance of another step directly (or indirectly) in
 your step class. Steps come and go at quite a rate during planning - being
 removed due to deduplicate, optimize, or tree shaking lifecycle events.
-Referring to a step that no longer exists is likely to make your program have
-very unexpected behaviors and/or crash.
+Referring to a step that no longer exists in the execution plan is likely to
+make your program have very unexpected behaviors and/or crash.
 
 In the exceedingly unlikely event that you need to reference another step but it
 is not a dependency, use:
@@ -958,10 +958,23 @@ of the class. You can even set it to a shared value between multiple step
 classes (a "family" of step classes) should that make sense. By default no
 `metaKey` is set, and your class will therefore have no `meta` object.
 
-:::tip Inspiration
+:::tip[Inspiration]
 
 The `loadMany` and `loadOne` standard steps make use of this key to optimize
 value caching, you may want to look at them for more inspiration.
+
+:::
+
+### optimizeMetaKey
+
+_EXPERIMENTAL_
+
+Makes the `meta` property available on `optimize` options.
+
+:::tip[Inspiration]
+
+The `list` and `object` standard steps make use of this key for caching
+constants consistently, you may want to look at them for more inspiration.
 
 :::
 
