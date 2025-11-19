@@ -813,6 +813,16 @@ export function value(val: SQLRawValue): SQL {
   return makeValueNode(val);
 }
 
+/** Equivalent to
+ *
+ * ```
+ * sql`${JSON.stringify(val)}::json`
+ * ```
+ */
+export function json(val: any): SQL {
+  return sql`${value(JSON.stringify(val))}::json`;
+}
+
 const trueNode = makeRawNode(`TRUE`, "true");
 const falseNode = makeRawNode(`FALSE`, "false");
 const nullNode = makeRawNode(`NULL`, "null");
@@ -1387,6 +1397,7 @@ export interface PgSQL<TEmbed = never> {
   raw: typeof raw;
   identifier: typeof identifier;
   value: typeof value;
+  json: typeof json;
   literal: typeof literal;
   join: typeof join;
   indent: typeof indent;
@@ -1419,6 +1430,7 @@ const attributes = {
   raw,
   identifier,
   value,
+  json,
   literal,
   join,
   indent,
