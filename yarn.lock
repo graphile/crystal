@@ -22254,6 +22254,7 @@ __metadata:
     eslint-plugin-simple-import-sort: "npm:^12.1.1"
     eslint-plugin-tsdoc: "npm:^0.4.0"
     eslint_d: "npm:^14.3.0"
+    glob: "npm:^11.1.0"
     globals: "npm:^16.3.0"
     graphql: "npm:^16.9.0"
     graphql-ws: "npm:^6.0.5"
