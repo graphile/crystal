@@ -23,6 +23,11 @@ requests). When executing an individual request, the data for a step is stored i
 an [execution value](#execution-value) which contains the full batch of values
 the step represents (for example "the author IDs of all the returned Posts").
 
+## Step function
+
+A function that returns a step (often by instantiating a step class or by
+calling other step functions).
+
 ## Unary step
 
 A step that will always have exactly one value when executing a request (i.e.
