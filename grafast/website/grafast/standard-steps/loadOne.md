@@ -183,7 +183,7 @@ they need multiple resources, you may pass them as a tuple or object of steps:
 const $organizationId = $org.get("id");
 const $membershipNumber = fieldArgs.get("membershipNumber");
 const $person = loadOne(
-  { orgId: $organizationId, num: $membershipNumber },
+  { org: $organizationId, num: $membershipNumber },
   getPersonByOrganizationIdAndMembershipNumber,
 );
 ```
@@ -194,21 +194,22 @@ The callback might look something like:
 async function getPersonByOrganizationIdAndMembershipNumber(lookups) {
   // Batch fetch all results
   const rows = await db.query(sql`
-    select *
+    select people.*
     from people
-    where (organization_id, membership_number) in (
-      select el->>'orgId', el->>'num'
-      from json_array_elements(${sql.value(JSON.stringify(lookups))}) el
-    )
+    inner join json_to_recordset(${sql.json(lookups)}) as lookups(org int, num int)
+    on ((people.organization_id, people.membership_number) = (lookups.org, lookups.num))
   `);
+
   // Return the matching result for each tuple
   return lookups.map((lookup) =>
     rows.find(
       (record) =>
-        record.organization_id === lookup.orgId &&
+        record.organization_id === lookup.org &&
         record.membership_number === lookup.num,
     ),
   );
+  // NOTE: optimization of the above O(N^2) algorithm is left as an exercise to
+  // the reader.
 }
 ```
 
