@@ -667,13 +667,18 @@ export type ExecutionValue<TData = any> =
   | UnaryExecutionValue<TData>;
 
 interface ExecutionValueBase<TData = any> {
+  /** Data at index in the batch (`0 <= batchIndex < count`) */
   at(i: number): TData;
+  /** `false` for unary execution values, `true` otherwise */
   isBatch: boolean;
-  /** Returns this.value for a unary execution value; throws if non-unary */
+  /** Returns the value for a unary execution value; throws if non-unary */
   unaryValue(): TData;
   /** @internal */
   _flagsAt(i: number): ExecutionEntryFlags;
-  /** bitwise OR of all the entry states @internal */
+  /**
+   * bitwise OR of all the entry states
+   * @internal
+   */
   _getStateUnion(): ExecutionEntryFlags;
   /** @internal */
   _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;
@@ -716,17 +721,33 @@ export interface ExecutionDetailsStream {
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
+  /** The size of the batch being processed */
   count: number;
-  indexMap: IndexMap;
-  indexForEach: IndexForEach;
+
+  /** An "execution value" for each dependency of the step */
   values: {
     [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
   } & {
     length: TDeps["length"];
     map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
   };
-  extra: ExecutionExtra;
+
+  /** Helper; makes array from `callback(batchIndex)` for each `0 <= batchIndex < count` */
+  indexMap: IndexMap;
+  /** Helper; calls `callback` for each batchIndex in the batch; no return value */
+  indexForEach: IndexForEach;
+
+  /**
+   * If this step is expected to return a stream (e.g. because it's a
+   * `subscription`, or because of the `@stream` incremental delivery
+   * directive) then an object with details of the stream, such as how many
+   * records were requested up front (`initialCount`). For subscriptions,
+   * `initialCount` will always be `0`.
+   */
   stream: ExecutionDetailsStream | null;
+
+  /** Currently experimental, use it at your own risk (and see the source for docs) */
+  extra: ExecutionExtra;
 }
 
 export interface LocationDetails {

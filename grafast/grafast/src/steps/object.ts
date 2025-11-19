@@ -372,7 +372,7 @@ export class ObjectStep<
 
       // We'll cache so that the constants can be more easily deduplicated
       const meta = opts.meta as Record<string, Record<string, any>[]>;
-      const keysJoined = this.keys.join(",");
+      const keysJoined = JSON.stringify(this.keys);
       if (!meta[keysJoined]) {
         meta[keysJoined] = [];
       }

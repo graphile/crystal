@@ -53,22 +53,20 @@ inherit directly from `Step`.
 
 :::
 
-:::warn[`__` prefix is reserved for internal usage]
+:::warning[Double underscore (`__`) prefix is reserved for internal usage]
 
 Step classes whose names start with two underscores (`__`) are internals and
-must not be used.
+must never be directly created by the user. Further, you must never name your
+own step classes such that they begin with two underscores.
 
 :::
 
 ## Step function
 
 By convention, we always define a function that constructs an instance of our
-class so we don't see the `new` calls or redundant `Step` text in our plan
-resolver functions.
-
-This function is typically named after the corresponding
-step class, but with the first letter in lower case and the `Step` suffix
-omitted, for example `AddStep` would become `add`:
+class. A step function is typically named after the corresponding step class,
+but with the first letter lowercased and the `Step` suffix omitted; for example
+the `AddStep` step class would have a step function named `add`:
 
 ```ts
 function add($a, $b) {
@@ -76,17 +74,26 @@ function add($a, $b) {
 }
 ```
 
-There's multiple reasons for this, a simple one is to make the plan code
-easier to read: we won't see the `new` calls in our plan resolver functions,
-nor the redundant `Step` wording, resulting in a higher signal-to-noise ratio.
-More importantly, though, is that the small layer of indirection allows us to
-do some minor manipulations before handing off to the class constructor, and
-makes the APIs more future-proof since we can have the function return
-something different in future without having to refactor our plans in the
-schema. And remember that this cost is only incurred at planning time (which is
-generally cached and can be re-used for similar future requests), and each
-field is only planned once, so the overhead of an additional function call is
-negligible.
+There are many reasons for this indirection:
+
+- simplicity, conciseness and readability of plan resolvers: no `new` keyword,
+  no redundant `Step` text, no harsh PascalCase identifiers; feels lighter
+- flexible API: the function can manipulate arguments before sending them on to
+  a class constructor, allowing for overloads, complex generics, or tagged
+  template literals
+- caching: it's simple to add a cache at the step function level, much harder to
+  handle that in the constructor of a step class
+- branching: a function may choose to return a different step under certain
+  circumstances, for example if it determines that the input is a constant
+- evolution: a step function should express the developer's intent; how that
+  maps to steps under the hood is less important - e.g. a `sideEffect()` step
+  might start out by building a `LambdaStep` and marking it as having side
+  effects, but later evolve to using its own `SideEffectStep` class, without
+  consuming code needing to change
+
+The tiny additional cost of these step functions is only incurred at plan-time,
+and plans are re-used for similar future requests; the cost of an additional
+function call during planning is negligible.
 
 ## Lifecycle methods
 
@@ -99,22 +106,22 @@ execute(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
 ```ts
 // These are simplified types
 interface ExecutionDetails {
-  /** The size of the batch being processed */
-  count: number;
-  /** An "execution value" for each dependency of the step */
-  values: [...ExecutionValue[]];
-
-  /** Helper; makes array from `callback(batchIndex)` for each 0 <= batchIndex < count */
+  count: number; // Size of the batch being processed
+  values: [...ExecutionValue[]]; // Represents your dependencies
+  stream: ExecutionDetailsStream | null; // Relates to `@stream`/`subscription`
+  // ...
   indexMap<T>(callback: (batchIndex: number) => T): ReadonlyArray<T>;
-  /** Helper; calls `callback` for each batchIndex in the batch; no return value */
   indexForEach(callback: (batchIndex: number) => any): void;
-
-  /** Currently experimental, use it at your own risk (and see the source for docs) */
-  extra: ExecutionExtra;
 }
-
-type ExecutionValue<TData> = { at(batchIndex: number): TData };
-type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+type ExecutionValue<TData = any> = {
+  isBatch: boolean;
+  unaryValue(): TData; // Throws if `isBatch` is true.
+  at(batchIndex: number): TData; // Get data entry (`0 <= batchIndex < count`)
+};
+interface ExecutionDetailsStream {
+  initialCount: number;
+}
+type GrafastResultsList<T = any> = ReadonlyArray<PromiseOrDirect<T>>;
 ```
 
 The one method that your step class must define is `execute`. It uses a similar
@@ -123,15 +130,104 @@ approach to
 but Gra*fast* steps are much more powerful thanks to the additional dependencies
 and lifecycle methods.
 
-A single argument is passed to `execute`, the "execution details", which is an
-object describing the size (`count`) of the batch, along with the execution
-value for each dependency (`values`).
+When the step class adds a dependency (with `this.addDependency($step)` or
+similar) a dependency index, `depIndex`, is returned. Dependency indexes start
+at 0 and increase monotonically (a dependency can never be removed[^1]).
 
-`execute` **must** return a list of length `count`, such that each entry in
-this list corresponds with the values in the batch at the same batch index.
+[^1]:
+    To remove a dependency, you must instead replace the step with a copy that
+    does not depend on that step, for example via the `optimize` lifecycle
+    method.
 
-For each dependency index, `depIndex`, the value for the batch index,
-`batchIndex`, can be retrieved via `values[depIndex].at(batchIndex)`.
+At execution time the step is passed `ExecutionDetails` which contains
+details and helpers for execution.
+
+#### details.count
+
+One key property is the size (`details.count`) of the batch; `execute` **must**
+return a list of length `count`, such that each entry in this list corresponds
+with the values in the batch at the same batch index. To save you from having to
+loop yourself, the `details.indexMap` helper will call the given callback with
+each index in the batch in turn; this is commonly used when returning the result
+of the execute method.
+
+#### details.values
+
+`details.values` is also critical: an ordered array of execution values, one for
+each dependency. You can retrieve the execution value for a given dependency via
+its `depIndex` as `const depEv = details.values[depIndex]`. Once you have an
+execution value, you can retrieve the value for a given index in the batch via
+`const value = depEv.at(batchIndex)`.
+
+Gra*fast* tracks which steps will always represent exactly one value (e.g. the
+GraphQL context, input values passed as field arguments, constants, etc), and
+which will represent a batch (e.g. values inside of a list). The former are
+stored in "unary execution values", and the latter in "batch execution values".
+For convenience, these both expose the `.at(batchIndex)` method so most of the
+time you do not need to know the difference and can just think of them all as
+simply "execution values".
+
+Unary dependencies are useful for request-global concerns such as pagination
+arguments, authentication credentials, database clients and the like. Should you
+know that your dependency is a unary step (e.g. because you added it via
+`this.addUnaryDependency($step)`), you may get its singular value via `const
+value = depEv.unaryValue()` (but if it wasn't unary then this will throw!).
+
+If you have a fixed number of dependencies it common to destructure them at the
+top of the execute method:
+
+```ts
+class MyStep extends Step {
+  constructor($a, $b, $c) {
+    this.aDepIndex = this.addUnaryDependency($a);
+    this.bDepIndex = this.addDependency($b);
+    this.cDepIndex = this.addDependency($c);
+  }
+  execute(details) {
+    const { values } = details;
+    // Retrieve the execution values in the same order we added dependencies
+    const [aEv, bEv, cEv] = values;
+    // The unary dependency value can be shared throughout execute
+    const a = aEv.unaryValue();
+
+    // We must return a list of the correct length in the correct order.
+    return details.indexMap((batchIndex) => {
+      // Batch depenencies may have a different value at each index.
+      const b = bEv.at(batchIndex);
+      const c = cEv.at(batchIndex);
+
+      return a + b + c;
+    });
+  }
+}
+```
+
+:::danger[Step with no dependencies]
+
+If the step has no dependencies then `values` will be a 0-tuple (an empty
+tuple), but that doesn't mean the batch is empty or has size one, `count` may
+be any positive integer. It's therefore recommended that you use `indexMap` to
+generate your results in the vast majority of cases:
+
+```ts
+return indexMap((i) => 42);
+```
+
+:::
+
+:::info[Tuple of values, rather than list of tuples?]
+
+You might wonder why the `values` input is a tuple of execution values, rather
+than a list of tuples. The reason comes down to efficiency, by using a tuple of
+execution values, <Grafast /> only needs to build one new array (the tuple),
+and into that array it can insert the results from previously executed steps
+unmodified. Were it to provide a list of tuples instead then it would need to
+build N+1 new arrays, where N was the number of values being processed, which
+can easily be in the thousands.
+
+:::
+
+#### Avoid N+1!
 
 **Critically**, the execute method should never do async actions whilst looping
 over the values, otherwise you introduce the N+1 problem. Most `execute` methods
@@ -193,77 +289,28 @@ class TranslationStep extends Step {
 }
 ```
 
-#### Caveats
+#### Errors
 
-:::tip[Unary dependencies]
-
-For dependencies added via `const depIndex = this.addUnaryDependency($step)`,
-the single (unary) value can be retrieved via `values[depIndex].unaryValue()`.
-This is roughly equivalent to `values[depIndex].at(0)` except it additionally
-asserts that the value _is_ a unary value, helping to catch bugs early.
-
-Unary dependencies are useful for request-global concerns such as pagination
-arguments, authentication credentials, database clients and the like.
-
-:::
-
-:::note[Batch vs unary execution values]
-
-Gra*fast* tracks which steps will always represent exactly one value (e.g. the
-GraphQL context, and input values passed as field arguments), and which will
-represent a batch (e.g. values inside of a list). The former are stored in
-"unary execution values", and the latter in "batch execution values". For
-convenience, these both expose the `.at(batchIndex)` method so most of the time
-you do not need to know the difference and can just think of them all as simply
-"execution values". `ev.at(batchIndex)` is roughly equivalent to `ev.isBatch ?
-ev.entries[i] : ev.value` since a batch execution value stores many entries,
-whereas a unary execution value always stores exactly one value.
-
-:::
-
-:::danger[Step with no dependencies]
-
-If the step has no dependencies then `values` will be a 0-tuple (an empty
-tuple), but that doesn't mean the batch is empty or has size one, `count` may
-be any positive integer. It's therefore recommended that you use `indexMap` to
-generate your results in the vast majority of cases:
-
-```ts
-return indexMap((i) => 42);
-```
-
-:::
-
-:::info[Tuple of values, rather than list of tuples?]
-
-You might wonder why the `values` input is a tuple of execution values, rather
-than a list of tuples. The reason comes down to efficiency, by using a tuple of
-execution values, <Grafast /> only needs to build one new array (the tuple),
-and into that array it can insert the results from previously executed steps
-unmodified. Were it to provide a list of tuples instead then it would need to
-build N+1 new arrays, where N was the number of values being processed, which
-can easily be in the thousands.
-
-:::
-
-:::tip[Raising errors for a subset of values]
+If the `execute` method throws (or rejects), then _all_ entries in the batch for
+this step will fail with the same error.
 
 If you want one of your entries to throw an error, but the others shouldn't,
-then an easy way to achieve this is to set the corresponding entry in the
-results list to `Promise.reject(new Error(...))`. You can do this even if you
-don't use promises for any of the other values, and even if your `execute`
-method is not marked as `async`. You **must not** do this if you have marked
-your step class with `isSyncAndSafe = true`.
+then set the corresponding entry in the results list to `flagError(error)`
+(where `error` is the error you want to use).
+
+:::tip[Alternatively reject the promise for that specific item]
+
+If it's more convenient and performance isn't a huge concern, you may return a
+list of values and promises, and reject specifically the promise in that list
+relating to that item. You can do this even if you don't use promises for any of
+the other values, and even if your `execute` method is not marked as `async`.
 
 :::
 
-### stream
+:::danger[No per-value errors if `isSyncAndSafe`]
 
-:::info REMOVED!
-
-`stream` is no longer its own method; it has been merged with `execute`.
-
-Use `executionDetails.stream` to determine whether you should stream or not.
+You **must not** add per-value errors if you have marked your step class with
+`isSyncAndSafe = true`; the results of doing so are undefined.
 
 :::
 
@@ -272,9 +319,8 @@ Use `executionDetails.stream` to determine whether you should stream or not.
 _This method is optional._
 
 ```ts
-deduplicate(
-  peers: readonly Step[]
-): readonly Step[]
+// Where `MyStep` is the current step class
+deduplicate(peers: readonly MyStep[]): readonly MyStep[]
 ```
 
 After a field has been fully planned, <Grafast /> will call this method on each
@@ -287,17 +333,15 @@ equivalent) to the current step.
 To cause your step class to never be deduplicated, either don't implement this
 method or simply `return [];`.
 
-You should not mutate your peers or yourself during this method, instead use
-the `deduplicatedWith` method to apply side-effects.
+You should not mutate your peers or yourself during this method, instead use the
+`deduplicatedWith` method to pass any necessary information to your replacement.
 
 ### deduplicatedWith
 
 _This method is optional._
 
 ```ts
-deduplicatedWith(
-  replacement: Step
-): void
+deduplicatedWith(replacement: Step): void
 ```
 
 If <Grafast /> determines that this specific step instance should be replaced
@@ -305,9 +349,9 @@ by one of its peers (thanks to the results from `deduplicate` above), <Grafast
 /> will call `deduplicatedWith` on the step that is being replaced, passing the
 step that it is being replaced with as the first argument. This gives your step
 a chance to pass any information to the peer that may be necessary to make the
-peers equivalent.
+peers truly equivalent.
 
-:::info
+:::info[When would I need this?]
 
 It's rare to need this functionality, so let's work through a hypothetical.
 
@@ -315,7 +359,7 @@ Imagine step `$select1` represents the SQL query `SELECT id, name FROM users`
 and step `$select2` represents `SELECT id, avatar_url FROM users`.
 
 Lets further imagine that we've optimised our SQL handling step classes such
-that both `$select1` and `$select2` return `[$select1, $select2]` from their
+that both `$select1` and `$select2` return each other from their
 `deduplicate` method (because they can "cheaply" be made equivalent).
 
 Assuming <Grafast /> chooses to keep `$select1` and
@@ -334,9 +378,7 @@ it would represent the SQL query `SELECT id, name, avatar_url FROM users`.
 _This method is optional._
 
 ```ts
-optimize(
-  options: { stream: StepStreamOptions | null }
-): Step
+optimize(options: { stream: {} | null, meta?: Record<string, unknown> }): Step
 ```
 
 This method is called on each step during the optimize lifecycle event. It
@@ -347,14 +389,14 @@ to be replaced, it can simply return itself: `return this;`.
 This one method unlocks a significant proportion of <Grafast />'s efficiency
 improvements. Here are some common use cases that it can be used for:
 
-#### Optimize: inlining
+#### Use case: inlining
 
 `optimize` is often useful for "inlining" the requirements of this step into an
 ancestor and then (optionally) replacing itself with a simple `access` or
 `remapKeys` step. This reduces the number of asynchronous tasks the request
 needs to execute and can enable significantly more efficient data fetching.
 
-#### Optimize: planning-time only steps
+#### Use case: plan-time only steps
 
 Another use case for `optimize` is to make planning-time only steps "evaporate"
 by replacing them with their parent or a different step.
@@ -371,7 +413,7 @@ can simply replace itself during `optimize` with its parent step (typically an
 The built-in `each` step uses `optimize` to replace itself with the underlying
 list where possible.
 
-#### Optimize: simplification
+#### Use case: simplification
 
 Another use case is simplification.
 
@@ -380,6 +422,14 @@ could be simplified down to just `access($a, ['b', 'c', 'd'])`, reducing the
 number of steps in the operation plan.
 
 Similarly `first(list([$a, $b]))` can be simplified to just `$a`.
+
+#### `options.meta`
+
+If the step sets a `this.optimizeMetaKey`, then `options.meta` will be a Record
+that can be mutated during optimize. This is useful for steps of the same class
+to communicate with each other out of band, for example `list()` and `object()`
+use it to ensure that if they replace themselves with constants, they do so with
+the same constant when representing the same values.
 
 ### finalize
 
@@ -395,7 +445,7 @@ done just once. A step that deals with a database might precompile its SQL, a
 step that transforms an object might build an optimized function to do so, there
 are so many other actions that this step can be used for.
 
-:::danger
+:::danger[Must call `super.finalize()` last!]
 
 It is critical that the step calls `super.finalize()` at the end of the
 `finalize()` step:
@@ -410,13 +460,13 @@ finalize() {
 
 :::
 
-:::info
+:::warning[Do not communicate with other steps!]
 
-Importantly during this step the step should only worry about its own concerns
-and should not attempt to communicate with its ancestors or descendents - they
-may not be the steps that it remembers as they may have been switched out
-during `optimize`! If the step needs to communicate with its ancestors it
-should use the `optimize` method to do so.
+Importantly during this lifecycle event the step should only worry about its own
+concerns and should not attempt to communicate with its ancestors or descendents
+&mdash; they may not be the steps that it remembers as they may have been
+switched out during `optimize`! If the step needs to communicate with its
+ancestors it should use the `optimize` method to do so.
 
 :::
 
@@ -458,12 +508,12 @@ class MyListStep extends Step {
 }
 ```
 
-:::warning
+:::warning[Must follow convention!]
 
-If your step implements `.at()`, make sure it meets the expectations:
-ie it correctly accepts a single argument an integer.
-&ZeroWidthSpace;<Grafast /> relies on this assumption; unanticipated behaviours may result
-from steps which don't adhere to these expectations.
+If your step implements `.at()`, make sure it meets the expectations: i.e. it
+correctly accepts a single argument: an integer. <Grafast /> relies on this
+assumption; unanticipated behaviours may result from steps which don't adhere to
+these expectations.
 
 :::
 
@@ -489,7 +539,7 @@ class MyObjectStep extends Step {
 }
 ```
 
-:::warning
+:::warning[Must follow convention!]
 
 If your step implements `.get()`, make sure it meets the expectations:
 i.e. it correctly accepts a single argument of a string.
@@ -502,7 +552,8 @@ from steps which don't adhere to these expectations.
 
 If you have put effort into making your `get` function type safe (such that
 accessing different keys returns different values), this will _not_ work with
-`get($step, key)` out of the box due to limitations of TypeScript.
+[`get($step, key)`](./standard-steps/get.md) out of the box due to limitations
+of TypeScript.
 
 To work around this, you can add the `__inferGet` fake property to your class
 which should be an object with the same keys as your `get` function accepts, and
@@ -551,7 +602,7 @@ class MyCollectionStep extends Step {
 }
 ```
 
-:::warning
+:::warning[Must follow convention!]
 
 If your step implements `.items()`, make sure it meets the expectations:
 i.e. it does not require any arguments.
@@ -706,18 +757,20 @@ class AddStep extends Step {
 
 :::danger Steps are ephemeral, never store a reference to a step.
 
-You must never store a reference to another step directly (or indirectly) in
+You must never store an instance of another step directly (or indirectly) in
 your step class. Steps come and go at quite a rate during planning - being
 removed due to deduplicate, optimize, or tree shaking lifecycle events.
-Referring to a step that no longer exists is likely to make your program have
-very unexpected behaviors and/or crash.
+Referring to a step that no longer exists in the execution plan is likely to
+make your program have very unexpected behaviors and/or crash.
 
 In the exceedingly unlikely event that you need to reference another step but it
-is not a dependency, use its `id` ─ you can then look up the step associated
-with that `id` at a later time; if it exists it may be different to the step you
-remember, but it should serve the same purpose. However, it may have been
-deleted due to tree shaking - if this causes a problem, then maybe that step
-should have been a dependency after all?
+is not a dependency, use:
+`this.refIdx = this.addRef($step, "[ENTER REASON WHY I'M NOT USING addDependency HERE]")`.
+You can then use `const $ref = this.getRef(this.refIdx)` to retrieve the step at
+a later time; if it exists it may be different to the step you remember, but it
+should serve the same purpose. However, it may have been deleted due to tree
+shaking - if this causes a problem, then maybe that step should have been a
+dependency after all?
 
 :::
 
@@ -905,10 +958,23 @@ of the class. You can even set it to a shared value between multiple step
 classes (a "family" of step classes) should that make sense. By default no
 `metaKey` is set, and your class will therefore have no `meta` object.
 
-:::tip Inspiration
+:::tip[Inspiration]
 
 The `loadMany` and `loadOne` standard steps make use of this key to optimize
 value caching, you may want to look at them for more inspiration.
+
+:::
+
+### optimizeMetaKey
+
+_EXPERIMENTAL_
+
+Makes the `meta` property available on `optimize` options.
+
+:::tip[Inspiration]
+
+The `list` and `object` standard steps make use of this key for caching
+constants consistently, you may want to look at them for more inspiration.
 
 :::
 
