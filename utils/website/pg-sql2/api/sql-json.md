@@ -26,13 +26,14 @@ Returns a `SQL` fragment representing the given JSON value.
 ```js
 import { sql } from "pg-sql2";
 
-const lookups = [{ orgId: 42, num: 67 }];
+const lookups = [{ org: 42, num: 67 }];
 const query = sql`
-  SELECT *
+  SELECT people.*
   FROM people
-  WHERE (organization_id, membership_number) IN (
-    SELECT el->>'orgId', el->>'num'
-    FROM json_array_elements(${sql.json(lookups)}) el
+  INNER JOIN json_to_recordset(${sql.json(lookups)}) AS lookups(org int, num int)
+  ON (
+    people.organization_id = lookups.org
+    AND people.membership_number = lookups.num
   )
 `;
 
@@ -42,12 +43,13 @@ console.log(text);
 /*
 SELECT *
 FROM people
-WHERE (organization_id, membership_number) IN (
-  SELECT el->>'orgId', el->>'num'
-  FROM json_array_elements($1::json) el
+INNER JOIN json_to_recordset($1::json) AS lookups(org int, num int)
+ON (
+  people.organization_id = lookups.org
+  AND people.membership_number = lookups.num
 )
 */
 
 console.log(values);
-// ['[{"orgId":42,"num":67}]']
+// ['[{"org":42,"num":67}]']
 ```

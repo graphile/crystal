@@ -3,13 +3,15 @@
 Takes a list of plans and turns it into a single plan that represents the list
 of their values.
 
-Usage:
+## Example
 
 ```ts
 const $abcTuple = list([$a, $b, $c]);
 ```
 
-A ListStep has the following methods:
+## Methods
+
+A `ListStep` has the following methods:
 
 - `.at(index)` - gets the value at `index` (`$abcTuple.at(1)` returns `$b`).
 - `.first()` - returns the first value in the list (`$abcTuple.first()` returns `$a`).

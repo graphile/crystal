@@ -175,7 +175,7 @@ const schema = makeGrafastSchema({ typeDefs, objects });
 :::note
 
 Although this simple ORM-like appearance looks like it would trigger multiple
-SQL statements, in most cases Grafast and `@dataplan/pg` working in concert
+SQL statements, in most cases Gra*fast* and `@dataplan/pg` working in concert
 will result in the plan being analyzed and the requests being automatically
 combined via joins and/or subqueries to produce a highly efficient SQL query
 

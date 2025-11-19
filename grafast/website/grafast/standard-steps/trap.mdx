@@ -1,10 +1,10 @@
 # trap
 
-Convert flagged values (values that errored, or were inhibited via
-[`inhibitOnNull`](./inhibitOnNull)) into ordinary (unflagged) data. `trap` wraps
-a step and accepts an `acceptFlags` argument describing which flags should be
-recovered. Use the exported helpers `TRAP_ERROR`, `TRAP_INHIBITED`, or
-`TRAP_ERROR_OR_INHIBITED` for common cases.
+Convert [flagged values](../flow.mdx#flagged-values) (e.g. values that
+errored or were inhibited via [`inhibitOnNull`](./inhibitOnNull)) into ordinary
+(unflagged) data. `trap` wraps a step and accepts an `acceptFlags` argument
+describing which flags should be recovered. Use the exported helpers
+`TRAP_ERROR`, `TRAP_INHIBITED`, or `TRAP_ERROR_OR_INHIBITED` for common cases.
 
 You can choose the replacement for inhibited or errored values via
 `valueForInhibited` and `valueForError`. Accepted values are:

@@ -16,7 +16,7 @@ performance even when dealing with complex setups.
 ## Types of polymorphism supported
 
 Gra*fast* leaves the planning of abstract types to the user (via the `planType`
-method - see [Grafast polymorphism](/grafast/polymorphism)), so `@dataplan/pg`
+method - see [Gra*fast* polymorphism](/grafast/polymorphism)), so `@dataplan/pg`
 does not specifically need polymorphism support. That said; we want to make
 your life easier when dealing with polymorphism, so here's how to handle some
 common forms of polymorphism in PostgreSQL:

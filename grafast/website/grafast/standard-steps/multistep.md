@@ -21,11 +21,15 @@ parameter that can take one of many forms:
 You can see this in Gra*fast*'s native APIs that accept "step or multistep"
 arguments, such as `loadOne`, `loadMany`, `lambda`, and `sideEffect`.
 
-Under the hood, these step functions will use the
-`multistep(specOrThunk)` function to convert this loose collection of steps into
-a single step with the expected shape. Tuples become a [`list`](./list.md),
-objects become an [`object`](./object.md), isolated steps are returned
-untouched, and `null`/`undefined` become a [`constant`](./constant.md) step.
+Under the hood, these step functions will use the `multistep(specOrThunk)`
+function to convert this loose collection of steps into a single step with the
+expected shape. Tuples become a [`list`](./list.md), objects become an
+[`object`](./object.md), isolated steps are returned untouched, and
+`null`/`undefined` become a [`constant`](./constant.md) step. Methods calling
+multistep may choose to pass either `true` or a string identifier as the second
+argument, doing so (as is done by `loadOne` and `loadMany` automatically)
+enables the same output tuple/object to be reused when the same input values are
+seen again, helping with logic that makes use of strict equality checks.
 
 ## Usage
 

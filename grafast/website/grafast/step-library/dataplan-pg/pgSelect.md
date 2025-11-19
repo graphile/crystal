@@ -458,18 +458,18 @@ A PgSelect step represents a collection of opaque tuples; sometimes you may
 want to transform these in some way, which you can do with list manipulation
 steps such as:
 
-- [`each`](../standard-steps/each.md) - maps over the list and builds a new
+- [`each`](../../standard-steps/each.md) - maps over the list and builds a new
   representation of each item (e.g. turning a list of users into a list of
   usernames: `const $usernames = each($users, $user => $user.get('username'))`)
-- [`filter`](../standard-steps/filter.md) - reduces the number of items in the
+- [`filter`](../../standard-steps/filter.md) - reduces the number of items in the
   list by performing filtering in your JavaScript runtime; typically you'd want
   to use `$pgSelect.where(...)` instead in order to filter on the database side
   for efficiency, but `filter()` can be useful:
   `const $admins = filter($users, $user => $user.get('is_admin'))`
-- [`first`](../standard-steps/first.md) / [`last`](../standard-steps/last.md) -
+- [`first`](../../standard-steps/first.md) / [`last`](../../standard-steps/last.md) -
   get the first/last entry from the list:
   `const $firstUser = $users.row(first($users));`
-- [`groupBy`](../standard-steps/groupBy.md) - group the records into a map
+- [`groupBy`](../../standard-steps/groupBy.md) - group the records into a map
   containing sub-lists keyed by a shared value, for example "posts by author":
   `const $postsByUser = groupBy($posts, $post => $post.get('author_id'))`
 
@@ -478,6 +478,6 @@ place immediately - sometimes the transforms are only applied when the step is
 paginated over. If you then use this step as a dependency of another step, you
 may get the raw (untransformed) values, causing confusion and bugs. To solve
 this, for now, you should use
-[`applyTransforms`](../standard-steps/applyTransforms.md) to force the
+[`applyTransforms`](../../standard-steps/applyTransforms.md) to force the
 transform to take place at the current level, such that depending on the
 transformed values is safe.

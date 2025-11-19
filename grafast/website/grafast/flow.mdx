@@ -117,12 +117,33 @@ a nullable position? Or encounters polymorphism?
 Any time the size of a batch might change, Gra*fast* creates a new "layer
 plan" and the following field plans have their steps planned there instead.
 
+### Execution value
+
 Gra*fast* executes each step in a plan diagram just once for every request[^1],
 even if that step is handling thousands of list values. For every dependency a
 step has, Gra*fast* takes the "execution value" that represents the list of
 values for that step, automatically filters out the entries that should not be
 executed (e.g. due to error or inhibition, see [flow control](#flow-control)),
 then passes the remaining values on to the step for processing.
+
+#### Flagged values
+
+Each value in an execution value has an associated bitmap of flags to indicate
+special properties of the value:
+
+- is it an error?
+- is it nullish?
+- is it inhibited? (see [inhibitOnNull](./standard-steps/inhibitOnNull.mdx))
+- is it skipped due to polymorphism? (i.e. the type doesn't match)
+- is it unrecoverably stopped?
+
+Gra*fast* assigns these flags automatically whilst processing the results from a
+step's execution. Any value flagged with skipped due to polymorphism or
+unrecoverably stopped will be filtered out from the execution values passed to
+future step execution. By default, any values flagged as error or inhibited will
+also be filtered out, but this can be overridden; e.g. the
+[`trap()`](./standard-steps/trap.mdx) step allows trapping errors or
+inhibits.
 
 [^1]:
     except for in incremental delivery with `@stream` and `@defer`; but you
@@ -208,7 +229,7 @@ flowchart TD
 Most readers can safely skim this section; only dive in when you encounter an
 advanced requirement. When you do, the helper docs provide the details:
 
-- [Flow control steps](./step-library/standard-steps/index.mdx#flow-control)
+- [Flow control steps](./standard-steps/index.mdx#flow-control)
   documents the APIs (`inhibitOnNull`, `assertNotNull`, `trap`).
 - [Plan diagrams](./plan-diagrams.mdx) gives an overview of the way different
   types of steps — and the relationships between them — appear.
@@ -242,11 +263,11 @@ Here `inhibitOnNull` marks only the `null` entries as inhibited, so `loadOne`
 never attempts to fetch those users while the rest of the batch proceeds as
 normal. Other helpers build on the same idea:
 
-- [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) skips
+- [`inhibitOnNull`](./standard-steps/inhibitOnNull.mdx) skips
   dependent work for `null` inputs while still returning `null` to the caller.
-- [`assertNotNull`](./step-library/standard-steps/assertNotNull.mdx) upgrades a
+- [`assertNotNull`](./standard-steps/assertNotNull.mdx) upgrades a
   `null` into a `SafeError`, making the failure visible to clients.
-- [`trap`](./step-library/standard-steps/trap.mdx) recovers an inhibited or
+- [`trap`](./standard-steps/trap.mdx) recovers an inhibited or
   errored value and turns it back into ordinary data (for example a plain
   `null` or an empty list).
 

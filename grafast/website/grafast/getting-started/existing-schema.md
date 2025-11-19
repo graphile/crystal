@@ -43,7 +43,7 @@ npm install --save grafast graphql
 
 ## Running
 
-Replace any calls to graphql.js' `graphql` or `execute` functions with Grafast's
+Replace any calls to graphql.js' `graphql` or `execute` functions with Gra*fast*'s
 `grafast` and `execute` respectively.
 
 ```diff

@@ -1,10 +1,11 @@
 # node
 
-We don't current have a `node()` step... it's not needed since you can typically
+There is no `node()` step currently; it's not needed since you can typically
 just return the ID verbatim and rely on the `Node` interface's `planType()`
 method to resolve the type.
 
-But what we do have is:
+However, we do have other functions for helping work with GraphQL Global Object
+Identification (Node) identifiers:
 
 ## specFromNodeId
 
@@ -136,7 +137,7 @@ const id = userHandler.codec.encode(planResult); // "WyJVc2VyIiwxMjNd"
 `NodeIdCodec` objects are responsible for converting a specifier to a string and
 back again. Implement `{ name, encode, decode }` and set
 `encode.isSyncAndSafe = true` / `decode.isSyncAndSafe = true` when the
-operations are synchronous and side-effect free so Grafast can inline them.
+operations are synchronous and side-effect free so Gra*fast* can inline them.
 
 Typically the same codec will be used for all IDs across your schema, but that
 is not a requirement. If in doubt, `base64JSONCodec` is a good default.

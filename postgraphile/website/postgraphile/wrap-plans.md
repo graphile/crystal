@@ -68,7 +68,7 @@ interface PlanWrapperRule {
 
 type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
-  $source: ExecutableStep,
+  $source: Step,
   fieldArgs: FieldArgs,
   info: FieldInfo,
 ) => any;
@@ -303,7 +303,7 @@ unmodified.
 ```ts
 type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
-  $source: ExecutableStep,
+  $source: Step,
   fieldArgs: FieldArgs,
   info: FieldInfo,
 ) => any;

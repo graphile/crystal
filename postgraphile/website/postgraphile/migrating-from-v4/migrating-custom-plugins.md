@@ -406,7 +406,7 @@ const MyPlugin: GraphileConfig.Plugin = {
             // Or if you prefer, you can make `assertStep` a callback that
             // throws an error if the step passed is incompatible:
             //
-            //     assertStep($step: ExecutableStep): asserts $step is ObjectStep {
+            //     assertStep($step: Step): asserts $step is ObjectStep {
             //       if (!($step instanceof ObjectStep)) {
             //         throw new Error(`Expected ObjectStep, instead received '${$step}'`);
             //       }

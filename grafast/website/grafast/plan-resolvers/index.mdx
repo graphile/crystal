@@ -8,7 +8,7 @@ import init from "../mermaid-init.mermaid?raw";
 
 # Plan resolvers
 
-:::info[Grafast operation plan recap]
+:::info[Gra*fast* operation plan recap]
 
 Before executing a GraphQL request, <Grafast /> must have an "_operation plan_"
 that details the actions ("_steps_") that are needed to satisfy the included
@@ -74,7 +74,7 @@ const defaultPlanResolver: FieldPlanResolver = ($source, fieldArgs, info) =>
   get($source, info.fieldName);
 ```
 
-The default plan resolver uses [`get()`](../step-library/standard-steps/get.md)
+The default plan resolver uses [`get()`](../standard-steps/get.md)
 to access the property of the `$source` object with the same name as the field.
 
 ### FieldArgs
@@ -573,7 +573,7 @@ const Post = new GraphQLObjectType({
 
 ## Execution order &amp; side effects
 
-Grafast is **declarative**: steps form a directed acyclic graph (DAG) and only
+Gra*fast* is **declarative**: steps form a directed acyclic graph (DAG) and only
 dependencies determine order &mdash; there is no implicit procedural sequencing. Two
 key rules:
 

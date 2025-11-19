@@ -59,7 +59,7 @@ An `AccessStep` has the following methods:
 
 ```ts
 function access<TData>(
-  $source: ExecutableStep<unknown>,
+  $source: Step<unknown>,
   path: (string | number)[] | string | number,
   fallback?: any,
 ): AccessStep<TData>;

@@ -11,7 +11,7 @@ import mermaidPlan from "../examples/users-and-friends/plan-simplified.mermaid?r
 
 :::info
 
-This introduction to Grafast assumes that you have a basic understanding of
+This introduction to Gra*fast* assumes that you have a basic understanding of
 GraphQL, including the concept of resolvers. We highly recommend that you read
 [Introduction to GraphQL](https://graphql.org/learn/), and in particular
 [GraphQL Execution](https://graphql.org/learn/execution/), before reading this
@@ -110,8 +110,8 @@ valid GraphQL schema could be implemented with <Grafast />, and a <Grafast />
 schema can query any data source, service, or business logic that Node.js can
 query. We do have highly optimized steps available for particular data stores,
 but you can reap huge benefits from just switching from using DataLoader in
-resolvers to using [`loadOne()`](./step-library/standard-steps/loadOne.md) and
-[`loadMany()`](./step-library/standard-steps/loadMany.md) in plan resolvers
+resolvers to using [`loadOne()`](./standard-steps/loadOne.md) and
+[`loadMany()`](./standard-steps/loadMany.md) in plan resolvers
 &mdash; and they can even use the same callback!
 
 ## Request lifecycle
@@ -265,7 +265,7 @@ they must describe what to do for arbitrary future data. For example, the
 `User.friends` Gra*fast* plan resolver cannot loop through the data with a `map`
 function as in the resolver example (since there is not yet any data to loop
 over), instead it describes the plan to do so using an [`each`
-step](/grafast/step-library/standard-steps/each), detailing what to do with each
+step](/grafast/standard-steps/each), detailing what to do with each
 item that will be seen at execution-time.
 
 :::tip The dollar convention

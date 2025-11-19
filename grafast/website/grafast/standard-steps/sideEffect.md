@@ -1,34 +1,37 @@
 # sideEffect
 
-Takes the input step (or array of steps, or nothing) as the first argument, a
-callback as the second argument, and returns a step that represents the result
-of feeding each value (or array of values, or nothing) through the given
-callback.
+Accepts a step/[multistep](./multistep.md) and a callback; returns a step
+representing calling the callback for each runtime value of the step.
 
 The callback is expected to have a side effect (change data or state on the
 backend), if your callback doesn't have any side effects then consider using
-[`lambda`](/grafast/step-library/standard-steps/lambda) instead, it has a very
+[`lambda`](/grafast/standard-steps/lambda) instead, it has a very
 similar API.
 
-:::info
+:::danger[Side effects should be constrained to root mutation fields]
 
-Side effects, according to the GraphQL spec, are only expected to occur in the
+Side effects, according to the GraphQL spec, are only allowed to occur in the
 root selection set of a GraphQL mutation operation (i.e. on the fields of the
-mutation operation root type), similarly Gra*fast* only expects side effects
-here and side effects in other locations in the plan may have unexpected
+mutation operation root type). Similarly, Gra*fast* only expects side effects
+here; side effects in other locations in the plan may have unexpected
 repercussions.
+
+That said, we aim for them to work elsewhere (they can be useful for debugging
+or certain other non-user-observable actions), so should you have issues with
+side effects in other places, please create a minimal reproduction and file an
+issue.
 
 :::
 
 `sideEffect` does not perform batching; it is only intended for performing
 mutations, and mutations rarely batch.
 
-:::tip
+:::tip[Mark any step as having side effects]
 
 Almost any step can be made to be treated as having side effects by setting
 `$step.hasSideEffects = true`, so if you require batching in your mutations
 consider using an alternative step, such as
-[`loadOne()`](/grafast/step-library/standard-steps/loadOne) and explicitly
+[`loadOne()`](/grafast/standard-steps/loadOne) and explicitly
 marking it as having side effects:
 
 ```ts
@@ -42,41 +45,34 @@ return $random;
 
 :::
 
-## Single dependency version
+## Usage
 
 ```ts
-function sideEffect<T, R>(
-  $input: ExecutableStep<T>,
-  callback: (input: T) => R | Promise<R>,
-): ExecutableStep<R>;
+function sideEffect<TIn extends Multistep, TOut>(
+  $input: TIn,
+  callback: (input: UnwrapMultistep<TIn>) => TOut | Promise<TOut>,
+): Step<TOut>;
 ```
 
-### Example
+## Examples
+
+### Single step
 
 ```ts
 const $logout = context().get("logout");
 sideEffect($logout, (logout) => logout());
 ```
 
-## Dependency-free version
+### No input
 
 If your callback doesn't need any input then you can pass `null` or `undefined`
 instead of a step.
 
 ```ts
-function sideEffect<R>(
-  $input: null | undefined,
-  callback: () => R | Promise<R>,
-): ExecutableStep<R>;
-```
-
-### Example
-
-```ts
 sideEffect(null, () => console.log(new Date().toISOString()));
 ```
 
-## Multiple dependencies version
+### Multistep - tuple
 
 If you need to pass multiple steps, you can pass a list:
 
@@ -89,7 +85,9 @@ sideEffect(
 );
 ```
 
-or an object:
+### Multistep - object
+
+If you need to pass multiple steps, you can pass an object:
 
 ```ts
 sideEffect(
