@@ -319,9 +319,8 @@ You **must not** add per-value errors if you have marked your step class with
 _This method is optional._
 
 ```ts
-deduplicate(
-  peers: readonly Step[]
-): readonly Step[]
+// Where `MyStep` is the current step class
+deduplicate(peers: readonly MyStep[]): readonly MyStep[]
 ```
 
 After a field has been fully planned, <Grafast /> will call this method on each
@@ -334,17 +333,15 @@ equivalent) to the current step.
 To cause your step class to never be deduplicated, either don't implement this
 method or simply `return [];`.
 
-You should not mutate your peers or yourself during this method, instead use
-the `deduplicatedWith` method to apply side-effects.
+You should not mutate your peers or yourself during this method, instead use the
+`deduplicatedWith` method to pass any necessary information to your replacement.
 
 ### deduplicatedWith
 
 _This method is optional._
 
 ```ts
-deduplicatedWith(
-  replacement: Step
-): void
+deduplicatedWith(replacement: Step): void
 ```
 
 If <Grafast /> determines that this specific step instance should be replaced
@@ -352,9 +349,9 @@ by one of its peers (thanks to the results from `deduplicate` above), <Grafast
 /> will call `deduplicatedWith` on the step that is being replaced, passing the
 step that it is being replaced with as the first argument. This gives your step
 a chance to pass any information to the peer that may be necessary to make the
-peers equivalent.
+peers truly equivalent.
 
-:::info
+:::info[When would I need this?]
 
 It's rare to need this functionality, so let's work through a hypothetical.
 
@@ -362,7 +359,7 @@ Imagine step `$select1` represents the SQL query `SELECT id, name FROM users`
 and step `$select2` represents `SELECT id, avatar_url FROM users`.
 
 Lets further imagine that we've optimised our SQL handling step classes such
-that both `$select1` and `$select2` return `[$select1, $select2]` from their
+that both `$select1` and `$select2` return each other from their
 `deduplicate` method (because they can "cheaply" be made equivalent).
 
 Assuming <Grafast /> chooses to keep `$select1` and
@@ -381,9 +378,7 @@ it would represent the SQL query `SELECT id, name, avatar_url FROM users`.
 _This method is optional._
 
 ```ts
-optimize(
-  options: { stream: StepStreamOptions | null }
-): Step
+optimize(options: { stream: {} | null, meta?: Record<string, unknown> }): Step
 ```
 
 This method is called on each step during the optimize lifecycle event. It
@@ -394,14 +389,14 @@ to be replaced, it can simply return itself: `return this;`.
 This one method unlocks a significant proportion of <Grafast />'s efficiency
 improvements. Here are some common use cases that it can be used for:
 
-#### Optimize: inlining
+#### Inlining
 
 `optimize` is often useful for "inlining" the requirements of this step into an
 ancestor and then (optionally) replacing itself with a simple `access` or
 `remapKeys` step. This reduces the number of asynchronous tasks the request
 needs to execute and can enable significantly more efficient data fetching.
 
-#### Optimize: planning-time only steps
+#### Plan-time only steps
 
 Another use case for `optimize` is to make planning-time only steps "evaporate"
 by replacing them with their parent or a different step.
@@ -418,7 +413,7 @@ can simply replace itself during `optimize` with its parent step (typically an
 The built-in `each` step uses `optimize` to replace itself with the underlying
 list where possible.
 
-#### Optimize: simplification
+#### Simplification
 
 Another use case is simplification.
 
@@ -427,6 +422,14 @@ could be simplified down to just `access($a, ['b', 'c', 'd'])`, reducing the
 number of steps in the operation plan.
 
 Similarly `first(list([$a, $b]))` can be simplified to just `$a`.
+
+#### `options.meta`
+
+If the step sets a `this.optimizeMetaKey`, then `options.meta` will be a Record
+that can be mutated during optimize. This is useful for steps of the same class
+to communicate with each other out of band, for example `list()` and `object()`
+use it to ensure that if they replace themselves with constants, they do so with
+the same constant when representing the same values.
 
 ### finalize
 
