@@ -667,13 +667,18 @@ export type ExecutionValue<TData = any> =
   | UnaryExecutionValue<TData>;
 
 interface ExecutionValueBase<TData = any> {
+  /** Data at index in the batch (`0 <= batchIndex < count`) */
   at(i: number): TData;
+  /** `false` for unary execution values, `true` otherwise */
   isBatch: boolean;
-  /** Returns this.value for a unary execution value; throws if non-unary */
+  /** Returns the value for a unary execution value; throws if non-unary */
   unaryValue(): TData;
   /** @internal */
   _flagsAt(i: number): ExecutionEntryFlags;
-  /** bitwise OR of all the entry states @internal */
+  /**
+   * bitwise OR of all the entry states
+   * @internal
+   */
   _getStateUnion(): ExecutionEntryFlags;
   /** @internal */
   _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;

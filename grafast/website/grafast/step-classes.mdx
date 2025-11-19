@@ -129,9 +129,16 @@ interface ExecutionDetails {
   extra: ExecutionExtra;
 }
 
-type ExecutionValue<TData> = { at(batchIndex: number): TData };
-type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+type ExecutionValue<TData = any> = {
+  /** Is this EV batched or not? */
+  isBatch: boolean;
+  /** If unbatched, return the value; otherwise throw */
+  unaryValue(): TData;
+  /** Data at index in the batch (`0 <= batchIndex < count`) */
+  at(batchIndex: number): TData;
+}
 interface ExecutionDetailsStream { initialCount: number; }
+type GrafastResultsList<T = any> = ReadonlyArray<PromiseOrDirect<T>>;
 ```
 
 The one method that your step class must define is `execute`. It uses a similar
