@@ -764,11 +764,13 @@ Referring to a step that no longer exists is likely to make your program have
 very unexpected behaviors and/or crash.
 
 In the exceedingly unlikely event that you need to reference another step but it
-is not a dependency, use its `id` ─ you can then look up the step associated
-with that `id` at a later time; if it exists it may be different to the step you
-remember, but it should serve the same purpose. However, it may have been
-deleted due to tree shaking - if this causes a problem, then maybe that step
-should have been a dependency after all?
+is not a dependency, use:
+`this.refIdx = this.addRef($step, "[ENTER REASON WHY I'M NOT USING addDependency HERE]")`.
+You can then use `const $ref = this.getRef(this.refIdx)` to retrieve the step at
+a later time; if it exists it may be different to the step you remember, but it
+should serve the same purpose. However, it may have been deleted due to tree
+shaking - if this causes a problem, then maybe that step should have been a
+dependency after all?
 
 :::
 
