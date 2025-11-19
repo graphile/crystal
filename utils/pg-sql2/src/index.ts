@@ -813,7 +813,12 @@ export function value(val: SQLRawValue): SQL {
   return makeValueNode(val);
 }
 
-/** Equivalent to ``sql`${JSON.stringify(val)}::json` `` */
+/** Equivalent to
+ *
+ * ```
+ * sql`${JSON.stringify(val)}::json`
+ * ```
+ */
 export function json(val: any): SQL {
   return sql`${value(JSON.stringify(val))}::json`;
 }
