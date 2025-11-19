@@ -142,7 +142,7 @@ at 0 and increase monotonically (a dependency can never be removed[^1]).
 At execution time the step is passed `ExecutionDetails` which contains
 details and helpers for execution.
 
-#### details.count 
+#### details.count
 
 One key property is the size (`details.count`) of the batch; `execute` **must**
 return a list of length `count`, such that each entry in this list corresponds
@@ -151,7 +151,7 @@ loop yourself, the `details.indexMap` helper will call the given callback with
 each index in the batch in turn; this is commonly used when returning the result
 of the execute method.
 
-#### details.values 
+#### details.values
 
 `details.values` is also critical: an ordered array of execution values, one for
 each dependency. You can retrieve the execution value for a given dependency via
@@ -165,7 +165,7 @@ which will represent a batch (e.g. values inside of a list). The former are
 stored in "unary execution values", and the latter in "batch execution values".
 For convenience, these both expose the `.at(batchIndex)` method so most of the
 time you do not need to know the difference and can just think of them all as
-simply "execution values". 
+simply "execution values".
 
 Unary dependencies are useful for request-global concerns such as pagination
 arguments, authentication credentials, database clients and the like. Should you
@@ -389,14 +389,14 @@ to be replaced, it can simply return itself: `return this;`.
 This one method unlocks a significant proportion of <Grafast />'s efficiency
 improvements. Here are some common use cases that it can be used for:
 
-#### Inlining
+#### Use case: inlining
 
 `optimize` is often useful for "inlining" the requirements of this step into an
 ancestor and then (optionally) replacing itself with a simple `access` or
 `remapKeys` step. This reduces the number of asynchronous tasks the request
 needs to execute and can enable significantly more efficient data fetching.
 
-#### Plan-time only steps
+#### Use case: plan-time only steps
 
 Another use case for `optimize` is to make planning-time only steps "evaporate"
 by replacing them with their parent or a different step.
@@ -413,7 +413,7 @@ can simply replace itself during `optimize` with its parent step (typically an
 The built-in `each` step uses `optimize` to replace itself with the underlying
 list where possible.
 
-#### Simplification
+#### Use case: simplification
 
 Another use case is simplification.
 
@@ -445,7 +445,7 @@ done just once. A step that deals with a database might precompile its SQL, a
 step that transforms an object might build an optimized function to do so, there
 are so many other actions that this step can be used for.
 
-:::danger
+:::danger[Must call `super.finalize()` last!]
 
 It is critical that the step calls `super.finalize()` at the end of the
 `finalize()` step:
@@ -460,13 +460,13 @@ finalize() {
 
 :::
 
-:::info
+:::warning[Do not communicate with other steps!]
 
-Importantly during this step the step should only worry about its own concerns
-and should not attempt to communicate with its ancestors or descendents - they
-may not be the steps that it remembers as they may have been switched out
-during `optimize`! If the step needs to communicate with its ancestors it
-should use the `optimize` method to do so.
+Importantly during this lifecycle event the step should only worry about its own
+concerns and should not attempt to communicate with its ancestors or descendents
+&mdash; they may not be the steps that it remembers as they may have been
+switched out during `optimize`! If the step needs to communicate with its
+ancestors it should use the `optimize` method to do so.
 
 :::
 
@@ -508,12 +508,12 @@ class MyListStep extends Step {
 }
 ```
 
-:::warning
+:::warning[Must follow convention!]
 
-If your step implements `.at()`, make sure it meets the expectations:
-ie it correctly accepts a single argument an integer.
-&ZeroWidthSpace;<Grafast /> relies on this assumption; unanticipated behaviours may result
-from steps which don't adhere to these expectations.
+If your step implements `.at()`, make sure it meets the expectations: i.e. it
+correctly accepts a single argument: an integer. <Grafast /> relies on this
+assumption; unanticipated behaviours may result from steps which don't adhere to
+these expectations.
 
 :::
 
@@ -539,7 +539,7 @@ class MyObjectStep extends Step {
 }
 ```
 
-:::warning
+:::warning[Must follow convention!]
 
 If your step implements `.get()`, make sure it meets the expectations:
 i.e. it correctly accepts a single argument of a string.
@@ -552,7 +552,8 @@ from steps which don't adhere to these expectations.
 
 If you have put effort into making your `get` function type safe (such that
 accessing different keys returns different values), this will _not_ work with
-`get($step, key)` out of the box due to limitations of TypeScript.
+[`get($step, key)`](./standard-steps/get.md) out of the box due to limitations
+of TypeScript.
 
 To work around this, you can add the `__inferGet` fake property to your class
 which should be an object with the same keys as your `get` function accepts, and
@@ -601,7 +602,7 @@ class MyCollectionStep extends Step {
 }
 ```
 
-:::warning
+:::warning[Must follow convention!]
 
 If your step implements `.items()`, make sure it meets the expectations:
 i.e. it does not require any arguments.
