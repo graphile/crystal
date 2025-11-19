@@ -732,7 +732,7 @@ export interface ExecutionDetails<
     map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
   };
 
-  /** Helper; makes array from `callback(batchIndex)` for each 0 <= batchIndex < count */
+  /** Helper; makes array from `callback(batchIndex)` for each `0 <= batchIndex < count` */
   indexMap: IndexMap;
   /** Helper; calls `callback` for each batchIndex in the batch; no return value */
   indexForEach: IndexForEach;
