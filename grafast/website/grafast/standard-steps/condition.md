@@ -7,40 +7,20 @@ Usage:
 
 ```ts
 // value === null?
-function condition(
-  operation: "null",
-  $value: Step,
-): Step<boolean>;
+function condition(operation: "null", $value: Step): Step<boolean>;
 
 // value !== null?
-function condition(
-  operation: "not null",
-  $value: Step,
-): Step<boolean>;
+function condition(operation: "not null", $value: Step): Step<boolean>;
 
 // value != null
-function condition(
-  operation: "exists",
-  $value: Step,
-): Step<boolean>;
+function condition(operation: "exists", $value: Step): Step<boolean>;
 
 // value == null
-function condition(
-  operation: "not exists",
-  $value: Step,
-): Step<boolean>;
+function condition(operation: "not exists", $value: Step): Step<boolean>;
 
 // a === b
-function condition(
-  operation: "===",
-  $a: Step,
-  $b: Step,
-): Step<boolean>;
+function condition(operation: "===", $a: Step, $b: Step): Step<boolean>;
 
 // a !== b
-function condition(
-  operation: "!==",
-  $a: Step,
-  $b: Step,
-): Step<boolean>;
+function condition(operation: "!==", $a: Step, $b: Step): Step<boolean>;
 ```
