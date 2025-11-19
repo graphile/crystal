@@ -106,36 +106,17 @@ execute(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
 ```ts
 // These are simplified types
 interface ExecutionDetails {
-  /** The size of the batch being processed */
-  count: number;
-  /** An "execution value" for each dependency of the step */
-  values: [...ExecutionValue[]];
-
-  /** Helper; makes array from `callback(batchIndex)` for each 0 <= batchIndex < count */
+  count: number; // Size of the batch being processed
+  values: [...ExecutionValue[]]; // Represents your dependencies
+  stream: ExecutionDetailsStream | null; // Relates to `@stream`/`subscription`
+  // Helpers:
   indexMap<T>(callback: (batchIndex: number) => T): ReadonlyArray<T>;
-  /** Helper; calls `callback` for each batchIndex in the batch; no return value */
   indexForEach(callback: (batchIndex: number) => any): void;
-
-  /**
-   * If this step is expected to return a stream (e.g. because it's a
-   * `subscription`, or because of the `@stream` incremental delivery
-   * directive) then an object with details of the stream, such as how many
-   * records were requested up front (`initialCount`). For subscriptions,
-   * `initialCount` will always be `0`.
-   */
-  stream: ExecutionDetailsStream | null;
-
-  /** Currently experimental, use it at your own risk (and see the source for docs) */
-  extra: ExecutionExtra;
 }
-
 type ExecutionValue<TData = any> = {
-  /** Is this EV batched or not? */
   isBatch: boolean;
-  /** If unbatched, return the value; otherwise throw */
-  unaryValue(): TData;
-  /** Data at index in the batch (`0 <= batchIndex < count`) */
-  at(batchIndex: number): TData;
+  unaryValue(): TData; // Throws if `isBatch` is true.
+  at(batchIndex: number): TData; // Get data entry (`0 <= batchIndex < count`)
 }
 interface ExecutionDetailsStream { initialCount: number; }
 type GrafastResultsList<T = any> = ReadonlyArray<PromiseOrDirect<T>>;
