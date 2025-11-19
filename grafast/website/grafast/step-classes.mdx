@@ -116,12 +116,22 @@ interface ExecutionDetails {
   /** Helper; calls `callback` for each batchIndex in the batch; no return value */
   indexForEach(callback: (batchIndex: number) => any): void;
 
+  /**
+   * If this step is expected to return a stream (e.g. because it's a
+   * `subscription`, or because of the `@stream` incremental delivery
+   * directive) then an object with details of the stream, such as how many
+   * records were requested up front (`initialCount`). For subscriptions,
+   * `initialCount` will always be `0`.
+   */
+  stream: ExecutionDetailsStream | null;
+
   /** Currently experimental, use it at your own risk (and see the source for docs) */
   extra: ExecutionExtra;
 }
 
 type ExecutionValue<TData> = { at(batchIndex: number): TData };
 type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+interface ExecutionDetailsStream { initialCount: number; }
 ```
 
 The one method that your step class must define is `execute`. It uses a similar
@@ -261,16 +271,6 @@ results list to `Promise.reject(new Error(...))`. You can do this even if you
 don't use promises for any of the other values, and even if your `execute`
 method is not marked as `async`. You **must not** do this if you have marked
 your step class with `isSyncAndSafe = true`.
-
-:::
-
-### stream
-
-:::info REMOVED!
-
-`stream` is no longer its own method; it has been merged with `execute`.
-
-Use `executionDetails.stream` to determine whether you should stream or not.
 
 :::
 

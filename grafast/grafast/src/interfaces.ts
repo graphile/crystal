@@ -716,17 +716,33 @@ export interface ExecutionDetailsStream {
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
+  /** The size of the batch being processed */
   count: number;
-  indexMap: IndexMap;
-  indexForEach: IndexForEach;
+
+  /** An "execution value" for each dependency of the step */
   values: {
     [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
   } & {
     length: TDeps["length"];
     map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
   };
-  extra: ExecutionExtra;
+
+  /** Helper; makes array from `callback(batchIndex)` for each 0 <= batchIndex < count */
+  indexMap: IndexMap;
+  /** Helper; calls `callback` for each batchIndex in the batch; no return value */
+  indexForEach: IndexForEach;
+
+  /**
+   * If this step is expected to return a stream (e.g. because it's a
+   * `subscription`, or because of the `@stream` incremental delivery
+   * directive) then an object with details of the stream, such as how many
+   * records were requested up front (`initialCount`). For subscriptions,
+   * `initialCount` will always be `0`.
+   */
   stream: ExecutionDetailsStream | null;
+
+  /** Currently experimental, use it at your own risk (and see the source for docs) */
+  extra: ExecutionExtra;
 }
 
 export interface LocationDetails {
