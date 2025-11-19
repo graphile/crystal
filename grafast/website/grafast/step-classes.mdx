@@ -109,7 +109,7 @@ interface ExecutionDetails {
   count: number; // Size of the batch being processed
   values: [...ExecutionValue[]]; // Represents your dependencies
   stream: ExecutionDetailsStream | null; // Relates to `@stream`/`subscription`
-  // Helpers:
+  // ...
   indexMap<T>(callback: (batchIndex: number) => T): ReadonlyArray<T>;
   indexForEach(callback: (batchIndex: number) => any): void;
 }
@@ -117,8 +117,10 @@ type ExecutionValue<TData = any> = {
   isBatch: boolean;
   unaryValue(): TData; // Throws if `isBatch` is true.
   at(batchIndex: number): TData; // Get data entry (`0 <= batchIndex < count`)
+};
+interface ExecutionDetailsStream {
+  initialCount: number;
 }
-interface ExecutionDetailsStream { initialCount: number; }
 type GrafastResultsList<T = any> = ReadonlyArray<PromiseOrDirect<T>>;
 ```
 
@@ -128,15 +130,104 @@ approach to
 but Gra*fast* steps are much more powerful thanks to the additional dependencies
 and lifecycle methods.
 
-A single argument is passed to `execute`, the "execution details", which is an
-object describing the size (`count`) of the batch, along with the execution
-value for each dependency (`values`).
+When the step class adds a dependency (with `this.addDependency($step)` or
+similar) a dependency index, `depIndex`, is returned. Dependency indexes start
+at 0 and increase monotonically (a dependency can never be removed[^1]).
 
-`execute` **must** return a list of length `count`, such that each entry in
-this list corresponds with the values in the batch at the same batch index.
+[^1]:
+    To remove a dependency, you must instead replace the step with a copy that
+    does not depend on that step, for example via the `optimize` lifecycle
+    method.
 
-For each dependency index, `depIndex`, the value for the batch index,
-`batchIndex`, can be retrieved via `values[depIndex].at(batchIndex)`.
+At execution time the step is passed `ExecutionDetails` which contains
+details and helpers for execution.
+
+#### details.count 
+
+One key property is the size (`details.count`) of the batch; `execute` **must**
+return a list of length `count`, such that each entry in this list corresponds
+with the values in the batch at the same batch index. To save you from having to
+loop yourself, the `details.indexMap` helper will call the given callback with
+each index in the batch in turn; this is commonly used when returning the result
+of the execute method.
+
+#### details.values 
+
+`details.values` is also critical: an ordered array of execution values, one for
+each dependency. You can retrieve the execution value for a given dependency via
+its `depIndex` as `const depEv = details.values[depIndex]`. Once you have an
+execution value, you can retrieve the value for a given index in the batch via
+`const value = depEv.at(batchIndex)`.
+
+Gra*fast* tracks which steps will always represent exactly one value (e.g. the
+GraphQL context, input values passed as field arguments, constants, etc), and
+which will represent a batch (e.g. values inside of a list). The former are
+stored in "unary execution values", and the latter in "batch execution values".
+For convenience, these both expose the `.at(batchIndex)` method so most of the
+time you do not need to know the difference and can just think of them all as
+simply "execution values". 
+
+Unary dependencies are useful for request-global concerns such as pagination
+arguments, authentication credentials, database clients and the like. Should you
+know that your dependency is a unary step (e.g. because you added it via
+`this.addUnaryDependency($step)`), you may get its singular value via `const
+value = depEv.unaryValue()` (but if it wasn't unary then this will throw!).
+
+If you have a fixed number of dependencies it common to destructure them at the
+top of the execute method:
+
+```ts
+class MyStep extends Step {
+  constructor($a, $b, $c) {
+    this.aDepIndex = this.addUnaryDependency($a);
+    this.bDepIndex = this.addDependency($b);
+    this.cDepIndex = this.addDependency($c);
+  }
+  execute(details) {
+    const { values } = details;
+    // Retrieve the execution values in the same order we added dependencies
+    const [aEv, bEv, cEv] = values;
+    // The unary dependency value can be shared throughout execute
+    const a = aEv.unaryValue();
+
+    // We must return a list of the correct length in the correct order.
+    return details.indexMap((batchIndex) => {
+      // Batch depenencies may have a different value at each index.
+      const b = bEv.at(batchIndex);
+      const c = cEv.at(batchIndex);
+
+      return a + b + c;
+    });
+  }
+}
+```
+
+:::danger[Step with no dependencies]
+
+If the step has no dependencies then `values` will be a 0-tuple (an empty
+tuple), but that doesn't mean the batch is empty or has size one, `count` may
+be any positive integer. It's therefore recommended that you use `indexMap` to
+generate your results in the vast majority of cases:
+
+```ts
+return indexMap((i) => 42);
+```
+
+:::
+
+:::info[Tuple of values, rather than list of tuples?]
+
+You might wonder why the `values` input is a tuple of execution values, rather
+than a list of tuples. The reason comes down to efficiency, by using a tuple of
+execution values, <Grafast /> only needs to build one new array (the tuple),
+and into that array it can insert the results from previously executed steps
+unmodified. Were it to provide a list of tuples instead then it would need to
+build N+1 new arrays, where N was the number of values being processed, which
+can easily be in the thousands.
+
+:::
+
+#### Avoid N+1!
 
 **Critically**, the execute method should never do async actions whilst looping
 over the values, otherwise you introduce the N+1 problem. Most `execute` methods
@@ -198,67 +289,28 @@ class TranslationStep extends Step {
 }
 ```
 
-#### Caveats
+#### Errors
 
-:::tip[Unary dependencies]
-
-For dependencies added via `const depIndex = this.addUnaryDependency($step)`,
-the single (unary) value can be retrieved via `values[depIndex].unaryValue()`.
-This is roughly equivalent to `values[depIndex].at(0)` except it additionally
-asserts that the value _is_ a unary value, helping to catch bugs early.
-
-Unary dependencies are useful for request-global concerns such as pagination
-arguments, authentication credentials, database clients and the like.
-
-:::
-
-:::note[Batch vs unary execution values]
-
-Gra*fast* tracks which steps will always represent exactly one value (e.g. the
-GraphQL context, and input values passed as field arguments), and which will
-represent a batch (e.g. values inside of a list). The former are stored in
-"unary execution values", and the latter in "batch execution values". For
-convenience, these both expose the `.at(batchIndex)` method so most of the time
-you do not need to know the difference and can just think of them all as simply
-"execution values". `ev.at(batchIndex)` is roughly equivalent to `ev.isBatch ?
-ev.entries[i] : ev.value` since a batch execution value stores many entries,
-whereas a unary execution value always stores exactly one value.
-
-:::
-
-:::danger[Step with no dependencies]
-
-If the step has no dependencies then `values` will be a 0-tuple (an empty
-tuple), but that doesn't mean the batch is empty or has size one, `count` may
-be any positive integer. It's therefore recommended that you use `indexMap` to
-generate your results in the vast majority of cases:
-
-```ts
-return indexMap((i) => 42);
-```
-
-:::
-
-:::info[Tuple of values, rather than list of tuples?]
-
-You might wonder why the `values` input is a tuple of execution values, rather
-than a list of tuples. The reason comes down to efficiency, by using a tuple of
-execution values, <Grafast /> only needs to build one new array (the tuple),
-and into that array it can insert the results from previously executed steps
-unmodified. Were it to provide a list of tuples instead then it would need to
-build N+1 new arrays, where N was the number of values being processed, which
-can easily be in the thousands.
-
-:::
-
-:::tip[Raising errors for a subset of values]
+If the `execute` method throws (or rejects), then _all_ entries in the batch for
+this step will fail with the same error.
 
 If you want one of your entries to throw an error, but the others shouldn't,
-then an easy way to achieve this is to set the corresponding entry in the
-results list to `Promise.reject(new Error(...))`. You can do this even if you
-don't use promises for any of the other values, and even if your `execute`
-method is not marked as `async`. You **must not** do this if you have marked
-your step class with `isSyncAndSafe = true`.
+then set the corresponding entry in the results list to `flagError(error)`
+(where `error` is the error you want to use).
+
+:::tip[Alternatively reject the promise for that specific item]
+
+If it's more convenient and performance isn't a huge concern, you may return a
+list of values and promises, and reject specifically the promise in that list
+relating to that item. You can do this even if you don't use promises for any of
+the other values, and even if your `execute` method is not marked as `async`.
+
+:::
+
+:::danger[No per-value errors if `isSyncAndSafe`]
+
+You **must not** add per-value errors if you have marked your step class with
+`isSyncAndSafe = true`; the results of doing so are undefined.
 
 :::
 
