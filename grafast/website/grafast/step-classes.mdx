@@ -53,22 +53,20 @@ inherit directly from `Step`.
 
 :::
 
-:::warn[`__` prefix is reserved for internal usage]
+:::warning[Double underscore (`__`) prefix is reserved for internal usage]
 
 Step classes whose names start with two underscores (`__`) are internals and
-must not be used.
+must never be directly created by the user. Further, you must never name your
+own step classes such that they begin with two underscores.
 
 :::
 
 ## Step function
 
 By convention, we always define a function that constructs an instance of our
-class so we don't see the `new` calls or redundant `Step` text in our plan
-resolver functions.
-
-This function is typically named after the corresponding
-step class, but with the first letter in lower case and the `Step` suffix
-omitted, for example `AddStep` would become `add`:
+class. A step function is typically named after the corresponding step class,
+but with the first letter lowercased and the `Step` suffix omitted; for example
+the `AddStep` step class would have a step function named `add`:
 
 ```ts
 function add($a, $b) {
@@ -76,17 +74,26 @@ function add($a, $b) {
 }
 ```
 
-There's multiple reasons for this, a simple one is to make the plan code
-easier to read: we won't see the `new` calls in our plan resolver functions,
-nor the redundant `Step` wording, resulting in a higher signal-to-noise ratio.
-More importantly, though, is that the small layer of indirection allows us to
-do some minor manipulations before handing off to the class constructor, and
-makes the APIs more future-proof since we can have the function return
-something different in future without having to refactor our plans in the
-schema. And remember that this cost is only incurred at planning time (which is
-generally cached and can be re-used for similar future requests), and each
-field is only planned once, so the overhead of an additional function call is
-negligible.
+There are many reasons for this indirection:
+
+- simplicity, conciseness and readability of plan resolvers: no `new` keyword,
+  no redundant `Step` text, no harsh PascalCase identifiers; feels lighter
+- flexible API: the function can manipulate arguments before sending them on to
+  a class constructor, allowing for overloads, complex generics, or tagged
+  template literals
+- caching: it's simple to add a cache at the step function level, much harder to
+  handle that in the constructor of a step class
+- branching: a function may choose to return a different step under certain
+  circumstances, for example if it determines that the input is a constant
+- evolution: a step function should express the developer's intent; how that
+  maps to steps under the hood is less important - e.g. a `sideEffect()` step
+  might start out by building a `LambdaStep` and marking it as having side
+  effects, but later evolve to using its own `SideEffectStep` class, without
+  consuming code needing to change
+
+The tiny additional cost of these step functions is only incurred at plan-time,
+and plans are re-used for similar future requests; the cost of an additional
+function call during planning is negligible.
 
 ## Lifecycle methods
 
