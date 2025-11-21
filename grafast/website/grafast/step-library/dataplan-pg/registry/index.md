@@ -14,13 +14,41 @@ a fully type safe registry in moments. Of course, you can auto-generate your
 first version of it, and then take over maintenance from that point on should
 you wish.
 
-(TODO: detail autogeneration.)
+## Autogeneration
+
+We can use the `postgraphile` library to autogenerate our registry for us, and
+export it as executable code using the `graphile-export` library:
+
+```ts
+import { writeFile } from "node:fs/promises";
+
+import { exportValueAsString } from "graphile-export";
+import { makePgService } from "postgraphile/adaptors/pg";
+import { gather } from "postgraphile/graphile-build";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+// Create a service representing our database
+const pgService = makePgService({ connectionString: process.env.DATABASE_URL });
+const config: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+  pgServices: [pgService],
+};
+
+// The registry is part of the result of the "gather" phase of graphile-build:
+const { pgRegistry } = await gather(config);
+// Release our connection to postgres
+await pgService.release?.();
+
+// Convert the registry to code and write it to registryExport.mts
+const { code } = await exportValueAsString("registry", pgRegistry, {});
+await writeFile("./registryExport.mts", code);
+```
 
 ## makeRegistryBuilder()
 
-We recommend that you use the registry builder to build the registry, this
-enables you to use a comfortable "builder" syntax and maintain types
-throughout.
+When building by hand, we recommend that you use the registry builder to build
+the registry, this enables you to use a comfortable "builder" syntax and
+maintain types throughout.
 
 ```ts
 import { makeRegistryBuilder } from "@dataplan/pg";
