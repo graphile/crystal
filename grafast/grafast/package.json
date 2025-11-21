@@ -110,7 +110,7 @@
     "ts-node": "^10.9.2",
     "tsafe": "^1.8.5",
     "typescript": "^5.8.3",
-    "zx": "^8.6.2"
+    "zx": "^8.8.5"
   },
   "publishConfig": {
     "access": "public",

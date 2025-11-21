@@ -2762,7 +2762,7 @@ __metadata:
     webpack: "npm:^5.100.1"
     webpack-cli: "npm:^6.0.1"
     webpack-node-externals: "npm:^3.0.0"
-    zx: "npm:^8.6.2"
+    zx: "npm:^8.8.5"
   peerDependencies:
     "@dataplan/json": "workspace:^"
     grafast: "workspace:^"
@@ -13831,7 +13831,7 @@ __metadata:
     tsafe: "npm:^1.8.5"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.8.3"
-    zx: "npm:^8.6.2"
+    zx: "npm:^8.8.5"
   peerDependencies:
     "@envelop/core": ^5.0.0
     graphql: ^16.9.0
@@ -22268,7 +22268,7 @@ __metadata:
     typescript-eslint: "npm:^8.36.0"
     webpack: "npm:^5.100.1"
     ws: "npm:^8.18.3"
-    zx: "npm:^8.6.2"
+    zx: "npm:^8.8.5"
   languageName: unknown
   linkType: soft
 
@@ -25735,11 +25735,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zx@npm:^8.6.2":
-  version: 8.6.2
-  resolution: "zx@npm:8.6.2"
+"zx@npm:^8.8.5":
+  version: 8.8.5
+  resolution: "zx@npm:8.8.5"
   bin:
     zx: build/cli.js
-  checksum: 10/5bcebe1f0e99a44b66ccbdc7edd76d02de08756f1df9c9928018c481009837d6da91127511a09b3322797031388e56ae59986d29338153bdf2a09927ff1dc5f0
+  checksum: 10/29e68a7a2f37b58e1140404655ec5d2f1ab1ab93f385d97192b37929972de61826a106bbc12bbf1fbd29bc649e119cad897c0c1b1751d4e9e01bc7d7629dc86e
   languageName: node
   linkType: hard
