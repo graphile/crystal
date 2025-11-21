@@ -42,14 +42,19 @@ same diagram in a more independent manner, please get in touch!
 
 :::
 
-## Buckets (aka layer plans)
+## Buckets
 
-A bucket, or layer plan, is where data for steps at a similar "layer" in the
-operation go. For each layer, the cardinality is the same for every step -
-every step deals with the same number of results. Generally buckets are
-introduced where this may no longer be the case - for example when we start
-handling more results due to processing the items in a list, or fewer results
-due to polymorphic filtering or excluding null results from further processing.
+A bucket is where data for steps at the same "layer" in the operation execution
+are stored. For each layer, the cardinality is the same for every step - every
+step deals with the same number of results. These "layers" are reflected at plan
+time via [layer plans](./operation-plan.mdx#layer-plans). Generally a new layer
+plan (and thus a new bucket) are introduced where this may no longer be the case
+&mdash; for example when we start handling more results due to processing the items in
+a list, or fewer results due to polymorphic filtering or excluding null results
+from further processing.
+
+The "buckets" you see in a plan diagram are technically "layer plans" since they
+are the plan-time representation of buckets that will exist at execution-time.
 
 Here's an example of a bucket node:
 
@@ -71,7 +76,8 @@ Buckets are numbered from `0`, but during the optimization of the operation
 plan the need for certain buckets may be eradicated, resulting in "gaps" in the
 numbering. Afterwards comes the reason for the bucket, in parenthesis: `root`,
 `nullableBoundary`, `listItem`, `subscription`, `mutationField`, `defer`,
-`polymorphic`, `subroutine` or other.
+`polymorphic`, `subroutine` or other - see [layer
+plans](./operation-plan.mdx#layer-plans) for details.
 
 ### `Deps:`
 
@@ -96,16 +102,17 @@ those steps in parallel since they are independent of each other.
 
 Immediately following a numbered line, there may be a line that begins with
 `ᐳ:`. This indicates the "synchronous and safe" unbatched steps that will be
-executed immediately after the numbered line - this is an optimization that
-means the system doesn't need to loop multiple times to satisfy these needs.
+executed immediately whilst processing the results from the numbered line - this
+is an optimization that means the system doesn't need to loop multiple times to
+satisfy these needs.
 
 ## Steps
 
 Generally when looking at a plan diagram, you care more about the steps than
 the buckets. Each step contains a first line that consists of the step class
 name with `Step` removed (for brevity), followed by `[X∈Y]` where X is the id
-of the step, and Y is the number of the bucket to which it belongs - the latter
-of which is also indicated by the border colour of the step.
+of the step, and Y is the number of the layer plan (bucket) to which it belongs
+- the latter of which is also indicated by the border colour of the step.
 
 Often steps will have a second line of text such as `ᐸ3.currentUserIdᐳ` - this
 is metadata specific to that particular step class that gives more detail on
@@ -130,6 +137,7 @@ In this example:
 - `__Value` is the name of the Step (but with the redundant 'Step' removed - truly it's called `__ValueStep`).
 - `5` is the step ID - every step has a unique identifier.
 - `∈0` means that the step "belongs" to LayerPlan (aka "bucket") number `0`.
+  This is also reflected in the border colour of the step.
 - The next line contains additional step-specific metadata; in this case it's telling us that the step represents the GraphQL `rootValue`
 
 ### Asynchronous steps
@@ -161,11 +169,11 @@ ${init}
 `}
 />
 
-`__ItemStep` steps never execute, they're managed by <Grafast /> manually to
-represent individual entries in a list or stream (including subscription event
-streams). They look like a trapezoid (US) / trapezium (UK) to imply that they
-are going from a smaller set to a larger set, though this isn't always the
-case.
+`__ItemStep` steps never execute, they're automatically pre-populated by
+<Grafast /> to represent individual entries in a list or stream (including
+subscription event streams). They look like a trapezoid (US) / trapezium (UK) to
+imply that they are going from a smaller set to a larger set, though this isn't
+always the case.
 
 ### Unbatched synchronous steps
 
