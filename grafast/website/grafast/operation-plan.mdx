@@ -18,34 +18,41 @@ cheatsheets.
 When <Grafast /> sees an operation for the first time, it builds an _operation
 plan_, which is the combination of an [**execution plan**](#execution-plan) and
 an [**output plan**](#output-plan). To do so, it walks the selection sets
-calling the user-provided `plan` method for each field to determine the _steps_
-that need to be executed for that field. That series of steps, which we'll call
-the _field plan_, is then woven with all the other field plans in the
-operation, to form a directed acyclic graph we call the _execution plan_.
-Whilst doing this, <Grafast /> keeps track of which fields returned which
-steps, and uses this information to form the _output plan_. Finally the
-_execution plan_ is optimized and finalized and the _output plan_ is finalized,
-then they are ready for execution.
+calling the developer-provided field plan resolver (`plan` method) for each
+field to determine the _steps_ that need to be executed for that field. That
+series of steps, which we'll call the _field plan_, is then woven with all the
+other field plans in the operation, to form a directed acyclic graph we call the
+_execution plan_. Whilst doing this, <Grafast /> keeps track of which fields
+returned which steps, and uses this information to form the _output plan_.
+Finally the _execution plan_ is optimized and finalized and the _output plan_ is
+finalized, then they are ready for execution.
 
 A simplified version of the process is this:
 
-1. Start at the root selection set.
-1. For each field in the current selection set:
-   1. Call field [plan resolver][plan resolvers]
-   1. Call any uncalled [argument applyPlan resolvers][]
-   1. **Deduplicate** new steps
-   1. Repeat step 2 using the field's selection set (if any)
-1. **Tree shake**
-1. **Optimise**
-1. **Tree shake**
-1. **Finalise**
+1. Create the root layer plan.
+1. Let `nextSelections` be the selections in the root selection set, each linked
+to the root layer plan.
+1. While `nextSelections` is not empty:
+   1. Let `currentSelections` be `nextSelections`.
+   1. Let `nextSelections` be an empty list.
+   1. For each field and associated layer plan in `currentSelections`:
+      1. Call the field's [plan resolver][plan resolvers].
+      1. Call any uncalled [argument applyPlan resolvers][].
+      1. **Deduplicate** new steps.
+      1. If the field has a selection set:
+         1. Add all selections from the field's selection set along with their
+         associated [layer plans](#layer-plans) to `nextSelections`.
+1. **Tree shake**.
+1. **Optimize**.
+1. **Tree shake**.
+1. **Finalize**.
 
 ## Execution plan
 
-The _execution plan_ is (generally[^1]) asynchronous. It is responsible for
+The _execution plan_ is (typically[^1]) asynchronous. It is responsible for
 fetching all the data required by the operation in as efficient a manner as
 possible, and can evolve quite significantly as a result of deduplication, tree
-shaking and optimization.
+shaking, and optimization.
 
 [^1]:
     If the execution plan contains no asynchronous steps, then it can be
@@ -53,29 +60,64 @@ shaking and optimization.
     steps that fetch data from remote data sources such as databases or web
     services.
 
+## Layer plans
+
+Every execution plan starts by populating steps into the "root" layer plan
+representing request data such as argument input values, variable values,
+GraphQL context, root value, constants, and so on. The "root" layer plan always
+has a batch size of 1. Any time the batch size might change (up or down), a new
+layer plan is introduced; reasons include:
+
+- root - the root of an operation plan
+- nullable field - any null (or errors) can be pruned from the batch before being processed
+  by the next layer
+- list item - when traversing lists, Gra*fast* multiplies up the batch size,
+  effectively flattening all the lists therein so we can handle each item in the
+  list as an individual entry in the batch
+- subscription - represents an individual subscription event
+- mutation field - each mutation gets its own layer plan which must complete
+  before the next sibling mutation field may execute. Batch size is always 1,
+  this is more related to flow control.
+- defer - part of incremental delivery
+- polymorphic - when abstract types are represented in the schema, the
+  polymorphic layer plan is used to resolve them
+- polymorphic partition - once abstract types are resolved, if the actions taken
+  are sufficiently different, the plan will "branch" such that each batch only
+  needs to contain actions relevant to that type
+- combined - when resolving an abstract type _within_ an abstract type, we first
+  recombine all the previous batches back together before branching out again;
+  this avoids exponential branching
+- subroutine - used as temporary storage during execution of a subroutine
+
+### Buckets
+
+Layer plans are a plan-time concern; when executing an individual request a
+"bucket" stores the data for a layer plan. When the context is clearly
+plan-time, it's common to refer to "layer plans" as "buckets" (we even do this
+in [plan diagrams](./plan-diagrams.mdx)), but if you are being crisp then the
+LayerPlan is the plan-time entity, and the Bucket is the execution-time
+representation which stores data for that LayerPlan within that request.
+
 ## Output plan
 
-The data fetched by the execution plan will not be in any particular format,
-and may have been significantly deduplicated and simplified as part of the
-operations. The _output plan_ is responsible for taking this bundle of data and
-formatting it back out as a valid GraphQL response, including serializing all
-the leaves correctly and handling nulls and errors following the GraphQL
-specification. The output plan always runs synchronously, though in streaming
-situations such as GraphQL subscriptions or incremental delivery
-(`@stream`/`@defer`) part of the output plan may be executed for each payload
-in the underlying stream.
+The data fetched by the execution plan will not be in any particular format, and
+may have been significantly deduplicated and simplified as part of the
+operations. The _output plan_ is responsible for taking the tree of data starting
+at the root bucket and formatting it back out as a valid GraphQL response,
+including serializing all the leaves correctly and handling nulls and errors
+following the GraphQL specification. The output plan always runs synchronously,
+though in streaming situations such as GraphQL subscriptions or incremental
+delivery (`@stream`/`@defer`) part of the output plan may be executed for each
+payload in the underlying stream.
 
 ## Constraints
 
 Whilst <Grafast /> is building the operation plan, it may also determined
 particular constraints that govern whether the operation plan may be used for a
 future request or not. For example, if the request contains
-`@skip(if: $variable)` then a different operation plan would be needed depending
+`@skip(if: $variable)` then a different operation plan may be needed depending
 on whether `$variable` was `true` or `false`. Where possible, constraints are
-kept as narrow as possible - for example "variable
-$foo is a list" is preferred over "variable
-$foo is the list [1,2,3]" - to
-maximize reuse.
+kept as narrow as possible to maximize reuse.
 
 When an operation is seen a future time, <Grafast /> first looks for an existing
 operation plan whose constraints fit the request before falling back to creating
@@ -90,23 +132,23 @@ has produced, attempting to replace them with existing "peer" steps that already
 existed. These "peer" steps will have been constructed via the same step class,
 and will have the same dependencies. By deduplicating at this stage (before
 planning the child selection set) we help to ensure that the schema remains in
-adherence to the GraphQL specification. Deduplication can reduce the number of
-steps in the plan, leading to greater efficiency (and easier to understand
-plans).
+adherence to the GraphQL specification. Deduplication can greatly reduce the
+number of steps in the plan, leading to greater efficiency (and easier to
+understand plans).
 
 ### Tree shake
 
 Once every selection set has been fully visited and every field has been
 planned, the execution plan is complete.
 
-&ZeroWidthSpace;<Grafast /> then walks through the output plans, their required steps and those
+Gra*fast* then walks through the output plans, their required steps and those
 steps dependencies (and their dependencies and so on), marking them as active.
 Any step that is not active is "unreachable" and thus is no longer needed,
 therefore it can be be removed from the execution plan.
 
 Certain steps are immune to tree shaking (they're seen as always active), in
-particular these include certain system steps, and any step that has side
-effects.
+particular these include certain system steps, and any step that is marked as
+having side effects.
 
 ### Optimize
 
@@ -137,7 +179,7 @@ unnecessary steps from the execution plan.
 
 ### Finalize
 
-&ZeroWidthSpace;<Grafast /> then finalizes the plan by calling the `finalize` method on steps
+Gra*fast* then finalizes the plan by calling the `finalize` method on steps
 that support it. This gives each step a chance to do work that need only be done
 once, for example:
 

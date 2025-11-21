@@ -95,15 +95,15 @@ Planning a polymorphic position is a collaboration between the field’s plan
 resolver and the abstract type’s `planType` method, which describes how to
 resolve abstract values into their concrete type and associated data.
 
-The plan returned by a field plan resolver representing the value to use
-for a polymorphic position is called a “specifier”. It’s called a specifier
-because it does not actually have to be the value itself (though it can be!),
-it can just be a description of that item sufficient for your abstract
-type to know how to fetch it.
+The step used as the result of a polymorphic position (e.g. returned from a
+field plan resolver) represents a value we call the "specifier". The term
+"specifier" is used because it does not actually have to be the object itself
+(though it can be), it needs to be something that sufficiently describes that
+item such that the abstract type can determine how to fetch the object.
 
-Gra*fast* recognizes that sometimes you need to fetch things to figure out what
-type they are, and sometimes you need to know what type they are in order to
-fetch them (and sometimes it’s a little of both).
+Gra*fast* recognizes that sometimes you need to fetch an entity to figure out
+what type it is, and sometimes you need to know what type it is in order to
+fetch it (and sometimes it’s a little of both).
 
 For example you might have an “animals” table in your database that details if
 an individual record is a cat, dog, fish, budgie or similar. In this case you
@@ -185,7 +185,7 @@ const schema = makeGrafastSchema({
 ```
 
 If you’re using GraphQL.js or another construction mechanism then the method
-actually lives inside extensions:
+actually lives at `type.extensions.grafast.planType`:
 
 ```ts
 const Animal = new GraphQLInterfaceType({
@@ -371,9 +371,13 @@ graph TD
 
 </figure>
 
-So for ten types (`P=10`) and five levels (`D=10`)
+So for ten types (`P=10`) and ten levels of nested polymorphism (`D=10`)
 instead of having up to 10,000,000,000 (`P^D`) branches; Gra*fast* scales linearly
 with depth meaning there’s only up to 100 (`P*D`) branches.
+
+Note we use "up to" because it's dependent on the shape of your plans. In our
+fetch-to-type example above there would be no branching at all since all
+abstract types use the same underlying step.
 
 :::
 

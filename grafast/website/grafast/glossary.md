@@ -83,35 +83,16 @@ them into a valid _GraphQL response_.
 
 ## Layer plan
 
-Every execution plan starts by populating steps into the "root" layer plan
-representing request data such as argument input values, variable values,
-GraphQL context, root value, constants, and so on. The "root" layer plan always
-has a batch size of 1. Any time the batch size might change (up or down), a new
-layer plan is introduced; reasons include:
-
-- root - the root of an operation plan
-- nullable field - any null (or errors) can be pruned from the batch before being processed
-  by the next layer
-- list item - when traversing lists, Gra*fast* multiplies up the batch size,
-  effectively flattening all the lists therein so we can handle each item in the
-  list as an individual entry in the batch
-- subscription - represents an individual subscription event
-- mutation field - each mutation gets its own layer plan which must complete
-  before the next sibling mutation field may execute. Batch size is always 1,
-  this is more related to flow control.
-- defer - part of incremental delivery
-- polymorphic - when abstract types are represented in the schema, the
-  polymorphic layer plan is used to resolve them
-- polymorphic partition - once abstract types are resolved, if the actions taken
-  are sufficiently different, the plan will "branch" such that each batch only
-  needs to contain actions relevant to that type
-- combined - when resolving an abstract type _within_ an abstract type, we first
-  recombine all the previous batches back together before branching out again;
-  this avoids exponential branching
-- subroutine - used as temporary storage during execution of a subroutine
+Every [step](#step) belongs to exactly one layer plan within the execution plan.
+The root layer plan represents request data and always
+has a batch size of 1; any time the batch size might change (up or down), a new
+layer plan is introduced to handle this transition - normally this will be a
+result of traversing types and selections in the GraphQL request.
 
 Layer plans are a plan-time concern; when executing an individual request a
 [bucket](#bucket) stores the data for a layer plan.
+
+See: [Layer plans](./operation-plan.mdx#layer-plans).
 
 ## Bucket
 
@@ -120,6 +101,10 @@ individual request. Contains the execution state of each step in the layer plan
 along with its [execution value](#execution-value), and also stores links to
 other buckets such that the [output plan](#output-plan) may later traverse to
 access the data.
+
+When the context is clearly plan-time, it's common to use the term "bucket" as a
+short-hand for "layer plan". This isn't technically correct, but is
+convenient.
 
 ## Plan diagram
 

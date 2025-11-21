@@ -11,14 +11,17 @@ likely what you will be using already (unless you're using string concatenation
 to build up your queries, in which case you should switch to using
 [variables](https://graphql.org/learn/queries/#variables)).
 
-Assuming you're consuming your GraphQL schema via an HTTP API, we recommend
-that you use [persisted operations](#persisted-operations) (e.g. via
-[`@grafserv/persisted`](https://www.npmjs.com/package/@grafserv/persisted)) to
-act as an operation "allow list." This helps to protect your server against bad
-actors sending malicious queries trying to instigate a [Denial of
+Assuming you're consuming your GraphQL schema via an HTTP API, we recommend that
+you use the [trusted documents](https://benjie.dev/graphql/trusted-documents)
+pattern such that in production only operations written by your developers can
+be executed. To achieve this, you can use [persisted
+operations](#persisted-operations) (e.g. via
+[`@grafserv/persisted`](https://www.npmjs.com/package/@grafserv/persisted)) as
+an operation "allow list." This helps to protect your server against bad actors
+sending malicious requests trying to instigate a [Denial of
 Service](#denial-of-service) attack.
 
-If you choose not to use persisted operations, or if you want to be extra safe
+If you choose not to use trusted documents, or if you want to be extra safe
 (especially if your team are not extremely disciplined about adding pagination
 limits or careful about placement of variables), then you should also consider
 setting planning and execution timeouts:
@@ -37,9 +40,16 @@ const preset = {
 };
 ```
 
+<!--
+
+ TODO: how does an execution timeout impact incremental delivery and/or
+subscriptions?
+
+-->
+
 In either case, it may be wise to track bad actors and block/rate limit
 requests from them. You can typically do this via a middleware in your
-webserver.
+webserver before the request even reaches Gra*fast*.
 
 Below, we'll go into a little more detail on each of these topics.
 
@@ -48,12 +58,12 @@ Below, we'll go into a little more detail on each of these topics.
 Building a GraphQL query via string concatination is generally considered bad
 practice (both in Gra*fast* and in the wider GraphQL ecosystem):
 
-```js
+```js title="🛑 Don't do this!"
 function getUserDetails(userId) {
   // DON'T DO THIS
   const source = `
     query UserDetails {
-      userById(id: ${userId}) { # <<< STRING CONCATENATION IS BAD!
+      userById(id: ${userId /* BAD!! */}) { # <<< STRING CONCATENATION IS BAD!
         username
         avatarUrl
       }
@@ -67,7 +77,7 @@ Instead, declare the query text once (a "static query"), and then use [GraphQL
 variables](https://graphql.org/learn/queries/#variables) to pass parameters
 alongside the query text:
 
-```js
+```js title="✅ Use variables"
 // Declare the query once:
 const UserDetailsQuery = /* GraphQL */ `
   query UserDetails($userId: Int!) {
@@ -102,14 +112,15 @@ Accept: application/json
 
 In Gra*fast* this is especially important because each time we see a new
 GraphQL document we will need to plan it, so by reusing the same document over
-and over again we can reduce our planning costs many times over.
+and over again (with different variables) we can reduce our planning costs many
+times over.
 
-## Persisted operations
+## Trusted documents
 
 If you do not intend to allow third parties to run arbitrary operations against
 your API then using
-[persisted operations](https://github.com/graphile/persisted-operations) as a
-query allowlist is a highly recommended solution to protect any GraphQL
+[persisted operations](https://github.com/graphile/persisted-operations) as an
+operation allowlist is a highly recommended solution to protect any GraphQL
 endpoint (Gra*fast* or otherwise). This technique ensures that only the
 operations you use in your own applications (website, mobile apps, desktop app,
 etc) can be executed on the server, preventing malicious (or merely curious)
@@ -177,6 +188,16 @@ this:
 2. Place limits on requests - see [Limits](#limits)
 
 You can use one or, preferably, both of these techniques to protect your server.
+
+:::info[Caching operation plans]
+
+Currently operation plans are cached in-memory using an LRU store. In a future
+version of Gra*fast* we hope to make these plans serializable such that they can
+be written to an external store and shared between instances. Combined with
+trusted documents, this will also allow for the establishment of plans at
+build-time to eliminate runtime costs.
+
+:::
 
 ## Limits
 

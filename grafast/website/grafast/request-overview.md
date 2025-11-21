@@ -15,36 +15,47 @@ streams. The aim is to give you a general feel for how the system works.
 For a straightforward GraphQL request (one that does not return a stream), the
 request cycle looks something like this:
 
-1. Receive and parse request from user
-2. Find or build operation and output plans
-3. Execute operation and output plan
-4. Return data to user
+1. Perform server middleware (typically auth) - outside the scope of
+   Gra*fast*
+1. Parse and validate GraphQL request (cached)
+1. Establish the operation plan
+1. Execute the execution plan
+1. Execute the output plan
+1. Return response to user
 
-## Receive and parse request
+## Parse and validate GraphQL request
 
-Essentially the same as in a graphql-js system with the slight tweak that we
-cache the parsing of the document.
+Essentially the same as in a graphql-js system, but caching the parse of the
+document is essential for Gra*fast* performance (in-memory document needs to be
+identical for plan to be reused).
 
-## Getting the operation plan
+## Establish the operation plan
 
 When <Grafast /> sees an operation for the first time, it builds an [operation
-plan][]. Whilst building the operation plan, it may have also determined
-particular constraints that a future request must satisfy in order to use this
-same operation plan; for example if the request contained `@skip(if: $variable)`
-then a different operation plan would be needed depending on whether `$variable`
-was `true` or `false`. Where possible, constraints are kept as narrow as
-possible - for example "variable $foo is a list" is preferred over "variable
-$foo
-is the list [1,2,3]" - to maximize reuse.
+plan][] (composed of an execution plan and associated output plan). Whilst
+building the operation plan, it may have also determined particular constraints
+that a future request must satisfy in order to use this same operation plan; for
+example if the request contained `@skip(if: $variable)` then a different
+operation plan would be needed depending on whether `$variable` was `true` or
+`false`. Constraints are kept as narrow and limited as possible to maximize reuse.
 
 When an operation is seen a future time, <Grafast/> looks for an existing
 operation plan whose constraints fit the request. If there is one then this
 operation plan can be executed, otherwise a new operation plan is created (see
 previous paragraph).
 
-## Execute operation plan
+:::info[Future versions may remove constraints]
 
-&ZeroWidthSpace;<Grafast /> will populate the relevant system steps in the plan
+Currently different permutations of `@skip`/`@include` arguments will produce
+different plans since they may require different work to be undertaken. In
+future versions we may manage this in a different way, for example by inhibiting
+steps related to excluded selection sets on a per-request basis.
+
+:::
+
+## Execute the execution plan
+
+Gra*fast* will populate the relevant system steps in the plan
 with the variables, context value, root value, etc and will then execute the
 execution plan, the execution flowing down through the execution plan's step graph,
 executing each step exactly once (and sometimes in parallel with other steps)
@@ -53,22 +64,26 @@ request, the execution must process all of the data in a batch. Thus, it is fed
 a list of data from each of its dependencies, and it must return a
 corresponding list of data that its dependents may themselves consume.
 
-Once the execution plan has executed to completion, the values gathered are ran
-through the output plan to produce the output. Typically this is a JSON object,
-however for an optimization <Grafast /> may optionally output stringified JSON
-instead without ever building the intermediary JavaScript objects.
+## Execute the output plan
 
-:::note
+Once the execution plan has executed to completion, the values gathered are
+processed via the output plan to produce the output. Typically this is a JSON
+object, however for an optimization <Grafast /> may optionally output
+stringified JSON instead without ever building the intermediary JavaScript
+objects.
 
-When the operation involves streams, the relevant execution and output plan
-steps take place for each element of the stream(s).
+:::note[Subscriptions and `@stream`/`@defer]
+
+When the operation involves streams (subscription or `@stream`), the relevant
+execution and output plan steps take place for each element of the stream(s).
+Similarly, deferred selections inside a list may execute more than once.
 
 :::
 
 [plan resolvers]: ./plan-resolvers
 [argument applyplan resolvers]: ./plan-resolvers#applyplan-plan-resolvers
 
-## Returning data to user
+## Returning response to user
 
 This can be the same as in a graphql-js project, but <Grafast /> also supports
 an optimized strategy for stringifying the result should you need to do so
