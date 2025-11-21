@@ -81,7 +81,7 @@ types (e.g. `TYPES.boolean` represents the `bool` type):
 <li>void</li>
 </ul>
 
-## recordCodec(config)
+## `recordCodec(config)`
 
 `recordCodec` is a helper function that returns a PgCodec representing a
 "composite type" (or "record") - a structured type with attributes. This is
@@ -131,7 +131,7 @@ const forumCodec = recordCodec({
 });
 ```
 
-## listOfCodec(innerCodec, config = {})
+## `listOfCodec(innerCodec, config = {})`
 
 `listOfCodec` returns a new codec that represents a list (array) of the given
 `innerCodec`. Optionally you may provide details about this codec:
@@ -146,23 +146,21 @@ expression that allows the transformed list of `$orderIds` to be referenced
 inside the step for selecting the associated order items.
 
 ```ts
-const $orders = orders.find({
-  customer_id: context().get("customerId"),
-});
-
+const $customerId = context().get("customerId");
+const $orders = orders.find({ customer_id: $customerId });
 const $orderIds = applyTransforms(each($orders, ($order) => $order.get("id")));
-
 const $orderItems = registry.pgResources.order_items.find();
-
 $orderItems.where(
+  // highlight-start
   sql`${$orderItems}.order_id = ANY (${$orderItems.placeholder(
     $orderIds,
     listOfCodec(TYPES.uuid),
   )})`,
+  // highlight-end
 );
 ```
 
-## rangeOfCodec(innerCodec, name, identifier)
+## `rangeOfCodec(innerCodec, name, identifier)`
 
 `rangeOfCodec` returns a new codec that represents a range of the given
 `innerCodec`. You must specify the `name` and `identifier` to use for this
