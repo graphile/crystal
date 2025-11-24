@@ -31,6 +31,9 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 // import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
 // import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
 
+// Every field plan is wrapped in a side effect; should this side effect log the results?
+const LOG_RESULTS = false;
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 declare global {
@@ -628,12 +631,15 @@ const preset: GraphileConfig.Preset = {
       () => ({
         // autoApplyFieldArgs: false,
         plan: EXPORTABLE(
-          (sideEffect) => (plan, _) => {
+          (LOG_RESULTS, sideEffect) => (plan, _) => {
             const $result = plan();
-            sideEffect($result, (r) => void console.dir(r));
+            sideEffect(
+              $result,
+              (r) => void (LOG_RESULTS ? console.dir(r) : null),
+            );
             return $result;
           },
-          [sideEffect],
+          [LOG_RESULTS, sideEffect],
         ),
       }),
     ),
