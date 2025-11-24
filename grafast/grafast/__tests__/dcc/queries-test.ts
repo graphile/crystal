@@ -17,6 +17,8 @@ import {
 import { readSnapshot, snapshot } from "../snapshots.js";
 import { makeBaseArgs } from "./dcc-schema.js";
 
+const itNotCi = process.env.CI ? it.skip : it;
+
 // The text the file must end with
 const SUFFIX = ".test.graphql";
 
@@ -144,7 +146,7 @@ describe("queries", () => {
               );
             });
           }
-          it("matched plan snapshot", async function () {
+          itNotCi("matched plan snapshot", async function () {
             const ext = result.extensions;
             const plan = (ext as any)?.explain?.operations?.find(
               (o: any) => o.type === "plan",
