@@ -220,7 +220,7 @@ export class HonoGrafserv extends GrafservBase {
         const { statusCode, headers, buffer } = result;
         this.setResponseHeaders(ctx, headers);
         ctx.status(statusCode as StatusCode);
-        return ctx.body(buffer);
+        return ctx.body(buffer as Buffer<ArrayBuffer>);
       }
       case "json": {
         const { statusCode, headers, json } = result;
