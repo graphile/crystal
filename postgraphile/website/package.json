@@ -16,8 +16,8 @@
     "posttest": "yarn build"
   },
   "dependencies": {
-    "@docusaurus/core": "3.8.1",
-    "@docusaurus/preset-classic": "3.8.1",
+    "@docusaurus/core": "^3.8.1",
+    "@docusaurus/preset-classic": "^3.8.1",
     "@docusaurus/remark-plugin-npm2yarn": "^3.8.1",
     "@docusaurus/theme-mermaid": "^3.8.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -34,7 +34,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.8.1",
+    "@docusaurus/module-type-aliases": "^3.8.1",
     "@types/react": "^19.1.8"
   },
   "browserslist": {
