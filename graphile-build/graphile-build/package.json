@@ -36,16 +36,16 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/node": "^22.16.3",
-    "@types/pluralize": "^0.0.30",
-    "@types/semver": "^7.7.0",
+    "@types/node": "^22.19.1",
+    "@types/pluralize": "^0.0.33",
+    "@types/semver": "^7.7.1",
     "chalk": "^4.1.2",
-    "debug": "^4.4.1",
+    "debug": "^4.4.3",
     "graphile-config": "workspace:^",
     "graphql": "^16.9.0",
     "lodash": "^4.17.21",
     "pluralize": "^7.0.0",
-    "semver": "^7.7.2",
+    "semver": "^7.7.3",
     "tamedevil": "workspace:^",
     "tslib": "^2.8.1"
   },
@@ -67,8 +67,8 @@
     "grafast": "workspace:^",
     "graphile-export": "workspace:^",
     "graphql": "^16.9.0",
-    "jest": "^30.0.4",
+    "jest": "^30.2.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }

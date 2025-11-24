@@ -111,7 +111,7 @@ export class WhatwgGrafserv extends GrafservBase {
       case "buffer": {
         const { statusCode, headers, buffer } = response;
         const respHeaders = new Headers(headers);
-        return new Response(buffer, {
+        return new Response(buffer as Buffer<ArrayBuffer>, {
           status: statusCode,
           headers: respHeaders,
         });

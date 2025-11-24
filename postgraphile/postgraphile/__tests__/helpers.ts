@@ -626,7 +626,7 @@ export async function snapshot(actual: string, filePath: string) {
   } catch (e) {
     /* noop */
   }
-  if (expected == null || shouldUpdateSnapshot(filePath)) {
+  if (!process.env.CI && (expected == null || shouldUpdateSnapshot(filePath))) {
     if (expected !== actual) {
       console.warn(`Updated snapshot in '${filePath}'`);
       await fsp.writeFile(filePath, actual);

@@ -34,7 +34,10 @@ export async function snapshot(
   allowUpdate = true,
 ) {
   const expected = await readSnapshot(filePath);
-  if (expected == null || (allowUpdate && shouldUpdateSnapshot(filePath))) {
+  if (
+    !process.env.CI &&
+    (expected == null || (allowUpdate && shouldUpdateSnapshot(filePath)))
+  ) {
     if (expected !== actual) {
       const relative = path.relative(process.cwd(), filePath);
       console.warn(`          Updated snapshot in '${relative}'`);

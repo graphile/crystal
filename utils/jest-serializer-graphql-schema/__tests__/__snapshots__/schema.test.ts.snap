@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Pokemon GraphQL API has a consistent schema 1`] = `
 """Represents a Pokémon's attack types"""

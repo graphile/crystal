@@ -41,16 +41,16 @@
     "@graphiql/plugin-doc-explorer": "^0.4.1",
     "@graphiql/plugin-explorer": "^5.1.1",
     "@graphiql/plugin-history": "^0.4.1",
-    "@graphiql/react": "^0.37.1",
+    "@graphiql/react": "^0.37.2",
     "@graphiql/toolkit": "^0.11.3",
-    "@types/node": "^22.16.3",
+    "@types/node": "^22.19.1",
     "grafast": "workspace:^",
-    "graphiql": "^5.2.0",
+    "graphiql": "^5.2.1",
     "graphql-ws": "^6.0.5",
-    "mermaid": "^11.10.0",
+    "mermaid": "^11.12.1",
     "prettier": "^3.6.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "tslib": "^2.8.1"
   },
   "engines": {
@@ -65,15 +65,15 @@
     "ruru.css"
   ],
   "devDependencies": {
-    "@types/codemirror": "^5.60.16",
+    "@types/codemirror": "^5.60.17",
     "@types/debug": "^4.1.12",
     "@types/jest": "^30.0.0",
-    "@types/nodemon": "3.1.1",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/nodemon": "^3.1.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "graphql": "^16.9.0",
-    "jest": "^30.0.4",
-    "nodemon": "^3.1.10",
-    "typescript": "^5.8.3"
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "typescript": "^5.9.3"
   }
 }
