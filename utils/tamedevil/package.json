@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/graphile/crystal/tree/main/utils/tamedevil",
   "devDependencies": {
-    "@types/debug": "4.1.12",
+    "@types/debug": "^4.1.12",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.16.3",
     "jest": "^30.0.4",

@@ -93,7 +93,7 @@
     "@types/jest": "^30.0.0",
     "@types/json5": "^2.2.0",
     "@types/license-checker-webpack-plugin": "^0.2.5",
-    "@types/nodemon": "3.1.1",
+    "@types/nodemon": "^3.1.1",
     "eventemitter3": "^5.0.1",
     "glob": "^11.1.0",
     "grafserv": "workspace:^",

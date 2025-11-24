@@ -68,7 +68,7 @@
     "@types/codemirror": "^5.60.16",
     "@types/debug": "^4.1.12",
     "@types/jest": "^30.0.0",
-    "@types/nodemon": "3.1.1",
+    "@types/nodemon": "^3.1.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "graphql": "^16.9.0",

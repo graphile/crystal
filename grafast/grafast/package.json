@@ -96,7 +96,7 @@
     "@types/mermaid": "^9.2.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.16.3",
-    "@types/nodemon": "3.1.1",
+    "@types/nodemon": "^3.1.1",
     "chai": "^5.2.1",
     "graphql": "^16.9.0",
     "jest": "^30.0.4",
