@@ -36,9 +36,9 @@
     "node": ">=16.10"
   },
   "devDependencies": {
-    "@types/glob": "^8.1.0",
+    "@types/glob": "^9.0.0",
     "@types/node": "^22.19.1",
-    "glob": "^11.1.0",
+    "glob": "^13.0.0",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

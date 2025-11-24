@@ -40,10 +40,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@graphql-codegen/visitor-plugin-common": "^5.8.0"
+    "@graphql-codegen/visitor-plugin-common": "^6.2.0"
   },
   "devDependencies": {
-    "@graphql-codegen/plugin-helpers": "^5.1.1",
+    "@graphql-codegen/plugin-helpers": "^6.1.0",
     "graphql": "^16.9.0",
     "typescript": "^5.9.3"
   },
