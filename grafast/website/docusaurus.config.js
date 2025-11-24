@@ -74,6 +74,9 @@ const config = {
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
         showLastUpdateTime: true,
+        remarkPlugins: [
+          [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
+        ],
       },
     ],
     [
@@ -85,6 +88,9 @@ const config = {
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
         showLastUpdateTime: true,
+        remarkPlugins: [
+          [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
+        ],
       },
     ],
     [
