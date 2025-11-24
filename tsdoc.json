@@ -4,11 +4,13 @@
     {
       "tagName": "@page",
       "syntaxKind": "inline"
+    },
+    {
+      "tagName": "@rc",
+      "syntaxKind": "inline"
     }
   ],
   "supportForTags": {
-    "@alpha": true,
-    "@beta": true,
     "@rc": true,
     "@defaultValue": true,
     "@decorator": true,
