@@ -35,6 +35,9 @@ import {
 import { version } from "../version.js";
 import { watchFixtures } from "../watchFixtures.js";
 
+/** Someone else created */
+const CLASH_CODES = ["23505", "42P06", "42P07", "42710"];
+
 export type PgEntityWithId =
   | PgNamespace
   | PgClass
@@ -670,9 +673,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               (client) => client.query({ text: watchFixtures }),
             );
           } catch (e) {
-            console.warn(
-              `Failed to install watch fixtures into '${pgService.name}'.\nInstalling watch fixtures requires superuser privileges; have you correctly configured a 'superuserConnectionString'?\nYou may also opt to configure 'installWatchFixtures: false' and install them yourself.\n\nPostgres says: ${e}`,
-            );
+            const code = e?.code;
+            if (CLASH_CODES.includes(code)) {
+              // Ignore; most likely someone else is installing it currently
+            } else {
+              console.warn(
+                `Failed to install watch fixtures into '${pgService.name}'.\nInstalling watch fixtures requires superuser privileges; have you correctly configured a 'superuserConnectionString'?\nYou may also opt to configure 'installWatchFixtures: false' and install them yourself.\n\nPostgres says: ${e}`,
+              );
+            }
           }
         }
         try {
