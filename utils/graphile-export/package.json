@@ -40,12 +40,12 @@
   },
   "homepage": "https://graphile.org/",
   "dependencies": {
-    "@babel/generator": "^7.28.0",
-    "@babel/parser": "^7.28.0",
+    "@babel/generator": "^7.28.5",
+    "@babel/parser": "^7.28.5",
     "@babel/template": "^7.27.2",
-    "@babel/traverse": "^7.28.0",
-    "@babel/types": "^7.28.0",
-    "@types/node": "^22.16.3",
+    "@babel/traverse": "^7.28.5",
+    "@babel/types": "^7.28.5",
+    "@types/node": "^22.19.1",
     "prettier": "^3.6.2",
     "tslib": "^2.8.1"
   },
@@ -73,8 +73,8 @@
     "@types/babel__template": "^7.4.4",
     "@types/jest": "^30.0.0",
     "@types/prettier": "^3.0.0",
-    "jest": "^30.0.4",
+    "jest": "^30.2.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }

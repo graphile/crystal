@@ -33,10 +33,10 @@
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.16.3",
-    "jest": "^30.0.4",
+    "@types/node": "^22.19.1",
+    "jest": "^30.2.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "tslib": "^2.8.1"

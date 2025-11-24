@@ -16,26 +16,26 @@
     "posttest": "yarn build"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.8.1",
-    "@docusaurus/preset-classic": "^3.8.1",
-    "@docusaurus/remark-plugin-npm2yarn": "^3.8.1",
-    "@docusaurus/theme-mermaid": "^3.8.1",
+    "@docusaurus/core": "^3.9.2",
+    "@docusaurus/preset-classic": "^3.9.2",
+    "@docusaurus/remark-plugin-npm2yarn": "^3.9.2",
+    "@docusaurus/theme-mermaid": "^3.9.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mdx-js/react": "^3.1.0",
+    "@fortawesome/react-fontawesome": "^0.2.6",
+    "@mdx-js/react": "^3.1.1",
     "clsx": "^2.1.1",
     "postcss": "^8.5.6",
     "postcss-nested": "^6.2.0",
     "prism-react-renderer": "^2.4.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.8.1",
-    "@types/react": "^19.1.8"
+    "@docusaurus/module-type-aliases": "^3.9.2",
+    "@types/react": "^19.2.7"
   },
   "browserslist": {
     "production": [

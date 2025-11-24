@@ -32,9 +32,9 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/node": "^22.16.3",
+    "@types/node": "^22.19.1",
     "postgraphile": "workspace:^",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   },
   "publishConfig": {
     "access": "public"

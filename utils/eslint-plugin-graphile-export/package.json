@@ -37,13 +37,13 @@
     "dist"
   ],
   "devDependencies": {
-    "@babel/types": "^7.28.0",
+    "@babel/types": "^7.28.5",
     "@types/eslint": "^9.6.1",
     "@types/estree": "^1.0.8",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.16.3",
-    "jest": "^30.0.4",
+    "@types/node": "^22.19.1",
+    "jest": "^30.2.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }
