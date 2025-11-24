@@ -173,7 +173,7 @@ async function snapshot(actual, filePath) {
   } catch (e) {
     /* noop */
   }
-  if (expected == null || UPDATE_SNAPSHOTS) {
+  if (!process.env.CI && (expected == null || UPDATE_SNAPSHOTS)) {
     if (expected !== actual) {
       console.warn(`Updated snapshot in '${filePath}'`);
       await fsp.writeFile(filePath, actual);
