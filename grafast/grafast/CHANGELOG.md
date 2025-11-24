@@ -1,5 +1,30 @@
 # grafast
 
+## 1.0.0-rc.2
+
+### Patch Changes
+
+- [#2823](https://github.com/graphile/crystal/pull/2823)
+  [`f3a9869`](https://github.com/graphile/crystal/commit/f3a9869c6f9e7aa1eb501af5f7d582d2073be585)
+  Thanks [@benjie](https://github.com/benjie)! - Tweak to object()'s internal
+  cache logic.
+
+- [#2801](https://github.com/graphile/crystal/pull/2801)
+  [`68f61cd`](https://github.com/graphile/crystal/commit/68f61cdbeea19e81b1d59a3fac69a569642c5c88)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes the performance of the
+  recursive algorithm used to determine if one step depends on another
+  (performance regression introduced in RC.1). Thanks to @purge for reporting
+  and providing a reproduction.
+
+- [#2829](https://github.com/graphile/crystal/pull/2829)
+  [`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependency ranges.
+
+- Updated dependencies
+  [[`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)]:
+  - graphile-config@1.0.0-rc.2
+  - @graphile/lru@5.0.0-rc.2
+
 ## 1.0.0-rc.1
 
 ### Patch Changes

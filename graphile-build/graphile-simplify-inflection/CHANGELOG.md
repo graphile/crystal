@@ -1,5 +1,13 @@
 # v8.0.0
 
+## 8.0.0-rc.2
+
+### Patch Changes
+
+- [#2829](https://github.com/graphile/crystal/pull/2829)
+  [`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependency ranges.
+
 ## 8.0.0-rc.1
 
 ### Patch Changes

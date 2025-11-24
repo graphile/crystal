@@ -1,5 +1,21 @@
 # pg-sql2
 
+## 5.0.0-rc.2
+
+### Patch Changes
+
+- [#2821](https://github.com/graphile/crystal/pull/2821)
+  [`8cfe23f`](https://github.com/graphile/crystal/commit/8cfe23f6e694503ffb99a642f816e858275f5b4e)
+  Thanks [@benjie](https://github.com/benjie)! - Add sql.json API
+
+- [#2829](https://github.com/graphile/crystal/pull/2829)
+  [`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependency ranges.
+
+- Updated dependencies
+  [[`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)]:
+  - @graphile/lru@5.0.0-rc.2
+
 ## 5.0.0-rc.1
 
 ### Patch Changes

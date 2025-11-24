@@ -1,5 +1,37 @@
 # graphile-build-pg
 
+## 5.0.0-rc.2
+
+### Patch Changes
+
+- [#2806](https://github.com/graphile/crystal/pull/2806)
+  [`5ad7ad0`](https://github.com/graphile/crystal/commit/5ad7ad018c0c4429005da8c680ba5f415ad560ed)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issues with extending
+  interfaces by adding new `build.append` helper.
+
+- [#2834](https://github.com/graphile/crystal/pull/2834)
+  [`bd6b605`](https://github.com/graphile/crystal/commit/bd6b60574e7c6f4e296eefb6de3475479beb7c93)
+  Thanks [@benjie](https://github.com/benjie)! - Hide conflict errors when
+  installing watch fixtures.
+
+- [#2829](https://github.com/graphile/crystal/pull/2829)
+  [`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependency ranges.
+
+- Updated dependencies
+  [[`5ad7ad0`](https://github.com/graphile/crystal/commit/5ad7ad018c0c4429005da8c680ba5f415ad560ed),
+  [`f3a9869`](https://github.com/graphile/crystal/commit/f3a9869c6f9e7aa1eb501af5f7d582d2073be585),
+  [`68f61cd`](https://github.com/graphile/crystal/commit/68f61cdbeea19e81b1d59a3fac69a569642c5c88),
+  [`8cfe23f`](https://github.com/graphile/crystal/commit/8cfe23f6e694503ffb99a642f816e858275f5b4e),
+  [`a82e6fa`](https://github.com/graphile/crystal/commit/a82e6fae099f7e9d62fb3fc1ee173368cdabca27)]:
+  - graphile-build@5.0.0-rc.2
+  - grafast@1.0.0-rc.2
+  - pg-sql2@5.0.0-rc.2
+  - pg-introspection@1.0.0-rc.2
+  - graphile-config@1.0.0-rc.2
+  - @dataplan/pg@1.0.0-rc.2
+  - tamedevil@0.1.0-rc.2
+
 ## 5.0.0-rc.1
 
 ### Patch Changes
