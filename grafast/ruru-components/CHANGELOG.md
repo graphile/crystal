@@ -1,5 +1,17 @@
 # ruru-components
 
+## 2.0.0-rc.3
+
+### Patch Changes
+
+- [#2836](https://github.com/graphile/crystal/pull/2836)
+  [`c4f2e52`](https://github.com/graphile/crystal/commit/c4f2e527c9c3a8ea99777f6940330c04d8c4f618)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug with Ruru bundling
+
+- Updated dependencies
+  [[`c4f2e52`](https://github.com/graphile/crystal/commit/c4f2e527c9c3a8ea99777f6940330c04d8c4f618)]:
+  - grafast@1.0.0-rc.3
+
 ## 2.0.0-rc.2
 
 ### Patch Changes

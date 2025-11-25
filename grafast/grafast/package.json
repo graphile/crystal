@@ -1,6 +1,6 @@
 {
   "name": "grafast",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "Cutting edge GraphQL planning and execution engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
