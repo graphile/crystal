@@ -178,6 +178,11 @@ const config: Configuration = {
     }),
     new OutputDataToSrcPlugin(),
   ],
+  optimization: {
+    // Don't break `new languages.LazyTokenizationSupport(...)` call in `standaloneLanguages.js`
+    // There seems to be a bug in webpack where this is being eliminated incorrectly.
+    usedExports: false,
+  },
   //stats: "detailed",
 };
 
