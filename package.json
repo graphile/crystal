@@ -98,5 +98,13 @@
   "dependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.7"
+  },
+  "dependenciesMeta": {
+    "sqlite3": {
+      "built": true
+    },
+    "unrs-resolver": {
+      "built": true
+    }
   }
 }

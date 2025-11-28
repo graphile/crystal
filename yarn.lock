@@ -23093,6 +23093,11 @@ __metadata:
     webpack: "npm:^5.103.0"
     ws: "npm:^8.18.3"
     zx: "npm:^8.8.5"
+  dependenciesMeta:
+    sqlite3:
+      built: true
+    unrs-resolver:
+      built: true
   languageName: unknown
   linkType: soft
 
