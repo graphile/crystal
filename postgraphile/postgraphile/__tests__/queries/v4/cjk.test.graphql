@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy();
+#> schema: ['cjk']
+{
+  allQiJians {
+    nodes {
+      ... on QiJian {
+        id
+        qiJian
+      }
+    }
+  }
+}

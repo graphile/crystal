@@ -1,0 +1,14 @@
+{
+  allQiJians: {
+    nodes: [
+      {
+        id: 1,
+        qiJian: 21,
+      },
+      {
+        id: 2,
+        qiJian: 22,
+      },
+    ],
+  },
+}

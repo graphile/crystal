@@ -97,6 +97,7 @@ delete from issue_2212.orders cascade;
 delete from issue_2212.user_contacts cascade;
 delete from issue_2212.users cascade;
 delete from function_returning_enum.applicants cascade;
+delete from cjk."期间" cascade;
 
 alter table b.types enable trigger user;
 
@@ -1183,3 +1184,9 @@ insert into function_returning_enum.applicants(
   (1, 'John', 'Doe', 'round 2', 'CAT', 'BIKE' ),
   (2, 'David', 'Bowie', 'round 2', 'DOG', 'SUBWAY'),
   (3, 'John', 'Lennon', 'round 1', 'CAT', 'CAR');
+
+--------------------------------------------------------------------------------
+
+insert into cjk."期间" (id, "期间") values
+  (1, 21),
+  (2, 22);
