@@ -1,5 +1,6 @@
-import { PgExecutor, TYPES, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgUpdateSingle, recordCodec } from "@dataplan/pg";
-import { ObjectStep, __ValueStep, access, assertExecutableStep, bakedInputRuntime, constant, context, createObjectAndApplyChildren, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
   typeName: "Query",
@@ -116,7 +117,17 @@ const accessoryCodec = recordCodec({
   },
   executor: executor
 });
-const pgResource_AccessoryPgResource = makeRegistry({
+const AccessoryUniques = [{
+  isPrimary: true,
+  attributes: ["Id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
+const resource_AccessoryPgResource = makeRegistry({
   pgExecutors: {
     __proto__: null,
     main: executor
@@ -458,16 +469,7 @@ const pgResource_AccessoryPgResource = makeRegistry({
       identifier: "main.scifi.Accessory",
       from: accessoryIdentifier,
       codec: accessoryCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["Id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
+      uniques: AccessoryUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -488,31 +490,64 @@ const pgResource_AccessoryPgResource = makeRegistry({
     __proto__: null
   }
 }).pgResources["Accessory"];
+const nodeIdHandler_Accessory = {
+  typeName: "Accessory",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("Accessory", false), $record.get("Id")]);
+  },
+  getSpec($list) {
+    return {
+      Id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_AccessoryPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "Accessory";
+  }
+};
+const specForHandlerCache = new Map();
+function specForHandler(handler) {
+  const existing = specForHandlerCache.get(handler);
+  if (existing) {
+    return existing;
+  }
+  function spec(nodeId) {
+    // We only want to return the specifier if it matches
+    // this handler; otherwise return null.
+    if (nodeId == null) return null;
+    try {
+      const specifier = handler.codec.decode(nodeId);
+      if (handler.match(specifier)) {
+        return specifier;
+      }
+    } catch {
+      // Ignore errors
+    }
+    return null;
+  }
+  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
+  spec.isSyncAndSafe = true; // Optimization
+  specForHandlerCache.set(handler, spec);
+  return spec;
+}
+const nodeFetcher_Accessory = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Accessory));
+  return nodeIdHandler_Accessory.get(nodeIdHandler_Accessory.getSpec($decoded));
+};
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: nodeIdHandler_Query,
-  Accessory: {
-    typeName: "Accessory",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("Accessory", false), $record.get("Id")]);
-    },
-    getSpec($list) {
-      return {
-        Id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_AccessoryPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "Accessory";
-    }
-  }
+  Accessory: nodeIdHandler_Accessory
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -525,13 +560,36 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+function CursorSerialize(value) {
+  return "" + value;
+}
 const specFromArgs_Accessory = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Accessory, $nodeId);
+  return specFromNodeId(nodeIdHandler_Accessory, $nodeId);
 };
 const specFromArgs_Accessory2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Accessory, $nodeId);
+  return specFromNodeId(nodeIdHandler_Accessory, $nodeId);
+};
+const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+  const $result = $mutation.getStepForKey("result", true);
+  if (!$result) return null;
+  if ($result instanceof PgDeleteSingleStep) {
+    return pgSelectFromRecord($result.resource, $result.record());
+  } else {
+    const spec = pkAttributes.reduce((memo, attributeName) => {
+      memo[attributeName] = $result.get(attributeName);
+      return memo;
+    }, Object.create(null));
+    return resource.find(spec);
+  }
+};
+const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+  if (!$select) return constant(null);
+  fieldArgs.apply($select, "orderBy");
+  const $connection = connection($select);
+  return new EdgeStep($connection, first($connection));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -551,6 +609,44 @@ type Query implements Node {
     """The globally unique \`ID\`."""
     id: ID!
   ): Node
+
+  """Get a single \`Accessory\`."""
+  accessoryByRowId(rowId: Int!): Accessory
+
+  """Reads a single \`Accessory\` using its globally unique \`ID\`."""
+  accessory(
+    """The globally unique \`ID\` to be used in selecting a single \`Accessory\`."""
+    id: ID!
+  ): Accessory
+
+  """Reads and enables pagination through a set of \`Accessory\`."""
+  allAccessories(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: AccessoryCondition
+
+    """The method to use when ordering \`Accessory\`."""
+    orderBy: [AccessoryOrderBy!] = [PRIMARY_KEY_ASC]
+  ): AccessoryConnection
 }
 
 """An object with a globally unique \`ID\`."""
@@ -559,6 +655,82 @@ interface Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   id: ID!
+}
+
+type Accessory implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+  name: String!
+  rowId: Int!
+}
+
+"""A connection to a list of \`Accessory\` values."""
+type AccessoryConnection {
+  """A list of \`Accessory\` objects."""
+  nodes: [Accessory]!
+
+  """
+  A list of edges which contains the \`Accessory\` and cursor to aid in pagination.
+  """
+  edges: [AccessoryEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Accessory\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Accessory\` edge in the connection."""
+type AccessoryEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Accessory\` at the end of the edge."""
+  node: Accessory
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""
+A condition to be used against \`Accessory\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input AccessoryCondition {
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+}
+
+"""Methods to use when ordering \`Accessory\`."""
+enum AccessoryOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  NAME_ASC
+  NAME_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
 }
 
 """
@@ -582,11 +754,11 @@ type Mutation {
   ): UpdateAccessoryPayload
 
   """Updates a single \`Accessory\` using a unique key and a patch."""
-  updateAccessoryById(
+  updateAccessoryByRowId(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateAccessoryByIdInput!
+    input: UpdateAccessoryByRowIdInput!
   ): UpdateAccessoryPayload
 
   """Deletes a single \`Accessory\` using its globally unique id."""
@@ -598,11 +770,11 @@ type Mutation {
   ): DeleteAccessoryPayload
 
   """Deletes a single \`Accessory\` using a unique key."""
-  deleteAccessoryById(
+  deleteAccessoryByRowId(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteAccessoryByIdInput!
+    input: DeleteAccessoryByRowIdInput!
   ): DeleteAccessoryPayload
 }
 
@@ -614,10 +786,19 @@ type CreateAccessoryPayload {
   """
   clientMutationId: String
 
+  """The \`Accessory\` that was created by this mutation."""
+  accessory: Accessory
+
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+
+  """An edge for our \`Accessory\`. May be used by Relay 1."""
+  accessoryEdge(
+    """The method to use when ordering \`Accessory\`."""
+    orderBy: [AccessoryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AccessoryEdge
 }
 
 """All input for the create \`Accessory\` mutation."""
@@ -635,7 +816,7 @@ input CreateAccessoryInput {
 """An input for mutations affecting \`Accessory\`"""
 input AccessoryInput {
   name: String!
-  id: Int!
+  rowId: Int!
 }
 
 """The output of our update \`Accessory\` mutation."""
@@ -646,10 +827,19 @@ type UpdateAccessoryPayload {
   """
   clientMutationId: String
 
+  """The \`Accessory\` that was updated by this mutation."""
+  accessory: Accessory
+
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+
+  """An edge for our \`Accessory\`. May be used by Relay 1."""
+  accessoryEdge(
+    """The method to use when ordering \`Accessory\`."""
+    orderBy: [AccessoryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AccessoryEdge
 }
 
 """All input for the \`updateAccessory\` mutation."""
@@ -676,17 +866,17 @@ Represents an update to a \`Accessory\`. Fields that are set will be updated.
 """
 input AccessoryPatch {
   name: String
-  id: Int
+  rowId: Int
 }
 
-"""All input for the \`updateAccessoryById\` mutation."""
-input UpdateAccessoryByIdInput {
+"""All input for the \`updateAccessoryByRowId\` mutation."""
+input UpdateAccessoryByRowIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int!
+  rowId: Int!
 
   """
   An object where the defined keys will be set on the \`Accessory\` being updated.
@@ -702,10 +892,20 @@ type DeleteAccessoryPayload {
   """
   clientMutationId: String
 
+  """The \`Accessory\` that was deleted by this mutation."""
+  accessory: Accessory
+  deletedAccessoryId: ID
+
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+
+  """An edge for our \`Accessory\`. May be used by Relay 1."""
+  accessoryEdge(
+    """The method to use when ordering \`Accessory\`."""
+    orderBy: [AccessoryOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): AccessoryEdge
 }
 
 """All input for the \`deleteAccessory\` mutation."""
@@ -722,14 +922,14 @@ input DeleteAccessoryInput {
   id: ID!
 }
 
-"""All input for the \`deleteAccessoryById\` mutation."""
-input DeleteAccessoryByIdInput {
+"""All input for the \`deleteAccessoryByRowId\` mutation."""
+input DeleteAccessoryByRowIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int!
+  rowId: Int!
 }`;
 export const objects = {
   Query: {
@@ -737,6 +937,47 @@ export const objects = {
       return true;
     },
     plans: {
+      accessory(_$parent, args) {
+        const $nodeId = args.getRaw("id");
+        return nodeFetcher_Accessory($nodeId);
+      },
+      accessoryByRowId(_$root, {
+        $rowId
+      }) {
+        return resource_AccessoryPgResource.get({
+          Id: $rowId
+        });
+      },
+      allAccessories: {
+        plan() {
+          return connection(resource_AccessoryPgResource.find());
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
       id($parent) {
         const specifier = nodeIdHandler_Query.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
@@ -754,7 +995,7 @@ export const objects = {
     plans: {
       createAccessory: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_AccessoryPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_AccessoryPgResource, Object.create(null));
           args.apply($insert);
           const plan = object({
             result: $insert
@@ -769,7 +1010,7 @@ export const objects = {
       },
       deleteAccessory: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_AccessoryPgResource, specFromArgs_Accessory2(args));
+          const $delete = pgDeleteSingle(resource_AccessoryPgResource, specFromArgs_Accessory2(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -781,10 +1022,10 @@ export const objects = {
           }
         }
       },
-      deleteAccessoryById: {
+      deleteAccessoryByRowId: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_AccessoryPgResource, {
-            Id: args.getRaw(['input', "id"])
+          const $delete = pgDeleteSingle(resource_AccessoryPgResource, {
+            Id: args.getRaw(['input', "rowId"])
           });
           args.apply($delete);
           return object({
@@ -799,7 +1040,7 @@ export const objects = {
       },
       updateAccessory: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_AccessoryPgResource, specFromArgs_Accessory(args));
+          const $update = pgUpdateSingle(resource_AccessoryPgResource, specFromArgs_Accessory(args));
           args.apply($update);
           return object({
             result: $update
@@ -811,10 +1052,10 @@ export const objects = {
           }
         }
       },
-      updateAccessoryById: {
+      updateAccessoryByRowId: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_AccessoryPgResource, {
-            Id: args.getRaw(['input', "id"])
+          const $update = pgUpdateSingle(resource_AccessoryPgResource, {
+            Id: args.getRaw(['input', "rowId"])
           });
           args.apply($update);
           return object({
@@ -829,9 +1070,45 @@ export const objects = {
       }
     }
   },
+  Accessory: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      id($parent) {
+        const specifier = nodeIdHandler_Accessory.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Accessory.codec.name].encode);
+      },
+      name($record) {
+        return $record.get("Name");
+      },
+      rowId($record) {
+        return $record.get("Id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of AccessoryUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_AccessoryPgResource.get(spec);
+    }
+  },
+  AccessoryConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
   CreateAccessoryPayload: {
     assertStep: assertExecutableStep,
     plans: {
+      accessory($object) {
+        return $object.get("result");
+      },
+      accessoryEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_AccessoryPgResource, AccessoryUniques[0].attributes, $mutation, fieldArgs);
+      },
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
@@ -844,9 +1121,20 @@ export const objects = {
   DeleteAccessoryPayload: {
     assertStep: ObjectStep,
     plans: {
+      accessory($object) {
+        return $object.get("result");
+      },
+      accessoryEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_AccessoryPgResource, AccessoryUniques[0].attributes, $mutation, fieldArgs);
+      },
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
+      },
+      deletedAccessoryId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Accessory.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
       },
       query() {
         return rootValue();
@@ -856,6 +1144,12 @@ export const objects = {
   UpdateAccessoryPayload: {
     assertStep: ObjectStep,
     plans: {
+      accessory($object) {
+        return $object.get("result");
+      },
+      accessoryEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_AccessoryPgResource, AccessoryUniques[0].attributes, $mutation, fieldArgs);
+      },
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
@@ -886,37 +1180,59 @@ export const interfaces = {
   }
 };
 export const inputObjects = {
+  AccessoryCondition: {
+    plans: {
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "Name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
+      },
+      rowId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "Id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
   AccessoryInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("Id", bakedInputRuntime(schema, field.type, val));
-      },
       name(obj, val, {
         field,
         schema
       }) {
         obj.set("Name", bakedInputRuntime(schema, field.type, val));
+      },
+      rowId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("Id", bakedInputRuntime(schema, field.type, val));
       }
     }
   },
   AccessoryPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("Id", bakedInputRuntime(schema, field.type, val));
-      },
       name(obj, val, {
         field,
         schema
       }) {
         obj.set("Name", bakedInputRuntime(schema, field.type, val));
+      },
+      rowId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("Id", bakedInputRuntime(schema, field.type, val));
       }
     }
   },
@@ -932,7 +1248,7 @@ export const inputObjects = {
       }
     }
   },
-  DeleteAccessoryByIdInput: {
+  DeleteAccessoryByRowIdInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
@@ -946,7 +1262,7 @@ export const inputObjects = {
       }
     }
   },
-  UpdateAccessoryByIdInput: {
+  UpdateAccessoryByRowIdInput: {
     plans: {
       accessoryPatch(qb, arg) {
         if (arg != null) {
@@ -971,9 +1287,73 @@ export const inputObjects = {
     }
   }
 };
+export const scalars = {
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  }
+};
+export const enums = {
+  AccessoryOrderBy: {
+    values: {
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "Name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "Name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        AccessoryUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        AccessoryUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ROW_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "Id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ROW_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "Id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      }
+    }
+  }
+};
 export const schema = makeGrafastSchema({
   typeDefs: typeDefs,
   objects: objects,
   interfaces: interfaces,
-  inputObjects: inputObjects
+  inputObjects: inputObjects,
+  scalars: scalars,
+  enums: enums
 });
