@@ -1,0 +1,276 @@
+"""All input for the create `QiJian` mutation."""
+input CreateQiJianInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `QiJian` to be created by this mutation."""
+  qiJian: QiJianInput!
+}
+
+"""The output of our create `QiJian` mutation."""
+type CreateQiJianPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `QiJian` that was created by this mutation."""
+  qiJian: QiJian
+
+  """An edge for our `QiJian`. May be used by Relay 1."""
+  qiJianEdge(
+    """The method to use when ordering `QiJian`."""
+    orderBy: [QiJiansOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): QiJiansEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `QiJian`."""
+  createQiJian(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateQiJianInput!
+  ): CreateQiJianPayload
+
+  """Updates a single `QiJian` using its globally unique id and a patch."""
+  updateQiJian(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateQiJianInput!
+  ): UpdateQiJianPayload
+
+  """Updates a single `QiJian` using a unique key and a patch."""
+  updateQiJianById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateQiJianByIdInput!
+  ): UpdateQiJianPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+type QiJian implements Node {
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  qiJian: Int
+}
+
+"""
+A condition to be used against `QiJian` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input QiJianCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `qiJian` field."""
+  qiJian: Int
+}
+
+"""An input for mutations affecting `QiJian`"""
+input QiJianInput {
+  id: Int
+  qiJian: Int
+}
+
+"""
+Represents an update to a `QiJian`. Fields that are set will be updated.
+"""
+input QiJianPatch {
+  id: Int
+  qiJian: Int
+}
+
+"""A connection to a list of `QiJian` values."""
+type QiJiansConnection {
+  """
+  A list of edges which contains the `QiJian` and cursor to aid in pagination.
+  """
+  edges: [QiJiansEdge]!
+
+  """A list of `QiJian` objects."""
+  nodes: [QiJian]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `QiJian` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `QiJian` edge in the connection."""
+type QiJiansEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `QiJian` at the end of the edge."""
+  node: QiJian
+}
+
+"""Methods to use when ordering `QiJian`."""
+enum QiJiansOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  QI_JIAN_ASC
+  QI_JIAN_DESC
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `QiJian`."""
+  allQiJians(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: QiJianCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `QiJian`."""
+    orderBy: [QiJiansOrderBy!] = [PRIMARY_KEY_ASC]
+  ): QiJiansConnection
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """Reads a single `QiJian` using its globally unique `ID`."""
+  qiJian(
+    """The globally unique `ID` to be used in selecting a single `QiJian`."""
+    nodeId: ID!
+  ): QiJian
+
+  """Get a single `QiJian`."""
+  qiJianById(id: Int!): QiJian
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+}
+
+"""All input for the `updateQiJianById` mutation."""
+input UpdateQiJianByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `QiJian` being updated.
+  """
+  qiJianPatch: QiJianPatch!
+}
+
+"""All input for the `updateQiJian` mutation."""
+input UpdateQiJianInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `QiJian` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `QiJian` being updated.
+  """
+  qiJianPatch: QiJianPatch!
+}
+
+"""The output of our update `QiJian` mutation."""
+type UpdateQiJianPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `QiJian` that was updated by this mutation."""
+  qiJian: QiJian
+
+  """An edge for our `QiJian`. May be used by Relay 1."""
+  qiJianEdge(
+    """The method to use when ordering `QiJian`."""
+    orderBy: [QiJiansOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): QiJiansEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}

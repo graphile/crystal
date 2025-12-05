@@ -28,7 +28,8 @@ drop schema if exists
   issue_2212,
   issue_2287,
   issue_2334,
-  relay
+  relay,
+  cjk
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -2551,4 +2552,13 @@ comment on function function_returning_enum.applicants_favorite_pet_transportati
 create schema no_fields;
 create table no_fields.citation (
   id integer primary key generated always as identity
+);
+
+--------------------------------------------------------------------------------
+
+create schema cjk;
+
+create table cjk."期间" (
+  id serial primary key,
+  "期间" int
 );
