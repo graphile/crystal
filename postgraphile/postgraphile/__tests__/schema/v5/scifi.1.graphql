@@ -1,0 +1,198 @@
+"""An input for mutations affecting `Accessory`"""
+input AccessoryInput {
+  id: Int!
+  name: String!
+}
+
+"""
+Represents an update to a `Accessory`. Fields that are set will be updated.
+"""
+input AccessoryPatch {
+  id: Int
+  name: String
+}
+
+"""All input for the create `Accessory` mutation."""
+input CreateAccessoryInput {
+  """The `Accessory` to be created by this mutation."""
+  accessory: AccessoryInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Accessory` mutation."""
+type CreateAccessoryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteAccessoryById` mutation."""
+input DeleteAccessoryByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteAccessory` mutation."""
+input DeleteAccessoryInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Accessory` to be deleted.
+  """
+  id: ID!
+}
+
+"""The output of our delete `Accessory` mutation."""
+type DeleteAccessoryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `Accessory`."""
+  createAccessory(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateAccessoryInput!
+  ): CreateAccessoryPayload
+
+  """Deletes a single `Accessory` using its globally unique id."""
+  deleteAccessory(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAccessoryInput!
+  ): DeleteAccessoryPayload
+
+  """Deletes a single `Accessory` using a unique key."""
+  deleteAccessoryById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteAccessoryByIdInput!
+  ): DeleteAccessoryPayload
+
+  """Updates a single `Accessory` using its globally unique id and a patch."""
+  updateAccessory(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAccessoryInput!
+  ): UpdateAccessoryPayload
+
+  """Updates a single `Accessory` using a unique key and a patch."""
+  updateAccessoryById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateAccessoryByIdInput!
+  ): UpdateAccessoryPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  id: ID!
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    id: ID!
+  ): Node
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+}
+
+"""All input for the `updateAccessoryById` mutation."""
+input UpdateAccessoryByIdInput {
+  """
+  An object where the defined keys will be set on the `Accessory` being updated.
+  """
+  accessoryPatch: AccessoryPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `updateAccessory` mutation."""
+input UpdateAccessoryInput {
+  """
+  An object where the defined keys will be set on the `Accessory` being updated.
+  """
+  accessoryPatch: AccessoryPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Accessory` to be updated.
+  """
+  id: ID!
+}
+
+"""The output of our update `Accessory` mutation."""
+type UpdateAccessoryPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}

@@ -29,7 +29,8 @@ drop schema if exists
   issue_2287,
   issue_2334,
   relay,
-  cjk
+  cjk,
+  scifi
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -2561,4 +2562,14 @@ create schema cjk;
 create table cjk."期间" (
   id serial primary key,
   "期间" int
+);
+
+--------------------------------------------------------------------------------
+
+-- SCIFI: Snake Case Is For Initiates.
+-- All the cool kids use UpperCamelCase
+create schema scifi;
+create table scifi."Accessory" (
+  "Name" varchar(200) not null,
+  "Id" integer not null primary key
 );
