@@ -155,7 +155,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
                   const attribute = codec.attributes[attributeName];
                   const baseName =
                     attribute.extensions?.tags?.name || attributeName;
-                  if (baseName === "id" && !codec.isAnonymous) {
+                  if (baseName.toLowerCase() === "id" && !codec.isAnonymous) {
                     return "id";
                   }
                 }
