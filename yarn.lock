@@ -14668,6 +14668,7 @@ __metadata:
   peerDependencies:
     "@envelop/core": ^5.0.0
     "@whatwg-node/server": ^0.9.64
+    elysia: ^1.0.0
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.9.0
@@ -14678,6 +14679,8 @@ __metadata:
     "@envelop/core":
       optional: true
     "@whatwg-node/server":
+      optional: true
+    elysia:
       optional: true
     h3:
       optional: true

@@ -46,6 +46,10 @@
       "types": "./dist/servers/hono/v4/index.d.ts",
       "default": "./dist/servers/hono/v4/index.js"
     },
+    "./elysia/v1": {
+      "types": "./dist/servers/elysia/v1/index.d.ts",
+      "default": "./dist/servers/elysia/v1/index.js"
+    },
     "./whatwg-node__server/v4": {
       "types": "./dist/servers/whatwg-node__server/v0/index.d.ts",
       "default": "./dist/servers/whatwg-node__server/v0/index.js"
@@ -108,6 +112,7 @@
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
     "@whatwg-node/server": "^0.9.64",
+    "elysia": "^1.0.0",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.9.0",
@@ -120,6 +125,9 @@
       "optional": true
     },
     "@whatwg-node/server": {
+      "optional": true
+    },
+    "elysia": {
       "optional": true
     },
     "h3": {
