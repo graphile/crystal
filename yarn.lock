@@ -14764,6 +14764,7 @@ __metadata:
     pluralize: "npm:^7.0.0"
     semver: "npm:^7.7.3"
     tamedevil: "workspace:^"
+    transliteration: "npm:^2.3.5"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
@@ -24965,6 +24966,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"transliteration@npm:^2.3.5":
+  version: 2.3.5
+  resolution: "transliteration@npm:2.3.5"
+  dependencies:
+    yargs: "npm:^17.5.1"
+  bin:
+    slugify: dist/bin/slugify
+    transliterate: dist/bin/transliterate
+  checksum: 10/faf4956ea0464612913f1ef3df312b4773a47c01b109aa60efbf65e6a3d6eba19ea7f0aebc072d27c4a43b2f2713209950ce6d098806b792fdc511e55cf79d93
+  languageName: node
+  linkType: hard
+
 "tree-dump@npm:^1.0.3, tree-dump@npm:^1.1.0":
   version: 1.1.0
   resolution: "tree-dump@npm:1.1.0"
@@ -26515,7 +26528,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:17.7.2, yargs@npm:^17.0.0, yargs@npm:^17.7.2":
+"yargs@npm:17.7.2, yargs@npm:^17.0.0, yargs@npm:^17.5.1, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:

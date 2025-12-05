@@ -25,6 +25,7 @@ import {
   RegisterQueryNodePlugin,
   // StreamDeferPlugin,
   SubscriptionPlugin,
+  TransliterationPlugin,
   TrimEmptyDescriptionsPlugin,
 } from "./plugins/index.js";
 import {
@@ -91,5 +92,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     RegisterQueryNodePlugin,
     NodeAccessorPlugin,
     AddInterfaceSubtypesToTypesPlugin,
+    TransliterationPlugin,
   ],
 };

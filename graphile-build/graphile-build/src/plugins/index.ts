@@ -20,6 +20,7 @@ import { RegisterQueryNodePlugin } from "./RegisterQueryNodePlugin.js";
 import { StreamDeferPlugin } from "./StreamDeferPlugin.js";
 import { SubscriptionPlugin } from "./SubscriptionPlugin.js";
 import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
+import { TransliterationPlugin } from "./TransliterationPlugin.js";
 import { TrimEmptyDescriptionsPlugin } from "./TrimEmptyDescriptionsPlugin.js";
 
 export {
@@ -45,5 +46,6 @@ export {
   StreamDeferPlugin,
   SubscriptionPlugin,
   SwallowErrorsPlugin,
+  TransliterationPlugin,
   TrimEmptyDescriptionsPlugin,
 };
