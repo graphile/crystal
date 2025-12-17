@@ -6,53 +6,68 @@ sidebar_position: 3
 
 Grafserv supports many different servers, and because each server is different,
 each has their own entrypoint, e.g. `grafserv/node` for the Node.js HTTP server
-or `grafserv/express/v4` for Express v4. Generally you import the `grafserv`
-function from the relevant entrypoint for your server of choice and then create
-an instance:
+or `grafserv/express/v4` for Express v4.
+
+## Creating `serv` instance
+
+Generally you import the `grafserv` function from the relevant entrypoint for
+your server of choice and then create an instance, called `serv`, by passing
+the preset and the GraphQL schema to use:
 
 ```ts
 import { grafserv } from "grafserv/path/to/adaptor";
 import preset from "./graphile.config";
 import schema from "./schema";
 
+// highlight-next-line
 const serv = grafserv({ preset, schema });
 ```
 
-`grafserv` is passed the GraphQL schema to use (if it's available, otherwise
-passing either null or a promise is also acceptable) and a [`graphile-config`
-preset](https://star.graphile.org/graphile-config/preset) - i.e. your
-configuration. The preset can be an empty object, but here's a bigger (but not
-exhaustive) example:
+The `serv` instance will have a number of methods on it, including
+methods specific to integrating it with your framework of choice. The methods
+available will differ for each server, but common methods are [documented
+below](#common-methods).
 
-```ts title="graphile.config.ts"
-import type {} from "grafserv";
+### Preset
 
-const preset: GraphileConfig.Preset = {
-  grafserv: {
-    port: 5678,
-    host: "0.0.0.0",
-    dangerouslyAllowAllCORSRequests: false,
-    graphqlPath: "/graphql",
-    eventStreamPath: "/graphql/stream",
-    graphqlOverGET: true,
-    graphiql: true,
-    graphiqlPath: "/",
-    websockets: true,
-    maxRequestLength: 100000,
-  },
-};
+The preset is your configuration object, see [Configuration](./config.md). To
+use the defaults, it can be a simple empty object (`{}`).
 
-export default preset;
+### Schema
+
+The schema can be any valid GraphQL.js schema, but for maximal benefit it should
+be a Gra*fast*-capable schema. For details on creating a Gra*fast* schema, see
+[Gra*fast*](/grafast).
+
+If a schema is not available then passing either `null` or a promise is
+acceptable.
+
+## Integrating with your server
+
+Please see the documentation for your specific server adaptor, but for servers
+that operate on a middleware basis this is typically `serv.addTo(app)` (which
+allows registering multiple route handlers); e.g. for Express:
+
+```ts
+import express from "express";
+import { createServer } from "node:http";
+
+const app = express();
+const server = createServer(app);
+
+// highlight-next-line
+await serv.addTo(app, server);
+
+server.listen(preset.grafserv?.port ?? 5678);
 ```
 
-Calling `grafserv` will return an instance, typically stored into a variable
-called `serv`. This instance will have a number of helpers on it, including
-helpers specific to integrating it with your framework of choice. For servers
-that operate on a middleware basis this is typically `serv.addTo(app)` (which
-allows registering multiple route handlers), though different servers may have
-different APIs, such as `serv.createGraphQLHandler()` for Lambda and Next.js.
+Other servers such as Lambda and
+Next.js may use
+different APIs, such as `serv.createGraphQLHandler()`.
 
-Note: There is little value in Grafserv reimplementing every non-GraphQL concern
+:::tip[Use middleware to implement common concerns]
+
+There is little value in Grafserv reimplementing every non-GraphQL concern
 your server may have, so instead it leans on the ecosystem of your chosen server
 to handle things like compression, rate limits, sessions, cookies, etc. For
 example, to compress your responses you'd need to use a module like
@@ -60,6 +75,10 @@ example, to compress your responses you'd need to use a module like
 for Express, [`koa-compress`](https://www.npmjs.com/package/koa-compress) for
 Koa, or [`@fastify/compress`](https://www.npmjs.com/package/@fastify/compress)
 for Fastify.
+
+:::
+
+## Common methods
 
 ### serv.release()
 
