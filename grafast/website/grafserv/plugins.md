@@ -31,19 +31,25 @@ As your TypeScript auto-complete will hopefully tell you, the following
 middlewares are available:
 
 ```ts
-interface GrafservMiddleware {
-  setPreset(event: InitEvent): PromiseOrDirect<void>;
-  processRequest(event: ProcessRequestEvent): PromiseOrDirect<Result | null>;
-  processGraphQLRequestBody(
-    event: ProcessGraphQLRequestBodyEvent,
-  ): PromiseOrDirect<void>;
-  /**
-   * Wraps the generation of the HTML to render from Ruru
-   */
-  ruruHTML(event: RuruHTMLEvent): PromiseOrDirect<string>;
-  onSubscribe(
-    event: OnSubscribeEvent,
-  ): TruePromiseOrDirect<void | readonly GraphQLError[] | ExecutionArgs>;
+declare global {
+  namespace GraphileConfig {
+    interface GrafservMiddleware {
+      setPreset(event: InitEvent): PromiseOrDirect<void>;
+      processRequest(
+        event: ProcessRequestEvent,
+      ): PromiseOrDirect<Result | null>;
+      processGraphQLRequestBody(
+        event: ProcessGraphQLRequestBodyEvent,
+      ): PromiseOrDirect<void>;
+      /**
+       * Wraps the generation of the HTML to render from Ruru
+       */
+      ruruHTML(event: RuruHTMLEvent): PromiseOrDirect<string>;
+      onSubscribe(
+        event: OnSubscribeEvent,
+      ): TruePromiseOrDirect<void | readonly GraphQLError[] | ExecutionArgs>;
+    }
+  }
 }
 ```
 
