@@ -122,7 +122,7 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
   const variables = currentUrl.searchParams.get("variables");
   if (query) {
     RURU_CONFIG.initialQuery = query;
-    RURU_CONFIG.initialQariables = variables;
+    RURU_CONFIG.initialVariables = variables;
   }
 }
 </script>
