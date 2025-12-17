@@ -38,7 +38,7 @@ You can run Ruru in many ways:
   - (optional) companion `serveStatic(...)` middleware enables offline usage
 
 [^1]:
-    Jem and I are big fans of the late Terry Pratchett's Discworld universe. The
+    At Graphile, we are big fans of the late Terry Pratchett's Discworld universe. The
     city at the centre of many a Discworld tale is the twin-city city-state of
     Ankh-Morpork. A "morepork" is a type of New Zealand owl, known in Māori as
     "ruru."[^3] Owls have excellent sight, and Ruru helps you to get an insight into not

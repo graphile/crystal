@@ -6,8 +6,8 @@ import * as printCmd from "./print/cli.js";
 export function options(yargs: Argv) {
   return yargs
     .command(
-      "options",
-      "Output the options your config may contain",
+      optionsCmd.command,
+      optionsCmd.description,
       optionsCmd.options,
       optionsCmd.run,
     )
