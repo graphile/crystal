@@ -8,7 +8,29 @@ Grafserv is configured via a [`graphile-config`
 preset](https://star.graphile.org/graphile-config/preset), typically stored to
 `graphile.config.ts` (or variants with an alternative file extension).
 
-## Minimal example
+## Preset
+
+A preset is a combination of other presets, plugins, and options.
+Typically, it is stored as the default export in the `graphile.config.ts` file
+for automatic integration into the Graphile suite,
+but this is not required.
+
+A preset is a simple JavaScript object with keys for different Graphile
+projects. Grafserv configuration lives under the `grafserv` configuration key:
+
+```ts title="graphile.config.ts"
+import type {} from "grafserv";
+
+const preset: GraphileConfig.Preset = {
+  grafserv: {
+    /* options go here */
+  },
+};
+
+export default preset;
+```
+
+### Minimal example
 
 The preset can be an
 empty object, in which case the defaults will be used:
@@ -17,9 +39,9 @@ empty object, in which case the defaults will be used:
 export default {};
 ```
 
-## Common example
+### Common example
 
-Common settings you might wish to configure are outlined below:
+Common settings you might wish to customize are outlined below:
 
 ```ts title="graphile.config.ts"
 import type {} from "grafserv";
@@ -42,25 +64,12 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-## `grafserv` Configuration Reference
-
-The following options apply to the `grafserv` section of your Graphile Config:
-
-```ts title="graphile.config.ts"
-import type {} from "grafserv";
-
-const preset: GraphileConfig.Preset = {
-  grafserv: {
-    /* options go here */
-  },
-};
-
-export default preset;
-```
+## Reference
 
 ### Overview
 
 <!-- START:OPTIONS:grafserv -->
+
 ```ts
 {
   allowedRequestContentTypes?: readonly RequestContentType[];
@@ -207,4 +216,5 @@ Duration (in milliseconds) between pings. Set to `-1` to disable.
 Type: `boolean | undefined`
 
 Should we enable a websockets transport if available?
+
 <!-- END:OPTIONS:grafserv -->
