@@ -143,10 +143,8 @@ export interface PgScalarCodec<
   sqlType: SQL;
 
   /**
-   * If this codec came from a specific database, we should list the executor
-   * here. If the codec is used with multiple databases, leave this null, but
-   * note that if it has attributes then it will not be able to be used as the
-   * type of an attribute itself.
+   * If this codec came from a specific database, specify the executor here. If
+   * the codec is used with multiple databases (or if unsure), set this null.
    */
   executor: PgExecutor | null;
 
@@ -246,6 +244,14 @@ export interface PgCodec<
     | PgCodec<string, undefined, any, any, undefined, any, undefined>
     | undefined,
 > extends PgScalarCodec<TName, TFromPostgres, TFromJavaScript> {
+  /**
+   * If this codec came from a specific database, specify the executor here. If
+   * the codec is used with multiple databases, leave this null, but note that
+   * if it has attributes then it will not be able to be used as the type of an
+   * attribute itself.
+   */
+  executor: PgExecutor | null;
+
   /**
    * If true, this is an anonymous type (e.g. the return type of a
    * `returns record` or `returns table` PostgreSQL function) and thus should

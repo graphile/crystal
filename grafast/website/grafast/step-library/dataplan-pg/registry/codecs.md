@@ -176,9 +176,9 @@ following properties:
 
 ```ts
 /**
- * A codec for a Postgres type, tells us how to convert to-and-from Postgres
- * (including changes to the SQL statement itself). Also includes metadata
- * about the type.
+ * A codec for a Postgres scalar type, tells us how to convert to-and-from
+ * Postgres (including changes to the SQL statement itself). Also includes
+ * metadata about the type.
  */
 export interface PgScalarCodec<
   TName extends string = string,
@@ -261,6 +261,9 @@ export interface PgScalarCodec<
    */
   hasNaturalOrdering?: boolean;
 
+  /**
+   * Documentation for the type.
+   */
   description?: string;
 
   /**
