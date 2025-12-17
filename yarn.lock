@@ -14649,6 +14649,7 @@ __metadata:
     express: "npm:^4.21.2"
     fastify: "npm:^4.29.1"
     grafast: "workspace:^"
+    graphile: "workspace:^"
     graphile-config: "workspace:^"
     graphql: "npm:^16.9.0"
     graphql-http: "npm:^1.22.4"
