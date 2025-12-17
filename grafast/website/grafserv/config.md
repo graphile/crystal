@@ -42,7 +42,8 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-<!-- START:OPTIONS:grafserv -->
+## `grafserv` Configuration Reference
+
 The following options apply to the `grafserv` section of your Graphile Config:
 
 ```ts title="graphile.config.ts"
@@ -57,10 +58,9 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-## `grafserv` Configuration Reference
+### Overview
 
-Configuration options for Grafserv
-
+<!-- START:OPTIONS:grafserv -->
 ```ts
 {
   allowedRequestContentTypes?: readonly RequestContentType[];

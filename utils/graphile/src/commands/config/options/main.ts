@@ -151,15 +151,11 @@ modules).\
         .filter((e) => e.kind === "property")
         .map((r) => r.name)
         .sort();
-      if (scope) {
-        outLater(
-          chalk.whiteBright.bold(`## \`${key}\` Configuration Reference`),
-        );
-      } else {
+      if (!scope) {
         outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
+        outLater();
+        outLater(prettyDocumentation(info?.documentation));
       }
-      outLater();
-      outLater(prettyDocumentation(info?.documentation));
       outLater();
 
       if (relevant) {
@@ -247,24 +243,7 @@ modules).\
 */
   }
 
-  if (scope) {
-    out(
-      `The following options apply to the \`${scope}\` section of your Graphile Config:`,
-    );
-    out("");
-    out('```ts title="graphile.config.ts"');
-    out(`import type {} from "grafserv";`);
-    out("");
-    out(`const preset: GraphileConfig.Preset = {`);
-    out(`  ${scope}: {`);
-    out(`    /* options go here */`);
-    out(`  },`);
-    out("};");
-    out("");
-    out("export default preset;");
-    out("```");
-    out();
-  } else if (entries.length) {
+  if (!scope && entries.length) {
     out("```ts");
     out(`{`);
     for (const entry of entries) {
