@@ -151,7 +151,13 @@ modules).\
         .filter((e) => e.kind === "property")
         .map((r) => r.name)
         .sort();
-      outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
+      if (scope) {
+        outLater(
+          chalk.whiteBright.bold(`## \`${key}\` Configuration Reference`),
+        );
+      } else {
+        outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
+      }
       outLater();
       outLater(prettyDocumentation(info?.documentation));
       outLater();
