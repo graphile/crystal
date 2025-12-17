@@ -1,0 +1,70 @@
+import { execFile } from "node:child_process";
+import { glob, readFile, writeFile } from "node:fs/promises";
+import { promisify, stripVTControlCharacters } from "node:util";
+
+const __dirname = import.meta.dirname;
+
+const execFileAsync = promisify(execFile);
+
+const START = "<!-- START:OPTIONS:";
+const START_END = "-->";
+
+const documentationFiles = await Array.fromAsync(
+  glob("{grafast,postgraphile,graphile-build,utils}/website/**/*/**/*.md", {
+    exclude: ["**/node_modules/**", "**/versioned_docs/**"],
+  }),
+);
+
+await Promise.all(
+  documentationFiles.map(async (file) => {
+    const original = await readFile(file, "utf8");
+    let contents = original;
+    let i = -1;
+    while ((i = contents.indexOf(START, i)) && i >= 0) {
+      const j = contents.indexOf(START_END, i);
+      if (j < 0) {
+        throw new Error(`${START} found but not ${START_END}!`);
+      }
+      const optionsFor = contents.slice(i + START.length, j).trim();
+      const contentStart = j + START_END.length;
+      const startTag = contents.slice(i, contentStart);
+      const closeTag = startTag.replace(/<!-- START/, "<!-- END");
+      const closeTagPosition = contents.indexOf(closeTag, contentStart);
+      if (closeTagPosition < 0) {
+        throw new Error(`${startTag} found, but no ${closeTag}!`);
+      }
+      const newContent = await getContentFor(optionsFor);
+      contents =
+        contents.slice(0, contentStart) +
+        "\n" +
+        newContent +
+        "\n" +
+        contents.slice(closeTagPosition);
+      i = closeTagPosition + closeTag.length;
+    }
+    if (contents !== original) {
+      await writeFile(file, contents);
+    }
+  }),
+);
+
+async function getContentFor(project) {
+  const { cwd, scope } = await getOptionsFor(project);
+  const result = await execFileAsync(
+    `${__dirname}/../utils/graphile/dist/cli-run.js`,
+    ["config", "options", scope],
+    { cwd, encoding: "utf8" },
+  );
+  return stripVTControlCharacters(result.stdout).trim();
+}
+
+async function getOptionsFor(project) {
+  switch (project) {
+    case "grafserv": {
+      return { cwd: "grafast/grafserv", scope: "grafserv" };
+    }
+    default: {
+      throw new Error(`Unknown project ${project}`);
+    }
+  }
+}
