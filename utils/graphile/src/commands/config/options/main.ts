@@ -98,15 +98,15 @@ modules).\
       }
     }
     //console.dir(completions);
+    keys.sort();
+    ["extends", "plugins", "disablePlugins"].reverse().forEach((key) => {
+      const i = keys.indexOf(key);
+      if (i >= 0) {
+        keys.splice(i, 1);
+      }
+      keys.unshift(key);
+    });
   }
-  keys.sort();
-  ["extends", "plugins", "disablePlugins"].reverse().forEach((key) => {
-    const i = keys.indexOf(key);
-    if (i >= 0) {
-      keys.splice(i, 1);
-    }
-    keys.unshift(key);
-  });
 
   let later: Array<string | undefined> = [];
   function outLater(str?: string): void {
