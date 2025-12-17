@@ -11,7 +11,8 @@ codecs for other types using the various helpers.
 
 Every codec has a `name`, which is a handy identifier for you to use to
 reference it (you can reference codecs from the registry via
-`registry.pgCodecs[name]`). A codec also has an `identifier` which is the name
+`registry.pgCodecs[name]`). A codec also has an `sqlType` which is an SQL
+expression giving the name
 of the type in the database.
 
 Codecs are responsible for performing coercion and validation; they should
@@ -91,7 +92,8 @@ which columns it has), but is also useful in other cases.
 The record codec config should contain:
 
 - `name: string` - the name to use for this codec
-- `identifier: SQL` - the database name for this type
+- `identifier: SQL` - an SQL fragment detailing the name of the type in the
+  database
 - `attributes: Record<string, PgCodecAttribute>` - the attributes (columns) on this codec; the keys on this object are the attribute names, and the values are objects with the following options:
   - `codec: PgCodec` - the PgCodec that details the type of this attribute
   - `notNull: boolean` (optional) - if true, indicates that the column cannot be null
@@ -136,7 +138,7 @@ const forumCodec = recordCodec({
 `listOfCodec` returns a new codec that represents a list (array) of the given
 `innerCodec`. Optionally you may provide details about this codec:
 
-- `identifier` - the database name for this type
+- `identifier` - the (SQL) database name for this type
 
 ### Example
 
@@ -168,11 +170,102 @@ codec.
 
 ## Custom scalar codecs
 
-Should you need to define more scalar codecs than those available via `TYPES`, you may create a PgCodec object representing them. The object can have the following properties:
+Should you need to define more scalar codecs than those available via `TYPES`,
+you may create a PgCodec object representing them. The object can have the
+following properties:
 
-- `name: string` (required) - the name to use for this codec
-- `sqlType: string` (required) - the `identifier` for this codec, the SQL fragment that represents the name of the type in the database
-- `fromPg` - optional callback function that, given the textual representation from postgres, returns the internal representation for the value to use in JavaScript
-- `toPg` - optional callback function that, given the internal representation used in JavaScript, returns the value to insert into an SQL statement - this should be a simple scalar (text, etc) that can be cast by postgres
-- `attributes` - see `recordCodec` instead
-- `polymorphism` - see [polymorphism](../polymorphism.md)
+```ts
+/**
+ * A codec for a Postgres type, tells us how to convert to-and-from Postgres
+ * (including changes to the SQL statement itself). Also includes metadata
+ * about the type.
+ */
+export interface PgScalarCodec<
+  TName extends string = string,
+  TFromPostgres = any,
+  TFromJavaScript = TFromPostgres,
+> {
+  /**
+   * Unique name to identify this codec.
+   */
+  name: TName;
+
+  /**
+   * When we have an expression of this type, we can safely cast it within
+   * Postgres using the cast `(${expression})::${sqlType}` to make the type
+   * explicit.
+   */
+  sqlType: SQL;
+
+  /**
+   * If this codec came from a specific database, specify the executor here. If
+   * the codec is used with multiple databases (or if unsure), set this null.
+   */
+  executor: PgExecutor | null;
+
+  /**
+   * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
+   * statement.
+   *
+   * **IMPORTANT**: nulls must already be handled!
+   */
+  toPg: PgEncode<TFromJavaScript>;
+
+  /**
+   * Given a text value from PostgreSQL, returns the value cast to TCanonical.
+   *
+   * **IMPORTANT**: nulls must already be handled!
+   */
+  fromPg: PgDecode<TFromJavaScript, TFromPostgres>;
+
+  /**
+   * We'll append `::text` by default to each selection; however if this type
+   * needs something special (e.g. `money` should be converted to `numeric`
+   * before being converted to `text`) then you can provide this custom
+   * callback to provide your own casting - this could even include function
+   * calls if you want.
+   */
+  castFromPg?: (fragment: SQL, guaranteedNotNull?: boolean) => SQL;
+
+  /**
+   * If you provide `castFromPg` you probably ought to also specify
+   * `listCastFromPg` so that a list of this type can be converted properly.
+   */
+  listCastFromPg?: (fragment: SQL, guaranteedNotNull?: boolean) => SQL;
+
+  /**
+   * True if this type is a binary type (e.g. bytea)
+   */
+  isBinary?: boolean;
+
+  /**
+   * True if doing an equality check for this value would have intuitive
+   * results for a human. E.g. `3.0` and `3.0000` when encoded as `float` are
+   * the same as a human would expect, so `float` has natural equality. On the
+   * other hand Postgres sees the `json` `{"a":1}` as different to
+   * `{ "a": 1 }`), whereas a human would see these as the same JSON objects,
+   * so `json` does not have natural equality.
+   *
+   * Typically true primitives will set this true.
+   */
+  hasNaturalEquality?: boolean;
+
+  /**
+   * True if this type has a natural ordering that would be intuitive for a human.
+   * For example numbers and text have natural ordering, whereas `{"a":1}` and
+   * `{ "a": 2 }` are not so obvious. Similarly, a `point` could be ordered in many
+   * ways relative to another point (x-first, then y; y-first, then x; distance
+   * from origin first, then angle; etc) so do not have natural order.
+   *
+   * Typically true primitives will set this true.
+   */
+  hasNaturalOrdering?: boolean;
+
+  description?: string;
+
+  /**
+   * Arbitrary metadata
+   */
+  extensions?: Partial<PgCodecExtensions>;
+}
+```

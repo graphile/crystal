@@ -121,33 +121,34 @@ export type PgCodecPolymorphism<TAttributeName extends string> =
   | PgCodecPolymorphismUnion;
 
 /**
- * A codec for a Postgres type, tells us how to convert to-and-from Postgres
- * (including changes to the SQL statement itself). Also includes metadata
- * about the type, for example any of the attributes it has.
+ * A codec for a Postgres scalar type, tells us how to convert to-and-from
+ * Postgres (including changes to the SQL statement itself). Also includes
+ * metadata about the type.
  */
-export interface PgCodec<
+export interface PgScalarCodec<
   TName extends string = string,
-  TAttributes extends PgCodecAttributes | undefined =
-    | PgCodecAttributes
-    | undefined,
   TFromPostgres = any,
   TFromJavaScript = TFromPostgres,
-  TArrayItemCodec extends
-    | PgCodec<string, any, any, any, any, any, any>
-    | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
-  TDomainItemCodec extends
-    | PgCodec<string, any, any, any, any, any, any>
-    | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
-  TRangeItemCodec extends
-    | PgCodec<string, undefined, any, any, undefined, any, undefined>
-    | undefined =
-    | PgCodec<string, undefined, any, any, undefined, any, undefined>
-    | undefined,
 > {
   /**
    * Unique name to identify this codec.
    */
   name: TName;
+
+  /**
+   * When we have an expression of this type, we can safely cast it within
+   * Postgres using the cast `(${expression})::${sqlType}` to make the type
+   * explicit.
+   */
+  sqlType: SQL;
+
+  /**
+   * If this codec came from a specific database, we should list the executor
+   * here. If the codec is used with multiple databases, leave this null, but
+   * note that if it has attributes then it will not be able to be used as the
+   * type of an attribute itself.
+   */
+  executor: PgExecutor | null;
 
   /**
    * Given a value of type TFromJavaScript, returns an `SQL` value to insert into an SQL
@@ -180,28 +181,9 @@ export interface PgCodec<
   listCastFromPg?: (fragment: SQL, guaranteedNotNull?: boolean) => SQL;
 
   /**
-   * When we have an expression of this type, we can safely cast it within
-   * Postgres using the cast `(${expression})::${sqlType}` to make the type
-   * explicit.
-   */
-  sqlType: SQL;
-
-  /**
-   * If true, this is an anonymous type (e.g. the return type of a
-   * `returns record` or `returns table` PostgreSQL function) and thus should
-   * not be referenced via `sqlType` directly.
-   */
-  isAnonymous?: boolean;
-
-  /**
    * True if this type is a binary type (e.g. bytea)
    */
   isBinary?: boolean;
-
-  /**
-   * True if this type is an enum type
-   */
-  isEnum?: boolean;
 
   /**
    * True if doing an equality check for this value would have intuitive
@@ -225,6 +207,56 @@ export interface PgCodec<
    * Typically true primitives will set this true.
    */
   hasNaturalOrdering?: boolean;
+
+  /**
+   * Documentation for the type.
+   */
+  description?: string;
+
+  /**
+   * Arbitrary metadata
+   */
+  extensions?: Partial<PgCodecExtensions>;
+
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
+}
+
+/**
+ * A codec for an arbitrary Postgres type, tells us how to convert to-and-from
+ * Postgres (including changes to the SQL statement itself). Also includes
+ * metadata about the type, for example any of the attributes it has.
+ */
+export interface PgCodec<
+  TName extends string = string,
+  TAttributes extends PgCodecAttributes | undefined =
+    | PgCodecAttributes
+    | undefined,
+  TFromPostgres = any,
+  TFromJavaScript = TFromPostgres,
+  TArrayItemCodec extends
+    | PgCodec<string, any, any, any, any, any, any>
+    | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
+  TDomainItemCodec extends
+    | PgCodec<string, any, any, any, any, any, any>
+    | undefined = PgCodec<string, any, any, any, any, any, any> | undefined,
+  TRangeItemCodec extends
+    | PgCodec<string, undefined, any, any, undefined, any, undefined>
+    | undefined =
+    | PgCodec<string, undefined, any, any, undefined, any, undefined>
+    | undefined,
+> extends PgScalarCodec<TName, TFromPostgres, TFromJavaScript> {
+  /**
+   * If true, this is an anonymous type (e.g. the return type of a
+   * `returns record` or `returns table` PostgreSQL function) and thus should
+   * not be referenced via `sqlType` directly.
+   */
+  isAnonymous?: boolean;
+
+  /**
+   * True if this type is an enum type
+   */
+  isEnum?: boolean;
 
   /**
    * If this is a composite type, the attributes it supports.
@@ -273,29 +305,11 @@ export interface PgCodec<
 
   polymorphism?: PgCodecPolymorphism<any>;
 
-  description?: string;
-
-  /**
-   * Arbitrary metadata
-   */
-  extensions?: Partial<PgCodecExtensions>;
-
   /**
    * Relations to follow for shortcut references, can be polymorphic, can be
    * many-to-many.
    */
   refs?: PgCodecRefs;
-
-  /**
-   * If this codec came from a specific database, we should list the executor
-   * here. If the codec is used with multiple databases, leave this null, but
-   * note that if it has attributes then it will not be able to be used as the
-   * type of an attribute itself.
-   */
-  executor: PgExecutor | null;
-
-  /** @internal */
-  [inspect.custom]?: CustomInspectFunction;
 }
 
 export type PgCodecWithAttributes<
