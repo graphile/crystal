@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import chalk from "chalk";
 
 import {
@@ -11,7 +13,7 @@ import {
 
 export function main(options: { filename?: string; quiet?: boolean }) {
   const { filename, quiet } = options;
-  const { getCompletions, getQuickInfo } = configVfs({
+  const { getCompletions, getDefinitions, getQuickInfo } = configVfs({
     filename,
     initialCode: `\
 const inflection: GraphileBuild.Inflection = null as any;
@@ -63,6 +65,7 @@ on the plugins and presets you use. You should regenerate it from time to time
     const key = entry.name;
     const withProperty = accessKey(key);
     const info = getQuickInfo(withProperty);
+    const definitions = getDefinitions(withProperty);
     //entries.push(
     //  `${chalk.cyanBright(key)}${prettyQuickInfoDisplayParts(info)};`,
     //);
@@ -78,6 +81,14 @@ on the plugins and presets you use. You should regenerate it from time to time
 
     outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
     outLater();
+    if (definitions.length) {
+      outLater(chalk.gray(`Defined in:`));
+      for (const def of definitions) {
+        const relativePath = path.relative(process.cwd(), def.fileName);
+        outLater(chalk.gray(`- ${relativePath}:${def.line}:${def.column}`));
+      }
+      outLater();
+    }
     outLater(prettyDocumentation(info?.documentation));
     outLater();
     outLater("```ts");
