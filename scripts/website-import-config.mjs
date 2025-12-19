@@ -14,6 +14,11 @@ const PROJECTS = {
     cwd: "grafast/grafast",
     scope: "grafast",
   },
+  postgraphile: {
+    cwd: "postgraphile/postgraphile",
+    scope: "postgraphile",
+    extraArgs: ["-C", "graphile.config.vanilla.ts"],
+  },
 };
 
 const START = "<!-- START:OPTIONS:";
@@ -62,10 +67,10 @@ await Promise.all(
 async function getContentFor(project) {
   const config = PROJECTS[project];
   if (!config) throw new Error(`Unknown project ${JSON.stringify(project)}`);
-  const { cwd, scope } = config;
+  const { cwd, scope, extraArgs = [] } = config;
   const result = await execFileAsync(
     `${__dirname}/../utils/graphile/dist/cli-run.js`,
-    ["config", "options", scope],
+    ["config", "options", ...extraArgs, scope],
     { cwd, encoding: "utf8" },
   );
   if (result.stderr.trim().length > 0) {
