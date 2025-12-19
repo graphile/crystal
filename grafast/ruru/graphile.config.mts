@@ -1,4 +1,4 @@
-import "graphile-config";
+import type {} from "ruru/server";
 
 const preset: GraphileConfig.Preset = {
   ruru: {
@@ -8,4 +8,5 @@ const preset: GraphileConfig.Preset = {
     },
   },
 };
+
 export default preset;

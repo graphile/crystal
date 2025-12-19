@@ -18,6 +18,15 @@ const PROJECTS = {
     cwd: "grafast/grafast",
     scope: "grafast",
   },
+  ruru: {
+    cwd: "grafast/ruru",
+    scope: "ruru",
+    extraArgs: ["-C", "graphile.config.mts"],
+  },
+  postgraphile_inflection: {
+    ...postgraphileBase,
+    scope: "inflection",
+  },
   postgraphile_gather: {
     ...postgraphileBase,
     scope: "gather",
@@ -33,6 +42,10 @@ const PROJECTS = {
   postgraphile_grafserv: {
     ...postgraphileBase,
     scope: "grafserv",
+  },
+  postgraphile_ruru: {
+    ...postgraphileBase,
+    scope: "ruru",
   },
 };
 
