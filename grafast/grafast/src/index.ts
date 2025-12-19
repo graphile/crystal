@@ -965,6 +965,8 @@ declare global {
        *
        * This must be set higher than the largest `@stream(initialCount:)`
        * argument you want to support.
+       *
+       * @advanced
        */
       distributorTargetBufferSize?: number;
 
@@ -974,6 +976,8 @@ declare global {
        * pause again.
        *
        * Must be at least 1. Recommend you set this fairly large.
+       *
+       * @advanced
        */
       distributorTargetBufferSizeIncrement?: number;
 
@@ -983,6 +987,8 @@ declare global {
        * `distributorTargetBufferSize` has been reached.
        *
        * Must be at least 0.
+       *
+       * @advanced
        */
       distributorPauseDuration?: number;
     }

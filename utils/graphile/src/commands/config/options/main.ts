@@ -160,15 +160,27 @@ modules).\
 
       if (relevant) {
         const subentries: string[] = [];
+        const advancedSubentries: string[] = [];
         let laterStill: Array<string | undefined> = [];
-        const outLaterStill = (line?: string): void => {
-          laterStill.push(line);
-        };
+        let evenLaterStill: Array<string | undefined> = [];
         for (const subkey of relevant) {
           const withSubpropertyAccess =
             withProperty + `preset${accessKey(key)}!${accessKey(subkey)}`;
           const info = getQuickInfo(withSubpropertyAccess);
-          subentries.push(
+          const advancedTag = info?.tags?.find((t) => t.name === "advanced");
+          const isAdvanced = !!advancedTag;
+          const outLaterStill = (line?: string): void => {
+            const target = isAdvanced ? evenLaterStill : laterStill;
+            if (isAdvanced && evenLaterStill.length === 0) {
+              evenLaterStill.push("### Advanced");
+              evenLaterStill.push("");
+              evenLaterStill.push(
+                "Only use these settings if you know what you are doing!",
+              );
+            }
+            target.push(line);
+          };
+          (isAdvanced ? advancedSubentries : subentries).push(
             `${chalk.greenBright.bold(subkey)}?: ${prettyDisplayParts(
               info?.displayParts,
               ":",
@@ -177,32 +189,54 @@ modules).\
               .trim()};`,
           );
           /*
-        const def = env.languageService.getDefinitionAtPosition(
-          FAKE_FILENAME,
-          contentWithSubpropertyAccess.length,
-        );
-        const hints = env.languageService.provideInlayHints(
-          FAKE_FILENAME,
-          ts.createTextSpan(
+          const def = env.languageService.getDefinitionAtPosition(
+            FAKE_FILENAME,
+            contentWithSubpropertyAccess.length,
+          );
+          const hints = env.languageService.provideInlayHints(
+            FAKE_FILENAME,
+            ts.createTextSpan(
+              contentWithProperty.length,
+              contentWithSubpropertyAccess.length - contentWithProperty.length,
+            ),
+            undefined,
+          );
+          const com = env.languageService.getDocCommentTemplateAtPosition(
+            FAKE_FILENAME,
             contentWithProperty.length,
-            contentWithSubpropertyAccess.length - contentWithProperty.length,
-          ),
-          undefined,
-        );
-        const com = env.languageService.getDocCommentTemplateAtPosition(
-          FAKE_FILENAME,
-          contentWithProperty.length,
-        );
-        console.log(key, subkey, info, def, hints, com);
-        */
+          );
+          console.log(key, subkey, info, def, hints, com);
+          */
           outLaterStill(
             chalk.whiteBright(
-              `### ${chalk.cyanBright.bold(key)}.${chalk.greenBright.bold(
+              `${isAdvanced ? "####" : "###"} ${chalk.cyanBright.bold(key)}.${chalk.greenBright.bold(
                 subkey,
               )}`,
             ),
           );
           outLaterStill();
+          const experimentalTag = info?.tags?.find(
+            (t) => t.name === "experimental",
+          );
+          if (experimentalTag) {
+            outLaterStill(":::danger Experimental");
+            outLaterStill();
+            outLaterStill(
+              prettyDisplayParts(experimentalTag.text) ??
+                "This feature may change or be removed in a patch release.",
+            );
+            outLaterStill();
+            outLaterStill(":::");
+            outLaterStill();
+          }
+          if (advancedTag?.text) {
+            outLaterStill(":::warning Advanced");
+            outLaterStill();
+            outLaterStill(prettyDisplayParts(advancedTag.text));
+            outLaterStill();
+            outLaterStill(":::");
+            outLaterStill();
+          }
           const displayParts = prettyDisplayParts(info?.displayParts, ":");
           outLaterStill(
             `${chalk.greenBright.bold("Type")}: \`${
@@ -216,10 +250,17 @@ modules).\
           outLaterStill();
         }
 
-        if (subentries.length) {
+        if (subentries.length || advancedSubentries.length) {
           outLater("```ts");
           outLater(`{`);
           for (const entry of subentries) {
+            outLater("  " + entry);
+          }
+          if (subentries.length && advancedSubentries.length) {
+            outLater("");
+            outLater("  // Advanced");
+          }
+          for (const entry of advancedSubentries) {
             outLater("  " + entry);
           }
           outLater("}");
@@ -229,7 +270,11 @@ modules).\
         for (const line of laterStill) {
           outLater(line);
         }
+        for (const line of evenLaterStill) {
+          outLater(line);
+        }
         laterStill = [];
+        evenLaterStill = [];
       }
     }
     /*

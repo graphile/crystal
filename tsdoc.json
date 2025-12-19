@@ -8,6 +8,10 @@
     {
       "tagName": "@rc",
       "syntaxKind": "inline"
+    },
+    {
+      "tagName": "@advanced",
+      "syntaxKind": "inline"
     }
   ],
   "supportForTags": {
