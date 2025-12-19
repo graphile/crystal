@@ -175,6 +175,7 @@ modules).\
           const advancedTag = tags.get("advanced");
           const deprecatedTag = tags.get("deprecated");
           const experimentalTag = tags.get("experimental");
+          const defaultValueTag = tags.get("defaultValue");
 
           const isDeprecated = !!deprecatedTag;
           const isAdvanced = !!advancedTag;
@@ -278,6 +279,14 @@ modules).\
                 : chalk.gray("unknown")
             }\``,
           );
+          if (defaultValueTag?.text) {
+            outLaterStill(
+              `${chalk.greenBright.bold("Default value")}: ${prettyDisplayParts(
+                defaultValueTag.text,
+                "",
+              )}`,
+            );
+          }
           outLaterStill();
           outLaterStill(prettyDocumentation(info?.documentation));
           outLaterStill();
