@@ -85,7 +85,7 @@ export interface PgDatabase {
    * - i = icu
    *
    *
-   * @remarks Only in 17.x, 16.x, 15.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x
    */
   datlocprovider?: string | null | undefined;
 
@@ -94,7 +94,7 @@ export interface PgDatabase {
    * the pg_event_trigger table during each backend startup. This flag is used internally by PostgreSQL and should not be
    * manually altered or read for monitoring purposes.
    *
-   * @remarks Only in 17.x
+   * @remarks Only in 18.x, 17.x
    */
   dathasloginevt?: boolean | null | undefined;
 
@@ -102,14 +102,14 @@ export interface PgDatabase {
    * Collation provider locale name for this database. If the provider is libc, datlocale is NULL; datcollate and
    * datctype are used instead.
    *
-   * @remarks Only in 17.x
+   * @remarks Only in 18.x, 17.x
    */
   datlocale?: string | null | undefined;
 
   /**
    * ICU collation rules for this database
    *
-   * @remarks Only in 17.x, 16.x
+   * @remarks Only in 18.x, 17.x, 16.x
    */
   daticurules?: string | null | undefined;
 
@@ -117,7 +117,7 @@ export interface PgDatabase {
    * Provider-specific version of the collation. This is recorded when the database is created and then checked when it
    * is used, to detect changes in the collation definition that could lead to data corruption.
    *
-   * @remarks Only in 17.x, 16.x, 15.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x
    */
   datcollversion?: string | null | undefined;
 
@@ -321,11 +321,20 @@ export interface PgClass {
   /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
 
   /**
+   * Number of pages that are marked all-frozen in the table's visibility map. This is only an estimate used for
+   * triggering autovacuums. It can also be used along with relallvisible for scheduling manual vacuums and tuning
+   * vacuum's freezing behavior. It is updated by VACUUM, ANALYZE, and a few DDL commands such as CREATE INDEX.
+   *
+   * @remarks Only in 18.x
+   */
+  relallfrozen?: number | null | undefined;
+
+  /**
    * For new relations being written during a DDL operation that requires a table rewrite, this contains the OID of the
    * original relation; otherwise zero. That state is only visible internally; this field should never contain anything
    * other than zero for a user-visible relation.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
    */
   relrewrite?: PgOid | null | undefined;
 
@@ -375,12 +384,6 @@ export interface PgAttribute {
   attnum: number;
 
   /**
-   * Always -1 in storage, but when loaded into a row descriptor in memory this might be updated to cache the offset of
-   * the attribute within the row
-   */
-  attcacheoff: number | null;
-
-  /**
    * atttypmod records type-specific data supplied at table creation time (for example, the maximum length of a varchar
    * column). It is passed to type-specific input functions and length coercion functions. The value will generally be -1
    * for types that do not need atttypmod.
@@ -405,7 +408,7 @@ export interface PgAttribute {
    */
   attstorage: string | null;
 
-  /** This represents a not-null constraint. */
+  /** This column has a (possibly invalid) not-null constraint. */
   attnotnull: boolean | null;
 
   /**
@@ -463,7 +466,7 @@ export interface PgAttribute {
    * (see [guc-default-toast-compression]). Otherwise, 'p' selects pglz compression, while 'l' selects LZ4 compression.
    * However, this field is ignored whenever attstorage does not allow compression.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x
    */
   attcompression?: string | null | undefined;
 
@@ -472,24 +475,32 @@ export interface PgAttribute {
    * added with a non-volatile DEFAULT value after the row is created. The actual value used is stored in the
    * attmissingval column.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
    */
   atthasmissing?: boolean | null | undefined;
 
   /**
-   * If a zero byte (''), then not a generated column. Otherwise, s = stored. (Other values might be added in the
-   * future.)
+   * If a zero byte (''), then not a generated column. Otherwise, s = stored, v = virtual. A stored generated column is
+   * physically stored like a normal column. A virtual generated column is physically stored as a null value, with the
+   * actual value being computed at run time.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x
    */
   attgenerated?: string | null | undefined;
+
+  /**
+   * Always -1 in storage, but when loaded into a row descriptor in memory this might be updated to cache the offset of
+   * the attribute within the row
+   *
+   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x, 10.x
+   */
+  attcacheoff?: number | null | undefined;
 }
 
 /**
- * The catalog pg_constraint stores check, primary key, unique, foreign key, and exclusion constraints on tables, as
- * well as not-null constraints on domains. (Column constraints are not treated specially. Every column constraint is
- * equivalent to some table constraint.) Not-null constraints on relations are represented in the pg_attribute catalog,
- * not here.
+ * The catalog pg_constraint stores check, not-null, primary key, unique, foreign key, and exclusion constraints on
+ * tables. (Column constraints are not treated specially. Every column constraint is equivalent to some table
+ * constraint.)
  */
 export interface PgConstraint {
   /* COMMON FIELDS */
@@ -506,7 +517,7 @@ export interface PgConstraint {
   /**
    * - c = check constraint,
    * - f = foreign key constraint,
-   * - n = not-null constraint (domains only),
+   * - n = not-null constraint,
    * - p = primary key constraint,
    * - u = unique constraint,
    * - t = constraint trigger,
@@ -520,7 +531,7 @@ export interface PgConstraint {
   /** Is the constraint deferred by default? */
   condeferred: boolean | null;
 
-  /** Has the constraint been validated? Currently, can be false only for foreign keys and CHECK constraints */
+  /** Has the constraint been validated? */
   convalidated: boolean | null;
 
   /** The table this constraint is on; zero if not a table constraint */
@@ -596,7 +607,10 @@ export interface PgConstraint {
   /** If a foreign key, list of the equality operators for FK = FK comparisons */
   conffeqop: ReadonlyArray<PgOid> | null;
 
-  /** If an exclusion constraint, list of the per-column exclusion operators */
+  /**
+   * If an exclusion constraint or WITHOUT OVERLAPS primary key/unique constraint, list of the per-column exclusion
+   * operators.
+   */
   conexclop: ReadonlyArray<PgOid> | null;
 
   /**
@@ -608,17 +622,32 @@ export interface PgConstraint {
   /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
 
   /**
+   * Is the constraint enforced?
+   *
+   * @remarks Only in 18.x
+   */
+  conenforced?: boolean | null | undefined;
+
+  /**
    * The corresponding constraint of the parent partitioned table, if this is a constraint on a partition; else zero
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
    */
   conparentid?: PgOid | null | undefined;
+
+  /**
+   * This constraint is defined with WITHOUT OVERLAPS (for primary keys and unique constraints) or PERIOD (for foreign
+   * keys).
+   *
+   * @remarks Only in 18.x
+   */
+  conperiod?: boolean | null | undefined;
 
   /**
    * If a foreign key with a SET NULL or SET DEFAULT delete action, the columns that will be updated. If null, all of the
    * referencing columns will be updated.
    *
-   * @remarks Only in 17.x, 16.x, 15.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x
    */
   confdelsetcols?: ReadonlyArray<number> | null | undefined;
 
@@ -667,7 +696,7 @@ export interface PgProc {
 
   /**
    * The function has no side effects. No information about the arguments is conveyed except via the return value. Any
-   * function that might throw an error depending on the values of its arguments is not leak-proof.
+   * function that might throw an error depending on the values of its arguments is not leakproof.
    */
   proleakproof: boolean | null;
 
@@ -767,14 +796,14 @@ export interface PgProc {
   /**
    * Planner support function for this function (see [xfunc-optimization]), or zero if none
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x
    */
   prosupport?: PgOid | null | undefined;
 
   /**
    * f for a normal function, p for a procedure, a for an aggregate function, or w for a window function
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
    */
   prokind?: string | null | undefined;
 
@@ -782,7 +811,7 @@ export interface PgProc {
    * Pre-parsed SQL function body. This is used for SQL-language functions when the body is given in SQL-standard
    * notation rather than as a string literal. It's null in other cases.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x
    */
   prosqlbody?: string | null | undefined;
 
@@ -883,21 +912,21 @@ export interface PgAuthMembers {
   /**
    * Row identifier
    *
-   * @remarks Only in 17.x, 16.x
+   * @remarks Only in 18.x, 17.x, 16.x
    */
   _id?: PgOid | undefined;
 
   /**
    * True if the member automatically inherits the privileges of the granted role
    *
-   * @remarks Only in 17.x, 16.x
+   * @remarks Only in 18.x, 17.x, 16.x
    */
   inherit_option?: boolean | null | undefined;
 
   /**
    * True if the member can SET ROLE to the granted role
    *
-   * @remarks Only in 17.x, 16.x
+   * @remarks Only in 18.x, 17.x, 16.x
    */
   set_option?: boolean | null | undefined;
 }
@@ -1080,7 +1109,7 @@ export interface PgType {
    * types have typsubscript = array_subscript_handler, but other types may have other handler functions to implement
    * specialized subscripting behavior.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x
    */
   typsubscript?: PgOid | null | undefined;
 }
@@ -1233,7 +1262,7 @@ export interface PgIndex {
    * The number of key columns in the index, not counting any included columns, which are merely stored and do not
    * participate in the index semantics
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
    */
   indnkeyatts?: number | null | undefined;
 
@@ -1242,7 +1271,7 @@ export interface PgIndex {
    * index can contain multiple null values in a column, the default PostgreSQL behavior). If it is true, it will
    * consider null values to be equal (so the index can only contain one null value in a column).
    *
-   * @remarks Only in 17.x, 16.x, 15.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x
    */
   indnullsnotdistinct?: boolean | null | undefined;
 }
@@ -1272,7 +1301,7 @@ export interface PgInherits {
   /**
    * true for a partition that is in the process of being detached; false otherwise.
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x
    */
   inhdetachpending?: boolean | null | undefined;
 }
@@ -1364,7 +1393,7 @@ export interface PgPolicy {
   /**
    * Row identifier
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x, 13.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x
    */
   _id?: PgOid | undefined;
 }
@@ -1396,7 +1425,7 @@ export interface PgRange {
   /**
    * OID of the multirange type for this range type
    *
-   * @remarks Only in 17.x, 16.x, 15.x, 14.x
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x
    */
   rngmultitypid?: PgOid | null | undefined;
 }
