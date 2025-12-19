@@ -3155,7 +3155,7 @@ function buildTheQuery<
       const extraSelects: SQL[] = [];
 
       const identifierIndexOffset =
-        extraSelects.push(sql`${identifiersAlias}.idx`) - 1;
+        extraSelects.push(sql`(${identifiersAlias}.ord - 1)`) - 1;
       // PERF: try and re-use existing trueOrderBySQL selection?
       const rowNumberIndexOffset =
         forceOrder || limit != null || offset != null
@@ -3233,19 +3233,13 @@ function buildTheQuery<
        */
       const text = `\
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-        queryValues.length > 0
-          ? `, ${queryValues
-              .map(({ codec }, idx) => {
-                return `(ids.value->>${idx})::${
-                  sql.compile(codec.sqlType).text
-                } as "id${idx}"`;
-              })
-              .join(", ")}`
-          : ""
-      } from json_array_elements($${
-        rawSqlValues.length + 1
-      }::json) with ordinality as ids) as ${identifiersAliasText},
+from rows from (json_to_recordset($${rawSqlValues.length + 1}::json) as (${queryValues
+        .map(({ codec }, idx) => `"${idx}" ${sql.compile(codec.sqlType).text}`)
+        .join(", ")}))
+with ordinality as ${identifiersAliasText} (${[
+        ...queryValues.map((_, idx) => `"id${idx}"`),
+        "ord",
+      ].join(", ")}),
 ${lateralText};`;
 
       return { text, rawSqlValues, identifierIndex };
