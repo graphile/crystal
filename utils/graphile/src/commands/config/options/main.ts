@@ -272,18 +272,18 @@ modules).\
             outLaterStill();
           }
           const displayParts = prettyDisplayParts(info?.displayParts, ":");
+          const hasDefaultValue = defaultValueTag?.text;
           outLaterStill(
             `${chalk.greenBright.bold("Type")}: \`${
               displayParts
                 ? chalk.whiteBright(displayParts)
                 : chalk.gray("unknown")
-            }\``,
+            }\`${hasDefaultValue ? "  " : ""}`,
           );
-          if (defaultValueTag?.text) {
+          if (hasDefaultValue) {
             outLaterStill(
               `${chalk.greenBright.bold("Default value")}: ${prettyDisplayParts(
                 defaultValueTag.text,
-                "",
               )}`,
             );
           }

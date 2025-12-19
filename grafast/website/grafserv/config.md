@@ -183,7 +183,7 @@ already, use `stringifyPayload` before sending to the user
 
 ### grafserv.parseAndValidateCacheSize
 
-Type: `number | undefined`
+Type: `number | undefined`  
 Default value: `500`
 
 How many documents should we cache the parse and validate result for?
@@ -208,7 +208,7 @@ Set true to enable watch mode
 
 ### grafserv.websocketKeepalive
 
-Type: `number | undefined`
+Type: `number | undefined`  
 Default value: `12_000`
 
 Duration (in milliseconds) between pings. Set to `-1` to disable.
