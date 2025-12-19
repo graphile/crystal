@@ -415,6 +415,8 @@ Must be at least 1. Recommend you set this fairly large.
   maxRequestLength?: number;
   outputDataAsString?: boolean;
   parseAndValidateCacheSize?: number;
+  pgJwtSecret?: Secret | GetPublicKeyOrSecret;
+  pgJwtVerifyOptions?: VerifyOptions;
   port?: number;
   schemaWaitTime?: number;
   watch?: boolean;
@@ -516,6 +518,14 @@ Type: `number | undefined`
 Default value: `500`
 
 How many documents should we cache the parse and validate result for?
+
+### grafserv.pgJwtSecret
+
+Type: `Secret | GetPublicKeyOrSecret | undefined`
+
+### grafserv.pgJwtVerifyOptions
+
+Type: `VerifyOptions | undefined`
 
 ### grafserv.port
 
