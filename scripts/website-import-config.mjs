@@ -2,17 +2,28 @@ import { execFile } from "node:child_process";
 import { glob, readFile, writeFile } from "node:fs/promises";
 import { promisify, stripVTControlCharacters } from "node:util";
 
+const execFileAsync = promisify(execFile);
 const __dirname = import.meta.dirname;
 
-const execFileAsync = promisify(execFile);
+const PROJECTS = {
+  grafserv: {
+    cwd: "grafast/grafserv",
+    scope: "grafserv",
+  },
+  grafast: {
+    cwd: "grafast/grafast",
+    scope: "grafast",
+  },
+};
 
 const START = "<!-- START:OPTIONS:";
 const START_END = "-->";
 
 const documentationFiles = await Array.fromAsync(
-  glob("{grafast,postgraphile,graphile-build,utils}/website/**/*/**/*.md", {
-    exclude: ["**/node_modules/**", "**/versioned_docs/**"],
-  }),
+  glob(
+    "{grafast,postgraphile,graphile-build,utils}/website/**/*/**/*.{md,mdx}",
+    { exclude: ["**/node_modules/**", "**/versioned_docs/**"] },
+  ),
 );
 
 await Promise.all(
@@ -36,9 +47,9 @@ await Promise.all(
       const newContent = await getContentFor(optionsFor);
       contents =
         contents.slice(0, contentStart) +
-        "\n" +
+        "\n\n" +
         newContent +
-        "\n" +
+        "\n\n" +
         contents.slice(closeTagPosition);
       i = closeTagPosition + closeTag.length;
     }
@@ -49,22 +60,13 @@ await Promise.all(
 );
 
 async function getContentFor(project) {
-  const { cwd, scope } = await getOptionsFor(project);
+  const config = PROJECTS[project];
+  if (!config) throw new Error(`Unknown project ${JSON.stringify(project)}`);
+  const { cwd, scope } = config;
   const result = await execFileAsync(
     `${__dirname}/../utils/graphile/dist/cli-run.js`,
     ["config", "options", scope],
     { cwd, encoding: "utf8" },
   );
   return stripVTControlCharacters(result.stdout).trim();
-}
-
-async function getOptionsFor(project) {
-  switch (project) {
-    case "grafserv": {
-      return { cwd: "grafast/grafserv", scope: "grafserv" };
-    }
-    default: {
-      throw new Error(`Unknown project ${project}`);
-    }
-  }
 }
