@@ -79,7 +79,31 @@ ${initialCode}`;
     return info;
   }
 
-  return { env, FAKE_FILENAME, BASE_CONTENT, getCompletions, getQuickInfo };
+  function getDefinitions(additionalContent = "", offsetFromEnd = 0) {
+    const contentWithProperty = BASE_CONTENT + additionalContent;
+    env.updateFile(FAKE_FILENAME, contentWithProperty);
+    const pos = contentWithProperty.length - offsetFromEnd;
+    const program = env.languageService.getProgram();
+    const definitions =
+      env.languageService.getDefinitionAndBoundSpan(FAKE_FILENAME, pos)
+        ?.definitions ?? [];
+    return definitions.map((def) => {
+      const sourceFile = program?.getSourceFile(def.fileName);
+      const lc = sourceFile
+        ? ts.getLineAndCharacterOfPosition(sourceFile, def.textSpan.start)
+        : { line: 0, character: 0 };
+      return { ...def, line: lc.line + 1, column: lc.character + 1 };
+    });
+  }
+
+  return {
+    env,
+    FAKE_FILENAME,
+    BASE_CONTENT,
+    getCompletions,
+    getQuickInfo,
+    getDefinitions,
+  };
 }
 
 /**
