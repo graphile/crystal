@@ -1,8 +1,97 @@
 ---
-sidebar_position: 11
+sidebar_position: 12
 ---
 
-# Config
+# Configuration
+
+Gra*fast* can operate without configuration; however if you'd like to customized
+advanced settings you may do so by passing a **resolved** [Graphile Config
+preset](https://star.graphile.org/graphile-config/preset) to the `grafast()`
+function; this is normally handled for you by your Grafast server (e.g. Grafserv
+or envelop).
+
+Typically you'd also pass a `requestContext` object that's used to share
+information about the wider request with the preset (e.g. so it can read HTTP
+headers).
+
+:::tip `graphile.config.ts` is not automatically read
+
+Gra*fast* does not automatically search for this configuration, you (or your
+server framework) must pass it explicitly.
+
+:::
+
+## Usage
+
+Your configuration preset is typically stored to a `graphile.config.ts` file
+(perhaps with an alternative extension), and Grafast configuration options go in
+the `grafast` scope:
+
+```ts title="graphile.config.ts"
+import type {} from "grafast";
+
+const preset: GraphileConfig.Preset = {
+  grafast: {
+    /* options go here */
+  },
+};
+
+export default preset;
+```
+
+You must then import and resolve this preset, passing the result to
+`grafast({...})`:
+
+```ts
+import { resolvePreset } from "graphile-config";
+import { grafast } from "grafast";
+import preset from "./graphile.config.ts";
+import schema from "./schema.ts";
+
+const resolvedPreset = resolvePreset(preset);
+
+const result = await grafast({
+  resolvedPreset,
+  requestContext: {
+    /* Typically populated by your server */
+  },
+  schema,
+  source: /* GraphQL */ `
+    {
+      __typename
+    }
+  `,
+});
+```
+
+## Example
+
+### Adding request data to GraphQL context
+
+In this configuration, we use the `grafast.context` callback function to further
+populate the GraphQL context with information from the HTTP request, if there is
+one. Assuming we're using `grafserv` with our Express v4 server, the
+`requestContext.expressv4` object should be populated; GraphQL calls that do not
+go through this adaptor may not populate this value and thus we use optional
+chaining for safe access. Finally we extract the user's ID (if there is one) and
+return it in an object to be merged with the GraphQL context passed into the
+`grafast({...})` call.
+
+```ts
+const preset: GraphileConfig.Preset = {
+  grafast: {
+    context(requestContext, args) {
+      const req = requestContext.expressv4?.req;
+      const userId = req?.user?.id;
+      return { userId };
+    },
+  },
+};
+```
+
+## Reference
+
+### Overview
 
 <!-- START:OPTIONS:grafast -->
 
@@ -97,4 +186,3 @@ limit should be set quite high - e.g. 6x the selection set depth.
 Type: `GrafastTimeouts | undefined`
 
 <!-- END:OPTIONS:grafast -->
-
