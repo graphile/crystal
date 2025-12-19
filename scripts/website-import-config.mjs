@@ -68,5 +68,8 @@ async function getContentFor(project) {
     ["config", "options", scope],
     { cwd, encoding: "utf8" },
   );
+  if (result.stderr.trim().length > 0) {
+    console.error(result.stderr);
+  }
   return stripVTControlCharacters(result.stdout).trim();
 }
