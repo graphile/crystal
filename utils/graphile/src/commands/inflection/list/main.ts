@@ -69,10 +69,7 @@ on the plugins and presets you use. You should regenerate it from time to time
     const doc = tightDocumentation(info, 80 - INDENT - 7);
     entries.push(
       `${
-        doc
-          ? chalk.gray(`/** ${doc} */
-`)
-          : ``
+        quiet || !doc ? "" : chalk.gray(`/** ${doc} */\n`)
       }${chalk.cyanBright(key)}${tightDisplayParts(
         info,
         80 - INDENT - key.length,
