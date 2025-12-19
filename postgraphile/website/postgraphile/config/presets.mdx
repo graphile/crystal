@@ -85,13 +85,12 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-
 `PgLazyJWTPreset` enables a convenience flow that verifies bearer JWTs inside
 Grafserv requests and populates `pgSettings` from the claims. It relies on the
 Grafserv adaptor (such as `grafserv/node`) and is intentionally limited; use
 your own `preset.grafast.context` if you need finer-grained control. Remember to
 extend Amber alongside it. For guidance on managing JWTs yourself, see the
-[JWT guide](./jwt-guide.mdx).
+[JWT guide](.././jwt-guide.mdx).
 
 ## Third-party preset bundles
 
