@@ -1,0 +1,541 @@
+# Reference
+
+These are all the configuration options available out of the box
+
+```ts
+import type {} from "postgraphile";
+const preset: GraphileConfig.Preset = {
+  inflection: {
+    /* ... */
+  },
+  gather: {
+    /* ... */
+  },
+  schema: {
+    /* ... */
+  },
+  grafast: {
+    /* ... */
+  },
+  grafserv: {
+    /* ... */
+  },
+};
+
+export default preset;
+```
+
+## preset.gather
+
+<!-- START:OPTIONS:postgraphile_gather -->
+
+```ts
+{
+  installWatchFixtures?: boolean;
+  muteWarnings?: boolean;
+  pgIdentifiers?: "qualified" | "unqualified";
+  pgJwtTypes?: string | string[];
+  pgStrictFunctions?: boolean;
+
+  // Deprecated
+  pgFakeConstraintsAutofixForeignKeyUniqueness?: boolean;
+  pgJwtType?: string | [string, string];
+}
+```
+
+### gather.installWatchFixtures
+
+Type: `boolean | undefined`
+
+Should we attempt to install the watch fixtures into the database?
+
+Default: true
+
+### gather.muteWarnings
+
+:::danger Experimental
+
+:::
+
+Type: `boolean | undefined`
+
+Used in tests to mute expected warnings. Likely to be replaced when
+we add a diagnostics system.
+
+### gather.pgIdentifiers
+
+Type: `"qualified" | "unqualified" | undefined`
+
+Set to 'unqualified' to omit the schema name from table, function, and type identifiers
+
+### gather.pgJwtTypes
+
+Type: `string | string[] | undefined`
+
+If you would like PostGraphile to automatically recognize certain
+PostgreSQL types as a JWT, you should pass a list of their identifiers
+here:
+`pgJwtTypes: ['my_schema.my_jwt_type', 'my_schema."myOtherJwtType"']`
+
+Parsing is similar to PostgreSQL's parsing, so identifiers are
+lower-cased unless they are escaped via double quotes.
+
+You can alternatively supply a comma-separated list if you prefer:
+`pgJwtTypes: 'my_schema.my_jwt_type,my_schema."myOtherJwtType"'`
+
+### gather.pgStrictFunctions
+
+Type: `boolean | undefined`
+
+If true, we'll treat all arguments that don't have defaults as being
+required.
+
+### Deprecated
+
+These settings should no longer be used.
+### gather.pgFakeConstraintsAutofixForeignKeyUniqueness
+
+:::warning Deprecated
+
+We strongly recommend that you fix the uniqueness yourself.
+
+:::
+
+Type: `boolean | undefined`
+
+### gather.pgJwtType
+
+:::warning Deprecated
+
+use pgJwtTypes instead
+
+:::
+
+Type: `string | [string, string] | undefined`
+
+<!-- END:OPTIONS:postgraphile_gather -->
+
+## preset.schema
+
+<!-- START:OPTIONS:postgraphile_schema -->
+
+```ts
+{
+  defaultBehavior?: string;
+  defaultNodeIdCodec?: string;
+  dontSwallowErrors?: boolean;
+  exportSchemaIntrospectionResultPath?: string;
+  exportSchemaSDLPath?: string;
+  jsonScalarAsString?: boolean;
+  muteWarnings?: boolean;
+  nodeIdFieldName?: string;
+  pgDefaultPartitionedTableExpose?: "both" | "child" | "parent";
+  pgForbidSetofFunctionsToReturnNull?: boolean;
+  pgFunctionsPreferNodeId?: boolean;
+  pgJwtSecret?: Secret;
+  pgJwtSignOptions?: SignOptions;
+  pgMutationPayloadRelations?: boolean;
+  pgOrderByNullsLast?: boolean;
+  pgUseCustomNetworkScalars?: boolean;
+  pgV4UseTableNameForNodeIdentifier?: boolean;
+  retryOnInitFail?: boolean | ((error: Error, attempts: number, delay: number) => boolean | Promise<boolean>);
+  sortExport?: boolean;
+}
+```
+
+### schema.defaultBehavior
+
+Type: `string | undefined`
+
+A behavior string to prepend to all behavior checks, can be overriden
+but is a great way to disable things by default and then re-enable
+them in specific locations.
+
+### schema.defaultNodeIdCodec
+
+Type: `string | undefined`  
+Default value: `"base64JSON"`
+
+The default Node ID codec to use. May be overridden on a
+table-by-table basis using the `@nodeIdCodec` smart tag.
+
+Use build.registerNodeIdCodec to register your own codecs.
+
+### schema.dontSwallowErrors
+
+Type: `boolean | undefined`
+
+`SwallowErrorsPlugin` by default will "swallow" errors, allowing you
+to continue building your GraphQL schema even if errors (such as
+naming conflicts) occur. It is recommended that you set this option to
+`true` in your production configuration to disable this behavior.
+
+### schema.exportSchemaIntrospectionResultPath
+
+Type: `string | undefined`
+
+### schema.exportSchemaSDLPath
+
+Type: `string | undefined`
+
+### schema.jsonScalarAsString
+
+Type: `boolean | undefined`
+
+Set 'true' if you want JSON values to be stringified.
+
+### schema.muteWarnings
+
+:::danger Experimental
+
+:::
+
+Type: `boolean | undefined`
+
+Used in tests to mute expected warnings. Likely to be replaced when
+we add a diagnostics system.
+
+### schema.nodeIdFieldName
+
+Type: `string | undefined`
+
+If your schema includes compatibility with the GraphQL Global Object
+Identification Specification, typically this will be called 'id'.
+However the term 'id' often conflicts with databases which commonly
+use 'id' as their primary key name, so we give you the option to
+rename it.
+
+### schema.pgDefaultPartitionedTableExpose
+
+Type: `"both" | "child" | "parent" | undefined`
+
+What to expose when we see a partitioned table (or its child partitions).
+
+- `parent` - only expose the parent (partitioned) table, not the
+  children (partitions)
+- `child` - only expose the children (partitions), not the parent
+  partitioned table
+- `both` - expose both the parent (partitioned) table and all of its
+  partitions
+
+### schema.pgForbidSetofFunctionsToReturnNull
+
+Type: `boolean | undefined`
+
+If true, setof functions cannot return null, so our list and
+connection types can use GraphQLNonNull in more places.
+
+### schema.pgFunctionsPreferNodeId
+
+Type: `boolean | undefined`
+
+### schema.pgJwtSecret
+
+Type: `Secret | undefined`
+
+### schema.pgJwtSignOptions
+
+Type: `SignOptions | undefined`
+
+### schema.pgMutationPayloadRelations
+
+Type: `boolean | undefined`
+
+### schema.pgOrderByNullsLast
+
+Type: `boolean | undefined`
+
+### schema.pgUseCustomNetworkScalars
+
+Type: `boolean | undefined`
+
+### schema.pgV4UseTableNameForNodeIdentifier
+
+Type: `boolean | undefined`
+
+### schema.retryOnInitFail
+
+Type: `boolean | ((error: Error, attempts: number, delay: number) => boolean | Promise<boolean>) | undefined`
+
+When false (default), Grafserv will exit if it fails to build the
+initial schema (for example if it cannot connect to the database, or if
+there are fatal naming conflicts in the schema). When true, PostGraphile
+will keep trying to rebuild the schema indefinitely, using an exponential
+backoff between attempts, starting at 100ms and increasing up to 30s delay
+between retries. When a function, the function will be called passing the
+error and the number of attempts, and it should return true to retry,
+false to permanently abort trying.
+
+### schema.sortExport
+
+Type: `boolean | undefined`
+
+<!-- END:OPTIONS:postgraphile_schema -->
+
+## preset.grafast
+
+<!-- START:OPTIONS:postgraphile_grafast -->
+
+```ts
+{
+  context?: Partial<Grafast.Context> | ((ctx: Partial<Grafast.RequestContext>, args: Grafast.ExecutionArgs) => PromiseOrValue<Partial<Grafast.Context>>);
+  explain?: boolean | string[];
+  maxPlanningDepth?: number;
+  timeouts?: GrafastTimeouts;
+
+  // Advanced
+  distributorPauseDuration?: number;
+  distributorTargetBufferSize?: number;
+  distributorTargetBufferSizeIncrement?: number;
+}
+```
+
+### grafast.context
+
+Type: `Partial<Grafast.Context> | ((ctx: Partial<Grafast.RequestContext>, args: Grafast.ExecutionArgs) => PromiseOrValue<Partial<Grafast.Context>>) | undefined`
+
+An object to merge into the GraphQL context. Alternatively, pass an
+(optionally asynchronous) function that returns an object to merge into
+the GraphQL context.
+
+### grafast.explain
+
+Type: `boolean | string[] | undefined`
+
+A list of 'explain' types that should be included in `extensions.explain`.
+
+- `plan` will cause the plan JSON to be included
+- other values are dependent on the plugins in play
+
+If set to `true` then all possible explain types will be exposed.
+
+### grafast.maxPlanningDepth
+
+Type: `number | undefined`
+
+How many planning layers deep do we allow? Should be handled by validation.
+
+A planning layer can happen due to:
+
+- A nested selection set
+- Planning a field return type
+- A list position
+- A polymorphic type
+- A deferred/streamed response
+
+These reasons may each cause 1, 2 or 3 planning layers to be added, so this
+limit should be set quite high - e.g. 6x the selection set depth.
+
+### grafast.timeouts
+
+Type: `GrafastTimeouts | undefined`
+
+### Advanced
+
+Only use these settings if you know what you are doing!
+#### grafast.distributorPauseDuration
+
+:::warning Advanced
+
+:::
+
+Type: `number | undefined`
+
+Duration (in milliseconds) for the distributor to pause whilst waiting
+for the slowest consumer to advance once the
+`distributorTargetBufferSize` has been reached.
+
+Must be at least 0.
+
+#### grafast.distributorTargetBufferSize
+
+:::warning Advanced
+
+:::
+
+Type: `number | undefined`
+
+This supports the `$step.cloneStreams = true` option, allowing
+multiple consumers to consume the same underlying stream, but tries to
+avoid any one consumer getting more than `distributorTargetBufferSize`
+items ahead of any other. When a fast consumer gets this far ahead of
+the slowest consumer, it will be paused for `distributorPauseDuration`
+milliseconds to allow the slowest consumer to advance. Should the
+slowest consumer not advance in time, the fast consumer will be
+allowed to continue and all intermediary results will be cached - so
+beware of memory exhaustion and be sure to place sensible limits on
+your queries (and construct them wisely).
+
+This must be set higher than the largest `@stream(initialCount:)`
+argument you want to support.
+
+#### grafast.distributorTargetBufferSizeIncrement
+
+:::warning Advanced
+
+:::
+
+Type: `number | undefined`
+
+When the `distributorTargetBufferSize` is exceeded, every time we get
+`distributorTargetBufferSizeIncrement` items further ahead, we'll
+pause again.
+
+Must be at least 1. Recommend you set this fairly large.
+
+<!-- END:OPTIONS:postgraphile_grafast -->
+
+## preset.grafserv
+
+<!-- START:OPTIONS:postgraphile_grafserv -->
+
+```ts
+{
+  allowedRequestContentTypes?: readonly RequestContentType[];
+  dangerouslyAllowAllCORSRequests?: boolean;
+  eventStreamPath?: string;
+  graphiql?: boolean;
+  graphiqlOnGraphQLGET?: boolean;
+  graphiqlPath?: string;
+  graphiqlStaticPath?: string;
+  graphqlOverGET?: boolean;
+  graphqlPath?: string;
+  host?: string;
+  maskError?: MaskErrorFn;
+  maxRequestLength?: number;
+  outputDataAsString?: boolean;
+  parseAndValidateCacheSize?: number;
+  port?: number;
+  schemaWaitTime?: number;
+  watch?: boolean;
+  websocketKeepalive?: number;
+  websockets?: boolean;
+}
+```
+
+### grafserv.allowedRequestContentTypes
+
+Type: `readonly RequestContentType[] | undefined`
+
+By default `application/json` and `application/graphql` are supported
+(`DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES`). You may add
+`application/x-www-form-urlencoded` to the list, but be aware that
+doing so potentially opens you to CSRF issues even if you're not using
+CORS since this media type is handled specially by browsers - ensure
+that you have CSRF protections in place.
+
+Note further that if you're using CORS the other media types are not
+safe, and you should still use CSRF protection.
+
+### grafserv.dangerouslyAllowAllCORSRequests
+
+Type: `boolean | undefined`
+
+Temporary hack to allow easy testing with graphql-http.com
+
+### grafserv.eventStreamPath
+
+Type: `string | undefined`
+
+The path at which the GraphQL event stream would be made available; usually /graphql/stream
+
+### grafserv.graphiql
+
+Type: `boolean | undefined`
+
+### grafserv.graphiqlOnGraphQLGET
+
+Type: `boolean | undefined`
+
+If true, then we will render GraphiQL on GET requests to the /graphql endpoint
+
+### grafserv.graphiqlPath
+
+Type: `string | undefined`
+
+The path at which GraphiQL will be available; usually /
+
+### grafserv.graphiqlStaticPath
+
+Type: `string | undefined`
+
+The path from which GraphiQL's static assets are served, must end in a slash. Usually /ruru-static/
+
+### grafserv.graphqlOverGET
+
+Type: `boolean | undefined`
+
+If true, allow GraphQL over GET requests. This has security ramifications, exercise caution.
+
+### grafserv.graphqlPath
+
+Type: `string | undefined`
+
+The path at which GraphQL will be available; usually /graphql
+
+### grafserv.host
+
+Type: `string | undefined`
+
+Host to listen on
+
+### grafserv.maskError
+
+Type: `MaskErrorFn | undefined`
+
+If you would like to customize the way in which errors are masked, you may
+pass your own error masking function here. You can also import
+`defaultMaskError` from `grafserv`.
+
+### grafserv.maxRequestLength
+
+Type: `number | undefined`
+
+The length, in bytes, for the largest request body that grafserv will accept
+
+### grafserv.outputDataAsString
+
+Type: `boolean | undefined`
+
+Use grafast 'string' optimization - response will be partially stringified
+already, use `stringifyPayload` before sending to the user
+
+### grafserv.parseAndValidateCacheSize
+
+Type: `number | undefined`  
+Default value: `500`
+
+How many documents should we cache the parse and validate result for?
+
+### grafserv.port
+
+Type: `number | undefined`
+
+Port number to listen on
+
+### grafserv.schemaWaitTime
+
+Type: `number | undefined`
+
+How long (in milliseconds) should we wait for a schema promise to resolve before sending a failure to the client?
+
+### grafserv.watch
+
+Type: `boolean | undefined`
+
+Set true to enable watch mode
+
+### grafserv.websocketKeepalive
+
+Type: `number | undefined`  
+Default value: `12_000`
+
+Duration (in milliseconds) between pings. Set to `-1` to disable.
+
+### grafserv.websockets
+
+Type: `boolean | undefined`
+
+Should we enable a websockets transport if available?
+
+<!-- END:OPTIONS:postgraphile_grafserv -->
