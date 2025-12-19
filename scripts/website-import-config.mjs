@@ -5,6 +5,10 @@ import { promisify, stripVTControlCharacters } from "node:util";
 const execFileAsync = promisify(execFile);
 const __dirname = import.meta.dirname;
 
+const postgraphileBase = {
+  cwd: "postgraphile/postgraphile",
+  extraArgs: ["-C", "graphile.config.vanilla.ts"],
+};
 const PROJECTS = {
   grafserv: {
     cwd: "grafast/grafserv",
@@ -14,10 +18,21 @@ const PROJECTS = {
     cwd: "grafast/grafast",
     scope: "grafast",
   },
-  postgraphile: {
-    cwd: "postgraphile/postgraphile",
-    scope: "postgraphile",
-    extraArgs: ["-C", "graphile.config.vanilla.ts"],
+  postgraphile_gather: {
+    ...postgraphileBase,
+    scope: "gather",
+  },
+  postgraphile_schema: {
+    ...postgraphileBase,
+    scope: "schema",
+  },
+  postgraphile_grafast: {
+    ...postgraphileBase,
+    scope: "grafast",
+  },
+  postgraphile_grafserv: {
+    ...postgraphileBase,
+    scope: "grafserv",
   },
 };
 
