@@ -155,6 +155,10 @@ Type: `GrafastTimeouts | undefined`
 Only use these settings if you know what you are doing!
 #### grafast.distributorPauseDuration
 
+:::warning Advanced
+
+:::
+
 Type: `number | undefined`
 
 Duration (in milliseconds) for the distributor to pause whilst waiting
@@ -164,6 +168,10 @@ for the slowest consumer to advance once the
 Must be at least 0.
 
 #### grafast.distributorTargetBufferSize
+
+:::warning Advanced
+
+:::
 
 Type: `number | undefined`
 
@@ -182,6 +190,10 @@ This must be set higher than the largest `@stream(initialCount:)`
 argument you want to support.
 
 #### grafast.distributorTargetBufferSizeIncrement
+
+:::warning Advanced
+
+:::
 
 Type: `number | undefined`
 

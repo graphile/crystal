@@ -239,6 +239,16 @@ modules).\
             ),
           );
           outLaterStill();
+          if (deprecatedTag) {
+            outLaterStill(":::warning Deprecated");
+            outLaterStill();
+            if (deprecatedTag.text) {
+              outLaterStill(prettyDisplayParts(deprecatedTag.text));
+              outLaterStill();
+            }
+            outLaterStill(":::");
+            outLaterStill();
+          }
           if (experimentalTag) {
             outLaterStill(":::danger Experimental");
             outLaterStill();
@@ -250,11 +260,13 @@ modules).\
             outLaterStill(":::");
             outLaterStill();
           }
-          if (advancedTag?.text) {
+          if (advancedTag) {
             outLaterStill(":::warning Advanced");
             outLaterStill();
-            outLaterStill(prettyDisplayParts(advancedTag.text));
-            outLaterStill();
+            if (advancedTag?.text) {
+              outLaterStill(prettyDisplayParts(advancedTag.text));
+              outLaterStill();
+            }
             outLaterStill(":::");
             outLaterStill();
           }
@@ -277,7 +289,7 @@ modules).\
           deprecatedSubentries.length
         ) {
           outLater("```ts");
-          outLater(`type options = {`);
+          outLater(`{`);
           for (const entry of subentries) {
             outLater("  " + entry);
           }
