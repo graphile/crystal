@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import type { JSDocTagInfo, QuickInfo, SymbolDisplayPart } from "typescript";
 
 import {
   accessKey,
@@ -161,26 +162,49 @@ modules).\
       if (relevant) {
         const subentries: string[] = [];
         const advancedSubentries: string[] = [];
-        let laterStill: Array<string | undefined> = [];
-        let evenLaterStill: Array<string | undefined> = [];
+        const deprecatedSubentries: string[] = [];
+        let normal: Array<string | undefined> = [];
+        let advanced: Array<string | undefined> = [];
+        let deprecated: Array<string | undefined> = [];
         for (const subkey of relevant) {
           const withSubpropertyAccess =
             withProperty + `preset${accessKey(key)}!${accessKey(subkey)}`;
           const info = getQuickInfo(withSubpropertyAccess);
-          const advancedTag = info?.tags?.find((t) => t.name === "advanced");
+
+          const tags = getTags(info);
+          const advancedTag = tags.get("advanced");
+          const deprecatedTag = tags.get("deprecated");
+          const experimentalTag = tags.get("experimental");
+
+          const isDeprecated = !!deprecatedTag;
           const isAdvanced = !!advancedTag;
           const outLaterStill = (line?: string): void => {
-            const target = isAdvanced ? evenLaterStill : laterStill;
-            if (isAdvanced && evenLaterStill.length === 0) {
-              evenLaterStill.push("### Advanced");
-              evenLaterStill.push("");
-              evenLaterStill.push(
-                "Only use these settings if you know what you are doing!",
-              );
+            let target = normal;
+            if (isDeprecated) {
+              target = deprecated;
+              if (target.length === 0) {
+                target.push("### Deprecated");
+                target.push("");
+                target.push("These settings should no longer be used.");
+              }
+            } else if (isAdvanced) {
+              target = advanced;
+              if (target.length === 0) {
+                target.push("### Advanced");
+                target.push("");
+                target.push(
+                  "Only use these settings if you know what you are doing!",
+                );
+              }
             }
             target.push(line);
           };
-          (isAdvanced ? advancedSubentries : subentries).push(
+          (isDeprecated
+            ? deprecatedSubentries
+            : isAdvanced
+              ? advancedSubentries
+              : subentries
+          ).push(
             `${chalk.greenBright.bold(subkey)}?: ${prettyDisplayParts(
               info?.displayParts,
               ":",
@@ -215,9 +239,6 @@ modules).\
             ),
           );
           outLaterStill();
-          const experimentalTag = info?.tags?.find(
-            (t) => t.name === "experimental",
-          );
           if (experimentalTag) {
             outLaterStill(":::danger Experimental");
             outLaterStill();
@@ -250,9 +271,13 @@ modules).\
           outLaterStill();
         }
 
-        if (subentries.length || advancedSubentries.length) {
+        if (
+          subentries.length ||
+          advancedSubentries.length ||
+          deprecatedSubentries.length
+        ) {
           outLater("```ts");
-          outLater(`{`);
+          outLater(`type options = {`);
           for (const entry of subentries) {
             outLater("  " + entry);
           }
@@ -263,18 +288,32 @@ modules).\
           for (const entry of advancedSubentries) {
             outLater("  " + entry);
           }
+          if (
+            (subentries.length || advancedSubentries.length) &&
+            deprecatedSubentries.length
+          ) {
+            outLater("");
+            outLater("  // Deprecated");
+          }
+          for (const entry of deprecatedSubentries) {
+            outLater("  " + entry);
+          }
           outLater("}");
           outLater("```");
           outLater();
         }
-        for (const line of laterStill) {
+        for (const line of normal) {
           outLater(line);
         }
-        for (const line of evenLaterStill) {
+        for (const line of advanced) {
           outLater(line);
         }
-        laterStill = [];
-        evenLaterStill = [];
+        for (const line of deprecated) {
+          outLater(line);
+        }
+        normal = [];
+        advanced = [];
+        deprecated = [];
       }
     }
     /*
@@ -303,4 +342,27 @@ modules).\
   }
   later = [];
   return outputText.trim() + "\n";
+}
+
+function getTags(info: QuickInfo | undefined) {
+  const tags = new Map<string, JSDocTagInfo>();
+  if (!info?.tags) return tags;
+  for (const tag of info.tags) {
+    const existing = tags.get(tag.name);
+    if (existing != null && tag.text != null) {
+      if (!existing.text) {
+        // Overwrite
+        tags.set(tag.name, tag);
+      } else {
+        // Merge
+        tags.set(tag.name, {
+          ...existing,
+          text: [...existing.text, ...tag.text],
+        });
+      }
+    } else {
+      tags.set(tag.name, tag);
+    }
+  }
+  return tags;
 }
