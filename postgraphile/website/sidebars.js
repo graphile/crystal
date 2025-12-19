@@ -57,7 +57,16 @@ const sidebars = {
     },
     "quick-start-guide",
     "registry",
-    "inflection",
+    {
+      type: "category",
+      label: "Inflection",
+      collapsed: false,
+      link: {
+        type: "doc",
+        id: "inflection/index",
+      },
+      items: ["inflection/reference"],
+    },
     "namespaces",
     {
       type: "category",

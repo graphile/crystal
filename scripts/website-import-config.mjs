@@ -9,7 +9,8 @@ const postgraphileBase = {
   cwd: "postgraphile/postgraphile",
   extraArgs: ["-C", "graphile.config.vanilla.ts"],
 };
-const PROJECTS = {
+
+const OPTIONS = {
   grafserv: {
     cwd: "grafast/grafserv",
     scope: "grafserv",
@@ -49,8 +50,15 @@ const PROJECTS = {
   },
 };
 
-const START = "<!-- START:OPTIONS:";
+const INFLECTION = {
+  postgraphile: {
+    ...postgraphileBase,
+  },
+};
+
+const START = "<!-- START:";
 const START_END = "-->";
+const END = "<!-- END:";
 
 const documentationFiles = await Array.fromAsync(
   glob(
@@ -69,15 +77,15 @@ await Promise.all(
       if (j < 0) {
         throw new Error(`${START} found but not ${START_END}!`);
       }
-      const optionsFor = contents.slice(i + START.length, j).trim();
+      const topic = contents.slice(i + START.length, j).trim();
       const contentStart = j + START_END.length;
       const startTag = contents.slice(i, contentStart);
-      const closeTag = startTag.replace(/<!-- START/, "<!-- END");
+      const closeTag = startTag.replace(START, END);
       const closeTagPosition = contents.indexOf(closeTag, contentStart);
       if (closeTagPosition < 0) {
         throw new Error(`${startTag} found, but no ${closeTag}!`);
       }
-      const newContent = await getContentFor(optionsFor);
+      const newContent = await getContentFor(topic);
       contents =
         contents.slice(0, contentStart) +
         "\n\n" +
@@ -92,13 +100,39 @@ await Promise.all(
   }),
 );
 
-async function getContentFor(project) {
-  const config = PROJECTS[project];
-  if (!config) throw new Error(`Unknown project ${JSON.stringify(project)}`);
+async function getContentFor(topic) {
+  const parts = topic.split(":");
+  if (parts[0] === "OPTIONS") {
+    return getContentForOptions(parts[1]);
+  } else if (parts[0] === "INFLECTION") {
+    return getContentForInflection(parts[1]);
+  } else {
+    throw new Error(`Didn't understand <!-- START:${topic} -->`);
+  }
+}
+
+async function getContentForOptions(project) {
+  const config = OPTIONS[project];
+  if (!config) {
+    throw new Error(`Unknown options scope ${JSON.stringify(project)}`);
+  }
   const { cwd, scope, extraArgs = [] } = config;
+  return graphile(cwd, ["config", "options", ...extraArgs, scope]);
+}
+
+async function getContentForInflection(project) {
+  const config = INFLECTION[project];
+  if (!config) {
+    throw new Error(`Unknown inflection scope ${JSON.stringify(project)}`);
+  }
+  const { cwd, extraArgs = [] } = config;
+  return graphile(cwd, ["inflection", "list", "--quiet", ...extraArgs]);
+}
+
+async function graphile(cwd, flags) {
   const result = await execFileAsync(
     `${__dirname}/../utils/graphile/dist/cli-run.js`,
-    ["config", "options", ...extraArgs, scope],
+    flags,
     { cwd, encoding: "utf8" },
   );
   if (result.stderr.trim().length > 0) {
