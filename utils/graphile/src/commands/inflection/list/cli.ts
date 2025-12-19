@@ -21,6 +21,6 @@ export function options(yargs: Argv) {
     });
 }
 export function run(args: ArgsFromOptions<typeof options>) {
-  const text = main({ filename: args.config });
+  const text = main({ filename: args.config, quiet: args.quiet });
   console.log(text);
 }
