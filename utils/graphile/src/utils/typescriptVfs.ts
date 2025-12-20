@@ -36,7 +36,7 @@ const compilerOptions = {
 */
   const fsMap = new Map<string, string>();
 
-  const FAKE_FILENAME = "graphileConfigInspection.ts";
+  const FAKE_FILENAME = `${process.cwd()}/graphileConfigInspection.ts`;
 
   // If using imports where the types don't directly match up to their FS representation (like the
   // imports for node) then use triple-slash directives to make sure globals are set up first.
@@ -88,11 +88,16 @@ ${initialCode}`;
       env.languageService.getDefinitionAndBoundSpan(FAKE_FILENAME, pos)
         ?.definitions ?? [];
     return definitions.map((def) => {
-      const sourceFile = program?.getSourceFile(def.fileName);
+      const fileName = def.originalFileName ?? def.fileName;
+      const textSpan = def.originalTextSpan ?? def.textSpan;
+      const sourceFile = program?.getSourceFile(fileName);
+      if (!sourceFile) {
+        throw new Error(`Failed to get source file ${fileName}`);
+      }
       const lc = sourceFile
-        ? ts.getLineAndCharacterOfPosition(sourceFile, def.textSpan.start)
+        ? ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start)
         : { line: 0, character: 0 };
-      return { ...def, line: lc.line + 1, column: lc.character + 1 };
+      return { ...def, fileName, line: lc.line + 1, column: lc.character + 1 };
     });
   }
 
