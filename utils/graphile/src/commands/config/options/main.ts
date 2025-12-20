@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type { JSDocTagInfo, QuickInfo, SymbolDisplayPart } from "typescript";
+import type { JSDocTagInfo, QuickInfo } from "typescript";
 
 import {
   accessKey,
