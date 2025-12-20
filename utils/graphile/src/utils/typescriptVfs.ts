@@ -121,8 +121,6 @@ function resolveDefinition(
   const lc = sourceFile
     ? ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start)
     : { line: 0, character: 0 };
-  const line = lc.line + 1;
-  const column = lc.character + 1;
   if (fileName.endsWith(".d.ts")) {
     try {
       const mapFile = `${fileName}.map`;
@@ -130,10 +128,23 @@ function resolveDefinition(
       if (rawMap) {
         // Map definition in .d.ts back to original source using the declaration map.
         const consumer = new SourceMapConsumer(JSON.parse(rawMap));
-        const original = consumer.originalPositionFor({
-          line,
+
+        const pos = {
+          line: lc.line + 1,
           column: lc.character,
-        });
+          bias: SourceMapConsumer.GREATEST_LOWER_BOUND,
+        };
+        let original = consumer.originalPositionFor(pos);
+        if (
+          !original.source ||
+          original.line == null ||
+          original.column == null
+        ) {
+          original = consumer.originalPositionFor({
+            ...pos,
+            bias: SourceMapConsumer.LEAST_UPPER_BOUND,
+          });
+        }
         if (
           original.source &&
           original.line != null &&
@@ -150,6 +161,8 @@ function resolveDefinition(
       console.warn(e);
     }
   }
+  const line = lc.line + 1;
+  const column = lc.character + 1;
   return { ...def, fileName, line, column };
 }
 
