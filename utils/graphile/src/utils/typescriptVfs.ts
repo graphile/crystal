@@ -1,8 +1,11 @@
+import path from "node:path";
+
 import {
   createFSBackedSystem,
   createVirtualTypeScriptEnvironment,
 } from "@typescript/vfs";
-import * as ts from "typescript";
+import { SourceMapConsumer } from "source-map-js";
+import ts from "typescript";
 
 export function configVfs(options: {
   filename?: string;
@@ -21,19 +24,11 @@ export function configVfs(options: {
     skipDefaultLibCheck: true,
     moduleResolution: ts.ModuleResolutionKind.Node16,
     allowJs: true,
+    jsx: ts.JsxEmit.React,
+    noEmit: true,
+    suppressOutputPathCheck: true,
   };
-  /*
-const compilerOptions = {
-  strict: true,
-  target: ts.ScriptTarget.ES2015,
-  typeRoots: [],
-  lib: ["es5"],
-  skipDefaultLibCheck: true,
-  skipLibCheck: true,
-  moduleResolution: ts.ModuleResolutionKind.NodeJs,
-  module: ts.ModuleKind.ES2015,
-};
-*/
+
   const fsMap = new Map<string, string>();
 
   const FAKE_FILENAME = `${process.cwd()}/graphileConfigInspection.ts`;
@@ -87,18 +82,7 @@ ${initialCode}`;
     const definitions =
       env.languageService.getDefinitionAndBoundSpan(FAKE_FILENAME, pos)
         ?.definitions ?? [];
-    return definitions.map((def) => {
-      const fileName = def.originalFileName ?? def.fileName;
-      const textSpan = def.originalTextSpan ?? def.textSpan;
-      const sourceFile = program?.getSourceFile(fileName);
-      if (!sourceFile) {
-        throw new Error(`Failed to get source file ${fileName}`);
-      }
-      const lc = sourceFile
-        ? ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start)
-        : { line: 0, character: 0 };
-      return { ...def, fileName, line: lc.line + 1, column: lc.character + 1 };
-    });
+    return definitions.map((def) => resolveDefinition(system, program, def));
   }
 
   return {
@@ -109,6 +93,64 @@ ${initialCode}`;
     getQuickInfo,
     getDefinitions,
   };
+}
+
+/**
+ * Takes DefinitionInfo and returns equivalent pointing at underlying source
+ * file if possible.
+ */
+function resolveDefinition(
+  system: ts.System,
+  program: ts.Program | undefined,
+  def: ts.DefinitionInfo,
+) {
+  const fileName = def.originalFileName ?? def.fileName;
+  const textSpan = def.originalTextSpan ?? def.textSpan;
+  let sourceFile = program?.getSourceFile(fileName);
+  if (!sourceFile) {
+    const sourceText = system.readFile(fileName);
+    if (sourceText != null) {
+      sourceFile = ts.createSourceFile(
+        fileName,
+        sourceText,
+        ts.ScriptTarget.ESNext,
+        true,
+      );
+    }
+  }
+  const lc = sourceFile
+    ? ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start)
+    : { line: 0, character: 0 };
+  const line = lc.line + 1;
+  const column = lc.character + 1;
+  if (fileName.endsWith(".d.ts")) {
+    try {
+      const mapFile = `${fileName}.map`;
+      const rawMap = system.readFile(mapFile);
+      if (rawMap) {
+        // Map definition in .d.ts back to original source using the declaration map.
+        const consumer = new SourceMapConsumer(JSON.parse(rawMap));
+        const original = consumer.originalPositionFor({
+          line,
+          column: lc.character,
+        });
+        if (
+          original.source &&
+          original.line != null &&
+          original.column != null
+        ) {
+          const fileName = path.resolve(path.dirname(mapFile), original.source);
+          const line = original.line;
+          const column = original.column + 1;
+          return { ...def, fileName, line, column };
+        }
+      }
+    } catch (e) {
+      // Ignore sourcemap issues and fall back to declaration location.
+      console.warn(e);
+    }
+  }
+  return { ...def, fileName, line, column };
 }
 
 /**
@@ -276,43 +318,3 @@ export const accessKey = (key: string): string => {
     return `[${JSON.stringify(key)}]`;
   }
 };
-
-/*
-debugger;
-
-const host = createVirtualCompilerHost(system, compilerOpts, ts);
-const program = ts.createProgram({
-  rootNames: [...fsMap.keys()],
-  options: compilerOpts,
-  host: host.compilerHost,
-});
-const checker = program.getTypeChecker();
-
-// This will update the fsMap with new files
-// for the .d.ts and .js files
-program.emit();
-
-// Now I can look at the AST for the .ts file too
-const index = program.getSourceFile(FAKE_FILENAME)!;
-const symbols = checker.getSymbolsInScope(index, ts.SymbolFlags.Variable);
-const symbol = symbols.find((s) => s.name === "preset");
-console.log(symbol);
-if (symbol) {
-  const type = checker.getDeclaredTypeOfSymbol(symbol);
-  console.log(type.getApparentProperties());
-  console.dir(type.get);
-  const properties = type.getProperties();
-  console.dir(properties);
-}
-ts.forEachChild(index, (node) => {
-  if (isVariableStatement(node)) {
-    console.log(node.getText());
-    const node2 = node.declarationList.declarations[0];
-    console.log(node2.getText());
-    const type = checker.getTypeAtLocation(node2);
-    const properties = type.getProperties();
-    // const properties = checker.getDeclaredTypeOfSymbol(symbol).getProperties();
-    console.dir(properties);
-  }
-});
-*/
