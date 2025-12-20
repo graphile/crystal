@@ -87,7 +87,7 @@ ${initialCode}`;
  */
 export function prettyDisplayParts(
   displayParts: ReadonlyArray<ts.SymbolDisplayPart> | undefined,
-  trimUntil = ":",
+  trimUntil?: string,
 ): string {
   if (!displayParts) {
     return "";

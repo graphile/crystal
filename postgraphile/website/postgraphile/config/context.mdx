@@ -1,0 +1,65 @@
+# GraphQL Context
+
+You can use your configuration to populate the GraphQL context based
+on the wider context in which the GraphQL request is being executed.
+
+## Making HTTP data available to plan resolvers
+
+Using the `grafast.context` callback we can extract data from the incoming HTTP
+request and make it accessible from within the Gra*fast* schema via the GraphQL context.
+
+Example:
+
+```js title="graphile.config.js"
+export default {
+  grafast: {
+    async context(requestContext, args) {
+      const req = requestContext.node?.req;
+      // You can perform asynchronous actions here if you need to; for example
+      // looking up the current user in the database.
+
+      // Return here things that your resolvers need
+      return {
+        // Return the current user from Passport.js or similar
+        user: req.user,
+
+        // Add a helper to get a header
+        getHeader(name) {
+          return req?.get(name);
+        },
+
+        // Give access to the database-owner PostgreSQL pool, for example to
+        // perform privileged actions
+        rootPgPool,
+      };
+    },
+  },
+};
+```
+
+:::warning[Use prefixes]
+
+When adding details to `grafast.context`, you must careful to not add properties that
+will clash with system context keys such as `withPgClient`, `pgSettings`,
+`pgSubscriber` and `jwtClaims` (you can see the existing context keys by
+inspecting the `contextValue` property of second argument to the `grafast.context`
+callback: `args.contextValue`).
+
+For the absolute best future compatibility, we recommend that you prefix your
+context keys with your initials, company name, or similar.
+
+:::
+
+:::tip[Use helpers]
+
+It’s _not_ a good idea to give direct access to the `req` or `res` objects
+via `grafast.context` as it binds the GraphQL context too tightly to the HTTP
+request lifecycle — this will cause you issues if you try and use the GraphQL
+schema in other contexts (e.g. directly from the application, in integration
+tests, or over alternative transports such as websockets for realtime).
+Instead, add helpers to get/set the data you need that can be implemented in
+each future situation.
+
+:::
+
+

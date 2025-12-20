@@ -98,6 +98,7 @@
     "@types/node": "^22.19.1",
     "@types/nodemon": "^3.1.1",
     "chai": "^5.3.3",
+    "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "jest": "^30.2.0",
     "lodash": "^4.17.21",

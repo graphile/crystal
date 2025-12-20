@@ -34,7 +34,22 @@ const sidebars = {
     "usage-cli",
     "usage-library",
     "usage-schema",
-    "config",
+    {
+      type: "category",
+      label: "Configuration",
+      collapsed: false,
+      link: {
+        type: "doc",
+        id: "config/index",
+      },
+      items: [
+        "config/presets",
+        "config/context",
+        "config/view",
+        "config/overview",
+        "config/reference",
+      ],
+    },
     {
       type: "html",
       value: "<h4>OPERATION</h4>",

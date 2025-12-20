@@ -1,0 +1,55 @@
+import GraphileCLI from "@theme/GraphileCLI";
+import Spon from "@site/src/components/Spon";
+
+# View Configuration Options
+
+Sponsors have access to the `graphile` CLI tool which can be used to view both
+the available options, and also your resolved configuration.
+
+## Viewing the available options
+
+Once you have a basic configuration file, you can use the <Spon /> `graphile` CLI to
+find out what options are available to you:
+
+```shell
+graphile config options
+```
+
+:::info[The graphile CLI is a development aid]
+
+The `graphile` CLI is a development aid only, and is not needed at runtime or
+in production (or in development really, it’s just a handy little helper). This
+utility is sponsors-only source-available software. If you’re not a sponsor
+there’s a 30 day free trial that starts as soon as you run it for the first
+time. You may sponsor at any level for access to this utility. Read the details
+in the [graphile command’s
+README](https://www.npmjs.com/package/graphile/v/alpha).
+
+:::
+
+Note that the options available will be influenced by the modules that you are
+using, so be sure to import any plugins and presets at the top of your config
+file.
+
+<figure>
+
+[![Cropped screenshot of 'graphile config options'](../graphile-config-options-screenshot.png)](../graphile-config-options-screenshot.png)
+
+<figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
+</figure>
+
+## Viewing the resolved configuration
+
+You can also use the <Spon /> `graphile` CLI to print out your resolved configuration
+(once all the presets have been applied). This can help with debugging:
+
+```shell
+graphile config print
+```
+
+<figure>
+
+[![Cropped screenshot of 'graphile config print'](../graphile-config-print-screenshot.png)](../graphile-config-print-screenshot.png)
+
+<figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
+</figure>
