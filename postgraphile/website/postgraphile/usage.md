@@ -5,7 +5,7 @@ minimal effort, the **library mode** that we expect most users will ultimately
 want to use, and **schema-only mode** which gives you the most control (but
 also the most responsibilities). Each of these layers builds on top of the
 layer below it, so it's fairly easy to move between them. We've also made sure
-that they are each configured via the same [preset system](./config) so you
+that they are each configured via the same [preset system](./config/presets) so you
 can move from one to another with minimal effort.
 
 ## CLI
@@ -93,7 +93,7 @@ Which layer would you like to read more about?
 - [**GraphQL schema** ("schema-only")](./usage-schema)
 - [Configuration](./config)
 
-[config file]: ./config.mdx
+[config file]: ./config/index.mdx
 [grafserv]: https://grafast.org/grafserv
 [grafast]: https://grafast.org/grafast
 [gra*fast*]: https://grafast.org/grafast

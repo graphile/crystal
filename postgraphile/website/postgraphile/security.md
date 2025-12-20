@@ -37,7 +37,7 @@ database/table); and permission is selectively granted with the use of policies.
 If you already have a secure database schema that implements these technologies
 to protect your data at the lowest levels then you can leverage `postgraphile`
 to generate a powerful, secure and fast API very rapidly. PostGraphile simply
-needs enough context (via [`pgSettings`](./config.mdx#pgsettings)) to understand
+needs enough context (via [`pgSettings`](./config/overview#pgsettings)) to understand
 who is making the current request.
 
 ## Authentication strategies
