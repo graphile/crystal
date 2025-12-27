@@ -2,17 +2,61 @@ import { execFile } from "node:child_process";
 import { glob, readFile, writeFile } from "node:fs/promises";
 import { promisify, stripVTControlCharacters } from "node:util";
 
+const execFileAsync = promisify(execFile);
 const __dirname = import.meta.dirname;
 
-const execFileAsync = promisify(execFile);
+const postgraphileBase = {
+  cwd: "postgraphile/postgraphile",
+  extraArgs: ["-C", "graphile.config.vanilla.ts"],
+};
+const PROJECTS = {
+  grafserv: {
+    cwd: "grafast/grafserv",
+    scope: "grafserv",
+  },
+  grafast: {
+    cwd: "grafast/grafast",
+    scope: "grafast",
+  },
+  ruru: {
+    cwd: "grafast/ruru",
+    scope: "ruru",
+    extraArgs: ["-C", "graphile.config.mts"],
+  },
+  postgraphile_inflection: {
+    ...postgraphileBase,
+    scope: "inflection",
+  },
+  postgraphile_gather: {
+    ...postgraphileBase,
+    scope: "gather",
+  },
+  postgraphile_schema: {
+    ...postgraphileBase,
+    scope: "schema",
+  },
+  postgraphile_grafast: {
+    ...postgraphileBase,
+    scope: "grafast",
+  },
+  postgraphile_grafserv: {
+    ...postgraphileBase,
+    scope: "grafserv",
+  },
+  postgraphile_ruru: {
+    ...postgraphileBase,
+    scope: "ruru",
+  },
+};
 
 const START = "<!-- START:OPTIONS:";
 const START_END = "-->";
 
 const documentationFiles = await Array.fromAsync(
-  glob("{grafast,postgraphile,graphile-build,utils}/website/**/*/**/*.md", {
-    exclude: ["**/node_modules/**", "**/versioned_docs/**"],
-  }),
+  glob(
+    "{grafast,postgraphile,graphile-build,utils}/website/**/*/**/*.{md,mdx}",
+    { exclude: ["**/node_modules/**", "**/versioned_docs/**"] },
+  ),
 );
 
 await Promise.all(
@@ -36,9 +80,9 @@ await Promise.all(
       const newContent = await getContentFor(optionsFor);
       contents =
         contents.slice(0, contentStart) +
-        "\n" +
+        "\n\n" +
         newContent +
-        "\n" +
+        "\n\n" +
         contents.slice(closeTagPosition);
       i = closeTagPosition + closeTag.length;
     }
@@ -49,22 +93,16 @@ await Promise.all(
 );
 
 async function getContentFor(project) {
-  const { cwd, scope } = await getOptionsFor(project);
+  const config = PROJECTS[project];
+  if (!config) throw new Error(`Unknown project ${JSON.stringify(project)}`);
+  const { cwd, scope, extraArgs = [] } = config;
   const result = await execFileAsync(
     `${__dirname}/../utils/graphile/dist/cli-run.js`,
-    ["config", "options", scope],
+    ["config", "options", ...extraArgs, scope],
     { cwd, encoding: "utf8" },
   );
-  return stripVTControlCharacters(result.stdout).trim();
-}
-
-async function getOptionsFor(project) {
-  switch (project) {
-    case "grafserv": {
-      return { cwd: "grafast/grafserv", scope: "grafserv" };
-    }
-    default: {
-      throw new Error(`Unknown project ${project}`);
-    }
+  if (result.stderr.trim().length > 0) {
+    console.error(result.stderr);
   }
+  return stripVTControlCharacters(result.stdout).trim();
 }

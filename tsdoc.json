@@ -8,6 +8,10 @@
     {
       "tagName": "@rc",
       "syntaxKind": "inline"
+    },
+    {
+      "tagName": "@advanced",
+      "syntaxKind": "block"
     }
   ],
   "supportForTags": {
@@ -36,6 +40,7 @@
     "@typeParam": true,
     "@virtual": true,
 
+    "@advanced": true,
     "@page": true
   }
 }

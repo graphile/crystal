@@ -1,0 +1,216 @@
+---
+title: Configuration
+---
+
+import GraphileCLI from "@theme/GraphileCLI";
+import Spon from "@site/src/components/Spon";
+
+# Configuration
+
+No matter whether you’re using PostGraphile CLI, library mode or schema only,
+PostGraphile (and other elements of the stack including Graphile Build,
+Gra*fast* and Grafserv) are configured via a [`graphile-config`
+“preset.”](https://star.graphile.org/graphile-config/preset)
+
+A preset is a simple JS object that contains a combination of: other presets,
+plugins, and options for the various scopes. Your configuration, your preset,
+will almost certainly need to extend an existing preset or presets; which
+preset(s) to extend depends on what you’re looking for from PostGraphile.
+
+The PostGraphile base presets are named after crystals; the first base preset
+available is `postgraphile/presets/amber`, so you’ll almost definitely want
+that.
+
+:::warning[Avoid naming conflicts!]
+
+Please don’t name your own presets after crystals, or we may end up having
+confusion!
+
+:::
+
+## Creating your configuration file
+
+Though you can build a preset anywhere in your source code and pass it to the
+relevant APIs, we recommend that you put your preset into a
+`graphile.config.mjs` (or `.ts` or `.mts` or `.js` etc) file, so that it can
+easily be picked up by the PostGraphile CLI and any other utilities (e.g. the
+`graphile` command). You may write your preset in either JS or TS, and you may
+expose it as either CommonJS (`module.exports = ...;`) or ESM (`export default
+...;`). In our examples, we’ll typically use `.mjs` since it’s modern but
+without the overhead of requiring TypeScript.
+
+Here’s an example preset which only extends the “Amber” preset:
+
+```js title="graphile.config.mjs"
+// @ts-check
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+/** @type {GraphileConfig.Preset} */
+const preset = {
+  extends: [PostGraphileAmberPreset],
+};
+
+export default preset;
+```
+
+Or in TypeScript:
+
+```ts title="graphile.config.mts"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+};
+
+export default preset;
+```
+
+Similarly, you can create your config as a `.js`, `.cjs`, `.ts` or `.cts` file;
+the PostGraphile CLI will pick up all of these automatically assuming that you
+have TypeScript installed locally and are running Node 24 or higher. (For Node
+22.6+ you'll need to be running with the `node --experimental-strip-types` flag,
+or have `tsx`, `ts-node`, or similar installed locally.)
+
+## General structure
+
+A preset is a plain JavaScript object, and every key in the preset is optional.
+`{}` is a valid (but not very useful!) preset. The key `default` is forbidden
+at the top level of a preset, this allows us to detect common issues with
+ESM/CommonJS interoperability.
+
+The value for the `extends` key, if specified, must be an array of other presets
+your preset wishes to inherit from.
+
+The value for the `plugins` key, if specified, must be an array of
+[`graphile-config` plugins](https://star.graphile.org/graphile-config/plugin)
+that your preset wishes to make use of. Plugins must always have unique names,
+and will be automatically de-duplicated by the system if the same plugin is
+referenced in multiple presets.
+
+The preset also accepts keys for each supported scope. `graphile-config` has no
+native scopes, but different Graphile projects can register their own scopes.
+For example: `graphile-build` registers the `inflection`, `gather` and `schema`
+scopes; `graphile-build-pg` registers the `pgServices` scope; Gra*fast*
+registers the `grafast` scope; Grafserv registers the `grafserv` scope; and
+`ruru` registers the `ruru` scope.
+
+We highly recommend using TypeScript for dealing with your preset so that you
+get auto-completion for the options available in each scope; you can also use
+the `graphile config options` command detailed below.
+
+:::tip[The Schema Build Process]
+
+The schema build process in PostGraphile is:
+
+- Synchronously build the inflectors via the `inflection` phase - inflectors are
+  used throughout the phases
+- Asynchronously build the registry by performing database introspection in the
+  `gather` phase
+- Synchronously determine the behaviors of each of the entities in the registry during the `behavior` phase
+- Synchronously build the GraphQL schema during the `schema` phase
+
+:::
+
+### Simple example
+
+```ts title="graphile.config.mts"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
+  grafserv: { port: 5678 },
+  pgServices: [makePgService({ connectionString: "postgres:///my_db" })],
+};
+```
+
+### Larger example
+
+```ts title="graphile.config.mts"
+// The standard base preset to use, includes the main PostGraphile features
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+// More presets you might want to mix in
+import { makeV4Preset } from "postgraphile/presets/v4";
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
+
+// Use the 'pg' module to connect to the database
+import { makePgService } from "postgraphile/adaptors/pg";
+
+// A plugin for the system to use for persisted operations support
+import PersistedPlugin from "@grafserv/persisted";
+
+const preset: GraphileConfig.Preset = {
+  extends: [
+    PostGraphileAmberPreset,
+    /* Add more presets here, e.g.: */
+    makeV4Preset({
+      simpleCollections: "both",
+      jwtPgTypeIdentifier: '"b"."jwt_token"',
+      dynamicJson: true,
+      graphiql: true,
+      graphiqlRoute: "/",
+    }),
+    // Uncomment this to opt into a smaller Relay-focussed schema
+    //PostGraphileRelayPreset,
+  ],
+
+  plugins: [
+    /* Add plugins here, e.g.: */
+    PersistedPlugin,
+  ],
+
+  inflection: {
+    /* options for the inflection system */
+  },
+  gather: {
+    /* options for the gather phase, e.g.: */
+    pgStrictFunctions: true,
+    installWatchFixtures: true,
+  },
+  schema: {
+    /* options for the schema build phase, e.g.: */
+    retryOnInitFail: true,
+    exportSchemaSDLPath: `${process.cwd()}/latestSchema.graphql`,
+    exportSchemaIntrospectionResultPath: `${process.cwd()}/latestSchema.json`,
+    sortExport: true,
+  },
+  grafast: {
+    /* options for Grafast, including setting GraphQL context, e.g.: */
+    context: {
+      meaningOfLife: 42,
+    },
+    // explain: true, // DO NOT ENABLE IN PRODUCTION!
+  },
+  grafserv: {
+    /* options for Grafserv, e.g.: */
+    port: 5678,
+    graphqlPath: "/graphql",
+    websockets: true,
+    graphqlOverGET: true,
+    persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,
+    allowUnpersistedOperation: true,
+  },
+  ruru: {
+    /* options for customizing Ruru, e.g.: */
+    htmlParts: {
+      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
+    },
+  },
+  pgServices: [
+    /* list of PG database configurations, e.g.: */
+    makePgService({
+      // Database connection string, read from an environmental variable:
+      connectionString: process.env.DATABASE_URL,
+
+      // List of database schemas to expose:
+      schemas: ["app_public"],
+
+      // Enable LISTEN/NOTIFY:
+      pubsub: true,
+    }),
+  ],
+};
+
+export default preset;
+```

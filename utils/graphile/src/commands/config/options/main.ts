@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import type { JSDocTagInfo, QuickInfo } from "typescript";
 
 import {
   accessKey,
@@ -160,15 +161,51 @@ modules).\
 
       if (relevant) {
         const subentries: string[] = [];
-        let laterStill: Array<string | undefined> = [];
-        const outLaterStill = (line?: string): void => {
-          laterStill.push(line);
-        };
+        const advancedSubentries: string[] = [];
+        const deprecatedSubentries: string[] = [];
+        let normal: Array<string | undefined> = [];
+        let advanced: Array<string | undefined> = [];
+        let deprecated: Array<string | undefined> = [];
         for (const subkey of relevant) {
           const withSubpropertyAccess =
             withProperty + `preset${accessKey(key)}!${accessKey(subkey)}`;
           const info = getQuickInfo(withSubpropertyAccess);
-          subentries.push(
+
+          const tags = getTags(info);
+          const advancedTag = tags.get("advanced");
+          const deprecatedTag = tags.get("deprecated");
+          const experimentalTag = tags.get("experimental");
+          const defaultValueTag = tags.get("defaultValue");
+
+          const isDeprecated = !!deprecatedTag;
+          const isAdvanced = !!advancedTag;
+          const outLaterStill = (line?: string): void => {
+            let target = normal;
+            if (isDeprecated) {
+              target = deprecated;
+              if (target.length === 0) {
+                target.push("### Deprecated");
+                target.push("");
+                target.push("These settings should no longer be used.");
+              }
+            } else if (isAdvanced) {
+              target = advanced;
+              if (target.length === 0) {
+                target.push("### Advanced");
+                target.push("");
+                target.push(
+                  "Only use these settings if you know what you are doing!",
+                );
+              }
+            }
+            target.push(line);
+          };
+          (isDeprecated
+            ? deprecatedSubentries
+            : isAdvanced
+              ? advancedSubentries
+              : subentries
+          ).push(
             `${chalk.greenBright.bold(subkey)}?: ${prettyDisplayParts(
               info?.displayParts,
               ":",
@@ -177,59 +214,127 @@ modules).\
               .trim()};`,
           );
           /*
-        const def = env.languageService.getDefinitionAtPosition(
-          FAKE_FILENAME,
-          contentWithSubpropertyAccess.length,
-        );
-        const hints = env.languageService.provideInlayHints(
-          FAKE_FILENAME,
-          ts.createTextSpan(
+          const def = env.languageService.getDefinitionAtPosition(
+            FAKE_FILENAME,
+            contentWithSubpropertyAccess.length,
+          );
+          const hints = env.languageService.provideInlayHints(
+            FAKE_FILENAME,
+            ts.createTextSpan(
+              contentWithProperty.length,
+              contentWithSubpropertyAccess.length - contentWithProperty.length,
+            ),
+            undefined,
+          );
+          const com = env.languageService.getDocCommentTemplateAtPosition(
+            FAKE_FILENAME,
             contentWithProperty.length,
-            contentWithSubpropertyAccess.length - contentWithProperty.length,
-          ),
-          undefined,
-        );
-        const com = env.languageService.getDocCommentTemplateAtPosition(
-          FAKE_FILENAME,
-          contentWithProperty.length,
-        );
-        console.log(key, subkey, info, def, hints, com);
-        */
+          );
+          console.log(key, subkey, info, def, hints, com);
+          */
           outLaterStill(
             chalk.whiteBright(
-              `### ${chalk.cyanBright.bold(key)}.${chalk.greenBright.bold(
+              `${isAdvanced ? "####" : "###"} ${chalk.cyanBright.bold(key)}.${chalk.greenBright.bold(
                 subkey,
               )}`,
             ),
           );
           outLaterStill();
+          if (deprecatedTag) {
+            outLaterStill(":::warning Deprecated");
+            outLaterStill();
+            if (deprecatedTag.text) {
+              outLaterStill(prettyDisplayParts(deprecatedTag.text));
+              outLaterStill();
+            }
+            outLaterStill(":::");
+            outLaterStill();
+          }
+          if (experimentalTag) {
+            outLaterStill(":::danger Experimental");
+            outLaterStill();
+            outLaterStill(
+              prettyDisplayParts(experimentalTag.text) ??
+                "This feature may change or be removed in a patch release.",
+            );
+            outLaterStill();
+            outLaterStill(":::");
+            outLaterStill();
+          }
+          if (advancedTag) {
+            outLaterStill(":::warning Advanced");
+            outLaterStill();
+            if (advancedTag?.text) {
+              outLaterStill(prettyDisplayParts(advancedTag.text));
+              outLaterStill();
+            }
+            outLaterStill(":::");
+            outLaterStill();
+          }
           const displayParts = prettyDisplayParts(info?.displayParts, ":");
+          const hasDefaultValue = defaultValueTag?.text;
           outLaterStill(
             `${chalk.greenBright.bold("Type")}: \`${
               displayParts
                 ? chalk.whiteBright(displayParts)
                 : chalk.gray("unknown")
-            }\``,
+            }\`${hasDefaultValue ? "  " : ""}`,
           );
+          if (hasDefaultValue) {
+            outLaterStill(
+              `${chalk.greenBright.bold("Default value")}: ${prettyDisplayParts(
+                defaultValueTag.text,
+              )}`,
+            );
+          }
           outLaterStill();
           outLaterStill(prettyDocumentation(info?.documentation));
           outLaterStill();
         }
 
-        if (subentries.length) {
+        if (
+          subentries.length ||
+          advancedSubentries.length ||
+          deprecatedSubentries.length
+        ) {
           outLater("```ts");
           outLater(`{`);
           for (const entry of subentries) {
+            outLater("  " + entry);
+          }
+          if (subentries.length && advancedSubentries.length) {
+            outLater("");
+            outLater("  // Advanced");
+          }
+          for (const entry of advancedSubentries) {
+            outLater("  " + entry);
+          }
+          if (
+            (subentries.length || advancedSubentries.length) &&
+            deprecatedSubentries.length
+          ) {
+            outLater("");
+            outLater("  // Deprecated");
+          }
+          for (const entry of deprecatedSubentries) {
             outLater("  " + entry);
           }
           outLater("}");
           outLater("```");
           outLater();
         }
-        for (const line of laterStill) {
+        for (const line of normal) {
           outLater(line);
         }
-        laterStill = [];
+        for (const line of advanced) {
+          outLater(line);
+        }
+        for (const line of deprecated) {
+          outLater(line);
+        }
+        normal = [];
+        advanced = [];
+        deprecated = [];
       }
     }
     /*
@@ -258,4 +363,27 @@ modules).\
   }
   later = [];
   return outputText.trim() + "\n";
+}
+
+function getTags(info: QuickInfo | undefined) {
+  const tags = new Map<string, JSDocTagInfo>();
+  if (!info?.tags) return tags;
+  for (const tag of info.tags) {
+    const existing = tags.get(tag.name);
+    if (existing != null && tag.text != null) {
+      if (!existing.text) {
+        // Overwrite
+        tags.set(tag.name, tag);
+      } else {
+        // Merge
+        tags.set(tag.name, {
+          ...existing,
+          text: [...existing.text, ...tag.text],
+        });
+      }
+    } else {
+      tags.set(tag.name, tag);
+    }
+  }
+  return tags;
 }

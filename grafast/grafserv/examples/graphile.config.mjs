@@ -7,7 +7,7 @@ import "grafserv/fastify/v4";
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
-  server: {
+  grafserv: {
     port: 5678,
     outputDataAsString: true,
     graphqlOverGET: true,

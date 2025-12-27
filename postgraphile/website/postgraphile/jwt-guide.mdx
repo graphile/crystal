@@ -6,7 +6,7 @@ JWTs are optional in PostGraphile. You can authenticate users with session
 cookies, API keys, mTLS, or any other mechanism that lets your web framework
 identify who is making the request. The key requirement is that you surface
 the relevant details to PostgreSQL via
-[`pgSettings`](./config.mdx#pgsettings) so that Row Level Security (RLS)
+[`pgSettings`](./config/overview#pgsettings) so that Row Level Security (RLS)
 policies and functions can make decisions. See the
 [security](./security.md) page for the broader architecture and trade-offs.
 
@@ -229,7 +229,7 @@ it only signs the composite payloads you return.
 JWTs are one option amongst many. Session cookies, OAuth-backed passport
 strategies, or bespoke API keys all work as long as you populate `pgSettings`
 appropriately. The
-[`pgSettings` section of the config docs](./config.mdx#pgsettings)
+[`pgSettings` section of the config docs](./config/overview#pgsettings)
 shows how to expose request data regardless of authentication style, and the
 [security](./security.md) page lists common approaches. Pick the strategy that
 fits your infrastructure, and make sure you're aware of the trade-offs of each
