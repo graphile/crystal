@@ -1,9 +1,19 @@
 import "postgraphile";
 import "postgraphile/adaptors/pg";
 import "postgraphile/utils";
-import "postgraphile/presets/amber";
-import "postgraphile/presets/v4";
-import "postgraphile/presets/relay";
-import "postgraphile/presets/lazy-jwt";
-const preset: GraphileConfig.Preset = {};
+
+import PostGraphileAmberPreset from "postgraphile/presets/amber";
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
+import { makeV4Preset } from "./src/presets/v4";
+
+const preset: GraphileConfig.Preset = {
+  // List to extend so we can declare the inflectors in the docs
+  extends: [
+    PostGraphileAmberPreset,
+    PgLazyJWTPreset,
+    PostGraphileRelayPreset,
+    makeV4Preset({}),
+  ],
+};
 export default preset;
