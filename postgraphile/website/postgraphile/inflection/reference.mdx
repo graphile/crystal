@@ -106,54 +106,287 @@ interface GraphileBuild.Inflection {
 }
 ```
 
-## pluralize
+## _allInterfaceModeUnionRows
 
-Builtin inflector.
+Added by PgInterfaceModeUnionAllRowsPlugin.
 
-Declared in: [graphile-build:src/inflection.ts:10:27](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L10)
+Declared in: [graphile-build-pg:src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts:34:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts#L34)
+
+The base inflector used by allInterfaceModeUnionRowsConnection and
+allInterfaceModeUnionRowsList.
 
 ```ts
-pluralize: (text: string) => string
+_allInterfaceModeUnionRows(codec: PgCodec): string
 ```
 
-## singularize
+## _allRows
 
-Builtin inflector.
+Added by PgAllRowsPlugin.
 
-Declared in: [graphile-build:src/inflection.ts:14:38](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L14)
+Declared in: [graphile-build-pg:src/plugins/PgAllRowsPlugin.ts:29:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAllRowsPlugin.ts#L29)
+
+The base inflector used by `allRowsConnection` and `allRowsList`.
 
 ```ts
-singularize: (text: string) => string
+_allRows(resource: PgResource<any, any, any, any, any>): string
 ```
 
-## upperCamelCase
+## _attributeName
 
-Builtin inflector.
+Added by PgAttributesPlugin.
 
-Declared in: [graphile-build:src/inflection.ts:18:37](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L18)
+Overridden by:
+
+- PgV4InflectionPlugin
+- PostGraphileV4CompatibilityPlugin
+- PgRelayPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgAttributesPlugin.ts:60:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAttributesPlugin.ts#L60)
+
+Given a attributeName on a PgCodec's attributes, should return the field
+name to use to represent this attribute (both for input and output).
 
 ```ts
-upperCamelCase: (text: string) => string
+_attributeName(details: {
+    codec: PgCodecWithAttributes;
+    attributeName: string;
+    skipRowId?: boolean;
+}): string
 ```
 
-## camelCase
+## _codecName
 
-Builtin inflector.
+Added by PgTablesPlugin.
 
-Declared in: [graphile-build:src/inflection.ts:22:27](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L22)
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:103:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L103)
+
+A PgCodec may represent any of a wide range of PostgreSQL types;
+this inflector gives a name to this codec, it's primarily used when
+naming _types_ in the GraphQL schema (as opposed to `_sourceName`
+which typically names _fields_).
 
 ```ts
-camelCase: (text: string) => string
+_codecName(codec: PgCodec<any, any, any, any, any, any, any>): string
 ```
 
-## constantCase
+## _functionName
 
-Builtin inflector.
+Added by PgCustomTypeFieldPlugin.
 
-Declared in: [graphile-build:src/inflection.ts:26:33](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L26)
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:141:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L141)
 
 ```ts
-constantCase: (text: string) => string
+_functionName(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## _joinAttributeNames
+
+Added by PgAttributesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgAttributesPlugin.ts:73:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAttributesPlugin.ts#L73)
+
+Takes a codec and the list of attribute names from that codec and turns
+it into a joined list.
+
+```ts
+_joinAttributeNames(codec: PgCodecWithAttributes, names: readonly string[]): string
+```
+
+## _manyRelation
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:106:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L106)
+
+```ts
+_manyRelation(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## _manyRelationRaw
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:102:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L102)
+
+```ts
+_manyRelationRaw(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## _resourceName
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:56:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L56)
+
+A PgResource represents a single way of getting a number of values of
+`resource.codec` type. It doesn't necessarily represent a table directly
+(although it can) - e.g. it might be a function that returns records
+from a table, or it could be a "sub-selection" of a table, e.g.
+"admin_users" might be "users where admin is true".  This inflector
+gives a name to this resource, it's primarily used when naming _fields_
+in the GraphQL schema (as opposed to `_codecName` which typically
+names _types_.
+
+```ts
+_resourceName(resource: PgResource<any, any, any, any, any>): string
+```
+
+## _schemaPrefix
+
+Added by PgTablesPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:74:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L74)
+
+When you're using multiple databases and/or schemas, you may want to
+prefix various type names/field names with an identifier for these
+DBs/schemas.
+
+```ts
+_schemaPrefix(details: {
+    serviceName: string;
+    pgNamespace: PgNamespace;
+}): string
+```
+
+## _singleRelationBackwardsRaw
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:94:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L94)
+
+```ts
+_singleRelationBackwardsRaw(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## _singleRelationRaw
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:86:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L86)
+
+```ts
+_singleRelationRaw(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## _singularizedCodecName
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:119:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L119)
+
+Takes a `_codecName` and singularizes it. This is also a good place to
+try and avoid potential conflicts, e.g. for a table `foo` a `Foo` and
+`FooInput` and `FooPatch` type might be generated. So a `foo_input`
+table could potentially cause conflicts. The default inflector would
+turn `foo_input` into `FooInputRecord`.
+
+```ts
+_singularizedCodecName(codec: PgCodec<any, any, any, any, any, any, any>): string
+```
+
+## _singularizedResourceName
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:64:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L64)
+
+Takes a `_sourceName` and singularizes it.
+
+```ts
+_singularizedResourceName(resource: PgResource<any, any, any, any, any>): string
+```
+
+## allInterfaceModeUnionRowsConnection
+
+Added by PgInterfaceModeUnionAllRowsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts:40:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts#L40)
+
+The field name for a Cursor Connection field that returns all rows
+from the given `@interface mode:union` codec.
+
+```ts
+allInterfaceModeUnionRowsConnection(codec: PgCodec): string
+```
+
+## allInterfaceModeUnionRowsList
+
+Added by PgInterfaceModeUnionAllRowsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts:49:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts#L49)
+
+The field name for a List field that returns all rows from the given
+`@interface mode:union` codec.
+
+```ts
+allInterfaceModeUnionRowsList(codec: PgCodec): string
+```
+
+## allRowsConnection
+
+Added by PgAllRowsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgAllRowsPlugin.ts:37:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAllRowsPlugin.ts#L37)
+
+The field name for a Cursor Connection field that returns all rows
+from the given resource.
+
+```ts
+allRowsConnection(resource: PgResource<any, any, any, any, any>): string
+```
+
+## allRowsList
+
+Added by PgAllRowsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgAllRowsPlugin.ts:46:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAllRowsPlugin.ts#L46)
+
+The field name for a List field that returns all rows from the given
+resource.
+
+```ts
+allRowsList(resource: PgResource<any, any, any, any, any>): string
+```
+
+## argument
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:181:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L181)
+
+```ts
+argument(details: GraphileBuild.InflectionCustomFieldArgumentDetails): string
+```
+
+## attribute
+
+Added by PgAttributesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgAttributesPlugin.ts:84:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAttributesPlugin.ts#L84)
+
+The field name for a given attribute on that pg_class' table type. May
+also be used in other places (e.g. the Input or Patch type associated
+with the table).
+
+```ts
+attribute(details: {
+    attributeName: string;
+    codec: PgCodecWithAttributes;
+}): string
+```
+
+## baseInputType
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:151:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L151)
+
+```ts
+baseInputType(typeName: string): string
 ```
 
 ## builtin
@@ -196,52 +429,27 @@ Other plugins may add their own builtins too; try and avoid conflicts!
 builtin(name: string): string
 ```
 
-## edgeType
+## camelCase
 
 Builtin inflector.
 
-Declared in: [graphile-build:src/inflection.ts:67:18](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L67)
-
-Take a type name and return the edge type name
+Declared in: [graphile-build:src/inflection.ts:22:27](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L22)
 
 ```ts
-edgeType(typeName: string): string
+camelCase: (text: string) => string
 ```
 
-## connectionType
+## classCodecName
 
-Builtin inflector.
+Added by PgCodecsPlugin.
 
-Declared in: [graphile-build:src/inflection.ts:72:24](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L72)
-
-Take a type name and return the connection type name
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:41:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L41)
 
 ```ts
-connectionType(typeName: string): string
-```
-
-## connectionField
-
-Builtin inflector.
-
-Declared in: [graphile-build:src/inflection.ts:77:25](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L77)
-
-The name of a field that returns a connection
-
-```ts
-connectionField(baseName: string): string
-```
-
-## listField
-
-Builtin inflector.
-
-Declared in: [graphile-build:src/inflection.ts:82:19](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L82)
-
-The name of a field that returns a list
-
-```ts
-listField(baseName: string): string
+classCodecName(details: {
+    pgClass: PgClass;
+    serviceName: string;
+}): string
 ```
 
 ## coerceToGraphQLName
@@ -266,115 +474,14 @@ See: https://graphql.github.io/graphql-spec/June2018/#sec-Appendix-Grammar-Summa
 coerceToGraphQLName(name: string): string
 ```
 
-## inputType
-
-Builtin inflector.
-
-Declared in: [graphile-build:src/inflection.ts:119:19](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L119)
-
-Given the name of a GraphQL output type, what name should we use for the
-equivalent input type?
-
-```ts
-inputType(typeName: string): string
-```
-
-## nodeIdFieldName
-
-Added by NodePlugin.
-
-Overridden by:
-
-- PostGraphileV4CompatibilityPlugin
-- PgRelayPlugin
-
-Declared in: [graphile-build:src/plugins/NodePlugin.ts:17:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/plugins/NodePlugin.ts#L17)
-
-```ts
-nodeIdFieldName(): string
-```
-
-## rowByUnique
-
-Added by PgRowByUniquePlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRowByUniquePlugin.ts:28:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRowByUniquePlugin.ts#L28)
-
-```ts
-rowByUnique(details: {
-    unique: PgResourceUnique;
-    resource: PgResource<any, any, any, any, any>;
-}): string
-```
-
-## _functionName
+## computedAttributeConnectionField
 
 Added by PgCustomTypeFieldPlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:141:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L141)
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:173:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L173)
 
 ```ts
-_functionName(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## customMutationField
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:145:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L145)
-
-```ts
-customMutationField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## customMutationPayload
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:149:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L149)
-
-```ts
-customMutationPayload(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## customMutationInput
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:153:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L153)
-
-```ts
-customMutationInput(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## customQueryField
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:157:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L157)
-
-```ts
-customQueryField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## customQueryConnectionField
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:161:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L161)
-
-```ts
-customQueryConnectionField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## customQueryListField
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:165:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L165)
-
-```ts
-customQueryListField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+computedAttributeConnectionField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
 ```
 
 ## computedAttributeField
@@ -387,16 +494,6 @@ Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:169:7](ht
 computedAttributeField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
 ```
 
-## computedAttributeConnectionField
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:173:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L173)
-
-```ts
-computedAttributeConnectionField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
 ## computedAttributeListField
 
 Added by PgCustomTypeFieldPlugin.
@@ -405,80 +502,6 @@ Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:177:7](ht
 
 ```ts
 computedAttributeListField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## argument
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:181:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L181)
-
-```ts
-argument(details: GraphileBuild.InflectionCustomFieldArgumentDetails): string
-```
-
-## recordFunctionConnectionType
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:185:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L185)
-
-```ts
-recordFunctionConnectionType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## scalarFunctionConnectionType
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:189:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L189)
-
-```ts
-scalarFunctionConnectionType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## recordFunctionEdgeType
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:193:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L193)
-
-```ts
-recordFunctionEdgeType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## scalarFunctionEdgeType
-
-Added by PgCustomTypeFieldPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:197:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L197)
-
-```ts
-scalarFunctionEdgeType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
-```
-
-## functionMutationResultFieldName
-
-Added by PgCustomTypeFieldPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:201:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L201)
-
-```ts
-functionMutationResultFieldName(details: GraphileBuild.InflectionCustomFieldMutationResult): string
-```
-
-## nodeById
-
-Added by NodeAccessorPlugin.
-
-Declared in: [graphile-build:src/plugins/NodeAccessorPlugin.ts:26:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/plugins/NodeAccessorPlugin.ts#L26)
-
-```ts
-nodeById(typeName: string): string
 ```
 
 ## computedAttributeOrder
@@ -494,46 +517,6 @@ computedAttributeOrder(details: {
 }): string
 ```
 
-## tableEdgeField
-
-Added by PgMutationPayloadEdgePlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgMutationPayloadEdgePlugin.ts:26:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationPayloadEdgePlugin.ts#L26)
-
-```ts
-tableEdgeField(codec: PgCodecWithAttributes): string
-```
-
-## functionResourceName
-
-Added by PgProceduresPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgProceduresPlugin.ts:32:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgProceduresPlugin.ts#L32)
-
-```ts
-functionResourceName(details: {
-    serviceName: string;
-    pgProc: PgProc;
-}): string
-```
-
-## functionRecordReturnCodecName
-
-Added by PgProceduresPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgProceduresPlugin.ts:39:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgProceduresPlugin.ts#L39)
-
-```ts
-functionRecordReturnCodecName(details: {
-    serviceName: string;
-    pgProc: PgProc;
-}): string
-```
-
 ## conditionType
 
 Added by PgConditionArgumentPlugin.
@@ -546,462 +529,38 @@ Declared in:
 conditionType(typeName: string): string (+1 overload)
 ```
 
-## _allInterfaceModeUnionRows
+## connectionField
 
-Added by PgInterfaceModeUnionAllRowsPlugin.
+Builtin inflector.
 
-Declared in: [graphile-build-pg:src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts:34:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts#L34)
+Declared in: [graphile-build:src/inflection.ts:77:25](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L77)
 
-The base inflector used by allInterfaceModeUnionRowsConnection and
-allInterfaceModeUnionRowsList.
+The name of a field that returns a connection
 
 ```ts
-_allInterfaceModeUnionRows(codec: PgCodec): string
+connectionField(baseName: string): string
 ```
 
-## allInterfaceModeUnionRowsConnection
+## connectionType
 
-Added by PgInterfaceModeUnionAllRowsPlugin.
+Builtin inflector.
 
-Declared in: [graphile-build-pg:src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts:40:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts#L40)
+Declared in: [graphile-build:src/inflection.ts:72:24](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L72)
 
-The field name for a Cursor Connection field that returns all rows
-from the given `@interface mode:union` codec.
+Take a type name and return the connection type name
 
 ```ts
-allInterfaceModeUnionRowsConnection(codec: PgCodec): string
+connectionType(typeName: string): string
 ```
 
-## allInterfaceModeUnionRowsList
+## constantCase
 
-Added by PgInterfaceModeUnionAllRowsPlugin.
+Builtin inflector.
 
-Declared in: [graphile-build-pg:src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts:49:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgInterfaceModeUnionAllRowsPlugin.ts#L49)
-
-The field name for a List field that returns all rows from the given
-`@interface mode:union` codec.
+Declared in: [graphile-build:src/inflection.ts:26:33](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L26)
 
 ```ts
-allInterfaceModeUnionRowsList(codec: PgCodec): string
-```
-
-## pgPolymorphismEnumType
-
-Added by PgPolymorphismOnlyArgumentPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgPolymorphismOnlyArgumentPlugin.ts:28:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgPolymorphismOnlyArgumentPlugin.ts#L28)
-
-```ts
-pgPolymorphismEnumType(pgCodec: PgCodec): string
-```
-
-## pgPolymorphismOnlyArgument
-
-Added by PgPolymorphismOnlyArgumentPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgPolymorphismOnlyArgumentPlugin.ts:29:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgPolymorphismOnlyArgumentPlugin.ts#L29)
-
-```ts
-pgPolymorphismOnlyArgument(pgCodec: PgCodec): string
-```
-
-## classCodecName
-
-Added by PgCodecsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:41:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L41)
-
-```ts
-classCodecName(details: {
-    pgClass: PgClass;
-    serviceName: string;
-}): string
-```
-
-## typeCodecName
-
-Added by PgCodecsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:46:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L46)
-
-```ts
-typeCodecName(details: {
-    pgType: PgType;
-    serviceName: string;
-}): string
-```
-
-## scalarCodecTypeName
-
-Added by PgCodecsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:48:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L48)
-
-```ts
-scalarCodecTypeName(codec: PgCodecAnyScalar): string
-```
-
-## enumType
-
-Added by PgCodecsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:49:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L49)
-
-```ts
-enumType(codec: PgEnumCodec<string, any>): string
-```
-
-## enumValue
-
-Added by PgCodecsPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:50:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L50)
-
-```ts
-enumValue(value: string, codec: PgEnumCodec<string, any>): string
-```
-
-## rangeBoundType
-
-Added by PgCodecsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:55:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L55)
-
-```ts
-rangeBoundType(input: {
-    codec: PgCodecAnyScalar;
-    underlyingTypeName: string;
-}): string
-```
-
-## rangeType
-
-Added by PgCodecsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:59:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L59)
-
-```ts
-rangeType(input: {
-    codec: PgCodecAnyScalar;
-    underlyingTypeName: string;
-}): string
-```
-
-## _schemaPrefix
-
-Added by PgTablesPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:74:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L74)
-
-When you're using multiple databases and/or schemas, you may want to
-prefix various type names/field names with an identifier for these
-DBs/schemas.
-
-```ts
-_schemaPrefix(details: {
-    serviceName: string;
-    pgNamespace: PgNamespace;
-}): string
-```
-
-## tableResourceName
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:85:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L85)
-
-The name of the PgResource for a table/class
-
-```ts
-tableResourceName(details: {
-    serviceName: string;
-    pgClass: PgClass;
-}): string
-```
-
-## _codecName
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:103:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L103)
-
-A PgCodec may represent any of a wide range of PostgreSQL types;
-this inflector gives a name to this codec, it's primarily used when
-naming _types_ in the GraphQL schema (as opposed to `_sourceName`
-which typically names _fields_).
-
-```ts
-_codecName(codec: PgCodec<any, any, any, any, any, any, any>): string
-```
-
-## _singularizedCodecName
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:119:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L119)
-
-Takes a `_codecName` and singularizes it. This is also a good place to
-try and avoid potential conflicts, e.g. for a table `foo` a `Foo` and
-`FooInput` and `FooPatch` type might be generated. So a `foo_input`
-table could potentially cause conflicts. The default inflector would
-turn `foo_input` into `FooInputRecord`.
-
-```ts
-_singularizedCodecName(codec: PgCodec<any, any, any, any, any, any, any>): string
-```
-
-## dontEndInInputOrPatch
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:128:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L128)
-
-Appends '_record' to a name that ends in `_input`, `_patch`, `Input`
-or `Patch` to avoid naming conflicts.
-
-```ts
-dontEndInInputOrPatch(text: string): string
-```
-
-## _resourceName
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:56:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L56)
-
-A PgResource represents a single way of getting a number of values of
-`resource.codec` type. It doesn't necessarily represent a table directly
-(although it can) - e.g. it might be a function that returns records
-from a table, or it could be a "sub-selection" of a table, e.g.
-"admin_users" might be "users where admin is true".  This inflector
-gives a name to this resource, it's primarily used when naming _fields_
-in the GraphQL schema (as opposed to `_codecName` which typically
-names _types_.
-
-```ts
-_resourceName(resource: PgResource<any, any, any, any, any>): string
-```
-
-## _singularizedResourceName
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:64:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L64)
-
-Takes a `_sourceName` and singularizes it.
-
-```ts
-_singularizedResourceName(resource: PgResource<any, any, any, any, any>): string
-```
-
-## tableType
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:135:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L135)
-
-The name of the GraphQL Object Type that's generated to represent a
-specific table (more specifically a PostgreSQL "pg_class" which is
-represented as a certain PgCodec)
-
-```ts
-tableType(codec: PgCodec<any, any, any, any, any, any, any>): string
-```
-
-## tableConnectionType
-
-Added by PgTablesPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:140:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L140)
-
-```ts
-tableConnectionType(codec: PgCodec<any, any, any, any, any, any, any>): string
-```
-
-## tableEdgeType
-
-Added by PgTablesPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:145:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L145)
-
-```ts
-tableEdgeType(codec: PgCodec<any, any, any, any, any, any, any>): string
-```
-
-## patchType
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:150:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L150)
-
-```ts
-patchType(typeName: string): string
-```
-
-## baseInputType
-
-Added by PgTablesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:151:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L151)
-
-```ts
-baseInputType(typeName: string): string
-```
-
-## _allRows
-
-Added by PgAllRowsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgAllRowsPlugin.ts:29:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAllRowsPlugin.ts#L29)
-
-The base inflector used by `allRowsConnection` and `allRowsList`.
-
-```ts
-_allRows(resource: PgResource<any, any, any, any, any>): string
-```
-
-## allRowsConnection
-
-Added by PgAllRowsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgAllRowsPlugin.ts:37:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAllRowsPlugin.ts#L37)
-
-The field name for a Cursor Connection field that returns all rows
-from the given resource.
-
-```ts
-allRowsConnection(resource: PgResource<any, any, any, any, any>): string
-```
-
-## allRowsList
-
-Added by PgAllRowsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgAllRowsPlugin.ts:46:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAllRowsPlugin.ts#L46)
-
-The field name for a List field that returns all rows from the given
-resource.
-
-```ts
-allRowsList(resource: PgResource<any, any, any, any, any>): string
-```
-
-## _attributeName
-
-Added by PgAttributesPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-- PostGraphileV4CompatibilityPlugin
-- PgRelayPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgAttributesPlugin.ts:60:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAttributesPlugin.ts#L60)
-
-Given a attributeName on a PgCodec's attributes, should return the field
-name to use to represent this attribute (both for input and output).
-
-```ts
-_attributeName(details: {
-    codec: PgCodecWithAttributes;
-    attributeName: string;
-    skipRowId?: boolean;
-}): string
-```
-
-## _joinAttributeNames
-
-Added by PgAttributesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgAttributesPlugin.ts:73:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAttributesPlugin.ts#L73)
-
-Takes a codec and the list of attribute names from that codec and turns
-it into a joined list.
-
-```ts
-_joinAttributeNames(codec: PgCodecWithAttributes, names: readonly string[]): string
-```
-
-## attribute
-
-Added by PgAttributesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgAttributesPlugin.ts:84:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgAttributesPlugin.ts#L84)
-
-The field name for a given attribute on that pg_class' table type. May
-also be used in other places (e.g. the Input or Patch type associated
-with the table).
-
-```ts
-attribute(details: {
-    attributeName: string;
-    codec: PgCodecWithAttributes;
-}): string
-```
-
-## orderByAttributeEnum
-
-Added by PgOrderAllAttributesPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgOrderAllAttributesPlugin.ts:23:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgOrderAllAttributesPlugin.ts#L23)
-
-```ts
-orderByAttributeEnum(details: {
-    codec: PgCodecWithAttributes;
-    attributeName: string;
-    variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
-}): string
-```
-
-## nodeIdAttribute
-
-Added by PgNodeIdAttributesPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgNodeIdAttributesPlugin.ts:35:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgNodeIdAttributesPlugin.ts#L35)
-
-The name of the attribute used as an `ID` input representing a related
-record ultimately representing the underlying keys.
-
-```ts
-nodeIdAttribute(details: {
-    registry: PgRegistry;
-    codec: PgCodecWithAttributes;
-    relationName: string;
-}): string
-```
-
-## orderByType
-
-Added by PgConnectionArgOrderByPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgConnectionArgOrderByPlugin.ts:24:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgConnectionArgOrderByPlugin.ts#L24)
-
-```ts
-orderByType(typeName: string): string
+constantCase: (text: string) => string
 ```
 
 ## createField
@@ -1034,79 +593,89 @@ Declared in: [graphile-build-pg:src/plugins/PgMutationCreatePlugin.ts:44:7](http
 createPayloadType(resource: PgResource<any, any, any, any, any>): string
 ```
 
-## tableFieldName
+## customMutationField
 
-Added by PgMutationCreatePlugin.
+Added by PgCustomTypeFieldPlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgMutationCreatePlugin.ts:48:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationCreatePlugin.ts#L48)
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:145:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L145)
 
 ```ts
-tableFieldName(resource: PgResource<any, any, any, any, any>): string
+customMutationField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
 ```
 
-## updatePayloadType
+## customMutationInput
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:153:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L153)
+
+```ts
+customMutationInput(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## customMutationPayload
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:149:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L149)
+
+```ts
+customMutationPayload(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## customQueryConnectionField
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:161:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L161)
+
+```ts
+customQueryConnectionField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## customQueryField
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:157:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L157)
+
+```ts
+customQueryField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## customQueryListField
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:165:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L165)
+
+```ts
+customQueryListField(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## deleteByKeysField
 
 Added by PgMutationUpdateDeletePlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:71:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L71)
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:136:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L136)
 
 ```ts
-updatePayloadType(details: {
-    resource: PgResource<any, any, any, any, any>;
-}): string
-```
-
-## deletePayloadType
-
-Added by PgMutationUpdateDeletePlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:77:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L77)
-
-```ts
-deletePayloadType(details: {
-    resource: PgResource<any, any, any, any, any>;
-}): string
-```
-
-## updateNodeField
-
-Added by PgMutationUpdateDeletePlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:84:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L84)
-
-```ts
-updateNodeField(details: {
+deleteByKeysField(details: {
     resource: PgResource<any, any, any, any, any>;
     unique: PgResourceUnique;
 }): string
 ```
 
-## updateNodeInputType
+## deleteByKeysInputType
 
 Added by PgMutationUpdateDeletePlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:91:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L91)
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:143:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L143)
 
 ```ts
-updateNodeInputType(details: {
+deleteByKeysInputType(details: {
     resource: PgResource<any, any, any, any, any>;
     unique: PgResourceUnique;
-}): string
-```
-
-## deletedNodeId
-
-Added by PgMutationUpdateDeletePlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:99:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L99)
-
-```ts
-deletedNodeId(details: {
-    resource: PgResource<any, any, any, any, any>;
 }): string
 ```
 
@@ -1136,6 +705,601 @@ deleteNodeInputType(details: {
 }): string
 ```
 
+## deletePayloadType
+
+Added by PgMutationUpdateDeletePlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:77:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L77)
+
+```ts
+deletePayloadType(details: {
+    resource: PgResource<any, any, any, any, any>;
+}): string
+```
+
+## deletedNodeId
+
+Added by PgMutationUpdateDeletePlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:99:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L99)
+
+```ts
+deletedNodeId(details: {
+    resource: PgResource<any, any, any, any, any>;
+}): string
+```
+
+## dontEndInInputOrPatch
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:128:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L128)
+
+Appends '_record' to a name that ends in `_input`, `_patch`, `Input`
+or `Patch` to avoid naming conflicts.
+
+```ts
+dontEndInInputOrPatch(text: string): string
+```
+
+## edgeType
+
+Builtin inflector.
+
+Declared in: [graphile-build:src/inflection.ts:67:18](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L67)
+
+Take a type name and return the edge type name
+
+```ts
+edgeType(typeName: string): string
+```
+
+## enumTableCodec
+
+Added by PgEnumTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgEnumTablesPlugin.ts:57:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgEnumTablesPlugin.ts#L57)
+
+Name of the _codec_ used to represent an enum table as an enum. You
+probably want `enumTableEnum` instead.
+
+```ts
+enumTableCodec(details: {
+    serviceName: string;
+    pgClass: PgClass;
+    pgConstraint: PgConstraint;
+}): string
+```
+
+## enumTableEnum
+
+Added by PgEnumTablesPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgEnumTablesPlugin.ts:44:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgEnumTablesPlugin.ts#L44)
+
+Name of the _GraphQL enum_ used to represent an enum table in the
+schema.
+
+```ts
+enumTableEnum(details: {
+    serviceName: string;
+    pgClass: PgClass;
+    pgConstraint: PgConstraint;
+}): string
+```
+
+## enumType
+
+Added by PgCodecsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:49:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L49)
+
+```ts
+enumType(codec: PgEnumCodec<string, any>): string
+```
+
+## enumValue
+
+Added by PgCodecsPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:50:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L50)
+
+```ts
+enumValue(value: string, codec: PgEnumCodec<string, any>): string
+```
+
+## functionMutationResultFieldName
+
+Added by PgCustomTypeFieldPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:201:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L201)
+
+```ts
+functionMutationResultFieldName(details: GraphileBuild.InflectionCustomFieldMutationResult): string
+```
+
+## functionRecordReturnCodecName
+
+Added by PgProceduresPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgProceduresPlugin.ts:39:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgProceduresPlugin.ts#L39)
+
+```ts
+functionRecordReturnCodecName(details: {
+    serviceName: string;
+    pgProc: PgProc;
+}): string
+```
+
+## functionResourceName
+
+Added by PgProceduresPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgProceduresPlugin.ts:32:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgProceduresPlugin.ts#L32)
+
+```ts
+functionResourceName(details: {
+    serviceName: string;
+    pgProc: PgProc;
+}): string
+```
+
+## inputType
+
+Builtin inflector.
+
+Declared in: [graphile-build:src/inflection.ts:119:19](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L119)
+
+Given the name of a GraphQL output type, what name should we use for the
+equivalent input type?
+
+```ts
+inputType(typeName: string): string
+```
+
+## listField
+
+Builtin inflector.
+
+Declared in: [graphile-build:src/inflection.ts:82:19](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L82)
+
+The name of a field that returns a list
+
+```ts
+listField(baseName: string): string
+```
+
+## manyRelationConnection
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:110:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L110)
+
+```ts
+manyRelationConnection(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## manyRelationList
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:114:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L114)
+
+```ts
+manyRelationList(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## nodeById
+
+Added by NodeAccessorPlugin.
+
+Declared in: [graphile-build:src/plugins/NodeAccessorPlugin.ts:26:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/plugins/NodeAccessorPlugin.ts#L26)
+
+```ts
+nodeById(typeName: string): string
+```
+
+## nodeIdAttribute
+
+Added by PgNodeIdAttributesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgNodeIdAttributesPlugin.ts:35:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgNodeIdAttributesPlugin.ts#L35)
+
+The name of the attribute used as an `ID` input representing a related
+record ultimately representing the underlying keys.
+
+```ts
+nodeIdAttribute(details: {
+    registry: PgRegistry;
+    codec: PgCodecWithAttributes;
+    relationName: string;
+}): string
+```
+
+## nodeIdFieldName
+
+Added by NodePlugin.
+
+Overridden by:
+
+- PostGraphileV4CompatibilityPlugin
+- PgRelayPlugin
+
+Declared in: [graphile-build:src/plugins/NodePlugin.ts:17:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/plugins/NodePlugin.ts#L17)
+
+```ts
+nodeIdFieldName(): string
+```
+
+## orderByAttributeEnum
+
+Added by PgOrderAllAttributesPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgOrderAllAttributesPlugin.ts:23:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgOrderAllAttributesPlugin.ts#L23)
+
+```ts
+orderByAttributeEnum(details: {
+    codec: PgCodecWithAttributes;
+    attributeName: string;
+    variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
+}): string
+```
+
+## orderByType
+
+Added by PgConnectionArgOrderByPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgConnectionArgOrderByPlugin.ts:24:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgConnectionArgOrderByPlugin.ts#L24)
+
+```ts
+orderByType(typeName: string): string
+```
+
+## patchField
+
+Added by PgMutationUpdateDeletePlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:151:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L151)
+
+```ts
+patchField(fieldName: string): string
+```
+
+## patchType
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:150:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L150)
+
+```ts
+patchType(typeName: string): string
+```
+
+## pgPolymorphismEnumType
+
+Added by PgPolymorphismOnlyArgumentPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgPolymorphismOnlyArgumentPlugin.ts:28:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgPolymorphismOnlyArgumentPlugin.ts#L28)
+
+```ts
+pgPolymorphismEnumType(pgCodec: PgCodec): string
+```
+
+## pgPolymorphismOnlyArgument
+
+Added by PgPolymorphismOnlyArgumentPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgPolymorphismOnlyArgumentPlugin.ts:29:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgPolymorphismOnlyArgumentPlugin.ts#L29)
+
+```ts
+pgPolymorphismOnlyArgument(pgCodec: PgCodec): string
+```
+
+## pluralize
+
+Builtin inflector.
+
+Declared in: [graphile-build:src/inflection.ts:10:27](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L10)
+
+```ts
+pluralize: (text: string) => string
+```
+
+## rangeBoundType
+
+Added by PgCodecsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:55:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L55)
+
+```ts
+rangeBoundType(input: {
+    codec: PgCodecAnyScalar;
+    underlyingTypeName: string;
+}): string
+```
+
+## rangeType
+
+Added by PgCodecsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:59:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L59)
+
+```ts
+rangeType(input: {
+    codec: PgCodecAnyScalar;
+    underlyingTypeName: string;
+}): string
+```
+
+## recordFunctionConnectionType
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:185:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L185)
+
+```ts
+recordFunctionConnectionType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## recordFunctionEdgeType
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:193:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L193)
+
+```ts
+recordFunctionEdgeType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## refConnection
+
+Added by PgRefsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRefsPlugin.ts:41:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRefsPlugin.ts#L41)
+
+```ts
+refConnection(details: {
+    refDefinition: PgRefDefinition;
+    identifier: string;
+}): string
+```
+
+## refList
+
+Added by PgRefsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRefsPlugin.ts:37:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRefsPlugin.ts#L37)
+
+```ts
+refList(details: {
+    refDefinition: PgRefDefinition;
+    identifier: string;
+}): string
+```
+
+## refSingle
+
+Added by PgRefsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRefsPlugin.ts:33:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRefsPlugin.ts#L33)
+
+```ts
+refSingle(details: {
+    refDefinition: PgRefDefinition;
+    identifier: string;
+}): string
+```
+
+## resourceRelationName
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:73:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L73)
+
+```ts
+resourceRelationName(details: {
+    serviceName: string;
+    pgConstraint: PgConstraint;
+    localClass: PgClass;
+    localAttributes: PgAttribute[];
+    foreignClass: PgClass;
+    foreignAttributes: PgAttribute[];
+    isUnique: boolean;
+    isReferencee: boolean;
+}): string
+```
+
+## rowByUnique
+
+Added by PgRowByUniquePlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRowByUniquePlugin.ts:28:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRowByUniquePlugin.ts#L28)
+
+```ts
+rowByUnique(details: {
+    unique: PgResourceUnique;
+    resource: PgResource<any, any, any, any, any>;
+}): string
+```
+
+## scalarCodecTypeName
+
+Added by PgCodecsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:48:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L48)
+
+```ts
+scalarCodecTypeName(codec: PgCodecAnyScalar): string
+```
+
+## scalarFunctionConnectionType
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:189:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L189)
+
+```ts
+scalarFunctionConnectionType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## scalarFunctionEdgeType
+
+Added by PgCustomTypeFieldPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCustomTypeFieldPlugin.ts:197:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCustomTypeFieldPlugin.ts#L197)
+
+```ts
+scalarFunctionEdgeType(details: GraphileBuild.InflectionCustomFieldProcedureDetails): string
+```
+
+## singleRelation
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:90:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L90)
+
+```ts
+singleRelation(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## singleRelationBackwards
+
+Added by PgRelationsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:98:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L98)
+
+```ts
+singleRelationBackwards(details: GraphileBuild.PgRelationsPluginRelationDetails): string
+```
+
+## singularize
+
+Builtin inflector.
+
+Declared in: [graphile-build:src/inflection.ts:14:38](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L14)
+
+```ts
+singularize: (text: string) => string
+```
+
+## tableConnectionType
+
+Added by PgTablesPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:140:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L140)
+
+```ts
+tableConnectionType(codec: PgCodec<any, any, any, any, any, any, any>): string
+```
+
+## tableEdgeField
+
+Added by PgMutationPayloadEdgePlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgMutationPayloadEdgePlugin.ts:26:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationPayloadEdgePlugin.ts#L26)
+
+```ts
+tableEdgeField(codec: PgCodecWithAttributes): string
+```
+
+## tableEdgeType
+
+Added by PgTablesPlugin.
+
+Overridden by:
+
+- PgV4InflectionPlugin
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:145:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L145)
+
+```ts
+tableEdgeType(codec: PgCodec<any, any, any, any, any, any, any>): string
+```
+
+## tableFieldName
+
+Added by PgMutationCreatePlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgMutationCreatePlugin.ts:48:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationCreatePlugin.ts#L48)
+
+```ts
+tableFieldName(resource: PgResource<any, any, any, any, any>): string
+```
+
+## tableResourceName
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:85:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L85)
+
+The name of the PgResource for a table/class
+
+```ts
+tableResourceName(details: {
+    serviceName: string;
+    pgClass: PgClass;
+}): string
+```
+
+## tableType
+
+Added by PgTablesPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgTablesPlugin.ts:135:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgTablesPlugin.ts#L135)
+
+The name of the GraphQL Object Type that's generated to represent a
+specific table (more specifically a PostgreSQL "pg_class" which is
+represented as a certain PgCodec)
+
+```ts
+tableType(codec: PgCodec<any, any, any, any, any, any, any>): string
+```
+
+## typeCodecName
+
+Added by PgCodecsPlugin.
+
+Declared in: [graphile-build-pg:src/plugins/PgCodecsPlugin.ts:46:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgCodecsPlugin.ts#L46)
+
+```ts
+typeCodecName(details: {
+    pgType: PgType;
+    serviceName: string;
+}): string
+```
+
 ## updateByKeysField
 
 Added by PgMutationUpdateDeletePlugin.
@@ -1162,216 +1326,52 @@ updateByKeysInputType(details: {
 }): string
 ```
 
-## deleteByKeysField
+## updateNodeField
 
 Added by PgMutationUpdateDeletePlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:136:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L136)
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:84:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L84)
 
 ```ts
-deleteByKeysField(details: {
+updateNodeField(details: {
     resource: PgResource<any, any, any, any, any>;
     unique: PgResourceUnique;
 }): string
 ```
 
-## deleteByKeysInputType
+## updateNodeInputType
 
 Added by PgMutationUpdateDeletePlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:143:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L143)
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:91:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L91)
 
 ```ts
-deleteByKeysInputType(details: {
+updateNodeInputType(details: {
     resource: PgResource<any, any, any, any, any>;
     unique: PgResourceUnique;
 }): string
 ```
 
-## patchField
+## updatePayloadType
 
 Added by PgMutationUpdateDeletePlugin.
 
-Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:151:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L151)
+Declared in: [graphile-build-pg:src/plugins/PgMutationUpdateDeletePlugin.ts:71:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgMutationUpdateDeletePlugin.ts#L71)
 
 ```ts
-patchField(fieldName: string): string
-```
-
-## enumTableEnum
-
-Added by PgEnumTablesPlugin.
-
-Overridden by:
-
-- PgV4InflectionPlugin
-
-Declared in: [graphile-build-pg:src/plugins/PgEnumTablesPlugin.ts:44:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgEnumTablesPlugin.ts#L44)
-
-Name of the _GraphQL enum_ used to represent an enum table in the
-schema.
-
-```ts
-enumTableEnum(details: {
-    serviceName: string;
-    pgClass: PgClass;
-    pgConstraint: PgConstraint;
+updatePayloadType(details: {
+    resource: PgResource<any, any, any, any, any>;
 }): string
 ```
 
-## enumTableCodec
+## upperCamelCase
 
-Added by PgEnumTablesPlugin.
+Builtin inflector.
 
-Declared in: [graphile-build-pg:src/plugins/PgEnumTablesPlugin.ts:57:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgEnumTablesPlugin.ts#L57)
-
-Name of the _codec_ used to represent an enum table as an enum. You
-probably want `enumTableEnum` instead.
+Declared in: [graphile-build:src/inflection.ts:18:37](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build/src/inflection.ts#L18)
 
 ```ts
-enumTableCodec(details: {
-    serviceName: string;
-    pgClass: PgClass;
-    pgConstraint: PgConstraint;
-}): string
-```
-
-## resourceRelationName
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:73:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L73)
-
-```ts
-resourceRelationName(details: {
-    serviceName: string;
-    pgConstraint: PgConstraint;
-    localClass: PgClass;
-    localAttributes: PgAttribute[];
-    foreignClass: PgClass;
-    foreignAttributes: PgAttribute[];
-    isUnique: boolean;
-    isReferencee: boolean;
-}): string
-```
-
-## _singleRelationRaw
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:86:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L86)
-
-```ts
-_singleRelationRaw(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## singleRelation
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:90:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L90)
-
-```ts
-singleRelation(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## _singleRelationBackwardsRaw
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:94:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L94)
-
-```ts
-_singleRelationBackwardsRaw(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## singleRelationBackwards
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:98:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L98)
-
-```ts
-singleRelationBackwards(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## _manyRelationRaw
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:102:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L102)
-
-```ts
-_manyRelationRaw(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## _manyRelation
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:106:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L106)
-
-```ts
-_manyRelation(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## manyRelationConnection
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:110:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L110)
-
-```ts
-manyRelationConnection(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## manyRelationList
-
-Added by PgRelationsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRelationsPlugin.ts:114:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRelationsPlugin.ts#L114)
-
-```ts
-manyRelationList(details: GraphileBuild.PgRelationsPluginRelationDetails): string
-```
-
-## refSingle
-
-Added by PgRefsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRefsPlugin.ts:33:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRefsPlugin.ts#L33)
-
-```ts
-refSingle(details: {
-    refDefinition: PgRefDefinition;
-    identifier: string;
-}): string
-```
-
-## refList
-
-Added by PgRefsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRefsPlugin.ts:37:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRefsPlugin.ts#L37)
-
-```ts
-refList(details: {
-    refDefinition: PgRefDefinition;
-    identifier: string;
-}): string
-```
-
-## refConnection
-
-Added by PgRefsPlugin.
-
-Declared in: [graphile-build-pg:src/plugins/PgRefsPlugin.ts:41:7](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgRefsPlugin.ts#L41)
-
-```ts
-refConnection(details: {
-    refDefinition: PgRefDefinition;
-    identifier: string;
-}): string
+upperCamelCase: (text: string) => string
 ```
 
 <!-- END:INFLECTION:postgraphile -->
