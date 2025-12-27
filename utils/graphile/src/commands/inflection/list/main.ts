@@ -105,6 +105,9 @@ on the plugins and presets you use. You should regenerate it from time to time
     }
   }
 
+  // TODO: give option to not sort
+  allKeys.sort();
+
   for (const key of allKeys) {
     const sources = trace.get(key);
     const deets = completionResults.find((r) => r.key === key);
