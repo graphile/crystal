@@ -103,7 +103,7 @@ export interface InflectorSource {
  */
 export const buildInflection = (
   preset: GraphileConfig.Preset,
-  /** @intenal */
+  /** @internal */
   trace?: Map<string, InflectorSource[]>,
 ): GraphileBuild.Inflection => {
   const resolvedPreset = resolvePreset(preset);
