@@ -2,6 +2,10 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 import chalk from "chalk";
+import type { InflectorSource } from "graphile-build";
+import { buildInflection } from "graphile-build";
+import { resolvePreset } from "graphile-config";
+import { loadConfig } from "graphile-config/load";
 import type { CompletionEntry } from "typescript";
 
 import type { ResolvedDefinition } from "../../../utils/typescriptVfs.js";
@@ -16,6 +20,13 @@ import {
 
 export async function main(options: { filename?: string; quiet?: boolean }) {
   const { filename, quiet } = options;
+
+  // Create inflection so we can determine where the inflectors came from
+  const preset = await loadConfig(filename);
+  const resolvedPreset = resolvePreset(preset ?? {});
+  const trace = new Map<string, InflectorSource[]>();
+  const inflection = buildInflection(resolvedPreset, trace);
+
   const { getCompletions, getDefinitions, getQuickInfo } = configVfs({
     filename,
     initialCode: `\

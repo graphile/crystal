@@ -92,16 +92,53 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** @experimental */
+export interface InflectorSource {
+  pluginName: string;
+  source: string;
+}
+
 /**
  * Generate 'build.inflection' from the given preset.
  */
 export const buildInflection = (
   preset: GraphileConfig.Preset,
+  /** @intenal */
+  trace?: Map<string, InflectorSource[]>,
 ): GraphileBuild.Inflection => {
   const resolvedPreset = resolvePreset(preset);
   const { plugins, inflection: _options = {} } = resolvedPreset;
 
-  const inflectors: Partial<GraphileBuild.Inflection> = makeInitialInflection();
+  const inflectors: Partial<GraphileBuild.Inflection> = {};
+  function add(
+    inflectorName: keyof GraphileBuild.Inflection,
+    inflector: () => string,
+    source: string,
+    pluginName: string,
+    replace = false,
+  ) {
+    if (!replace || !inflectors[inflectorName]) {
+      extend(inflectors, { [inflectorName]: inflector }, source);
+    } else {
+      inflectors[inflectorName] = inflector;
+    }
+    if (trace) {
+      let list = trace.get(inflectorName);
+      if (!list) {
+        list = [];
+        trace.set(inflectorName, list);
+      }
+      list.push({ pluginName, source });
+    }
+  }
+
+  const base = makeInitialInflection();
+  for (const [inflectorName, inflector] of Object.entries(base) as [
+    keyof GraphileBuild.Inflection,
+    () => string,
+  ][]) {
+    add(inflectorName, inflector, "Builtin", "");
+  }
 
   // Add the base inflectors
   if (plugins) {
@@ -117,10 +154,12 @@ export const buildInflection = (
               inflectors as GraphileBuild.Inflection,
               preset,
             );
-            extend(
-              inflectors,
-              { [inflectorName]: inflector },
+            add(
+              inflectorName,
+              inflector,
               `Adding inflectors from ${plugin.name}`,
+              plugin.name,
+              false,
             );
           }
         }
@@ -147,8 +186,13 @@ export const buildInflection = (
             previous,
             preset,
           );
-          inflectors[inflectorName as keyof GraphileBuild.Inflection] =
-            inflector;
+          add(
+            inflectorName,
+            inflector,
+            `Adding inflectors from ${plugin.name}`,
+            plugin.name,
+            true,
+          );
         }
       },
     );
