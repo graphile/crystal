@@ -114,7 +114,11 @@ on the plugins and presets you use. You should regenerate it from time to time
       for (let i = 0, l = sources.length; i < l; i++) {
         const source = sources[i];
         if (i === 0) {
-          outLater(chalk.gray(`Added by ${source.pluginName}`));
+          if (source.pluginName === "") {
+            outLater(chalk.gray(`Builtin inflector.`));
+          } else {
+            outLater(chalk.gray(`Added by ${source.pluginName}.`));
+          }
         } else {
           if (i === 1) {
             outLater();
