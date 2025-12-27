@@ -4,6 +4,7 @@ import path from "node:path";
 import chalk from "chalk";
 import type { CompletionEntry } from "typescript";
 
+import type { ResolvedDefinition } from "../../../utils/typescriptVfs.js";
 import {
   accessKey,
   configVfs,
@@ -64,10 +65,6 @@ on the plugins and presets you use. You should regenerate it from time to time
   const entries: string[] = [];
   const INDENT = 2;
   async function processEntry(entry: CompletionEntry) {
-    const messages: (string | undefined)[] = [];
-    function outLater(message?: string) {
-      messages.push(message);
-    }
     const key = entry.name;
     const withProperty = accessKey(key);
     const info = getQuickInfo(withProperty);
@@ -84,29 +81,27 @@ on the plugins and presets you use. You should regenerate it from time to time
         80 - INDENT - key.length,
       )}`,
     );
+    const defs = await Promise.all(definitions.map(formatPathWithPackage));
+    return { key, entry, info, defs };
+  }
 
+  type Deets = Awaited<ReturnType<typeof processEntry>>;
+
+  function outputEntry(deets: Deets) {
+    const { key, info, defs } = deets;
+    const messages: (string | undefined)[] = [];
+    function outLater(message?: string) {
+      messages.push(message);
+    }
     outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
     outLater();
-    if (definitions.length) {
-      if (definitions.length === 1) {
-        const def = definitions[0];
-        const { packageName, path } = await formatPathWithPackage(def.fileName);
-        outLater(
-          chalk.gray(
-            `Defined in: ${formatPackage(packageName, path, def.line, def.column)}`,
-          ),
-        );
+    if (defs.length) {
+      if (defs.length === 1) {
+        outLater(chalk.gray(`Defined in: ${formatPackage(defs[0])}`));
       } else {
         outLater(chalk.gray(`Defined in:`));
-        for (const def of definitions) {
-          const { packageName, path } = await formatPathWithPackage(
-            def.fileName,
-          );
-          outLater(
-            chalk.gray(
-              `- ${formatPackage(packageName, path, def.line, def.column)}`,
-            ),
-          );
+        for (const def of defs) {
+          outLater(chalk.gray(`- ${formatPackage(def)}`));
         }
       }
       outLater();
@@ -121,7 +116,8 @@ on the plugins and presets you use. You should regenerate it from time to time
   }
 
   const completionResults = await Promise.all(completions.map(processEntry));
-  for (const messages of completionResults) {
+  for (const deets of completionResults) {
+    const messages = outputEntry(deets);
     for (const message of messages) {
       outLater(message);
     }
@@ -149,7 +145,8 @@ on the plugins and presets you use. You should regenerate it from time to time
  * If found, return "package-name:relative/path/from/package/root".
  * Otherwise return the original relative path.
  */
-export async function formatPathWithPackage(filePath: string) {
+export async function formatPathWithPackage(definition: ResolvedDefinition) {
+  const filePath = definition.fileName;
   let currentDir = path.dirname(path.resolve(process.cwd(), filePath));
 
   for (let depth = 0; depth < 15; depth++) {
@@ -160,6 +157,7 @@ export async function formatPathWithPackage(filePath: string) {
         return {
           packageName: packageJSON.name,
           path: path.relative(currentDir, filePath),
+          definition,
         };
       }
     } catch {
@@ -175,6 +173,7 @@ export async function formatPathWithPackage(filePath: string) {
   return {
     packageName: null,
     path: path.relative(process.cwd(), filePath),
+    definition,
   };
 }
 
@@ -184,12 +183,21 @@ const DIRS: Record<string, string> = {
   postgraphile: "postgraphile/postgraphile",
 };
 
-function formatPackage(
-  packageName: string | null,
-  path: string,
-  line: number,
-  column: number,
-) {
+interface Deets {
+  packageName: string | null;
+  path: string;
+  definition: {
+    line: number;
+    column: number;
+  };
+}
+
+function formatPackage(deets: Deets) {
+  const {
+    packageName,
+    path,
+    definition: { line, column },
+  } = deets;
   if (packageName === null) return `${path}:${line}:${column}`;
   const subdir = DIRS[packageName];
   if (subdir) {

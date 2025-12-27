@@ -166,6 +166,8 @@ function resolveDefinition(
   return { ...def, fileName, line, column };
 }
 
+export type ResolvedDefinition = ReturnType<typeof resolveDefinition>;
+
 /**
  * @deprecated use prettyQuickInfoDisplayParts instead
  */
