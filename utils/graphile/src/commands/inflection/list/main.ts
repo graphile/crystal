@@ -96,42 +96,58 @@ on the plugins and presets you use. You should regenerate it from time to time
     return { key, entry, info, defs };
   }
 
-  type Deets = Awaited<ReturnType<typeof processEntry>>;
+  const completionResults = await Promise.all(completions.map(processEntry));
 
-  function outputEntry(deets: Deets) {
-    const { key, info, defs } = deets;
-    const messages: (string | undefined)[] = [];
-    function outLater(message?: string) {
-      messages.push(message);
+  const allKeys = Object.keys(inflection);
+  for (const r of completionResults) {
+    if (!allKeys.includes(r.key)) {
+      allKeys.push(r.key);
     }
+  }
+
+  for (const key of allKeys) {
+    const sources = trace.get(key);
+    const deets = completionResults.find((r) => r.key === key);
     outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
     outLater();
-    if (defs.length) {
+    if (sources) {
+      for (let i = 0, l = sources.length; i < l; i++) {
+        const source = sources[i];
+        if (i === 0) {
+          outLater(chalk.gray(`Added by ${source.pluginName}`));
+        } else {
+          if (i === 1) {
+            outLater();
+            outLater(chalk.gray(`Overridden by:`));
+            outLater();
+          }
+          outLater(chalk.gray(`- ${source.pluginName}`));
+        }
+      }
+      outLater();
+    }
+    if (deets) {
+      const { info, defs } = deets;
       if (defs.length === 1) {
-        outLater(chalk.gray(`Defined in: ${formatPackage(defs[0])}`));
+        outLater(chalk.gray(`Declared in: ${formatPackage(defs[0])}`));
       } else {
-        outLater(chalk.gray(`Defined in:`));
+        outLater(chalk.gray(`Declared in:`));
         for (const def of defs) {
           outLater(chalk.gray(`- ${formatPackage(def)}`));
         }
       }
       outLater();
+      outLater(prettyDocumentation(info?.documentation));
+      outLater();
+      outLater("```ts");
+      outLater(key + prettyQuickInfoDisplayParts(info));
+      outLater("```");
+    } else {
+      outLater(
+        chalk.red(`Could not find TypeScript definition of this inflector!`),
+      );
     }
-    outLater(prettyDocumentation(info?.documentation));
     outLater();
-    outLater("```ts");
-    outLater(key + prettyQuickInfoDisplayParts(info));
-    outLater("```");
-    outLater();
-    return messages;
-  }
-
-  const completionResults = await Promise.all(completions.map(processEntry));
-  for (const deets of completionResults) {
-    const messages = outputEntry(deets);
-    for (const message of messages) {
-      outLater(message);
-    }
   }
 
   if (entries.length) {
