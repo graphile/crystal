@@ -1,6 +1,8 @@
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 
 import chalk from "chalk";
+import type { CompletionEntry } from "typescript";
 
 import {
   accessKey,
@@ -11,7 +13,7 @@ import {
   tightDocumentation,
 } from "../../../utils/typescriptVfs.js";
 
-export function main(options: { filename?: string; quiet?: boolean }) {
+export async function main(options: { filename?: string; quiet?: boolean }) {
   const { filename, quiet } = options;
   const { getCompletions, getDefinitions, getQuickInfo } = configVfs({
     filename,
@@ -61,7 +63,11 @@ on the plugins and presets you use. You should regenerate it from time to time
   }
   const entries: string[] = [];
   const INDENT = 2;
-  for (const entry of completions) {
+  async function processEntry(entry: CompletionEntry) {
+    const messages: (string | undefined)[] = [];
+    function outLater(message?: string) {
+      messages.push(message);
+    }
     const key = entry.name;
     const withProperty = accessKey(key);
     const info = getQuickInfo(withProperty);
@@ -84,8 +90,12 @@ on the plugins and presets you use. You should regenerate it from time to time
     if (definitions.length) {
       outLater(chalk.gray(`Defined in:`));
       for (const def of definitions) {
-        const relativePath = path.relative(process.cwd(), def.fileName);
-        outLater(chalk.gray(`- ${relativePath}:${def.line}:${def.column}`));
+        const { packageName, path } = await formatPathWithPackage(def.fileName);
+        outLater(
+          chalk.gray(
+            `- ${formatPackage(packageName, path, def.line, def.column)}`,
+          ),
+        );
       }
       outLater();
     }
@@ -95,6 +105,14 @@ on the plugins and presets you use. You should regenerate it from time to time
     outLater(key + prettyQuickInfoDisplayParts(info));
     outLater("```");
     outLater();
+    return messages;
+  }
+
+  const completionResults = await Promise.all(completions.map(processEntry));
+  for (const messages of completionResults) {
+    for (const message of messages) {
+      outLater(message);
+    }
   }
 
   if (entries.length) {
@@ -112,4 +130,59 @@ on the plugins and presets you use. You should regenerate it from time to time
   }
   later = [];
   return outputText.trim() + "\n";
+}
+
+/**
+ * Given a file path, walk up directories looking for package.json.
+ * If found, return "package-name:relative/path/from/package/root".
+ * Otherwise return the original relative path.
+ */
+export async function formatPathWithPackage(filePath: string) {
+  let currentDir = path.dirname(path.resolve(process.cwd(), filePath));
+
+  for (let depth = 0; depth < 15; depth++) {
+    const pkgPath = path.join(currentDir, "package.json");
+    try {
+      const packageJSON = JSON.parse(await readFile(pkgPath, "utf8"));
+      if (packageJSON.name) {
+        return {
+          packageName: packageJSON.name,
+          path: path.relative(currentDir, filePath),
+        };
+      }
+    } catch {
+      // Ignore
+    }
+    const parent = path.dirname(currentDir);
+    if (parent === currentDir) {
+      break;
+    } else {
+      currentDir = parent;
+    }
+  }
+  return {
+    packageName: null,
+    path: path.relative(process.cwd(), filePath),
+  };
+}
+
+const DIRS: Record<string, string> = {
+  "graphile-build": "graphile-build/graphile-build",
+  "graphile-build-pg": "graphile-build/graphile-build-pg",
+  postgraphile: "postgraphile/postgraphile",
+};
+
+function formatPackage(
+  packageName: string | null,
+  path: string,
+  line: number,
+  column: number,
+) {
+  if (packageName === null) return `${path}:${line}:${column}`;
+  const subdir = DIRS[packageName];
+  if (subdir) {
+    return `[${packageName}:${path}:${line}:${column}](https://github.com/graphile/crystal/blob/main/${subdir}/${path}#L${line})`;
+  } else {
+    return `${packageName}:${path}:${line}:${column}`;
+  }
 }

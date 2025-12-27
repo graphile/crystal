@@ -20,7 +20,7 @@ export function options(yargs: Argv) {
       normalize: true,
     });
 }
-export function run(args: ArgsFromOptions<typeof options>) {
-  const text = main({ filename: args.config, quiet: args.quiet });
+export async function run(args: ArgsFromOptions<typeof options>) {
+  const text = await main({ filename: args.config, quiet: args.quiet });
   console.log(text);
 }
