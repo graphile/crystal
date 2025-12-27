@@ -88,14 +88,26 @@ on the plugins and presets you use. You should regenerate it from time to time
     outLater(chalk.whiteBright.bold(`## ${chalk.cyanBright.bold(key)}`));
     outLater();
     if (definitions.length) {
-      outLater(chalk.gray(`Defined in:`));
-      for (const def of definitions) {
+      if (definitions.length === 1) {
+        const def = definitions[0];
         const { packageName, path } = await formatPathWithPackage(def.fileName);
         outLater(
           chalk.gray(
-            `- ${formatPackage(packageName, path, def.line, def.column)}`,
+            `Defined in: ${formatPackage(packageName, path, def.line, def.column)}`,
           ),
         );
+      } else {
+        outLater(chalk.gray(`Defined in:`));
+        for (const def of definitions) {
+          const { packageName, path } = await formatPathWithPackage(
+            def.fileName,
+          );
+          outLater(
+            chalk.gray(
+              `- ${formatPackage(packageName, path, def.line, def.column)}`,
+            ),
+          );
+        }
       }
       outLater();
     }
