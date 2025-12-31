@@ -10,51 +10,90 @@ projects, helping you to create, debug, update, interact with and maintain them.
 
 At the moment, it doesn't contain much, but it should grow over time.
 
-## Sponsors-only, source available
+## `graphile config`
 
-**TL;DR**: _30 day free trial, then become a sponsor to continue using_.
+Config debugging commands
 
-Unlike the vast majority of our other packages, **this package is not open
-source software**. Instead it is licensed software, only to be used by sponsors.
-
-At Graphile, we can only work on open source as much as we do thanks to the
-support of our sponsors. Sadly, many corporations decline to fund the open
-source software that underpins the success of their businesses. This lack of
-funding can lead to maintainer burnout and ultimately the discontinuation of
-projects, leaving these short-sighted companies to spend large amounts on
-maintenance, security, and/or rewrites.
-
-<figure>
-<img
-  src="https://imgs.xkcd.com/comics/dependency.png"
-  alt="An XKCD cartoon showing how all modern digital infrastructure relies on a project some random person in Nebraska has been thanklessly maintaining since 2003."
-  />
-<figcaption>
-<p><em>Mandatory XKCD #2347 - Dependency.</em></p>
-</figcaption>
-</figure>
-
-Fortunately smart engineers tend to recognize that OSS projects need financial
-support to both be sustainable and to keep advancing. This sponsors-only package
-serves two purposes. First and foremost, it is a thank you to our sponsors who
-have helped us to get this far. Secondly, it acts as a carrot that
-forward-thinking engineers can use to convince their corporations sponsorship is
-necessary.
-
-_We hope that once a company is sponsoring one project, sponsoring others should
-be much easier; as such, this project is **only licensed for sponsors** - we do
-not sell licenses to it separately._
-
-We offer non-sponsors a 30 day trial of this software, after that you must
-become a sponsor to keep using it. We recommend a sponsorship of at least $25/mo
-per engineer, however you may sponsor us at any amount that the platforms allow.
-One-time sponsorships are equivalent to 30 calendar days of sponsorship.
-
-## `graphile config print`
+### `graphile config print`
 
 Prints out the configuration from your `graphile.config.mjs` (or similar) file
 in an easy to read/digest form.
 
-## `graphile config options`
+### `graphile config options`
 
-Indicates the full list of options that you may specify in your config file.
+Outputs markdown detailing the full list of options that you may specify in your
+config file, suitable for inclusion in your repository's documentation folder.
+Output is honed specifically to your set of plugins and presets.
+
+## `graphile inflection`
+
+Inflection debugging commands
+
+### `graphile inflection list`
+
+Outputs markdown detailing the full list of inflectors that have been defined
+(and may be overridden via a plugin), suitable for inclusion in your
+repository's documentation folder. Output is honed specifically to your set of
+plugins and presets.
+
+## `graphile behavior`
+
+Behavior debugging commands. (WARNING: This hasn't been updated since behavior
+defaults were reworked, so is now super verbose and a little confusing.)
+
+### `graphile behavior debug`
+
+Lists the `entityType`s available to debug (will vary depending on your
+plugins); example:
+
+```
+$ graphile behavior debug
+No entity type was specified; please pick one of the supported entity types:
+- pgCodec
+- pgCodecAttribute
+- pgCodecRef
+- pgCodecRelation
+- pgRefDefinition
+- pgResource
+- pgResourceUnique
+```
+
+(See
+[@dataplan/pg registry](https://grafast.org/grafast/step-library/dataplan-pg/registry/)
+for details of the example above.)
+
+### `graphile behavior debug <entityType>`
+
+Lists the entity identifiers for that specific entity type; e.g.
+
+```
+$ graphile behavior debug pgResource
+No entity identifier was specified; please pick one of the supported entities for entity type 'pgResource':
+- fn
+- person
+- post
+```
+
+### `graphile behavior debug <entityType> <entityIdentifier>`
+
+Outputs the behavior string for the given entity, along with sources that caused
+it to be derived in that way - indicating which behaviors came from which
+plugins.
+
+The output for each plugin includes styled text:
+
+- green text is behavior strings added by this plugin - this may be either at
+  the start or end of the string
+- grey text is inherited from previous behavior string
+- strike through text (green or grey) indicates a behavior fragment that has
+  been overridden by a later value in the string
+
+The `__ApplyBehaviors_*__`-style entry is a workaround that shows the
+"multiplication" of the previous behavior with the default behavior. It's a
+hack/workaround until we have a better way of presenting this concept.
+
+### `graphile behavior debug <entityType> <entityIdentifier> <filterString>`
+
+As above, but pass a filter string (a behavior fragment) and any behaviors
+related to that will be highlit so you can see what came to manipulate that
+particular setting.

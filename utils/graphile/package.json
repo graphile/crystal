@@ -19,7 +19,7 @@
     "graphite"
   ],
   "author": "Benjie Gillam <code@benjiegillam.com>",
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphile/crystal/issues"
   },
@@ -28,8 +28,7 @@
     "node": ">=14.17"
   },
   "files": [
-    "dist",
-    "LICENSE.md"
+    "dist"
   ],
   "dependencies": {
     "@typescript/vfs": "^1.6.2",
