@@ -430,8 +430,9 @@ export const makeV4Preset = (
             async context(ctx) {
               const context = Object.create(null);
 
-              const req = ctx.node?.req ?? ctx.ws?.request;
-              const res = ctx.node?.res ?? (ctx.ws?.request as any)?.res;
+              const req = (ctx as any).node?.req ?? (ctx as any).ws?.request;
+              const res =
+                (ctx as any).node?.res ?? (ctx as any).ws?.request?.res;
               if (options.additionalGraphQLContextFromRequest) {
                 if (!req || !res) {
                   console.warn(

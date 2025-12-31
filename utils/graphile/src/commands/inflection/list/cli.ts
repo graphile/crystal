@@ -13,9 +13,14 @@ export function options(yargs: Argv) {
       type: "string",
       description: "The path to the config file",
       normalize: true,
+    })
+    .option("quiet", {
+      type: "boolean",
+      description: "Turn off the preamble",
+      normalize: true,
     });
 }
-export function run(args: ArgsFromOptions<typeof options>) {
-  const text = main({ filename: args.config });
+export async function run(args: ArgsFromOptions<typeof options>) {
+  const text = await main({ filename: args.config, quiet: args.quiet });
   console.log(text);
 }

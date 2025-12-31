@@ -1,8 +1,11 @@
+import path from "node:path";
+
 import {
   createFSBackedSystem,
   createVirtualTypeScriptEnvironment,
 } from "@typescript/vfs";
-import * as ts from "typescript";
+import { SourceMapConsumer } from "source-map-js";
+import ts from "typescript";
 
 export function configVfs(options: {
   filename?: string;
@@ -21,22 +24,14 @@ export function configVfs(options: {
     skipDefaultLibCheck: true,
     moduleResolution: ts.ModuleResolutionKind.Node16,
     allowJs: true,
+    jsx: ts.JsxEmit.React,
+    noEmit: true,
+    suppressOutputPathCheck: true,
   };
-  /*
-const compilerOptions = {
-  strict: true,
-  target: ts.ScriptTarget.ES2015,
-  typeRoots: [],
-  lib: ["es5"],
-  skipDefaultLibCheck: true,
-  skipLibCheck: true,
-  moduleResolution: ts.ModuleResolutionKind.NodeJs,
-  module: ts.ModuleKind.ES2015,
-};
-*/
+
   const fsMap = new Map<string, string>();
 
-  const FAKE_FILENAME = "graphileConfigInspection.ts";
+  const FAKE_FILENAME = `${process.cwd()}/graphileConfigInspection.ts`;
 
   // If using imports where the types don't directly match up to their FS representation (like the
   // imports for node) then use triple-slash directives to make sure globals are set up first.
@@ -79,8 +74,99 @@ ${initialCode}`;
     return info;
   }
 
-  return { env, FAKE_FILENAME, BASE_CONTENT, getCompletions, getQuickInfo };
+  function getDefinitions(additionalContent = "", offsetFromEnd = 0) {
+    const contentWithProperty = BASE_CONTENT + additionalContent;
+    env.updateFile(FAKE_FILENAME, contentWithProperty);
+    const pos = contentWithProperty.length - offsetFromEnd;
+    const program = env.languageService.getProgram();
+    const definitions =
+      env.languageService.getDefinitionAndBoundSpan(FAKE_FILENAME, pos)
+        ?.definitions ?? [];
+    return definitions.map((def) => resolveDefinition(system, program, def));
+  }
+
+  return {
+    env,
+    FAKE_FILENAME,
+    BASE_CONTENT,
+    getCompletions,
+    getQuickInfo,
+    getDefinitions,
+  };
 }
+
+/**
+ * Takes DefinitionInfo and returns equivalent pointing at underlying source
+ * file if possible.
+ */
+function resolveDefinition(
+  system: ts.System,
+  program: ts.Program | undefined,
+  def: ts.DefinitionInfo,
+) {
+  const fileName = def.originalFileName ?? def.fileName;
+  const textSpan = def.originalTextSpan ?? def.textSpan;
+  let sourceFile = program?.getSourceFile(fileName);
+  if (!sourceFile) {
+    const sourceText = system.readFile(fileName);
+    if (sourceText != null) {
+      sourceFile = ts.createSourceFile(
+        fileName,
+        sourceText,
+        ts.ScriptTarget.ESNext,
+        true,
+      );
+    }
+  }
+  const lc = sourceFile
+    ? ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start)
+    : { line: 0, character: 0 };
+  if (fileName.endsWith(".d.ts")) {
+    try {
+      const mapFile = `${fileName}.map`;
+      const rawMap = system.readFile(mapFile);
+      if (rawMap) {
+        // Map definition in .d.ts back to original source using the declaration map.
+        const consumer = new SourceMapConsumer(JSON.parse(rawMap));
+
+        const pos = {
+          line: lc.line + 1,
+          column: lc.character,
+          bias: SourceMapConsumer.GREATEST_LOWER_BOUND,
+        };
+        let original = consumer.originalPositionFor(pos);
+        if (
+          !original.source ||
+          original.line == null ||
+          original.column == null
+        ) {
+          original = consumer.originalPositionFor({
+            ...pos,
+            bias: SourceMapConsumer.LEAST_UPPER_BOUND,
+          });
+        }
+        if (
+          original.source &&
+          original.line != null &&
+          original.column != null
+        ) {
+          const fileName = path.resolve(path.dirname(mapFile), original.source);
+          const line = original.line;
+          const column = original.column + 1;
+          return { ...def, fileName, line, column };
+        }
+      }
+    } catch (e) {
+      // Ignore sourcemap issues and fall back to declaration location.
+      console.warn(e);
+    }
+  }
+  const line = lc.line + 1;
+  const column = lc.character + 1;
+  return { ...def, fileName, line, column };
+}
+
+export type ResolvedDefinition = ReturnType<typeof resolveDefinition>;
 
 /**
  * @deprecated use prettyQuickInfoDisplayParts instead
@@ -247,43 +333,3 @@ export const accessKey = (key: string): string => {
     return `[${JSON.stringify(key)}]`;
   }
 };
-
-/*
-debugger;
-
-const host = createVirtualCompilerHost(system, compilerOpts, ts);
-const program = ts.createProgram({
-  rootNames: [...fsMap.keys()],
-  options: compilerOpts,
-  host: host.compilerHost,
-});
-const checker = program.getTypeChecker();
-
-// This will update the fsMap with new files
-// for the .d.ts and .js files
-program.emit();
-
-// Now I can look at the AST for the .ts file too
-const index = program.getSourceFile(FAKE_FILENAME)!;
-const symbols = checker.getSymbolsInScope(index, ts.SymbolFlags.Variable);
-const symbol = symbols.find((s) => s.name === "preset");
-console.log(symbol);
-if (symbol) {
-  const type = checker.getDeclaredTypeOfSymbol(symbol);
-  console.log(type.getApparentProperties());
-  console.dir(type.get);
-  const properties = type.getProperties();
-  console.dir(properties);
-}
-ts.forEachChild(index, (node) => {
-  if (isVariableStatement(node)) {
-    console.log(node.getText());
-    const node2 = node.declarationList.declarations[0];
-    console.log(node2.getText());
-    const type = checker.getTypeAtLocation(node2);
-    const properties = type.getProperties();
-    // const properties = checker.getDeclaredTypeOfSymbol(symbol).getProperties();
-    console.dir(properties);
-  }
-});
-*/
