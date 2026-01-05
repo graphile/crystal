@@ -1403,43 +1403,38 @@ export interface PgSQL<TEmbed = never> {
     ...values: Array<SQL | SQLable | TEmbed>
   ): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
-  compile(sql: SQL, options?: PgSQLCompileOptions): PgSQLCompileResult;
-  isEquivalent(
-    sql1: SQL,
-    sql2: SQL,
-    options?: PgSQLIsEquivalentOptions,
-  ): boolean;
+  compile: typeof compile;
+  isEquivalent: typeof isEquivalent;
   query: PgSQL<TEmbed>;
-  raw(text: string): SQL;
-  identifier(...names: Array<string | symbol>): SQL;
-  value(val: SQLRawValue): SQL;
-  json(val: any): SQL;
-  literal(val: string | number | boolean | null): SQL;
-  join(items: ReadonlyArray<SQL>, separator?: string): SQL;
+  raw: typeof raw;
+  identifier: typeof identifier;
+  value: typeof value;
+  json: typeof json;
+  literal: typeof literal;
+  join: typeof join;
   indent(fragment: SQL): SQL;
   indent(
     strings: TemplateStringsArray,
     ...values: Array<SQL | SQLable | TEmbed>
   ): SQL;
-  indentIf(condition: boolean, fragment: SQL): SQL;
-  parens(frag: SQL, force?: boolean): SQL;
-  comment(text: string, include?: boolean): SQL;
-  symbolAlias(symbol1: symbol, symbol2: symbol): SQL;
-  placeholder(symbol: symbol, fallback?: SQL): SQL;
-  blank: SQL;
+  indentIf: typeof indentIf;
+  parens: typeof parens;
+  comment: typeof comment;
+  symbolAlias: typeof symbolAlias;
+  placeholder: typeof placeholder;
+  blank: typeof blank;
   fragment: PgSQL<TEmbed>;
-  true: SQL;
-  false: SQL;
-  null: SQL;
-  isSQL(node: unknown): node is SQL;
-  /** @experimental */
-  replaceSymbol(frag: SQL, needle: symbol, replacement: symbol): SQL;
+  true: typeof trueNode;
+  false: typeof falseNode;
+  null: typeof nullNode;
+  isSQL: typeof isSQL;
+  replaceSymbol: typeof replaceSymbol;
   sql: PgSQL<TEmbed>;
   withTransformer<TNewEmbed, TResult = SQL>(
     transformer: Transformer<TNewEmbed>,
     callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
   ): TResult;
-  getIdentifierSymbol(potentialIdentifier: SQL): symbol | null;
+  getIdentifierSymbol: typeof getIdentifierSymbol;
 }
 
 const attributes = {
