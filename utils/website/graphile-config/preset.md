@@ -242,13 +242,9 @@ to avoid unexpected behavior.
 
 ## `graphile` CLI
 
-:::tip Sponsorship has perks: the `graphile` CLI!
+:::tip The `graphile` CLI is MIT licensed
 
-Graphile's open source projects only exist thanks to the sponsorship of
-individuals and organizations that use them. To help convince your boss to fund
-the ongoing development of the OSS that your company relies on, sponsorship
-comes with perks. One such perk is the `graphile` CLI which is only licensed for
-usage by sponsors. See the
+The `graphile` CLI is open source like the rest of the Graphile suite. See the
 [README](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)
 for more details.
 

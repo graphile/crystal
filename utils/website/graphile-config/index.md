@@ -22,8 +22,8 @@ standard configuration and plugin interface.
 - Powerful middleware system to make your library extensible.
 - Users don't need to put plugins in a particular order, thanks to the ordering system.
 - View the available options and resolved values of a preset with the `graphile`
-  CLI
-  ([available to sponsors](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)).
+  CLI (see the
+  [README](https://github.com/graphile/crystal/blob/main/utils/graphile/README.md)).
 
 ## Different Users
 

@@ -2,8 +2,6 @@
 title: Inflection
 ---
 
-import Spon from "@site/src/components/Spon";
-
 Inflection governs how things are named whilst building your PostGraphile
 schema. “Inflection” is the system of naming things; it’s composed of a large
 set of named functions, and we call each of these inflection functions an
@@ -11,8 +9,8 @@ set of named functions, and we call each of these inflection functions an
 
 The inflectors that you have available will depend on the plugins and presets
 you’re using. To get a list of the inflectors available to you, you can use
-TypeScript autocompletion, or if you’re a sponsor you can install the <Spon />`graphile`
-package and run `yarn graphile inflection list` (or equivalent for
+TypeScript autocompletion, or install the `graphile` package and run
+`yarn graphile inflection list` (or equivalent for
 other package managers).
 
 In GraphQL, types typically use singular `UpperCamelCase` (`PascalCase`);
@@ -106,9 +104,9 @@ const preset = {
 
 Our maintainer, Benjie, prefers to use this plugin in all his projects.
 
-## <Spon />Listing available inflectors
+## Listing available inflectors
 
-We’ve built a command into our sponsors-only `graphile` development assistant
+We’ve built a command into our `graphile` development assistant
 to help you determine all the inflectors available to you:
 
 ```bash npm2yarn

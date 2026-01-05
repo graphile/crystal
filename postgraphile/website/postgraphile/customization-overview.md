@@ -166,7 +166,7 @@ The configuration options that are available to you in this file will be
 dependent on the plugins and presets that it uses, for available options see
 the documentation of the plugins and presets you are using. You may also wish
 to use TypeScript to explore the options available, or try out the
-sponsors-only `graphile config options` command which attempts to use the
+`graphile config options` command which attempts to use the
 TypeScript language server to determine which options are available to you.
 
 ### Presets
