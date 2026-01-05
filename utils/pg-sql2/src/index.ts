@@ -318,7 +318,10 @@ function makeIndentNode(content: SQL): SQLIndentNode {
   return Object.freeze({
     [$$type]: "INDENT" as const,
     f: flags,
-    c: content[$$type] === "QUERY" ? content : makeQueryNode([content]),
+    c:
+      content[$$type] === "QUERY"
+        ? content
+        : makeQueryNode([enforceValidNode(content)]),
   });
 }
 
