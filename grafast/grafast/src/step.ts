@@ -583,6 +583,10 @@ export /* abstract */ class Step<TData = any> {
     return null;
   }
 
+  [inspect.custom]() {
+    return this.toString();
+  }
+
   public planJSONExtra(): Record<string, JSONValue | undefined> | undefined {
     return undefined;
   }
