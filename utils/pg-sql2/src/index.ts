@@ -9,6 +9,8 @@ export { version } from "./version.js";
 /** Use this to enable coercing objects to SQL to make composing SQL fragments more ergonomic */
 export const $$toSQL = Symbol("toSQL");
 
+type Maybe<T> = T | null | undefined;
+
 function exportAs<T>(thing: T, exportName: string) {
   const existingExport = (thing as any).$$export;
   if (existingExport) {
@@ -439,18 +441,23 @@ function enforceValidNode(node: unknown, where?: string): SQL {
   );
 }
 
+export interface PgSQLCompileOptions {
+  placeholderValues?: ReadonlyMap<symbol, SQL>;
+}
+export interface PgSQLCompileResult {
+  text: string;
+  values: SQLRawValue[];
+  [$$symbolToIdentifier]: Map<symbol, string>;
+}
+
 /**
  * Accepts an sql`...` expression and compiles it out to SQL text with
  * placeholders, and the values to substitute for these values.
  */
 export function compile(
   sql: SQL,
-  options?: { placeholderValues?: ReadonlyMap<symbol, SQL> },
-): {
-  text: string;
-  values: SQLRawValue[];
-  [$$symbolToIdentifier]: Map<symbol, string>;
-} {
+  options?: PgSQLCompileOptions,
+): PgSQLCompileResult {
   const placeholderValues = options?.placeholderValues;
   /**
    * Values hold the JavaScript values that are represented in the query string
@@ -688,7 +695,7 @@ const sqlBase = function sql(
     if (i < l - 1) {
       const rawVal = values[i];
       const valid: SQL =
-        rawVal?.[$$type] !== undefined
+        (rawVal as Maybe<SQL>)?.[$$type] !== undefined
           ? (rawVal as SQL)
           : enforceValidNode(rawVal, `template literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
@@ -948,16 +955,19 @@ function expandQueryNodes(node: SQLQuery): ReadonlyArray<SQLNode> {
 export function indent(fragment: SQL): SQL;
 export function indent(
   strings: TemplateStringsArray,
-  ...values: Array<SQL>
+  ...values: ReadonlyArray<SQL>
 ): SQL;
 export function indent(
   fragmentOrStrings: SQL | TemplateStringsArray,
-  ...values: Array<SQL>
+  ...values: ReadonlyArray<SQL>
 ): SQL {
   const fragment =
-    "raw" in fragmentOrStrings
-      ? sql(fragmentOrStrings, ...values)
-      : fragmentOrStrings;
+    values.length > 0
+      ? sql(
+          fragmentOrStrings as TemplateStringsArray,
+          ...(values as ReadonlyArray<SQL>),
+        )
+      : (fragmentOrStrings as SQL);
   if (!isDev) {
     return fragment;
   }
@@ -1116,7 +1126,7 @@ export function comment(
   if (include) {
     return makeCommentNode(text);
   } else {
-    return sql.blank;
+    return blank;
   }
 }
 
@@ -1164,12 +1174,14 @@ export function isEquivalentSymbol(
 }
 */
 
+export interface PgSQLIsEquivalentOptions {
+  symbolSubstitutes?: ReadonlyMap<symbol, symbol>;
+}
+
 export function isEquivalent(
   sql1: SQL,
   sql2: SQL,
-  options?: {
-    symbolSubstitutes?: ReadonlyMap<symbol, symbol>;
-  },
+  options?: PgSQLIsEquivalentOptions,
 ): boolean {
   if (sql1 === sql2) {
     return true;
@@ -1391,34 +1403,43 @@ export interface PgSQL<TEmbed = never> {
     ...values: Array<SQL | SQLable | TEmbed>
   ): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
-  compile: typeof compile;
-  isEquivalent: typeof isEquivalent;
+  compile(sql: SQL, options?: PgSQLCompileOptions): PgSQLCompileResult;
+  isEquivalent(
+    sql1: SQL,
+    sql2: SQL,
+    options?: PgSQLIsEquivalentOptions,
+  ): boolean;
   query: PgSQL<TEmbed>;
-  raw: typeof raw;
-  identifier: typeof identifier;
-  value: typeof value;
-  json: typeof json;
-  literal: typeof literal;
-  join: typeof join;
-  indent: typeof indent;
-  indentIf: typeof indentIf;
-  parens: typeof parens;
-  comment: typeof comment;
-  symbolAlias: typeof symbolAlias;
-  placeholder: typeof placeholder;
-  blank: typeof blank;
+  raw(text: string): SQL;
+  identifier(...names: Array<string | symbol>): SQL;
+  value(val: SQLRawValue): SQL;
+  json(val: any): SQL;
+  literal(val: string | number | boolean | null): SQL;
+  join(items: ReadonlyArray<SQL>, separator?: string): SQL;
+  indent(fragment: SQL): SQL;
+  indent(
+    strings: TemplateStringsArray,
+    ...values: Array<SQL | SQLable | TEmbed>
+  ): SQL;
+  indentIf(condition: boolean, fragment: SQL): SQL;
+  parens(frag: SQL, force?: boolean): SQL;
+  comment(text: string, include?: boolean): SQL;
+  symbolAlias(symbol1: symbol, symbol2: symbol): SQL;
+  placeholder(symbol: symbol, fallback?: SQL): SQL;
+  blank: SQL;
   fragment: PgSQL<TEmbed>;
-  true: typeof trueNode;
-  false: typeof falseNode;
-  null: typeof nullNode;
-  isSQL: typeof isSQL;
-  replaceSymbol: typeof replaceSymbol;
+  true: SQL;
+  false: SQL;
+  null: SQL;
+  isSQL(node: unknown): node is SQL;
+  /** @experimental */
+  replaceSymbol(frag: SQL, needle: symbol, replacement: symbol): SQL;
   sql: PgSQL<TEmbed>;
   withTransformer<TNewEmbed, TResult = SQL>(
     transformer: Transformer<TNewEmbed>,
     callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
   ): TResult;
-  getIdentifierSymbol: typeof getIdentifierSymbol;
+  getIdentifierSymbol(potentialIdentifier: SQL): symbol | null;
 }
 
 const attributes = {
