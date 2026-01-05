@@ -8,7 +8,7 @@ export let inspect: {
       breakLength?: number;
     },
   ): string;
-  custom: symbol;
+  readonly custom: unique symbol;
 };
 
 try {
@@ -27,6 +27,6 @@ try {
         ? String(JSON.stringify(obj))
         : String(obj);
     },
-    { custom: Symbol.for("nodejs.util.inspect.custom") },
+    { custom: Symbol.for("nodejs.util.inspect.custom") as any },
   );
 }
