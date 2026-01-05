@@ -12,8 +12,7 @@ import type {
 } from "@dataplan/pg";
 import type { GraphQLType } from "grafast/graphql";
 import { gatherConfig } from "graphile-build";
-import type { SQL } from "pg-sql2";
-import type sql from "pg-sql2";
+import type { PgSQL, SQL } from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import type { PgCodecMetaLookup } from "../inputUtils.js";
@@ -104,7 +103,7 @@ declare global {
       /**
        * pg-sql2 access on Build to avoid duplicate module issues.
        */
-      sql: typeof sql;
+      sql: PgSQL<never>;
 
       pgGetBehavior: typeof getBehavior;
 
