@@ -4417,7 +4417,8 @@ export function makeExampleSchema(
                 },
               });
               $items.where(
-                sql`${$items}.id = ${$items.placeholder($id, TYPES.int)}`,
+                (sql) =>
+                  sql`${$items}.id = ${$items.placeholder($id, TYPES.int)}`,
               );
               return $items.single();
             },

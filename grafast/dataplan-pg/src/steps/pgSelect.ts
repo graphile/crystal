@@ -63,6 +63,7 @@ import type {
 } from "../interfaces.js";
 import { parseArray } from "../parseArray.js";
 import { PgLocker } from "../pgLocker.js";
+import { runtimeScopedSQL } from "../utils.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
@@ -131,7 +132,10 @@ type PgSelectPlanJoin =
       lateral?: boolean;
     };
 
-type PgSelectScopedPlanJoin = PgSQLCallbackOrDirect<PgSelectPlanJoin>;
+type PgSelectScopedPlanJoin<TEmbed> = PgSQLCallbackOrDirect<
+  PgSelectPlanJoin,
+  TEmbed
+>;
 
 export type PgSelectIdentifierSpec =
   | {
@@ -836,7 +840,7 @@ export class PgSelectStep<
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
    */
-  public join(spec: PgSelectScopedPlanJoin) {
+  public join(spec: PgSelectScopedPlanJoin<this>) {
     this.joins.push(this.scopedSQL(spec));
   }
 
@@ -850,7 +854,7 @@ export class PgSelectStep<
    * @internal
    */
   public selectAndReturnIndex(
-    fragmentOrCb: PgSQLCallbackOrDirect<SQL>,
+    fragmentOrCb: PgSQLCallbackOrDirect<SQL, this>,
   ): number {
     const fragment = this.scopedSQL(fragmentOrCb);
     if (!this.isArgumentsFinalized) {
@@ -914,7 +918,8 @@ export class PgSelectStep<
 
   where(
     rawCondition: PgSQLCallbackOrDirect<
-      PgWhereConditionSpec<keyof GetPgResourceAttributes<TResource> & string>
+      PgWhereConditionSpec<keyof GetPgResourceAttributes<TResource> & string>,
+      this
     >,
   ): void {
     if (this.locker.locked) {
@@ -946,7 +951,7 @@ export class PgSelectStep<
     }
   }
 
-  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec, this>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
@@ -956,7 +961,8 @@ export class PgSelectStep<
 
   having(
     rawCondition: PgSQLCallbackOrDirect<
-      PgHavingConditionSpec<keyof GetPgResourceAttributes<TResource> & string>
+      PgHavingConditionSpec<keyof GetPgResourceAttributes<TResource> & string>,
+      this
     >,
   ): void {
     if (this.locker.locked) {
@@ -977,7 +983,7 @@ export class PgSelectStep<
     }
   }
 
-  orderBy(order: PgSQLCallbackOrDirect<PgOrderSpec>): void {
+  orderBy(order: PgSQLCallbackOrDirect<PgOrderSpec, this>): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(this.scopedSQL(order));
   }
@@ -3096,8 +3102,9 @@ function buildTheQuery<
     fixedPlaceholderValues,
     _symbolSubstitutes,
   } = rawInfo;
-  const { count, trueOrderBySQL, info, stream, meta } =
-    buildTheQueryCore(rawInfo);
+  const { count, trueOrderBySQL, info, stream, meta } = runtimeScopedSQL(() =>
+    buildTheQueryCore(rawInfo),
+  );
 
   const {
     name,

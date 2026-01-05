@@ -18,6 +18,7 @@ import type { PgSelectQueryBuilder } from "./steps/pgSelect.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.js";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+import type { PgEmbeddable } from "./utils.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -784,10 +785,12 @@ export type GetPgResourceUniques<
   TResource extends PgResource<any, any, any, any, any>,
 > = TResource["uniques"];
 
-export type PgSQLCallback<TResult> = (
-  sql: PgSQL<PgTypedStep<PgCodec>>,
+export type PgSQLCallback<TResult, TEmbed = never> = (
+  sql: PgSQL<PgEmbeddable | TEmbed>,
 ) => TResult;
-export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;
+export type PgSQLCallbackOrDirect<TResult, TEmbed = never> =
+  | PgSQLCallback<TResult, TEmbed>
+  | TResult;
 
 export interface PgQueryBuilder {
   /** The alias of the current table */
@@ -810,6 +813,7 @@ export type ObjectForResource<
 };
 
 export interface PgQueryRootStep extends Step {
+  alias: SQL;
   getPgRoot(): PgQueryRootStep;
   placeholder($step: PgTypedStep<PgCodec>): SQL;
   placeholder($step: Step, codec: PgCodec, alreadyEncoded?: boolean): SQL;

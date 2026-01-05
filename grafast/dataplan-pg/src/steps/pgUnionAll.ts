@@ -276,12 +276,15 @@ export class PgUnionAllSingleStep extends Step {
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
+  public selectAndReturnIndex(
+    rawFragment: PgSQLCallbackOrDirect<SQL, this>,
+  ): number {
+    const fragment = this.scopedSQL(rawFragment);
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public select<TExpressionCodec extends PgCodec>(
-    fragment: PgSQLCallbackOrDirect<SQL>,
+    fragment: PgSQLCallbackOrDirect<SQL, this>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -714,7 +717,7 @@ on (${sql.indent(
     return index;
   }
 
-  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL>): number {
+  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL, this>): number {
     const fragment = this.scopedSQL(rawFragment);
     const existingIndex = this.selects.findIndex(
       (s) =>
@@ -742,7 +745,7 @@ on (${sql.indent(
   }
 
   selectExpression(
-    rawExpression: PgSQLCallbackOrDirect<SQL>,
+    rawExpression: PgSQLCallbackOrDirect<SQL, this>,
     codec: PgCodec,
   ): number {
     const expression = this.scopedSQL(rawExpression);
@@ -813,7 +816,10 @@ on (${sql.indent(
   }
 
   where(
-    rawWhereSpec: PgSQLCallbackOrDirect<PgWhereConditionSpec<TAttributes>>,
+    rawWhereSpec: PgSQLCallbackOrDirect<
+      PgWhereConditionSpec<TAttributes>,
+      this
+    >,
   ): void {
     if (this.locker.locked) {
       throw new Error(
@@ -838,7 +844,7 @@ on (${sql.indent(
     }
   }
 
-  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec, this>): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
@@ -847,7 +853,7 @@ on (${sql.indent(
   }
 
   having(
-    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>>,
+    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>, this>,
   ): void {
     if (this.locker.locked) {
       throw new Error(

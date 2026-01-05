@@ -310,7 +310,7 @@ export class PgSelectSingleStep<
    * Returns a plan representing the result of an expression.
    */
   public select<TExpressionCodec extends PgCodec>(
-    fragment: PgSQLCallbackOrDirect<SQL>,
+    fragment: PgSQLCallbackOrDirect<SQL, this>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -328,7 +328,9 @@ export class PgSelectSingleStep<
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
+  public selectAndReturnIndex(
+    fragment: PgSQLCallbackOrDirect<SQL, this>,
+  ): number {
     return this.getClassStep().selectAndReturnIndex(this.scopedSQL(fragment));
   }
 
@@ -524,12 +526,14 @@ export class PgSelectSingleStep<
           attribute: { codec },
           attr,
         } = nonNullAttribute;
-        const expression = sql`${this}.${sql.identifier(attr)}`;
-        this.nullCheckAttributeIndex = this.getClassStep().selectAndReturnIndex(
-          codec.castFromPg
+        const derivedExpression = this.scopedSQL((sql) => {
+          const expression = sql`${this}.${sql.identifier(attr)}`;
+          return codec.castFromPg
             ? codec.castFromPg(expression)
-            : sql`${sql.parens(expression)}::text`,
-        );
+            : sql`${sql.parens(expression)}::text`;
+        });
+        this.nullCheckAttributeIndex =
+          this.getClassStep().selectAndReturnIndex(derivedExpression);
       } else {
         this.nullCheckId = this.getClassStep().getNullCheckIndex();
       }
