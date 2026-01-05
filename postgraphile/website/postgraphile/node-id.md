@@ -34,6 +34,7 @@ const IdToNodeIdPlugin: GraphileConfig.Plugin = {
         return "nodeId";
       },
       _attributeName(previous, options, details) {
+        const { codec, attributeName } = details;
         const attribute = codec.attributes[attributeName];
         const name = attribute.extensions?.tags?.name || attributeName;
         return this.coerceToGraphQLName(name);
