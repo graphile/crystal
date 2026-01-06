@@ -1,4 +1,4 @@
-import { ExecutableStep } from "grafast";
+import { ExecutableStep, inspect } from "grafast";
 import type { SQL, Transformer } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -71,7 +71,7 @@ export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
       } else if (hasGetPgRoot(that)) {
         return that.getPgRoot().alias;
       } else {
-        throw new Error(`Don't know how to embed ${value}`);
+        throw new Error(`Don't know how to embed ${inspect(value)}`);
       }
     }
     if (value instanceof ExecutableStep && "pgCodec" in value) {

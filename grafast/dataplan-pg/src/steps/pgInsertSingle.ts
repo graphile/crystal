@@ -6,14 +6,13 @@ import type {
   Setter,
   SetterCapable,
 } from "grafast";
-import { access, exportAs, isDev, setter, Step } from "grafast";
+import { access, exportAs, inspect, isDev, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
 import { sqlValueWithCodec } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
-import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,

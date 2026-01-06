@@ -1,6 +1,6 @@
-import type { Modifier, Step } from "grafast";
+import type { inspect, Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
-import type { CustomInspectFunction, inspect } from "util";
+import type { CustomInspectFunction } from "util";
 
 import type { PgCodecAttributes } from "./codecs.js";
 import type {
@@ -316,6 +316,9 @@ export interface PgCodec<
    * many-to-many.
    */
   refs?: PgCodecRefs;
+
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 export type PgCodecWithAttributes<
