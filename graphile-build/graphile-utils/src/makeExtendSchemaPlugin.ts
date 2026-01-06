@@ -676,7 +676,12 @@ export function extendSchema(
                     const fullConfig = enumValueSpec as EnumValueConfig;
 
                     const keys = Object.keys(fullConfig);
-                    const ALLOWED_KEYS = ["extensions", "apply", "value"];
+                    const ALLOWED_KEYS = [
+                      "extensions",
+                      "apply",
+                      "value",
+                      "scope",
+                    ];
                     const forbiddenKeys = keys.filter(
                       (key) => !ALLOWED_KEYS.includes(key),
                     );
@@ -700,6 +705,12 @@ export function extendSchema(
                     }
                     if ("value" in fullConfig) {
                       valueValue = fullConfig.value;
+                    }
+                    if ("scope" in fullConfig) {
+                      // TODO: handle scope
+                      console.warn(
+                        `[WARNING] scope entry for enum value ${name}.${valueName} ignored.`,
+                      );
                     }
                   } else {
                     // It must be the value
