@@ -433,7 +433,18 @@ function enforceValidNode(node: unknown, where?: string): SQL {
     }
   }
   if (isSQLable(node)) {
-    return enforceValidNode(node[$$toSQL](), where);
+    const sqlifiedNode = node[$$toSQL]();
+    if (isSQL(sqlifiedNode)) {
+      return sqlifiedNode;
+    } else {
+      throw new Error(
+        `[pg-sql2] Invalid $$toSQL method (on ${String(node)}), expected to return an SQL item${
+          where ? ` at ${where}` : ""
+        } but received '${inspect(
+          sqlifiedNode,
+        )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal. Alternatively, perhaps you forgot to call sql.withTransformer() when building your SQL?`,
+      );
+    }
   }
   throw new Error(
     `[pg-sql2] Invalid expression. Expected an SQL item${
