@@ -63,7 +63,11 @@ import type {
 } from "../interfaces.js";
 import { parseArray } from "../parseArray.js";
 import { PgLocker } from "../pgLocker.js";
-import type { PlantimeEmbeddable } from "../utils.js";
+import type {
+  PlantimeEmbeddable,
+  RuntimeEmbeddable,
+  RuntimeSQLThunk,
+} from "../utils.js";
 import { runtimeScopedSQL } from "../utils.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
@@ -952,7 +956,9 @@ export class PgSelectStep<
     }
   }
 
-  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec, this>): void {
+  groupBy(
+    group: PgSQLCallbackOrDirect<PgGroupSpec, this | PlantimeEmbeddable>,
+  ): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
@@ -2874,7 +2880,7 @@ function buildTheQueryCore<
     },
     selectAndReturnIndex,
     join(spec) {
-      info.joins.push(spec);
+      info.joins.push(runtimeScopedSQL(spec));
     },
     setMeta(key, value) {
       meta[key] = value;
@@ -2884,7 +2890,7 @@ function buildTheQueryCore<
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
-        info.orders.push(spec);
+        info.orders.push(runtimeScopedSQL(spec));
       } else {
         // Throw it away?
         // Maybe later we can use it in the aggregates themself - e.g. `array_agg(... order by <blah>)`
@@ -2964,7 +2970,7 @@ function buildTheQueryCore<
       }
     },
     groupBy(spec) {
-      info.groups.push(spec);
+      info.groups.push(runtimeScopedSQL(spec));
     },
     having(rawCondition) {
       const condition = runtimeScopedSQL(rawCondition);
@@ -4001,7 +4007,7 @@ export interface PgSelectQueryBuilder<
 > extends PgQueryBuilder {
   mode: PgSelectMode;
   /** Instruct to add another order */
-  orderBy(spec: PgOrderSpec): void;
+  orderBy(spec: PgSQLCallbackOrDirect<PgOrderSpec, RuntimeEmbeddable>): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
   /** Returns the SQL alias representing the table related to this relation */
@@ -4016,7 +4022,7 @@ export interface PgSelectQueryBuilder<
     >,
   ): void;
   whereBuilder(): PgCondition<this>;
-  groupBy(group: PgGroupSpec): void;
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec, RuntimeEmbeddable>): void;
   having(
     condition: PgHavingConditionSpec<
       keyof GetPgResourceAttributes<TResource> & string
@@ -4025,8 +4031,8 @@ export interface PgSelectQueryBuilder<
   havingBuilder(): PgCondition<this>;
   // IMPORTANT: if you add `JOIN` here, **only** allow `LEFT JOIN`, otherwise
   // if we're inlined things may go wrong.
-  join(spec: PgSelectPlanJoin): void;
-  selectAndReturnIndex(fragment: SQL): number;
+  join(spec: PgSQLCallbackOrDirect<PgSelectPlanJoin, RuntimeEmbeddable>): void;
+  selectAndReturnIndex(fragment: RuntimeSQLThunk): number;
 }
 
 function buildWhereOrHaving(
