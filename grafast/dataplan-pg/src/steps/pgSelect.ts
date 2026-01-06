@@ -1692,16 +1692,6 @@ export class PgSelectStep<
     }
   }
 
-  private mergeSelectsWith(otherPlan: PgSelectStep<PgResource>): {
-    [desiredIndex: string]: string;
-  } {
-    const actualKeyByDesiredKey = Object.create(null);
-    this.selects.forEach((frag, idx) => {
-      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
-    });
-    return actualKeyByDesiredKey;
-  }
-
   /**
    * - Merge placeholders
    * - Merge fixedPlaceholders
