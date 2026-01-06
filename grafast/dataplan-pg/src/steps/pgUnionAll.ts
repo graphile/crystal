@@ -22,7 +22,7 @@ import {
   SafeError,
   Step,
 } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
@@ -41,7 +41,8 @@ import type {
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
-import { makeScopedSQL } from "../utils.js";
+import type { PlantimeEmbeddable, RuntimeSQLThunk } from "../utils.js";
+import { makeScopedSQL, runtimeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
@@ -276,12 +277,15 @@ export class PgUnionAllSingleStep extends Step {
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
+  public selectAndReturnIndex(
+    rawFragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
+  ): number {
+    const fragment = this.scopedSQL(rawFragment);
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public select<TExpressionCodec extends PgCodec>(
-    fragment: PgSQLCallbackOrDirect<SQL>,
+    fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -307,7 +311,11 @@ export class PgUnionAllSingleStep extends Step {
       : arrayOfLength(count, values0.value);
   }
 
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.getClassStep().alias;
   }
 }
@@ -714,7 +722,9 @@ on (${sql.indent(
     return index;
   }
 
-  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL>): number {
+  selectAndReturnIndex(
+    rawFragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
+  ): number {
     const fragment = this.scopedSQL(rawFragment);
     const existingIndex = this.selects.findIndex(
       (s) =>
@@ -742,7 +752,7 @@ on (${sql.indent(
   }
 
   selectExpression(
-    rawExpression: PgSQLCallbackOrDirect<SQL>,
+    rawExpression: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
     codec: PgCodec,
   ): number {
     const expression = this.scopedSQL(rawExpression);
@@ -813,7 +823,7 @@ on (${sql.indent(
   }
 
   where(
-    rawWhereSpec: PgSQLCallbackOrDirect<PgWhereConditionSpec<TAttributes>>,
+    rawWhereSpec: PgWhereConditionSpec<TAttributes, this | PlantimeEmbeddable>,
   ): void {
     if (this.locker.locked) {
       throw new Error(
@@ -838,7 +848,9 @@ on (${sql.indent(
     }
   }
 
-  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
+  groupBy(
+    group: PgSQLCallbackOrDirect<PgGroupSpec, this | PlantimeEmbeddable>,
+  ): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
@@ -847,7 +859,7 @@ on (${sql.indent(
   }
 
   having(
-    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>>,
+    rawCondition: PgHavingConditionSpec<string, this | PlantimeEmbeddable>,
   ): void {
     if (this.locker.locked) {
       throw new Error(
@@ -1075,7 +1087,11 @@ on (${sql.indent(
     });
   }
 
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 
@@ -1198,7 +1214,8 @@ function buildTheQuery<
 
   const { values, count } = info.executionDetails;
 
-  function selectAndReturnIndex(expression: SQL): number {
+  function selectAndReturnIndex(rawExpression: RuntimeSQLThunk): number {
+    const expression = runtimeScopedSQL(rawExpression);
     const existingIndex = info.selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&
@@ -1235,7 +1252,8 @@ function buildTheQuery<
   }
 
   const meta = Object.create(null);
-  const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> = {
+  const queryBuilder: PgUnionAllQueryBuilder<TAttributes, TTypeNames> &
+    SQLable = {
     mode: info.mode,
     alias: info.alias,
     [$$toSQL]() {
@@ -1255,7 +1273,8 @@ function buildTheQuery<
     setOrderIsUnique() {
       info.isOrderUnique = true;
     },
-    where(whereSpec) {
+    where(rawWhereSpec) {
+      const whereSpec = runtimeScopedSQL(rawWhereSpec);
       for (const digest of info.memberDigests) {
         const { alias: tableAlias, symbol } = digest;
         if (sql.isSQL(whereSpec)) {
@@ -1275,7 +1294,8 @@ function buildTheQuery<
         }
       }
     },
-    having(condition) {
+    having(rawCondition) {
+      const condition = runtimeScopedSQL(rawCondition);
       if (info.mode !== "aggregate") {
         throw new SafeError(`Cannot add having to a non-aggregate query`);
       }

@@ -45,11 +45,8 @@ interface PgUpdatePlanFinalizeResults {
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateSingleStep<
-    TResource extends PgResource<any, any, any, any, any> = PgResource,
-  >
-  extends Step<unknown[]>
-  implements SQLable
-{
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> extends Step<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUpdateSingleStep",
@@ -373,7 +370,7 @@ export class PgUpdateSingleStep<
       }
 
       const meta = Object.create(null);
-      const queryBuilder: PgUpdateSingleQueryBuilder = {
+      const queryBuilder: PgUpdateSingleQueryBuilder & SQLable = {
         alias,
         [$$toSQL]() {
           return alias;
@@ -511,7 +508,11 @@ export class PgUpdateSingleStep<
 
     super.finalize();
   }
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 }

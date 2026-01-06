@@ -1,6 +1,5 @@
 import type { Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
-import { $$toSQL } from "pg-sql2";
 import type { CustomInspectFunction, inspect } from "util";
 
 import type { PgCodecAttributes } from "./codecs.js";
@@ -18,6 +17,7 @@ import type { PgSelectQueryBuilder } from "./steps/pgSelect.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.js";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+import type { RuntimeSQLThunk } from "./utils.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -372,7 +372,9 @@ export interface PgEnumCodec<
  * A PgTypedStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedStep<TCodec extends PgCodec> extends Step {
+export interface PgTypedStep<
+  TCodec extends PgCodec = PgCodec<any, any, any, any, any, any, any>,
+> extends Step {
   pgCodec: TCodec;
 }
 
@@ -461,8 +463,8 @@ export type PlanByUniques<
 
 export type PgConditionLike = Modifier<any> & {
   alias: SQL;
-  where(condition: SQL): void;
-  having(condition: SQL): void;
+  where(condition: RuntimeSQLThunk): void;
+  having(condition: RuntimeSQLThunk): void;
 };
 
 export type KeysOfType<TObject, TValueType> = {
@@ -784,15 +786,16 @@ export type GetPgResourceUniques<
   TResource extends PgResource<any, any, any, any, any>,
 > = TResource["uniques"];
 
-export type PgSQLCallback<TResult> = (
-  sql: PgSQL<PgTypedStep<PgCodec>>,
+export type PgSQLCallback<TResult, TEmbed = never> = (
+  sql: PgSQL<TEmbed>,
 ) => TResult;
-export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;
+export type PgSQLCallbackOrDirect<TResult, TEmbed = never> =
+  | PgSQLCallback<TResult, TEmbed>
+  | TResult;
 
 export interface PgQueryBuilder {
   /** The alias of the current table */
   alias: SQL;
-  [$$toSQL](): SQL;
   setMeta(key: string, value: unknown): void;
   getMetaRaw(key: string): unknown;
 }
@@ -810,6 +813,7 @@ export type ObjectForResource<
 };
 
 export interface PgQueryRootStep extends Step {
+  alias: SQL;
   getPgRoot(): PgQueryRootStep;
   placeholder($step: PgTypedStep<PgCodec>): SQL;
   placeholder($step: Step, codec: PgCodec, alreadyEncoded?: boolean): SQL;

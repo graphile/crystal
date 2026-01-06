@@ -1,10 +1,18 @@
 import { Modifier } from "grafast";
-import type { SQL, SQLable } from "pg-sql2";
+import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
-export type PgWhereConditionSpec<TAttribute extends string> =
-  | SQL
-  | PgWhereConditionAttributeSpec<TAttribute>;
+import type { PgConditionLike, PgSQLCallbackOrDirect } from "../interfaces.js";
+import type { RuntimeEmbeddable } from "../utils.js";
+import { runtimeScopedSQL } from "../utils.js";
+
+export type PgWhereConditionSpec<
+  TAttribute extends string,
+  TMoreEmbeds = never,
+> = PgSQLCallbackOrDirect<
+  SQL | PgWhereConditionAttributeSpec<TAttribute>,
+  RuntimeEmbeddable | TMoreEmbeds
+>;
 
 export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
   type: "attribute";
@@ -12,7 +20,10 @@ export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
   callback: (fragment: SQL) => SQL;
 }
 
-export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
+export type PgHavingConditionSpec<
+  _TAttribute extends string,
+  TMoreEmbeds = never,
+> = PgSQLCallbackOrDirect<SQL, RuntimeEmbeddable | TMoreEmbeds>;
 // | ...
 
 export interface PgConditionCapableParent {
@@ -46,7 +57,7 @@ export class PgCondition<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
   extends Modifier<TParent>
-  implements PgConditionCapableParent, SQLable
+  implements PgConditionCapableParent, PgConditionLike
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -212,7 +223,12 @@ where ${sqlCondition}`})`;
       }
     }
   }
-  [$$toSQL]() {
+
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 }
@@ -224,7 +240,8 @@ export function pgWhereConditionSpecListToSQL(
   transform: (frag: SQL) => SQL = (frag) => frag,
 ): SQL | null {
   const mappedConditions = [];
-  for (const c of conditions) {
+  for (const rawC of conditions) {
+    const c = runtimeScopedSQL(rawC);
     if (sql.isSQL(c)) {
       if (sql.isEquivalent(c, sql.blank)) {
         continue;

@@ -36,7 +36,7 @@ import {
   stepAShouldTryAndInlineIntoStepB,
   UnbatchedStep,
 } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
@@ -63,6 +63,12 @@ import type {
 } from "../interfaces.js";
 import { parseArray } from "../parseArray.js";
 import { PgLocker } from "../pgLocker.js";
+import type {
+  PlantimeEmbeddable,
+  RuntimeEmbeddable,
+  RuntimeSQLThunk,
+} from "../utils.js";
+import { runtimeScopedSQL } from "../utils.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
   PgHavingConditionSpec,
@@ -131,7 +137,10 @@ type PgSelectPlanJoin =
       lateral?: boolean;
     };
 
-type PgSelectScopedPlanJoin = PgSQLCallbackOrDirect<PgSelectPlanJoin>;
+type PgSelectScopedPlanJoin<TEmbed> = PgSQLCallbackOrDirect<
+  PgSelectPlanJoin,
+  TEmbed
+>;
 
 export type PgSelectIdentifierSpec =
   | {
@@ -836,7 +845,7 @@ export class PgSelectStep<
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
    */
-  public join(spec: PgSelectScopedPlanJoin) {
+  public join(spec: PgSelectScopedPlanJoin<this | PlantimeEmbeddable>): void {
     this.joins.push(this.scopedSQL(spec));
   }
 
@@ -850,7 +859,7 @@ export class PgSelectStep<
    * @internal
    */
   public selectAndReturnIndex(
-    fragmentOrCb: PgSQLCallbackOrDirect<SQL>,
+    fragmentOrCb: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
   ): number {
     const fragment = this.scopedSQL(fragmentOrCb);
     if (!this.isArgumentsFinalized) {
@@ -913,8 +922,9 @@ export class PgSelectStep<
   }
 
   where(
-    rawCondition: PgSQLCallbackOrDirect<
-      PgWhereConditionSpec<keyof GetPgResourceAttributes<TResource> & string>
+    rawCondition: PgWhereConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string,
+      this | PlantimeEmbeddable
     >,
   ): void {
     if (this.locker.locked) {
@@ -946,7 +956,9 @@ export class PgSelectStep<
     }
   }
 
-  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec>): void {
+  groupBy(
+    group: PgSQLCallbackOrDirect<PgGroupSpec, this | PlantimeEmbeddable>,
+  ): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);
@@ -955,8 +967,9 @@ export class PgSelectStep<
   }
 
   having(
-    rawCondition: PgSQLCallbackOrDirect<
-      PgHavingConditionSpec<keyof GetPgResourceAttributes<TResource> & string>
+    rawCondition: PgHavingConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string,
+      this | PlantimeEmbeddable
     >,
   ): void {
     if (this.locker.locked) {
@@ -977,7 +990,9 @@ export class PgSelectStep<
     }
   }
 
-  orderBy(order: PgSQLCallbackOrDirect<PgOrderSpec>): void {
+  orderBy(
+    order: PgSQLCallbackOrDirect<PgOrderSpec, this | PlantimeEmbeddable>,
+  ): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(this.scopedSQL(order));
   }
@@ -1677,16 +1692,6 @@ export class PgSelectStep<
     }
   }
 
-  private mergeSelectsWith(otherPlan: PgSelectStep<PgResource>): {
-    [desiredIndex: string]: string;
-  } {
-    const actualKeyByDesiredKey = Object.create(null);
-    this.selects.forEach((frag, idx) => {
-      actualKeyByDesiredKey[idx] = otherPlan.selectAndReturnIndex(frag);
-    });
-    return actualKeyByDesiredKey;
-  }
-
   /**
    * - Merge placeholders
    * - Merge fixedPlaceholders
@@ -2094,7 +2099,11 @@ export class PgSelectStep<
     return (isScalar ? $single.getSelfNamed() : $single) as any;
   }
 
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
   whereBuilder() {
@@ -2844,7 +2853,8 @@ function buildTheQueryCore<
     shouldReverseOrder: false,
   };
 
-  function selectAndReturnIndex(expression: SQL): number {
+  function selectAndReturnIndex(rawExpression: RuntimeSQLThunk): number {
+    const expression = runtimeScopedSQL(rawExpression);
     const existingIndex = info.selects.findIndex((s) =>
       sql.isEquivalent(s, expression),
     );
@@ -2853,7 +2863,7 @@ function buildTheQueryCore<
   }
 
   const meta = info.meta;
-  const queryBuilder: PgSelectQueryBuilder = {
+  const queryBuilder: PgSelectQueryBuilder & SQLable = {
     mode: info.mode,
     alias: info.alias,
     [$$toSQL]() {
@@ -2861,7 +2871,7 @@ function buildTheQueryCore<
     },
     selectAndReturnIndex,
     join(spec) {
-      info.joins.push(spec);
+      info.joins.push(runtimeScopedSQL(spec));
     },
     setMeta(key, value) {
       meta[key] = value;
@@ -2871,7 +2881,7 @@ function buildTheQueryCore<
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
-        info.orders.push(spec);
+        info.orders.push(runtimeScopedSQL(spec));
       } else {
         // Throw it away?
         // Maybe later we can use it in the aggregates themself - e.g. `array_agg(... order by <blah>)`
@@ -2928,7 +2938,8 @@ function buildTheQueryCore<
       info.relationJoins.set(relationIdentifier, alias);
       return alias;
     },
-    where(condition) {
+    where(rawCondition) {
+      const condition = runtimeScopedSQL(rawCondition);
       if (sql.isSQL(condition)) {
         info.conditions.push(condition);
       } else {
@@ -2950,9 +2961,10 @@ function buildTheQueryCore<
       }
     },
     groupBy(spec) {
-      info.groups.push(spec);
+      info.groups.push(runtimeScopedSQL(spec));
     },
-    having(condition) {
+    having(rawCondition) {
+      const condition = runtimeScopedSQL(rawCondition);
       if (info.mode !== "aggregate") {
         throw new SafeError(`Cannot add having to a non-aggregate query`);
       }
@@ -3096,8 +3108,9 @@ function buildTheQuery<
     fixedPlaceholderValues,
     _symbolSubstitutes,
   } = rawInfo;
-  const { count, trueOrderBySQL, info, stream, meta } =
-    buildTheQueryCore(rawInfo);
+  const { count, trueOrderBySQL, info, stream, meta } = runtimeScopedSQL(() =>
+    buildTheQueryCore(rawInfo),
+  );
 
   const {
     name,
@@ -3985,7 +3998,7 @@ export interface PgSelectQueryBuilder<
 > extends PgQueryBuilder {
   mode: PgSelectMode;
   /** Instruct to add another order */
-  orderBy(spec: PgOrderSpec): void;
+  orderBy(spec: PgSQLCallbackOrDirect<PgOrderSpec, RuntimeEmbeddable>): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
   /** Returns the SQL alias representing the table related to this relation */
@@ -4000,7 +4013,7 @@ export interface PgSelectQueryBuilder<
     >,
   ): void;
   whereBuilder(): PgCondition<this>;
-  groupBy(group: PgGroupSpec): void;
+  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec, RuntimeEmbeddable>): void;
   having(
     condition: PgHavingConditionSpec<
       keyof GetPgResourceAttributes<TResource> & string
@@ -4009,8 +4022,8 @@ export interface PgSelectQueryBuilder<
   havingBuilder(): PgCondition<this>;
   // IMPORTANT: if you add `JOIN` here, **only** allow `LEFT JOIN`, otherwise
   // if we're inlined things may go wrong.
-  join(spec: PgSelectPlanJoin): void;
-  selectAndReturnIndex(fragment: SQL): number;
+  join(spec: PgSQLCallbackOrDirect<PgSelectPlanJoin, RuntimeEmbeddable>): void;
+  selectAndReturnIndex(fragment: RuntimeSQLThunk): number;
 }
 
 function buildWhereOrHaving(

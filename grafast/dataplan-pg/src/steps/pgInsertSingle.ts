@@ -44,8 +44,7 @@ export class PgInsertSingleStep<
   implements
     SetterCapable<{
       [key in keyof GetPgResourceAttributes<TResource> & string]: Step;
-    }>,
-    SQLable
+    }>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -340,7 +339,7 @@ export class PgInsertSingleStep<
       }
 
       const meta = Object.create(null);
-      const queryBuilder: PgInsertSingleQueryBuilder = {
+      const queryBuilder: PgInsertSingleQueryBuilder & SQLable = {
         alias,
         [$$toSQL]() {
           return alias;
@@ -434,7 +433,11 @@ export class PgInsertSingleStep<
 
     super.finalize();
   }
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 }

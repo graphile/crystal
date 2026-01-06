@@ -2026,14 +2026,14 @@ export function makeExampleSchema(
         extensions: {
           grafast: {
             apply: EXPORTABLE(
-              (TYPES, sql) => (qb: PgSelectQueryBuilder) => {
-                qb.orderBy({
+              (TYPES) => (qb: PgSelectQueryBuilder) => {
+                qb.orderBy((sql) => ({
                   codec: TYPES.text,
                   fragment: sql`${qb}.body`,
                   direction: "ASC",
-                });
+                }));
               },
-              [TYPES, sql],
+              [TYPES],
             ),
           },
         },
@@ -2042,14 +2042,14 @@ export function makeExampleSchema(
         extensions: {
           grafast: {
             apply: EXPORTABLE(
-              (TYPES, sql) => (qb: PgSelectQueryBuilder) => {
-                qb.orderBy({
+              (TYPES) => (qb: PgSelectQueryBuilder) => {
+                qb.orderBy((sql) => ({
                   codec: TYPES.text,
                   fragment: sql`${qb}.body`,
                   direction: "DESC",
-                });
+                }));
               },
-              [TYPES, sql],
+              [TYPES],
             ),
           },
         },
@@ -2272,13 +2272,14 @@ export function makeExampleSchema(
           (TYPES, sql, sqlValueWithCodec) =>
             function plan($condition, arg) {
               if (arg === null) {
-                $condition.where(sql`${$condition}.featured is null`);
+                $condition.where((sql) => sql`${$condition}.featured is null`);
               } else {
                 $condition.where(
-                  sql`${$condition}.featured = ${sqlValueWithCodec(
-                    arg,
-                    TYPES.boolean,
-                  )}`,
+                  (sql) =>
+                    sql`${$condition}.featured = ${sqlValueWithCodec(
+                      arg,
+                      TYPES.boolean,
+                    )}`,
                 );
               }
             },
@@ -2338,35 +2339,35 @@ export function makeExampleSchema(
       featured: {
         type: BooleanFilter,
         apply: EXPORTABLE(
-          (PgBooleanFilter, sql) =>
+          (PgBooleanFilter) =>
             function plan($messageFilter, arg) {
               if (arg === null) {
                 // Ignore
               } else {
                 return new PgBooleanFilter(
                   $messageFilter,
-                  sql`${$messageFilter}.featured`,
+                  (sql) => sql`${$messageFilter}.featured`,
                 );
               }
             },
-          [PgBooleanFilter, sql],
+          [PgBooleanFilter],
         ),
       },
       isArchived: {
         type: BooleanFilter,
         apply: EXPORTABLE(
-          (PgBooleanFilter, sql) =>
+          (PgBooleanFilter) =>
             function plan($messageFilter, arg) {
               if (arg === null) {
                 // Ignore
               } else {
                 return new PgBooleanFilter(
                   $messageFilter,
-                  sql`${$messageFilter}.is_archived`,
+                  (sql) => sql`${$messageFilter}.is_archived`,
                 );
               }
             },
-          [PgBooleanFilter, sql],
+          [PgBooleanFilter],
         ),
       },
     },
@@ -2381,13 +2382,14 @@ export function makeExampleSchema(
           (TYPES, sql, sqlValueWithCodec) =>
             function plan($condition, arg) {
               if (arg === null) {
-                $condition.where(sql`${$condition}.name is null`);
+                $condition.where((sql) => sql`${$condition}.name is null`);
               } else {
                 $condition.where(
-                  sql`${$condition}.name = ${sqlValueWithCodec(
-                    arg,
-                    TYPES.text,
-                  )}`,
+                  (sql) =>
+                    sql`${$condition}.name = ${sqlValueWithCodec(
+                      arg,
+                      TYPES.text,
+                    )}`,
                 );
               }
             },
@@ -4417,7 +4419,8 @@ export function makeExampleSchema(
                 },
               });
               $items.where(
-                sql`${$items}.id = ${$items.placeholder($id, TYPES.int)}`,
+                (sql) =>
+                  sql`${$items}.id = ${$items.placeholder($id, TYPES.int)}`,
               );
               return $items.single();
             },
@@ -5417,7 +5420,9 @@ const includeArchivedCondition = EXPORTABLE(
         if (value === "YES") {
           // No restriction
         } else if (value === "EXCLUSIVELY") {
-          queryBuilder.where(sql`${queryBuilder}.archived_at is not null`);
+          queryBuilder.where(
+            (sql) => sql`${queryBuilder}.archived_at is not null`,
+          );
         } else if (
           value === "INHERIT" &&
           // INHERIT only works if the parent has an archived_at attribute.
@@ -5427,7 +5432,7 @@ const includeArchivedCondition = EXPORTABLE(
             sql`(${queryBuilder.alias}.archived_at is null) = (${sqlParentArchivedAt} is null)`,
           );
         } else {
-          queryBuilder.where(sql`${queryBuilder}.archived_at is null`);
+          queryBuilder.where((sql) => sql`${queryBuilder}.archived_at is null`);
         }
       };
     },

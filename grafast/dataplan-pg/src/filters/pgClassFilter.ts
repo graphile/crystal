@@ -1,5 +1,5 @@
 import { Modifier } from "grafast";
-import type { SQL, SQLable } from "pg-sql2";
+import type { SQL } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
 import type { PgConditionLike } from "../index.js";
@@ -7,12 +7,14 @@ import type {
   PgCondition,
   PgConditionCapableParent,
 } from "../steps/pgCondition.js";
+import type { RuntimeSQLThunk } from "../utils.js";
+import { runtimeScopedSQL } from "../utils.js";
 
 export class PgClassFilter<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
   extends Modifier<PgCondition<TParent>>
-  implements SQLable, PgConditionLike
+  implements PgConditionLike
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -29,12 +31,12 @@ export class PgClassFilter<
     super(parent);
   }
 
-  where(condition: SQL) {
-    this.conditions.push(condition);
+  where(condition: RuntimeSQLThunk) {
+    this.conditions.push(runtimeScopedSQL(condition));
   }
 
-  having(condition: SQL) {
-    this.havingConditions.push(condition);
+  having(condition: RuntimeSQLThunk) {
+    this.havingConditions.push(runtimeScopedSQL(condition));
   }
 
   apply() {
@@ -42,7 +44,11 @@ export class PgClassFilter<
     this.havingConditions.forEach((condition) => this.parent.having(condition));
   }
 
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 }
