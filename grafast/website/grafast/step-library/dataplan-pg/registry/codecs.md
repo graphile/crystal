@@ -154,10 +154,11 @@ const $orderIds = applyTransforms(each($orders, ($order) => $order.get("id")));
 const $orderItems = registry.pgResources.order_items.find();
 $orderItems.where(
   // highlight-start
-  sql`${$orderItems}.order_id = ANY (${$orderItems.placeholder(
-    $orderIds,
-    listOfCodec(TYPES.uuid),
-  )})`,
+  (sql) =>
+    sql`${$orderItems}.order_id = ANY (${$orderItems.placeholder(
+      $orderIds,
+      listOfCodec(TYPES.uuid),
+    )})`,
   // highlight-end
 );
 ```

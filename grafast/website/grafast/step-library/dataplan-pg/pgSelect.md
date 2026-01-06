@@ -65,7 +65,7 @@ you can reference a column of the table or similar:
 ```ts
 const $users = usersResource.find();
 const tbl = $users.alias;
-$users.where(sql`${tbl}.username = 'Benjie'`);
+$users.where((sql) => sql`${tbl}.username = 'Benjie'`);
 ```
 
 ### $pgSelect.single()
@@ -119,6 +119,9 @@ or a fragment spec, an object with the following properties:
 - `direction` (required) - `"ASC"` or `"DESC"`
 - `nulls` (optional) - `"FIRST"` or `"LAST"` or `null`
 
+When you need to build SQL fragments, use the callback form
+(`$pgSelect.orderBy((sql) => ({ ... }))`) so the `sql` tag is provided.
+
 #### Example
 
 ```ts
@@ -126,14 +129,14 @@ or a fragment spec, an object with the following properties:
 const $users = usersResource.find();
 
 // Sort by username length
-$users.orderBy({
+$users.orderBy((sql) => ({
   attribute: "username",
   callback(usernameExpression, codec) {
     return [sql`length(${usernameExpression})`, TYPES.int];
   },
   direction: "ASC",
   nulls: "LAST",
-});
+}));
 
 // Sort within that by user id
 $users.orderBy({ attribute: "id", direction: "ASC" });
@@ -155,10 +158,13 @@ ordering in order to make it stable.
 Adds a `WHERE` clause to the query, can be called multiple times and the
 conditions will be appended with `AND`.
 
+When you build SQL fragments, use the callback form
+(`$pgSelect.where((sql) => ...)`) so the `sql` tag is provided.
+
 ```ts
 const $users = usersResource.find();
 const tbl = $users.alias;
-$users.where(sql`${tbl}.username = 'Benjie'`);
+$users.where((sql) => sql`${tbl}.username = 'Benjie'`);
 ```
 
 ### $pgSelect.placeholder($step, codec)
@@ -175,7 +181,7 @@ const tbl = $users.alias;
 const $username = fieldArgs.getRaw("username");
 const frag = $users.placeholder($username, TYPES.citext);
 
-$users.where(sql`${tbl}.username = ${frag}`);
+$users.where((sql) => sql`${tbl}.username = ${frag}`);
 ```
 
 ### sqlValueWithCodec(value, codec)
@@ -195,13 +201,14 @@ value properly encoded so that it can be inserted into a `pg-sql2` query.
       plans: {
         featured(pgCondition, value) {
           if (value === null) {
-            pgCondition.where(sql`${pgCondition}.featured is null`);
+            pgCondition.where((sql) => sql`${pgCondition}.featured is null`);
           } else {
             pgCondition.where(
-              sql`${pgCondition}.featured = ${sqlValueWithCodec(
-                value,
-                TYPES.boolean,
-              )}`,
+              (sql) =>
+                sql`${pgCondition}.featured = ${sqlValueWithCodec(
+                  value,
+                  TYPES.boolean,
+                )}`,
             );
           }
         },
@@ -224,7 +231,7 @@ Example: "return all the posts where the forum is not archived":
 ```ts
 const $posts = postsResource.find();
 const forumAlias = $posts.singleRelation("forum");
-$posts.where(sql`${forumAlias}.is_archived = false`);
+$posts.where((sql) => sql`${forumAlias}.is_archived = false`);
 return $posts;
 
 // Result is something like:
@@ -282,6 +289,9 @@ object with the following properties:
 
 Like `$pgSelect.where(condition)`, but for the `HAVING` clause of a grouped
 query and only supports the SQL fragment condition form.
+
+When you build SQL fragments, use the callback form
+(`$pgSelect.having((sql) => ...)`) so the `sql` tag is provided.
 
 TODO: THIS METHOD IS UNTESTED!
 

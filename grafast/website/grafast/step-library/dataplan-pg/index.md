@@ -39,7 +39,9 @@ SQL expressions and sources should you need to.
 
 Reference to `sql` in code examples is a reference to `import { sql } from
 "pg-sql2";` - `@dataplan/pg` makes heavy use of this performant, type-safe,
-injection-proof SQL builder.
+injection-proof SQL builder. When a method accepts a callback (for example
+`.where((sql) => ...)`) it provides the `sql` tag, so you may not need to
+import it for simple cases.
 
 :::
 

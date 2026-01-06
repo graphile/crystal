@@ -58,10 +58,14 @@ Returns a child pgCondition in `EXISTS` mode with the given options.
 ## $pgCondition.where(condition)
 
 Adds `condition` to the list of conditions. Cannot be used in "having" mode.
+When you build SQL fragments, use the callback form
+(`$pgCondition.where((sql) => ...)`) so the `sql` tag is provided.
 
 ## $pgCondition.having(condition)
 
 Adds `condition` to the list of conditions. Cannot be used unless in "having" mode.
+When you build SQL fragments, use the callback form
+(`$pgCondition.having((sql) => ...)`) so the `sql` tag is provided.
 
 ## sqlValueWithCodec(value, codec)
 
