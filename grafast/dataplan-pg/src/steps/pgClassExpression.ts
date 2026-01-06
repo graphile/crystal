@@ -289,7 +289,11 @@ export class PgClassExpressionStep<
     );
   }
 
-  public [$$toSQL](): SQL {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL](): SQL {
     return this.expression;
   }
 

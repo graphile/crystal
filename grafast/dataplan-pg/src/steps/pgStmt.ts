@@ -67,6 +67,8 @@ export abstract class PgStmtBaseStep<T>
     exportName: "PgStmtBaseStep",
   };
 
+  public abstract alias: SQL;
+
   protected abstract locker: PgLocker<any>;
 
   /**

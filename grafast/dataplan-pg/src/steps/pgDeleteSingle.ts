@@ -5,7 +5,7 @@ import type {
   PromiseOrDirect,
 } from "grafast";
 import { access, exportAs, isDev, SafeError, Step } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
@@ -300,7 +300,7 @@ export class PgDeleteSingleStep<
       const context = contextDep.at(i);
 
       const meta = Object.create(null);
-      const queryBuilder: PgDeleteSingleQueryBuilder = {
+      const queryBuilder: PgDeleteSingleQueryBuilder & SQLable = {
         alias,
         [$$toSQL]() {
           return alias;
