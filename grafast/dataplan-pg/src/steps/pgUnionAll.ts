@@ -752,7 +752,7 @@ on (${sql.indent(
   }
 
   selectExpression(
-    rawExpression: PgSQLCallbackOrDirect<SQL, this>,
+    rawExpression: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
     codec: PgCodec,
   ): number {
     const expression = this.scopedSQL(rawExpression);
@@ -848,7 +848,9 @@ on (${sql.indent(
     }
   }
 
-  groupBy(group: PgSQLCallbackOrDirect<PgGroupSpec, this>): void {
+  groupBy(
+    group: PgSQLCallbackOrDirect<PgGroupSpec, this | PlantimeEmbeddable>,
+  ): void {
     this.locker.assertParameterUnlocked("groupBy");
     if (this.mode !== "aggregate") {
       throw new SafeError(`Cannot add groupBy to a non-aggregate query`);

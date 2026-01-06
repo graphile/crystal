@@ -310,7 +310,7 @@ export class PgSelectSingleStep<
    * Returns a plan representing the result of an expression.
    */
   public select<TExpressionCodec extends PgCodec>(
-    fragment: PgSQLCallbackOrDirect<SQL, this>,
+    fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
