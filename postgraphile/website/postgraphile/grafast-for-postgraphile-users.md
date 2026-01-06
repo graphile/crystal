@@ -67,10 +67,15 @@ more typically you will want to add your own conditions:
 
 ```ts
 const $users = users.find();
-$users.where(sql`${$users}.is_active = true`);
+$users.where((sql) => sql`${$users}.is_active = true`);
 ```
 
 (Returns a `pgSelect` step.)
+
+When you pass SQL fragments to `.where(...)`, `.having(...)`, or
+`.orderBy(...)`, use the callback form; it provides the `sql` tag so you do not
+need to import it for simple cases, and also enables you to embed more types of
+expressions, reducing the need for explicit placeholders.
 
 #### pgResource.execute()
 

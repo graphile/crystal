@@ -120,11 +120,11 @@ $vulnerabilities.orderBy({
   attribute: "cvss_score",
   direction: "DESC",
 });
-$vulnerabilities.where({
+$vulnerabilities.where((sql) => ({
   attribute: "cvss_score",
   callback: (alias) =>
     sql`${alias} > ${$vulnerabilities.placeholder(constant(6), TYPES.float)}`,
-});
+}));
 $vulnerabilities.setFirst(2);
 $vulnerabilities.setOffset(2);
 ```
