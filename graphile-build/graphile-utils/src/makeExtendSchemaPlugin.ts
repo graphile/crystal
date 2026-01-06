@@ -672,8 +672,20 @@ export function extendSchema(
                     typeof enumValueSpec === "object" &&
                     enumValueSpec != null
                   ) {
-                    const fullConfig = enumValueSpec as EnumValueConfig;
                     // It's a full spec
+                    const fullConfig = enumValueSpec as EnumValueConfig;
+
+                    const keys = Object.keys(fullConfig);
+                    const ALLOWED_KEYS = ["extensions", "apply", "value"];
+                    const forbiddenKeys = keys.filter(
+                      (key) => !ALLOWED_KEYS.includes(key),
+                    );
+                    if (forbiddenKeys.length > 0) {
+                      throw new Error(
+                        `Enum type ${name} value specification for ${valueName} has forbidden keys: ${forbiddenKeys.join(", ")}. If your enum is meant to have an object value, please specify it via a wrapper object with the 'value' key.`,
+                      );
+                    }
+
                     if (fullConfig.extensions) {
                       Object.assign(extensions, fullConfig.extensions);
                     }
