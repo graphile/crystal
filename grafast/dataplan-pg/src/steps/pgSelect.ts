@@ -845,7 +845,7 @@ export class PgSelectStep<
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
    */
-  public join(spec: PgSelectScopedPlanJoin<this>) {
+  public join(spec: PgSelectScopedPlanJoin<this | PlantimeEmbeddable>): void {
     this.joins.push(this.scopedSQL(spec));
   }
 
@@ -859,7 +859,7 @@ export class PgSelectStep<
    * @internal
    */
   public selectAndReturnIndex(
-    fragmentOrCb: PgSQLCallbackOrDirect<SQL, this>,
+    fragmentOrCb: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
   ): number {
     const fragment = this.scopedSQL(fragmentOrCb);
     if (!this.isArgumentsFinalized) {
@@ -2863,7 +2863,8 @@ function buildTheQueryCore<
     shouldReverseOrder: false,
   };
 
-  function selectAndReturnIndex(expression: SQL): number {
+  function selectAndReturnIndex(rawExpression: RuntimeSQLThunk): number {
+    const expression = runtimeScopedSQL(rawExpression);
     const existingIndex = info.selects.findIndex((s) =>
       sql.isEquivalent(s, expression),
     );

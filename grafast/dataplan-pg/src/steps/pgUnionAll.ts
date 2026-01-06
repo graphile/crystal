@@ -41,7 +41,7 @@ import type {
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
-import type { PlantimeEmbeddable } from "../utils.js";
+import type { PlantimeEmbeddable, RuntimeSQLThunk } from "../utils.js";
 import { makeScopedSQL, runtimeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
@@ -278,14 +278,14 @@ export class PgUnionAllSingleStep extends Step {
    * @internal
    */
   public selectAndReturnIndex(
-    rawFragment: PgSQLCallbackOrDirect<SQL, this>,
+    rawFragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
   ): number {
     const fragment = this.scopedSQL(rawFragment);
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
   public select<TExpressionCodec extends PgCodec>(
-    fragment: PgSQLCallbackOrDirect<SQL, this>,
+    fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -722,7 +722,9 @@ on (${sql.indent(
     return index;
   }
 
-  selectAndReturnIndex(rawFragment: PgSQLCallbackOrDirect<SQL, this>): number {
+  selectAndReturnIndex(
+    rawFragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
+  ): number {
     const fragment = this.scopedSQL(rawFragment);
     const existingIndex = this.selects.findIndex(
       (s) =>
@@ -1210,7 +1212,8 @@ function buildTheQuery<
 
   const { values, count } = info.executionDetails;
 
-  function selectAndReturnIndex(expression: SQL): number {
+  function selectAndReturnIndex(rawExpression: RuntimeSQLThunk): number {
+    const expression = runtimeScopedSQL(rawExpression);
     const existingIndex = info.selects.findIndex(
       (s) =>
         s.type === "outerExpression" &&

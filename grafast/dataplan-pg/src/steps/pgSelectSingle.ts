@@ -17,6 +17,7 @@ import type {
   PgSQLCallbackOrDirect,
   PgTypedStep,
 } from "../interfaces.js";
+import type { PlantimeEmbeddable } from "../utils.js";
 import { makeScopedSQL } from "../utils.js";
 import {
   pgClassExpression,
@@ -328,7 +329,7 @@ export class PgSelectSingleStep<
    * @internal
    */
   public selectAndReturnIndex(
-    fragment: PgSQLCallbackOrDirect<SQL, this>,
+    fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
   ): number {
     return this.getClassStep().selectAndReturnIndex(this.scopedSQL(fragment));
   }
