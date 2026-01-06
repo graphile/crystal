@@ -45,11 +45,8 @@ function hasGetPgRoot(t: any): t is { getPgRoot(): PgQueryRootStep } {
   return t != null && typeof t.getPgRoot === "function";
 }
 
-type PlantimeEmbeddable =
-  | PgTypedStep<PgCodec>
-  | PgQueryBuilder
-  | PgConditionLike;
-type RuntimeEmbeddable = PgQueryBuilder | PgConditionLike;
+export type RuntimeEmbeddable = PgQueryBuilder | PgConditionLike;
+export type PlantimeEmbeddable = PgTypedStep<PgCodec>;
 
 export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
   that: TThis,
