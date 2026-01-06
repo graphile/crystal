@@ -866,6 +866,18 @@ input DeleteUserByRowIdInput {
 }"
 `;
 
+exports[`enables setting apply for enum values 1`] = `
+"""The root query type which gives access points into the data universe."""
+type Query {
+  test(enum: TestEnum!): Int
+}
+
+enum TestEnum {
+  ADD_SEVEN
+  SUBTRACT_TWO
+}
+`;
+
 exports[`exposes types even if they're not directly referenced 1`] = `
 type A implements Named {
   name: String!

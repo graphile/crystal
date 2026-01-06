@@ -1,6 +1,14 @@
 import { pgSelect, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
-import { connection, constant, grafast, grafastGraphql, lambda } from "grafast";
+import {
+  connection,
+  constant,
+  ExecutionDetails,
+  grafast,
+  grafastGraphql,
+  lambda,
+  Step,
+} from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import { GraphQLScalarType, printSchema } from "grafast/graphql";
 import { buildSchema, QueryPlugin } from "graphile-build";
@@ -789,4 +797,97 @@ it("exposes types even if they're not directly referenced", async () => {
   const { data, errors } = result;
   expect(errors).toBeFalsy();
   expect(data).toMatchSnapshot();
+});
+
+it("enables setting apply for enum values", async () => {
+  interface Thingy {
+    add(n: number): void;
+    subtract(n: number): void;
+  }
+  class ThingyStep extends Step {
+    private applyDepIds: number[] = [];
+    apply($step: Step<(n: Thingy) => void>) {
+      this.applyDepIds.push(this.addUnaryDependency($step));
+    }
+
+    execute({ values, indexMap }: ExecutionDetails) {
+      return indexMap(() => {
+        let value = 0;
+
+        const thingy: Thingy = {
+          add(n) {
+            value += n;
+          },
+          subtract(n) {
+            value -= n;
+          },
+        };
+        this.applyDepIds.forEach((id) => {
+          values[id].unaryValue()(thingy);
+        });
+
+        return value;
+      });
+    }
+  }
+  const preset: GraphileConfig.Preset = {
+    extends: [PostGraphileAmberPreset],
+    disablePlugins: ["NodePlugin", "QueryQueryPlugin"],
+    plugins: [
+      extendSchema((_build) => ({
+        typeDefs: gql`
+          extend type Query {
+            test(enum: TestEnum!): Int
+          }
+          enum TestEnum {
+            ADD_SEVEN
+            SUBTRACT_TWO
+          }
+        `,
+        objects: {
+          Query: {
+            plans: {
+              test(_$root, fieldArgs) {
+                const $thingy = new ThingyStep();
+                fieldArgs.apply($thingy);
+                return $thingy;
+              },
+            },
+          },
+        },
+        enums: {
+          TestEnum: {
+            values: {
+              ADD_SEVEN(thingy: Thingy) {
+                thingy.add(7);
+              },
+              SUBTRACT_TWO(thingy: Thingy) {
+                thingy.subtract(2);
+              },
+            },
+          },
+        },
+      })),
+    ],
+  };
+  const { schema, resolvedPreset } = await makeSchema(preset);
+  expect(schema).toMatchSnapshot();
+  const result = await grafastGraphql({
+    resolvedPreset,
+    requestContext: {},
+    schema,
+    source: /* GraphQL */ `
+      query {
+        seven: test(enum: ADD_SEVEN)
+        minusTwo: test(enum: SUBTRACT_TWO)
+      }
+    `,
+  });
+  if (!("data" in result)) throw new Error(`Invalid result type`);
+  const { data, errors } = result;
+  expect(errors).toBeFalsy();
+  expect(data).toEqual({
+    seven: 7,
+    minusTwo: -2,
+  });
 });
