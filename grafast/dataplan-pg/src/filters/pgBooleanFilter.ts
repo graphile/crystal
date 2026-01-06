@@ -1,12 +1,12 @@
 import { Modifier } from "grafast";
-import type { SQL, SQLable } from "pg-sql2";
+import type { SQL } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
 import type { PgConditionLike } from "../interfaces.js";
 
 export class PgBooleanFilter
   extends Modifier<PgConditionLike>
-  implements SQLable
+  implements PgConditionLike
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -38,7 +38,11 @@ export class PgBooleanFilter
     this.havingConditions.forEach((condition) => this.parent.having(condition));
   }
 
-  [$$toSQL]() {
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 }

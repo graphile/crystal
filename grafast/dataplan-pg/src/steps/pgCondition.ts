@@ -1,6 +1,8 @@
 import { Modifier } from "grafast";
-import type { SQL, SQLable } from "pg-sql2";
+import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
+
+import type { PgConditionLike } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL
@@ -46,7 +48,7 @@ export class PgCondition<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
   extends Modifier<TParent>
-  implements PgConditionCapableParent, SQLable
+  implements PgConditionCapableParent, PgConditionLike
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -212,7 +214,12 @@ where ${sqlCondition}`})`;
       }
     }
   }
-  [$$toSQL]() {
+
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
+  private [$$toSQL]() {
     return this.alias;
   }
 }

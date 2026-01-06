@@ -433,6 +433,10 @@ export class PgInsertSingleStep<
 
     super.finalize();
   }
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
   private [$$toSQL]() {
     return this.alias;
   }

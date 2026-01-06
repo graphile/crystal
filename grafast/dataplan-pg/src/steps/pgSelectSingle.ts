@@ -563,6 +563,10 @@ export class PgSelectSingleStep<
     return result;
   }
 
+  /**
+   * @deprecated Only present for backwards compatibility, we want TypeScript to reject these embeds.
+   * @internal
+   */
   private [$$toSQL]() {
     return this.getClassStep().alias;
   }
