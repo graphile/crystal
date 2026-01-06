@@ -1,6 +1,6 @@
-import { ExecutableStep, isDev } from "grafast";
+import { ExecutableStep } from "grafast";
 import type { SQL, Transformer } from "pg-sql2";
-import sql, { isSQL } from "pg-sql2";
+import sql from "pg-sql2";
 
 import type { PgResource } from "./datasource.js";
 import type {
@@ -83,9 +83,6 @@ export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
     } else if (hasAlias(value)) {
       return value.alias;
     } else {
-      if (isDev && !isSQL(value)) {
-        console.log(`Expected SQL item, but found`, value);
-      }
       return value;
     }
   };
@@ -104,9 +101,6 @@ const runtimeSQLTransformer: Transformer<RuntimeEmbeddable> = (sql, value) => {
   } else {
     if (value instanceof ExecutableStep) {
       throw new Error(`Cannot reference steps at runtime`);
-    }
-    if (isDev && !isSQL(value)) {
-      console.log(`Expected SQL item, but found`, value);
     }
     return value;
   }
