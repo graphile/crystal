@@ -13,13 +13,13 @@ import {
   asyncIteratorWithCleanup,
   defer,
   exportAs,
+  inspect,
   isAsyncIterable,
   isDev,
 } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
-import { inspect } from "./inspect.js";
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);

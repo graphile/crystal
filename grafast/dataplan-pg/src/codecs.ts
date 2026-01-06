@@ -1,5 +1,5 @@
 import type { JSONValue } from "grafast";
-import { exportAs, isDev, Step } from "grafast";
+import { exportAs, inspect, isDev, Step } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as rangeParse } from "postgres-range";
@@ -36,7 +36,6 @@ import {
   stringifyPolygon,
 } from "./codecUtils/index.js";
 import type { PgExecutor } from "./executor.js";
-import { inspect } from "./inspect.js";
 import type {
   PgCodec,
   PgCodecExtensions,

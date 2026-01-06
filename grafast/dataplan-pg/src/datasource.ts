@@ -7,6 +7,7 @@ import {
   constant,
   ExecutableStep,
   exportAs,
+  inspect,
   partitionByIndex,
 } from "grafast";
 import type { SQL } from "pg-sql2";
@@ -26,7 +27,6 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor.js";
-import { inspect } from "./inspect.js";
 import type {
   Expand,
   GetPgCodecAttributes,
