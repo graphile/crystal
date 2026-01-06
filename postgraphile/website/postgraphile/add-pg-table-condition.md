@@ -46,7 +46,6 @@ export default addPgTableCondition(
   { schemaName: "app_public", tableName: "forums" },
   "idIn",
   (build) => {
-    const { sql } = build;
     const { sqlValueWithCodec, listOfCodec, TYPES } = build.dataplanPg;
     const { GraphQLList, GraphQLNonNull, GraphQLInt } = build.graphql;
     return {
@@ -56,10 +55,11 @@ export default addPgTableCondition(
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
       apply(condition /* : PgCondition */, ids) {
         condition.where(
-          sql`${condition.alias}.id = ANY(${sqlValueWithCodec(
-            ids,
-            listOfCodec(TYPES.int),
-          )})`,
+          (sql) =>
+            sql`${condition.alias}.id = ANY(${sqlValueWithCodec(
+              ids,
+              listOfCodec(TYPES.int),
+            )})`,
         );
       },
     };
@@ -81,7 +81,6 @@ export default addPgTableCondition(
   { schemaName: "app_public", tableName: "forums" },
   "containsPostsByUserId",
   (build) => {
-    const { sql } = build;
     const { sqlValueWithCodec, TYPES } = build.dataplanPg;
     const { GraphQLInt } = build.graphql;
     return {
@@ -90,13 +89,18 @@ export default addPgTableCondition(
         "contain posts written by the specified user.",
       type: GraphQLInt,
       apply(condition /* : PgCondition */, userId) {
-        const sqlIdentifier = sql.identifier(Symbol("postsByUser"));
-        condition.where(sql`exists(
-          select 1
-          from app_public.posts as ${sqlIdentifier}
-          where ${sqlIdentifier}.forum_id = ${condition.alias}.id
-          and ${sqlIdentifier}.user_id = ${sqlValueWithCodec(userId, TYPES.int)}
-        )`);
+        condition.where((sql) => {
+          const sqlIdentifier = sql.identifier(Symbol("postsByUser"));
+          return sql`exists(
+            select 1
+            from app_public.posts as ${sqlIdentifier}
+            where ${sqlIdentifier}.forum_id = ${condition.alias}.id
+            and ${sqlIdentifier}.user_id = ${sqlValueWithCodec(
+              userId,
+              TYPES.int,
+            )}
+          )`;
+        });
       },
     };
   },
@@ -199,8 +203,8 @@ Also inside `fieldSpecGenerator` should be an `applyPlan`, which indicates how
 this condition should work. It is passed two arguments, the `condition` (which
 is a `PgConditionStep` wrapping the `PgSelectStep` that we’re applying
 conditions to) and the `value` (which is a `FieldArgs` instance representing
-the value of the field). The `applyPlan` should use `conditon.where(...)` to
-apply a condition to the fetch.
+the value of the field). The `applyPlan` should use
+`condition.where((sql) => ...)` to apply a condition to the fetch.
 
 When the field named in `conditionFieldName` is used in a query, the
 `applyPlan` is called during planning, which results in an additional `WHERE`

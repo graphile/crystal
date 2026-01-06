@@ -645,7 +645,9 @@ export const MyProductReviewsPlugin = extendSchema((build) => {
           reviews($product) {
             const $productId = $product.get("id");
             const $reviews = reviews.find();
-            $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+            $reviews.where(
+              (sql) => sql`${$reviews}.product_id = ${$productId}`,
+            );
 
             // highlight-next-line
             return connection($reviews);

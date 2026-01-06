@@ -803,8 +803,9 @@ dealing with a `PgSelectStep` (`$pgSelect`) in V5. Note that these are
 significantly different things, but they do have some parallels:
 
 - `QueryBuilder.getTableAlias()` -> `$pgSelect.alias`
-- `QueryBuilder.where(fragment)` -> `$pgSelect.where(fragment)`
-- `QueryBuilder.orderBy(...)` -> `$pgSelect.orderBy(...)` (arguments differ, see TypeScript for details)
+- `QueryBuilder.where(...)` -> `$pgSelect.where((sql) => ...)`
+- `QueryBuilder.orderBy(...)` -> `$pgSelect.orderBy((sql) => ...)`
+  (arguments differ, see TypeScript for details)
 
 Note that it's common to be dealing with a `PgSelectSingleStep`
 (`$pgSelectSingle`) when you're looking at a single record rather than the
@@ -822,7 +823,7 @@ queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not null`);
 
 // V5
 const $archivedAt = $parent.get("archived_at");
-$pgSelect.where(sql`${$archivedAt} is not null`);
+$pgSelect.where((sql) => sql`${$archivedAt} is not null`);
 ```
 
 :::info
