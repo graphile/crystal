@@ -2,16 +2,17 @@ import type {
   AbstractTypePlanner,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
+  EnumValueConfig,
   GrafastSchemaConfig,
   ObjectFieldConfig,
   ObjectPlan as GrafastObjectPlan,
   PlanTypeInfo,
   Step,
 } from "grafast";
+// ONLY import types here, not values
 import type {
   DirectiveDefinitionNode,
   DirectiveLocation,
-  // Nodes:
   DirectiveNode,
   DocumentNode,
   EnumTypeDefinitionNode,
@@ -20,16 +21,13 @@ import type {
   GraphQLArgumentConfig,
   GraphQLDirective,
   GraphQLEnumType,
-  // Config:
   GraphQLEnumValueConfigMap,
+  GraphQLEnumValueExtensions,
   GraphQLFieldConfigMap,
-  // Resolvers:
   GraphQLFieldResolver,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
-  // ONLY import types here, not values
-  // Misc:
   GraphQLIsTypeOfFn,
   GraphQLNamedOutputType,
   GraphQLNamedType,
@@ -38,7 +36,6 @@ import type {
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
-  // Union types:
   GraphQLType,
   GraphQLTypeResolver,
   GraphQLUnionType,
@@ -652,10 +649,51 @@ export function extendSchema(
                   //   }
                   // }
                   // Ref: https://github.com/graphql/graphql-js/issues/525#issuecomment-255834625
-                  const valueValue =
-                    relevantResolver[valueName] !== undefined
-                      ? relevantResolver[valueName]
-                      : valueName;
+                  const enumValueSpec = relevantResolver[valueName];
+
+                  const extensions: GraphQLEnumValueExtensions =
+                    Object.create(null);
+                  build.exportNameHint(
+                    extensions,
+                    `${name}_${valueName}_extensions`,
+                  );
+
+                  let valueValue;
+                  if (typeof enumValueSpec === "function") {
+                    build.exportNameHint(
+                      enumValueSpec,
+                      `${name}_${valueName}_apply`,
+                    );
+                    // It's a plan
+                    extensions.grafast = {
+                      apply: enumValueSpec,
+                    } as Grafast.EnumValueExtensions;
+                  } else if (
+                    typeof enumValueSpec === "object" &&
+                    enumValueSpec != null
+                  ) {
+                    const fullConfig = enumValueSpec as EnumValueConfig;
+                    // It's a full spec
+                    if (fullConfig.extensions) {
+                      Object.assign(extensions, fullConfig.extensions);
+                    }
+                    if (fullConfig.apply) {
+                      build.exportNameHint(
+                        fullConfig.apply,
+                        `${name}_${valueName}_apply`,
+                      );
+                      extensions.grafast = {
+                        apply: fullConfig.apply,
+                      } as Grafast.EnumValueExtensions;
+                    }
+                    if ("value" in fullConfig) {
+                      valueValue = fullConfig.value;
+                    }
+                  } else {
+                    // It must be the value
+                    valueValue = enumValueSpec;
+                  }
+                  valueValue ??= valueName;
 
                   const deprecatedDirective = valueDirectives.find(
                     (d) => d.directiveName === "deprecated",
@@ -669,6 +707,10 @@ export function extendSchema(
                       deprecationReason: valueDeprecationReason,
                       description: valueDescription,
                       directives: valueDirectives,
+                      extensions:
+                        Object.keys(extensions).length > 0
+                          ? extensions
+                          : undefined,
                     },
                   };
                 },
