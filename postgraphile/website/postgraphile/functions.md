@@ -296,9 +296,7 @@ export const MyPlugin = extendSchema((build) => {
                   // SQL query before it is executed
                   (queryBuilder) => {
                     if (!includeArchived) {
-                      queryBuilder.where(
-                        (sql) => sql`archived_at is null`,
-                      );
+                      queryBuilder.where((sql) => sql`archived_at is null`);
                     }
                   },
               ),
