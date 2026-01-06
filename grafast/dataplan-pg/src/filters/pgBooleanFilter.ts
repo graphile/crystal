@@ -3,6 +3,8 @@ import type { SQL } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
 import type { PgConditionLike } from "../interfaces.js";
+import type { RuntimeSQLThunk } from "../utils.js";
+import { runtimeScopedSQL } from "../utils.js";
 
 export class PgBooleanFilter
   extends Modifier<PgConditionLike>
@@ -16,21 +18,20 @@ export class PgBooleanFilter
   private conditions: SQL[] = [];
   private havingConditions: SQL[] = [];
   public alias: SQL;
+  public readonly expression;
 
-  constructor(
-    classFilter: PgConditionLike,
-    public readonly expression: SQL,
-  ) {
+  constructor(classFilter: PgConditionLike, expression: RuntimeSQLThunk) {
     super(classFilter);
     this.alias = classFilter.alias;
+    this.expression = runtimeScopedSQL(expression);
   }
 
-  where(condition: SQL) {
-    this.conditions.push(condition);
+  where(condition: RuntimeSQLThunk) {
+    this.conditions.push(runtimeScopedSQL(condition));
   }
 
-  having(condition: SQL) {
-    this.havingConditions.push(condition);
+  having(condition: RuntimeSQLThunk) {
+    this.havingConditions.push(runtimeScopedSQL(condition));
   }
 
   apply() {

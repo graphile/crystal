@@ -41,7 +41,8 @@ import type {
   ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import { PgLocker } from "../pgLocker.js";
-import { makeScopedSQL } from "../utils.js";
+import type { PlantimeEmbeddable } from "../utils.js";
+import { makeScopedSQL, runtimeScopedSQL } from "../utils.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import type {
@@ -820,10 +821,7 @@ on (${sql.indent(
   }
 
   where(
-    rawWhereSpec: PgSQLCallbackOrDirect<
-      PgWhereConditionSpec<TAttributes>,
-      this
-    >,
+    rawWhereSpec: PgWhereConditionSpec<TAttributes, this | PlantimeEmbeddable>,
   ): void {
     if (this.locker.locked) {
       throw new Error(
@@ -857,7 +855,7 @@ on (${sql.indent(
   }
 
   having(
-    rawCondition: PgSQLCallbackOrDirect<PgHavingConditionSpec<string>, this>,
+    rawCondition: PgHavingConditionSpec<string, this | PlantimeEmbeddable>,
   ): void {
     if (this.locker.locked) {
       throw new Error(
@@ -1270,7 +1268,8 @@ function buildTheQuery<
     setOrderIsUnique() {
       info.isOrderUnique = true;
     },
-    where(whereSpec) {
+    where(rawWhereSpec) {
+      const whereSpec = runtimeScopedSQL(rawWhereSpec);
       for (const digest of info.memberDigests) {
         const { alias: tableAlias, symbol } = digest;
         if (sql.isSQL(whereSpec)) {
@@ -1290,7 +1289,8 @@ function buildTheQuery<
         }
       }
     },
-    having(condition) {
+    having(rawCondition) {
+      const condition = runtimeScopedSQL(rawCondition);
       if (info.mode !== "aggregate") {
         throw new SafeError(`Cannot add having to a non-aggregate query`);
       }

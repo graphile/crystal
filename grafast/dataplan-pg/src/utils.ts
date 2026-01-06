@@ -46,11 +46,18 @@ function hasGetPgRoot(t: any): t is { getPgRoot(): PgQueryRootStep } {
 }
 
 export type RuntimeEmbeddable = PgQueryBuilder | PgConditionLike;
-export type PlantimeEmbeddable = PgTypedStep<PgCodec>;
+/**
+ * At plantime we can embed a PgTypedStep, or anything that can be embedded at
+ * runtime (since if an argument is a constant rather than variable, we may be
+ * able to evaluate its value at plantime as an optimization).
+ */
+export type PlantimeEmbeddable = PgTypedStep<PgCodec> | RuntimeEmbeddable;
+
+export type RuntimeSQLThunk = PgSQLCallbackOrDirect<SQL, RuntimeEmbeddable>;
 
 export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
   that: TThis,
-): <T>(cb: PgSQLCallbackOrDirect<T, TThis | PgTypedStep>) => T {
+): <T>(cb: PgSQLCallbackOrDirect<T, TThis | PlantimeEmbeddable>) => T {
   function isThis(value: any): value is TThis {
     return value === that;
   }
@@ -82,11 +89,11 @@ export function makeScopedSQL<TThis extends { placeholder(value: any): SQL }>(
       return value;
     }
   };
-  return <T>(cb: PgSQLCallbackOrDirect<T, TThis | PgTypedStep>) =>
+  return <T>(cb: PgSQLCallbackOrDirect<T, TThis | PlantimeEmbeddable>) =>
     typeof cb === "function"
       ? sql.withTransformer(
           sqlTransformer,
-          cb as PgSQLCallback<T, TThis | PgTypedStep>,
+          cb as PgSQLCallback<T, TThis | PlantimeEmbeddable>,
         )
       : cb;
 }

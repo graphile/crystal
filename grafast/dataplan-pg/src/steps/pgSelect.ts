@@ -63,6 +63,7 @@ import type {
 } from "../interfaces.js";
 import { parseArray } from "../parseArray.js";
 import { PgLocker } from "../pgLocker.js";
+import type { PlantimeEmbeddable } from "../utils.js";
 import { runtimeScopedSQL } from "../utils.js";
 import { PgClassExpressionStep } from "./pgClassExpression.js";
 import type {
@@ -917,9 +918,9 @@ export class PgSelectStep<
   }
 
   where(
-    rawCondition: PgSQLCallbackOrDirect<
-      PgWhereConditionSpec<keyof GetPgResourceAttributes<TResource> & string>,
-      this | PgTypedStep
+    rawCondition: PgWhereConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string,
+      this | PlantimeEmbeddable
     >,
   ): void {
     if (this.locker.locked) {
@@ -960,9 +961,9 @@ export class PgSelectStep<
   }
 
   having(
-    rawCondition: PgSQLCallbackOrDirect<
-      PgHavingConditionSpec<keyof GetPgResourceAttributes<TResource> & string>,
-      this
+    rawCondition: PgHavingConditionSpec<
+      keyof GetPgResourceAttributes<TResource> & string,
+      this | PlantimeEmbeddable
     >,
   ): void {
     if (this.locker.locked) {
@@ -983,7 +984,9 @@ export class PgSelectStep<
     }
   }
 
-  orderBy(order: PgSQLCallbackOrDirect<PgOrderSpec, this>): void {
+  orderBy(
+    order: PgSQLCallbackOrDirect<PgOrderSpec, this | PlantimeEmbeddable>,
+  ): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(this.scopedSQL(order));
   }
@@ -2938,7 +2941,8 @@ function buildTheQueryCore<
       info.relationJoins.set(relationIdentifier, alias);
       return alias;
     },
-    where(condition) {
+    where(rawCondition) {
+      const condition = runtimeScopedSQL(rawCondition);
       if (sql.isSQL(condition)) {
         info.conditions.push(condition);
       } else {
@@ -2962,7 +2966,8 @@ function buildTheQueryCore<
     groupBy(spec) {
       info.groups.push(spec);
     },
-    having(condition) {
+    having(rawCondition) {
+      const condition = runtimeScopedSQL(rawCondition);
       if (info.mode !== "aggregate") {
         throw new SafeError(`Cannot add having to a non-aggregate query`);
       }

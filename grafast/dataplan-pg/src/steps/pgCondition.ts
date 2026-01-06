@@ -2,11 +2,17 @@ import { Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
-import type { PgConditionLike } from "../interfaces.js";
+import type { PgConditionLike, PgSQLCallbackOrDirect } from "../interfaces.js";
+import type { RuntimeEmbeddable } from "../utils.js";
+import { runtimeScopedSQL } from "../utils.js";
 
-export type PgWhereConditionSpec<TAttribute extends string> =
-  | SQL
-  | PgWhereConditionAttributeSpec<TAttribute>;
+export type PgWhereConditionSpec<
+  TAttribute extends string,
+  TMoreEmbeds = never,
+> = PgSQLCallbackOrDirect<
+  SQL | PgWhereConditionAttributeSpec<TAttribute>,
+  RuntimeEmbeddable | TMoreEmbeds
+>;
 
 export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
   type: "attribute";
@@ -14,7 +20,10 @@ export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
   callback: (fragment: SQL) => SQL;
 }
 
-export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
+export type PgHavingConditionSpec<
+  _TAttribute extends string,
+  TMoreEmbeds = never,
+> = PgSQLCallbackOrDirect<SQL, RuntimeEmbeddable | TMoreEmbeds>;
 // | ...
 
 export interface PgConditionCapableParent {
@@ -231,7 +240,8 @@ export function pgWhereConditionSpecListToSQL(
   transform: (frag: SQL) => SQL = (frag) => frag,
 ): SQL | null {
   const mappedConditions = [];
-  for (const c of conditions) {
+  for (const rawC of conditions) {
+    const c = runtimeScopedSQL(rawC);
     if (sql.isSQL(c)) {
       if (sql.isEquivalent(c, sql.blank)) {
         continue;

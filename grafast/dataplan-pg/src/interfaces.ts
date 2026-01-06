@@ -18,6 +18,7 @@ import type { PgSelectQueryBuilder } from "./steps/pgSelect.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
 import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.js";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+import type { RuntimeSQLThunk } from "./utils.js";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -463,8 +464,8 @@ export type PlanByUniques<
 
 export type PgConditionLike = Modifier<any> & {
   alias: SQL;
-  where(condition: SQL): void;
-  having(condition: SQL): void;
+  where(condition: RuntimeSQLThunk): void;
+  having(condition: RuntimeSQLThunk): void;
 };
 
 export type KeysOfType<TObject, TValueType> = {
