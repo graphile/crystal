@@ -348,7 +348,6 @@ const preset: GraphileConfig.Preset = {
     StreamDeferPlugin,
     extendSchema((build) => {
       const {
-        sql,
         dataplanPg: { TYPES },
       } = build;
       return {
