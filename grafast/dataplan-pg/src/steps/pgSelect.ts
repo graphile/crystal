@@ -29,7 +29,6 @@ import {
   isPromiseLike,
   lambda,
   maybeArraysMatch,
-  noop,
   reverseArray,
   SafeError,
   Step,
