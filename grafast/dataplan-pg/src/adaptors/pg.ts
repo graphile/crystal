@@ -530,7 +530,13 @@ export class PgSubscriber<
 
     function doFinally(value?: unknown, error?: Error) {
       if (finished === null) {
-        finished = error ? Promise.reject(error) : { done: true, value };
+        if (error) {
+          finished = Promise.reject(error);
+          // Avoid unhandled promise rejection errors
+          finished.then(null, noop);
+        } else {
+          finished = { done: true, value };
+        }
         if (queue.length > 0) {
           const promises = queue.splice(0, queue.length);
           promises.forEach((p) => p.resolve(finished!));
