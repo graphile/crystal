@@ -9,10 +9,6 @@
     "declarationMap": true,
     "allowJs": false,
 
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "target": "ES2022",
-    "lib": ["ES2022", "ESNext.Disposable"],
     // This has runtime performance overhead! Specifically it means a lot of
     // time is spent in 'instance_members_initializer' in V8. Disable.
     "useDefineForClassFields": false,

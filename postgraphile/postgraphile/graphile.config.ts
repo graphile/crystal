@@ -348,7 +348,6 @@ const preset: GraphileConfig.Preset = {
     StreamDeferPlugin,
     extendSchema((build) => {
       const {
-        sql,
         dataplanPg: { TYPES },
       } = build;
       return {
@@ -389,18 +388,18 @@ const preset: GraphileConfig.Preset = {
           Person: {
             plans: {
               greet: EXPORTABLE(
-                (TYPES, sql) =>
+                (TYPES) =>
                   ($user: PgSelectSingleStep, { $greeting }) => {
                     const placeholderSql = $user.placeholder(
                       $greeting,
                       TYPES.text,
                     );
                     return $user.select(
-                      sql`${placeholderSql} || ', ' || ${$user}.name`,
+                      (sql) => sql`${placeholderSql} || ', ' || ${$user}.name`,
                       TYPES.text,
                     );
                   },
-                [TYPES, sql],
+                [TYPES],
               ),
               query: EXPORTABLE(
                 (constant) => () => {
