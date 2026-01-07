@@ -224,18 +224,15 @@ const finalize = (
       promise.then(
         () => {
           iterator.push({ hasNext: false });
-          const result = iterator.return(undefined);
-          result.then(null, noop);
+          iterator.return(undefined).then(null, noop);
         },
         (e) => {
-          const result = iterator.throw(e);
-          result.then(null, noop);
+          iterator.throw(e).then(null, noop);
         },
       );
     } else {
       iterator.push({ hasNext: false });
-      const result = iterator.return(undefined);
-      result.then(null, noop);
+      iterator.return(undefined).then(null, noop);
     }
 
     return iterator;
@@ -517,8 +514,7 @@ function executePreemptive(
             break;
           }
           if (!next) {
-            const result = iterator.throw(new Error("Invalid iteration"));
-            result.then(null, noop);
+            iterator.throw(new Error("Invalid iteration")).then(null, noop);
             break;
           }
           const { done, value } = next;
@@ -764,8 +760,7 @@ function newIterator<T = any>(
               } catch (e) {
                 // ignore
               }
-              const result = this.throw(e);
-              result.then(null, noop);
+              this.throw(e).then(null, noop);
             },
           );
         } else {

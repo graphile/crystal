@@ -1255,8 +1255,7 @@ export class PgSelectStep<
             } else if (streamInitialCount != null && l < streamInitialCount) {
               done = true;
               const r = innerIterator.return?.();
-              r?.then(null, noop);
-              return Promise.resolve({ value: undefined, done });
+              return r ?? Promise.resolve({ value: undefined, done });
             } else {
               return innerIterator.next();
             }

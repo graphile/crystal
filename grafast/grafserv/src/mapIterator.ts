@@ -52,14 +52,12 @@ export function mapIterator<T, U>(
     },
     return(value) {
       status = 2;
-      const r = iterator.return?.(value);
-      r?.then(null, noop);
+      iterator.return?.(value)?.then(null, noop);
       return Promise.resolve({ value: undefined, done: true });
     },
     throw(error) {
       status = 2;
-      const r = iterator.throw?.(error);
-      r?.then(null, noop);
+      iterator.throw?.(error)?.then(null, noop);
       return Promise.reject(error);
     },
     [Symbol.asyncIterator]() {

@@ -381,8 +381,7 @@ export function distributor<TData>(
     }
 
     const onAbort = () => {
-      const result = iterator.return();
-      result.then(null, noop);
+      iterator.return().then(null, noop);
     };
     const iterator = {
       [Symbol.asyncIterator]() {

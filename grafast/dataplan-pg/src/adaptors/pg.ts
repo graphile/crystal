@@ -660,8 +660,7 @@ export class PgSubscriber<
           Object.values(this.topics).forEach((iterators) => {
             if (iterators) {
               for (const iterator of iterators) {
-                const r = iterator.throw!(e);
-                r.then(null, noop);
+                iterator.throw!(e).then(null, noop);
               }
             }
           });
@@ -741,11 +740,9 @@ export class PgSubscriber<
       for (const topic of Object.keys(this.topics)) {
         for (const asyncIterableIterator of this.topics[topic]!) {
           if (asyncIterableIterator.return) {
-            const result = asyncIterableIterator.return();
-            result.then(null, noop);
+            asyncIterableIterator.return().then(null, noop);
           } else if (asyncIterableIterator.throw) {
-            const result = asyncIterableIterator.throw(new Error("Released"));
-            result.then(null, noop);
+            asyncIterableIterator.throw(new Error("Released")).then(null, noop);
           } else {
             // What do we do now?!
             // TYPES: if instead of using an AsyncIterableIterator we required it was an AsyncGenerator then this problem would go away.

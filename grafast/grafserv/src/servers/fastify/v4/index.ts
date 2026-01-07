@@ -143,11 +143,9 @@ export class FastifyGrafserv extends GrafservBase {
           if (!bufferIteratorHandled) {
             try {
               if (bufferIterator.return) {
-                const result = bufferIterator.return();
-                result.then(null, noop);
+                bufferIterator.return().then(null, noop);
               } else if (bufferIterator.throw) {
-                const result = bufferIterator.throw(e);
-                result.then(null, noop);
+                bufferIterator.throw(e).then(null, noop);
               }
             } catch (e2) {
               /* nom nom nom */
