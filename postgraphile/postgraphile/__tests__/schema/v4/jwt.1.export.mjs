@@ -8166,7 +8166,7 @@ export const scalars = {
           memo[attributeName] = value[attributeName];
         }
         return memo;
-      }, {});
+      }, Object.create(null));
       const options = Object.assign(Object.create(null), undefined, token.aud || undefined && undefined.audience ? null : {
         audience: "postgraphile"
       }, token.iss || undefined && undefined.issuer ? null : {
