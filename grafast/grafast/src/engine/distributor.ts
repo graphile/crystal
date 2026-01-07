@@ -156,14 +156,18 @@ export function distributor<TData>(
           if (isPromiseLike(r)) {
             r.then(null, noop);
           }
-        } catch {}
+        } catch {
+          /*noop*/
+        }
       } else if (iterator?.throw) {
         try {
           const r = iterator.throw(new Error("Stop"));
           if (isPromiseLike(r)) {
             r.then(null, noop);
           }
-        } catch {}
+        } catch {
+          /*noop*/
+        }
       } else {
         // Just ignore it? Or do we need to call `.next()` indefinitely?
         // Since it could be infinite, the next chain doesn't make sense, so

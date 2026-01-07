@@ -1535,7 +1535,9 @@ export function terminateIterable(
     try {
       const result = iterable.return();
       if (isPromiseLike(result)) result.then(null, noop);
-    } catch {}
+    } catch {
+      /*noop*/
+    }
   }
 }
 

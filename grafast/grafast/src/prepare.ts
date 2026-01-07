@@ -173,7 +173,9 @@ function releaseUnusedIterators(
         try {
           const result = stream.return();
           if (isPromiseLike(result)) result.then(null, noop);
-        } catch {}
+        } catch {
+          /*noop*/
+        }
       } else if (stream.throw) {
         try {
           const result = stream.throw(
@@ -182,7 +184,9 @@ function releaseUnusedIterators(
             ),
           );
           if (isPromiseLike(result)) result.then(null, noop);
-        } catch {}
+        } catch {
+          /*noop*/
+        }
       }
     }
   }
@@ -490,14 +494,18 @@ function executePreemptive(
             if (isPromiseLike(result)) {
               result.then(null, noop);
             }
-          } catch {}
+          } catch {
+            /*noop*/
+          }
         } else {
           try {
             const result = stream.return?.();
             if (isPromiseLike(result)) {
               result.then(null, noop);
             }
-          } catch {}
+          } catch {
+            /*noop*/
+          }
         }
       });
       (async () => {

@@ -5,7 +5,7 @@ import {
   withSuperuserPgClientFromPgService,
 } from "@dataplan/pg";
 import type { PromiseOrDirect, Step } from "grafast";
-import { constant, context, defer, noop, object } from "grafast";
+import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
