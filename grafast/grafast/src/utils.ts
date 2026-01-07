@@ -640,10 +640,13 @@ function inputObjectSpec<TParent>(
     fields: () => {
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
-      const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = inputObjectFieldSpec(fields[key], `${spec.name}.${key}`);
-        return o;
-      }, Object.create(null) as GraphQLInputFieldConfigMap);
+      const modifiedFields = Object.keys(fields).reduce(
+        (o, key) => {
+          o[key] = inputObjectFieldSpec(fields[key], `${spec.name}.${key}`);
+          return o;
+        },
+        Object.create(null) as GraphQLInputFieldConfigMap,
+      );
       return modifiedFields;
     },
   };
