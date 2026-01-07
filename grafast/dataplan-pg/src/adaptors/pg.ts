@@ -539,7 +539,8 @@ export class PgSubscriber<
         }
         if (queue.length > 0) {
           const promises = queue.splice(0, queue.length);
-          promises.forEach((p) => p.resolve(finished!));
+          const f = finished; // Appease TypeScript
+          promises.forEach((p) => p.resolve(f));
         }
         eventEmitter.removeListener(topic as string, recv);
         // Every code path above this has to go through a `yield` and thus
