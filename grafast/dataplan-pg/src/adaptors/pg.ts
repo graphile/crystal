@@ -524,16 +524,23 @@ export class PgSubscriber<
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     const { eventEmitter, topics } = this;
-    const stack: any[] = [];
-    const queue: Deferred<any>[] = [];
-    let finished: IteratorReturnResult<any> | false = false;
+    const stack: Array<TTopics[TTopic]> = [];
+    const queue: Array<Deferred<IteratorResult<TTopics[TTopic]>>> = [];
+    let finished: IteratorReturnResult<unknown> | Promise<never> | null = null;
 
-    function doFinally(value?: any) {
-      if (!finished) {
-        finished = { done: true, value };
-        if (queue) {
+    function doFinally(value?: unknown, error?: Error) {
+      if (finished === null) {
+        if (error) {
+          finished = Promise.reject(error);
+          // Avoid unhandled promise rejection errors
+          finished.then(null, noop);
+        } else {
+          finished = { done: true, value };
+        }
+        if (queue.length > 0) {
           const promises = queue.splice(0, queue.length);
-          promises.forEach((p) => p.resolve(finished));
+          const f = finished; // Appease TypeScript
+          promises.forEach((p) => p.resolve(f));
         }
         eventEmitter.removeListener(topic as string, recv);
         // Every code path above this has to go through a `yield` and thus
@@ -550,37 +557,36 @@ export class PgSubscriber<
       return finished;
     }
 
-    const asyncIterableIterator: AsyncIterableIterator<any> = {
+    const asyncIterableIterator: AsyncIterableIterator<TTopics[TTopic]> = {
       [Symbol.asyncIterator]() {
         return this;
       },
       async next() {
         if (stack.length > 0) {
-          const value = await stack.shift();
+          const value = stack.shift() as TTopics[TTopic];
           return { done: false, value };
         } else if (finished) {
           return finished;
         } else {
           // This must be done synchronously - there must be **NO AWAIT BEFORE THIS**
-          const waiting = defer();
+          const waiting = defer<IteratorResult<TTopics[TTopic]>>();
           queue.push(waiting);
 
-          const value = await waiting;
-          return { done: false, value };
+          return waiting;
         }
       },
       async return(value) {
         return doFinally(value);
       },
-      async throw() {
-        return doFinally();
+      async throw(e) {
+        return doFinally(undefined, e);
       },
     };
 
-    function recv(payload: any) {
-      if (queue.length > 0) {
-        const first = queue.shift();
-        first!.resolve(payload);
+    function recv(payload: TTopics[TTopic]) {
+      const first = queue.shift();
+      if (first) {
+        first.resolve({ done: false, value: payload });
       } else {
         stack.push(payload);
       }
