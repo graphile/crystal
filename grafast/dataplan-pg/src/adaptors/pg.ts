@@ -526,11 +526,11 @@ export class PgSubscriber<
     const { eventEmitter, topics } = this;
     const stack: Array<TTopics[TTopic]> = [];
     const queue: Array<Deferred<IteratorResult<TTopics[TTopic]>>> = [];
-    let finished: IteratorReturnResult<unknown> | null = null;
+    let finished: IteratorReturnResult<unknown> | Promise<never> | null = null;
 
-    function doFinally(value?: unknown) {
+    function doFinally(value?: unknown, error?: Error) {
       if (finished === null) {
-        finished = { done: true, value };
+        finished = error ? Promise.reject(error) : { done: true, value };
         if (queue.length > 0) {
           const promises = queue.splice(0, queue.length);
           promises.forEach((p) => p.resolve(finished!));
@@ -571,8 +571,8 @@ export class PgSubscriber<
       async return(value) {
         return doFinally(value);
       },
-      async throw() {
-        return doFinally();
+      async throw(e) {
+        return doFinally(undefined, e);
       },
     };
 
