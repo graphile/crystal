@@ -35,6 +35,8 @@ import {
 import { version } from "../version.js";
 import { watchFixtures } from "../watchFixtures.js";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /** Someone else created */
 const CLASH_CODES = ["23505", "42P06", "42P07", "42710"];
 
@@ -684,11 +686,19 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           }
         }
         try {
-          const eventStream =
+          let eventStream =
             await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
           const abort = defer<typeof $$stop>();
           unlistens.push(() => abort.resolve($$stop));
+          const regather = () => {
+            // Delete the introspection results
+            info.cache.introspectionResultsPromise = null;
+            // Deleting the introspection results is not sufficient since they might be replaced before gather runs again
+            info.cache.dirty = true;
+            // Trigger re-gather
+            callback();
+          };
           const waitNext = () => {
             const next = Promise.race([abort, eventStream.next()]);
             next.then(
@@ -696,34 +706,54 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 if (event === $$stop) {
                   // Terminate the stream
                   if (eventStream.return) {
-                    eventStream.return();
+                    const result = eventStream.return();
+                    result.then(null, noop);
                   } else if (eventStream.throw) {
-                    eventStream.throw(
+                    const result = eventStream.throw(
                       new Error("Please stop streaming events now."),
                     );
+                    result.then(null, noop);
                   }
                 } else {
-                  try {
-                    // Delete the introspection results
-                    info.cache.introspectionResultsPromise = null;
-                    // Deleting the introspection results is not sufficient since they might be replaced before gather runs again
-                    info.cache.dirty = true;
-                    // Trigger re-gather
-                    callback();
-                  } finally {
-                    // Wait for the next event
-                    waitNext();
+                  if (event.done) {
+                    // This should never happen
+                    return restart();
+                  } else {
+                    try {
+                      regather();
+                    } finally {
+                      // Wait for the next event
+                      waitNext();
+                    }
                   }
                 }
               },
               (e) => {
-                console.error(
-                  `Unexpected error occurred while watching pgService '${pgService.name}' for schema changes.`,
-                  e,
-                );
-                abort.resolve($$stop);
+                return restart(e);
               },
             );
+          };
+          let attempts = 0;
+          const restart = async (e?: Error) => {
+            attempts++;
+            let delay = 50 * Math.pow(1.5, attempts - 1);
+            const MAX_DELAY = 30_000;
+            if (delay > MAX_DELAY) delay = MAX_DELAY * (Math.random() + 0.5);
+            console.error(
+              `postgraphile_watch subscription failed (${e}); waiting ${delay.toFixed(0)}ms then re-establishing`,
+            );
+            const result = await Promise.race([sleep(delay), abort]);
+            if (result === $$stop) {
+              return;
+            }
+            try {
+              eventStream =
+                await pgService.pgSubscriber!.subscribe("postgraphile_watch");
+            } catch (e) {
+              return restart(e);
+            }
+            regather();
+            waitNext();
           };
           waitNext();
         } catch (e) {
