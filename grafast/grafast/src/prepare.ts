@@ -230,7 +230,8 @@ const finalize = (
       );
     } else {
       iterator.push({ hasNext: false });
-      iterator.return(undefined);
+      const result = iterator.return(undefined);
+      result.then(null, noop);
     }
 
     return iterator;
@@ -527,13 +528,12 @@ function executePreemptive(
           }
           i++;
         }
-      })().then(
-        () => iterator.return(),
-        (e) => {
-          const result = iterator.throw(e);
-          result.then(null, noop);
-        },
-      );
+      })()
+        .then(
+          () => iterator.return(),
+          (e) => iterator.throw(e),
+        )
+        .then(null, noop);
       return iterator;
     }
 
