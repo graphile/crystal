@@ -431,7 +431,7 @@ const preset: GraphileConfig.Preset = {
         }
         extend type Subscription {
           sub(topic: String!): Int
-          gql: Int
+          gql(max: Int! = 10): Int
           slow: String
         }
       `,
@@ -469,8 +469,8 @@ const preset: GraphileConfig.Preset = {
               ),
               subscribe: EXPORTABLE(
                 (sleep) =>
-                  async function* subscribe() {
-                    for (let i = 0; i < 10; i++) {
+                  async function* subscribe(_, { max }) {
+                    for (let i = 1; i <= max; i++) {
                       yield i;
                       await sleep(300);
                     }
@@ -506,6 +506,7 @@ const preset: GraphileConfig.Preset = {
       typeDefs: /* GraphQL */ `
         extend type Subscription {
           error: Int
+          errorAfter(n: Int! = 3): Int
         }
       `,
       objects: {
@@ -520,6 +521,26 @@ const preset: GraphileConfig.Preset = {
                     });
                   },
                 [constant, lambda],
+              ),
+            },
+            errorAfter: {
+              subscribe: EXPORTABLE(
+                (sleep) =>
+                  async function* subscribe(_, { n }) {
+                    for (let i = 0; i < n; i++) {
+                      yield i;
+                      await sleep(1000);
+                    }
+                    throw new Error(`Error after ${n}`);
+                  },
+                [sleep],
+              ),
+              resolve: EXPORTABLE(
+                () =>
+                  function resolve(i) {
+                    return i;
+                  },
+                [],
               ),
             },
           },
