@@ -1,4 +1,9 @@
-import type { BaseGraphQLArguments, GrafastFieldConfig, Step } from "grafast";
+import type {
+  BaseGraphQLArguments,
+  GrafastFieldConfig,
+  GrafastFieldConfigArgumentMap,
+  Step,
+} from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
@@ -256,7 +261,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args =
-                  resolvedFieldSpec.args ?? (Object.create(null) as {});
+                  resolvedFieldSpec.args ??
+                  (Object.create(null) as GrafastFieldConfigArgumentMap);
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
                   { ...fieldContext };
                 const finalFieldSpec = {
