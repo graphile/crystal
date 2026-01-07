@@ -11,4 +11,4 @@ yarn nodemon \
   --watch "../../utils/*/dist/**/*" \
   --watch "../../grafast/ruru/bundle/**/*" \
   --watch "../../contrib/*/dist/**/*" \
-  -x "node --enable-source-maps dist/cli-run.js --watch $*"
+  -x "node --enable-source-maps --async-stack-traces --unhandled-rejections=strict --trace-uncaught dist/cli-run.js --watch $*"
