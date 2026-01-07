@@ -26,7 +26,7 @@ export default function extend<
   if (isDev && (Array.isArray(base) || Array.isArray(extra))) {
     throw new Error(`Do not extend arrays!`);
   }
-  const hints = base[$$hints] || {};
+  const hints = base[$$hints] || Object.create(null);
 
   const keysB = Object.keys(extra);
   const extraHints = extra[$$hints] || {};

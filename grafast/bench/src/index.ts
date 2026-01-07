@@ -65,7 +65,7 @@ export async function bench(
         );
         const variableValues = variableValuesMatch
           ? JSON5.parse(variableValuesMatch[1])
-          : {};
+          : Object.create(null);
         const checkForErrors = (
           result: ExecutionResult | ExecutionPatchResult,
         ) => {

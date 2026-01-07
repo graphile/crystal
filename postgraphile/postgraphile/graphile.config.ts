@@ -331,9 +331,10 @@ const AddToResponseExtensionsPropertyPlugin: GraphileConfig.Plugin = {
       execute(next, event) {
         return next.callback((error, result) => {
           if (error) throw error;
-          const context = (event.args.contextValue ?? {}) as Grafast.Context;
+          const context = (event.args.contextValue ??
+            Object.create(null)) as Grafast.Context;
           if (!isAsyncIterable(result)) {
-            if (!result.extensions) result.extensions = {};
+            if (!result.extensions) result.extensions = Object.create(null);
             result.extensions.number = context.number;
           }
           return result;

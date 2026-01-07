@@ -294,9 +294,9 @@ export function extendSchema(
             GraphQLSchema: {
               directives: [],
             },
-            GraphQLInputObjectType: {},
-            GraphQLObjectType: {},
-            GraphQLInterfaceType: {},
+            GraphQLInputObjectType: Object.create(null),
+            GraphQLObjectType: Object.create(null),
+            GraphQLInterfaceType: Object.create(null),
           };
           const newTypes: Array<NewTypeDef> = [];
           document.definitions.forEach((definition) => {
@@ -383,7 +383,7 @@ export function extendSchema(
           } else {
             // Hackily convert the new format into the old format. We'll do away with
             // this in future, but for now it's the easiest way to ensure compatibility
-            plans = {};
+            plans = Object.create(null);
             const definitionNodes = document.definitions.filter(
               (d) =>
                 d.kind === Kind.OBJECT_TYPE_DEFINITION ||
@@ -490,7 +490,7 @@ export function extendSchema(
 
             for (const [typeName, spec] of Object.entries(objects ?? {})) {
               const fields = assertLocation(typeName, "objects");
-              const o = {} as Record<string, any>;
+              const o = Object.create(null) as Record<string, any>;
               plans[typeName] = o as any;
 
               const { plans: planResolvers = {}, ...rest } = spec;
@@ -510,7 +510,7 @@ export function extendSchema(
 
             for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
               const fields = assertLocation(typeName, "inputObjects");
-              const o = {} as Record<string, any>;
+              const o = Object.create(null) as Record<string, any>;
               plans[typeName] = o as any;
 
               const { plans: planResolvers = {}, ...rest } = spec;
@@ -530,7 +530,7 @@ export function extendSchema(
 
             for (const [typeName, spec] of Object.entries(unions ?? {})) {
               assertLocation(typeName, "unions");
-              const o = {} as Record<string, any>;
+              const o = Object.create(null) as Record<string, any>;
               plans[typeName] = o as any;
 
               for (const [key, val] of Object.entries(spec)) {
@@ -541,7 +541,7 @@ export function extendSchema(
 
             for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
               const fields = assertLocation(typeName, "interfaces");
-              const o = {} as Record<string, any>;
+              const o = Object.create(null) as Record<string, any>;
               plans[typeName] = o as any;
 
               const { fields: fieldConfigs = {}, ...rest } = spec;
@@ -589,7 +589,7 @@ export function extendSchema(
 
             for (const [typeName, spec] of Object.entries(enums ?? {})) {
               const enumValues = assertLocation(typeName, "enums");
-              const o = {} as Record<string, any>;
+              const o = Object.create(null) as Record<string, any>;
               plans[typeName] = o as any;
 
               const { values = {}, ...rest } = spec;
@@ -1375,7 +1375,7 @@ export function extendSchema(
         return memo;
       }, Object.create(null));
     }
-    return {};
+    return Object.create(null);
   }
 
   function getFields<TSource>(
@@ -1520,7 +1520,7 @@ export function extendSchema(
         }
       }, Object.create(null));
     }
-    return {};
+    return Object.create(null);
   }
 
   function getInputFields(
@@ -1571,7 +1571,7 @@ export function extendSchema(
         return memo;
       }, Object.create(null));
     }
-    return {};
+    return Object.create(null);
   }
 }
 

@@ -546,7 +546,7 @@ class CodegenFile {
         }
         return memo;
       },
-      {} as { [key: string]: t.Expression | null },
+      Object.create(null) as { [key: string]: t.Expression | null },
     );
     return t.objectExpression(objectToObjectProperties(obj));
   }
@@ -588,7 +588,7 @@ class CodegenFile {
         }
         return memo;
       },
-      {} as { [key: string]: t.Expression | null },
+      Object.create(null) as { [key: string]: t.Expression | null },
     );
     return t.objectExpression(objectToObjectProperties(obj));
   }
@@ -631,7 +631,7 @@ class CodegenFile {
         }
         return memo;
       },
-      {} as { [key: string]: t.Expression | null },
+      Object.create(null) as { [key: string]: t.Expression | null },
     );
     return t.objectExpression(objectToObjectProperties(obj));
   }

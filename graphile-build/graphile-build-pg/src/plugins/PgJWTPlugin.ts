@@ -162,16 +162,19 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
             serialize: EXPORTABLE(
               (attributeNames, pgJwtSecret, pgJwtSignOptions, signJwt) =>
                 function serialize(value: any) {
-                  const token = attributeNames.reduce((memo, attributeName) => {
-                    if (attributeName === "exp") {
-                      memo[attributeName] = value[attributeName]
-                        ? parseFloat(value[attributeName])
-                        : undefined;
-                    } else {
-                      memo[attributeName] = value[attributeName];
-                    }
-                    return memo;
-                  }, {} as any);
+                  const token = attributeNames.reduce(
+                    (memo, attributeName) => {
+                      if (attributeName === "exp") {
+                        memo[attributeName] = value[attributeName]
+                          ? parseFloat(value[attributeName])
+                          : undefined;
+                      } else {
+                        memo[attributeName] = value[attributeName];
+                      }
+                      return memo;
+                    },
+                    Object.create(null) as any,
+                  );
                   const options = Object.assign(
                     Object.create(null),
                     pgJwtSignOptions,

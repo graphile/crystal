@@ -151,10 +151,13 @@ export class ObjectStep<
       this.keys,
       tuple,
     );
-    const newObj = this.keys.reduce((memo, key, i) => {
-      memo[key] = tuple[i];
-      return memo;
-    }, {} as Partial<DataFromObjectSteps<TPlans>>) as DataFromObjectSteps<TPlans>;
+    const newObj = this.keys.reduce(
+      (memo, key, i) => {
+        memo[key] = tuple[i];
+        return memo;
+      },
+      Object.create(null) as Partial<DataFromObjectSteps<TPlans>>,
+    ) as DataFromObjectSteps<TPlans>;
 
     // Cache newObj so the same tuple values result in the exact same object.
     meta.results.push([tuple, newObj]);

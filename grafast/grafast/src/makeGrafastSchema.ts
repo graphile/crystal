@@ -299,7 +299,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
   } else {
     // Hackily convert the new format into the old format. We'll do away with
     // this in future, but for now it's the easiest way to ensure compatibility
-    plans = {};
+    plans = Object.create(null);
 
     const assertLocation = <
       TExpected extends
@@ -357,7 +357,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     };
     for (const [typeName, spec] of Object.entries(objects ?? {})) {
       const t = assertLocation(typeName, "objects");
-      const o = {} as Record<string, any>;
+      const o = Object.create(null) as Record<string, any>;
       plans[typeName] = o as any;
 
       const { plans: planResolvers = {}, ...rest } = spec;
@@ -374,7 +374,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
 
     for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
       const t = assertLocation(typeName, "inputObjects");
-      const o = {} as Record<string, any>;
+      const o = Object.create(null) as Record<string, any>;
       plans[typeName] = o as any;
 
       const { plans: planResolvers = {}, ...rest } = spec;
@@ -393,7 +393,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
 
     for (const [typeName, spec] of Object.entries(unions ?? {})) {
       assertLocation(typeName, "unions");
-      const o = {} as Record<string, any>;
+      const o = Object.create(null) as Record<string, any>;
       plans[typeName] = o as any;
 
       for (const [key, val] of Object.entries(spec)) {
@@ -403,7 +403,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
 
     for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
       assertLocation(typeName, "interfaces");
-      const o = {} as Record<string, any>;
+      const o = Object.create(null) as Record<string, any>;
       plans[typeName] = o as any;
 
       for (const [key, val] of Object.entries(spec)) {
@@ -418,7 +418,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
 
     for (const [typeName, spec] of Object.entries(enums ?? {})) {
       const t = assertLocation(typeName, "enums");
-      const o = {} as Record<string, any>;
+      const o = Object.create(null) as Record<string, any>;
       plans[typeName] = o as any;
 
       const { values = {}, ...rest } = spec;

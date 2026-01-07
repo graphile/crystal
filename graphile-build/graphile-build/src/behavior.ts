@@ -189,7 +189,7 @@ export class Behavior {
           const behaviorString = key as keyof GraphileBuild.BehaviorStrings;
           if (!this.behaviorRegistry[behaviorString]) {
             this.behaviorRegistry[behaviorString] = {
-              entities: {},
+              entities: Object.create(null),
             };
           }
           const { description } = spec;
