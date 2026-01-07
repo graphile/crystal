@@ -270,9 +270,24 @@ export const useFetcher = (
           next(...args) {
             const n = iterator.next(...args);
             if (isPromise(n)) {
-              return n.then(({ done, value }: any) => {
-                return { done, value: processPayload(value, true) };
-              });
+              return n.then(
+                ({ done, value }: any) => {
+                  return { done, value: processPayload(value, true) };
+                },
+                (e) => {
+                  if (e && e.target && e.target instanceof WebSocket) {
+                    // This commonly handles websocket termination event, which
+                    // ends up outputting as `{"isTrusted": true}` if we're
+                    // not careful!
+                    return Promise.reject({
+                      message:
+                        "WebSocket connection terminated unexpectedly (server restart?)",
+                    });
+                  } else {
+                    return Promise.reject(e);
+                  }
+                },
+              );
             } else {
               const { done, value } = n as unknown as Awaited<typeof n>;
               return { done, value: processPayload(value, true) };
