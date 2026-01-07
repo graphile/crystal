@@ -753,6 +753,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
               return restart(e);
             }
             regather();
+            // Reset to success
+            attempts = 0;
             waitNext();
           };
           waitNext();
