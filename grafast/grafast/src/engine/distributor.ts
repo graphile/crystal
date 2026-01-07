@@ -4,7 +4,7 @@ import { defer } from "../deferred";
 import { isDev, noop } from "../dev";
 import type { Maybe } from "../interfaces";
 import type { Step } from "../step";
-import { arrayOfLength, sleep } from "../utils";
+import { arrayOfLength, isPromiseLike, sleep } from "../utils";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
@@ -151,9 +151,19 @@ export function distributor<TData>(
       //} else
 
       if (iterator.return) {
-        iterator.return();
+        try {
+          const r = iterator.return();
+          if (isPromiseLike(r)) {
+            r.then(null, noop);
+          }
+        } catch {}
       } else if (iterator?.throw) {
-        iterator.throw(new Error("Stop"));
+        try {
+          const r = iterator.throw(new Error("Stop"));
+          if (isPromiseLike(r)) {
+            r.then(null, noop);
+          }
+        } catch {}
       } else {
         // Just ignore it? Or do we need to call `.next()` indefinitely?
         // Since it could be infinite, the next chain doesn't make sense, so
