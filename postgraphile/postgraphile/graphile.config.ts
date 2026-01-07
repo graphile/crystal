@@ -431,7 +431,7 @@ const preset: GraphileConfig.Preset = {
         }
         extend type Subscription {
           sub(topic: String!): Int
-          gql: Int
+          gql(max: Int! = 10): Int
           slow: String
         }
       `,
@@ -469,8 +469,8 @@ const preset: GraphileConfig.Preset = {
               ),
               subscribe: EXPORTABLE(
                 (sleep) =>
-                  async function* subscribe() {
-                    for (let i = 0; i < 10; i++) {
+                  async function* subscribe(_, { max }) {
+                    for (let i = 1; i <= max; i++) {
                       yield i;
                       await sleep(300);
                     }
