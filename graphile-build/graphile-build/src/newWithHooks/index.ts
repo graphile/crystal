@@ -256,7 +256,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                 ) as typeof resolvedFieldSpec;
 
                 resolvedFieldSpec.args =
-                  resolvedFieldSpec.args ?? Object.create(null);
+                  resolvedFieldSpec.args ?? (Object.create(null) as {});
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
                   { ...fieldContext };
                 const finalFieldSpec = {
