@@ -141,7 +141,26 @@ export function wrapPlans<T>(
           if (!planWrapper) {
             return field;
           }
-          const { plan: oldPlan = defaultPlanResolver } = field;
+          const { plan: oldPlan, resolve, subscribe } = field;
+
+          if (!oldPlan) {
+            if (resolve) {
+              console.warn(
+                `[WARNING]: \`wrapPlans(...)\` refusing to wrap ${Self.name}.${fieldName} since it has no plan and it has a resolver.`,
+              );
+              return field;
+            } else if (subscribe) {
+              console.warn(
+                `[WARNING]: \`wrapPlans(...)\` refusing to wrap ${Self.name}.${fieldName} since it has no plan and it has a subscription resolver.`,
+              );
+              return field;
+            } else {
+              console.warn(
+                `[WARNING]: \`wrapPlans(...)\` wrapping default plan resolver for ${Self.name}.${fieldName}; if resolver emulation is in use then things may go awry`,
+              );
+            }
+          }
+
           const typeName = Self.name;
           return {
             ...field,
@@ -149,6 +168,7 @@ export function wrapPlans<T>(
               (
                 ExecutableStep,
                 autoApplyFieldArgs,
+                defaultPlanResolver,
                 fieldName,
                 inspect,
                 isExecutableStep,
@@ -164,7 +184,10 @@ export function wrapPlans<T>(
                         planParams.slice(overrideParams.length),
                       ),
                     ] as typeof planParams;
-                    const $prev = oldPlan.apply(this, args);
+                    const $prev = (oldPlan ?? defaultPlanResolver).apply(
+                      this,
+                      args,
+                    );
                     if (!($prev instanceof ExecutableStep)) {
                       console.error(
                         `Wrapped a plan function at ${typeName}.${fieldName}, but that function did not return a step!\n${String(
@@ -205,6 +228,7 @@ export function wrapPlans<T>(
               [
                 ExecutableStep,
                 autoApplyFieldArgs,
+                defaultPlanResolver,
                 fieldName,
                 inspect,
                 isExecutableStep,
