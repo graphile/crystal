@@ -660,7 +660,8 @@ export class PgSubscriber<
           Object.values(this.topics).forEach((iterators) => {
             if (iterators) {
               for (const iterator of iterators) {
-                iterator.throw!(e);
+                const r = iterator.throw!(e);
+                r.then(null, noop);
               }
             }
           });
