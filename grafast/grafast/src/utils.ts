@@ -498,7 +498,7 @@ export function objectSpec<
           );
           return o;
         },
-        {} as GraphQLFieldConfigMap<any, Grafast.Context>,
+        Object.create(null) as GraphQLFieldConfigMap<any, Grafast.Context>,
       );
       return modifiedFields;
     },
@@ -585,7 +585,7 @@ export function objectFieldSpec<
         };
         return memo;
       }, Object.create(null))
-    : {};
+    : Object.create(null);
 
   return {
     ...spec,
@@ -643,7 +643,7 @@ function inputObjectSpec<TParent>(
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
         o[key] = inputObjectFieldSpec(fields[key], `${spec.name}.${key}`);
         return o;
-      }, {} as GraphQLInputFieldConfigMap);
+      }, Object.create(null) as GraphQLInputFieldConfigMap);
       return modifiedFields;
     },
   };

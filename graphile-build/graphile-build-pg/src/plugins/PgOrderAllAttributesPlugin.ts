@@ -253,7 +253,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               );
               return memo;
             },
-            {} as GraphQLEnumValueConfigMap,
+            Object.create(null) as GraphQLEnumValueConfigMap,
           ),
           `Adding order values from table '${pgCodec.name}'`,
         );

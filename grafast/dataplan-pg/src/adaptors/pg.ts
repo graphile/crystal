@@ -505,7 +505,7 @@ export class PgSubscriber<
 > implements GrafastSubscriber<TTopics>
 {
   private topics: { [topic in keyof TTopics]?: AsyncIterableIterator<any>[] } =
-    {};
+    Object.create(null);
   private eventEmitter = new EventEmitter();
   private alive = true;
 

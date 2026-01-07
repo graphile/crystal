@@ -151,9 +151,11 @@ export const useFetcher = (
   }, [url]);
 
   const fetcherOptions = useMemo<CreateFetcherOptions>(() => {
-    const headers: Record<string, string> = explain
-      ? { "X-PostGraphile-Explain": "on", "X-GraphQL-Explain": "plan,sql" }
-      : {};
+    const headers: Record<string, string> = Object.create(null);
+    if (explain) {
+      headers["X-PostGraphile-Explain"] = "on";
+      headers["X-GraphQL-Explain"] = "plan,sql";
+    }
     return {
       url,
       headers,

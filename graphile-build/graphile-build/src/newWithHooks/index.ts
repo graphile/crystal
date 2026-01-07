@@ -255,7 +255,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                   `|${typeName}.fields.${fieldName}`,
                 ) as typeof resolvedFieldSpec;
 
-                resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
+                resolvedFieldSpec.args =
+                  resolvedFieldSpec.args ?? Object.create(null);
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
                   { ...fieldContext };
                 const finalFieldSpec = {
@@ -448,7 +449,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     fieldContext,
                     `|${typeName}.fields.${fieldName}`,
                   );
-                  newSpec.args = newSpec.args || {};
+                  newSpec.args = newSpec.args || Object.create(null);
                   const argsContext = {
                     ...fieldContext,
                   };

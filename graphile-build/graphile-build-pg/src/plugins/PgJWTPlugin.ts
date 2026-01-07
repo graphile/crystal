@@ -171,7 +171,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                       memo[attributeName] = value[attributeName];
                     }
                     return memo;
-                  }, {} as any);
+                  }, Object.create(null) as any);
                   const options = Object.assign(
                     Object.create(null),
                     pgJwtSignOptions,
