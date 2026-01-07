@@ -626,7 +626,7 @@ const preset: GraphileConfig.Preset = {
     TestSideEffectCancellingPlugin,
     AddToResponseExtensionsPropertyPlugin,
     wrapPlans(
-      () => true,
+      (ctx) => (ctx.scope.isRootSubscription ? null : ctx),
       () => ({
         // autoApplyFieldArgs: false,
         plan: EXPORTABLE(
