@@ -21,7 +21,7 @@ import * as graphql from "graphql";
 
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
-import { isDev } from "./dev.js";
+import { isDev, noop } from "./dev.js";
 import type {
   LayerPlan,
   LayerPlanReasonDefer,
@@ -1535,7 +1535,12 @@ export function terminateIterable(
   iterable: readonly any[] | Iterable<any> | AsyncIterable<any>,
 ) {
   if ("return" in iterable && typeof iterable.return === "function") {
-    iterable.return();
+    try {
+      const result = iterable.return();
+      if (isPromiseLike(result)) result.then(null, noop);
+    } catch {
+      /*noop*/
+    }
   }
 }
 

@@ -1253,25 +1253,21 @@ export class PgSelectStep<
               });
             } else if (streamInitialCount != null && l < streamInitialCount) {
               done = true;
-              innerIterator.return?.();
-              return Promise.resolve({ value: undefined, done });
+              const r = innerIterator.return?.();
+              return r ?? Promise.resolve({ value: undefined, done });
             } else {
               return innerIterator.next();
             }
           },
           return(value) {
             done = true;
-            return (
-              innerIterator.return?.(value) ??
-              Promise.resolve({ value: undefined, done })
-            );
+            const r = innerIterator.return?.(value);
+            return r ?? Promise.resolve({ value: undefined, done });
           },
           throw(e) {
             done = true;
-            return (
-              innerIterator.throw?.(e) ??
-              Promise.resolve({ value: undefined, done })
-            );
+            const r = innerIterator.throw?.(e);
+            return r ?? Promise.resolve({ value: undefined, done });
           },
           [Symbol.asyncIterator]() {
             return this;

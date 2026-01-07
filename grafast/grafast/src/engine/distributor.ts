@@ -1,9 +1,10 @@
-import { isDev, type Maybe } from "..";
 import * as assert from "../assert";
 import type { Deferred } from "../deferred";
 import { defer } from "../deferred";
+import { isDev, noop } from "../dev";
+import type { Maybe } from "../interfaces";
 import type { Step } from "../step";
-import { arrayOfLength, sleep } from "../utils";
+import { arrayOfLength, isPromiseLike, sleep } from "../utils";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
@@ -150,9 +151,23 @@ export function distributor<TData>(
       //} else
 
       if (iterator.return) {
-        iterator.return();
+        try {
+          const r = iterator.return();
+          if (isPromiseLike(r)) {
+            r.then(null, noop);
+          }
+        } catch {
+          /*noop*/
+        }
       } else if (iterator?.throw) {
-        iterator.throw(new Error("Stop"));
+        try {
+          const r = iterator.throw(new Error("Stop"));
+          if (isPromiseLike(r)) {
+            r.then(null, noop);
+          }
+        } catch {
+          /*noop*/
+        }
       } else {
         // Just ignore it? Or do we need to call `.next()` indefinitely?
         // Since it could be infinite, the next chain doesn't make sense, so
@@ -330,7 +345,14 @@ export function distributor<TData>(
   function stop(stepIndex: number, error?: unknown, advance = true) {
     if (!terminalResult[stepIndex]) {
       deliveredIndex[stepIndex] = Infinity;
-      terminalResult[stepIndex] = error ? Promise.reject(error) : DONE_PROMISE;
+      if (error) {
+        const p = Promise.reject(error);
+        // Catch this error so it doesn't cause premature termination
+        p.then(null, noop);
+        terminalResult[stepIndex] = p;
+      } else {
+        terminalResult[stepIndex] = DONE_PROMISE;
+      }
       if (advance) {
         maybeAdvanceLowWaterMark();
       }
@@ -359,7 +381,7 @@ export function distributor<TData>(
     }
 
     const onAbort = () => {
-      iterator.return();
+      iterator.return().then(null, noop);
     };
     const iterator = {
       [Symbol.asyncIterator]() {

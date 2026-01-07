@@ -1,3 +1,5 @@
+import { noop } from "./utils";
+
 export function mapIterator<T, U>(
   iterable: AsyncIterable<T>,
   cb: (payload: T) => U,
@@ -50,12 +52,12 @@ export function mapIterator<T, U>(
     },
     return(value) {
       status = 2;
-      iterator.return?.(value);
+      iterator.return?.(value)?.then(null, noop);
       return Promise.resolve({ value: undefined, done: true });
     },
     throw(error) {
       status = 2;
-      iterator.throw?.(error);
+      iterator.throw?.(error)?.then(null, noop);
       return Promise.reject(error);
     },
     [Symbol.asyncIterator]() {

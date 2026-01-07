@@ -21,6 +21,7 @@ import type {
 import {
   getBodyFromFrameworkBody,
   makeGraphQLWSConfig,
+  noop,
   normalizeRequest,
   processHeaders,
 } from "../../../utils.js";
@@ -142,9 +143,9 @@ export class FastifyGrafserv extends GrafservBase {
           if (!bufferIteratorHandled) {
             try {
               if (bufferIterator.return) {
-                bufferIterator.return();
+                bufferIterator.return().then(null, noop);
               } else if (bufferIterator.throw) {
-                bufferIterator.throw(e);
+                bufferIterator.throw(e).then(null, noop);
               }
             } catch (e2) {
               /* nom nom nom */

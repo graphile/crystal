@@ -18,6 +18,7 @@ import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
   execute as grafastExecute,
   hookArgs,
+  noop,
   subscribe as grafastSubscribe,
 } from "grafast";
 import type {
@@ -510,7 +511,7 @@ export async function runTestQuery(
             if (operationType === "subscription") {
               const iterator = result[Symbol.asyncIterator]();
               // Terminate the subscription
-              iterator.return?.();
+              iterator.return?.()?.then(null, noop);
             }
 
             // Now wait for all payloads to have been collected

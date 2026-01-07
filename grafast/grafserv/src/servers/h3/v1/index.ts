@@ -31,6 +31,7 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
+import { noop } from "../../../utils.js";
 
 declare global {
   namespace Grafast {
@@ -198,9 +199,9 @@ export class H3Grafserv extends GrafservBase {
           if (!bufferIteratorHandled) {
             try {
               if (bufferIterator.return) {
-                bufferIterator.return();
+                bufferIterator.return().then(null, noop);
               } else if (bufferIterator.throw) {
-                bufferIterator.throw(e);
+                bufferIterator.throw(e).then(null, noop);
               }
             } catch (e2) {
               /* nom nom nom */

@@ -9,7 +9,7 @@ import "../interfaces.js";
 import LRU from "@graphile/lru";
 import EventEmitter from "eventemitter3";
 import type { Deferred, GrafastSubscriber, PromiseOrDirect } from "grafast";
-import { defer } from "grafast";
+import { defer, noop } from "grafast";
 import type {
   Notification,
   Pool,
@@ -660,7 +660,7 @@ export class PgSubscriber<
           Object.values(this.topics).forEach((iterators) => {
             if (iterators) {
               for (const iterator of iterators) {
-                iterator.throw!(e);
+                iterator.throw!(e).then(null, noop);
               }
             }
           });
@@ -740,9 +740,9 @@ export class PgSubscriber<
       for (const topic of Object.keys(this.topics)) {
         for (const asyncIterableIterator of this.topics[topic]!) {
           if (asyncIterableIterator.return) {
-            asyncIterableIterator.return();
+            asyncIterableIterator.return().then(null, noop);
           } else if (asyncIterableIterator.throw) {
-            asyncIterableIterator.throw(new Error("Released"));
+            asyncIterableIterator.throw(new Error("Released")).then(null, noop);
           } else {
             // What do we do now?!
             // TYPES: if instead of using an AsyncIterableIterator we required it was an AsyncGenerator then this problem would go away.

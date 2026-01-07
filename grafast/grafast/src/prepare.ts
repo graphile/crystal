@@ -170,13 +170,23 @@ function releaseUnusedIterators(
   if (allStreams.size > 0) {
     for (const stream of allStreams) {
       if (stream.return) {
-        stream.return();
+        try {
+          const result = stream.return();
+          if (isPromiseLike(result)) result.then(null, noop);
+        } catch {
+          /*noop*/
+        }
       } else if (stream.throw) {
-        stream.throw(
-          new Error(
-            `Iterator no longer needed (due to OutputPlan branch being skipped)`,
-          ),
-        );
+        try {
+          const result = stream.throw(
+            new Error(
+              `Iterator no longer needed (due to OutputPlan branch being skipped)`,
+            ),
+          );
+          if (isPromiseLike(result)) result.then(null, noop);
+        } catch {
+          /*noop*/
+        }
       }
     }
   }
@@ -214,15 +224,15 @@ const finalize = (
       promise.then(
         () => {
           iterator.push({ hasNext: false });
-          iterator.return(undefined);
+          iterator.return(undefined).then(null, noop);
         },
         (e) => {
-          iterator.throw(e);
+          iterator.throw(e).then(null, noop);
         },
       );
     } else {
       iterator.push({ hasNext: false });
-      iterator.return(undefined);
+      iterator.return(undefined).then(null, noop);
     }
 
     return iterator;
@@ -476,9 +486,23 @@ function executePreemptive(
         stopped = true;
         abort.resolve(undefined);
         if (e != null) {
-          stream.throw?.(e);
+          try {
+            const result = stream.throw?.(e);
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
+          } catch {
+            /*noop*/
+          }
         } else {
-          stream.return?.();
+          try {
+            const result = stream.return?.();
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
+          } catch {
+            /*noop*/
+          }
         }
       });
       (async () => {
@@ -490,7 +514,7 @@ function executePreemptive(
             break;
           }
           if (!next) {
-            iterator.throw(new Error("Invalid iteration"));
+            iterator.throw(new Error("Invalid iteration")).then(null, noop);
             break;
           }
           const { done, value } = next;
@@ -518,12 +542,12 @@ function executePreemptive(
           }
           i++;
         }
-      })().then(
-        () => iterator.return(),
-        (e) => {
-          iterator.throw(e);
-        },
-      );
+      })()
+        .then(
+          () => iterator.return(),
+          (e) => iterator.throw(e),
+        )
+        .then(null, noop);
       return iterator;
     }
 
@@ -736,7 +760,7 @@ function newIterator<T = any>(
               } catch (e) {
                 // ignore
               }
-              this.throw(e);
+              this.throw(e).then(null, noop);
             },
           );
         } else {

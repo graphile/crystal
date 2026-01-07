@@ -12,6 +12,7 @@ if (process.env.DEBUG) {
 import { promises as fsp } from "fs";
 import {
   execute as grafastExecute,
+  noop,
   stringifyPayload,
   subscribe as grafastSubscribe,
 } from "grafast";
@@ -303,7 +304,8 @@ export async function runTestQuery(
           if (operationType === "subscription") {
             const iterator = result[Symbol.asyncIterator]();
             // Terminate the subscription
-            iterator.return?.();
+            const r = iterator.return?.();
+            r?.then(null, noop);
           }
 
           // Now wait for all payloads to have been collected
