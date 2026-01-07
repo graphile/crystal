@@ -495,17 +495,17 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * This class provides helpers for Postgres' LISTEN/NOTIFY pub/sub
  * implementation. We aggregate all LISTEN/NOTIFY events so that we can supply
  * them all via a single pgClient. We grab and release this client from/to the
- * pool automatically. If the Postgres connection is interrupted then we'll
- * automatically reconnect and re-establish the LISTENs, however _events can be
- * lost_ when this happens, so you should be careful that Postgres connections
- * will not be prematurely terminated in general.
+ * pool automatically. If the Postgres connection is interrupted then we will
+ * NOT automatically reconnect and re-establish the LISTENs because we want to
+ * ensure "at least once" delivery and clients should be informed if messages
+ * may be missed.
  */
 export class PgSubscriber<
   TTopics extends { [key: string]: string } = { [key: string]: string },
 > implements GrafastSubscriber<TTopics>
 {
   private topics: { [topic in keyof TTopics]?: AsyncIterableIterator<any>[] } =
-    {};
+    Object.create(null);
   private eventEmitter = new EventEmitter();
   private alive = true;
 
@@ -653,10 +653,18 @@ export class PgSubscriber<
           );
         }
         if (Object.keys(this.topics).length > 0) {
-          // Trigger a new client to be fetched and have it sync.
-          this.getClient().then(null, () => {
-            // Must be released; ignore
+          // Terminate all subscriptions, to ensure at-least-once delivery
+          const e = new Error(
+            `Underlying pubsub channel interrupted, terminating connection due to risk of missing messages.`,
+          );
+          Object.values(this.topics).forEach((iterators) => {
+            if (iterators) {
+              for (const iterator of iterators) {
+                iterator.throw!(e);
+              }
+            }
           });
+          this.topics = Object.create(null);
         }
       }
     });
