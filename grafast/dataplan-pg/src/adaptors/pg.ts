@@ -9,7 +9,7 @@ import "../interfaces.js";
 import LRU from "@graphile/lru";
 import EventEmitter from "eventemitter3";
 import type { Deferred, GrafastSubscriber, PromiseOrDirect } from "grafast";
-import { defer } from "grafast";
+import { defer, noop } from "grafast";
 import type {
   Notification,
   Pool,

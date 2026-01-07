@@ -1,7 +1,8 @@
-import { isDev, type Maybe } from "..";
 import * as assert from "../assert";
 import type { Deferred } from "../deferred";
 import { defer } from "../deferred";
+import { isDev, noop } from "../dev";
+import type { Maybe } from "../interfaces";
 import type { Step } from "../step";
 import { arrayOfLength, sleep } from "../utils";
 
@@ -330,7 +331,14 @@ export function distributor<TData>(
   function stop(stepIndex: number, error?: unknown, advance = true) {
     if (!terminalResult[stepIndex]) {
       deliveredIndex[stepIndex] = Infinity;
-      terminalResult[stepIndex] = error ? Promise.reject(error) : DONE_PROMISE;
+      if (error) {
+        const p = Promise.reject(error);
+        // Catch this error so it doesn't cause premature termination
+        p.then(null, noop);
+        terminalResult[stepIndex] = p;
+      } else {
+        terminalResult[stepIndex] = DONE_PROMISE;
+      }
       if (advance) {
         maybeAdvanceLowWaterMark();
       }

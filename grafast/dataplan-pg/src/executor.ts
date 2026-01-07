@@ -16,6 +16,7 @@ import {
   inspect,
   isAsyncIterable,
   isDev,
+  noop,
 } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
@@ -900,7 +901,10 @@ ${duration}
           if (isAsyncIterable(stream)) {
             stream[Symbol.asyncIterator]().throw?.(e);
           }
-          streams[resultIndex] = Promise.reject(e);
+          const ep = Promise.reject(e);
+          // Avoid unhandled promise rejection errors
+          ep.then(null, noop);
+          streams[resultIndex] = ep;
         });
       });
       promises.push(promise);
