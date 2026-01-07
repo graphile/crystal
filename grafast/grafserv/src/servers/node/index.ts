@@ -18,6 +18,7 @@ import type { OptionsFromConfig } from "../../options.js";
 import {
   getBodyFromRequest,
   makeGraphQLWSConfig,
+  noop,
   processHeaders,
 } from "../../utils.js";
 import { handleWebSocketKeepalive } from "../../websocketKeepalive.js";
@@ -202,7 +203,8 @@ export class NodeGrafservBase extends GrafservBase {
             // Clean up when connection closes.
             const cleanup = () => {
               try {
-                bufferIterator.return?.();
+                const r = bufferIterator.return?.();
+                r?.then(null, noop);
               } catch {
                 /* nom nom nom */
               }

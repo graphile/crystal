@@ -485,9 +485,19 @@ function executePreemptive(
         stopped = true;
         abort.resolve(undefined);
         if (e != null) {
-          stream.throw?.(e);
+          try {
+            const result = stream.throw?.(e);
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
+          } catch {}
         } else {
-          stream.return?.();
+          try {
+            const result = stream.return?.();
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
+          } catch {}
         }
       });
       (async () => {

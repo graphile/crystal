@@ -5,7 +5,7 @@ import { PgContextPlugin } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { readFile } from "fs/promises";
 import { sync as globSync } from "glob";
-import { grafast } from "grafast";
+import { grafast, noop } from "grafast";
 import { resolvePreset } from "graphile-config";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
@@ -82,7 +82,8 @@ async function runTestQuery(basePath) {
     if (operationType === "subscription") {
       const iterator = result[Symbol.asyncIterator]();
       // Terminate the subscription
-      iterator.return?.();
+      const r = iterator.return?.();
+      r?.then(null, noop);
     }
     // Now wait for all payloads to have been collected
     await promise;

@@ -899,7 +899,9 @@ ${duration}
         batch.forEach(({ resultIndex }) => {
           const stream = streams[resultIndex];
           if (isAsyncIterable(stream)) {
-            stream[Symbol.asyncIterator]().throw?.(e);
+            const it = stream[Symbol.asyncIterator]();
+            const r = it.throw?.(e);
+            r?.then(null, noop);
           }
           const ep = Promise.reject(e);
           // Avoid unhandled promise rejection errors
