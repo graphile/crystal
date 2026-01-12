@@ -63,9 +63,19 @@ export const Download: FC = () => {
         setError(new Error("Schema is not available to be exported"));
         return;
       }
-      download(sdl, "schema.graphql");
+      const filenameParts = ["schema"];
+      if (!depr.checked) {
+        filenameParts.push("no-deprecated");
+      }
+      if (!descs.checked) {
+        filenameParts.push("no-descriptions");
+      }
+      if (sort.checked) {
+        filenameParts.push("sorted");
+      }
+      download(sdl, `${filenameParts.join(".")}.graphql`);
     },
-    [sdl],
+    [depr.checked, descs.checked, sdl, sort.checked],
   );
   const copy = useCallback(
     (e: FormEvent<HTMLButtonElement>) => {
