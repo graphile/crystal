@@ -1,5 +1,5 @@
 import type { GraphiQLPlugin } from "@graphiql/react";
-import { ChevronDownIcon } from "@graphiql/react";
+import { RootTypeIcon } from "@graphiql/react";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -14,8 +14,19 @@ const DownloadPanel: FC = () => {
   return (
     <div>
       <div className="graphiql-doc-explorer-header">
-        <div className="graphiql-doc-explorer-title">Download SDL</div>
+        <div className="graphiql-doc-explorer-title">SDL</div>
       </div>
+      <p>
+        The Schema Definition Language (SDL, aka Interface Definition Language -
+        IDL) is the language used to describe the type system of a GraphQL
+        schema. It can be useful for discussion, and also as input to tooling
+        such as code generators.
+      </p>
+      <p>
+        Below you will find the SDL for the current schema along with the
+        ability to download it or copy it to your clipboard. You may customize
+        the SDL output with the options below.
+      </p>
       <ErrorBoundary
         fallbackRender={({ error }) => (
           <div>
@@ -31,9 +42,8 @@ const DownloadPanel: FC = () => {
     </div>
   );
 };
-
 export const DOWNLOAD_PLUGIN: GraphiQLPlugin = {
-  title: "Download",
-  icon: ChevronDownIcon,
+  title: "SDL",
+  icon: RootTypeIcon,
   content: DownloadPanel,
 };

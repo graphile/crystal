@@ -10,7 +10,20 @@ function useToggle(initialState = false) {
   const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setChecked(e.target.checked);
   }, []);
-  return useMemo(() => ({ checked, onChange }), [checked, onChange]);
+  const reset = useCallback(
+    () => void setChecked(initialState),
+    [initialState],
+  );
+  return useMemo(
+    () => ({
+      checked,
+      setChecked,
+      reset,
+      changed: checked !== initialState,
+      attrs: { checked, onChange },
+    }),
+    [checked, initialState, onChange, reset],
+  );
 }
 
 function download(
@@ -33,9 +46,17 @@ function download(
 
 export const Download: FC = () => {
   const [error, setError] = useState<Error | null>(null);
+
   const sort = useToggle(false);
   const descs = useToggle(true);
   const depr = useToggle(true);
+  const changed = sort.changed || descs.changed || depr.changed;
+  const reset = useCallback(() => {
+    sort.reset();
+    descs.reset();
+    depr.reset();
+  }, [depr, descs, sort]);
+
   const schema = useGraphiQL((sel) => sel.schema);
   const sdl = useMemo(() => {
     if (!schema) return null;
@@ -96,15 +117,15 @@ export const Download: FC = () => {
       <form onSubmit={submit}>
         <p>
           <label>
-            <input type="checkbox" {...sort} /> Sorted (lexicographically)
+            <input type="checkbox" {...sort.attrs} /> Sorted (lexicographically)
           </label>
           <br />
           <label>
-            <input type="checkbox" {...descs} /> Include descriptions
+            <input type="checkbox" {...descs.attrs} /> Include descriptions
           </label>
           <br />
           <label>
-            <input type="checkbox" {...depr} /> Include deprecated
+            <input type="checkbox" {...depr.attrs} /> Include deprecated
           </label>
         </p>
         {error ? <p className="error">{error.message}</p> : null}
@@ -112,6 +133,9 @@ export const Download: FC = () => {
           <button type="submit">Download</button>
           <button type="button" onClick={copy}>
             Copy
+          </button>
+          <button type="button" disabled={!changed} onClick={reset}>
+            Reset
           </button>
         </div>
       </form>
