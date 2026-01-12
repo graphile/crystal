@@ -1,7 +1,9 @@
 import { useGraphiQL } from "@graphiql/react";
-import { lexicographicSortSchema, printSchema } from "graphql";
+import { lexicographicSortSchema, printSchema } from "grafast/graphql";
 import type { ChangeEvent, FC, FormEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
+
+import { transformSchema } from "../utils/transformSchema.js";
 
 function useToggle(initialState = false) {
   const [checked, setChecked] = useState(initialState);
@@ -32,16 +34,27 @@ function download(
 export const Download: FC = () => {
   const [error, setError] = useState<Error | null>(null);
   const sort = useToggle(false);
+  const descs = useToggle(true);
+  const depr = useToggle(true);
   const schema = useGraphiQL((sel) => sel.schema);
   const sdl = useMemo(() => {
     if (!schema) return null;
     let toExport = schema;
+
+    if (!descs.checked || !depr.checked) {
+      toExport = transformSchema(toExport, {
+        trimDescriptions: !descs.checked,
+        trimDeprecated: !depr.checked,
+      });
+    }
+
     if (sort.checked) {
       toExport = lexicographicSortSchema(toExport);
     }
+
     const string = printSchema(toExport) + "\n";
     return string;
-  }, [schema, sort.checked]);
+  }, [schema, descs.checked, depr.checked, sort.checked]);
   const submit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -73,7 +86,15 @@ export const Download: FC = () => {
       <form onSubmit={submit}>
         <p>
           <label>
-            <input type="checkbox" {...sort} /> Lexicographically sorted
+            <input type="checkbox" {...sort} /> Sorted (lexicographically)
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" {...descs} /> Include descriptions
+          </label>
+          <br />
+          <label>
+            <input type="checkbox" {...depr} /> Include deprecated
           </label>
         </p>
         {error ? <p className="error">{error.message}</p> : null}
@@ -84,7 +105,7 @@ export const Download: FC = () => {
           </button>
         </div>
       </form>
-      <pre>
+      <pre style={{ fontSize: "0.75rem" }}>
         <code>{sdl}</code>
       </pre>{" "}
     </div>
