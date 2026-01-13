@@ -5,8 +5,8 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
     "jsx": "react-jsx",
-    "target": "es2021",
-    "lib": ["dom", "es2021"],
+    "target": "es2022",
+    "lib": ["dom", "es2022"],
 
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "NodeNext",

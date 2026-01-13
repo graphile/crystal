@@ -335,7 +335,7 @@ const AddToResponseExtensionsPropertyPlugin: GraphileConfig.Plugin = {
             Object.create(null)) as Grafast.Context;
           if (!isAsyncIterable(result)) {
             if (!result.extensions) result.extensions = Object.create(null);
-            result.extensions.number = context.number;
+            result.extensions!.number = context.number;
           }
           return result;
         });

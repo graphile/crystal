@@ -28,6 +28,7 @@ import { usePrettify } from "./hooks/usePrettify.js";
 import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
+import { DOWNLOAD_PLUGIN } from "./plugins/download.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
 
 type GraphiQLInterfaceProps = ComponentProps<typeof GraphiQLInterface>;
@@ -41,6 +42,7 @@ const explorerPlugin = makeExplorerPlugin({
 });
 const plugins = [
   DOC_EXPLORER_PLUGIN,
+  DOWNLOAD_PLUGIN,
   HISTORY_PLUGIN,
   explorerPlugin,
   EXPLAIN_PLUGIN,
