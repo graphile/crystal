@@ -13,7 +13,7 @@ const TierList = [
     buttonText: "Start Monthly Plan",
     frequency: "/mo",
     comparison: "Cancel any time",
-    badge: "Updated August 2025",
+    badge: "Discount extended into 2026",
     description: (
       <>
         <ul>
@@ -23,7 +23,6 @@ const TierList = [
           <li>
             <strong>Flexible</strong>
           </li>
-          <li>New lower price for 2025</li>
           <li>
             <strong>Access to discounted consultancy packages</strong>
           </li>
