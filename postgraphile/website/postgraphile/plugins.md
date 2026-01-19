@@ -144,7 +144,7 @@ export default preset;
 ```
 
 ```bash
-postgraphile --preset ./graphile.config.ts -c postgres:///my_db
+postgraphile -c postgres:///my_db
 ```
 
 ### Writing your own plugins
