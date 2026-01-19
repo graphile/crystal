@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.js";
-import { defer } from "../deferred.js";
+import { noop } from "../dev.js";
 import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.js";
 import type {
   BaseGraphQLArguments,
@@ -973,9 +973,14 @@ function makeProcessedCollection<TItem>(
     }
     items = wrapIndicies ? array.map(indexedItem) : array;
   } else {
-    const deferredHasNext =
-      typeof __hasMore === "boolean" ? null : defer<boolean>();
-    hasNext = deferredHasNext ?? (__hasMore as boolean);
+    let deferredHasNext: PromiseWithResolvers<boolean> | undefined;
+    if (typeof __hasMore === "boolean") {
+      hasNext = __hasMore;
+    } else {
+      deferredHasNext = Promise.withResolvers();
+      deferredHasNext.promise.catch(noop); // Guard against unhandledPromiseRejection
+      hasNext = deferredHasNext.promise;
+    }
     let didHaveNext = false;
     let started = false;
     items = asyncIteratorWithCleanup(
@@ -1029,9 +1034,7 @@ function makeProcessedCollection<TItem>(
         }
       })(),
       () => {
-        if (deferredHasNext) {
-          deferredHasNext.resolve(didHaveNext);
-        }
+        deferredHasNext?.resolve(didHaveNext);
         if (!started) {
           terminateIterable(collection);
         }
