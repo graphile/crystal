@@ -8,11 +8,11 @@ repository.
 
 - Improve documentation. Be concise, clear, and accurate. Reflect nuances via
   admonitions where appropriate. Only make essential changes, avoid stylistic
-  changes.
+  changes. Do not re-wrap unedited text, formatters handle that.
 - Spot mistakes in the docs where they do not correctly reflect the code.
 - When refactoring, keep changes to a minimum. For larger edits do the changes
-  in stages; for example: reorder the code first, get that committed by the
-  user, then edit the functionality.
+  in stages; for example: reorder the code first, commit, then edit the
+  functionality.
 
 ## Repository Overview
 
@@ -66,57 +66,32 @@ into 4 main categories based on the root folders, each of which have a
    - Avoid moving/renaming files/pages unless essential.
    - Avoid changing lockfiles or versions unless essential.
 
-## Non-VM Guardrails
-
-If the user says “Unlock VM mode”, these guardrails do not apply because you are
-running in a dedicated VM with limited credentials access, and you are thus
-cleared to run whatever local commands or installations are required to achieve
-your goals. Still keep in mind that changes should be minimal to achieve your
-goals though!
-
-Otherwise, you must follow these rules:
-
-1. **Never install dependencies** unless the maintainer explicitly says “Unlock
-   VM mode”. In that mode you are in a dedicated disposable VM, and you may
-   install anything needed (package managers, OS packages, background services)
-   to complete the task—but keep installs focused on the work at hand.
-1. **Never edit `package.json`** files unless specifically instructed.
-1. **Avoid shell commands unless necessary.**
-   - The user already runs compilation and websites in watch mode.
-   - The user would rather commit, rebase, and change branches themself - do not
-     do this for them.
-   - The user would generally rather that you don't run your own commands, but
-     you may do so if it is necessary to apply your automated changes to
-     code/docs.
-1. Suggest CI/test commands **in prose**; do not execute them.
-
 ## Always Allowed Actions
 
-- Read files and make changes to markdown, TypeScript, and `*.test.*` files.
-- Write tests; update fixtures and test helpers.
-- Update docs (typically under the `<category>/website` folder).
+- If you spot typos in prose whilst performing other actions, fix them.
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
 
 ## Preferred Style
 
 - Never use `<https://...>`-style links, always use `[text](https://...)`.
-- Links do not end in a slash
+- Internal links must not end in a slash
 - Follow current formatting/lint rules; **do not** add style-only churn.
 - Do not trim file suffixes from links (e.g. `.md`/`.mdx`) - we use Docusaurus
   to resolve these.
 - Keep code samples runnable in principle; **do not** add scripts to run them.
-- Wrap prose at 80 characters.
+- Wrap prose at 80 characters (when editing the text only).
 - Always use `Gra*fast*` in Markdown when referring to Gra*fast* - the "fast" is
-  stylized in italics. When in MDX use the `<Grafast />` component if available,
-  otherwise `Gra*fast*` is fine.
+  stylized in italics. When in MDX use the `<Grafast />` component if already
+  available, otherwise `Gra*fast*` is fine.
 - When discussing steps, say a step **represents** a value at plan-time and
   **yields** values at execution-time. Avoid "evaluates"/"resolves" unless
   quoting legacy APIs.
-- Keep Grafast documentation backend-agnostic: do not reference
+- Keep Gra*fast* documentation backend-agnostic: do not reference
   PostGraphile-specific helpers (e.g. `@dataplan/pg`) unless the page is
   explicitly about that integration.
 - When adding `:::` admonitions, be sure to have a blank line both above and
-  below each `:::` line.
+  below each `:::` line. Note that adminition syntax is
+  `:::note[Description here]` which differs from legacy syntax.
 - The documentation uses UK English, but the code uses US English. If a spelling
   is valid in both US and UK English, prefer that shared form (e.g. `centralize`
   rather than the UK-only `centralise`). Use UK spellings such as `behaviour` in
@@ -130,8 +105,8 @@ Otherwise, you must follow these rules:
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
 
-When writing Grafast plan resolvers in documentation, try and only do one action
-per statement; for example instead of:
+When writing Gra*fast* plan resolvers in documentation, try and only do one
+action per statement; for example instead of:
 
 ```ts
 const $invoices = loadMany($customer.get("stripeId"), invoicesByStripId);
