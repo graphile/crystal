@@ -8,8 +8,8 @@ import "../interfaces.js";
 
 import LRU from "@graphile/lru";
 import EventEmitter from "eventemitter3";
-import type { Deferred, GrafastSubscriber, PromiseOrDirect } from "grafast";
-import { defer, noop } from "grafast";
+import type { GrafastSubscriber, PromiseOrDirect } from "grafast";
+import { noop } from "grafast";
 import type {
   Notification,
   Pool,
@@ -525,7 +525,8 @@ export class PgSubscriber<
     const that = this;
     const { eventEmitter, topics } = this;
     const stack: Array<TTopics[TTopic]> = [];
-    const queue: Array<Deferred<IteratorResult<TTopics[TTopic]>>> = [];
+    const queue: Array<PromiseWithResolvers<IteratorResult<TTopics[TTopic]>>> =
+      [];
     let finished: IteratorReturnResult<unknown> | Promise<never> | null = null;
 
     function doFinally(value?: unknown, error?: Error) {
@@ -569,10 +570,12 @@ export class PgSubscriber<
           return finished;
         } else {
           // This must be done synchronously - there must be **NO AWAIT BEFORE THIS**
-          const waiting = defer<IteratorResult<TTopics[TTopic]>>();
+          const waiting =
+            Promise.withResolvers<IteratorResult<TTopics[TTopic]>>();
+          waiting.promise.catch(noop); // Guard against unhandledPromiseRejection
           queue.push(waiting);
 
-          return waiting;
+          return waiting.promise;
         }
       },
       async return(value) {
