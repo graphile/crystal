@@ -2,13 +2,6 @@
 title: Running PostGraphile as a Library in Docker
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 The following guide describes how to run a network of Docker containers on a
 local machine, including one container for a PostgreSQL database and one
 container running PostGraphile.
@@ -66,35 +59,45 @@ following content.
   "description": "PostGraphile as a library in a dockerized Node.js application.",
   "author": "Alexis ROLLAND",
   "license": "Apache-2.0",
-  "main": "server.js",
+  "type": "module",
   "keywords": ["nodejs", "postgraphile"],
   "dependencies": {
-    "postgraphile": "^4.5.5",
-    "postgraphile-plugin-connection-filter": "^1.1.3"
+    "postgraphile": "^5.0.0"
   }
 }
 ```
 
 This file will be used by NPM package manager to install the dependencies in the
-Node.js container. In particular `postgraphile` and the excellent plugin
-`postgraphile-plugin-connection-filter`.
+Node.js container.
 
 In the same `src` folder, create a new file `server.js` with the following
 content.
 
 ```js
-const http = require("http");
-const { postgraphile } = require("postgraphile");
+import { createServer } from "node:http";
+import { postgraphile } from "postgraphile";
+import { grafserv } from "postgraphile/grafserv/node";
+import { makePgService } from "postgraphile/adaptors/pg";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
-http
-  .createServer(
-    postgraphile(process.env.DATABASE_URL, "public", {
-      watchPg: true,
-      graphiql: true,
-      enhanceGraphiql: true,
-    }),
-  )
-  .listen(process.env.PORT);
+const preset = {
+  extends: [PostGraphileAmberPreset],
+  pgServices: [makePgService({ connectionString: process.env.DATABASE_URL })],
+  grafserv: {
+    graphqlPath: "/graphql",
+  },
+};
+
+const pgl = postgraphile(preset);
+const serv = pgl.createServ(grafserv);
+const server = createServer();
+
+serv.addTo(server).catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
+
+server.listen(process.env.PORT);
 ```
 
 ### Create PostGraphile Dockerfile
@@ -103,7 +106,7 @@ Create a new file `Dockerfile` in the `graphql` folder (not in the folder `src`)
 with the following content.
 
 ```dockerfile
-FROM node:alpine
+FROM node:24-alpine
 LABEL description="Instant high-performance GraphQL API for your PostgreSQL database https://github.com/graphile/postgraphile"
 
 # Set Node.js app folder

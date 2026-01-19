@@ -2,13 +2,6 @@
 title: Running PostGraphile in Docker
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 The following guide describes how to run a network of Docker containers on a
 local machine, including one container for a PostgreSQL database and one
 container for PostGraphile. A the end of this guide, you will have a GraphQL API
@@ -212,7 +205,7 @@ FROM postgres:14-alpine
 COPY ./init/ /docker-entrypoint-initdb.d/
 ```
 
-The first line `FROM postgres:alpine` indicates to build the Docker image based
+The first line `FROM postgres:14-alpine` indicates to build the Docker image based
 on the official PostgreSQL Docker image running in an Alpine Linux container.
 The second line `COPY ./init/ /docker-entrypoint-initdb.d/` will copy the
 database initialization files (SQL) into the folder `docker-entrypoint-initdb.d`
@@ -303,16 +296,14 @@ The `DATABASE_URL` follows the syntax
 
 Create a new folder `graphql` at the root of the repository. It will be used to
 store the files necessary to create the PostGraphile container. Create a new
-file `Dockerfile` in the `graphql` folder with the following content. You will
-notice we include the excellent plugin Connection Filter.
+file `Dockerfile` in the `graphql` folder with the following content.
 
 ```dockerfile
-FROM node:alpine
+FROM node:24-alpine
 LABEL description="Instant high-performance GraphQL API for your PostgreSQL database https://github.com/graphile/postgraphile"
 
-# Install PostGraphile and PostGraphile connection filter plugin
+# Install PostGraphile
 RUN npm install -g postgraphile
-RUN npm install -g postgraphile-plugin-connection-filter
 
 EXPOSE 5000
 ENTRYPOINT ["postgraphile", "-n", "0.0.0.0"]
@@ -342,7 +333,7 @@ services:
             - network
         ports:
             - 5433:5433
-        command: ["--connection", "${DATABASE_URL}", "--port", "5433", "--schema", "public", "--append-plugins", "postgraphile-plugin-connection-filter"]
+        command: ["--preset", "postgraphile/presets/amber", "--connection", "${DATABASE_URL}", "--port", "5433", "--schema", "public"]
 [...]
 ```
 
