@@ -1,5 +1,7 @@
 /**
  * A promise that can be `.resolve()`-ed or `.reject()`-ed at a later time.
+ *
+ * @deprecated Use Promise.withResolvers
  */
 export interface Deferred<T> extends PromiseLike<T> {
   resolve: (input: T | PromiseLike<T>) => void;
