@@ -5,7 +5,7 @@ import {
   withSuperuserPgClientFromPgService,
 } from "@dataplan/pg";
 import type { PromiseOrDirect, Step } from "grafast";
-import { constant, context, defer, noop, object } from "grafast";
+import { constant, context, noop, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
@@ -689,7 +689,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           let eventStream =
             await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
-          const abort = defer<typeof $$stop>();
+          const abort = Promise.withResolvers<typeof $$stop>();
           unlistens.push(() => abort.resolve($$stop));
           const regather = () => {
             // Delete the introspection results
@@ -700,7 +700,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             callback();
           };
           const waitNext = () => {
-            const next = Promise.race([abort, eventStream.next()]);
+            const next = Promise.race([abort.promise, eventStream.next()]);
             next.then(
               (event) => {
                 if (event === $$stop) {
@@ -742,7 +742,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             console.error(
               `postgraphile_watch subscription failed (${e}); waiting ${delay.toFixed(0)}ms then re-establishing`,
             );
-            const result = await Promise.race([sleep(delay), abort]);
+            const result = await Promise.race([sleep(delay), abort.promise]);
             if (result === $$stop) {
               return;
             }
