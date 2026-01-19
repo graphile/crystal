@@ -17,7 +17,8 @@ the CLI and web layer. Thanks to `graphile-config`, this now uses the same
 plugin system, just different scopes.
 
 Server plugins are regular `graphile-config` plugins. Add them to your preset
-and PostGraphile will pick them up automatically.
+in `graphile.config.*` and PostGraphile will load them automatically when it
+loads your configuration file.
 
 Here's a basic `graphile.config.ts` with a server plugin:
 
