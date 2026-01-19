@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/graphile/crystal/tree/main/utils/lru",
   "engines": {
-    "node": ">=14.17"
+    "node": ">=22"
   },
   "files": [
     "dist"
