@@ -2,8 +2,8 @@ import * as assert from "../assert";
 import { isDev, noop } from "../dev";
 import type { Maybe } from "../interfaces";
 import {
-  promiseWithResolve,
   type PromiseWithResolve,
+  promiseWithResolve,
 } from "../promiseWithResolve";
 import type { Step } from "../step";
 import { arrayOfLength, isPromiseLike, sleep } from "../utils";

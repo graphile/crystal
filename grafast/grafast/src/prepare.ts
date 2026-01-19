@@ -49,13 +49,13 @@ import type {
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.js";
+import { promiseWithResolve } from "./promiseWithResolve.js";
 import { timeSource } from "./timeSource.js";
 import {
   arrayOfLength,
   asyncIteratorWithCleanup,
   isPromiseLike,
 } from "./utils.js";
-import { promiseWithResolve } from "./promiseWithResolve.js";
 
 const { GraphQLError } = graphql;
 
