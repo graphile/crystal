@@ -4,8 +4,8 @@ title: Deploying with Docker
 
 :::warning
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+This documentation has not yet been tested with PostGraphile V5. Please get in
+touch if you have used it!
 
 :::
 
@@ -16,7 +16,7 @@ https://hub.docker.com/r/graphile/postgraphile/
 
 Our Docker images are versioned:
 
-- `graphile/postgraphile:4` will give you the latest stable in the "v4.x.x" line
+- `graphile/postgraphile:5` will give you the latest stable in the "v5.x.x" line
   (no alphas, betas, rcs); **this is the recommended version to use**
 - Every new versioned git tag will be available using the exact same tag; e.g.
   `v5.6.7-alpha.8` would become `graphile/postgraphile:v5.6.7-alpha.8`
@@ -27,10 +27,10 @@ Our Docker images are versioned:
 - `graphile/postgraphile:next` will give you the equivalent of what's on
   `master` right now (i.e. pre-release/bleeding edge/nightly)
 
-From time to time `graphile/postgraphile:4` may lag behind where it should be
+From time to time `graphile/postgraphile:5` may lag behind where it should be
 because it's the only manual step in the above. If this happens, give Benjie a
-poke over Discord and he'll push the latest v4.x.y tag to the `v4` branch via
-`git push origin v4.x.y:v4`.
+poke over Discord and he'll push the latest v5.x.y tag to the `v5` branch via
+`git push origin v5.x.y:v5`.
 
 A request was made for clarification on why there are Docker versions with dots
 and other Docker versions with dashes; hopefully this clears things up:
@@ -87,7 +87,7 @@ ARG NODE_ENV="production"
 ################################################################################
 # Build stage 1 - `yarn build`
 
-FROM node:12-alpine as builder
+FROM node:24-alpine as builder
 # Import our shared args
 ARG NODE_ENV
 
@@ -105,7 +105,7 @@ RUN yarn run build
 ################################################################################
 # Build stage 2 - COPY the relevant things (multiple steps)
 
-FROM node:12-alpine as clean
+FROM node:24-alpine as clean
 # Import our shared args
 ARG NODE_ENV
 
@@ -116,7 +116,7 @@ COPY --from=builder /app/server/dist/ /app/server/dist/
 ################################################################################
 # Build stage FINAL - COPY everything, once, and then do a clean `yarn install`
 
-FROM node:12-alpine
+FROM node:24-alpine
 # Import our shared args
 ARG NODE_ENV
 

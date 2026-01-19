@@ -146,8 +146,8 @@ beta_settings:
   cloud_sql_instances: your-cloudsql-instance-connection-string
 ```
 
-1. You will need `flexible` environment for websocket support (subscriptions and
-   live queries). If you are not interested in real-time features you can use
+1. You will need `flexible` environment for websocket support (subscriptions).
+   If you are not interested in real-time features you can use
    `standard` environment and save some bucks. In that case, remove the
    `beta_settings` section
 1. This requires using postgraphile as a library. Minimum setup would be

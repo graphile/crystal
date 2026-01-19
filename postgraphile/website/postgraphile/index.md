@@ -92,7 +92,7 @@ Some of the features we offer:
 - Incredible performance - even for your custom logic!
 - Full GraphQL feature-set, including advanced topics such as:
   - [polymorphism](./polymorphism.md) (interfaces and unions)
-  - [Real-time](./realtime.md) features (subscriptions and soon: live queries)
+- [Real-time](./realtime.md) features (subscriptions)
   - `@stream` / `@defer` support
 - Excellent Relay support via our `postgraphile/presets/relay` preset:
   - Global object identification
