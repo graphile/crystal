@@ -652,10 +652,7 @@ ${duration}
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
-
       const { resolve: resolveTx, promise: tx } = promiseWithResolve<void>();
-      // No need to handle error
-
       let txResolved = false;
       let cursorOpen = false;
       const promise = (async () => {
