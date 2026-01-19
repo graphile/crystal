@@ -1,4 +1,9 @@
-import type { ExecutionDetails, Maybe, PromiseOrDirect } from "..";
+import { noop } from "../dev.js";
+import type {
+  ExecutionDetails,
+  Maybe,
+  PromiseOrDirect,
+} from "../interfaces.js";
 import type { Multistep, UnwrapMultistep } from "../multistep";
 import type { Step } from "../step.js";
 import { isListLikeStep, isObjectLikeStep } from "../step.js";
@@ -210,6 +215,7 @@ export function executeLoad<
   const pendingCount = batch.size;
   if (pendingCount > 0) {
     const deferred = Promise.withResolvers<ReadonlyArray<TData>>();
+    deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
     const batchSpecs = [...batch.keys()];
     const loadBatch: LoadBatch = { deferred, batchSpecs };
     if (!meta.loadBatchesByLoad) {

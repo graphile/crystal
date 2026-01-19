@@ -99,6 +99,7 @@ export function distributor<TData>(
   function lowWaterMarkIncreased(): PromiseLike<void> {
     if (wmi === null) {
       const d = Promise.withResolvers<void>();
+      d.promise.catch(noop); // Guard against unhandledPromiseRejection
       wmi = d;
     }
     return wmi.promise;

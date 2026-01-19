@@ -825,7 +825,7 @@ async function processStream(
 ): Promise<void> {
   /** Resolve this when finished */
   const whenDone = Promise.withResolvers<void>();
-  whenDone.promise.catch(e); // Guard against unhandledPromiseRejection
+  whenDone.promise.catch(noop); // Guard against unhandledPromiseRejection
 
   type ResultTuple = [any, number];
 

@@ -689,8 +689,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           let eventStream =
             await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
-          const abort = Promise.withResolvers<typeof $$stop>();
-          unlistens.push(() => abort.resolve($$stop));
+          const { resolve, promise: abort } =
+            Promise.withResolvers<typeof $$stop>();
+          unlistens.push(() => resolve($$stop));
           const regather = () => {
             // Delete the introspection results
             info.cache.introspectionResultsPromise = null;
@@ -700,7 +701,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             callback();
           };
           const waitNext = () => {
-            const next = Promise.race([abort.promise, eventStream.next()]);
+            const next = Promise.race([abort, eventStream.next()]);
             next.then(
               (event) => {
                 if (event === $$stop) {
@@ -742,7 +743,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             console.error(
               `postgraphile_watch subscription failed (${e}); waiting ${delay.toFixed(0)}ms then re-establishing`,
             );
-            const result = await Promise.race([sleep(delay), abort.promise]);
+            const result = await Promise.race([sleep(delay), abort]);
             if (result === $$stop) {
               return;
             }

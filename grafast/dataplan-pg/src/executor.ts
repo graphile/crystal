@@ -523,7 +523,7 @@ ${duration}
                 }
 
                 const pendingResult = Promise.withResolvers<any[]>(); // CRITICAL: this MUST resolve later
-                pendingResult.promise.catch(noop); // Protect against unhandledPromiseRejection
+                pendingResult.promise.catch(noop); // Guard against unhandledPromiseRejection
 
                 results[resultIndex] = pendingResult.promise;
                 scopedCache.set(identifiersJSON, pendingResult);
@@ -652,7 +652,7 @@ ${duration}
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
       const tx = Promise.withResolvers<void>();
-      tx.promise.catch(noop); // Protect against unhandledPromiseRejection
+      tx.promise.catch(noop); // Guard against unhandledPromiseRejection
       let txResolved = false;
       let cursorOpen = false;
       const promise = (async () => {
@@ -755,6 +755,7 @@ ${duration}
               throw new Error(`Waiting on more than one record! Forbidden!`);
             }
             const deferred = Promise.withResolvers<any>();
+            deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
             waiting[batchIndex] = deferred;
             return deferred.promise;
           }

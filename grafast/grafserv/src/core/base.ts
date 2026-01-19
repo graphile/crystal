@@ -4,6 +4,7 @@ import {
   execute,
   getGrafastMiddleware,
   isPromiseLike,
+  noop,
   stringifyPayload,
   subscribe,
 } from "grafast";
@@ -346,6 +347,7 @@ export class GrafservBase {
     function (this: GrafservBase, ...args) {
       const [request] = args;
       const deferred = Promise.withResolvers<HandlerResult | null>();
+      deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
       const { dynamicOptions } = this;
       const onReady = () => {
         this.eventEmitter.off("dynamicOptions:ready", onReady);
@@ -388,6 +390,7 @@ export class GrafservBase {
       const [request] = args;
       const { dynamicOptions } = this;
       const deferred = Promise.withResolvers<HandlerResult>();
+      deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
       const onReady = () => {
         this.eventEmitter.off("dynamicOptions:ready", onReady);
         this.eventEmitter.off("dynamicOptions:error", onError);
@@ -431,6 +434,7 @@ export class GrafservBase {
     const [request] = args;
     const { dynamicOptions } = this;
     const deferred = Promise.withResolvers<HandlerResult>();
+    deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
     const onReady = () => {
       this.eventEmitter.off("dynamicOptions:ready", onReady);
       this.eventEmitter.off("dynamicOptions:error", onError);
