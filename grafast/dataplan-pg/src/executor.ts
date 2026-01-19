@@ -460,19 +460,16 @@ ${duration}
     type TextAndValues = string & { brand?: "TextAndValues" };
     type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
     type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
-    for (const [context, batch] of batches) {
+    for (const [batchContext, batch] of batches) {
+      const context = batchContext as typeof batchContext &
+        Record<symbol, LRU<TextAndValues, CacheForQuery> | undefined>;
       promises.push(
         (async () => {
-          let cacheForContext = useCache
-            ? ((context as any)[this.$$cache] as LRU<
-                TextAndValues,
-                CacheForQuery
-              >)
-            : null;
-          if (!cacheForContext) {
+          let cacheForContext = useCache ? context[this.$$cache] : undefined;
+          if (cacheForContext === undefined) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
             if (useCache) {
-              (context as any)[this.$$cache] = cacheForContext;
+              context[this.$$cache] = cacheForContext;
             }
           }
 
