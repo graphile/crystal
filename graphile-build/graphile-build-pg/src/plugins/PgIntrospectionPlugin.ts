@@ -5,7 +5,7 @@ import {
   withSuperuserPgClientFromPgService,
 } from "@dataplan/pg";
 import type { PromiseOrDirect, Step } from "grafast";
-import { constant, context, noop, object } from "grafast";
+import { constant, context, noop, object, promiseWithResolve } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
@@ -690,7 +690,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
           const { resolve, promise: abort } =
-            Promise.withResolvers<typeof $$stop>();
+            promiseWithResolve<typeof $$stop>();
           unlistens.push(() => resolve($$stop));
           const regather = () => {
             // Delete the introspection results

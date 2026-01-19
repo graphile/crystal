@@ -11,6 +11,7 @@ import type {
 } from "graphql";
 import type { ObjMap } from "graphql/jsutils/ObjMap";
 
+import { promiseWithResolve } from "./promiseWithResolve.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { DataFromObjectSteps } from "./steps/object.js";
 
@@ -503,6 +504,7 @@ export {
   partitionByIndex,
   PlanTypeInfo,
   PromiseOrDirect,
+  promiseWithResolve,
   proxy,
   ProxyStep,
   recordsMatch,
@@ -546,9 +548,11 @@ export {
   UnionPlan,
   UnwrapMultistep,
 };
+export type { PromiseWithResolve } from "./promiseWithResolve.js";
 
 exportAsMany("grafast", {
   exportAs,
+  promiseWithResolve,
   exportAsMany,
   grafastPrint,
   makeGrafastSchema,

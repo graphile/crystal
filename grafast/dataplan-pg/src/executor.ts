@@ -15,6 +15,7 @@ import {
   isAsyncIterable,
   isDev,
   noop,
+  promiseWithResolve,
 } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
@@ -652,11 +653,7 @@ ${duration}
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
 
-      const { resolve: resolveTx, promise: tx } = Promise.withResolvers() as {
-        promise: Promise<void>;
-        // Explicitly forbid passing errors to resolve
-        resolve(): void;
-      };
+      const { resolve: resolveTx, promise: tx } = promiseWithResolve<void>();
       // No need to handle error
 
       let txResolved = false;
