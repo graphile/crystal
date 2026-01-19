@@ -49,8 +49,8 @@ PORT=5433
 
 Create a new folder `graphql` at the root of the repository. It will be used to
 store the files necessary to create the PostGraphile container. In the `graphql`
-folder, create a subfolder `src` and add a file `package.json` into it with the
-following content.
+folder, create a subfolder `src` and add a file `package.json` (plus a lockfile
+such as `package-lock.json`) into it with the following content.
 
 ```json
 {
@@ -114,7 +114,7 @@ RUN mkdir -p /home/node/app/node_modules
 WORKDIR /home/node/app
 
 # Copy dependencies
-COPY ./src/package*.json .
+COPY ./src/package.json ./src/package-lock.json ./
 RUN chown -R node:node /home/node/app
 
 # Install dependencies
@@ -167,6 +167,7 @@ At this stage, the repository should look like this:
 ├─ graphql/
 |  ├─ src/
 |  |  ├─ package.json
+|  |  ├─ package-lock.json
 |  |  └─ server.js
 |  └─ Dockerfile
 ├─ .env
