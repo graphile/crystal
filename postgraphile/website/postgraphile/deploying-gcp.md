@@ -177,12 +177,12 @@ in package.json:
 ```json
 {
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.mjs"
   }
 }
 ```
 
-Create a `graphile.config.js` alongside your `src` folder:
+Create a `graphile.config.mjs` inside your `src` folder:
 
 ```js
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
@@ -202,11 +202,11 @@ export default {
 };
 ```
 
-in index.js:
+in index.mjs:
 
 ```js
 import express from "express";
-import preset from "../graphile.config.js";
+import preset from "./graphile.config.mjs";
 import { postgraphile } from "postgraphile";
 import { grafserv } from "postgraphile/grafserv/express/v4";
 

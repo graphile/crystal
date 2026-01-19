@@ -70,9 +70,9 @@ such as `package-lock.json`) into it with the following content.
 This file will be used by NPM package manager to install the dependencies in the
 Node.js container.
 
-Create a `graphile.config.ts` file in the `graphql` folder:
+Create a `graphile.config.mjs` file in the `graphql/src` folder:
 
-```ts title="graphql/graphile.config.ts"
+```js title="graphql/src/graphile.config.mjs"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
 
@@ -90,7 +90,7 @@ content.
 
 ```js
 import { createServer } from "node:http";
-import preset from "../graphile.config.js";
+import preset from "./graphile.config.mjs";
 import { postgraphile } from "postgraphile";
 import { grafserv } from "postgraphile/grafserv/node";
 
@@ -129,7 +129,6 @@ RUN npm install
 
 # Copy application files and config
 COPY --chown=node:node ./src ./src
-COPY --chown=node:node ./graphile.config.ts ./graphile.config.ts
 
 EXPOSE 8080
 CMD [ "node", "src/server.js" ]
@@ -172,10 +171,10 @@ At this stage, the repository should look like this:
 |  |  └─ 01-data.sql
 |  └─ Dockerfile
 ├─ graphql/
-|  ├─ graphile.config.ts
 |  ├─ src/
 |  |  ├─ package.json
 |  |  ├─ package-lock.json
+|  |  ├─ graphile.config.mjs
 |  |  └─ server.js
 |  └─ Dockerfile
 ├─ .env
