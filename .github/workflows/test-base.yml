@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres-version: [12, 17] #, 11, 13, 14, 15]
+        postgres-version: [12, 14, 18] #, 15, 16, 17]
         node-version: [22.x]
 
     services:
