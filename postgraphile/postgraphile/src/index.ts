@@ -1,8 +1,8 @@
 // Copy the types through for our dependents
 import "graphile-build-pg";
 
-import type { Deferred, PromiseOrDirect } from "grafast";
-import { defer, isPromiseLike } from "grafast";
+import type { PromiseOrDirect } from "grafast";
+import { isPromiseLike } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
@@ -25,15 +25,19 @@ export function postgraphile(
   preset: GraphileConfig.Preset,
 ): PostGraphileInstance {
   const resolvedPreset = resolvePreset(preset);
-  let schemaResult:
-    | PromiseLike<SchemaResult>
-    | Deferred<SchemaResult>
-    | SchemaResult;
+  let schemaResult: PromiseLike<SchemaResult> | SchemaResult;
   let stopWatchingPromise: Promise<() => void> | null = null;
   let released = false;
   let server: GrafservBase | undefined;
   if (resolvedPreset.grafserv?.watch) {
-    schemaResult = defer<SchemaResult>();
+    const promiseWithResolvers = Promise.withResolvers<SchemaResult>();
+    let resolve = promiseWithResolvers.resolve as
+      | typeof promiseWithResolvers.resolve
+      | null;
+    let reject = promiseWithResolvers.reject as
+      | typeof promiseWithResolvers.reject
+      | null;
+    schemaResult = promiseWithResolvers.promise;
     stopWatchingPromise = watchSchema(preset, async (error, newParams) => {
       if (error || !newParams) {
         console.error("Watch error: ", error);
@@ -49,14 +53,10 @@ export function postgraphile(
         }
         return;
       }
-      const oldSchemaResult = schemaResult;
       schemaResult = newParams;
-      if (
-        oldSchemaResult !== null &&
-        "resolve" in oldSchemaResult &&
-        typeof oldSchemaResult.resolve === "function"
-      ) {
-        oldSchemaResult.resolve(schemaResult);
+      if (resolve != null) {
+        resolve(schemaResult);
+        resolve = reject = null;
       }
       if (server) {
         await server.ready();
