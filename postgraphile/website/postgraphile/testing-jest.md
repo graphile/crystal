@@ -221,8 +221,11 @@ you can place assertions on the results.
 First, make sure that your PostGraphile preset lives in
 `graphile.config.js` (or `.ts`) so both your server and tests can import it.
 The helper below reuses that preset to build a schema, then runs queries via
-`grafast()` while supplying a `requestContext` that looks like the one Grafserv
-would provide.
+Gra*fast* while supplying a `requestContext` that looks like the one Grafserv
+would provide. It also uses
+`makeWithPgClientViaPgClientAlreadyInTransaction()` so the GraphQL operation
+and any assertions can run inside the same transaction. This helper is only
+appropriate for tests.
 
 <details>
 <summary>(Click to expand.) Create a <tt>test_helper.ts</tt> file for running
@@ -234,9 +237,16 @@ The following code is in TypeScript; you can convert it to JavaScript via
 https://www.typescriptlang.org/play
 
 ```ts
+import { makeWithPgClientViaPgClientAlreadyInTransaction } from "@dataplan/pg/adaptors/pg";
 import type { GraphileConfig } from "graphile-config";
-import { grafast } from "grafast";
-import type { ExecutionResult, GraphQLSchema } from "graphql";
+import { execute, hookArgs } from "grafast";
+import {
+  parse,
+  type ExecutionResult,
+  type GraphQLSchema,
+  validate,
+} from "graphql";
+import { Pool } from "pg";
 import { postgraphile } from "postgraphile";
 import preset from "../src/graphile.config.js";
 
@@ -309,14 +319,21 @@ interface ICtx {
   pgl: ReturnType<typeof postgraphile>;
   schema: GraphQLSchema;
   resolvedPreset: GraphileConfig.ResolvedPreset;
+  pgPool: Pool;
 }
 let ctx: ICtx | null = null;
 
 export const setup = async () => {
+  if (!process.env.TEST_DATABASE_URL) {
+    throw new Error("Cannot run tests without a TEST_DATABASE_URL");
+  }
   const pgl = postgraphile(preset);
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
+  const pgPool = new Pool({
+    connectionString: process.env.TEST_DATABASE_URL,
+  });
 
-  ctx = { pgl, schema, resolvedPreset };
+  ctx = { pgl, schema, resolvedPreset, pgPool };
 };
 
 export const teardown = async () => {
@@ -324,9 +341,10 @@ export const teardown = async () => {
     if (!ctx) {
       return null;
     }
-    const { pgl } = ctx;
+    const { pgl, pgPool } = ctx;
     ctx = null;
     await pgl.release();
+    await pgPool.end();
     return null;
   } catch (e) {
     console.error(e);
@@ -344,7 +362,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
   ) => void | ExecutionResult | Promise<void | ExecutionResult> = () => {}, // Place test assertions in this function
 ) {
   if (!ctx) throw new Error("No ctx!");
-  const { schema, resolvedPreset } = ctx;
+  const { schema, resolvedPreset, pgPool } = ctx;
   const req = new MockReq({
     url: resolvedPreset.grafserv?.graphqlPath ?? "/graphql",
     method: "POST",
@@ -357,31 +375,55 @@ export const runGraphQLQuery = async function runGraphQLQuery(
   const res: any = { req };
   req.res = res;
 
-  const contextValue: Record<string, any> = {
-    __TESTING: true,
-  };
+  const pgClient = await pgPool.connect();
+  await pgClient.query("begin");
 
-  const result = await grafast({
-    schema,
-    resolvedPreset,
-    requestContext: {
-      node: { req, res },
-      expressv4: { req, res },
-    },
-    source: query,
-    variableValues: variables ?? {},
-    contextValue,
-  });
+  try {
+    const document = parse(query);
+    const validationErrors = validate(schema, document);
+    if (validationErrors.length > 0) {
+      throw validationErrors[0];
+    }
 
-  // This is where we call the `checker` so you can do your assertions.
-  const checkResult = await checker(result as ExecutionResult, {
-    contextValue,
-  });
+    const contextValue: Record<string, any> = {
+      __TESTING: true,
+    };
 
-  // You don't have to keep this, I just like knowing when things change!
-  expect(sanitize(result)).toMatchSnapshot();
+    const executionArgs = {
+      schema,
+      document,
+      variableValues: variables ?? {},
+      contextValue,
+      resolvedPreset,
+      requestContext: {
+        node: { req, res },
+        expressv4: { req, res },
+      },
+    };
+    const args = await hookArgs(executionArgs);
 
-  return checkResult == null ? result : checkResult;
+    // Test-only helper: reuse a client that's already in a transaction.
+    const withPgClient = makeWithPgClientViaPgClientAlreadyInTransaction(
+      pgClient,
+      true,
+    );
+    args.contextValue.withPgClient = withPgClient;
+
+    const result = await execute(args);
+
+    // This is where we call the `checker` so you can do your assertions.
+    const checkResult = await checker(result as ExecutionResult, {
+      contextValue: args.contextValue,
+    });
+
+    // You don't have to keep this, I just like knowing when things change!
+    expect(sanitize(result)).toMatchSnapshot();
+
+    return checkResult == null ? result : checkResult;
+  } finally {
+    await pgClient.query("rollback");
+    pgClient.release();
+  }
 };
 ```
 
@@ -430,7 +472,7 @@ test("GraphQL query nodeId", async () => {
           contextValue.pgSettings ?? null,
           async (pgClient: any) => {
             const { rows } = await pgClient.query(
-              `SELECT * FROM app_public.users WHERE id = $1`,
+              `select * from app_public.users where id = $1`,
               [17],
             );
             if (rows.length !== 1) {
