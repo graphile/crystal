@@ -7,13 +7,6 @@ testing there.
 
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 ### Testing the database
 
 Making sure your database functions, triggers, permissions, etc work correctly
