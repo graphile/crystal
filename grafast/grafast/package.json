@@ -61,7 +61,7 @@
   },
   "homepage": "https://grafast.org",
   "engines": {
-    "node": ">=14.17"
+    "node": ">=22"
   },
   "dependencies": {
     "@graphile/lru": "workspace:^",
