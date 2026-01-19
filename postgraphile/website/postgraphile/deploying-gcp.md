@@ -2,13 +2,6 @@
 title: Deploying to GCP
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 _aka Google Cloud Platform (App Engine)_
 
 _This post is a work in progress. Please see
@@ -22,8 +15,7 @@ Deploying PostGraphile with nothing more than command-line arguments to the
 cloud to serve between PostgreSQL hosted in Google Cloud SQL and an Angular App
 hosted in Google App Engine.
 
-Need to use `cloud_sql_instances` to connect to the PostgreSQL instance, and set
-the host and port in the command line.
+Need to use `cloud_sql_instances` to connect to the PostgreSQL instance.
 
 Make sure you've got a project with your
 [Cloud SQL PostgreSQL database](https://cloud.google.com/sql/docs/postgres/connect-app-engine),
@@ -82,6 +74,26 @@ instance `websr-dev`.
 - You can get the full instance name from your Cloud SQL Instance in the area of
   the Cloud SQL interface titled "Connect to this instance"
 
+Create a `graphile.config.mjs` alongside your `package.json` so PostGraphile can
+load the configuration automatically:
+
+```js
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+export default {
+  extends: [PostGraphileAmberPreset],
+  pgServices: [makePgService({ connectionString: process.env.DATABASE_URL })],
+  grafserv: {
+    host: "0.0.0.0",
+    port: 8080,
+    graphqlPath: "/",
+    // Quick hack for development; use a proper CORS policy in production.
+    // dangerouslyAllowAllCORSRequests: true,
+  },
+};
+```
+
 In `package.json` specify `postgraphile`, some project details, and the `start`
 script. E.g.:
 
@@ -90,15 +102,14 @@ script. E.g.:
   "name": "myprojectname",
   "version": "1.0.0",
   "scripts": {
-    "start": "postgraphile --host --port 8080 --cors --enhance-graphiql --graphql / 0.0.0.0 -c postgres://user:password@172.17.0.1:5432/str_dev"
+    "start": "postgraphile"
   },
   "engines": {
-    "node": "^10.15",
-    "npm": "^6.9"
+    "node": ">=24"
   },
   "license": "ISC",
   "dependencies": {
-    "postgraphile": "^4.4.5"
+    "postgraphile": "^5.0.0"
   }
 }
 ```
@@ -106,17 +117,18 @@ script. E.g.:
 **The project will end up at `https://[project-name].appspot.com/`**
 
 - Your GraphQL endpoint will be that URL.
-- You can access GraphiQL at `https://[project-name].appspot.com/graphiql`
+- You can access Ruru at `https://[project-name].appspot.com/graphiql`
 
-Regarding the `start` command, the flags are:
+In `graphile.config.mjs`, the settings are:
 
-- `--host 0.0.0.0` allows GAE's nginx to successfully bind to the service
-- `--port 8080` binds to port 8080, which is a special port number that Google
-  cloud will automatically expose via the service name, so you can access your
-  PostGraphile service directly at **`https://[project-name].appspot.com/`**
-- `--graphql /` puts the GraphQL endpoint at the root `/` (rather than
-  `/graphql` as is the default)
-- `--cors` circumvents annoying CORS nonsense
+- `grafserv.host: "0.0.0.0"` allows GAE's nginx to successfully bind to the
+  service
+- `grafserv.port: 8080` binds to port 8080, which is a special port number that
+  Google cloud will automatically expose via the service name, so you can
+  access your PostGraphile service directly at
+  **`https://[project-name].appspot.com/`**
+- `grafserv.graphqlPath: "/"` puts the GraphQL endpoint at the root `/` (rather
+  than `/graphql` as is the default)
 
 ### Deploying
 
@@ -147,9 +159,9 @@ beta_settings:
 ```
 
 1. You will need `flexible` environment for websocket support (subscriptions).
-   If you are not interested in real-time features you can use
-   `standard` environment and save some bucks. In that case, remove the
-   `beta_settings` section
+   If you are not interested in real-time features you can use `standard`
+   environment and save some bucks. In that case, remove the `beta_settings`
+   section
 1. This requires using postgraphile as a library. Minimum setup would be
    something like:
 
@@ -173,27 +185,31 @@ in package.json:
 in index.js:
 
 ```js
-const express = require("express");
-const { postgraphile } = require("postgraphile");
+import express from "express";
+import { postgraphile } from "postgraphile";
+import { grafserv } from "postgraphile/grafserv/express/v4";
+import { makePgService } from "postgraphile/adaptors/pg";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 const app = express();
 
-// node-postgres Pool config (https://node-postgres.com/api/pool,
-// https://node-postgres.com/api/client)
-const pgConfig = {
-  host: process.env.PGHOST || "localhost",
-  port: process.env.PGPORT || 5432,
-  user: process.env.PGUSER,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
+const preset = {
+  extends: [PostGraphileAmberPreset],
+  pgServices: [
+    makePgService({
+      connectionString: process.env.DATABASE_URL,
+    }),
+  ],
+  grafserv: {
+    host: "0.0.0.0",
+    port: 8080,
+  },
 };
 
-// Your PostGraphile config:
-// https://www.graphile.org/postgraphile/usage-library/#api-postgraphilepgconfig-schemaname-options
-const postgraphileOptions = {
-  /* ... */
-};
-app.use(postgraphile(pgConfig, "public", postgraphileOptions));
+const pgl = postgraphile(preset);
+const serv = pgl.createServ(grafserv);
+
+await serv.addTo(app);
 
 app.listen(8080);
 ```
