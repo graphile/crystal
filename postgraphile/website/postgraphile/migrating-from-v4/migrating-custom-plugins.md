@@ -87,9 +87,8 @@ a `prepack` script to compile your TypeScript:
 
 ### Upgrade to V5 dependencies
 
-At time of writing, V5 is in release candidate status, so you should use the `@rc` tag to
-install devDependencies. Go through each PostGraphile V4 related package
-referenced in package.json and install the `@rc` version of it, for example:
+Go through each PostGraphile V4 related package referenced in package.json
+and install the corresponding V5 version of it, for example:
 
 ```json title="package.json before"
 {
@@ -104,19 +103,19 @@ referenced in package.json and install the `@rc` version of it, for example:
 
 ```bash
 yarn add --dev \
-  graphile-build@rc \
-  graphile-build-pg@rc \
-  postgraphile@rc \
-  postgraphile-plugin-connection-filter@rc
+  graphile-build \
+  graphile-build-pg \
+  postgraphile \
+  postgraphile-plugin-connection-filter
 ```
 
 ```json title="package.json after"
 {
   "devDependencies": {
-    "graphile-build": "^5.0.0-rc.3",
-    "graphile-build-pg": "^5.0.0-rc.3",
-    "postgraphile": "^5.0.0-rc.4",
-    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
+    "graphile-build": "^5.0.0",
+    "graphile-build-pg": "^5.0.0",
+    "postgraphile": "^5.0.0",
+    "postgraphile-plugin-connection-filter": "^3.0.0"
   }
 }
 ```
@@ -139,8 +138,8 @@ now be just:
 ```json title="package.json using subpaths for graphile-build*"
 {
   "devDependencies": {
-    "postgraphile": "^5.0.0-rc.4",
-    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
+    "postgraphile": "^5.0.0",
+    "postgraphile-plugin-connection-filter": "^3.0.0"
   }
 }
 ```

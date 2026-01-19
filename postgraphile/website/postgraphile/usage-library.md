@@ -146,7 +146,7 @@ npm init -y
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@rc
+npm install --save express postgraphile
 ```
 
 ### Environment variables
@@ -279,7 +279,7 @@ the versions of `express` and `postgraphile` being the most recent):
   "version": "1.0.0",
   "dependencies": {
     "express": "^4.21.2",
-    "postgraphile": "^5.0.0-beta.38"
+    "postgraphile": "^5.0.0"
   },
   "private": true,
   "type": "module",
@@ -308,7 +308,7 @@ To tidy up, let's make the following changes to the `package.json` file:
 -  "description": "",
    "dependencies": {
      "express": "^4.21.2",
-     "postgraphile": "^5.0.0-rc.4"
+     "postgraphile": "^5.0.0"
    }
  }
 ```
@@ -391,7 +391,7 @@ nvm use
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@rc @graphile/simplify-inflection
+npm install --save express postgraphile @graphile/simplify-inflection
 npm install --save-dev typescript @tsconfig/node24 @types/express @types/node
 ```
 
@@ -528,9 +528,9 @@ with different version numbers):
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@graphile/simplify-inflection": "^8.0.0-beta.6",
+    "@graphile/simplify-inflection": "^8.0.0",
     "express": "^4.21.2",
-    "postgraphile": "^5.0.0-beta.38"
+    "postgraphile": "^5.0.0"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.0",
