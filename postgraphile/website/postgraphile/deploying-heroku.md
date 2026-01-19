@@ -2,13 +2,6 @@
 title: Deploying to Heroku
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 It's possible to use PostGraphile on Heroku with either AWS RDS or Heroku
 Postgres.
 
@@ -53,9 +46,23 @@ See: https://devcenter.heroku.com/articles/heroku-postgresql-credentials
 5. Add the heroku remote `heroku git:remote -a heroku_app_name`
 6. Configure Heroku to use the right url
    `heroku config:set RDS_URL="postgres://user:pass@rdshost/dbname?ssl=true" -a heroku_app_name`
-7. Create Procfile:
-   `echo 'web: postgraphile -c $RDS_URL --host 0.0.0.0 --port $PORT' >> Procfile`
-8. Deploy: `git push heroku master`
+7. Create `graphile.config.mjs`:
+   ```js
+   import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+   import { makePgService } from "postgraphile/adaptors/pg";
+
+   export default {
+     extends: [PostGraphileAmberPreset],
+     pgServices: [makePgService({ connectionString: process.env.RDS_URL })],
+     grafserv: {
+       host: "0.0.0.0",
+       port: parseInt(process.env.PORT, 10),
+     },
+   };
+   ```
+8. Create Procfile:
+   `echo 'web: postgraphile' >> Procfile`
+9. Deploy: `git push heroku master`
 
 ### More detailed setup, using PostGraphile as a library
 
@@ -76,7 +83,10 @@ you have `engines` defined to tell Heroku which version of Node to use:
 ```json
   "scripts": {
     "build": "tsc",
-    "start": "node server.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "engines": {
     "node": "12.x"

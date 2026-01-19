@@ -51,14 +51,7 @@ module.exports = {
 
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
-PostGraphile is designed to be ran as a standard Node.js application on the
+PostGraphile is designed to be run as a standard Node.js application on the
 server, using the built in `require` functionality which reads code from the
 filesystem. However, if system startup time is a critical metric in your
 environment (for example on serverless environments) this "searching and loading
