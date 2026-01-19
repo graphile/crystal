@@ -518,15 +518,15 @@ export class PgSubscriber<
   subscribe<TTopic extends keyof TTopics>(
     topic: TTopic,
   ): AsyncIterableIterator<TTopics[TTopic]> {
+    type Topic = TTopics[TTopic];
     if (!this.alive) {
       throw new Error("This PgSubscriber has been released.");
     }
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     const { eventEmitter, topics } = this;
-    const stack: Array<TTopics[TTopic]> = [];
-    const queue: Array<PromiseWithResolvers<IteratorResult<TTopics[TTopic]>>> =
-      [];
+    const stack: Array<Topic> = [];
+    const queue: Array<PromiseWithResolvers<IteratorResult<Topic>>> = [];
     let finished: IteratorReturnResult<unknown> | Promise<never> | null = null;
 
     function doFinally(value?: unknown, error?: Error) {
@@ -558,20 +558,19 @@ export class PgSubscriber<
       return finished;
     }
 
-    const asyncIterableIterator: AsyncIterableIterator<TTopics[TTopic]> = {
+    const asyncIterableIterator: AsyncIterableIterator<Topic> = {
       [Symbol.asyncIterator]() {
         return this;
       },
       async next() {
         if (stack.length > 0) {
-          const value = stack.shift() as TTopics[TTopic];
+          const value = stack.shift() as Topic;
           return { done: false, value };
         } else if (finished) {
           return finished;
         } else {
           // This must be done synchronously - there must be **NO AWAIT BEFORE THIS**
-          const waiting =
-            Promise.withResolvers<IteratorResult<TTopics[TTopic]>>();
+          const waiting = Promise.withResolvers<IteratorResult<Topic>>();
           waiting.promise.catch(noop); // Guard against unhandledPromiseRejection
           queue.push(waiting);
 
@@ -586,7 +585,7 @@ export class PgSubscriber<
       },
     };
 
-    function recv(payload: TTopics[TTopic]) {
+    function recv(payload: Topic) {
       const first = queue.shift();
       if (first) {
         first.resolve({ done: false, value: payload });
