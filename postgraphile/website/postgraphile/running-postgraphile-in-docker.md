@@ -208,7 +208,7 @@ Dockerfile for PostgreSQL is extremely simple. In the folder `db` (not in the
 folder `init`), create a new file named `Dockerfile` with the following content.
 
 ```dockerfile
-FROM postgres:11.0-alpine
+FROM postgres:14-alpine
 COPY ./init/ /docker-entrypoint-initdb.d/
 ```
 

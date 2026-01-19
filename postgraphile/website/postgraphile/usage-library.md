@@ -308,7 +308,7 @@ To tidy up, let's make the following changes to the `package.json` file:
 -  "description": "",
    "dependencies": {
      "express": "^4.21.2",
-     "postgraphile": "^5.0.0-beta.38"
+     "postgraphile": "^5.0.0-rc.4"
    }
  }
 ```
@@ -376,8 +376,9 @@ cd postgraphile_express_typescript
 npm init -y
 ```
 
-You should also ensure you're running Node v24+. If you're running earlier
-versions, then you may need to pass `--experimental-strip-types` to Node.
+You should also ensure you're running Node v24+ (Node v22 is also supported,
+but does not include built-in type stripping; you may need to pass
+`--experimental-strip-types` to Node if using v22).
 
 ```bash
 # For nvm; other Node version managers exist.
@@ -413,8 +414,8 @@ echo .env >> .gitignore
 ### TypeScript configuration
 
 Create a `tsconfig.json` file that extends from the relevant @tsconfig for your
-Node.js major version; e.g. if you're using Node v22.14.0 that would be
-[`@tsconfig/node22`](https://www.npmjs.com/package/@tsconfig/node22):
+Node.js major version; e.g. if you're using Node v24.0.0 that would be
+[`@tsconfig/node24`](https://www.npmjs.com/package/@tsconfig/node24):
 
 ```json title="tsconfig.json"
 {
@@ -532,9 +533,9 @@ with different version numbers):
     "postgraphile": "^5.0.0-beta.38"
   },
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.0",
+    "@tsconfig/node24": "^24.0.0",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.15.32",
+    "@types/node": "^24.0.0",
     "typescript": "^5.7.3"
   },
   "private": true,
