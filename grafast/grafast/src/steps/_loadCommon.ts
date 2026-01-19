@@ -1,5 +1,4 @@
 import type { ExecutionDetails, Maybe, PromiseOrDirect } from "..";
-import { defer, type Deferred } from "../deferred";
 import type { Multistep, UnwrapMultistep } from "../multistep";
 import type { Step } from "../step.js";
 import { isListLikeStep, isObjectLikeStep } from "../step.js";
@@ -87,8 +86,8 @@ export function paramSig(
   );
 }
 
-export interface LoadBatch {
-  deferred: Deferred<any>;
+interface LoadBatch {
+  deferred: PromiseWithResolvers<any>;
   batchSpecs: readonly any[];
 }
 
@@ -210,7 +209,7 @@ export function executeLoad<
   }
   const pendingCount = batch.size;
   if (pendingCount > 0) {
-    const deferred = defer<ReadonlyArray<TData>>();
+    const deferred = Promise.withResolvers<ReadonlyArray<TData>>();
     const batchSpecs = [...batch.keys()];
     const loadBatch: LoadBatch = { deferred, batchSpecs };
     if (!meta.loadBatchesByLoad) {
@@ -232,7 +231,7 @@ export function executeLoad<
       });
     }
     return (async () => {
-      const loadResults = await deferred;
+      const loadResults = await deferred.promise;
       for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {
         const spec = batchSpecs[pendingIndex];
         const targetIndexes = batch.get(spec)!;
