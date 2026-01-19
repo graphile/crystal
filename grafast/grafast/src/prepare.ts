@@ -55,6 +55,7 @@ import {
   asyncIteratorWithCleanup,
   isPromiseLike,
 } from "./utils.js";
+import { promiseWithResolve } from "./promiseWithResolve.js";
 
 const { GraphQLError } = graphql;
 
@@ -479,11 +480,11 @@ function executePreemptive(
       const stream = arr[$$streamMore];
       // Do the async iterable
       let stopped = false;
-      const abort = Promise.withResolvers<undefined>();
-      abort.promise.catch(noop); // Protect against unhandledPromiseRejection
+      const { promise: abortPromise, resolve: resolveAbort } =
+        promiseWithResolve<void>();
       const iterator = newIterator((e) => {
         stopped = true;
-        abort.resolve(undefined);
+        resolveAbort();
         if (e != null) {
           try {
             const result = stream.throw?.(e);
@@ -508,7 +509,7 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await Promise.race([abort.promise, stream.next()]);
+          const next = await Promise.race([abortPromise, stream.next()]);
           if (stopped || !next) {
             break;
           }
@@ -521,7 +522,7 @@ function executePreemptive(
             break;
           }
           const payload = await Promise.race([
-            abort.promise,
+            abortPromise,
             executeStreamPayload(value, i),
           ]);
           if (payload === undefined) {
