@@ -295,19 +295,6 @@ export function isPromiseLike<T>(t: T | PromiseLike<T>): t is PromiseLike<T> {
 }
 
 /**
- * Is a promise that can be externally resolved.
- */
-export function isDeferred<T>(
-  t: T | Promise<T> | Deferred<T>,
-): t is Deferred<T> {
-  return (
-    isPromise(t) &&
-    typeof (t as any).resolve === "function" &&
-    typeof (t as any).reject === "function"
-  );
-}
-
-/**
  * Returns true if array1 and array2 have the same length, and every pair of
  * values within them pass the `comparator` check (which defaults to `===`).
  */
