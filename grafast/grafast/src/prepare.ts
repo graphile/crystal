@@ -16,8 +16,6 @@ import {
   FLAG_ERROR,
   NO_FLAGS,
 } from "./constants.js";
-import type { Deferred } from "./deferred.js";
-import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
 import {
   batchExecutionValue,
@@ -481,7 +479,7 @@ function executePreemptive(
       const stream = arr[$$streamMore];
       // Do the async iterable
       let stopped = false;
-      const abort = defer<undefined>();
+      const abort = Promise.withResolvers<undefined>();
       const iterator = newIterator((e) => {
         stopped = true;
         abort.resolve(undefined);
@@ -509,7 +507,7 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await Promise.race([abort, stream.next()]);
+          const next = await Promise.race([abort.promise, stream.next()]);
           if (stopped || !next) {
             break;
           }
@@ -522,7 +520,7 @@ function executePreemptive(
             break;
           }
           const payload = await Promise.race([
-            abort,
+            abort.promise,
             executeStreamPayload(value, i),
           ]);
           if (payload === undefined) {
@@ -825,7 +823,7 @@ async function processStream(
   outputDataAsString: boolean,
 ): Promise<void> {
   /** Resolve this when finished */
-  const whenDone = defer();
+  const whenDone = Promise.withResolvers<void>();
 
   type ResultTuple = [any, number];
 
@@ -1001,7 +999,7 @@ async function processStream(
     }
     // TODO: cleanup
   }
-  return whenDone;
+  return whenDone.promise;
 }
 
 function processSingleDeferred(
@@ -1112,7 +1110,7 @@ function processBatches(
     RequestTools,
     Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
   >,
-  whenDone: Deferred<void>,
+  whenDone: PromiseWithResolvers<void>,
   asString: boolean,
 ) {
   try {
@@ -1168,8 +1166,8 @@ type DBBRC = Map<
 >;
 let deferredBatchesByRequestToolsAsString: DBBRC = new Map();
 let deferredBatchesByRequestToolsNotAsString: DBBRC = new Map();
-let nextBatchAsString: Deferred<void> | null = null;
-let nextBatchNotAsString: Deferred<void> | null = null;
+let nextBatchAsString: PromiseWithResolvers<void> | null = null;
+let nextBatchNotAsString: PromiseWithResolvers<void> | null = null;
 
 function processDeferred(
   requestContext: RequestTools,
@@ -1193,16 +1191,16 @@ function processDeferred(
   }
   if (outputDataAsString) {
     if (!nextBatchAsString) {
-      nextBatchAsString = defer();
+      nextBatchAsString = Promise.withResolvers();
       setTimeout(processBatchAsString, 1);
     }
-    return nextBatchAsString;
+    return nextBatchAsString.promise;
   } else {
     if (!nextBatchNotAsString) {
-      nextBatchNotAsString = defer();
+      nextBatchNotAsString = Promise.withResolvers();
       setTimeout(processBatchNotAsString, 1);
     }
-    return nextBatchNotAsString;
+    return nextBatchNotAsString.promise;
   }
 }
 
