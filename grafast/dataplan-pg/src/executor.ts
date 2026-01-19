@@ -2,7 +2,6 @@ import LRU from "@graphile/lru";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
-  Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
   GrafastValuesList,
@@ -729,7 +728,9 @@ ${duration}
         let valuesPending = 0;
 
         const pending: Array<any[]> = batch.map(() => []);
-        const waiting: Array<Deferred<any> | null> = batch.map(() => null);
+        const waiting: Array<PromiseWithResolvers<any> | null> = batch.map(
+          () => null,
+        );
         let finished = false;
 
         // eslint-disable-next-line no-inner-declarations
@@ -753,9 +754,9 @@ ${duration}
             if (isDev && waiting[batchIndex]) {
               throw new Error(`Waiting on more than one record! Forbidden!`);
             }
-            const deferred = defer<any>();
+            const deferred = Promise.withResolvers<any>();
             waiting[batchIndex] = deferred;
-            return deferred;
+            return deferred.promise;
           }
         }
 
@@ -776,7 +777,12 @@ ${duration}
           }
         }
 
-        const executePromise = defer<ExecuteFunction>();
+        const {
+          reject,
+          resolve,
+          promise: executePromise,
+        } = Promise.withResolvers<ExecuteFunction>();
+        executePromise.catch(noop); // Guard against unhandledPromiseRejection
         const handleFetchError = (error: Error) => {
           if (finished) {
             console.error(
@@ -788,7 +794,7 @@ ${duration}
           tx.resolve();
           txResolved = true;
           cursorOpen = false;
-          executePromise.reject(error);
+          reject(error);
           console.error("Error occurred:");
           console.error(error);
           for (let i = 0, l = batch.length; i < l; i++) {
@@ -796,8 +802,8 @@ ${duration}
           }
         };
 
-        this.withTransaction(context, async (_execute) => {
-          executePromise.resolve(_execute);
+        this.withTransaction(context, (_execute) => {
+          resolve(_execute);
           return tx.promise;
         }).then(null, handleFetchError);
         const execute = await executePromise;
