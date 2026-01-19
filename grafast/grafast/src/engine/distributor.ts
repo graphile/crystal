@@ -1,6 +1,10 @@
 import * as assert from "../assert";
 import { isDev, noop } from "../dev";
 import type { Maybe } from "../interfaces";
+import {
+  promiseWithResolve,
+  type PromiseWithResolve,
+} from "../promiseWithResolve";
 import type { Step } from "../step";
 import { arrayOfLength, isPromiseLike, sleep } from "../utils";
 
@@ -95,11 +99,10 @@ export function distributor<TData>(
   const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 
   // Easy way to resolve a promise for slowing down the fastest consumer
-  let wmi: PromiseWithResolvers<void> | null = null;
+  let wmi: PromiseWithResolve<void> | null = null;
   function lowWaterMarkIncreased(): PromiseLike<void> {
     if (wmi === null) {
-      const d = Promise.withResolvers<void>();
-      d.promise.catch(noop); // Guard against unhandledPromiseRejection
+      const d = promiseWithResolve<void>();
       wmi = d;
     }
     return wmi.promise;
