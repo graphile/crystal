@@ -20,7 +20,6 @@ import type {
 import * as graphql from "graphql";
 
 import * as assert from "./assert.js";
-import type { Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import type {
   LayerPlan,

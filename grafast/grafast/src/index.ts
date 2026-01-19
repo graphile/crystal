@@ -54,7 +54,6 @@ import {
   $$verbatim,
   DEFAULT_ACCEPT_FLAGS,
 } from "./constants.js";
-import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
@@ -355,8 +354,6 @@ export {
   debugPlans,
   DEFAULT_ACCEPT_FLAGS,
   defaultPlanResolver,
-  defer,
-  Deferred,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   each,
@@ -556,7 +553,6 @@ exportAsMany("grafast", {
   grafastPrint,
   makeGrafastSchema,
   OperationPlan,
-  defer,
   execute,
   getNullableInputTypeAtPath,
   getGrafastMiddleware,
