@@ -522,7 +522,10 @@ ${duration}
                     "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
                   );
                 }
+
                 const pendingResult = Promise.withResolvers<any[]>(); // CRITICAL: this MUST resolve later
+                pendingResult.promise.catch(noop); // Protect against unhandledPromiseRejection
+
                 results[resultIndex] = pendingResult.promise;
                 scopedCache.set(identifiersJSON, pendingResult);
                 remaining.push(identifiersJSON);
@@ -650,6 +653,7 @@ ${duration}
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
       const tx = Promise.withResolvers<void>();
+      tx.promise.catch(noop); // Protect against unhandledPromiseRejection
       let txResolved = false;
       let cursorOpen = false;
       const promise = (async () => {

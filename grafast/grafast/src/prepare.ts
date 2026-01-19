@@ -480,6 +480,7 @@ function executePreemptive(
       // Do the async iterable
       let stopped = false;
       const abort = Promise.withResolvers<undefined>();
+      abort.promise.catch(noop); // Protect against unhandledPromiseRejection
       const iterator = newIterator((e) => {
         stopped = true;
         abort.resolve(undefined);
@@ -824,6 +825,7 @@ async function processStream(
 ): Promise<void> {
   /** Resolve this when finished */
   const whenDone = Promise.withResolvers<void>();
+  whenDone.promise.catch(e); // Guard against unhandledPromiseRejection
 
   type ResultTuple = [any, number];
 
@@ -1192,12 +1194,14 @@ function processDeferred(
   if (outputDataAsString) {
     if (!nextBatchAsString) {
       nextBatchAsString = Promise.withResolvers();
+      nextBatchAsString.promise.catch(noop); // Guard against unhandledPromiseRejection
       setTimeout(processBatchAsString, 1);
     }
     return nextBatchAsString.promise;
   } else {
     if (!nextBatchNotAsString) {
       nextBatchNotAsString = Promise.withResolvers();
+      nextBatchNotAsString.promise.catch(noop); // Guard against unhandledPromiseRejection
       setTimeout(processBatchNotAsString, 1);
     }
     return nextBatchNotAsString.promise;

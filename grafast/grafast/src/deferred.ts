@@ -11,14 +11,12 @@ function NOOP() {}
 /**
  * Returns a promise that can be `.resolve()`-ed or `.reject()`-ed at a later
  * time.
+ *
+ * @deprecated Use Promise.withResolvers
  */
 export function defer<T = void>(): Deferred<T> {
-  let resolve!: (input: T | PromiseLike<T>) => void;
-  let reject!: (error: Error) => void;
-  const promise = new Promise<T>((_resolve, _reject): void => {
-    resolve = _resolve;
-    reject = _reject;
-  }) as unknown as Deferred<T>;
+  const { resolve, reject, promise: rawPromise } = Promise.withResolvers<T>();
+  const promise = rawPromise as unknown as Deferred<T>;
   promise.resolve = resolve;
   promise.reject = reject;
 
