@@ -2,7 +2,7 @@
 import "graphile-build-pg";
 
 import type { PromiseOrDirect } from "grafast";
-import { isPromiseLike, noop, promiseWithResolve } from "grafast";
+import { isPromiseLike, promiseWithResolve } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
