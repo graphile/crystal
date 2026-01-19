@@ -188,11 +188,26 @@ Create a `server.js` file with the following contents:
 import express from "express";
 import { createServer } from "node:http";
 import { postgraphile } from "postgraphile";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
 import { grafserv } from "postgraphile/grafserv/express/v4";
-import preset from "./graphile.config.js";
 
 // Which port do we want to listen for requests on?
 const PORT = 5050;
+
+/** @type {GraphileConfig.Preset} */
+const preset = {
+  extends: [PostGraphileAmberPreset],
+  pgServices: [
+    makePgService({
+      connectionString: process.env.DATABASE_URL,
+      schemas: ["public"],
+    }),
+  ],
+  grafast: {
+    explain: true,
+  },
+};
 
 // Create our PostGraphile instance, `pgl`:
 const pgl = postgraphile(preset);
