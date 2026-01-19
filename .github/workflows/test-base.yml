@@ -59,7 +59,7 @@ jobs:
           cache: "yarn"
       - name: Configure PostgreSQL
         run: |
-          if [ "${{ matrix.postgres-version }}" == "18" ]; then ln -s /var/lib/postgresql/18/docker /var/lib/postgresql/data; fi
+          if [ "${{ matrix.postgres-version }}" == "18" ]; then echo 'ln -s /var/lib/postgresql/18/docker /var/lib/postgresql/data' | docker exec -i postgres bash; fi
           cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
           cat .github/workflows/ci/docker-entrypoint-initdb.d/020-wal2json.sh | docker exec -i postgres bash
           cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -i postgres bash
