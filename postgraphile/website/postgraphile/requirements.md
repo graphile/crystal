@@ -117,23 +117,33 @@ PostgreSQL version reaches EOL **no reasonable user should use it**, and as
 such a change to drop support for it is not a breaking change for reasonable
 users.
 
-#### PG 11 [officially supported]
+#### PG 12 [unsupported - EOL Nov 2024]
 
-Works well.
+Works well; but not officially supported and support may be dropped in a patch
+release.
 
-#### PG 12 [officially supported]
+#### PG 13 [unsupported - EOL Nov 2025]
 
-Works well.
-
-#### PG 13 [officially supported]
-
-Works well.
+Works well; but not officially supported and support may be dropped in a patch
+release.
 
 #### PG 14 [officially supported]
 
 Works well.
 
 #### PG 15 [officially supported]
+
+Works well.
+
+#### PG 16 [officially supported]
+
+Works well.
+
+#### PG 17 [officially supported]
+
+Works well.
+
+#### PG 18 [officially supported]
 
 Works well.
 
