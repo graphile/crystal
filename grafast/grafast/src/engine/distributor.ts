@@ -102,8 +102,7 @@ export function distributor<TData>(
   let wmi: PromiseWithResolve<void> | null = null;
   function lowWaterMarkIncreased(): PromiseLike<void> {
     if (wmi === null) {
-      const d = promiseWithResolve<void>();
-      wmi = d;
+      wmi = promiseWithResolve<void>();
     }
     return wmi.promise;
   }
