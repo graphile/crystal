@@ -14,6 +14,8 @@ import type {
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
+import type { PromiseWithResolve } from "../promiseWithResolve.js";
+import { promiseWithResolve } from "../promiseWithResolve.js";
 import { Step, UnbatchedStep } from "../step.js";
 import {
   asyncIteratorWithCleanup,
@@ -973,12 +975,11 @@ function makeProcessedCollection<TItem>(
     }
     items = wrapIndicies ? array.map(indexedItem) : array;
   } else {
-    let deferredHasNext: PromiseWithResolvers<boolean> | undefined;
+    let deferredHasNext: PromiseWithResolve<boolean> | undefined;
     if (typeof __hasMore === "boolean") {
       hasNext = __hasMore;
     } else {
-      deferredHasNext = Promise.withResolvers();
-      deferredHasNext.promise.catch(noop); // Guard against unhandledPromiseRejection
+      deferredHasNext = promiseWithResolve();
       hasNext = deferredHasNext.promise;
     }
     let didHaveNext = false;
