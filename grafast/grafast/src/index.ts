@@ -11,6 +11,7 @@ import type {
 } from "graphql";
 import type { ObjMap } from "graphql/jsutils/ObjMap";
 
+import { promiseWithResolve } from "./promiseWithResolve.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { DataFromObjectSteps } from "./steps/object.js";
 
@@ -54,7 +55,6 @@ import {
   $$verbatim,
   DEFAULT_ACCEPT_FLAGS,
 } from "./constants.js";
-import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
@@ -355,8 +355,6 @@ export {
   debugPlans,
   DEFAULT_ACCEPT_FLAGS,
   defaultPlanResolver,
-  defer,
-  Deferred,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   each,
@@ -506,6 +504,7 @@ export {
   partitionByIndex,
   PlanTypeInfo,
   PromiseOrDirect,
+  promiseWithResolve,
   proxy,
   ProxyStep,
   recordsMatch,
@@ -549,14 +548,15 @@ export {
   UnionPlan,
   UnwrapMultistep,
 };
+export type { PromiseWithResolve } from "./promiseWithResolve.js";
 
 exportAsMany("grafast", {
   exportAs,
+  promiseWithResolve,
   exportAsMany,
   grafastPrint,
   makeGrafastSchema,
   OperationPlan,
-  defer,
   execute,
   getNullableInputTypeAtPath,
   getGrafastMiddleware,

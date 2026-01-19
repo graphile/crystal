@@ -2,7 +2,6 @@ import LRU from "@graphile/lru";
 import chalk from "chalk";
 import debugFactory from "debug";
 import type {
-  Deferred,
   ExecutableStep,
   ExecutionEventEmitter,
   GrafastValuesList,
@@ -11,12 +10,12 @@ import type {
 } from "grafast";
 import {
   asyncIteratorWithCleanup,
-  defer,
   exportAs,
   inspect,
   isAsyncIterable,
   isDev,
   noop,
+  promiseWithResolve,
 } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
@@ -419,7 +418,7 @@ ${duration}
       : undefined;
 
     const valuesCount = values.length;
-    const results: Array<Deferred<Array<TOutput>> | undefined> = [];
+    const results: Array<PromiseLike<Array<TOutput>> | undefined> = [];
 
     const batches = (() => {
       if (common.useTransaction) {
@@ -458,16 +457,19 @@ ${duration}
 
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
-    for (const [context, batch] of batches) {
+    type TextAndValues = string & { brand?: "TextAndValues" };
+    type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
+    type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
+    for (const [batchContext, batch] of batches) {
+      const context = batchContext as typeof batchContext &
+        Record<symbol, LRU<TextAndValues, CacheForQuery> | undefined>;
       promises.push(
         (async () => {
-          let cacheForContext = useCache
-            ? (context as any)[this.$$cache]
-            : null;
-          if (!cacheForContext) {
+          let cacheForContext = useCache ? context[this.$$cache] : undefined;
+          if (cacheForContext === undefined) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
             if (useCache) {
-              (context as any)[this.$$cache] = cacheForContext;
+              context[this.$$cache] = cacheForContext;
             }
           }
 
@@ -484,7 +486,7 @@ ${duration}
            * The `identifiersJSON` (`JSON.stringify(queryValues)`) that don't exist in the cache currently.
            */
           const remaining: string[] = [];
-          const remainingDeferreds: Array<Deferred<any[]>> = [];
+          const remainingDeferreds: Array<PromiseWithResolvers<any[]>> = [];
 
           try {
             // Concurrent requests to the same queryValues should result in the same value/execution.
@@ -499,10 +501,10 @@ ${duration}
                     "%s served %o from cache: %c",
                     this,
                     identifiersJSON,
-                    existingResult,
+                    existingResult.promise,
                   );
                 }
-                results[resultIndex] = existingResult;
+                results[resultIndex] = existingResult.promise;
               } else {
                 if (debugVerbose.enabled) {
                   debugVerbose(
@@ -517,8 +519,11 @@ ${duration}
                     "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
                   );
                 }
-                const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
-                results[resultIndex] = pendingResult;
+
+                const pendingResult = Promise.withResolvers<any[]>(); // CRITICAL: this MUST resolve later
+                pendingResult.promise.catch(noop); // Guard against unhandledPromiseRejection
+
+                results[resultIndex] = pendingResult.promise;
                 scopedCache.set(identifiersJSON, pendingResult);
                 remaining.push(identifiersJSON);
                 remainingDeferreds.push(pendingResult);
@@ -644,7 +649,7 @@ ${duration}
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
-      const tx = defer();
+      const { resolve: resolveTx, promise: tx } = promiseWithResolve<void>();
       let txResolved = false;
       let cursorOpen = false;
       const promise = (async () => {
@@ -720,7 +725,9 @@ ${duration}
         let valuesPending = 0;
 
         const pending: Array<any[]> = batch.map(() => []);
-        const waiting: Array<Deferred<any> | null> = batch.map(() => null);
+        const waiting: Array<PromiseWithResolvers<any> | null> = batch.map(
+          () => null,
+        );
         let finished = false;
 
         // eslint-disable-next-line no-inner-declarations
@@ -744,9 +751,10 @@ ${duration}
             if (isDev && waiting[batchIndex]) {
               throw new Error(`Waiting on more than one record! Forbidden!`);
             }
-            const deferred = defer<any>();
+            const deferred = Promise.withResolvers<any>();
+            deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
             waiting[batchIndex] = deferred;
-            return deferred;
+            return deferred.promise;
           }
         }
 
@@ -767,7 +775,12 @@ ${duration}
           }
         }
 
-        const executePromise = defer<ExecuteFunction>();
+        const {
+          reject: rejectExecute,
+          resolve: resolveExecute,
+          promise: executePromise,
+        } = Promise.withResolvers<ExecuteFunction>();
+        executePromise.catch(noop); // Guard against unhandledPromiseRejection
         const handleFetchError = (error: Error) => {
           if (finished) {
             console.error(
@@ -776,10 +789,10 @@ ${duration}
             return;
           }
           finished = true;
-          tx.resolve();
+          resolveTx();
           txResolved = true;
           cursorOpen = false;
-          executePromise.reject(error);
+          rejectExecute(error);
           console.error("Error occurred:");
           console.error(error);
           for (let i = 0, l = batch.length; i < l; i++) {
@@ -787,8 +800,8 @@ ${duration}
           }
         };
 
-        this.withTransaction(context, async (_execute) => {
-          executePromise.resolve(_execute);
+        this.withTransaction(context, (_execute) => {
+          resolveExecute(_execute);
           return tx;
         }).then(null, handleFetchError);
         const execute = await executePromise;
@@ -854,7 +867,7 @@ ${duration}
                 await execute(releaseCursorSQL, []);
               } finally {
                 if (!txResolved) {
-                  tx.resolve();
+                  resolveTx();
                   txResolved = true;
                   cursorOpen = false;
                 }
@@ -893,7 +906,7 @@ ${duration}
       promise.then(null, (e) => {
         console.error("UNEXPECTED ERROR!");
         console.error(e);
-        tx.resolve();
+        resolveTx();
         txResolved = true;
         cursorOpen = false;
         batch.forEach(({ resultIndex }) => {

@@ -20,7 +20,6 @@ import type {
 import * as graphql from "graphql";
 
 import * as assert from "./assert.js";
-import type { Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import type {
   LayerPlan,
@@ -292,19 +291,6 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
  */
 export function isPromiseLike<T>(t: T | PromiseLike<T>): t is PromiseLike<T> {
   return t != null && typeof (t as any).then === "function";
-}
-
-/**
- * Is a promise that can be externally resolved.
- */
-export function isDeferred<T>(
-  t: T | Promise<T> | Deferred<T>,
-): t is Deferred<T> {
-  return (
-    isPromise(t) &&
-    typeof (t as any).resolve === "function" &&
-    typeof (t as any).reject === "function"
-  );
 }
 
 /**

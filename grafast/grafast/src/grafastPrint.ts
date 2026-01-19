@@ -14,12 +14,7 @@ import { OutputPlan } from "./engine/OutputPlan.js";
 import { inspect } from "./inspect.js";
 import { Step } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
-import {
-  isDeferred,
-  isPromise,
-  ROOT_VALUE_OBJECT,
-  sharedNull,
-} from "./utils.js";
+import { isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
 
 /*
  * This file contains utilities used with the `debug` module primarily (but
@@ -59,9 +54,6 @@ export function _grafastPrint(
   symbol: string | symbol | symbol[] | Record<symbol, any> | Map<any, any>,
   seen: Set<any>,
 ): string {
-  if (isDeferred(symbol)) {
-    return chalk.gray`<Deferred>`;
-  }
   if (isPromise(symbol)) {
     return chalk.gray`<Promise>`;
   }
