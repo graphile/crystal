@@ -2,7 +2,7 @@
 import "graphile-build-pg";
 
 import type { PromiseOrDirect } from "grafast";
-import { isPromiseLike, noop } from "grafast";
+import { isPromiseLike, noop, promiseWithResolve } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
@@ -30,15 +30,8 @@ export function postgraphile(
   let released = false;
   let server: GrafservBase | undefined;
   if (resolvedPreset.grafserv?.watch) {
-    const promiseWithResolvers = Promise.withResolvers<SchemaResult>();
-    promiseWithResolvers.promise.catch(noop); // Guard against unhandledPromiseRejection
-    let resolve = promiseWithResolvers.resolve as
-      | typeof promiseWithResolvers.resolve
-      | null;
-    let reject = promiseWithResolvers.reject as
-      | typeof promiseWithResolvers.reject
-      | null;
-    schemaResult = promiseWithResolvers.promise;
+    let resolve: null | ((r: SchemaResult) => void);
+    ({ resolve, promise: schemaResult } = promiseWithResolve<SchemaResult>());
     stopWatchingPromise = watchSchema(preset, async (error, newParams) => {
       if (error || !newParams) {
         console.error("Watch error: ", error);
@@ -57,7 +50,7 @@ export function postgraphile(
       schemaResult = newParams;
       if (resolve != null) {
         resolve(schemaResult);
-        resolve = reject = null;
+        resolve = null;
       }
       if (server) {
         await server.ready();
