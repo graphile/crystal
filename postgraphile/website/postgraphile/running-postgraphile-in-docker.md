@@ -295,18 +295,51 @@ The `DATABASE_URL` follows the syntax
 ### Create PostGraphile Dockerfile
 
 Create a new folder `graphql` at the root of the repository. It will be used to
-store the files necessary to create the PostGraphile container. Create a new
-file `Dockerfile` in the `graphql` folder with the following content.
+store the files necessary to create the PostGraphile container.
+
+In `graphql`, create a `package.json` and lockfile (for example `package-lock.json`)
+that install PostGraphile, then add a `graphile.config.ts` to configure it.
+
+```json title="graphql/package.json"
+{
+  "name": "postgraphile-docker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "postgraphile": "^5.0.0"
+  }
+}
+```
+
+```ts title="graphql/graphile.config.ts"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+export default {
+  extends: [PostGraphileAmberPreset],
+  pgServices: [makePgService({ connectionString: process.env.DATABASE_URL })],
+};
+```
+
+Create a new file `Dockerfile` in the `graphql` folder with the following
+content.
 
 ```dockerfile
 FROM node:24-alpine
 LABEL description="Instant high-performance GraphQL API for your PostgreSQL database https://github.com/graphile/postgraphile"
 
-# Install PostGraphile
-RUN npm install -g postgraphile
+# Set app folder
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm install
+
+# Copy config
+COPY graphile.config.ts ./
 
 EXPOSE 5000
-ENTRYPOINT ["postgraphile", "-n", "0.0.0.0"]
+ENTRYPOINT ["npx", "postgraphile", "-n", "0.0.0.0"]
 ```
 
 ### Update Docker Compose File
@@ -333,7 +366,7 @@ services:
             - network
         ports:
             - 5433:5433
-        command: ["--preset", "postgraphile/presets/amber", "--connection", "${DATABASE_URL}", "--port", "5433", "--schema", "public"]
+        command: ["--port", "5433"]
 [...]
 ```
 
@@ -347,6 +380,9 @@ At this stage, the repository should look like this:
 |  |  └─ 01-data.sql
 |  └─ Dockerfile
 ├─ graphql/
+|  ├─ graphile.config.ts
+|  ├─ package.json
+|  ├─ package-lock.json
 |  └─ Dockerfile
 ├─ .env
 └─ docker-compose.yml

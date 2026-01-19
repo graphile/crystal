@@ -118,43 +118,6 @@ experience, or act as a template for writing your own plugins:
 - `@graphile/pg-pubsub` - provides realtime capabilities to schema plugins
   powered by PostgreSQL's LISTEN/NOTIFY.
 
-### First-party premium plugins
-
-There are also a couple of first-party plugins that may be purchased on the
-[Graphile Store](https://store.graphile.com):
-
-- ~~`@graphile/supporter`~~ - all features now OSS via `@graphile/pg-pubsub`
-  plugin
-- `@graphile/pro` [PRO] - includes protections that can be mounted in front of
-  PostGraphile to protect it from malicious actors
-
-To use these premium plugins you will need a `GRAPHILE_LICENSE` environmental
-variable to be present, as in these examples:
-
-```bash
-# GNU/Linux and macOS bash:
-export GRAPHILE_LICENSE="license_key_from_graphile_store"
-postgraphile -c postgres://...
-
-# Heroku
-heroku config:set GRAPHILE_LICENSE="license_key_from_graphile_store" -a my_heroku_app
-
-# Windows Console
-set GRAPHILE_LICENSE="license_key_from_graphile_store" & postgraphile -c postgres://...
-
-# Windows PowerShell
-$env:GRAPHILE_LICENSE="license_key_from_graphile_store"; postgraphile -c postgres://...
-```
-
-**IMPORTANT**: these plugins do not "phone home" so you'll need to update your
-license at least once every 9 months. You can check the expiry date of your
-current license
-[in the Graphile Store validator](https://store.graphile.com/validate) and log
-in to generate a new license code.
-
-For more information, see the FAQ at the bottom of the [Go Pro!](/pricing)
-page.
-
 ### Installing
 
 You can install plugins with `yarn add` or `npm install`, e.g.
