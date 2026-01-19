@@ -47,6 +47,7 @@ See: https://devcenter.heroku.com/articles/heroku-postgresql-credentials
 6. Configure Heroku to use the right url
    `heroku config:set RDS_URL="postgres://user:pass@rdshost/dbname?ssl=true" -a heroku_app_name`
 7. Create `graphile.config.mjs`:
+
    ```js
    import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
    import { makePgService } from "postgraphile/adaptors/pg";
@@ -60,6 +61,7 @@ See: https://devcenter.heroku.com/articles/heroku-postgresql-credentials
      },
    };
    ```
+
 8. Create Procfile:
    `echo 'web: postgraphile' >> Procfile`
 9. Deploy: `git push heroku master`
