@@ -147,7 +147,7 @@ can select the various SQL queries and their explain results.
 :::info
 
 Currently SQL `EXPLAIN` can only be enabled via `DEBUG` envvar. This is a known
-issue that should be fixed before the release of PostGraphile v5.0.0.
+issue that we plan to address.
 
 <!-- TODO: fix this! -->
 
@@ -155,19 +155,23 @@ issue that should be fixed before the release of PostGraphile v5.0.0.
 
 ### Via `DEBUG` envvar
 
+These examples assume you already have a `graphile.config.*` file in your
+working directory. If you do not, add your connection details and preset via
+CLI flags instead.
+
 Another way is to set the relevant [DEBUG](https://github.com/visionmedia/debug)
 environmental variable before running PostGraphile. For example:
 
 ```bash
 # Bash (Linux, macOS, etc)
 export DEBUG="@dataplan/pg:PgExecutor:explain"
-postgraphile -c postgres://...
+postgraphile
 
 # Windows Console
-set DEBUG=@dataplan/pg:PgExecutor:explain & postgraphile -c postgres://...
+set DEBUG=@dataplan/pg:PgExecutor:explain & postgraphile
 
 # Windows PowerShell
-$env:DEBUG='@dataplan/pg:PgExecutor:explain'; postgraphile -c postgres://...
+$env:DEBUG='@dataplan/pg:PgExecutor:explain'; postgraphile
 ```
 
 <!--
@@ -179,20 +183,20 @@ To find details of any errors thrown whilst executing SQL, use:
 ```bash
 # Bash (Linux, macOS, etc)
 export DEBUG="postgraphile:postgres,postgraphile:postgres:error"
-postgraphile -c postgres://...
+postgraphile
   # or:
 export DEBUG="postgraphile:postgres*"
-postgraphile -c postgres://...
+postgraphile
 
 # Windows Console
-set DEBUG=postgraphile:postgres,postgraphile:postgres:error & postgraphile -c postgres://...
+set DEBUG=postgraphile:postgres,postgraphile:postgres:error & postgraphile
   #or
-set DEBUG=postgraphile:postgres* & postgraphile -c postgres://...
+set DEBUG=postgraphile:postgres* & postgraphile
 
 # Windows PowerShell
-$env:DEBUG = "postgraphile:postgres,postgraphile:postgres:error"; postgraphile -c postgres://...
+$env:DEBUG = "postgraphile:postgres,postgraphile:postgres:error"; postgraphile
   #or
-$env:DEBUG = "postgraphile:postgres*"; postgraphile -c postgres://...
+$env:DEBUG = "postgraphile:postgres*"; postgraphile
 ```
 
 -->
@@ -216,13 +220,13 @@ then run PostGraphile or your Node.js server in the same terminal:
 ```bash
 # Bash (Linux, macOS, etc)
 export DEBUG="graphile-build:warn,@dataplan/pg:*"
-postgraphile -c postgres://...
+postgraphile
 
 # Windows Console
-set DEBUG=graphile-build:warn,@dataplan/pg:* & postgraphile -c postgres://...
+set DEBUG=graphile-build:warn,@dataplan/pg:* & postgraphile
 
 # Windows PowerShell
-$env:DEBUG = "graphile-build:warn,@dataplan/pg:*"; postgraphile -c postgres://...
+$env:DEBUG = "graphile-build:warn,@dataplan/pg:*"; postgraphile
 ```
 
 ## Advanced: getting your hands dirty
@@ -244,7 +248,7 @@ code execution.
 node --inspect `which postgraphile` -c postgres://...
 
 # or for locally installed PostGraphile:
-node --inspect node_modules/.bin/postgraphile -c postgres://...
+node --inspect node_modules/.bin/postgraphile
 
 # or, if you have your own Node.js app in `server.js`:
 node --inspect server.js

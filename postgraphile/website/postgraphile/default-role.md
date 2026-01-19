@@ -8,13 +8,6 @@ dependent on a role not already having been set.
 
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 PostGraphile makes full use of PostgreSQL roles, so in this article we will
 explain briefly how PostgreSQL roles and users work and how that relates to how
 we use them in PostGraphile.
@@ -73,24 +66,28 @@ referred to as the `auth_user`. You’d connect with your `auth_user` as follows
 postgraphile -c postgres://auth_user@localhost/mydb
 ```
 
-The `auth_user` will have all the priveleges PostGraphile might need.
+The `auth_user` will have all the privileges PostGraphile might need.
 
-You can also specify a `default_role` with PostGraphile. The `default_role` will
-be used by PostGraphile whenever no authorization token is provided or when the
-role claim in the authorization token is not specified. So all users that don’t
-explicitly specify a role will automatically use the `default_role`.
+In PostGraphile V5 there is no `--default-role` option. Instead, decide which
+role should apply for unauthenticated requests in your `pgSettings` logic. That
+role should have restricted privileges to only your data that is publicly
+accessible.
 
-So the `default_role` should have restricted privileges to only your data that
-is publicly accessible.
+For example, in `graphile.config.mjs`:
 
-After that you could also specify more roles like a `user_role` which should be
-included in the payload of your authorization tokens which may have more or less
-permissions then `default_role`.
+```js
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
-In order to configure an default role just do the following:
-
-```bash
-postgraphile -c postgres://auth_user@localhost/mydb --default-role default_role
+export default {
+  extends: [PostGraphileAmberPreset],
+  grafast: {
+    context(requestContext, args) {
+      return {
+        role: args.contextValue.pgSettings?.role ?? "default_role",
+      };
+    },
+  },
+};
 ```
 
 _This article was originally written by
