@@ -11,7 +11,6 @@ import type {
 } from "grafast";
 import {
   asyncIteratorWithCleanup,
-  defer,
   exportAs,
   inspect,
   isAsyncIterable,
@@ -419,7 +418,7 @@ ${duration}
       : undefined;
 
     const valuesCount = values.length;
-    const results: Array<Deferred<Array<TOutput>> | undefined> = [];
+    const results: Array<PromiseLike<Array<TOutput>> | undefined> = [];
 
     const batches = (() => {
       if (common.useTransaction) {
@@ -458,11 +457,17 @@ ${duration}
 
     // For each context, run the relevant fetches
     const promises: Promise<void>[] = [];
+    type TextAndValues = string & { brand?: "TextAndValues" };
+    type IdentifiersJSON = string & { brand?: "IdentifiersJSON" };
+    type CacheForQuery = Map<IdentifiersJSON, PromiseWithResolvers<any[]>>;
     for (const [context, batch] of batches) {
       promises.push(
         (async () => {
           let cacheForContext = useCache
-            ? (context as any)[this.$$cache]
+            ? ((context as any)[this.$$cache] as LRU<
+                TextAndValues,
+                CacheForQuery
+              >)
             : null;
           if (!cacheForContext) {
             cacheForContext = new LRU({ maxLength: 500 /* SQL queries */ });
@@ -484,7 +489,7 @@ ${duration}
            * The `identifiersJSON` (`JSON.stringify(queryValues)`) that don't exist in the cache currently.
            */
           const remaining: string[] = [];
-          const remainingDeferreds: Array<Deferred<any[]>> = [];
+          const remainingDeferreds: Array<PromiseWithResolvers<any[]>> = [];
 
           try {
             // Concurrent requests to the same queryValues should result in the same value/execution.
@@ -499,10 +504,10 @@ ${duration}
                     "%s served %o from cache: %c",
                     this,
                     identifiersJSON,
-                    existingResult,
+                    existingResult.promise,
                   );
                 }
-                results[resultIndex] = existingResult;
+                results[resultIndex] = existingResult.promise;
               } else {
                 if (debugVerbose.enabled) {
                   debugVerbose(
@@ -517,8 +522,8 @@ ${duration}
                     "Should only fetch each identifiersJSON once, future entries in the loop should receive previous deferred",
                   );
                 }
-                const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
-                results[resultIndex] = pendingResult;
+                const pendingResult = Promise.withResolvers<any[]>(); // CRITICAL: this MUST resolve later
+                results[resultIndex] = pendingResult.promise;
                 scopedCache.set(identifiersJSON, pendingResult);
                 remaining.push(identifiersJSON);
                 remainingDeferreds.push(pendingResult);
@@ -644,7 +649,7 @@ ${duration}
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
-      const tx = defer();
+      const tx = Promise.withResolvers<void>();
       let txResolved = false;
       let cursorOpen = false;
       const promise = (async () => {
@@ -789,7 +794,7 @@ ${duration}
 
         this.withTransaction(context, async (_execute) => {
           executePromise.resolve(_execute);
-          return tx;
+          return tx.promise;
         }).then(null, handleFetchError);
         const execute = await executePromise;
 
