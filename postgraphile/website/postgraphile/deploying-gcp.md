@@ -182,18 +182,13 @@ in package.json:
 }
 ```
 
-in index.js:
+Create a `graphile.config.js` alongside your `src` folder:
 
 ```js
-import express from "express";
-import { postgraphile } from "postgraphile";
-import { grafserv } from "postgraphile/grafserv/express/v4";
-import { makePgService } from "postgraphile/adaptors/pg";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
 
-const app = express();
-
-const preset = {
+export default {
   extends: [PostGraphileAmberPreset],
   pgServices: [
     makePgService({
@@ -205,6 +200,17 @@ const preset = {
     port: 8080,
   },
 };
+```
+
+in index.js:
+
+```js
+import express from "express";
+import preset from "../graphile.config.js";
+import { postgraphile } from "postgraphile";
+import { grafserv } from "postgraphile/grafserv/express/v4";
+
+const app = express();
 
 const pgl = postgraphile(preset);
 const serv = pgl.createServ(grafserv);

@@ -70,23 +70,29 @@ such as `package-lock.json`) into it with the following content.
 This file will be used by NPM package manager to install the dependencies in the
 Node.js container.
 
-In the same `src` folder, create a new file `server.js` with the following
-content.
+Create a `graphile.config.ts` file in the `graphql` folder:
 
-```js
-import { createServer } from "node:http";
-import { postgraphile } from "postgraphile";
-import { grafserv } from "postgraphile/grafserv/node";
-import { makePgService } from "postgraphile/adaptors/pg";
+```ts title="graphql/graphile.config.ts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { makePgService } from "postgraphile/adaptors/pg";
 
-const preset = {
+export default {
   extends: [PostGraphileAmberPreset],
   pgServices: [makePgService({ connectionString: process.env.DATABASE_URL })],
   grafserv: {
     graphqlPath: "/graphql",
   },
 };
+```
+
+In the same `src` folder, create a new file `server.js` with the following
+content.
+
+```js
+import { createServer } from "node:http";
+import preset from "../graphile.config.js";
+import { postgraphile } from "postgraphile";
+import { grafserv } from "postgraphile/grafserv/node";
 
 const pgl = postgraphile(preset);
 const serv = pgl.createServ(grafserv);
@@ -121,11 +127,12 @@ RUN chown -R node:node /home/node/app
 USER node
 RUN npm install
 
-# Copy application files
-COPY --chown=node:node ./src .
+# Copy application files and config
+COPY --chown=node:node ./src ./src
+COPY --chown=node:node ./graphile.config.ts ./graphile.config.ts
 
 EXPOSE 8080
-CMD [ "node", "server.js" ]
+CMD [ "node", "src/server.js" ]
 ```
 
 ### Update Docker Compose File
@@ -165,6 +172,7 @@ At this stage, the repository should look like this:
 |  |  └─ 01-data.sql
 |  └─ Dockerfile
 ├─ graphql/
+|  ├─ graphile.config.ts
 |  ├─ src/
 |  |  ├─ package.json
 |  |  ├─ package-lock.json
