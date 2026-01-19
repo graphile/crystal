@@ -341,7 +341,7 @@ COPY graphile.config.ts ./
 COPY plugins ./plugins
 
 EXPOSE 5000
-ENTRYPOINT ["npx", "postgraphile", "-n", "0.0.0.0"]
+ENTRYPOINT ["npx", "--no-install", "postgraphile", "-n", "0.0.0.0"]
 ```
 
 ### Update Docker Compose File
