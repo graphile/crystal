@@ -651,8 +651,14 @@ ${duration}
     const promises: Promise<void>[] = [];
     for (const [context, batch] of groupMap.entries()) {
       // ENHANCE: this is a mess, we should refactor and simplify it significantly
-      const tx = Promise.withResolvers<void>();
-      tx.promise.catch(noop); // Guard against unhandledPromiseRejection
+
+      const { resolve: resolveTx, promise: tx } = Promise.withResolvers() as {
+        promise: Promise<void>;
+        // Explicitly forbid passing errors to resolve
+        resolve(): void;
+      };
+      // No need to handle error
+
       let txResolved = false;
       let cursorOpen = false;
       const promise = (async () => {
@@ -779,8 +785,8 @@ ${duration}
         }
 
         const {
-          reject,
-          resolve,
+          reject: rejectExecute,
+          resolve: resolveExecute,
           promise: executePromise,
         } = Promise.withResolvers<ExecuteFunction>();
         executePromise.catch(noop); // Guard against unhandledPromiseRejection
@@ -792,10 +798,10 @@ ${duration}
             return;
           }
           finished = true;
-          tx.resolve();
+          resolveTx();
           txResolved = true;
           cursorOpen = false;
-          reject(error);
+          rejectExecute(error);
           console.error("Error occurred:");
           console.error(error);
           for (let i = 0, l = batch.length; i < l; i++) {
@@ -804,8 +810,8 @@ ${duration}
         };
 
         this.withTransaction(context, (_execute) => {
-          resolve(_execute);
-          return tx.promise;
+          resolveExecute(_execute);
+          return tx;
         }).then(null, handleFetchError);
         const execute = await executePromise;
 
@@ -870,7 +876,7 @@ ${duration}
                 await execute(releaseCursorSQL, []);
               } finally {
                 if (!txResolved) {
-                  tx.resolve();
+                  resolveTx();
                   txResolved = true;
                   cursorOpen = false;
                 }
@@ -909,7 +915,7 @@ ${duration}
       promise.then(null, (e) => {
         console.error("UNEXPECTED ERROR!");
         console.error(e);
-        tx.resolve();
+        resolveTx();
         txResolved = true;
         cursorOpen = false;
         batch.forEach(({ resultIndex }) => {
