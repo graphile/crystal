@@ -47,6 +47,7 @@ flexible method 2 is what you want.
 // Method 1: wrap individual resolvers of known fields
 function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 
 interface PlanWrapperRules {
@@ -64,6 +65,14 @@ interface PlanWrapperRule {
    * when your plan wrapper calls the underlying plan.
    */
   autoApplyFieldArgs?: boolean;
+}
+
+interface WrapPlansOptions {
+  /**
+   * Set false to disable the resolver emulation warning that appears when
+   * wrapping default plan resolvers.
+   */
+  warnOnResolverEmulation?: boolean;
 }
 
 type PlanWrapperFn = (
@@ -87,8 +96,14 @@ function wrapPlans<T>(
     field: GrafastFieldConfig,
   ) => T | null,
   rule: (match: T) => PlanWrapperRule | PlanWrapperFn,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
+
+Both signatures accept an optional `options` argument. Set
+`warnOnResolverEmulation: false` to silence the resolver emulation warning.
+This warning is irrelevant when your schema uses only Gra*fast* plan resolvers
+and no traditional resolvers.
 
 ## Method 1: wrapping individual resolvers of known fields
 
@@ -96,6 +111,7 @@ function wrapPlans<T>(
 // Method 1: wrap individual resolvers of known fields
 function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
 
@@ -238,6 +254,7 @@ function wrapPlans<T>(
     field: GrafastFieldConfig,
   ) => T | null,
   rule: (match: T) => PlanWrapperRule | PlanWrapperFn,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
 
