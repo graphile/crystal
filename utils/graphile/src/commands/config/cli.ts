@@ -12,8 +12,8 @@ export function options(yargs: Argv) {
       optionsCmd.run,
     )
     .command(
-      "print",
-      "Prints your resolved configuration",
+      printCmd.command,
+      printCmd.description,
       printCmd.options,
       printCmd.run,
     )
