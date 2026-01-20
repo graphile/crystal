@@ -1,5 +1,39 @@
 # graphile-export
 
+## 1.0.0-rc.3
+
+### Patch Changes
+
+- [#2877](https://github.com/graphile/crystal/pull/2877)
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3)
+  Thanks [@benjie](https://github.com/benjie)! - Safety - use null prototype
+  objects in more places.
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
+- Updated dependencies
+  [[`44555c7`](https://github.com/graphile/crystal/commit/44555c7f479d531d6aef100f99859c3bcbf06c93),
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3),
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36),
+  [`a565503`](https://github.com/graphile/crystal/commit/a5655035dfee7000c1d37e4791354d7a2ba35792),
+  [`d9ccc82`](https://github.com/graphile/crystal/commit/d9ccc82a30ca6167f480e5c8bc15d17df51c0d1c),
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c),
+  [`eafa3f0`](https://github.com/graphile/crystal/commit/eafa3f036ce68e6ffb65935f0a78edee2fa6bdf8),
+  [`b27c562`](https://github.com/graphile/crystal/commit/b27c562409f7a2fd8a0eeaca96cd2c6b935efe4c),
+  [`f23f0cf`](https://github.com/graphile/crystal/commit/f23f0cf8812eddff7c91c529499a4f20f1f2978c),
+  [`afe31f0`](https://github.com/graphile/crystal/commit/afe31f09a5b204f79321f8db9b42440df23a1183),
+  [`d3a1be9`](https://github.com/graphile/crystal/commit/d3a1be921d70d143a94ca376d9d08dd85269f5bf)]:
+  - grafast@1.0.0-rc.4
+  - pg-sql2@5.0.0-rc.3
+
 ## 1.0.0-rc.2
 
 ### Patch Changes

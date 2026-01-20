@@ -1,5 +1,93 @@
 # graphile-utils
 
+## 5.0.0-rc.3
+
+### Patch Changes
+
+- [#2877](https://github.com/graphile/crystal/pull/2877)
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3)
+  Thanks [@benjie](https://github.com/benjie)! - Safety - use null prototype
+  objects in more places.
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
+- [#2875](https://github.com/graphile/crystal/pull/2875)
+  [`ced4abe`](https://github.com/graphile/crystal/commit/ced4abe359bb1c5edc432844cfdb283bf24b46eb)
+  Thanks [@benjie](https://github.com/benjie)! - `wrapPlans()` now refuses to
+  wrap the plan for a field that both has no plan and either has a `resolve()`
+  or `subscribe()` method (i.e. resolver emulation will be used). This is done
+  by simply skipping wrapping the resolver, and emitting a warning to the
+  console. This is a breaking fix as fields that may have previously had the
+  default plan resolver wrapped may no longer do so, but should not impact
+  anyone running a "pure" PostGraphile/Grafast schema (it only impacts you if
+  you are using traditional (non-plan) resolvers, e.g. via `extendSchema()`, and
+  you're also using `wrapPlans()` to target these same fields).
+
+- [#2872](https://github.com/graphile/crystal/pull/2872)
+  [`4ca27c1`](https://github.com/graphile/crystal/commit/4ca27c1f543359d5a7dc53fae35fc35caddb4076)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where `apply()`
+  couldn't be added to enum values via `extendSchema()`. This is a breaking
+  fix - if you add non-scalar enum values to your schema via `extendSchema()`
+  then you will now need to use an object wrapper to set them instead (see
+  example below). An error will be thrown if we suspect this of being the case,
+  to ensure we don't incorrectly build your schema.
+
+  ```diff
+   extendSchema({
+     typeDefs: `enum SomeEnum { FOO, BAR }`,
+     enums: {
+       SomeEnum: {
+         values: {
+  +        // Scalar values can be specified directly
+           FOO: 7,
+
+  +        // Non-scalars look like enum specification (`value`, `apply()`,
+  +        // `extensions`, etc), so must be specified via a wrapper object:
+  -        BAR: { mol: 42 },
+  +        BAR: {
+  +          value: { mol: 42 },
+  +        },
+         }
+       }
+     }
+   })
+  ```
+
+- Updated dependencies
+  [[`44555c7`](https://github.com/graphile/crystal/commit/44555c7f479d531d6aef100f99859c3bcbf06c93),
+  [`86db203`](https://github.com/graphile/crystal/commit/86db203bf8e3697860c0bb52ac2d64b87170b3e8),
+  [`b69a2b0`](https://github.com/graphile/crystal/commit/b69a2b01cadc5ea2af5cf9cfcc52c34b1ad26481),
+  [`c2ae685`](https://github.com/graphile/crystal/commit/c2ae685a5ce001f79356c4a994613b16cdb01475),
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3),
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36),
+  [`a60ed2a`](https://github.com/graphile/crystal/commit/a60ed2acc7abbdfce727eaef48f6ca0349c24635),
+  [`a565503`](https://github.com/graphile/crystal/commit/a5655035dfee7000c1d37e4791354d7a2ba35792),
+  [`d9ccc82`](https://github.com/graphile/crystal/commit/d9ccc82a30ca6167f480e5c8bc15d17df51c0d1c),
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c),
+  [`eafa3f0`](https://github.com/graphile/crystal/commit/eafa3f036ce68e6ffb65935f0a78edee2fa6bdf8),
+  [`22bfbc0`](https://github.com/graphile/crystal/commit/22bfbc0053294a716f1ec92c8c50fed556ea9a4e),
+  [`bd3250e`](https://github.com/graphile/crystal/commit/bd3250e0b8e0f45991e3553f9d3d1d0afa785f59),
+  [`456d387`](https://github.com/graphile/crystal/commit/456d387887bb6fb9a880d2c3cd8cc6ece8391cf0),
+  [`c65d03c`](https://github.com/graphile/crystal/commit/c65d03c2ad5f238f382eb9936c85571d00daa08b),
+  [`b27c562`](https://github.com/graphile/crystal/commit/b27c562409f7a2fd8a0eeaca96cd2c6b935efe4c),
+  [`f23f0cf`](https://github.com/graphile/crystal/commit/f23f0cf8812eddff7c91c529499a4f20f1f2978c),
+  [`a258427`](https://github.com/graphile/crystal/commit/a2584278e78535dc3c611c5257c332e515c280bc),
+  [`65d9556`](https://github.com/graphile/crystal/commit/65d9556cf18c54a7cd9c291aa10aa9806adb3c7a)]:
+  - grafast@1.0.0-rc.4
+  - graphile-build-pg@5.0.0-rc.3
+  - @dataplan/pg@1.0.0-rc.3
+  - graphile-build@5.0.0-rc.3
+  - graphile-config@1.0.0-rc.3
+  - tamedevil@0.1.0-rc.3
+
 ## 5.0.0-rc.2
 
 ### Patch Changes

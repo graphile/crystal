@@ -1,5 +1,44 @@
 # ruru
 
+## 2.0.0-rc.4
+
+### Patch Changes
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2881](https://github.com/graphile/crystal/pull/2881)
+  [`1606298`](https://github.com/graphile/crystal/commit/1606298cdac2938e02675d0e7e5e134364ac7bcf)
+  Thanks [@benjie](https://github.com/benjie)! - Fix `{"isTrusted": true}` error
+  that would be output in Ruru when websocket connection unexpectedly
+  terminated.
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
+- [#2883](https://github.com/graphile/crystal/pull/2883)
+  [`2e770df`](https://github.com/graphile/crystal/commit/2e770df354db58d39aead55c3aeca8ee2fb41833)
+  Thanks [@benjie](https://github.com/benjie)! - Ruru gains ability to export
+  schema as SDL (with options!)
+
+- [#2847](https://github.com/graphile/crystal/pull/2847)
+  [`d758351`](https://github.com/graphile/crystal/commit/d75835194591ef8146d095814bc1bb1f92f1f290)
+  Thanks [@benjie](https://github.com/benjie)! - Add ruru-components as a
+  dependency so the RuruProps type can come through.
+
+- Updated dependencies
+  [[`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3),
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36),
+  [`1606298`](https://github.com/graphile/crystal/commit/1606298cdac2938e02675d0e7e5e134364ac7bcf),
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c),
+  [`2e770df`](https://github.com/graphile/crystal/commit/2e770df354db58d39aead55c3aeca8ee2fb41833)]:
+  - ruru-components@2.0.0-rc.4
+  - graphile-config@1.0.0-rc.3
+
 ## 2.0.0-rc.3
 
 ### Patch Changes

@@ -1,5 +1,82 @@
 # graphile-build-pg
 
+## 5.0.0-rc.3
+
+### Patch Changes
+
+- [#2867](https://github.com/graphile/crystal/pull/2867)
+  [`86db203`](https://github.com/graphile/crystal/commit/86db203bf8e3697860c0bb52ac2d64b87170b3e8)
+  Thanks [@benjie](https://github.com/benjie)! - Change type of
+  GraphileBuild.Build.sql to be more explicit.
+
+- [#2877](https://github.com/graphile/crystal/pull/2877)
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3)
+  Thanks [@benjie](https://github.com/benjie)! - Safety - use null prototype
+  objects in more places.
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2887](https://github.com/graphile/crystal/pull/2887)
+  [`a565503`](https://github.com/graphile/crystal/commit/a5655035dfee7000c1d37e4791354d7a2ba35792)
+  Thanks [@benjie](https://github.com/benjie)! - Internals reworked to use
+  `Promise.withResolvers()` instead of removed `defer()` function.
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
+- [#2850](https://github.com/graphile/crystal/pull/2850)
+  [`456d387`](https://github.com/graphile/crystal/commit/456d387887bb6fb9a880d2c3cd8cc6ece8391cf0)
+  Thanks [@benjie](https://github.com/benjie)! - Handle primary key columns
+  called `Id`, `ID` and... I guess... `iD` when renaming `id` -> `rowId` to make
+  space for the `id: ID!` Relay column when using the Amber preset without V4
+  preset.
+
+- [#2880](https://github.com/graphile/crystal/pull/2880)
+  [`c65d03c`](https://github.com/graphile/crystal/commit/c65d03c2ad5f238f382eb9936c85571d00daa08b)
+  Thanks [@benjie](https://github.com/benjie)! - Fix PgIntrospectionPlugin to
+  handle new PgSubscriber behavior where subscriptions aren't auto-restored
+
+- [#2868](https://github.com/graphile/crystal/pull/2868)
+  [`a258427`](https://github.com/graphile/crystal/commit/a2584278e78535dc3c611c5257c332e515c280bc)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul types of `.where()`,
+  `.having()`, `.orderBy()` and similar methods to avoid invalid embeds
+  resulting in runtime errors - TypeScript should complain if you do the wrong
+  thing now. To fix your code in most cases you can switch to the callback form:
+  e.g. `.orderBy({ ... })` becomes `.orderBy(sql => ({ ... }))` - the `sql` here
+  is scoped to explicitly allow some embeds.
+- Updated dependencies
+  [[`44555c7`](https://github.com/graphile/crystal/commit/44555c7f479d531d6aef100f99859c3bcbf06c93),
+  [`b69a2b0`](https://github.com/graphile/crystal/commit/b69a2b01cadc5ea2af5cf9cfcc52c34b1ad26481),
+  [`c2ae685`](https://github.com/graphile/crystal/commit/c2ae685a5ce001f79356c4a994613b16cdb01475),
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3),
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36),
+  [`a60ed2a`](https://github.com/graphile/crystal/commit/a60ed2acc7abbdfce727eaef48f6ca0349c24635),
+  [`a565503`](https://github.com/graphile/crystal/commit/a5655035dfee7000c1d37e4791354d7a2ba35792),
+  [`d9ccc82`](https://github.com/graphile/crystal/commit/d9ccc82a30ca6167f480e5c8bc15d17df51c0d1c),
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c),
+  [`eafa3f0`](https://github.com/graphile/crystal/commit/eafa3f036ce68e6ffb65935f0a78edee2fa6bdf8),
+  [`22bfbc0`](https://github.com/graphile/crystal/commit/22bfbc0053294a716f1ec92c8c50fed556ea9a4e),
+  [`bd3250e`](https://github.com/graphile/crystal/commit/bd3250e0b8e0f45991e3553f9d3d1d0afa785f59),
+  [`db3d7cb`](https://github.com/graphile/crystal/commit/db3d7cbf9f0c696906142f54be15e26cedc703e3),
+  [`b27c562`](https://github.com/graphile/crystal/commit/b27c562409f7a2fd8a0eeaca96cd2c6b935efe4c),
+  [`f23f0cf`](https://github.com/graphile/crystal/commit/f23f0cf8812eddff7c91c529499a4f20f1f2978c),
+  [`afe31f0`](https://github.com/graphile/crystal/commit/afe31f09a5b204f79321f8db9b42440df23a1183),
+  [`d3a1be9`](https://github.com/graphile/crystal/commit/d3a1be921d70d143a94ca376d9d08dd85269f5bf),
+  [`a258427`](https://github.com/graphile/crystal/commit/a2584278e78535dc3c611c5257c332e515c280bc),
+  [`65d9556`](https://github.com/graphile/crystal/commit/65d9556cf18c54a7cd9c291aa10aa9806adb3c7a)]:
+  - grafast@1.0.0-rc.4
+  - @dataplan/pg@1.0.0-rc.3
+  - graphile-build@5.0.0-rc.3
+  - graphile-config@1.0.0-rc.3
+  - pg-introspection@1.0.0-rc.3
+  - pg-sql2@5.0.0-rc.3
+  - tamedevil@0.1.0-rc.3
+
 ## 5.0.0-rc.2
 
 ### Patch Changes
