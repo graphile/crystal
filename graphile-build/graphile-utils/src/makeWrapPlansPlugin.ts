@@ -33,10 +33,6 @@ export interface PlanWrapperRules {
   };
 }
 
-export interface WrapPlansOptions {
-  warnOnResolverEmulation?: boolean;
-}
-
 export type PlanWrapperRulesGenerator = (
   build: Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
 ) => PlanWrapperRules;
@@ -51,20 +47,36 @@ export type PlanWrapperFilterRule<T> = (
   match: T,
 ) => PlanWrapperRule | PlanWrapperFn;
 
-let counter = 0;
-const resolverEmulationWarningCoordinates = new Set<string>();
-let resolverEmulationWarningTimeout: ReturnType<typeof setTimeout> | null =
-  null;
+export interface WrapPlansOptions {
+  /** The name to give this plugin, to make debugging easier */
+  name?: string;
+  /** Optional version of the plugin */
+  version?: string;
+  /** Optional description of the plugin, to make debugging easier */
+  description?: string;
 
+  /**
+   * Set this `true` if you know that the given plans will never be called in
+   * the context of resolver emulation, and thus wrapping `defaultPlanResolver`
+   * will not cause issues.
+   *
+   * @see {@link https://err.red/pwpr}
+   *
+   */
+  disableResolverEmulationWarnings?: boolean;
+}
+
+const resolverEmulationWarningCoordinates = new Set<string>();
+let timeout: ReturnType<typeof setTimeout> | null = null;
 const queueResolverEmulationWarning = (coordinate: string) => {
   resolverEmulationWarningCoordinates.add(coordinate);
-  if (resolverEmulationWarningTimeout) {
+  if (timeout != null) {
     return;
   }
-  resolverEmulationWarningTimeout = setTimeout(() => {
+  timeout = setTimeout(() => {
     const coordinates = [...resolverEmulationWarningCoordinates].sort();
     resolverEmulationWarningCoordinates.clear();
-    resolverEmulationWarningTimeout = null;
+    timeout = null;
     if (coordinates.length === 0) {
       return;
     }
@@ -78,6 +90,9 @@ const queueResolverEmulationWarning = (coordinate: string) => {
     );
   }, 0);
 };
+
+let counter = 0;
+const EMPTY_OPTIONS: WrapPlansOptions = Object.freeze({});
 
 export function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
@@ -96,21 +111,29 @@ export function wrapPlans<T>(
   ruleOrOptions?: PlanWrapperFilterRule<T> | WrapPlansOptions,
   maybeOptions?: WrapPlansOptions,
 ): GraphileConfig.Plugin {
-  const rule =
-    typeof ruleOrOptions === "function" ? ruleOrOptions : undefined;
-  const options =
-    typeof ruleOrOptions === "function" ? maybeOptions : ruleOrOptions;
-  if (ruleOrOptions && typeof ruleOrOptions !== "function" && maybeOptions) {
+  // Parse out the overloaded signature
+  if (maybeOptions != null && typeof ruleOrOptions !== "function") {
     throw new Error(
       "Invalid call signature for wrapPlans, expected second argument to be a function",
     );
   }
-  const warnOnResolverEmulation = options?.warnOnResolverEmulation ?? true;
-  const name = `WrapPlansPlugin_${++counter}`;
+  const [rule, options = EMPTY_OPTIONS] =
+    typeof ruleOrOptions === "function"
+      ? [ruleOrOptions, maybeOptions]
+      : [undefined, ruleOrOptions];
+
+  const {
+    name = `WrapPlansPlugin_${++counter}`,
+    description,
+    version = "0.0.0",
+    disableResolverEmulationWarnings = false,
+  } = options;
   const symbol = Symbol(name);
+
   return {
     name,
-    version: "0.0.0",
+    description,
+    version,
     schema: {
       hooks: {
         build(build) {
@@ -179,9 +202,13 @@ export function wrapPlans<T>(
           if (!planWrapper) {
             return field;
           }
-          const { plan: oldPlan, resolve, subscribe } = field;
+          const {
+            plan: oldPlan = defaultPlanResolver,
+            resolve,
+            subscribe,
+          } = field;
 
-          if (!oldPlan) {
+          if (oldPlan === defaultPlanResolver) {
             if (resolve) {
               console.warn(
                 `[WARNING]: \`wrapPlans(...)\` refusing to wrap ${Self.name}.${fieldName} since it has no plan and it has a resolver.`,
@@ -192,10 +219,10 @@ export function wrapPlans<T>(
                 `[WARNING]: \`wrapPlans(...)\` refusing to wrap ${Self.name}.${fieldName} since it has no plan and it has a subscription resolver.`,
               );
               return field;
-            } else if (
-              warnOnResolverEmulation &&
-              !Self.extensions?.grafast?.assertStep
-            ) {
+            } else if (Self.extensions?.grafast?.assertStep) {
+              // It's fine; we know we must be running in step (not resolver
+              // emulation) context due to assertStep
+            } else if (!disableResolverEmulationWarnings) {
               queueResolverEmulationWarning(`${Self.name}.${fieldName}`);
             }
           }
@@ -207,7 +234,6 @@ export function wrapPlans<T>(
               (
                 ExecutableStep,
                 autoApplyFieldArgs,
-                defaultPlanResolver,
                 fieldName,
                 inspect,
                 isExecutableStep,
@@ -223,10 +249,7 @@ export function wrapPlans<T>(
                         planParams.slice(overrideParams.length),
                       ),
                     ] as typeof planParams;
-                    const $prev = (oldPlan ?? defaultPlanResolver).apply(
-                      this,
-                      args,
-                    );
+                    const $prev = oldPlan.apply(this, args);
                     if (!($prev instanceof ExecutableStep)) {
                       console.error(
                         `Wrapped a plan function at ${typeName}.${fieldName}, but that function did not return a step!\n${String(
@@ -267,7 +290,6 @@ export function wrapPlans<T>(
               [
                 ExecutableStep,
                 autoApplyFieldArgs,
-                defaultPlanResolver,
                 fieldName,
                 inspect,
                 isExecutableStep,
