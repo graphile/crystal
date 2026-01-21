@@ -108,6 +108,7 @@ export function wrapPlans<T>(
   const resolverEmulationWarningCoordinates = new Set<string>();
   let timeout: ReturnType<typeof setTimeout> | null = null;
   const queueResolverEmulationWarning = (coordinate: string) => {
+    if (disableResolverEmulationWarnings) return;
     resolverEmulationWarningCoordinates.add(coordinate);
     if (timeout != null) {
       return;
@@ -222,7 +223,7 @@ export function wrapPlans<T>(
             } else if (Self.extensions?.grafast?.assertStep) {
               // It's fine; we know we must be running in step (not resolver
               // emulation) context due to assertStep
-            } else if (!disableResolverEmulationWarnings) {
+            } else {
               queueResolverEmulationWarning(`${Self.name}.${fieldName}`);
             }
           }
