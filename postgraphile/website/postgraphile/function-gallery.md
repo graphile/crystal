@@ -7,9 +7,13 @@ title: Function Gallery
 Below you'll find some examples of various PostgreSQL functions, and their
 effects on PostGraphile.
 
+:::note[WIP]
+
 _This page is a WIP — sorry that it's hard to read right now, we will definitely
 be tidying it up! If you want to help with this, please pop into our
 [discord chat](http://discord.gg/graphile) and volunteer!_
+
+:::
 
 ## Custom Queries
 

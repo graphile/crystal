@@ -172,9 +172,9 @@ beta_settings:
    |--index.js
 ```
 
-in package.json:
+Create the following files:
 
-```json
+```json title="package.json"
 {
   "scripts": {
     "start": "node src/index.mjs"
@@ -182,9 +182,7 @@ in package.json:
 }
 ```
 
-Create a `graphile.config.mjs` inside your `src` folder:
-
-```js
+```js title="src/graphile.config.mjs"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
 
@@ -202,9 +200,7 @@ export default {
 };
 ```
 
-in index.mjs:
-
-```js
+```js title="src/index.mjs"
 import express from "express";
 import preset from "./graphile.config.mjs";
 import { postgraphile } from "postgraphile";

@@ -92,7 +92,7 @@ Some of the features we offer:
 - Incredible performance - even for your custom logic!
 - Full GraphQL feature-set, including advanced topics such as:
   - [polymorphism](./polymorphism.md) (interfaces and unions)
-- [Real-time](./realtime.md) features (subscriptions)
+  - [Real-time](./realtime.md) features (subscriptions)
   - `@stream` / `@defer` support
 - Excellent Relay support via our `postgraphile/presets/relay` preset:
   - Global object identification
@@ -120,7 +120,7 @@ Some of the features we offer:
   - Many-to-many navigation
   - Ordering by related tables
   - Multi-tenancy
-  - PostGIS
+  - PostGIS (not yet ported to V5)
   - And many many more...
 
 The easiest way to get started is with the [CLI interface](./usage-cli); if you

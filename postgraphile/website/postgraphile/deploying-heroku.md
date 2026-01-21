@@ -16,6 +16,12 @@ connects to RDS using SSL you need to add `?ssl=true` to the connection string,
 e.g.
 `heroku config:set DATABASE_URL="postgres://...rdshost.../db_name?ssl=true"`
 
+You should also take any further recommended actions by Heroku and AWS to ensure
+the security of your database.
+
+We recommend against the lowest tier of PostgreSQL on Amazon RDS because it's
+I/O credit limits are too low and it can very quickly grind to a halt.
+
 ### Heroku Postgres
 
 It is also possible to use PostGraphile with Heroku Postgres too with a bit more
@@ -108,7 +114,7 @@ instead be accomplished with the Heroku web interface):
   ```bash
   heroku config:set \
       NODE_ENV="production" \
-      GRAPHILE_TURBO="1" \
+      GRAPHILE_ENV="production" \
       DATABASE_URL="postgres://username:password@host:port/dbname?ssl=true" \
       -a myappname
   ```

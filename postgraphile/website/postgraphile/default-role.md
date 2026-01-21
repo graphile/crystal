@@ -2,12 +2,6 @@
 title: The Default Role
 ---
 
-PostGraphile V5 doesn’t have a “default role” any more, but you can indicate a
-role to use in your [pgSettings](./config#pgsettings), and this can be
-dependent on a role not already having been set.
-
----
-
 PostGraphile makes full use of PostgreSQL roles, so in this article we will
 explain briefly how PostgreSQL roles and users work and how that relates to how
 we use them in PostGraphile.
@@ -60,30 +54,50 @@ roles you could start a PostgreSQL connection with
 So how does this apply to PostGraphile? PostGraphile requires you to have at
 least one user (role that can log in) when connecting to the server. That role
 will be specified in your connection string and will from here on out be
-referred to as the `auth_user`. You’d connect with your `auth_user` as follows:
+referred to as the `authenticator`. You’d connect with your `authenticator` as follows:
 
 ```bash
-postgraphile -c postgres://auth_user@localhost/mydb
+postgraphile -c postgres://authenticator@localhost/mydb
 ```
 
-The `auth_user` will have all the privileges PostGraphile might need.
+The `authenticator` will have all the privileges PostGraphile might need
+(including, and often exclusively, the ability to switch to certain other
+roles), but should be restricted so that it can only see data that's intended to
+be exposed.
 
-In PostGraphile V5 there is no `--default-role` option. Instead, decide which
-role should apply for unauthenticated requests in your `pgSettings` logic. That
-role should have restricted privileges to only your data that is publicly
-accessible.
+The `authenticator` role can be granted the ability to switch to other roles e.g. via
+`grant visitor to authenticator;`. Using the `noinherit` option when you define
+the authenticator role (`create role authenticator login noinherit ...`) will mean
+that it needs to switch to this role to gain its permissions - e.g. via `set
+role to visitor;` - this can be a
+great security boundary.
 
-For example, in `graphile.config.mjs`:
+In PostGraphile this role switch can be triggered via the
+`role` setting which can be populated
+in your [preset.grafast.context](./config/context.mdx) callback:
 
-```js
+```js title="graphile.config.mjs"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 export default {
   extends: [PostGraphileAmberPreset],
   grafast: {
     context(requestContext, args) {
+      // Extract the "session user" from the request context, e.g.
+      const user = requestContext.expressv4?.req?.user;
+
+      // Start with the role we've already set it to - e.g. via the JWT plugin
+      let role = args.contextValue.pgSettings?.role;
+
+      // If this is unset: default to "visitor" if logged in, anonymous otherwise
+      role ??= user ? "visitor" : "anonymous";
+
       return {
-        role: args.contextValue.pgSettings?.role ?? "default_role",
+        pgSettings: {
+          // Override the role in the pgSettings
+          ...args.contextValue.pgSettings,
+          role,
+        },
       };
     },
   },

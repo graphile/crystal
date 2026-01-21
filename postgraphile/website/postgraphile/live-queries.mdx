@@ -4,18 +4,6 @@ title: Live Queries
 
 import styles from "@site/src/css/common.module.css";
 
-:::warning[Not yet available in PostGraphile V5]
-
-Live queries are **not yet supported** in PostGraphile V5. The V4 implementation
-was highly experimental and had significant issues. Gra*fast* should allow a
-much more powerful, performant, and stable implementation, but it has not been
-built yet.
-
-If you want live queries in V5, please sponsor the feature or reach out to work
-on it together.
-
-:::
-
 <div className={styles.intro}>
 
 A “live query” monitors the query a user provides and gives the client an
@@ -29,3 +17,23 @@ Live queries are planned for a future PostGraphile V5 release. For now, use
 standard GraphQL subscriptions for real-time updates. The [Real-time
 features](./realtime.md) page covers the subscription options currently
 available.
+
+:::note[Subscriptions should generally be preferred over live queries]
+
+Subscriptions work on an event basis and are very scalable for that reason -
+look into pubsub scalability. They're also expressive, and can tell you things
+that your data might not - for example "Benjie is typing..." might not be a
+state that you store permanently to the database, but is is a reasonable event.
+
+Live queries on the other hand require a reactive datastore (or polling) to try
+and keep a particular query up to date whenever something under the query might
+cause it to change. It's very hard to achieve especially when combining multiple
+data sources, and is often a lot "noisier" on the network. There is not yet a
+GraphQL standard for live queries.
+
+The PostGraphile V4 implementation of live queries was highly experimental and
+had significant issues. Gra*fast* should allow a much more powerful, performant,
+and stable implementation, but it has not been built yet. If you want live
+queries in V5, please sponsor the feature or reach out to work on it together.
+
+:::
