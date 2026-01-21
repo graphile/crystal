@@ -43,7 +43,7 @@
     "debug": "^4.4.3",
     "graphile-config": "workspace:^",
     "graphql": "^16.9.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "pluralize": "^7.0.0",
     "semver": "^7.7.3",
     "tamedevil": "workspace:^",

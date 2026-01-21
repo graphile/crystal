@@ -101,7 +101,7 @@
     "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "jest": "^30.2.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mermaid": "^11.12.1",
     "mocha": "^11.7.5",
     "nodemon": "^3.1.11",
