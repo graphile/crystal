@@ -115,7 +115,7 @@ Both signatures accept an optional `options` argument. Set
 `disableResolverEmulationWarnings: true` to silence the resolver emulation
 warning. This warning is irrelevant when your schema uses only Gra*fast* plan
 resolvers and contains no traditional resolvers. Read more at [wrapPlans
-resolver emulation warning](/postgraphile/5/errors/wpr).
+resolver emulation warning](https://err.red/pwpr).
 
 ## Method 1: wrapping individual resolvers of known fields
 
