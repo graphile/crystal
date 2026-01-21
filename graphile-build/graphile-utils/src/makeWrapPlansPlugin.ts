@@ -87,12 +87,11 @@ export function wrapPlans<T>(
   maybeOptions?: WrapPlansOptions,
 ): GraphileConfig.Plugin {
   // Parse out the overloaded signature
-  const [rule, options = EMPTY_OPTIONS] =
-    typeof ruleOrOptions === "function"
-      ? [ruleOrOptions, maybeOptions]
-      : [undefined, ruleOrOptions];
-
-  if (rule && typeof rule !== "function") {
+  const [rule, options = EMPTY_OPTIONS, forbidden] =
+    typeof ruleOrOptions === "function" || ruleOrOptions == null
+      ? [ruleOrOptions, maybeOptions, undefined]
+      : [undefined, ruleOrOptions, maybeOptions];
+  if (forbidden !== undefined) {
     throw new Error(
       "Invalid call signature for wrapPlans, expected second argument to be a function",
     );
