@@ -68,11 +68,22 @@ interface PlanWrapperRule {
 }
 
 interface WrapPlansOptions {
+  /** The name to give this plugin, to make debugging easier */
+  name?: string;
+  /** Optional version of the plugin */
+  version?: string;
+  /** Optional description of the plugin, to make debugging easier */
+  description?: string;
+
   /**
-   * Set false to disable the resolver emulation warning that appears when
-   * wrapping default plan resolvers.
+   * Set this `true` if you know that the given plans will never be called in
+   * the context of resolver emulation, and thus wrapping `defaultPlanResolver`
+   * will not cause issues.
+   *
+   * @see {@link https://err.red/pwpr}
+   *
    */
-  warnOnResolverEmulation?: boolean;
+  disableResolverEmulationWarnings?: boolean;
 }
 
 type PlanWrapperFn = (
@@ -101,9 +112,10 @@ function wrapPlans<T>(
 ```
 
 Both signatures accept an optional `options` argument. Set
-`warnOnResolverEmulation: false` to silence the resolver emulation warning.
-This warning is irrelevant when your schema uses only Gra*fast* plan resolvers
-and no traditional resolvers.
+`disableResolverEmulationWarnings: true` to silence the resolver emulation
+warning. This warning is irrelevant when your schema uses only Gra*fast* plan
+resolvers and contains no traditional resolvers. Read more at [wrapPlans
+resolver emulation warning](/postgraphile/5/errors/wpr).
 
 ## Method 1: wrapping individual resolvers of known fields
 
