@@ -66,31 +66,6 @@ export interface WrapPlansOptions {
   disableResolverEmulationWarnings?: boolean;
 }
 
-const resolverEmulationWarningCoordinates = new Set<string>();
-let timeout: ReturnType<typeof setTimeout> | null = null;
-const queueResolverEmulationWarning = (coordinate: string) => {
-  resolverEmulationWarningCoordinates.add(coordinate);
-  if (timeout != null) {
-    return;
-  }
-  timeout = setTimeout(() => {
-    const coordinates = [...resolverEmulationWarningCoordinates].sort();
-    resolverEmulationWarningCoordinates.clear();
-    timeout = null;
-    if (coordinates.length === 0) {
-      return;
-    }
-    const plural = coordinates.length > 1;
-    console.log(
-      `[WARNING]: \`wrapPlans(...)\` wrapping default plan resolver for ${
-        plural ? "coordinates" : "coordinate"
-      } ${coordinates.join(
-        ", ",
-      )}; if resolver emulation is in use then things may go awry. See https://err.red/pwpr`,
-    );
-  }, 0);
-};
-
 let counter = 0;
 const EMPTY_OPTIONS: WrapPlansOptions = Object.freeze({});
 
@@ -129,6 +104,31 @@ export function wrapPlans<T>(
     disableResolverEmulationWarnings = false,
   } = options;
   const symbol = Symbol(name);
+
+  const resolverEmulationWarningCoordinates = new Set<string>();
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  const queueResolverEmulationWarning = (coordinate: string) => {
+    resolverEmulationWarningCoordinates.add(coordinate);
+    if (timeout != null) {
+      return;
+    }
+    timeout = setTimeout(() => {
+      const coordinates = [...resolverEmulationWarningCoordinates].sort();
+      resolverEmulationWarningCoordinates.clear();
+      timeout = null;
+      if (coordinates.length === 0) {
+        return;
+      }
+      const plural = coordinates.length > 1;
+      console.log(
+        `[WARNING]: \`wrapPlans(...)\` plugin ${name} has wrapped the default plan resolver at field ${
+          plural ? "coordinates" : "coordinate"
+        } ${coordinates.join(
+          ", ",
+        )}. If this is an impure schema (one that mixes traditional resolvers with Grafast's plan resolvers) then this may result in hard to track down issues - hence this warning. See https://err.red/pwpr for full explanation and proposed solutions.`,
+      );
+    }, 0);
+  };
 
   return {
     name,
