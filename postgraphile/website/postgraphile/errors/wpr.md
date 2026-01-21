@@ -5,9 +5,11 @@ title: wrapPlans resolver emulation warning
 You're probably here because you just saw a warning like:
 
 ```
-[WARNING]: `wrapPlans(...)` wrapping default plan resolver for coordinate
-User.email; if resolver emulation is in use then things may go awry. See
-https://err.red/pwpr
+[WARNING]: `wrapPlans(...)` plugin WrapPlansPlugin_1 has wrapped the default
+plan resolver at field coordinate User.email. If this is an impure schema (one
+that mixes traditional resolvers with Gra*fast* plan resolvers) then this may
+result in hard to track down issues - hence this warning. See
+https://err.red/pwpr for full explanation and proposed solutions.
 ```
 
 ## Plan resolvers vs traditional resolvers
@@ -59,8 +61,8 @@ To resolve this:
 
 1. Add a (non-default) plan resolver for the field you are wrapping, or
 2. Avoid wrapping the default plan resolver, or
-3. Set `warnOnResolverEmulation: false` when calling `wrapPlans()` once you
-   have confirmed it is safe for your schema.
+3. Set `disableResolverEmulationWarnings: true` when calling `wrapPlans()` once
+   you have confirmed it is safe for your schema.
 
 ### Avoid wrapping default plan resolvers
 
