@@ -59,6 +59,7 @@ And please give some love to our featured sponsors 🤩:
 <table><tr>
 <td align="center"><a href="https://www.the-guild.dev/"><img src="https://graphile.org/images/sponsors/theguild.png" width="90" height="90" alt="The Guild" /><br />The Guild</a> *</td>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
+<td align="center"><a href=""><img src="https://graphile.org/images/sponsors/" width="90" height="90" alt="Outbank" /><br />Outbank</a></td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
