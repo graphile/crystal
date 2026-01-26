@@ -34,7 +34,8 @@ export const PageInfoStartEndCursorPlugin: GraphileConfig.Plugin = {
         if (Self.name !== inflection.builtin("PageInfo")) {
           return fields;
         }
-        const Cursor = getOutputTypeByName("Cursor") ?? GraphQLString;
+        const Cursor =
+          getOutputTypeByName(inflection.builtin("Cursor")) ?? GraphQLString;
         return extend(
           fields,
           {
