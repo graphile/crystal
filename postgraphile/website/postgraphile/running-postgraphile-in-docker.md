@@ -396,7 +396,6 @@ At this stage, the repository should look like this:
 |  ├─ package.json
 |  ├─ package-lock.json
 |  ├─ plugins/
-|  |  └─ wrap-plans.ts
 |  └─ Dockerfile
 ├─ .env
 └─ docker-compose.yml
