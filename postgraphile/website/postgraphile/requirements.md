@@ -11,6 +11,8 @@ We recommend using the latest LTS version of Node.js and PostgreSQL, but we have
 limited support for older versions, so long as they are still LTS. Using newer
 released versions should generally work fine (we don't recommend using with
 alpha/beta versions though), but if there's any issues let us know in an issue.
+PostGraphile supports Node.js 22+ and recommends Node.js 24+ for the best
+experience (including built-in type stripping for `.ts` files).
 
 ### Your PostgreSQL database
 
@@ -58,9 +60,10 @@ On top of this, standard PostgreSQL best practices apply: use indexes carefully
 for performance, use constraints and triggers to ensure your data is valid and
 consistent, etc.
 
-### Node.js: use the LTS
+### Node.js: use the active LTS
 
-We only support LTS versions of Node.js. **Once a Node.js version reaches
+PostGraphile supports Node.js 22+ but recommends Node.js 24+ where possible. We
+only support LTS versions of Node.js. **Once a Node.js version reaches
 end-of-life we no longer support it**, and any future patch release may be
 incompatible with it. We do not see this as a violation of semver — once a
 Node.js version reaches EOL **no reasonable user should use it**, and as such a
@@ -78,6 +81,30 @@ TypeScript configuration:
 
 ```
     "moduleResolution": "node16", // Or "nodenext"
+```
+
+Instead of configuring TypeScript manually, we recommend that you use the
+appropriate [TSConfig Base](https://github.com/tsconfig/bases) for your Node.js
+version.
+
+```json title="tsconfig.json"
+{
+  "extends": "@tsconfig/node24/tsconfig.json"
+}
+```
+
+If you want to use type stripping (which limits the syntax you can use,
+but means Node can run your TS files directly), then also add the
+`@tsconfig/node-ts` preset and make sure you're running Node 24+ and TypeScript
+v5.8.0+. To use the LTS version of Node along with type stripping:
+
+```json title="tsconfig.json"
+{
+  "extends": [
+    "@tsconfig/node-lts/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ]
+}
 ```
 
 Our adherence to semver **does not cover types** — we _may_ make breaking
@@ -109,13 +136,18 @@ notifications. To stop this, you can add the following to `jsconfig.json`:
 ### PostgreSQL: use latest
 
 For best results we recommend you use the latest stable release of PostgreSQL
-that we officially support, however it should run well on any earlier version
-of PostgreSQL that have not yet reached end-of life. Once a PostgreSQL version
-reaches end-of-life we no longer support it, and any future patch release may
-be incompatible with it. We do not see this as a violation of semver — once a
-PostgreSQL version reaches EOL **no reasonable user should use it**, and as
-such a change to drop support for it is not a breaking change for reasonable
-users.
+that we officially support, however PostGraphile should run well on any earlier
+version of PostgreSQL that has not yet reached end-of life.
+
+Once a PostgreSQL version reaches end-of-life we no longer support it, and any
+future patch release may be incompatible with it. We do not see this as a
+violation of semver — once a PostgreSQL version reaches EOL **no reasonable user
+should use it**, and as such a change to drop support for it is not a breaking
+change for reasonable users.
+
+Currently versions 12 and 13 are EOL according to the PostgreSQL project. They
+work with PostGraphile and are exercised in CI at time of writing; however, they
+are not officially supported and may be removed from CI if they hold us back.
 
 #### PG 12 [unsupported - EOL Nov 2024]
 
