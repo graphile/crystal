@@ -54,6 +54,7 @@ function commonFn(
   const {
     extend,
     getTypeByName,
+    inflection,
     graphql: { GraphQLInt },
   } = build;
   const { scope, Self } = context;
@@ -81,7 +82,7 @@ function commonFn(
     return args;
   }
 
-  const Cursor = getTypeByName("Cursor");
+  const Cursor = getTypeByName(inflection.builtin("Cursor"));
 
   const canPaginateBackwards =
     isPgFieldConnection &&
