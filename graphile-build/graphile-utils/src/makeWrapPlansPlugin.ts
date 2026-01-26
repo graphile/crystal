@@ -47,32 +47,94 @@ export type PlanWrapperFilterRule<T> = (
   match: T,
 ) => PlanWrapperRule | PlanWrapperFn;
 
+export interface WrapPlansOptions {
+  /** The name to give this plugin, to make debugging easier */
+  name?: string;
+  /** Optional version of the plugin */
+  version?: string;
+  /** Optional description of the plugin, to make debugging easier */
+  description?: string;
+
+  /**
+   * Set this `true` if you know that the given plans will never be called in
+   * the context of resolver emulation, and thus wrapping `defaultPlanResolver`
+   * will not cause issues.
+   *
+   * @see {@link https://err.red/pwpr}
+   *
+   */
+  disableResolverEmulationWarnings?: boolean;
+}
+
 let counter = 0;
+const EMPTY_OPTIONS: WrapPlansOptions = Object.freeze({});
 
 export function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 export function wrapPlans<T>(
   filter: PlanWrapperFilter<T>,
   rule: PlanWrapperFilterRule<T>,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 export function wrapPlans<T>(
   rulesOrGeneratorOrFilter:
     | PlanWrapperRules
     | PlanWrapperRulesGenerator
     | PlanWrapperFilter<T>,
-  rule?: PlanWrapperFilterRule<T>,
+  ruleOrOptions?: PlanWrapperFilterRule<T> | WrapPlansOptions,
+  maybeOptions?: WrapPlansOptions,
 ): GraphileConfig.Plugin {
-  if (rule && typeof rule !== "function") {
+  // Parse out the overloaded signature
+  const [rule, options = EMPTY_OPTIONS, forbidden] =
+    typeof ruleOrOptions === "function" || ruleOrOptions == null
+      ? [ruleOrOptions, maybeOptions, undefined]
+      : [undefined, ruleOrOptions, maybeOptions];
+  if (forbidden !== undefined) {
     throw new Error(
       "Invalid call signature for wrapPlans, expected second argument to be a function",
     );
   }
-  const name = `WrapPlansPlugin_${++counter}`;
+
+  const {
+    name = `WrapPlansPlugin_${++counter}`,
+    description,
+    version = "0.0.0",
+    disableResolverEmulationWarnings = false,
+  } = options;
   const symbol = Symbol(name);
+
+  const resolverEmulationWarningCoordinates = new Set<string>();
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  const queueResolverEmulationWarning = (coordinate: string) => {
+    if (disableResolverEmulationWarnings) return;
+    resolverEmulationWarningCoordinates.add(coordinate);
+    if (timeout != null) {
+      return;
+    }
+    timeout = setTimeout(() => {
+      const coordinates = [...resolverEmulationWarningCoordinates].sort();
+      resolverEmulationWarningCoordinates.clear();
+      timeout = null;
+      if (coordinates.length === 0) {
+        return;
+      }
+      const plural = coordinates.length > 1;
+      console.log(
+        `[WARNING]: \`wrapPlans(...)\` plugin ${name} has wrapped the default plan resolver at field ${
+          plural ? "coordinates" : "coordinate"
+        } ${coordinates.join(
+          ", ",
+        )}. If this is an impure schema (one that mixes traditional resolvers with Grafast's plan resolvers) then this may result in hard to track down issues - hence this warning. See https://err.red/pwpr for full explanation and proposed solutions.`,
+      );
+    }, 0);
+  };
+
   return {
     name,
-    version: "0.0.0",
+    description,
+    version,
     schema: {
       hooks: {
         build(build) {
@@ -141,9 +203,13 @@ export function wrapPlans<T>(
           if (!planWrapper) {
             return field;
           }
-          const { plan: oldPlan, resolve, subscribe } = field;
+          const {
+            plan: oldPlan = defaultPlanResolver,
+            resolve,
+            subscribe,
+          } = field;
 
-          if (!oldPlan) {
+          if (oldPlan === defaultPlanResolver) {
             if (resolve) {
               console.warn(
                 `[WARNING]: \`wrapPlans(...)\` refusing to wrap ${Self.name}.${fieldName} since it has no plan and it has a resolver.`,
@@ -154,10 +220,11 @@ export function wrapPlans<T>(
                 `[WARNING]: \`wrapPlans(...)\` refusing to wrap ${Self.name}.${fieldName} since it has no plan and it has a subscription resolver.`,
               );
               return field;
+            } else if (Self.extensions?.grafast?.assertStep) {
+              // It's fine; we know we must be running in step (not resolver
+              // emulation) context due to assertStep
             } else {
-              console.warn(
-                `[WARNING]: \`wrapPlans(...)\` wrapping default plan resolver for ${Self.name}.${fieldName}; if resolver emulation is in use then things may go awry`,
-              );
+              queueResolverEmulationWarning(`${Self.name}.${fieldName}`);
             }
           }
 
@@ -168,7 +235,6 @@ export function wrapPlans<T>(
               (
                 ExecutableStep,
                 autoApplyFieldArgs,
-                defaultPlanResolver,
                 fieldName,
                 inspect,
                 isExecutableStep,
@@ -184,10 +250,7 @@ export function wrapPlans<T>(
                         planParams.slice(overrideParams.length),
                       ),
                     ] as typeof planParams;
-                    const $prev = (oldPlan ?? defaultPlanResolver).apply(
-                      this,
-                      args,
-                    );
+                    const $prev = oldPlan.apply(this, args);
                     if (!($prev instanceof ExecutableStep)) {
                       console.error(
                         `Wrapped a plan function at ${typeName}.${fieldName}, but that function did not return a step!\n${String(
@@ -228,7 +291,6 @@ export function wrapPlans<T>(
               [
                 ExecutableStep,
                 autoApplyFieldArgs,
-                defaultPlanResolver,
                 fieldName,
                 inspect,
                 isExecutableStep,
