@@ -236,44 +236,46 @@ by this file. </summary>
 The following code is in TypeScript; you can convert it to JavaScript via
 https://www.typescriptlang.org/play
 
+**WARNING**: This code has been ported from v4 to v5 in syntax, but has not yet
+been tested. Please let us know if it works for you!
+
 ```ts
 import { makeWithPgClientViaPgClientAlreadyInTransaction } from "@dataplan/pg/adaptors/pg";
-import type { GraphileConfig } from "graphile-config";
 import { execute, hookArgs } from "grafast";
-import {
-  parse,
-  type ExecutionResult,
-  type GraphQLSchema,
-  validate,
-} from "graphql";
+import { parse, validate } from "graphql";
+import type { ExecutionResult, GraphQLSchema } from "graphql";
 import { Pool } from "pg";
 import { postgraphile } from "postgraphile";
 import preset from "../src/graphile.config.js";
 
 const MockReq = require("mock-req");
 
-let known: Record<string, { counter: number; values: Map<unknown, string> }> =
-  {};
+type Maskable = "nodeId" | "id" | "timestamp" | "email" | "username";
+type MaskCache = { counter: number; values: Map<unknown, string> };
+
+let maskCacheByType: Record<Maskable, MaskCache> = {};
+// Reset the cache before each test
 beforeEach(() => {
-  known = {};
+  maskCacheByType = {};
 });
-/*
- * This function replaces values that are expected to change with static
+
+/**
+ * Replaces values that are expected to change between test runs with static
  * placeholders so that our snapshot testing doesn't throw an error
  * every time we run the tests because time has ticked on in it's inevitable
  * march toward the future.
  */
 export function sanitize(json: any): any {
-  /* This allows us to maintain stable references whilst dealing with variable values */
-  function mask(value: unknown, type: string) {
-    if (!known[type]) {
-      known[type] = { counter: 0, values: new Map() };
+  /** Maintain stable references whilst dealing with variable values */
+  function mask(value: unknown, type: Maskable) {
+    if (!maskCacheByType[type]) {
+      maskCacheByType[type] = { counter: 0, values: new Map() };
     }
-    const o = known[type];
-    if (!o.values.has(value)) {
-      o.values.set(value, `[${type}-${++o.counter}]`);
+    const maskCache = maskCacheByType[type];
+    if (!maskCache.values.has(value)) {
+      maskCache.values.set(value, `[${type}-${++maskCache.counter}]`);
     }
-    return o.values.get(value);
+    return maskCache.values.get(value);
   }
 
   if (Array.isArray(json)) {
@@ -363,6 +365,13 @@ export const runGraphQLQuery = async function runGraphQLQuery(
 ) {
   if (!ctx) throw new Error("No ctx!");
   const { schema, resolvedPreset, pgPool } = ctx;
+
+  const document = parse(query);
+  const validationErrors = validate(schema, document);
+  if (validationErrors.length > 0) {
+    throw validationErrors[0];
+  }
+
   const req = new MockReq({
     url: resolvedPreset.grafserv?.graphqlPath ?? "/graphql",
     method: "POST",
@@ -375,38 +384,33 @@ export const runGraphQLQuery = async function runGraphQLQuery(
   const res: any = { req };
   req.res = res;
 
+  const contextValue: Record<string, any> = {
+    __TESTING: true,
+  };
+
+  const args = await hookArgs({
+    schema,
+    document,
+    variableValues: variables ?? {},
+    contextValue,
+    resolvedPreset,
+    requestContext: {
+      node: { req, res },
+      expressv4: { req, res },
+    },
+  });
+
   const pgClient = await pgPool.connect();
-  await pgClient.query("begin");
 
   try {
-    const document = parse(query);
-    const validationErrors = validate(schema, document);
-    if (validationErrors.length > 0) {
-      throw validationErrors[0];
-    }
-
-    const contextValue: Record<string, any> = {
-      __TESTING: true,
-    };
-
-    const executionArgs = {
-      schema,
-      document,
-      variableValues: variables ?? {},
-      contextValue,
-      resolvedPreset,
-      requestContext: {
-        node: { req, res },
-        expressv4: { req, res },
-      },
-    };
-    const args = await hookArgs(executionArgs);
+    await pgClient.query("begin");
 
     // Test-only helper: reuse a client that's already in a transaction.
     const withPgClient = makeWithPgClientViaPgClientAlreadyInTransaction(
       pgClient,
       true,
     );
+    // Overwrite `withPgClient` with our test version
     args.contextValue.withPgClient = withPgClient;
 
     const result = await execute(args);
@@ -421,8 +425,11 @@ export const runGraphQLQuery = async function runGraphQLQuery(
 
     return checkResult == null ? result : checkResult;
   } finally {
-    await pgClient.query("rollback");
-    pgClient.release();
+    try {
+      await pgClient.query("rollback");
+    } finally {
+      pgClient.release();
+    }
   }
 };
 ```
