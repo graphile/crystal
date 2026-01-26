@@ -162,10 +162,6 @@ issue that we plan to address.
 
 #### Via `DEBUG` envvar
 
-These examples assume you already have a `graphile.config.*` file in your
-working directory. If you do not, add your connection details and preset via
-CLI flags instead.
-
 Another way is to set the relevant [DEBUG](https://github.com/visionmedia/debug)
 environmental variable before running PostGraphile. For example:
 
