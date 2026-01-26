@@ -445,8 +445,9 @@ Graphile Starter:
 
 Your test might look something like this:
 
-```js {9,24-25}
-const { setup, teardown, runGraphQLQuery } = require("../test_helper");
+```ts
+import type { PgClient } from "postgraphile/@dataplan/pg";
+import { setup, teardown, runGraphQLQuery } from "../test_helper.js";
 
 beforeAll(setup);
 afterAll(teardown);
@@ -477,11 +478,11 @@ test("GraphQL query nodeId", async () => {
       if (typeof contextValue.withPgClient === "function") {
         await contextValue.withPgClient(
           contextValue.pgSettings ?? null,
-          async (pgClient: any) => {
-            const { rows } = await pgClient.query(
-              `select * from app_public.users where id = $1`,
-              [17],
-            );
+          async (pgClient: PgClient) => {
+            const { rows } = await pgClient.query({
+              text: `select * from app_public.users where id = $1`,
+              values: [17],
+            });
             if (rows.length !== 1) {
               throw new Error("User not found!");
             }
