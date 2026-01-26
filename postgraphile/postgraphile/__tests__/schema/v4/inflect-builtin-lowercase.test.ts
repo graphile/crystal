@@ -2,6 +2,8 @@ import * as core from "./core.js";
 
 const LowerCaseBuiltinsPlugin: GraphileConfig.Plugin = {
   name: "LowerCaseBuiltinsPlugin",
+  description:
+    "Forces all builtin names to lowercase to ensure that we're always referencing the builtin inflector when we need to",
   version: "0.0.0",
   inflection: {
     replace: {
