@@ -1035,7 +1035,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             float: "Float",
             float4: "Float",
             money: "Float",
-            numeric: "BigFloat",
+            numeric: inflection.builtin("BigFloat"),
             citext: "String",
             text: "String",
             char: "String",
