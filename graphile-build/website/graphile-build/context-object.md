@@ -22,8 +22,8 @@ All contexts include these properties:
 
 ## Scope specialisations
 
-Every scope includes `__origin?: string | null | undefined` and
-`directives?: DirectiveDetails[]`. Specialised scopes add additional fields:
+Every scope includes `directives?: DirectiveDetails[]`. Specialised scopes add
+additional fields:
 
 - `ScopeObject` - `isRootQuery`, `isRootMutation`, `isRootSubscription`,
   `isMutationPayload`, `isPageInfo`.

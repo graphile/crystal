@@ -635,6 +635,7 @@ declare global {
      * inherit this Scope interface.
      */
     interface Scope {
+      /** @internal */
       __origin?: string | null | undefined;
       directives?: DirectiveDetails[];
     }
