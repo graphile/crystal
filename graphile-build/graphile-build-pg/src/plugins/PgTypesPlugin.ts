@@ -1,4 +1,4 @@
-import "./PgBasicsPlugin.js";
+import "./PgBasicsPlugin.ts";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";

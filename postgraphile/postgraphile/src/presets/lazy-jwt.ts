@@ -1,4 +1,4 @@
-import "../index.js";
+import "../index.ts";
 
 import type {} from "grafserv/node";
 import { PgJWTPlugin } from "graphile-build-pg";

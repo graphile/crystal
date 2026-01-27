@@ -1,5 +1,5 @@
-import "./global.js";
-import "./interfaces.js";
+import "./global.ts";
+import "./interfaces.ts";
 
 import * as grafast from "grafast";
 import {

@@ -1,5 +1,5 @@
-import "./PgTablesPlugin.js";
-import "./PgBasicsPlugin.js";
+import "./PgTablesPlugin.ts";
+import "./PgBasicsPlugin.ts";
 import "graphile-config";
 
 import type {

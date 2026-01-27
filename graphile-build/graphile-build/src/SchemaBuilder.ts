@@ -1,4 +1,4 @@
-import "./global.js";
+import "./global.ts";
 
 import debugFactory from "debug";
 import { EventEmitter } from "events";

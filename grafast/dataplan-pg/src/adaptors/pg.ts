@@ -4,7 +4,7 @@
 
 // IMPORTANT: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
-import "../interfaces.js";
+import "../interfaces.ts";
 
 import LRU from "@graphile/lru";
 import { EventEmitter } from "eventemitter3";

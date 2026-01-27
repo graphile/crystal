@@ -1,8 +1,8 @@
 import "graphile-config";
-import "./PgCodecsPlugin.js";
-import "./PgProceduresPlugin.js";
-import "./PgRelationsPlugin.js";
-import "./PgTablesPlugin.js";
+import "./PgCodecsPlugin.ts";
+import "./PgProceduresPlugin.ts";
+import "./PgRelationsPlugin.ts";
+import "./PgTablesPlugin.ts";
 
 import type {
   PgCodec,

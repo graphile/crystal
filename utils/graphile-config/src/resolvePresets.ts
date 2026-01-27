@@ -1,4 +1,4 @@
-import "./interfaces.js";
+import "./interfaces.ts";
 
 import { sortWithBeforeAfterProvides } from "./sort.ts";
 

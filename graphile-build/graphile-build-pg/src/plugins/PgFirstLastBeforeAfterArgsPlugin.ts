@@ -1,4 +1,4 @@
-import "./PgTablesPlugin.js";
+import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";

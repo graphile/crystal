@@ -1,4 +1,4 @@
-import "./global.js";
+import "./global.ts";
 
 import chalk from "chalk";
 import type { GraphQLNamedType, GraphQLType } from "grafast/graphql";

@@ -1,4 +1,4 @@
-import "../index.js";
+import "../index.ts";
 
 import type { GraphQLError, GraphQLFormattedError } from "grafast/graphql";
 import { formatError as defaultFormatError } from "grafast/graphql";

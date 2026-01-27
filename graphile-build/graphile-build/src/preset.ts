@@ -1,4 +1,4 @@
-import "./interfaces.js";
+import "./interfaces.ts";
 import "graphile-config";
 
 import * as grafast from "grafast";

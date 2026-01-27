@@ -1,4 +1,4 @@
-import "./thereCanBeOnlyOne.js";
+import "./thereCanBeOnlyOne.ts";
 
 import type LRU from "@graphile/lru";
 import debugFactory from "debug";

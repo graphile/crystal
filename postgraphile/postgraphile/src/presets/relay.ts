@@ -1,4 +1,4 @@
-import "../index.js";
+import "../index.ts";
 
 import type { PgCodecRelation } from "@dataplan/pg";
 

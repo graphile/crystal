@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import "./interfaces.js";
+import "./interfaces.ts";
 
 import { access } from "node:fs/promises";
 import { resolve } from "node:path";
