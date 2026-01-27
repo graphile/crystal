@@ -1,13 +1,13 @@
 import type { ExecutionArgs } from "graphql";
 
-import { $$hooked } from "./constants.js";
+import { $$hooked } from "./constants.ts";
 import type {
   GrafastExecutionArgs,
   PrepareArgsEvent,
   PromiseOrDirect,
-} from "./interfaces.js";
-import { getGrafastMiddleware } from "./middleware.js";
-import { isPromiseLike } from "./utils.js";
+} from "./interfaces.ts";
+import { getGrafastMiddleware } from "./middleware.ts";
+import { isPromiseLike } from "./utils.ts";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
 const $$writeTest = Symbol("grafastWriteTest");

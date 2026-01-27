@@ -8,11 +8,11 @@ import type {
 } from "grafserv";
 import type {} from "graphile-config";
 
-export type { PersistedOperationGetter } from "./interfaces.js";
+export type { PersistedOperationGetter } from "./interfaces.ts";
 import LRU from "@graphile/lru";
 
-import type { PersistedOperationGetter } from "./interfaces.js";
-import { version } from "./version.js";
+import type { PersistedOperationGetter } from "./interfaces.ts";
+import { version } from "./version.ts";
 
 declare global {
   namespace GraphileConfig {

@@ -1,5 +1,34 @@
 # pg-sql2
 
+## 5.0.0-rc.3
+
+### Patch Changes
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
+- [#2869](https://github.com/graphile/crystal/pull/2869)
+  [`afe31f0`](https://github.com/graphile/crystal/commit/afe31f09a5b204f79321f8db9b42440df23a1183)
+  Thanks [@benjie](https://github.com/benjie)! - Don't allow recursion when
+  calling `node[$$toSQL]()`; customize error message if `$$toSQL` was invoked.
+
+- [#2866](https://github.com/graphile/crystal/pull/2866)
+  [`d3a1be9`](https://github.com/graphile/crystal/commit/d3a1be921d70d143a94ca376d9d08dd85269f5bf)
+  Thanks [@benjie](https://github.com/benjie)! - More explicit types of exported
+  PgSQL
+
+- Updated dependencies
+  [[`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36),
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)]:
+  - @graphile/lru@5.0.0-rc.3
+
 ## 5.0.0-rc.2
 
 ### Patch Changes

@@ -1,15 +1,19 @@
-import type { ExecutionDetails, Maybe, PromiseOrDirect } from "..";
-import { defer, type Deferred } from "../deferred";
-import type { Multistep, UnwrapMultistep } from "../multistep";
-import type { Step } from "../step.js";
-import { isListLikeStep, isObjectLikeStep } from "../step.js";
+import { noop } from "../dev.ts";
+import type {
+  ExecutionDetails,
+  Maybe,
+  PromiseOrDirect,
+} from "../interfaces.ts";
+import type { Multistep, UnwrapMultistep } from "../multistep.ts";
+import type { Step } from "../step.ts";
+import { isListLikeStep, isObjectLikeStep } from "../step.ts";
 import {
   arraysMatch,
   isTuple,
   recordsMatch,
   stableStringSortFirstTupleEntry,
-} from "../utils.js";
-import { access } from "./access.js";
+} from "../utils.ts";
+import { access } from "./access.ts";
 
 export const nextTick: (cb: () => void) => void =
   typeof process !== "undefined" && typeof process.nextTick === "function"
@@ -87,8 +91,8 @@ export function paramSig(
   );
 }
 
-export interface LoadBatch {
-  deferred: Deferred<any>;
+interface LoadBatch {
+  deferred: PromiseWithResolvers<any>;
   batchSpecs: readonly any[];
 }
 
@@ -210,7 +214,8 @@ export function executeLoad<
   }
   const pendingCount = batch.size;
   if (pendingCount > 0) {
-    const deferred = defer<ReadonlyArray<TData>>();
+    const deferred = Promise.withResolvers<ReadonlyArray<TData>>();
+    deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
     const batchSpecs = [...batch.keys()];
     const loadBatch: LoadBatch = { deferred, batchSpecs };
     if (!meta.loadBatchesByLoad) {
@@ -232,7 +237,7 @@ export function executeLoad<
       });
     }
     return (async () => {
-      const loadResults = await deferred;
+      const loadResults = await deferred.promise;
       for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {
         const spec = batchSpecs[pendingIndex];
         const targetIndexes = batch.get(spec)!;

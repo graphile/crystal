@@ -6,8 +6,8 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { OperationPlan } from "./index.js";
-import { inspect } from "./inspect.js";
+import type { OperationPlan } from "./index.ts";
+import { inspect } from "./inspect.ts";
 
 const { Kind } = graphql;
 

@@ -6,10 +6,10 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import { SafeError } from "../error.js";
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import { UnbatchedStep } from "../step.js";
-import type { __TrackedValueStep } from "./__trackedValue.js";
+import { SafeError } from "../error.ts";
+import type { UnbatchedExecutionExtra } from "../interfaces.ts";
+import { UnbatchedStep } from "../step.ts";
+import type { __TrackedValueStep } from "./__trackedValue.ts";
 
 const { Kind } = graphql;
 
@@ -25,12 +25,14 @@ export class __InputDynamicScalarStep<
   };
   isSyncAndSafe = true;
   private variableNames: string[] = [];
+  private value: ListValueNode | ObjectValueNode;
 
   constructor(
     inputType: GraphQLScalarType,
-    private value: ListValueNode | ObjectValueNode,
+    value: ListValueNode | ObjectValueNode,
   ) {
     super();
+    this.value = value;
     // Walk value and add any variable references as dependencies
     const walk = (inputValue: ValueNode): void => {
       switch (inputValue.kind) {

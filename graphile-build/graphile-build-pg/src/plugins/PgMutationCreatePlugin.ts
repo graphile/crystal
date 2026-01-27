@@ -11,8 +11,8 @@ import { assertExecutableStep, object } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

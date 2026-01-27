@@ -113,10 +113,10 @@ yarn add --dev \
 ```json title="package.json after"
 {
   "devDependencies": {
-    "graphile-build": "^5.0.0-beta.27",
-    "graphile-build-pg": "^5.0.0-beta.31",
-    "postgraphile": "^5.0.0-beta.32",
-    "postgraphile-plugin-connection-filter": "^3.0.0-beta.5"
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
   }
 }
 ```
@@ -139,8 +139,8 @@ now be just:
 ```json title="package.json using subpaths for graphile-build*"
 {
   "devDependencies": {
-    "postgraphile": "^5.0.0-beta.32",
-    "postgraphile-plugin-connection-filter": "^3.0.0-beta.5"
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
   }
 }
 ```

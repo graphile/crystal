@@ -1,2 +1,2 @@
-export { Fetcher, RuruProps } from "./interfaces.js";
-export { Ruru } from "./ruru.js";
+export type { Fetcher, RuruProps } from "./interfaces.ts";
+export { Ruru } from "./ruru.tsx";

@@ -6,11 +6,14 @@ import { loadConfig } from "graphile-config/load";
 import type { InspectOptions } from "util";
 import { inspect } from "util";
 
-import { stripAnsi } from "../../../stripAnsi.js";
+import { stripAnsi } from "../../../stripAnsi.ts";
 
 const inspectOpts: InspectOptions = {
   colors: true,
 };
+
+export const command = "print [section]";
+export const description = "Prints your resolved configuration";
 
 export function options(yargs: Argv) {
   return yargs
@@ -32,30 +35,78 @@ export function options(yargs: Argv) {
       type: "boolean",
       description: "Include details to help debug the ordering of plugins",
       normalize: true,
+    })
+    .positional("section", {
+      description:
+        "Only print the given section (plugins|lib|grafserv|schema|gather|grafast|ruru|inflection|pgServices|etc)",
+      demandOption: false,
+      type: "string",
     });
 }
 
 type Opts = ArgsFromOptions<typeof options>;
 
 export async function run(args: Opts) {
+  const printed = [
+    // These are already handled in a resolved preset
+    "extends",
+  ];
+  const initialPrintedLength = printed.length;
   const opts: Opts = {
     ...args,
     // debug-order implies full currently
     full: args.full || args.debugOrder,
   };
+  const section = args.section;
   const userPreset = await loadConfig(opts.config);
   if (!userPreset) {
     console.error("Failed to load config, please check the file exists");
     process.exit(1);
   }
   const resolvedPreset = resolvePreset(userPreset);
-  console.log(printPlugins(opts, resolvedPreset.plugins));
+  if (!section || section === "plugins") {
+    printed.push("plugins");
+    console.log(printPlugins(opts, resolvedPreset.plugins));
+  }
+  if (!section || section === "disablePlugins") {
+    printed.push("disablePlugins");
+    if (resolvedPreset.disablePlugins.length > 0) {
+      console.log();
+      console.log(
+        chalk.whiteBright.bold("disablePlugins") +
+          `:\n- ${resolvedPreset.disablePlugins.join("\n- ")}`,
+      );
+    }
+  }
+
+  if (!section || section === "lib") {
+    if (!args.full) {
+      printed.push("lib");
+      if (Object.keys(resolvedPreset.lib).length > 0) {
+        console.log();
+        console.log(
+          chalk.whiteBright.bold("lib") +
+            `:\n- ${Object.entries(resolvedPreset.lib)
+              .map(
+                ([key, value]) =>
+                  `${key}: ${(typeof value === "object" && value != null) || typeof value === "function" ? `${typeof value} (${Object.keys(value).length} keys)` : value}`,
+              )
+              .join("\n- ")}`,
+        );
+      }
+    }
+  }
+
   for (const key of Object.keys(
     resolvedPreset,
   ) as (keyof typeof resolvedPreset)[]) {
-    if (key === "plugins" || key === "extends" || key === "disablePlugins") {
+    if (printed.includes(key)) {
       continue;
     }
+    if (section && section !== key) {
+      continue;
+    }
+    printed.push(key);
     console.log();
     console.log(chalk.whiteBright.bold(key) + ":");
     const value = resolvedPreset[key];
@@ -76,6 +127,13 @@ export async function run(args: Opts) {
     } else {
       console.log(inspect(value, inspectOpts));
     }
+  }
+
+  if (printed.length === initialPrintedLength) {
+    console.log(
+      "Nothing printed! Try `graphile config print` without further flags",
+    );
+    process.exitCode = 4; //404
   }
 }
 

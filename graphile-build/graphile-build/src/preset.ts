@@ -1,4 +1,4 @@
-import "./interfaces.js";
+import "./interfaces.ts";
 import "graphile-config";
 
 import * as grafast from "grafast";
@@ -27,13 +27,13 @@ import {
   SubscriptionPlugin,
   TransliterationPlugin,
   TrimEmptyDescriptionsPlugin,
-} from "./plugins/index.js";
+} from "./plugins/index.ts";
 import {
   EXPORTABLE,
   EXPORTABLE_OBJECT_CLONE,
   exportNameHint,
-} from "./utils.js";
-import { version } from "./version.js";
+} from "./utils.ts";
+import { version } from "./version.ts";
 
 declare global {
   namespace GraphileConfig {

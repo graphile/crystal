@@ -14,8 +14,8 @@ import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
-import type { RuruProps } from "../interfaces.js";
-import { useStorage } from "./useStorage.js";
+import type { RuruProps } from "../interfaces.ts";
+import { useStorage } from "./useStorage.ts";
 
 export interface IExplainedOperation {
   type: string;

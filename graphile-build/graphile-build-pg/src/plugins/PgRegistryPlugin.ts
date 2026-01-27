@@ -4,7 +4,7 @@ import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import { gatherConfig } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

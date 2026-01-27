@@ -1,12 +1,16 @@
-import type { RuruProps } from "ruru-components";
+import type { RuruProps } from "ruru-types";
 
 import type {
   BakedRuruClientConfig,
   RuruConfig,
   RuruHTMLParts,
-} from "./interfaces.js";
-import { version } from "./version.js";
-export { RuruClientConfig, RuruConfig, RuruHTMLParts } from "./interfaces.js";
+} from "./interfaces.ts";
+import { version } from "./version.ts";
+export type {
+  RuruClientConfig,
+  RuruConfig,
+  RuruHTMLParts,
+} from "./interfaces.ts";
 
 const DEFAULT_STATIC_PATH = `https://unpkg.com/ruru@${version}/static/`;
 

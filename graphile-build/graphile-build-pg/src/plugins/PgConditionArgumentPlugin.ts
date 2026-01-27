@@ -1,4 +1,4 @@
-import "./PgTablesPlugin.js";
+import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type {
@@ -10,7 +10,7 @@ import type {
 import type { ConnectionStep, GrafastArgumentConfig } from "grafast";
 import type { GraphQLInputObjectType } from "grafast/graphql";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

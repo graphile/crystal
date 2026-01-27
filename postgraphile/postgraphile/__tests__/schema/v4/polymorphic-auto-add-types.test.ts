@@ -1,6 +1,6 @@
 import { MutationPlugin, NodePlugin } from "graphile-build";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 const HideApplicationsAndVulnerabilitiesPlugin: GraphileConfig.Plugin = {
   name: "HideApplicationsAndVulnerabilitiesPlugin",

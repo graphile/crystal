@@ -22,8 +22,8 @@ import type {
   Super as ESTreeSuper,
 } from "estree";
 
-import { fastFindReferenceWithParent, reportProblem } from "./common.js";
-import { isExportableCall } from "./utils.js";
+import { fastFindReferenceWithParent, reportProblem } from "./common.ts";
+import { isExportableCall } from "./utils.ts";
 
 interface CommonOptions {
   disableAutofix: boolean;

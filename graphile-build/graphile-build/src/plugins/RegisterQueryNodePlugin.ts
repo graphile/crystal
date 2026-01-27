@@ -2,7 +2,7 @@ import "graphile-config";
 
 import { constant, rootValue } from "grafast";
 
-import { EXPORTABLE } from "../utils.js";
+import { EXPORTABLE } from "../utils.ts";
 
 declare global {
   namespace GraphileConfig {

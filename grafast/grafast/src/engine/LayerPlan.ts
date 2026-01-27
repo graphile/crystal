@@ -1,5 +1,5 @@
-import * as assert from "../assert.js";
-import type { Bucket } from "../bucket.js";
+import * as assert from "../assert.ts";
+import type { Bucket } from "../bucket.ts";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
@@ -8,21 +8,21 @@ import {
   FLAG_STOPPED,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
-} from "../constants.js";
-import { isDev } from "../dev.js";
-import { isFlaggedValue } from "../error.js";
-import { inspect } from "../inspect.js";
+} from "../constants.ts";
+import { isDev } from "../dev.ts";
+import { isFlaggedValue } from "../error.ts";
+import { inspect } from "../inspect.ts";
 import type {
   BatchExecutionValue,
   ExecutionValue,
   UnaryExecutionValue,
-} from "../interfaces.js";
-import type { Step, UnbatchedStep } from "../step";
-import type { __ValueStep } from "../steps/index.js";
-import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
-import { isDistributor } from "./distributor.js";
-import { batchExecutionValue, newBucket } from "./executeBucket.js";
-import type { OperationPlan } from "./OperationPlan";
+} from "../interfaces.ts";
+import type { Step, UnbatchedStep } from "../step.ts";
+import type { __ValueStep } from "../steps/index.ts";
+import { arrayOfLength, arraysMatch, setsMatch } from "../utils.ts";
+import { isDistributor } from "./distributor.ts";
+import { batchExecutionValue, newBucket } from "./executeBucket.ts";
+import type { OperationPlan } from "./OperationPlan.ts";
 
 /**
  * If any of these flags exist on a value then it isn't the value we want to
@@ -412,10 +412,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     | LayerPlan<LayerPlanReasonRoot>
     | LayerPlan<LayerPlanReasonMutationField>;
 
-  constructor(
-    public readonly operationPlan: OperationPlan,
-    public readonly reason: TReason, //parentStep: ExecutableStep | null,
-  ) {
+  public readonly operationPlan: OperationPlan;
+  public readonly reason: TReason;
+
+  constructor(operationPlan: OperationPlan, reason: TReason) {
+    this.operationPlan = operationPlan;
+    this.reason = reason;
     // This layer plan is dependent on the latest side effect. Note that when
     // we set a `rootStep` later, if the root step is dependent on this step
     // (directly or indirectly) we will clear this property.

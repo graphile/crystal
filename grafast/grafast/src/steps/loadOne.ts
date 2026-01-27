@@ -1,23 +1,23 @@
-import type { ExecutionDetails } from "../index.js";
+import type { ExecutionDetails } from "../index.ts";
 import type {
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
   Thunk,
-} from "../interfaces.js";
-import type { Multistep, UnwrapMultistep } from "../multistep.js";
-import { multistep } from "../multistep.js";
-import { Step } from "../step.js";
-import { canonicalJSONStringify, recordsMatch } from "../utils.js";
-import type { IOEquivalence } from "./_loadCommon.js";
+} from "../interfaces.ts";
+import type { Multistep, UnwrapMultistep } from "../multistep.ts";
+import { multistep } from "../multistep.ts";
+import { Step } from "../step.ts";
+import { canonicalJSONStringify, recordsMatch } from "../utils.ts";
+import type { IOEquivalence } from "./_loadCommon.ts";
 import {
   executeLoad,
   ioEquivalenceMatches,
   makeAccessMap,
   paramSig,
-} from "./_loadCommon.js";
-import { access } from "./access.js";
-import { constant } from "./constant.js";
+} from "./_loadCommon.ts";
+import { access } from "./access.ts";
+import { constant } from "./constant.ts";
 
 export interface LoadOneInfo<
   TItem,

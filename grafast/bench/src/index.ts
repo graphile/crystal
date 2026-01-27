@@ -9,8 +9,8 @@ import type {
 import { parse, validate } from "grafast/graphql";
 import JSON5 from "json5";
 
-import type { BenchOperation, GrafastBenchSetupResult } from "./interfaces.js";
-export { GrafastBenchConfig } from "./interfaces.js";
+import type { BenchOperation, GrafastBenchSetupResult } from "./interfaces.ts";
+export type { GrafastBenchConfig } from "./interfaces.ts";
 
 const grafastMetricsEmitter = new EventEmitter();
 

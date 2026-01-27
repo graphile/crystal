@@ -33,7 +33,7 @@
     "tslib": "^2.8.1"
   },
   "engines": {
-    "node": ">=16.10"
+    "node": ">=22"
   },
   "devDependencies": {
     "@types/glob": "^9.0.0",

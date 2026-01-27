@@ -7,8 +7,8 @@ import type {
   GrafastPlanJSON,
   GrafastPlanJSONv1,
   GrafastPlanStepJSONv1,
-} from "./interfaces";
-import { stripAnsi } from "./stripAnsi.js";
+} from "./interfaces.ts";
+import { stripAnsi } from "./stripAnsi.ts";
 
 /**
  * An array of hex colour codes that we use for colouring the buckets/steps in
@@ -598,7 +598,7 @@ function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
   return out.join("\n");
 }
 
-export * from "./planJSONInterfaces.js";
+export type * from "./planJSONInterfaces.ts";
 
 function trim(string: string, length = 15): string {
   if (string.length > length) {

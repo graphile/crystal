@@ -1,6 +1,6 @@
 import { buildASTSchema, parse } from "graphql";
 
-import * as GraphQLSchemaSnapshotSerializer from "../src/index.js";
+import * as GraphQLSchemaSnapshotSerializer from "../src/index.ts";
 
 expect.addSnapshotSerializer(GraphQLSchemaSnapshotSerializer);
 

@@ -1,6 +1,6 @@
 import { stripAnsi } from "grafast";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 if (process.env.DEBUG) {
   console.warn(`\

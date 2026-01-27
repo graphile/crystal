@@ -5,7 +5,7 @@ import {
   withSuperuserPgClientFromPgService,
 } from "@dataplan/pg";
 import type { PromiseOrDirect, Step } from "grafast";
-import { constant, context, defer, noop, object } from "grafast";
+import { constant, context, noop, object, promiseWithResolve } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
@@ -32,8 +32,8 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import { version } from "../version.js";
-import { watchFixtures } from "../watchFixtures.js";
+import { version } from "../version.ts";
+import { watchFixtures } from "../watchFixtures.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -689,8 +689,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           let eventStream =
             await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
-          const abort = defer<typeof $$stop>();
-          unlistens.push(() => abort.resolve($$stop));
+          const { resolve, promise: abort } =
+            promiseWithResolve<typeof $$stop>();
+          unlistens.push(() => resolve($$stop));
           const regather = () => {
             // Delete the introspection results
             info.cache.introspectionResultsPromise = null;

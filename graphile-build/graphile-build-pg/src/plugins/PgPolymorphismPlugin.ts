@@ -1,8 +1,8 @@
 import "graphile-config";
-import "./PgCodecsPlugin.js";
-import "./PgProceduresPlugin.js";
-import "./PgRelationsPlugin.js";
-import "./PgTablesPlugin.js";
+import "./PgCodecsPlugin.ts";
+import "./PgProceduresPlugin.ts";
+import "./PgRelationsPlugin.ts";
+import "./PgTablesPlugin.ts";
 
 import type {
   PgCodec,
@@ -50,13 +50,13 @@ import type {
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import { getBehavior } from "../behavior.js";
+import { getBehavior } from "../behavior.ts";
 import {
   parseDatabaseIdentifier,
   parseSmartTagsOptsString,
   tagToString,
-} from "../utils.js";
-import { version } from "../version.js";
+} from "../utils.ts";
+import { version } from "../version.ts";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;

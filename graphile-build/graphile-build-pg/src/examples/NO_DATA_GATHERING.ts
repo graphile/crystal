@@ -33,7 +33,7 @@ import { EXPORTABLE, exportSchema } from "graphile-export";
 import { Pool } from "pg";
 import sql from "pg-sql2";
 
-import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { defaultPreset as graphileBuildPgPreset } from "../index.ts";
 
 const pool = new Pool({
   connectionString: "graphilecrystaltest",

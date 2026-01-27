@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "5.0.0-rc.2",
+  "version": "5.0.0-rc.3",
   "description": "Utilities to help with building graphile-build plugins",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -42,7 +42,7 @@
     "tslib": "^2.8.1"
   },
   "engines": {
-    "node": ">=14.17"
+    "node": ">=22"
   },
   "peerDependencies": {
     "@dataplan/pg": "workspace:^",

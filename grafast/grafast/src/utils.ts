@@ -19,27 +19,26 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import * as assert from "./assert.js";
-import type { Deferred } from "./deferred.js";
-import { isDev, noop } from "./dev.js";
+import * as assert from "./assert.ts";
+import { isDev, noop } from "./dev.ts";
 import type {
   LayerPlan,
   LayerPlanReasonDefer,
   LayerPlanReasonListItem,
   LayerPlanReasonSubscription,
-} from "./engine/LayerPlan.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { SafeError } from "./error.js";
-import { inspect } from "./inspect.js";
+} from "./engine/LayerPlan.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { SafeError } from "./error.ts";
+import { inspect } from "./inspect.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
   Maybe,
-} from "./interfaces.js";
-import type { Step } from "./step.js";
-import { constant } from "./steps/constant.js";
+} from "./interfaces.ts";
+import type { Step } from "./step.ts";
+import { constant } from "./steps/constant.ts";
 
 const {
   GraphQLBoolean,
@@ -292,19 +291,6 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
  */
 export function isPromiseLike<T>(t: T | PromiseLike<T>): t is PromiseLike<T> {
   return t != null && typeof (t as any).then === "function";
-}
-
-/**
- * Is a promise that can be externally resolved.
- */
-export function isDeferred<T>(
-  t: T | Promise<T> | Deferred<T>,
-): t is Deferred<T> {
-  return (
-    isPromise(t) &&
-    typeof (t as any).resolve === "function" &&
-    typeof (t as any).reject === "function"
-  );
 }
 
 /**

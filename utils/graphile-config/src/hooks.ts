@@ -1,11 +1,11 @@
-import { orderedApply } from "./functionality.js";
+import { orderedApply } from "./functionality.ts";
 import type {
   CallbackDescriptor,
   CallbackOrDescriptor,
   FunctionalityObject,
   PromiseOrDirect,
   UnwrapCallback,
-} from "./interfaces.js";
+} from "./interfaces.ts";
 
 const isDev =
   typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";

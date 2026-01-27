@@ -120,7 +120,7 @@ export function getMiddleware(resolvedPreset: GraphileConfig.ResolvedPreset) {
 
 ```ts title="src/main.ts"
 // Get the user's Graphile Config from somewhere, e.g.
-import config from "./graphile.config.js";
+import config from "./graphile.config.ts";
 
 // Resolve the above config, recursively applying all the presets it extends from
 const resolvedPreset = resolvePreset(config);

@@ -1,7 +1,7 @@
-import "./ConnectionPlugin.js";
+import "./ConnectionPlugin.ts";
 import "graphile-config";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

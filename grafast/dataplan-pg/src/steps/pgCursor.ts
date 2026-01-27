@@ -1,7 +1,7 @@
 import type { ExecutableStep, Step, UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedStep } from "grafast";
 
-import type { PgCodec } from "../index.js";
+import type { PgCodec } from "../index.ts";
 
 export interface PgCursorDetails {
   readonly digest: string;

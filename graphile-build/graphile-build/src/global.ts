@@ -38,9 +38,9 @@ import type {
   GraphQLUnionTypeConfig,
 } from "grafast/graphql";
 
-import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
-import type { InflectionBase } from "./inflection.js";
-import type { stringTypeSpec, wrapDescription } from "./utils.js";
+import type { Behavior, BehaviorDynamicMethods } from "./behavior.ts";
+import type { InflectionBase } from "./inflection.ts";
+import type { stringTypeSpec, wrapDescription } from "./utils.ts";
 
 /*
  * To make it easier for plugins to extend our builtin types we put them all in

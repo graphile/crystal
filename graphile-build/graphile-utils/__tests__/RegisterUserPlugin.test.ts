@@ -9,8 +9,8 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 import {
   createTestDatabase,
   dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { RegisterUserPlugin } from "./RegisterUserPlugin.js";
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import { RegisterUserPlugin } from "./RegisterUserPlugin.ts";
 
 let pgPool: Pool | null = null;
 let connectionString = "";

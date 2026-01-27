@@ -1,11 +1,11 @@
-import "./PgTablesPlugin.js";
+import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
 import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -54,6 +54,7 @@ function commonFn(
   const {
     extend,
     getTypeByName,
+    inflection,
     graphql: { GraphQLInt },
   } = build;
   const { scope, Self } = context;
@@ -81,7 +82,7 @@ function commonFn(
     return args;
   }
 
-  const Cursor = getTypeByName("Cursor");
+  const Cursor = getTypeByName(inflection.builtin("Cursor"));
 
   const canPaginateBackwards =
     isPgFieldConnection &&

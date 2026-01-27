@@ -3,8 +3,8 @@ import * as assert from "assert";
 import type { CustomInspectFunction } from "util";
 import { inspect } from "util";
 
-import { $$type } from "./thereCanBeOnlyOne.js";
-export { version } from "./version.js";
+import { $$type } from "./thereCanBeOnlyOne.ts";
+export { version } from "./version.ts";
 
 /** Use this to enable coercing objects to SQL to make composing SQL fragments more ergonomic */
 export const $$toSQL = Symbol("toSQL");

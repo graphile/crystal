@@ -3,12 +3,12 @@ import type {
   ExecutionArgs,
   ExecutionResult,
 } from "graphql";
-import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
+import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue.js";
 
-import { withGrafastArgs } from "./execute.js";
-import type { GrafastExecutionArgs } from "./index.js";
-import type { SubscribeEvent } from "./interfaces.js";
-import { getGrafastMiddleware } from "./middleware.js";
+import { withGrafastArgs } from "./execute.ts";
+import type { GrafastExecutionArgs } from "./index.ts";
+import type { SubscribeEvent } from "./interfaces.ts";
+import { getGrafastMiddleware } from "./middleware.ts";
 
 /**
  * @deprecated Second and third parameters should be passed as part of args,

@@ -1,4 +1,4 @@
-import "./thereCanBeOnlyOne.js";
+import "./thereCanBeOnlyOne.ts";
 
 import type LRU from "@graphile/lru";
 import debugFactory from "debug";
@@ -9,16 +9,17 @@ import type {
   GraphQLError,
   OperationDefinitionNode,
 } from "graphql";
-import type { ObjMap } from "graphql/jsutils/ObjMap";
+import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
-import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import type { DataFromObjectSteps } from "./steps/object.js";
+import { promiseWithResolve } from "./promiseWithResolve.ts";
+import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
+import type { DataFromObjectSteps } from "./steps/object.ts";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
-import { exportAs, exportAsMany } from "./exportAs.js";
-import { grafastPrint } from "./grafastPrint.js";
-import {
+import { exportAs, exportAsMany } from "./exportAs.ts";
+import { grafastPrint } from "./grafastPrint.ts";
+import type {
   AbstractTypePlan,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
@@ -31,12 +32,12 @@ import {
   InputObjectFieldConfig,
   InputObjectPlan,
   InterfacePlan,
-  makeGrafastSchema,
   ObjectFieldConfig,
   ObjectPlan,
   ScalarPlan,
   UnionPlan,
-} from "./makeGrafastSchema.js";
+} from "./makeGrafastSchema.ts";
+import { makeGrafastSchema } from "./makeGrafastSchema.ts";
 
 // HACK: doing this here feels "naughty".
 debugFactory.formatters.c = grafastPrint;
@@ -45,7 +46,7 @@ import type {
   $$cacheByOperation,
   $$hooked,
   $$queryCache,
-} from "./constants.js";
+} from "./constants.ts";
 import {
   $$bypassGraphQL,
   $$eventEmitter,
@@ -53,21 +54,20 @@ import {
   $$idempotent,
   $$verbatim,
   DEFAULT_ACCEPT_FLAGS,
-} from "./constants.js";
-import { defer, Deferred } from "./deferred.js";
+} from "./constants.ts";
 // Handy for debugging
-import { isDev, noop } from "./dev.js";
-import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
+import { isDev, noop } from "./dev.ts";
+import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.ts";
 import {
   currentFieldStreamDetails,
   isUnaryStep,
-} from "./engine/lib/withGlobalLayerPlan.js";
-import { OperationPlan } from "./engine/OperationPlan.js";
-import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
-import { execute } from "./execute.js";
-import { context, debugPlans, operationPlan, rootValue } from "./global.js";
-import { grafast, grafastSync } from "./grafastGraphql.js";
-import { inspect } from "./inspect.js";
+} from "./engine/lib/withGlobalLayerPlan.ts";
+import { OperationPlan } from "./engine/OperationPlan.ts";
+import { $$inhibit, flagError, isSafeError, SafeError } from "./error.ts";
+import { execute } from "./execute.ts";
+import { context, debugPlans, operationPlan, rootValue } from "./global.ts";
+import { grafast, grafastSync } from "./grafastGraphql.ts";
+import { inspect } from "./inspect.ts";
 import type {
   AbstractTypePlanner,
   ArgumentApplyPlanResolver,
@@ -130,11 +130,12 @@ import type {
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
   ValidateSchemaEvent,
-} from "./interfaces.js";
-import { getGrafastMiddleware } from "./middleware.js";
-import type { Multistep, UnwrapMultistep } from "./multistep.js";
-import { multistep } from "./multistep.js";
-import { getNullableInputTypeAtPath } from "./operationPlan-input.js";
+} from "./interfaces.ts";
+import { getGrafastMiddleware } from "./middleware.ts";
+import type { Multistep, UnwrapMultistep } from "./multistep.ts";
+import { multistep } from "./multistep.ts";
+import { getNullableInputTypeAtPath } from "./operationPlan-input.ts";
+import type { ListCapableStep, ListLikeStep, ObjectLikeStep } from "./step.ts";
 import {
   assertExecutableStep,
   assertListCapableStep,
@@ -144,26 +145,44 @@ import {
   isListLikeStep,
   isObjectLikeStep,
   isStep,
-  ListCapableStep,
-  ListLikeStep,
-  ObjectLikeStep,
   Step,
   UnbatchedStep,
-} from "./step.js";
+} from "./step.ts";
+import type {
+  __InputObjectStepWithDollars,
+  __TrackedValueStepWithDollars,
+  ActualKeyByDesiredKey,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
+  ConnectionOptimizedStep,
+  FilterPlanMemo,
+  GroupByPlanMemo,
+  ListTransformItemPlanCallback,
+  ListTransformOptions,
+  ListTransformReduce,
+  LoadManyCallback,
+  LoadManyInfo,
+  LoadManyLoader,
+  LoadOneCallback,
+  LoadOneInfo,
+  LoadOneLoader,
+  ObjectPlanMeta,
+  PaginationFeatures,
+  PaginationParams,
+  SetterCapable,
+  StepRepresentingList,
+} from "./steps/index.ts";
 import {
   __FlagStep,
   __InputListStep,
   __InputObjectStep,
-  __InputObjectStepWithDollars,
   __InputStaticLeafStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
-  __TrackedValueStepWithDollars,
   __ValueStep,
   access,
   AccessStep,
-  ActualKeyByDesiredKey,
   applyInput,
   ApplyInputStep,
   applyTransforms,
@@ -178,9 +197,6 @@ import {
   condition,
   ConditionStep,
   connection,
-  ConnectionHandlingResult,
-  ConnectionHandlingStep,
-  ConnectionOptimizedStep,
   ConnectionStep,
   constant,
   ConstantStep,
@@ -190,14 +206,12 @@ import {
   error,
   ErrorStep,
   filter,
-  FilterPlanMemo,
   first,
   FirstStep,
   get,
   graphqlResolver,
   GraphQLResolverStep,
   groupBy,
-  GroupByPlanMemo,
   inhibitOnNull,
   isModifier,
   lambda,
@@ -209,22 +223,13 @@ import {
   ListenStep,
   ListStep,
   listTransform,
-  ListTransformItemPlanCallback,
-  ListTransformOptions,
-  ListTransformReduce,
   LoadedRecordStep,
   loadMany,
-  LoadManyCallback,
   loadManyCallback,
-  LoadManyInfo,
-  LoadManyLoader,
   loadManyLoader,
   LoadManyStep,
   loadOne,
-  LoadOneCallback,
   loadOneCallback,
-  LoadOneInfo,
-  LoadOneLoader,
   loadOneLoader,
   LoadOneStep,
   makeDecodeNodeId,
@@ -232,10 +237,7 @@ import {
   Modifier,
   nodeIdFromNode,
   object,
-  ObjectPlanMeta,
   ObjectStep,
-  PaginationFeatures,
-  PaginationParams,
   partitionByIndex,
   proxy,
   ProxyStep,
@@ -246,31 +248,33 @@ import {
   ReverseStep,
   Setter,
   setter,
-  SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
-  StepRepresentingList,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
-} from "./steps/index.js";
-import { stringifyPayload } from "./stringifyPayload.js";
-import { stripAnsi } from "./stripAnsi.js";
-import { subscribe } from "./subscribe.js";
+} from "./steps/index.ts";
+import { stringifyPayload } from "./stringifyPayload.ts";
+import { stripAnsi } from "./stripAnsi.ts";
+import { subscribe } from "./subscribe.ts";
+import type {
+  GrafastInputFieldConfigMap,
+  GrafastInputObjectType,
+  GrafastObjectType,
+  InputObjectTypeSpec,
+  ObjectTypeFields,
+  ObjectTypeSpec,
+} from "./utils.ts";
 import {
   arrayOfLength,
   arraysMatch,
   asyncIteratorWithCleanup,
   getEnumValueConfig,
   getEnumValueConfigs,
-  GrafastInputFieldConfigMap,
-  GrafastInputObjectType,
-  GrafastObjectType,
   GraphQLSpecifiedErrorBehaviors,
   inputObjectFieldSpec,
-  InputObjectTypeSpec,
   isPromiseLike,
   mapsMatch,
   maybeArraysMatch,
@@ -279,31 +283,129 @@ import {
   newObjectTypeBuilder,
   objectFieldSpec,
   objectSpec,
-  ObjectTypeFields,
-  ObjectTypeSpec,
   recordsMatch,
   setsMatch,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   stepAShouldTryAndInlineIntoStepB,
   stepsAreInSamePhase,
-} from "./utils.js";
+} from "./utils.ts";
 export {
   GraphQLDeferDirective,
   graphqlHasStreamDefer,
   GraphQLStreamDirective,
-} from "./incremental.js";
+} from "./incremental.ts";
 export { isAsyncIterable } from "iterall";
+export type {
+  __InputObjectStepWithDollars,
+  __TrackedValueStepWithDollars,
+  AbstractTypePlan,
+  AbstractTypePlanner,
+  ActualKeyByDesiredKey,
+  BaseEventMap,
+  BaseGraphQLArguments,
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
+  BatchExecutionValue,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
+  ConnectionOptimizedStep,
+  DataFromObjectSteps,
+  DataFromStep,
+  DeprecatedInputObjectPlan,
+  DeprecatedObjectPlan,
+  EnumPlan,
+  EnumValueConfig,
+  EnumValueInput,
+  ErrorBehavior,
+  EventCallback,
+  EventMapKey,
+  ExecutionDetails,
+  ExecutionDetailsStream,
+  ExecutionEventEmitter,
+  ExecutionEventMap,
+  ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
+  ExecutionValue,
+  FieldArg,
+  FieldArgs,
+  FieldInfo,
+  FieldPlan,
+  FieldPlanResolver,
+  FilterPlanMemo,
+  GrafastArgumentConfig,
+  GrafastExecutionArgs,
+  GrafastFieldConfig,
+  GrafastFieldConfigArgumentMap,
+  GrafastInputFieldConfig,
+  GrafastInputFieldConfigMap,
+  GrafastInputObjectType,
+  GrafastObjectType,
+  GrafastPlanJSON,
+  GrafastResultsList,
+  GrafastResultStreamList,
+  GrafastSchemaConfig,
+  GrafastSubscriber,
+  GrafastValuesList,
+  GroupByPlanMemo,
+  InputFieldPlan,
+  InputObjectFieldApplyResolver,
+  InputObjectFieldConfig,
+  InputObjectPlan,
+  InputObjectTypeBakedInfo,
+  InputObjectTypeBakedResolver,
+  InputObjectTypeSpec,
+  InterfacePlan,
+  JSONArray,
+  JSONObject,
+  JSONValue,
+  ListCapableStep,
+  ListLikeStep,
+  ListTransformItemPlanCallback,
+  ListTransformOptions,
+  ListTransformReduce,
+  LoadManyCallback,
+  LoadManyInfo,
+  LoadManyLoader,
+  LoadOneCallback,
+  LoadOneInfo,
+  LoadOneLoader,
+  Maybe,
+  Multistep,
+  NodeIdCodec,
+  NodeIdHandler,
+  ObjectFieldConfig,
+  ObjectLikeStep,
+  ObjectPlan,
+  ObjectPlanMeta,
+  ObjectTypeFields,
+  ObjectTypeSpec,
+  PaginationFeatures,
+  PaginationParams,
+  PlanTypeInfo,
+  PromiseOrDirect,
+  ScalarPlan,
+  ScalarPlanResolver,
+  SetterCapable,
+  StepOptimizeOptions,
+  StepRepresentingList,
+  StepStreamOptions,
+  Thunk,
+  TypedEventEmitter,
+  UnaryExecutionValue,
+  UnbatchedExecutionExtra,
+  UnionPlan,
+  UnwrapMultistep,
+};
 export {
   __FlagStep,
   __InputListStep,
   __InputObjectStep,
-  __InputObjectStepWithDollars,
   __InputStaticLeafStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
-  __TrackedValueStepWithDollars,
   __ValueStep,
   $$bypassGraphQL,
   $$eventEmitter,
@@ -311,11 +413,8 @@ export {
   $$idempotent,
   $$inhibit,
   $$verbatim,
-  AbstractTypePlan,
-  AbstractTypePlanner,
   access,
   AccessStep,
-  ActualKeyByDesiredKey,
   applyInput,
   ApplyInputStep,
   applyTransforms,
@@ -331,63 +430,29 @@ export {
   bakedInput,
   bakedInputRuntime,
   BakedInputStep,
-  BaseEventMap,
-  BaseGraphQLArguments,
-  BaseGraphQLRootValue,
-  BaseGraphQLVariables,
-  BatchExecutionValue,
   coalesce,
   CoalesceStep,
   condition,
   ConditionStep,
   connection,
-  ConnectionHandlingResult,
-  ConnectionHandlingStep,
-  ConnectionOptimizedStep,
   ConnectionStep,
   constant,
   ConstantStep,
   context,
   createObjectAndApplyChildren,
   currentFieldStreamDetails,
-  DataFromObjectSteps,
-  DataFromStep,
   debugPlans,
   DEFAULT_ACCEPT_FLAGS,
   defaultPlanResolver,
-  defer,
-  Deferred,
-  DeprecatedInputObjectPlan,
-  DeprecatedObjectPlan,
   each,
   EdgeStep,
-  EnumPlan,
-  EnumValueConfig,
-  EnumValueInput,
   error,
-  ErrorBehavior,
   ErrorStep,
-  EventCallback,
-  EventMapKey,
   Step as ExecutableStep,
   execute,
-  ExecutionDetails,
-  ExecutionDetailsStream,
-  ExecutionEventEmitter,
-  ExecutionEventMap,
-  ExecutionExtra,
-  ExecutionResults,
-  ExecutionResultValue,
-  ExecutionValue,
   exportAs,
   exportAsMany,
-  FieldArg,
-  FieldArgs,
-  FieldInfo,
-  FieldPlan,
-  FieldPlanResolver,
   filter,
-  FilterPlanMemo,
   first,
   FirstStep,
   flagError,
@@ -397,40 +462,17 @@ export {
   getGrafastMiddleware,
   getNullableInputTypeAtPath,
   grafast,
-  GrafastArgumentConfig,
-  GrafastExecutionArgs,
-  GrafastFieldConfig,
-  GrafastFieldConfigArgumentMap,
   grafast as grafastGraphql,
   grafastSync as grafastGraphqlSync,
-  GrafastInputFieldConfig,
-  GrafastInputFieldConfigMap,
-  GrafastInputObjectType,
-  GrafastObjectType,
-  GrafastPlanJSON,
   grafastPrint,
-  GrafastResultsList,
-  GrafastResultStreamList,
-  GrafastSchemaConfig,
-  GrafastSubscriber,
   grafastSync,
-  GrafastValuesList,
   graphqlResolver,
   GraphQLResolverStep,
   GraphQLSpecifiedErrorBehaviors,
   groupBy,
-  GroupByPlanMemo,
   inhibitOnNull,
-  InputFieldPlan,
-  InputObjectFieldApplyResolver,
-  InputObjectFieldConfig,
   inputObjectFieldSpec,
-  InputObjectPlan,
-  InputObjectTypeBakedInfo,
-  InputObjectTypeBakedResolver,
-  InputObjectTypeSpec,
   inspect,
-  InterfacePlan,
   isDev,
   isExecutableStep,
   isListCapableStep,
@@ -441,71 +483,44 @@ export {
   isSafeError,
   isStep,
   isUnaryStep,
-  JSONArray,
-  JSONObject,
-  JSONValue,
   lambda,
   LambdaStep,
   last,
   LastStep,
   list,
-  ListCapableStep,
   listen,
   ListenStep,
-  ListLikeStep,
   ListStep,
   listTransform,
-  ListTransformItemPlanCallback,
-  ListTransformOptions,
-  ListTransformReduce,
   LoadedRecordStep,
   loadMany,
-  LoadManyCallback,
   loadManyCallback,
-  LoadManyInfo,
-  LoadManyLoader,
   loadManyLoader,
   LoadManyStep,
   loadOne,
-  LoadOneCallback,
   loadOneCallback,
-  LoadOneInfo,
-  LoadOneLoader,
   loadOneLoader,
   LoadOneStep,
   makeDecodeNodeId,
   makeDecodeNodeIdRuntime,
   makeGrafastSchema,
   mapsMatch,
-  Maybe,
   maybeArraysMatch,
   Modifier,
-  Multistep,
   multistep,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
-  NodeIdCodec,
   nodeIdFromNode,
-  NodeIdHandler,
   noop,
   object,
-  ObjectFieldConfig,
   objectFieldSpec,
-  ObjectLikeStep,
-  ObjectPlan,
-  ObjectPlanMeta,
   objectSpec,
   ObjectStep,
-  ObjectTypeFields,
-  ObjectTypeSpec,
   OperationPlan,
   operationPlan,
-  PaginationFeatures,
-  PaginationParams,
   partitionByIndex,
-  PlanTypeInfo,
-  PromiseOrDirect,
+  promiseWithResolve,
   proxy,
   ProxyStep,
   recordsMatch,
@@ -516,12 +531,9 @@ export {
   ReverseStep,
   rootValue,
   SafeError,
-  ScalarPlan,
-  ScalarPlanResolver,
   setsMatch,
   Setter,
   setter,
-  SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
@@ -529,34 +541,26 @@ export {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   stepAShouldTryAndInlineIntoStepB,
-  StepOptimizeOptions,
-  StepRepresentingList,
   stepsAreInSamePhase,
-  StepStreamOptions,
   stringifyPayload,
   stripAnsi,
   subscribe,
-  Thunk,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
-  TypedEventEmitter,
-  UnaryExecutionValue,
   UnbatchedStep as UnbatchedExecutableStep,
-  UnbatchedExecutionExtra,
   UnbatchedStep,
-  UnionPlan,
-  UnwrapMultistep,
 };
+export type { PromiseWithResolve } from "./promiseWithResolve.ts";
 
 exportAsMany("grafast", {
   exportAs,
+  promiseWithResolve,
   exportAsMany,
   grafastPrint,
   makeGrafastSchema,
   OperationPlan,
-  defer,
   execute,
   getNullableInputTypeAtPath,
   getGrafastMiddleware,
@@ -690,8 +694,8 @@ exportAsMany("grafast", {
   multistep,
 });
 
-export { hookArgs } from "./args.js";
-export { version } from "./version.js";
+export { hookArgs } from "./args.ts";
+export { version } from "./version.ts";
 
 declare global {
   namespace Grafast {
@@ -1076,7 +1080,7 @@ declare module "graphql" {
   }
 }
 
-declare module "graphql/execution/execute" {
+declare module "graphql/execution/execute.js" {
   interface ExecutionResult<
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     TData = ObjMap<unknown>,

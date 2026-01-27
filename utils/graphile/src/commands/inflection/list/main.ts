@@ -8,7 +8,7 @@ import { resolvePreset } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
 import type { CompletionEntry } from "typescript";
 
-import type { ResolvedDefinition } from "../../../utils/typescriptVfs.js";
+import type { ResolvedDefinition } from "../../../utils/typescriptVfs.ts";
 import {
   accessKey,
   configVfs,
@@ -16,7 +16,7 @@ import {
   prettyQuickInfoDisplayParts,
   tightDisplayParts,
   tightDocumentation,
-} from "../../../utils/typescriptVfs.js";
+} from "../../../utils/typescriptVfs.ts";
 
 export async function main(options: { filename?: string; quiet?: boolean }) {
   const { filename, quiet } = options;

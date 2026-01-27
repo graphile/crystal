@@ -126,9 +126,17 @@ const config = {
 
     "import/extensions": [
       "error",
-      "ignorePackages",
-      // TODO: fix this properly, rather than turning off 'ts'/'tsx'
-      { ts: "never", tsx: "never" },
+      "always",
+      {
+        ignorePackages: true,
+        checkTypeImports: true,
+        pathGroupOverrides: [
+          {
+            pattern: "{graphile-build-pg,postgraphile,pgl,ruru}/**",
+            action: "ignore",
+          },
+        ],
+      },
     ],
     "import/no-deprecated": "warn",
 
@@ -216,8 +224,6 @@ const oldConfig = {
       rules: {
         "no-dupe-class-members": "off",
         "no-undef": "off",
-        // This rule doesn't understand import of './js'
-        "import/no-unresolved": "off",
       },
     },
 
@@ -243,6 +249,7 @@ const oldConfig = {
       },
       rules: {
         "@typescript-eslint/consistent-type-imports": "error",
+        "@typescript-eslint/consistent-type-exports": "error",
       },
     },
 

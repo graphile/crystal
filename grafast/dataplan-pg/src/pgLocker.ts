@@ -1,6 +1,6 @@
 import { isDev } from "grafast";
 
-import type { PgStmtBaseStep } from "./steps/pgStmt";
+import type { PgStmtBaseStep } from "./steps/pgStmt.ts";
 
 export type PgLockableParameter =
   | "orderBy"
@@ -20,7 +20,11 @@ export class PgLocker<TStep extends PgStmtBaseStep<any>> {
    */
   public locked = false;
 
-  constructor(private parent: TStep) {}
+  private parent: TStep;
+
+  constructor(parent: TStep) {
+    this.parent = parent;
+  }
 
   private _beforeLock: {
     [a in PgLockableParameter]: Array<PgLockCallback<TStep>>;

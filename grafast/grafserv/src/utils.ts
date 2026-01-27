@@ -11,7 +11,7 @@ import type {
 } from "graphql-ws";
 import type { Extra } from "graphql-ws/use/ws";
 
-import type { GrafservBase } from "./index.js";
+import type { GrafservBase } from "./index.ts";
 import type {
   GrafservBody,
   JSONValue,
@@ -19,9 +19,9 @@ import type {
   OnSubscribeEvent,
   ParsedGraphQLBody,
   RequestDigest,
-} from "./interfaces.js";
-import { $$normalizedHeaders } from "./interfaces.js";
-import { validateGraphQLBody } from "./middleware/graphql.js";
+} from "./interfaces.ts";
+import { $$normalizedHeaders } from "./interfaces.ts";
+import { validateGraphQLBody } from "./middleware/graphql.ts";
 
 const { GraphQLError } = graphql;
 

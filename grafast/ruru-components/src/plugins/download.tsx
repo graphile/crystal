@@ -4,7 +4,7 @@ import type { FC } from "react";
 import { useCallback, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Download } from "../components/Download.js";
+import { Download } from "../components/Download.tsx";
 
 const DownloadPanel: FC = () => {
   const [counter, setCounter] = useState(0);

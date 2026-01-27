@@ -161,11 +161,15 @@ export class Behavior {
   public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
 
   private globalDefaultBehavior: ResolvedBehavior;
+  private resolvedPreset: GraphileConfig.ResolvedPreset;
+  private build: GraphileBuild.Build;
 
   constructor(
-    private resolvedPreset: GraphileConfig.ResolvedPreset,
-    private build: GraphileBuild.Build,
+    resolvedPreset: GraphileConfig.ResolvedPreset,
+    build: GraphileBuild.Build,
   ) {
+    this.resolvedPreset = resolvedPreset;
+    this.build = build;
     this.behaviorRegistry = Object.create(null);
     this.behaviorEntities = Object.create(null);
     this.registerEntity("string");

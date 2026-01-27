@@ -1,7 +1,7 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 
-import * as optionsCmd from "./options/cli.js";
-import * as printCmd from "./print/cli.js";
+import * as optionsCmd from "./options/cli.ts";
+import * as printCmd from "./print/cli.ts";
 
 export function options(yargs: Argv) {
   return yargs
@@ -12,8 +12,8 @@ export function options(yargs: Argv) {
       optionsCmd.run,
     )
     .command(
-      "print",
-      "Prints your resolved configuration",
+      printCmd.command,
+      printCmd.description,
       printCmd.options,
       printCmd.run,
     )

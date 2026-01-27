@@ -1,6 +1,6 @@
 {
   "name": "grafast",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "description": "Cutting edge GraphQL planning and execution engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -61,7 +61,7 @@
   },
   "homepage": "https://grafast.org",
   "engines": {
-    "node": ">=14.17"
+    "node": ">=22"
   },
   "dependencies": {
     "@graphile/lru": "workspace:^",
@@ -101,7 +101,7 @@
     "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "jest": "^30.2.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "mermaid": "^11.12.1",
     "mocha": "^11.7.5",
     "nodemon": "^3.1.11",

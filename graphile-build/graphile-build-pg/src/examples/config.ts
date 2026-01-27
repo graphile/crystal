@@ -15,7 +15,7 @@ import {
 } from "graphile-build";
 import { Pool } from "pg";
 
-import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { defaultPreset as graphileBuildPgPreset } from "../index.ts";
 
 // You should set these to be the values you want to use for demonstration
 const DATABASE_CONNECTION_STRING = "postgres:///pagila";

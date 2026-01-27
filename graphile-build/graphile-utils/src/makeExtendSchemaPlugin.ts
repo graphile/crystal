@@ -56,7 +56,7 @@ import type {
 } from "grafast/graphql";
 import type { GraphileBuild } from "graphile-build";
 
-import { EXPORTABLE } from "./exportable.js";
+import { EXPORTABLE } from "./exportable.ts";
 
 type Maybe<T> = T | null | undefined;
 

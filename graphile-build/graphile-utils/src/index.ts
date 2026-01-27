@@ -1,38 +1,44 @@
 import type { BaseGraphQLArguments, Step } from "grafast";
 
-export { EXPORTABLE } from "./exportable.js";
-export { gql } from "./gql.js";
-export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
+export { EXPORTABLE } from "./exportable.ts";
+export { gql } from "./gql.ts";
+export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.ts";
 export {
   addPgTableCondition,
   makeAddPgTableConditionPlugin,
-} from "./makeAddPgTableConditionPlugin.js";
+} from "./makeAddPgTableConditionPlugin.ts";
+export type {
+  MakeAddPgTableOrderByPluginOrders,
+  NullsSortMethod,
+  OrderByAscDescOptions,
+} from "./makeAddPgTableOrderByPlugin.ts";
 export {
   addPgTableOrderBy,
   makeAddPgTableOrderByPlugin,
-  MakeAddPgTableOrderByPluginOrders,
-  NullsSortMethod,
   orderByAscDesc,
-  OrderByAscDescOptions,
-} from "./makeAddPgTableOrderByPlugin.js";
-export {
-  changeNullability,
+} from "./makeAddPgTableOrderByPlugin.ts";
+export type {
   ChangeNullabilityRules,
   ChangeNullabilityTypeRules,
-  makeChangeNullabilityPlugin,
   NullabilitySpec,
   NullabilitySpecString,
-} from "./makeChangeNullabilityPlugin.js";
+} from "./makeChangeNullabilityPlugin.ts";
 export {
+  changeNullability,
+  makeChangeNullabilityPlugin,
+} from "./makeChangeNullabilityPlugin.ts";
+export type {
   EnumResolver,
-  extendSchema,
   ExtensionDefinition,
-  makeExtendSchemaPlugin,
   ObjectPlan,
   ObjectResolver,
   Plans,
   Resolvers,
-} from "./makeExtendSchemaPlugin.js";
+} from "./makeExtendSchemaPlugin.ts";
+export {
+  extendSchema,
+  makeExtendSchemaPlugin,
+} from "./makeExtendSchemaPlugin.ts";
 export {
   jsonPgSmartTags,
   makeJSONPgSmartTagsPlugin,
@@ -41,21 +47,20 @@ export {
   pgSmartTags,
   pgSmartTagsFromFile,
   TagsFilePlugin,
-} from "./makePgSmartTagsPlugin.js";
+} from "./makePgSmartTagsPlugin.ts";
 export {
   makeProcessSchemaPlugin,
   processSchema,
-} from "./makeProcessSchemaPlugin.js";
-export {
-  makeWrapPlansPlugin,
+} from "./makeProcessSchemaPlugin.ts";
+export type {
   PlanWrapperFilter,
   PlanWrapperFilterRule,
   PlanWrapperFn,
   PlanWrapperRule,
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
-  wrapPlans,
-} from "./makeWrapPlansPlugin.js";
+} from "./makeWrapPlansPlugin.ts";
+export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.ts";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {

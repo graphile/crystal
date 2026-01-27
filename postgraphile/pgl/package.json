@@ -1,6 +1,6 @@
 {
   "name": "pgl",
-  "version": "5.0.0-rc.3",
+  "version": "5.0.0-rc.4",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "exports": {
@@ -253,7 +253,7 @@
     "ws": "^8.18.3"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=22"
   },
   "files": [
     "dist",

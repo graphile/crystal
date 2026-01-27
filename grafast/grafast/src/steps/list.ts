@@ -3,10 +3,10 @@ import type {
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
   UnwrapPlanTuple,
-} from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { constant, ConstantStep } from "./constant.js";
+} from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { constant, ConstantStep } from "./constant.ts";
 
 const DEFAULT_CACHE_SIZE = 100;
 

@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
-import * as assert from "../assert.js";
-import type { Bucket, RequestTools, SharedBucketState } from "../bucket.js";
+import * as assert from "../assert.ts";
+import type { Bucket, RequestTools, SharedBucketState } from "../bucket.ts";
 import {
   $$streamMore,
   $$timeout,
@@ -11,10 +11,10 @@ import {
   FLAG_POLY_SKIPPED,
   FLAG_STOPPED,
   NO_FLAGS,
-} from "../constants.js";
-import { isDev } from "../dev.js";
-import { flagError, isFlaggedValue, SafeError } from "../error.js";
-import { inspect } from "../inspect.js";
+} from "../constants.ts";
+import { isDev } from "../dev.ts";
+import { flagError, isFlaggedValue, SafeError } from "../error.ts";
+import { inspect } from "../inspect.ts";
 import type {
   BatchExecutionValue,
   ExecuteStepEvent,
@@ -32,25 +32,25 @@ import type {
   StreamMaybeMoreableArray,
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Step, UnbatchedStep } from "../step.js";
-import { __ItemStep } from "../steps/__item.js";
-import { __ValueStep } from "../steps/__value.js";
-import { timeSource } from "../timeSource.js";
+} from "../interfaces.ts";
+import type { Step, UnbatchedStep } from "../step.ts";
+import { __ItemStep } from "../steps/__item.ts";
+import { __ValueStep } from "../steps/__value.ts";
+import { timeSource } from "../timeSource.ts";
 import {
   arrayOfLength,
   isPhaseTransitionLayerPlan,
   isPromiseLike,
   sudo,
-} from "../utils.js";
-import type { DistributorOptions } from "./distributor.js";
+} from "../utils.ts";
+import type { DistributorOptions } from "./distributor.ts";
 import {
   distributor,
   isDistributor,
   resolveDistributorOptions,
-} from "./distributor.js";
-import type { LayerPlan } from "./LayerPlan.js";
-import type { MetaByMetaKey } from "./OperationPlan.js";
+} from "./distributor.ts";
+import type { LayerPlan } from "./LayerPlan.ts";
+import type { MetaByMetaKey } from "./OperationPlan.ts";
 
 /** Default recoverable/trappable flags (excluding NULL) */
 const INHIBIT_OR_ERROR_FLAGS = FLAG_INHIBITED | FLAG_ERROR;

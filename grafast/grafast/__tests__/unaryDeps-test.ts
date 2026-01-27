@@ -52,11 +52,13 @@ function run(db: sqlite3.Database, sql: string, values: any[] = []) {
 class GetRecordsStep<T extends Record<string, any>> extends Step {
   depIdByIdentifier: Record<string, number>;
   dbDepId: number;
+  private tableName: string;
   constructor(
-    private tableName: string,
+    tableName: string,
     identifiers: Record<string, Step> = Object.create(null),
   ) {
     super();
+    this.tableName = tableName;
     this.dbDepId = this.addUnaryDependency(context().get("db"));
     this.depIdByIdentifier = Object.fromEntries(
       Object.entries(identifiers).map(([col, $step]) => [

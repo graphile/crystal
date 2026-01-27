@@ -1,6 +1,6 @@
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import { UnbatchedStep } from "../step.js";
-import type { __TrackedValueStep } from "./__trackedValue.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.ts";
+import { UnbatchedStep } from "../step.ts";
+import type { __TrackedValueStep } from "./__trackedValue.ts";
 
 export class __InputDefaultStep extends UnbatchedStep {
   static $$export = {
@@ -8,12 +8,11 @@ export class __InputDefaultStep extends UnbatchedStep {
     exportName: "__InputDefaultStep",
   };
   isSyncAndSafe = true;
+  private defaultValue: unknown;
 
-  constructor(
-    $variableValue: __TrackedValueStep,
-    private defaultValue: unknown,
-  ) {
+  constructor($variableValue: __TrackedValueStep, defaultValue: unknown) {
     super();
+    this.defaultValue = defaultValue;
     this.addUnaryDependency($variableValue);
   }
 

@@ -15,14 +15,20 @@ export class PgValidateParsedCursorStep extends UnbatchedStep<undefined> {
   };
 
   isSyncAndSafe = true;
+  private digest: string;
+  private orderCount: number;
+  private beforeOrAfter: "before" | "after";
 
   constructor(
     $parsedCursorPlan: ExecutableStep<readonly any[] | null>,
-    private digest: string,
-    private orderCount: number,
-    private beforeOrAfter: "before" | "after",
+    digest: string,
+    orderCount: number,
+    beforeOrAfter: "before" | "after",
   ) {
     super();
+    this.digest = digest;
+    this.orderCount = orderCount;
+    this.beforeOrAfter = beforeOrAfter;
     this.addDependency($parsedCursorPlan);
     if (this.getAndFreezeIsUnary() !== true) {
       throw new Error(

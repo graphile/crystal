@@ -12,5 +12,10 @@
     "moduleResolution": "Nodenext"
   },
   "include": ["."],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules"],
+  "references": [
+    { "path": "../grafast" },
+    { "path": "../ruru-components" },
+    { "path": "../ruru-types" }
+  ]
 }
