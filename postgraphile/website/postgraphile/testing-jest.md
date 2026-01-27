@@ -249,6 +249,7 @@ import type { PostGraphileInstance } from "postgraphile";
 import { postgraphile } from "postgraphile";
 import { makeWithPgClientViaPgClientAlreadyInTransaction } from "postgraphile/adaptors/pg";
 import { execute, hookArgs } from "postgraphile/grafast";
+import type { PromiseOrDirect } from "postgraphile/grafast";
 import type { ExecutionResult, GraphQLSchema } from "postgraphile/graphql";
 import { parse, validate } from "postgraphile/graphql";
 import preset from "../src/graphile.config.ts";
