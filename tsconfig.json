@@ -6,6 +6,7 @@
   "compilerOptions": {
     // Will be enabled by @tsconfig/node-ts soon
     "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
 
     "composite": true,
     "declaration": true,
