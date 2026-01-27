@@ -131,7 +131,7 @@ const config = {
         ignorePackages: true,
         pathGroupOverrides: [
           {
-            pattern: "postgraphile/**",
+            pattern: "{postgraphile,pgl}/**",
             action: "ignore",
           },
         ],
