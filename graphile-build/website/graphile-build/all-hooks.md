@@ -5,114 +5,99 @@ title: All Hooks
 sidebar_position: 4
 ---
 
-The following hooks are currently supported, but more may be added in future.
-Trying to add a hook for a hook name that does not exist will result in an
-error.
+The following hooks are currently supported; attempting to register any other
+hook name results in an error.
 
-- `build`: The build object represents the current schema build and is passed
-  to all hooks, hook the 'build' event to extend this object. GraphQL types
-  should not be constructed during this phase.
+## Hook list
 
-- `init`: The init event is triggered after `build` and should be used to
-  register the GraphQL type names and their specifications for types that may be
-  useful later. The argument to this is an opaque object and should be passed
-  through unmodified (it currently is an empty object that gets ignored).
+- `build`: Extend the `build` object. Do not construct GraphQL types here.
+- `init`: Register types via `build.registerType` before the schema is built.
+- `finalize`: Inspect, wrap, or replace the built schema.
 
-- `GraphQLSchema`: This event defines the root-level schema configuration; hook
-  it to add `query`, `mutation`, `subscription` root operations or similar
-  options.
+- `GraphQLSchema`: Configure the schema root types and options.
+- `GraphQLSchema_types`: Add named types that are not otherwise referenced
+  (typically abstract types).
 
-- `GraphQLObjectType*`: When creating a GraphQLObjectType,
-  we'll execute the following hooks:
-  - `GraphQLObjectType` to add any root-level attributes, e.g. a description.
-  - `GraphQLObjectType_interfaces` to add additional interfaces to this object
-    type.
-  - `GraphQLObjectType_fields` (_deferred_) to add additional fields to this
-    object type. It is ran asynchronously (by passing `fields` as a thunk to
-    [`GraphQLObjectType`](https://graphql.org/graphql-js/type/#graphqlobjecttype))
-    and gets a reference to the final GraphQL Type as `Self` in the context.
-  - `GraphQLObjectType_fields_field`: to manipulate any root-level attributes on
-    an individual field, e.g. add a description.
-  - `GraphQLObjectType_fields_field_args` to add arguments of an individual
-    field.
-  - `GraphQLObjectType_fields_field_args_arg` to modify a specific argument.
+- `GraphQLObjectType`: Extend object type configuration.
+- `GraphQLObjectType_interfaces`: Add interfaces to the object type.
+- `GraphQLObjectType_fields` (deferred): Add fields to the object type.
+- `GraphQLObjectType_fields_field`: Adjust a single field config.
+- `GraphQLObjectType_fields_field_args`: Adjust a field argument map.
+- `GraphQLObjectType_fields_field_args_arg`: Adjust a single argument config.
 
-- `GraphQLInputObjectType*`: When creating a GraphQLInputObjectType, we'll execute the following hooks:
-  - `GraphQLInputObjectType` to add any root-level attributes, e.g. a
-    description.
-  - `GraphQLInputObjectType_fields` (_deferred_) to add additional fields to
-    this input type. It is ran asynchronously (by passing `fields` as a thunk to
-    [`GraphQLInputObjectType`](https://graphql.org/graphql-js/type/#graphqlinputobjecttype))
-    and gets a reference to the final GraphQL Type as `Self` in the context.
-  - `GraphQLInputObjectType_fields_field`: to customize an individual field from
-    above.
+- `GraphQLInputObjectType`: Extend input object configuration.
+- `GraphQLInputObjectType_fields` (deferred): Add fields to the input object.
+- `GraphQLInputObjectType_fields_field`: Adjust a single input field config.
 
-- `GraphQLEnumType*`: When creating a GraphQLEnumType, we'll
-  execute the following hooks:
-  - `GraphQLEnumType` add any root-level attributes, e.g. add a description.
-  - `GraphQLEnumType_values` add values.
-  - `GraphQLEnumType_values_value` customize an individual value from above.
+- `GraphQLEnumType`: Extend enum configuration.
+- `GraphQLEnumType_values`: Add or adjust enum values.
+- `GraphQLEnumType_values_value`: Adjust a single enum value config.
 
-- `finalize`: This event is triggered when the schema has been constructed, hook
-  it to modify or wrap the built schema instance.
+- `GraphQLUnionType`: Extend union configuration.
+- `GraphQLUnionType_types`: Add types to the union.
 
-:::info
+- `GraphQLInterfaceType`: Extend interface configuration.
+- `GraphQLInterfaceType_fields` (deferred): Add fields to the interface.
+- `GraphQLInterfaceType_fields_field`: Adjust a single field config.
+- `GraphQLInterfaceType_fields_field_args`: Adjust a field argument map.
+- `GraphQLInterfaceType_fields_field_args_arg`: Adjust a single argument config.
+- `GraphQLInterfaceType_interfaces`: Add interfaces to the interface.
 
-This documentation does NOT contains all the hooks.
+- `GraphQLScalarType`: Extend scalar configuration.
 
-<!-- TODO: list them all! -->
+The deferred hooks are called after the object is constructed (GraphQL uses a
+thunk for the `fields` callback), which means they can reference the object
+itself via `context.Self`. GraphQL calls the thunk when the fields are needed,
+which can still be in the same tick.
 
-:::
+## Input types
 
-The "(deferred)" hooks above (and their descendents) are not called until
-_after_ the object is constructed (which means they can reference the object
-itself - allowing circular references such as `type Query { query: Query }`);
-GraphQL will automatically call them when `Type.getFields()` is called, which
-may still be within the same tick - i.e. they are not necessarily fully
-asynchronous.
+These are the input types passed as the first argument to each hook:
 
-<!-- TODO: note about (discouraged) removing of options during a hook -->
+- `build` - `Build` (the current build object)
+- `init` - `Record<string, never>` (an empty object)
+- `finalize` - [`GraphQLSchema`][graphql-schema]
 
-### Input types
+- `GraphQLSchema` - [`GraphQLSchemaConfig`][graphql-schema]
+- `GraphQLSchema_types` - `GraphQLNamedType[]`
 
-Depending on the hook being called the input object might be an array (as in the
-case of `GraphQLObjectType_interfaces`) or an object (as in all other cases,
-currently). More specifically, the types for each hook are:
+- `GraphQLObjectType` - `GraphileBuild.GrafastObjectTypeConfig`
+- `GraphQLObjectType_interfaces` - [`GraphQLInterfaceType[]`][graphql-interface]
+- `GraphQLObjectType_fields` - `GraphileBuild.GrafastFieldConfigMap`
+- `GraphQLObjectType_fields_field` - `GraphileBuild.GrafastFieldConfig`
+- `GraphQLObjectType_fields_field_args` -
+  `GraphileBuild.GrafastFieldConfigArgumentMap`
+- `GraphQLObjectType_fields_field_args_arg` -
+  `GraphileBuild.GrafastArgumentConfig`
 
-- inflection - a plain object with some core inflection methods, built in
-  [`makeNewBuild`](https://github.com/graphile/graphile-engine/blob/v4.4.4/packages/graphile-build/src/makeNewBuild.js#L929-L997)
-- build - a [`Build` object](./build-object)
-- init - an opaque object, please just return it verbatim
+- `GraphQLInputObjectType` - `GraphileBuild.GrafastInputObjectTypeConfig`
+- `GraphQLInputObjectType_fields` -
+  [`GraphQLInputFieldConfigMap`][graphql-input]
+- `GraphQLInputObjectType_fields_field` -
+  `GraphileBuild.GrafastInputFieldConfig`
 
-- GraphQLSchema -
-  [`GraphQLSchemaConfig`](http://graphql.org/graphql-js/type/#graphqlschema)
+- `GraphQLEnumType` - [`GraphQLEnumTypeConfig`][graphql-enum]
+- `GraphQLEnumType_values` - [`GraphQLEnumValueConfigMap`][graphql-enum]
+- `GraphQLEnumType_values_value` - [`GraphQLEnumValueConfig`][graphql-enum]
 
-- GraphQLObjectType -
-  [`GraphQLObjectTypeConfig`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
-- GraphQLObjectType_interfaces -
-  [array of `GraphQLInterfaceType` instances](http://graphql.org/graphql-js/type/#graphqlinterfacetype)
-- GraphQLObjectType_fields -
-  [`GraphQLFieldConfigMap`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
-- GraphQLObjectType_fields_field -
-  [`GraphQLFieldConfig`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
-- GraphQLObjectType_fields_field_args -
-  [`GraphQLFieldConfigArgumentMap`](http://graphql.org/graphql-js/type/#graphqlobjecttype)
+- `GraphQLUnionType` - `GraphileBuild.GrafastUnionTypeConfig`
+- `GraphQLUnionType_types` - [`GraphQLObjectType[]`][graphql-object]
 
-- GraphQLInputObjectType -
-  [`GraphQLInputObjectTypeConfig`](http://graphql.org/graphql-js/type/#graphqlinputobjecttype)
-- GraphQLInputObjectType_fields -
-  [`GraphQLInputObjectConfigFieldMap`](http://graphql.org/graphql-js/type/#graphqlinputobjecttype)
-- GraphQLInputObjectType_fields_field -
-  [`GraphQLInputObjectFieldConfig`](http://graphql.org/graphql-js/type/#graphqlinputobjecttype)
+- `GraphQLInterfaceType` - `GraphileBuild.GrafastInterfaceTypeConfig`
+- `GraphQLInterfaceType_fields` - [`GraphQLFieldConfigMap`][graphql-object]
+- `GraphQLInterfaceType_fields_field` - [`GraphQLFieldConfig`][graphql-object]
+- `GraphQLInterfaceType_fields_field_args` -
+  [`GraphQLFieldConfigArgumentMap`][graphql-object]
+- `GraphQLInterfaceType_fields_field_args_arg` -
+  [`GraphQLArgumentConfig`][graphql-object]
+- `GraphQLInterfaceType_interfaces` -
+  [`GraphQLInterfaceType[]`][graphql-interface]
 
-- GraphQLEnumType -
-  [`GraphQLEnumTypeConfig`](http://graphql.org/graphql-js/type/#graphqlenumtype)
-- GraphQLEnumType_values -
-  [`GraphQLEnumValueConfigMap`](http://graphql.org/graphql-js/type/#graphqlenumtype)
-- GraphQLEnumType_values_value -
-  [`GraphQLEnumValueConfig`](http://graphql.org/graphql-js/type/#graphqlenumtype)
+- `GraphQLScalarType` - [`GraphQLScalarTypeConfig`][graphql-scalar]
 
-- finalize -
-  [`GraphQLSchema`](http://graphql.org/graphql-js/type/#graphqlschema)
-
-<!-- TODO: document the scope of each hook -->
+[graphql-schema]: https://graphql.org/graphql-js/type/#graphqlschema
+[graphql-interface]: https://graphql.org/graphql-js/type/#graphqlinterfacetype
+[graphql-input]: https://graphql.org/graphql-js/type/#graphqlinputobjecttype
+[graphql-enum]: https://graphql.org/graphql-js/type/#graphqlenumtype
+[graphql-object]: https://graphql.org/graphql-js/type/#graphqlobjecttype
+[graphql-scalar]: https://graphql.org/graphql-js/type/#graphqlscalartype

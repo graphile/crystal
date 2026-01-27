@@ -7,23 +7,88 @@ sidebar_position: 7
 
 Whereas the `Build` object is the same for all hooks (except the `build` hook
 which constructs it) within an individual build, the `Context` object changes
-for each hook. Different hooks have different values available to them on the
-`Context` object; you can explore what they are through TypeScript auto-completion.
+for each hook. Different hooks have different values available on the `Context`
+object; use TypeScript auto-completion to explore them.
 
-The main ones are:
+## Common properties
 
-### `scope`
+All contexts include these properties:
 
-An object based on the second argument to `register*Type` or `fieldWithHooks` -
-this is useful for filtering which objects a particular hook should apply to.
+- `type` - a string indicating the hook being executed. Possible values are
+  `build`, `init`, `finalize`, `GraphQLSchema`, `GraphQLScalarType`,
+  `GraphQLObjectType`, `GraphQLInterfaceType`, `GraphQLUnionType`,
+  `GraphQLEnumType`, and `GraphQLInputObjectType`.
+- `scope` - a structured object that explains why the hook was called.
+
+## Scope specialisations
+
+Every scope includes `__origin?: string | null | undefined` and
+`directives?: DirectiveDetails[]`. Specialised scopes add additional fields:
+
+- `ScopeObject` - `isRootQuery`, `isRootMutation`, `isRootSubscription`,
+  `isMutationPayload`, `isPageInfo`.
+- `ScopeObjectFieldsField` - `fieldName`, `fieldBehaviorScope`,
+  `fieldDirectives`, `isCursorField`.
+- `ScopeObjectFieldsFieldArgsArg` - `argName`.
+- `ScopeInterface` - `supportsNodeInterface`.
+- `ScopeInterfaceFieldsField` - `fieldName`.
+- `ScopeInterfaceFieldsFieldArgsArg` - `argName`.
+- `ScopeInputObject` - `isMutationInput`.
+- `ScopeInputObjectFieldsField` - `fieldName`, `fieldBehaviorScope`.
+- `ScopeEnumValuesValue` - `valueName`.
 
 For deeper hooks (such as `GraphQLObjectType_fields_field`) the scope from
-shallower hooks (such as `GraphQLObjectType`) are merged in; it's thus
-advisable to ensure that field hooks contain the word `field` in each of the
-scopes added, and so on.
+shallower hooks (such as `GraphQLObjectType`) are merged in; ensure that field
+hooks include `field` in their scope names to avoid collisions.
 
-For example you might use a hook such as this to add a description to the
-`clientMutationId` field on all mutation input objects:
+## Context variants
+
+The hook name determines which specialised context is used. Contexts inherit
+from their parent contexts, so properties like `Self` and `fieldWithHooks`
+remain available on deeper hooks.
+
+- `build` - `ContextBuild`
+- `init` - `ContextInit`
+- `finalize` - `ContextFinalize`
+- `GraphQLSchema` - `ContextSchema`
+- `GraphQLSchema_types` - `ContextSchemaTypes` (includes `config`)
+- `GraphQLScalarType` - `ContextScalar`
+- `GraphQLObjectType` - `ContextObject`
+- `GraphQLObjectType_interfaces` - `ContextObjectInterfaces` (includes `Self`)
+- `GraphQLObjectType_fields` - `ContextObjectFields` (includes `Self` and
+  `fieldWithHooks`)
+- `GraphQLObjectType_fields_field` - `ContextObjectFieldsField`
+- `GraphQLObjectType_fields_field_args` - `ContextObjectFieldsFieldArgs`
+- `GraphQLObjectType_fields_field_args_arg` - `ContextObjectFieldsFieldArgsArg`
+- `GraphQLInputObjectType` - `ContextInputObject`
+- `GraphQLInputObjectType_fields` - `ContextInputObjectFields` (includes `Self`
+  and `fieldWithHooks`)
+- `GraphQLInputObjectType_fields_field` - `ContextInputObjectFieldsField`
+  (includes `Self`)
+- `GraphQLEnumType` - `ContextEnum`
+- `GraphQLEnumType_values` - `ContextEnumValues` (includes `Self` with `name`)
+- `GraphQLEnumType_values_value` - `ContextEnumValuesValue`
+- `GraphQLUnionType` - `ContextUnion`
+- `GraphQLUnionType_types` - `ContextUnionTypes` (includes `Self`)
+- `GraphQLInterfaceType` - `ContextInterface`
+- `GraphQLInterfaceType_fields` - `ContextInterfaceFields` (includes `Self` and
+  `fieldWithHooks`)
+- `GraphQLInterfaceType_fields_field` - `ContextInterfaceFieldsField`
+- `GraphQLInterfaceType_fields_field_args` - `ContextInterfaceFieldsFieldArgs`
+- `GraphQLInterfaceType_fields_field_args_arg` -
+  `ContextInterfaceFieldsFieldArgsArg`
+- `GraphQLInterfaceType_interfaces` - `ContextInterfaceInterfaces` (includes
+  `Self`)
+
+## `fieldWithHooks(scope, spec)`
+
+Available on `GraphQLObjectType_fields`, `GraphQLInputObjectType_fields`, and
+`GraphQLInterfaceType_fields`, this function registers scope for a field and
+returns the generated field spec. If you do not call it, Graphile Build will
+call it later on your behalf.
+
+For example, to add a description to the `clientMutationId` field on all
+mutation input objects:
 
 ```js
 const MyPlugin = {
@@ -58,20 +123,7 @@ const MyPlugin = {
 };
 ```
 
-### `Self`
-
-Whilst only available on hooks that are called after the object is created (e.g.
-`GraphQLObjectType_fields`), this field is useful because it contains the object
-that has been created; allowing circular references to be built. A common
-use-case for this is the root `Query` object referencing itself with the `query`
-field to work around some issues in Relay 1.
-
-### `fieldWithHooks(scope, spec)`
-
-Available on hooks `GraphQLObjectType_fields` and
-`GraphQLInputObjectType_fields`, this function is useful for providing scopes
-so that fields can be hooked by other plugins. If you don't call this, it will
-be called for you at a later time.
+And to add a field while defining a scope:
 
 ```js
 const MyPlugin = {
@@ -85,9 +137,7 @@ const MyPlugin = {
           extend,
           graphql: { GraphQLNonNull, GraphQLString },
         } = build;
-        // highlight-next-line
         const { fieldWithHooks } = context;
-        // TODO: if (...) return fields;
         return extend(
           fields,
           {
@@ -113,5 +163,3 @@ const MyPlugin = {
   },
 };
 ```
-
-<!-- TODO: add more context properties -->
