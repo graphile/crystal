@@ -5,7 +5,7 @@ import * as grafast from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 
 // @ts-ignore
-// eslint-ignore-next-line import/no-unresolved
+// eslint-disable-next-line import/no-unresolved
 import { schema as s } from "../../exported-schema-for-webpack.mjs.js";
 
 const schema: GraphQLSchema = s;

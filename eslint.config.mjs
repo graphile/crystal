@@ -129,9 +129,10 @@ const config = {
       "always",
       {
         ignorePackages: true,
+        checkTypeImports: true,
         pathGroupOverrides: [
           {
-            pattern: "{postgraphile,pgl}/**",
+            pattern: "{graphile-build-pg,postgraphile,pgl,ruru}/**",
             action: "ignore",
           },
         ],
