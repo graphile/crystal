@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-console,curly */
-import WebSocket, { WebSocketServer } from "ws";
+import type WebSocket from "ws";
+import { OPEN, WebSocketServer } from "ws";
 
 import type { AnnounceCallback } from "./index.ts";
 import subscribeToLogicalDecoding from "./index.ts";
@@ -38,7 +39,7 @@ async function main() {
   // Send keepalive every 25 seconds
   setInterval(() => {
     clients.forEach((ws) => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
+      if (ws && ws.readyState === OPEN) {
         ws.send(
           JSON.stringify({
             _: "KA",
@@ -151,7 +152,7 @@ async function main() {
     if (!channelClients) return;
     const msg = JSON.stringify(announcement);
     for (const socket of channelClients) {
-      if (socket && socket.readyState === WebSocket.OPEN) {
+      if (socket && socket.readyState === OPEN) {
         socket.send(msg);
       }
     }
