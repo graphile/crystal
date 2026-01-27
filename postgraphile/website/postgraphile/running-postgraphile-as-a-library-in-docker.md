@@ -2,6 +2,13 @@
 title: Running PostGraphile as a Library in Docker
 ---
 
+:::warning[Untested!]
+
+This guide has been updated for PostGraphile V5, but has not yet been tested.
+Exercise caution, and please report any issues.
+
+:::
+
 The following guide describes how to run a network of Docker containers on a
 local machine, including one container for a PostgreSQL database and one
 container running PostGraphile.
@@ -33,7 +40,7 @@ At this stage, the repository should look like this:
 
 ### Update Environment Variables
 
-Update the file `.env` to add the `PORT` and `DATABASE_URL` which will be used
+Update the file `.env` to add the `DATABASE_URL` which will be used
 by PostGraphile to connect to the PostgreSQL database. Note the `DATABASE_URL`
 follows the syntax `postgres://<user>:<password>@db:5432/<db_name>`.
 
@@ -42,7 +49,6 @@ follows the syntax `postgres://<user>:<password>@db:5432/<db_name>`.
 # GRAPHQL
 # Parameters used by graphql container
 DATABASE_URL=postgres://postgres:change_me@db:5432/forum_example
-PORT=5433
 ```
 
 ### Create Node.js Application
@@ -52,15 +58,11 @@ store the files necessary to create the PostGraphile container. In the `graphql`
 folder, create a subfolder `src` and add a file `package.json` (plus a lockfile
 such as `package-lock.json`) into it with the following content.
 
-```json
+```json title="graphql/src/package.json"
 {
   "name": "postgraphile-as-library",
-  "version": "0.0.1",
-  "description": "PostGraphile as a library in a dockerized Node.js application.",
-  "author": "Alexis ROLLAND",
-  "license": "Apache-2.0",
+  "private": true,
   "type": "module",
-  "keywords": ["nodejs", "postgraphile"],
   "dependencies": {
     "postgraphile": "^5.0.0"
   }
@@ -72,38 +74,39 @@ Node.js container.
 
 Create a `graphile.config.js` file in the `graphql/src` folder:
 
-```js title="graphql/src/graphile.config.js"
+```ts title="graphql/src/graphile.config.ts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
 
-export default {
+const preset = {
   extends: [PostGraphileAmberPreset],
   pgServices: [makePgService({ connectionString: process.env.DATABASE_URL })],
   grafserv: {
-    graphqlPath: "/graphql",
+    port: 5678,
   },
-};
+} satisfies GraphileConfig.Preset;
+
+export default preset;
 ```
 
-In the same `src` folder, create a new file `server.js` with the following
+In the same `graphql/src` folder, create a new file `server.ts` with the following
 content.
 
-```js
+```ts title="graphql/src/server.ts"
 import { createServer } from "node:http";
-import preset from "./graphile.config.js";
 import { postgraphile } from "postgraphile";
 import { grafserv } from "postgraphile/grafserv/node";
+import preset from "./graphile.config.ts";
 
 const pgl = postgraphile(preset);
 const serv = pgl.createServ(grafserv);
-const server = createServer();
 
+const server = createServer();
 serv.addTo(server).catch((e) => {
   console.error(e);
   process.exit(1);
 });
-
-server.listen(process.env.PORT);
+server.listen(preset.grafserv.port);
 ```
 
 ### Create PostGraphile Dockerfile
@@ -111,16 +114,15 @@ server.listen(process.env.PORT);
 Create a new file `Dockerfile` in the `graphql` folder (not in the folder `src`)
 with the following content.
 
-```dockerfile
+```dockerfile title="graphql/Dockerfile"
 FROM node:24-alpine
-LABEL description="Instant high-performance GraphQL API for your PostgreSQL database https://github.com/graphile/postgraphile"
 
 # Set Node.js app folder
 RUN mkdir -p /home/node/app/node_modules
 WORKDIR /home/node/app
 
 # Copy dependencies
-COPY ./src/package.json ./src/package-lock.json ./
+COPY ./src/package.json ./src/package-lock.json .
 RUN chown -R node:node /home/node/app
 
 # Install dependencies
@@ -128,10 +130,10 @@ USER node
 RUN npm install
 
 # Copy application files and config
-COPY --chown=node:node ./src ./src
+COPY --chown=node:node ./src .
 
 EXPOSE 8080
-CMD [ "node", "src/server.js" ]
+CMD [ "node", "server.ts" ]
 ```
 
 ### Update Docker Compose File
@@ -157,7 +159,7 @@ services:
         networks:
             - network
         ports:
-            - 5433:5433
+            - 5678:5678
 [...]
 ```
 
@@ -174,8 +176,8 @@ At this stage, the repository should look like this:
 |  ├─ src/
 |  |  ├─ package.json
 |  |  ├─ package-lock.json
-|  |  ├─ graphile.config.js
-|  |  └─ server.js
+|  |  ├─ graphile.config.ts
+|  |  └─ server.ts
 |  └─ Dockerfile
 ├─ .env
 └─ docker-compose.yml
@@ -228,8 +230,8 @@ the command `$ docker-machine ip default`.
 
 | Container                 | Docker on Linux / Windows Pro    | Docker on Windows Home                        |
 | ------------------------- | -------------------------------- | --------------------------------------------- |
-| GraphQL API Documentation | `http://localhost:5433/graphiql` | `http://your_docker_machine_ip:5433/graphiql` |
-| GraphQL API               | `http://localhost:5433/graphql`  | `http://your_docker_machine_ip:5433/graphql`  |
+| GraphQL API Documentation | `http://localhost:5678/graphiql` | `http://your_docker_machine_ip:5678/graphiql` |
+| GraphQL API               | `http://localhost:5678/graphql`  | `http://your_docker_machine_ip:5678/graphql`  |
 | PostgreSQL Database       | host: `localhost`, port: `5432`  | host: `your_docker_machine_ip`, port: `5432`  |
 
 ### Re-initialize The Database

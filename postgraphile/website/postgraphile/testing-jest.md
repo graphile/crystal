@@ -236,24 +236,30 @@ by this file. </summary>
 The following code is in TypeScript; you can convert it to JavaScript via
 https://www.typescriptlang.org/play
 
-**WARNING**: This code has been ported from v4 to v5 in syntax, but has not yet
-been tested. Please let us know if it works for you!
+:::warning[Untested!]
+
+This code has been ported from v4 to v5 in syntax, but has not yet been tested.
+Please let us know if it works for you!
+
+:::
 
 ```ts
-import { makeWithPgClientViaPgClientAlreadyInTransaction } from "@dataplan/pg/adaptors/pg";
-import { execute, hookArgs } from "grafast";
-import { parse, validate } from "graphql";
-import type { ExecutionResult, GraphQLSchema } from "graphql";
 import { Pool } from "pg";
+import type { PostGraphileInstance } from "postgraphile";
 import { postgraphile } from "postgraphile";
-import preset from "../src/graphile.config.js";
+import { makeWithPgClientViaPgClientAlreadyInTransaction } from "postgraphile/adaptors/pg";
+import { execute, hookArgs } from "postgraphile/grafast";
+import type { PromiseOrDirect } from "postgraphile/grafast";
+import type { ExecutionResult, GraphQLSchema } from "postgraphile/graphql";
+import { parse, validate } from "postgraphile/graphql";
+import preset from "../src/graphile.config.ts";
 
 const MockReq = require("mock-req");
 
 type Maskable = "nodeId" | "id" | "timestamp" | "email" | "username";
 type MaskCache = { counter: number; values: Map<unknown, string> };
 
-let maskCacheByType: Record<Maskable, MaskCache> = {};
+let maskCacheByType: Record<Maskable, MaskCache | undefined> = {};
 // Reset the cache before each test
 beforeEach(() => {
   maskCacheByType = {};
@@ -317,13 +323,17 @@ export function sanitize(json: any): any {
   }
 }
 
-interface ICtx {
-  pgl: ReturnType<typeof postgraphile>;
+function noop() {
+  /* noop */
+}
+
+interface TestContext {
+  pgl: PostGraphileInstance;
   schema: GraphQLSchema;
   resolvedPreset: GraphileConfig.ResolvedPreset;
   pgPool: Pool;
 }
-let ctx: ICtx | null = null;
+let ctx: TestContext | null = null;
 
 export const setup = async () => {
   if (!process.env.TEST_DATABASE_URL) {
@@ -331,18 +341,19 @@ export const setup = async () => {
   }
   const pgl = postgraphile(preset);
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
+
   const pgPool = new Pool({
     connectionString: process.env.TEST_DATABASE_URL,
   });
+  pgPool.on("error", noop);
+  pgPool.on("connect", (client) => client.on("error", noop));
 
   ctx = { pgl, schema, resolvedPreset, pgPool };
 };
 
 export const teardown = async () => {
+  if (ctx == null) return null;
   try {
-    if (!ctx) {
-      return null;
-    }
     const { pgl, pgPool } = ctx;
     ctx = null;
     await pgl.release();
@@ -354,15 +365,23 @@ export const teardown = async () => {
   }
 };
 
-export const runGraphQLQuery = async function runGraphQLQuery(
-  query: string, // The GraphQL query string
-  variables: { [key: string]: any } | null, // The GraphQL variables
-  reqOptions: { [key: string]: any } | null, // Any additional items to set on `req` (e.g. `{user: {id: 17}}`)
-  checker: (
+export async function runGraphQLQuery(args: {
+  /** The GraphQL query string */
+  query: string;
+
+  /** The GraphQL variables */
+  variableValues?: { [key: string]: any };
+
+  /** Any additional items to set on `req` (e.g. `{user: {id: 17}}`) */
+  reqOptions?: { [key: string]: any };
+
+  /** Place test assertions in this function */
+  checker?: (
     result: ExecutionResult,
     context: { contextValue: Record<string, any> },
-  ) => void | ExecutionResult | Promise<void | ExecutionResult> = () => {}, // Place test assertions in this function
-) {
+  ) => PromiseOrDirect<void | ExecutionResult>;
+}) {
+  const { query, variableValues = {}, reqOptions, checker = () => {} } = args;
   if (!ctx) throw new Error("No ctx!");
   const { schema, resolvedPreset, pgPool } = ctx;
 
@@ -391,7 +410,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
   const args = await hookArgs({
     schema,
     document,
-    variableValues: variables ?? {},
+    variableValues,
     contextValue,
     resolvedPreset,
     requestContext: {
@@ -410,6 +429,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
       pgClient,
       true,
     );
+
     // Overwrite `withPgClient` with our test version
     args.contextValue.withPgClient = withPgClient;
 
@@ -431,7 +451,7 @@ export const runGraphQLQuery = async function runGraphQLQuery(
       pgClient.release();
     }
   }
-};
+}
 ```
 
 </details>
@@ -453,43 +473,41 @@ beforeAll(setup);
 afterAll(teardown);
 
 test("GraphQL query nodeId", async () => {
-  await runGraphQLQuery(
+  await runGraphQLQuery({
     // GraphQL query goes here:
-    `{ __typename }`,
+    query: `{ __typename }`,
 
     // GraphQL variables go here:
-    {},
+    variableValues: {},
 
     // Any additional properties you want `req` to have (e.g. if you're using
     // `pgSettings`) go here:
-    {
+    reqOptions: {
       // Assuming you're using Passport.js / pgSettings, you could pretend
       // to be logged in by setting `req.user` to `{id: 17}`:
       user: { id: 17 },
     },
 
     // This function runs all your test assertions:
-    async (json, { contextValue }) => {
+    async checker(json, { contextValue }) {
       expect(json.errors).toBeFalsy();
       expect(json.data.__typename).toEqual("Query");
 
       // If you need to, you can query the DB here; for example, using the
-      // `withPgClient` helper added to the context by PostGraphile.
-      if (typeof contextValue.withPgClient === "function") {
-        await contextValue.withPgClient(
-          contextValue.pgSettings ?? null,
-          async (pgClient: PgClient) => {
-            const { rows } = await pgClient.query({
-              text: `select * from app_public.users where id = $1`,
-              values: [17],
-            });
-            if (rows.length !== 1) {
-              throw new Error("User not found!");
-            }
-          },
-        );
-      }
+      // `withPgClient` helper we put on the context
+      await contextValue.withPgClient(
+        contextValue.pgSettings ?? null,
+        async (pgClient: PgClient) => {
+          const { rows } = await pgClient.query({
+            text: `select * from app_public.users where id = $1`,
+            values: [17],
+          });
+          if (rows.length !== 1) {
+            throw new Error("User not found!");
+          }
+        },
+      );
     },
-  );
+  });
 });
 ```

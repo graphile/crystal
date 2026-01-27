@@ -2,6 +2,13 @@
 title: Running PostGraphile in Docker
 ---
 
+:::warning[Untested!]
+
+This guide has been updated for PostGraphile V5, but has not yet been tested.
+Exercise caution, and please report any issues.
+
+:::
+
 The following guide describes how to run a network of Docker containers on a
 local machine, including one container for a PostgreSQL database and one
 container for PostGraphile. A the end of this guide, you will have a GraphQL API
@@ -319,13 +326,17 @@ import { makePgService } from "postgraphile/adaptors/pg";
 export default {
   extends: [PostGraphileAmberPreset],
   pgServices: [makePgService({ connectionString: process.env.DATABASE_URL })],
+  grafserv: {
+    host: "0.0.0.0",
+    port: 5678,
+  },
 };
 ```
 
 Create a new file `Dockerfile` in the `graphql` folder with the following
 content.
 
-```dockerfile
+```dockerfile title="graphql/Dockerfile"
 FROM node:24-alpine
 LABEL description="Instant high-performance GraphQL API for your PostgreSQL database https://github.com/graphile/postgraphile"
 
@@ -340,8 +351,8 @@ RUN npm install
 COPY graphile.config.ts ./
 COPY plugins ./plugins
 
-EXPOSE 5000
-ENTRYPOINT ["npx", "--no-install", "postgraphile", "-n", "0.0.0.0"]
+EXPOSE 5678
+ENTRYPOINT ["npx", "--no-install", "postgraphile"]
 ```
 
 ### Update Docker Compose File
@@ -367,8 +378,7 @@ services:
         networks:
             - network
         ports:
-            - 5433:5433
-        command: ["--port", "5433"]
+            - 5678:5678
 [...]
 ```
 
@@ -386,7 +396,6 @@ At this stage, the repository should look like this:
 |  ├─ package.json
 |  ├─ package-lock.json
 |  ├─ plugins/
-|  |  └─ wrap-plans.ts
 |  └─ Dockerfile
 ├─ .env
 └─ docker-compose.yml
@@ -442,8 +451,8 @@ Each container can be accessed at the following addresses:
 
 | Container                 | Docker on Linux / Windows Pro    | Docker on Windows Home                        |
 | ------------------------- | -------------------------------- | --------------------------------------------- |
-| GraphQL API Documentation | `http://localhost:5433/graphiql` | `http://your_docker_machine_ip:5433/graphiql` |
-| GraphQL API               | `http://localhost:5433/graphql`  | `http://your_docker_machine_ip:5433/graphql`  |
+| GraphQL API Documentation | `http://localhost:5678/graphiql` | `http://your_docker_machine_ip:5678/graphiql` |
+| GraphQL API               | `http://localhost:5678/graphql`  | `http://your_docker_machine_ip:5678/graphql`  |
 | PostgreSQL Database       | host: `localhost`, port: `5432`  | host: `your_docker_machine_ip`, port: `5432`  |
 
 :::note

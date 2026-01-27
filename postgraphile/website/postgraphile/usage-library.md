@@ -193,7 +193,7 @@ import { makePgService } from "postgraphile/adaptors/pg";
 import { grafserv } from "postgraphile/grafserv/express/v4";
 
 // Which port do we want to listen for requests on?
-const PORT = 5050;
+const PORT = 5678;
 
 /** @type {GraphileConfig.Preset} */
 const preset = {
@@ -263,7 +263,7 @@ Configure your project by setting some options in `package.json`:
 ```bash
 # Delete things we're not configuring right now
 npm pkg delete author license description keywords scripts main
-# Don't allow publishing to npm
+# Don't allow publishing to npm (`--json` since `true` is boolean not string)
 npm pkg set private=true --json
 # Use ESModule syntax and set our start script
 npm pkg set type=module scripts.start="node server.js"
@@ -334,7 +334,7 @@ Alternatively you can run the command from the start script directly:
 node --env-file=./.env server.js
 ```
 
-Either way, this will start a server at `http://localhost:5050`. Opening the
+Either way, this will start a server at `http://localhost:5678`. Opening the
 URL in a browser will show a user interface where a GraphQL query can be
 entered. The following query is valid against any GraphQL schema and tells you
 the fields that are available to be queried at the `Query` root:
@@ -366,6 +366,8 @@ This example will have three files in a `src` directory: `graphile.config.ts`,
 preset`](https://www.npmjs.com/package/@graphile/simplify-inflection), included
 as `PgSimplifyInflectionPreset` in `graphile.config.ts`
 
+### Initialize the project
+
 To start, create a directory for the project and initialize a Node.js project
 in that folder:
 
@@ -373,6 +375,17 @@ in that folder:
 mkdir postgraphile_express_typescript
 cd postgraphile_express_typescript
 npm init -y
+```
+
+Configure `package.json` to fit our project
+
+```bash
+# Delete things we're not configuring right now
+npm pkg delete version description main keywords author license scripts.test
+# Don't allow publishing to npm (`--json` since `true` is boolean not string)
+npm pkg set private=true --json
+# Use ESModule syntax, never publish to npm, set some scripts
+npm pkg set type=module scripts.start="node --env-file=./.env src/server.ts" scripts.build=tsc scripts.prod="node dist/server.js"
 ```
 
 You should also ensure you're running Node v24+ (Node v22 is also supported,
@@ -390,8 +403,8 @@ nvm use
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@rc @graphile/simplify-inflection
-npm install --save-dev typescript @tsconfig/node24 @types/express @types/node
+npm install --legacy-peer-deps --save express postgraphile@rc @graphile/simplify-inflection
+npm install --save-dev typescript @tsconfig/node24 @tsconfig/node-ts @types/express @types/node
 ```
 
 ### Environment variables
@@ -407,21 +420,26 @@ GRAPHILE_ENV=development
 And ensure that it is not tracked by git:
 
 ```bash title="Ensure the .env file is ignored by git"
+echo node_modules >> .gitignore
 echo .env >> .gitignore
 ```
 
 ### TypeScript configuration
 
 Create a `tsconfig.json` file that extends from the relevant @tsconfig for your
-Node.js major version; e.g. if you're using Node v24.0.0 that would be
-[`@tsconfig/node24`](https://www.npmjs.com/package/@tsconfig/node24):
+Node.js major version (
+e.g. if you're using Node v24.0.0 that would be
+[`@tsconfig/node24`](https://www.npmjs.com/package/@tsconfig/node24)),
+and add also `@tsconfig/node-ts` if you want to use type
+stripping; for example:
 
 ```json title="tsconfig.json"
 {
-  "extends": "@tsconfig/node24/tsconfig.json",
+  "extends": [
+    "@tsconfig/node24/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ],
   "compilerOptions": {
-    "erasableSyntaxOnly": true,
-    "rewriteRelativeImportExtensions": true,
     "rootDir": "./src",
     "outDir": "./dist"
   }
@@ -441,7 +459,7 @@ import { makePgService } from "postgraphile/adaptors/pg";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgSimplifyInflectionPreset } from "@graphile/simplify-inflection";
 
-const preset: GraphileConfig.Preset = {
+const preset = {
   extends: [PostGraphileAmberPreset, PgSimplifyInflectionPreset],
   pgServices: [
     makePgService({
@@ -452,7 +470,11 @@ const preset: GraphileConfig.Preset = {
   grafast: {
     explain: true,
   },
-};
+  grafserv: {
+    host: "localhost",
+    port: 5678,
+  },
+} satisfies GraphileConfig.Preset;
 
 export default preset;
 ```
@@ -487,6 +509,7 @@ are output as `.js` when compiled for production usage.
 import { createServer } from "node:http";
 import express from "express";
 import { grafserv } from "postgraphile/grafserv/express/v4";
+import preset from "./graphile.config.ts";
 import { pgl } from "./pgl.ts";
 
 const serv = pgl.createServ(grafserv);
@@ -500,48 +523,39 @@ serv.addTo(app, server).catch((e) => {
   console.error(e);
   process.exit(1);
 });
-server.listen(5050);
 
-console.log("Server listening at http://localhost:5050");
+const { host, port } = preset.grafserv;
+server.listen(port, host);
+
+console.log(`Server listening at http://${host}:${port}`);
 ```
 
 ### Contents of `package.json`
-
-Configure `package.json` to fit our project
-
-```bash
-# Delete things we're not configuring right now
-npm pkg delete author license description keywords scripts main
-# Don't allow publishing to npm
-npm pkg set private=true --json
-# Use ESModule syntax and set some scripts
-npm pkg set type=module scripts.start="node --env-file=./.env src/server.ts" scripts.build=tsc scripts.prod="node dist/server.js"
-```
 
 The `package.json` file should now have content similar to the following (likely
 with different version numbers):
 
 ```diff title="package.json"
 {
-  "name": "simple_node_project",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "@graphile/simplify-inflection": "^8.0.0-beta.6",
-    "express": "^4.21.2",
-    "postgraphile": "^5.0.0-beta.38"
-  },
-  "devDependencies": {
-    "@tsconfig/node24": "^24.0.0",
-    "@types/express": "^5.0.0",
-    "@types/node": "^24.0.0",
-    "typescript": "^5.7.3"
-  },
-  "private": true,
+  "name": "postgraphile_express_typescript",
   "scripts": {
     "start": "node --env-file=./.env src/server.ts",
     "build": "tsc",
     "prod": "node dist/server.js"
+  },
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@graphile/simplify-inflection": "^8.0.0-rc.3",
+    "express": "^5.2.1",
+    "postgraphile": "^5.0.0-rc.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node-ts": "^23.6.2",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3"
   }
 }
 ```
@@ -575,7 +589,7 @@ postgraphile_express_typescript/
 
 In development, run `npm start` as before. This will run the source code
 directly using Node's native type stripping feature. This will start a server
-at `http://localhost:5050`, opening the url in a browser will show a user
+at `http://localhost:5678`, opening the url in a browser will show a user
 interface where a GraphQL query can be entered, for example
 
 ```graphql

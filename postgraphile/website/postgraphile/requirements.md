@@ -60,7 +60,7 @@ On top of this, standard PostgreSQL best practices apply: use indexes carefully
 for performance, use constraints and triggers to ensure your data is valid and
 consistent, etc.
 
-### Node.js: use the LTS
+### Node.js: use the active LTS
 
 PostGraphile supports Node.js 22+ but recommends Node.js 24+ where possible. We
 only support LTS versions of Node.js. **Once a Node.js version reaches
@@ -81,6 +81,30 @@ TypeScript configuration:
 
 ```
     "moduleResolution": "node16", // Or "nodenext"
+```
+
+Instead of configuring TypeScript manually, we recommend that you use the
+appropriate [TSConfig Base](https://github.com/tsconfig/bases) for your Node.js
+version.
+
+```json title="tsconfig.json"
+{
+  "extends": "@tsconfig/node24/tsconfig.json"
+}
+```
+
+If you want to use type stripping (which limits the syntax you can use,
+but means Node can run your TS files directly), then also add the
+`@tsconfig/node-ts` preset and make sure you're running Node 24+ and TypeScript
+v5.8.0+. To use the LTS version of Node along with type stripping:
+
+```json title="tsconfig.json"
+{
+  "extends": [
+    "@tsconfig/node-lts/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ]
+}
 ```
 
 Our adherence to semver **does not cover types** — we _may_ make breaking
