@@ -1,4 +1,4 @@
-import type { RuruProps } from "ruru-components";
+import type { RuruProps } from "ruru-types";
 
 import type {
   BakedRuruClientConfig,

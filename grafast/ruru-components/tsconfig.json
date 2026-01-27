@@ -13,5 +13,5 @@
     "module": "NodeNext"
   },
   "include": ["src"],
-  "references": [{ "path": "../grafast" }]
+  "references": [{ "path": "../grafast" }, { "path": "../ruru-types" }]
 }
