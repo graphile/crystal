@@ -100,9 +100,9 @@ export default preset;
 
 ### Common plugins
 
-V5 plugins use the `@rc` tag on npm during the release candidate phase. Also many are
-now technically "presets" rather than "plugins" - plugins go into the `plugins`
-list, but presets go into the `extends` list:
+Many of the V5 extension modules are now technically "presets" rather than
+"plugins" - plugins go into the `plugins` list in your configuration, but
+presets go into the `extends` list:
 
 ```ts title="graphile.config.ts"
 const preset: GraphileConfig.Preset = {

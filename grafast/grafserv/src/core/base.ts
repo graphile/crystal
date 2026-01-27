@@ -1,10 +1,10 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import {
-  defer,
   execute,
   getGrafastMiddleware,
   isPromiseLike,
+  noop,
   stringifyPayload,
   subscribe,
 } from "grafast";
@@ -13,7 +13,7 @@ import * as graphql from "grafast/graphql";
 import type { Middleware } from "graphile-config";
 import { resolvePreset } from "graphile-config";
 
-import { getGrafservMiddleware } from "../hooks.js";
+import { getGrafservMiddleware } from "../hooks.ts";
 import type {
   BufferResult,
   BufferStreamResult,
@@ -31,20 +31,20 @@ import type {
   Result,
   SchemaChangeEvent,
   SetPresetEvent,
-} from "../interfaces.js";
-import { mapIterator } from "../mapIterator.js";
+} from "../interfaces.ts";
+import { mapIterator } from "../mapIterator.ts";
 import {
   makeGraphiQLHandler,
   makeGraphiQLStaticHandler,
-} from "../middleware/graphiql.js";
+} from "../middleware/graphiql.ts";
 import {
   APPLICATION_JSON,
   makeGraphQLHandler,
   makeParseAndValidateFunction,
-} from "../middleware/graphql.js";
-import type { OptionsFromConfig } from "../options.js";
-import { optionsFromConfig } from "../options.js";
-import { handleErrors, normalizeRequest, sleep } from "../utils.js";
+} from "../middleware/graphql.ts";
+import type { OptionsFromConfig } from "../options.ts";
+import { optionsFromConfig } from "../options.ts";
+import { handleErrors, normalizeRequest, sleep } from "../utils.ts";
 
 const buffer404 = Buffer.from(
   `<!doctype html><html><head><title>Not found</title></head><body><h1>Not found</h1><p>Please try again with a different URL</p></body></html>`,
@@ -346,7 +346,8 @@ export class GrafservBase {
   private waitForGraphqlHandler: ReturnType<typeof makeGraphQLHandler> =
     function (this: GrafservBase, ...args) {
       const [request] = args;
-      const deferred = defer<HandlerResult | null>();
+      const deferred = Promise.withResolvers<HandlerResult | null>();
+      deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
       const { dynamicOptions } = this;
       const onReady = () => {
         this.eventEmitter.off("dynamicOptions:ready", onReady);
@@ -381,14 +382,15 @@ export class GrafservBase {
       this.eventEmitter.on("dynamicOptions:ready", onReady);
       this.eventEmitter.on("dynamicOptions:error", onError);
       setTimeout(onError, 5000, new Error("Server initialization timed out"));
-      return Promise.resolve(deferred);
+      return Promise.resolve(deferred.promise);
     };
 
   private waitForGraphiqlHandler: ReturnType<typeof makeGraphiQLHandler> =
     function (this: GrafservBase, ...args) {
       const [request] = args;
       const { dynamicOptions } = this;
-      const deferred = defer<HandlerResult>();
+      const deferred = Promise.withResolvers<HandlerResult>();
+      deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
       const onReady = () => {
         this.eventEmitter.off("dynamicOptions:ready", onReady);
         this.eventEmitter.off("dynamicOptions:error", onError);
@@ -423,7 +425,7 @@ export class GrafservBase {
       this.eventEmitter.on("dynamicOptions:ready", onReady);
       this.eventEmitter.on("dynamicOptions:error", onError);
       setTimeout(onError, 5000, new Error("Server initialization timed out"));
-      return Promise.resolve(deferred);
+      return Promise.resolve(deferred.promise);
     };
 
   private waitForGraphiqlStaticHandler: ReturnType<
@@ -431,7 +433,8 @@ export class GrafservBase {
   > = function (this: GrafservBase, ...args) {
     const [request] = args;
     const { dynamicOptions } = this;
-    const deferred = defer<HandlerResult>();
+    const deferred = Promise.withResolvers<HandlerResult>();
+    deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
     const onReady = () => {
       this.eventEmitter.off("dynamicOptions:ready", onReady);
       this.eventEmitter.off("dynamicOptions:error", onError);
@@ -454,7 +457,7 @@ export class GrafservBase {
     this.eventEmitter.on("dynamicOptions:ready", onReady);
     this.eventEmitter.on("dynamicOptions:error", onError);
     setTimeout(onError, 5000, new Error("Server initialization timed out"));
-    return Promise.resolve(deferred);
+    return Promise.resolve(deferred.promise);
   };
 
   private failedGraphqlHandler: ReturnType<typeof makeGraphQLHandler> =

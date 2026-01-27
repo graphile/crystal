@@ -12,8 +12,8 @@ import type {
   HandlerResult,
   NormalizedRequestDigest,
   RuruHTMLEvent,
-} from "../interfaces.js";
-import type { OptionsFromConfig } from "../options.js";
+} from "../interfaces.ts";
+import type { OptionsFromConfig } from "../options.ts";
 
 const brotliCompress = promisify(brotliCompressCb);
 

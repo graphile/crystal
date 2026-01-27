@@ -4,8 +4,8 @@ import { randomBytes } from "crypto";
 import type { Pool } from "pg";
 import { Client } from "pg";
 
-import type { PgClientQuery, WithPgClient } from "../src";
-import { createWithPgClient } from "../src/adaptors/pg.js";
+import { createWithPgClient } from "../src/adaptors/pg.ts";
+import type { PgClientQuery, WithPgClient } from "../src/index.ts";
 
 function noop() {}
 

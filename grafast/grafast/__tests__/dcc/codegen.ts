@@ -9,6 +9,7 @@ const config: CodegenConfig = {
       config: {
         grafastModule: "../../dist/index.js",
         overridesFile: "./dcc-type-overrides.ts",
+        enumsAsTypes: true,
       },
     },
   },

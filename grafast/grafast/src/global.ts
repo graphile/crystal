@@ -1,6 +1,6 @@
-import { currentLayerPlan } from "./engine/lib/withGlobalLayerPlan.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { __TrackedValueStep, __ValueStep } from "./steps/index.js";
+import { currentLayerPlan } from "./engine/lib/withGlobalLayerPlan.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import type { __TrackedValueStep, __ValueStep } from "./steps/index.ts";
 
 let debug = false;
 export function setDebug(newDebug: boolean): void {

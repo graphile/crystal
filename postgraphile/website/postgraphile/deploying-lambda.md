@@ -2,13 +2,22 @@
 title: Deploying to AWS Lambda
 ---
 
-:::warning
+PostGraphile V5 can run on AWS Lambda via the [Grafserv Lambda adaptor](https://grafast.org/grafserv/servers/lambda)
+(`postgraphile/grafserv/lambda/v1`). We
+strongly recommend you [export your schema as executable
+code](./exporting-schema.md) so that startup time is minimized.
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+```ts
+import { grafserv } from "grafserv/lambda/v1";
+import preset from "./graphile.config.mjs";
+import schema from "./exported-schema.mjs";
 
-:::
+// Create a Grafserv instance
+const serv = grafserv({ schema, preset });
 
-We have an example of how to deploy to AWS Lambda located here:
+// Export a lambda handler for GraphQL
+export const handler = serv.createHandler();
+```
 
-https://github.com/graphile/postgraphile-lambda-example
+Please ask for help [via the discord](https://discord.gg/graphile) (or GitHub
+issues) and submit improvements to this page if/when you get it working.

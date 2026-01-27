@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<link rel="modulepreload" href="https://unpkg.com/ruru@2.0.0-rc.3/static/ruru.js" />
+<link rel="modulepreload" href="https://unpkg.com/ruru@2.0.0-rc.4/static/ruru.js" />
 <title>Ruru - GraphQL/Grafast IDE</title>
-<link rel="stylesheet" href="https://unpkg.com/ruru@2.0.0-rc.3/static/ruru.css" />
+<link rel="stylesheet" href="https://unpkg.com/ruru@2.0.0-rc.4/static/ruru.css" />
 <style>
 body {
 margin: 0;
@@ -15,7 +15,7 @@ height: 100vh;
 </style>
 <script>
 const RURU_CONFIG = {
-"staticPath": "https://unpkg.com/ruru@2.0.0-rc.3/static/",
+"staticPath": "https://unpkg.com/ruru@2.0.0-rc.4/static/",
 // Replace this with your own endpoint:
 "endpoint": "/graphql",
 };
@@ -34,7 +34,7 @@ if (endpoint) RURU_CONFIG.endpoint = endpoint;
 <!-- /DELETE THIS -->
 
 <script type="module">
-const worker = (file) => new Worker(URL.createObjectURL(new Blob(['import "https://unpkg.com/ruru@2.0.0-rc.3/static/' + file + '";'], {type: 'text/javascript'})), { type: "module" });
+const worker = (file) => new Worker(URL.createObjectURL(new Blob(['import "https://unpkg.com/ruru@2.0.0-rc.4/static/' + file + '";'], {type: 'text/javascript'})), { type: "module" });
 globalThis.MonacoEnvironment = {
 getWorker(_, label) {
 switch (label) {
@@ -128,7 +128,7 @@ if (val) $(sel).style.flex = val + " 1 0%";
 }
 </script>
 <script type="module">
-import { React, createRoot, Ruru } from "https://unpkg.com/ruru@2.0.0-rc.3/static/ruru.js";
+import { React, createRoot, Ruru } from "https://unpkg.com/ruru@2.0.0-rc.4/static/ruru.js";
 createRoot(document.getElementById("ruru-root"))
 .render(React.createElement(Ruru, RURU_CONFIG));
 </script>

@@ -18,18 +18,18 @@ import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { ComponentProps, FC } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { ErrorPopup } from "./components/ErrorPopup.js";
-import { RuruFooter } from "./components/Footer.js";
-import { defaultQuery as DEFAULT_QUERY } from "./defaultQuery.js";
-import { ExplainContext, useExplain } from "./hooks/useExplain.js";
-import { useFetcher } from "./hooks/useFetcher.js";
-import { useGraphQLChangeStream } from "./hooks/useGraphQLChangeStream.js";
-import { usePrettify } from "./hooks/usePrettify.js";
-import type { RuruStorage } from "./hooks/useStorage.js";
-import { useStorage } from "./hooks/useStorage.js";
-import type { RuruProps } from "./interfaces.js";
-import { DOWNLOAD_PLUGIN } from "./plugins/download.js";
-import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
+import { ErrorPopup } from "./components/ErrorPopup.tsx";
+import { RuruFooter } from "./components/Footer.tsx";
+import { defaultQuery as DEFAULT_QUERY } from "./defaultQuery.ts";
+import { ExplainContext, useExplain } from "./hooks/useExplain.ts";
+import { useFetcher } from "./hooks/useFetcher.ts";
+import { useGraphQLChangeStream } from "./hooks/useGraphQLChangeStream.ts";
+import { usePrettify } from "./hooks/usePrettify.tsx";
+import type { RuruStorage } from "./hooks/useStorage.ts";
+import { useStorage } from "./hooks/useStorage.ts";
+import type { RuruProps } from "./interfaces.ts";
+import { DOWNLOAD_PLUGIN } from "./plugins/download.tsx";
+import { EXPLAIN_PLUGIN } from "./plugins/explain.tsx";
 
 type GraphiQLInterfaceProps = ComponentProps<typeof GraphiQLInterface>;
 

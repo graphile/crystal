@@ -3,4 +3,4 @@ export {
   assertResultsMatch,
   assertSnapshotsMatch,
   runTestQuery,
-} from "../helpers.js";
+} from "../helpers.ts";

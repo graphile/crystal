@@ -54,10 +54,10 @@ import {
   createTestDatabase,
   dropTestDatabase,
   withTestWithPgClient,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { makeSchema } from "../src/index.js";
-import AmberPreset from "../src/presets/amber.js";
-import { makeV4Preset } from "../src/presets/v4.js";
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import { makeSchema } from "../src/index.ts";
+import AmberPreset from "../src/presets/amber.ts";
+import { makeV4Preset } from "../src/presets/v4.ts";
 
 export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
   name: "SwallowAllErrorsPlugin",

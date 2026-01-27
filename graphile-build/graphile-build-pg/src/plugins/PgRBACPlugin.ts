@@ -4,7 +4,7 @@ import type { PgResource } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 import { entityPermissions } from "pg-introspection";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

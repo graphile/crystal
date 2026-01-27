@@ -1,24 +1,24 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
 } from "graphql";
-import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
+import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue.js";
 
-import { $$eventEmitter, $$extensions } from "./constants.js";
-import { isDev } from "./dev.js";
-import { inspect } from "./inspect.js";
+import { $$eventEmitter, $$extensions } from "./constants.ts";
+import { isDev } from "./dev.ts";
+import { inspect } from "./inspect.ts";
 import type {
   ExecuteEvent,
   ExecutionEventEmitter,
   ExecutionEventMap,
   GrafastExecutionArgs,
-} from "./interfaces.js";
-import { getGrafastMiddleware } from "./middleware.js";
-import type { GrafastOperationOptions } from "./prepare.js";
-import { grafastPrepare } from "./prepare.js";
-import { isPromiseLike } from "./utils.js";
+} from "./interfaces.ts";
+import { getGrafastMiddleware } from "./middleware.ts";
+import type { GrafastOperationOptions } from "./prepare.ts";
+import { grafastPrepare } from "./prepare.ts";
+import { isPromiseLike } from "./utils.ts";
 
 /**
  * Used by `execute` and `subscribe`.

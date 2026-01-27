@@ -1,4 +1,4 @@
-import { noop } from "./utils";
+import { noop } from "./utils.ts";
 
 export function mapIterator<T, U>(
   iterable: AsyncIterable<T>,

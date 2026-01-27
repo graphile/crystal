@@ -1,9 +1,9 @@
 import chalk from "chalk";
 
-import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { arraysMatch, digestKeys } from "../utils.js";
+import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { arraysMatch, digestKeys } from "../utils.ts";
 
 /**
  * Returns a function that will extract the value at the given path from an
@@ -72,13 +72,15 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
   allowMultipleOptimizations = true;
   public readonly path: (string | number | symbol)[];
   private readonly hasSymbols: boolean;
+  public readonly fallback?: any;
 
   constructor(
     parentPlan: Step<unknown>,
     path: (string | number | symbol)[],
-    public readonly fallback?: any,
+    fallback?: any,
   ) {
     super();
+    this.fallback = fallback;
     this._isImmutable = parentPlan._isImmutable;
     this.path = path;
     this.hasSymbols = this.path.some((k) => typeof k === "symbol");

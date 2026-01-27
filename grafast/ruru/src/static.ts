@@ -80,13 +80,13 @@ function createStaticFileLoader(
  * Returns an object containing all of the static files needed by Ruru; calling
  * this will increase memory consumption by ~4MB
  */
-const getStaticFiles = createStaticFileLoader(() => import("./bundleCode.js"));
+const getStaticFiles = createStaticFileLoader(() => import("./bundleCode.ts"));
 
 /**
  * Returns an object containing all of the source maps for ruru source; calling
  * this will increase memory consumption by ~10MB
  */
-const getStaticMaps = createStaticFileLoader(() => import("./bundleMeta.js"));
+const getStaticMaps = createStaticFileLoader(() => import("./bundleMeta.ts"));
 
 export interface GetStaticFileContext {
   /**

@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "Simple schema print (no ordering)",

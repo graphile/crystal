@@ -24,7 +24,7 @@ import {
   sendResult,
 } from "graphql-helix";
 
-import { getPool, makeSharedPresetAndClient } from "./config.js";
+import { getPool, makeSharedPresetAndClient } from "./config.ts";
 
 const pool = getPool();
 

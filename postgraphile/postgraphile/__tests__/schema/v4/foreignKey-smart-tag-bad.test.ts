@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test("raises an error when a foreignKey tries to reference a non-unique combination of columns", async () => {
   const promise = core.test(

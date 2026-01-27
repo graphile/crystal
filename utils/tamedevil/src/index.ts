@@ -1,5 +1,5 @@
-import { reservedWords } from "./reservedWords.js";
-import { $$type } from "./thereCanBeOnlyOne.js";
+import { reservedWords } from "./reservedWords.ts";
+import { $$type } from "./thereCanBeOnlyOne.ts";
 
 type Primitive = null | boolean | number | string;
 

@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "autofix plugin automatically adds uniques where needed",

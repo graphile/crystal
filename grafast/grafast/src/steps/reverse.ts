@@ -2,9 +2,9 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
+} from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
 
 /**
  * Returns a reversed copy of the list.

@@ -3,10 +3,10 @@ import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
-} from "./constants.js";
-import { isDev } from "./dev.js";
-import { inspect } from "./inspect.js";
-import type { ExecutionEntryFlags } from "./interfaces.js";
+} from "./constants.ts";
+import { isDev } from "./dev.ts";
+import { inspect } from "./inspect.ts";
+import type { ExecutionEntryFlags } from "./interfaces.ts";
 
 const $$flagged = Symbol("grafastFlaggedValue");
 
@@ -93,12 +93,14 @@ export class SafeError<
     exportName: "SafeError",
   };
   [$$safeError] = true;
+  public extensions: TExtensions;
   constructor(
     message: string,
-    public extensions: TExtensions = undefined as TExtensions,
+    extensions: TExtensions = undefined as TExtensions,
     errorOptions?: ErrorOptions,
   ) {
     super(message, errorOptions);
+    this.extensions = extensions;
     Object.setPrototypeOf(this, SafeError.prototype);
   }
 }

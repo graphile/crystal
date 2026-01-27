@@ -1,4 +1,4 @@
-import type { RuruProps } from "ruru-components";
+import type { RuruProps } from "ruru-types";
 
 /**
  * The parts of the HTML page created to serve Ruru. Create the defaults via

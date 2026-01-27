@@ -1,6 +1,6 @@
 {
   "name": "@grafserv/persisted",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "Persisted operations support for Grafserv",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -43,7 +43,7 @@
     "tslib": "^2.8.1"
   },
   "engines": {
-    "node": ">=16.10"
+    "node": ">=22"
   },
   "peerDependencies": {
     "grafast": "workspace:^",

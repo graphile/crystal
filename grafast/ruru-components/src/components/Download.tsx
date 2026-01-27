@@ -3,7 +3,7 @@ import { lexicographicSortSchema, printSchema } from "grafast/graphql";
 import type { ChangeEvent, FC, FormEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { transformSchema } from "../utils/transformSchema.js";
+import { transformSchema } from "../utils/transformSchema.ts";
 
 function useToggle(initialState = false) {
   const [checked, setChecked] = useState(initialState);

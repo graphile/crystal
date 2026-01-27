@@ -1,3 +1,3 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test("prints a schema with the default options", core.test(__filename, ["d"]));

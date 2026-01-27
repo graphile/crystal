@@ -2,9 +2,9 @@ import { Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
-import type { PgConditionLike } from "../interfaces.js";
-import type { RuntimeSQLThunk } from "../utils.js";
-import { runtimeScopedSQL } from "../utils.js";
+import type { PgConditionLike } from "../interfaces.ts";
+import type { RuntimeSQLThunk } from "../utils.ts";
+import { runtimeScopedSQL } from "../utils.ts";
 
 export class PgOrFilter
   extends Modifier<PgConditionLike>

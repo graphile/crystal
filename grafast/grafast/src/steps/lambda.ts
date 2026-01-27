@@ -1,12 +1,12 @@
 import type {
   PromiseOrDirect,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Multistep, UnwrapMultistep } from "../multistep.js";
-import { multistep } from "../multistep.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { sideEffect } from "./sideEffect.js";
+} from "../interfaces.ts";
+import type { Multistep, UnwrapMultistep } from "../multistep.ts";
+import { multistep } from "../multistep.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { sideEffect } from "./sideEffect.ts";
 
 /**
  * Calls the given lambda function for each tuple
@@ -21,11 +21,13 @@ export class LambdaStep<TIn, TOut> extends UnbatchedStep<TOut> {
   allowMultipleOptimizations = true;
 
   private depId: number | null;
+  private fn: (value: TIn) => PromiseOrDirect<TOut>;
   constructor(
     $plan: Step<TIn> | null | undefined,
-    private fn: (value: TIn) => PromiseOrDirect<TOut>,
+    fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
+    this.fn = fn;
     this.depId = $plan != null ? this.addDataDependency($plan) : null;
     if ((fn as any).hasSideEffects) {
       this.hasSideEffects = true;

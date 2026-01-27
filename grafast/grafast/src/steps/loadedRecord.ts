@@ -1,10 +1,10 @@
-import { type __ItemStep, type ExecutionDetails } from "../index.js";
-import type { GrafastResultsList, Maybe } from "../interfaces.js";
-import { Step } from "../step.js";
-import { arrayOfLength, recordsMatch } from "../utils.js";
-import { access } from "./access.js";
-import { constant } from "./constant.js";
-import { LoadManyStep } from "./loadMany.js";
+import { type __ItemStep, type ExecutionDetails } from "../index.ts";
+import type { GrafastResultsList, Maybe } from "../interfaces.ts";
+import { Step } from "../step.ts";
+import { arrayOfLength, recordsMatch } from "../utils.ts";
+import { access } from "./access.ts";
+import { constant } from "./constant.ts";
+import { LoadManyStep } from "./loadMany.ts";
 
 /**
  * You shouldn't create instances of this yourself - use `loadOne` or `loadMany` instead.
@@ -25,15 +25,21 @@ export class LoadedRecordStep<
   paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
+  private isSingle: boolean;
+  private sourceDescription: Maybe<string>;
+  private ioEquivalence: Record<string, Step>;
   constructor(
     $loadMany: LoadManyStep<any, any, any, any, any>,
     $data: Step<TData>,
-    private isSingle: boolean,
-    private sourceDescription: Maybe<string>,
+    isSingle: boolean,
+    sourceDescription: Maybe<string>,
     // Only safe to reference this during planning phase
-    private ioEquivalence: Record<string, Step>,
+    ioEquivalence: Record<string, Step>,
   ) {
     super();
+    this.isSingle = isSingle;
+    this.sourceDescription = sourceDescription;
+    this.ioEquivalence = ioEquivalence;
     this.addDependency($data);
     this.addDependency($loadMany);
   }

@@ -13,16 +13,16 @@ import {
   Kind,
 } from "graphql";
 
-import type { Constraint } from "../constraints.js";
-import { __ListTransformStep, arrayOfLength, operationPlan } from "../index.js";
+import type { Constraint } from "../constraints.ts";
+import { __ListTransformStep, arrayOfLength, operationPlan } from "../index.ts";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import { UnbatchedStep } from "../step.js";
-import type { __ValueStep } from "./__value.js";
-import type { AccessStep } from "./access.js";
+} from "../interfaces.ts";
+import { UnbatchedStep } from "../step.ts";
+import type { __ValueStep } from "./__value.ts";
+import type { AccessStep } from "./access.ts";
 
 /**
  * Implements the `__TrackedValueStep(operationPlan, object, constraints, path)`

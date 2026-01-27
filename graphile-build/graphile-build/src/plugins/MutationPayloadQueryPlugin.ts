@@ -3,8 +3,8 @@ import "graphile-config";
 import { rootValue } from "grafast";
 import type { GraphQLOutputType } from "graphql";
 
-import { EXPORTABLE } from "../utils.js";
-import { version } from "../version.js";
+import { EXPORTABLE } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

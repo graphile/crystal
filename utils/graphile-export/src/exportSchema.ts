@@ -45,15 +45,15 @@ import {
   printSchema,
   specifiedDirectives,
 } from "grafast/graphql";
-import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
+import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema.js";
 import type { PgSQL, SQL } from "pg-sql2";
 
-import { isForbidden } from "./helpers.js";
-import type { ExportOptions } from "./interfaces.js";
-import { optimize } from "./optimize/index.js";
-import { reservedWords } from "./reservedWords.js";
-import { isImportable, isNotNullish } from "./utils.js";
-import { wellKnown } from "./wellKnown.js";
+import { isForbidden } from "./helpers.ts";
+import type { ExportOptions } from "./interfaces.ts";
+import { optimize } from "./optimize/index.ts";
+import { reservedWords } from "./reservedWords.ts";
+import { isImportable, isNotNullish } from "./utils.ts";
+import { wellKnown } from "./wellKnown.ts";
 
 // Cannot import sql because it's optional
 //     import { sql } from "pg-sql2";
@@ -285,7 +285,11 @@ class CodegenFile {
   _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
     new Map();
 
-  constructor(public options: ExportOptions) {}
+  public options: ExportOptions;
+
+  constructor(options: ExportOptions) {
+    this.options = options;
+  }
 
   addStatements(statements: t.Statement | t.Statement[]): void {
     if (Array.isArray(statements)) {

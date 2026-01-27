@@ -3,15 +3,15 @@ import type { Server as HTTPSServer } from "node:https";
 
 import { createServerAdapter } from "@whatwg-node/server";
 
-import { GrafservBase } from "../../../core/base.js";
+import { GrafservBase } from "../../../core/base.ts";
 import type {
   GrafservBody,
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../../interfaces.js";
-import type { OptionsFromConfig } from "../../../options.js";
-import { httpError } from "../../../utils.js";
+} from "../../../interfaces.ts";
+import type { OptionsFromConfig } from "../../../options.ts";
+import { httpError } from "../../../utils.ts";
 
 export async function getBodyFromRequest(
   req: Request /* IncomingMessage */,

@@ -1,15 +1,15 @@
-import "../index.js";
+import "../index.ts";
 
 import type { GraphQLError, GraphQLFormattedError } from "grafast/graphql";
 import { formatError as defaultFormatError } from "grafast/graphql";
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
 import type { IncomingMessage, ServerResponse } from "http";
 
-import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
-import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
-import { PgV4SimpleSubscriptionsPlugin } from "../plugins/PgV4SimpleSubscriptionsPlugin.js";
-import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
-import PostGraphileAmberPreset from "./amber.js";
+import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.ts";
+import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.ts";
+import { PgV4SimpleSubscriptionsPlugin } from "../plugins/PgV4SimpleSubscriptionsPlugin.ts";
+import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.ts";
+import PostGraphileAmberPreset from "./amber.ts";
 
 export {
   PgV4BehaviorPlugin,

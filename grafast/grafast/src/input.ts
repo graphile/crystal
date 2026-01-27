@@ -9,25 +9,25 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { inspect } from "./inspect.js";
-import type { AnyInputStep } from "./interfaces.js";
-import { __InputDefaultStep } from "./steps/__inputDefault.js";
-import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
-import { __InputObjectStep } from "./steps/__inputObject.js";
-import { __inputStaticLeaf } from "./steps/__inputStaticLeaf.js";
-import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { inspect } from "./inspect.ts";
+import type { AnyInputStep } from "./interfaces.ts";
+import { __InputDefaultStep } from "./steps/__inputDefault.ts";
+import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
+import type { __InputObjectStepWithDollars } from "./steps/__inputObject.ts";
+import { __InputObjectStep } from "./steps/__inputObject.ts";
+import { __inputStaticLeaf } from "./steps/__inputStaticLeaf.ts";
+import type { __TrackedValueStepWithDollars } from "./steps/__trackedValue.ts";
 import {
   __InputListStep,
   __InputStaticLeafStep,
   __TrackedValueStep,
   constant,
-} from "./steps/index.js";
+} from "./steps/index.ts";
 import {
   findVariableNamesUsedInValueNode,
   valueNodeToStaticValue,
-} from "./utils.js";
+} from "./utils.ts";
 
 const {
   assertScalarType,

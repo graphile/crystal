@@ -1,5 +1,5 @@
-import type { SQLQuery } from "../src/index.js";
-import sql from "../src/index.js";
+import type { SQLQuery } from "../src/index.ts";
+import sql from "../src/index.ts";
 
 it("table.column::text 1", () => {
   const node = sql`${sql.parens(sql.identifier("table", "column"))}::text`;

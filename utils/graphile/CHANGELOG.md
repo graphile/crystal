@@ -1,5 +1,64 @@
 # graphile
 
+## 5.0.0-rc.3
+
+### Patch Changes
+
+- [#2852](https://github.com/graphile/crystal/pull/2852)
+  [`65c9eb4`](https://github.com/graphile/crystal/commit/65c9eb4630013bcdb8364f8fb0dcbdec31f602f3)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `graphile config options [scope]` command to limit options to a specific
+  scope.
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2862](https://github.com/graphile/crystal/pull/2862)
+  [`8503db6`](https://github.com/graphile/crystal/commit/8503db64831037c72249a3cc525b20ff91304a89)
+  Thanks [@benjie](https://github.com/benjie)! - Change `graphile` CLI to be
+  FLOSS under MIT license (previously sponsors only... but sponsorship still
+  encouraged!)
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
+- [#2855](https://github.com/graphile/crystal/pull/2855)
+  [`1682bed`](https://github.com/graphile/crystal/commit/1682bedd8d47e266ba9751bfaf77f09960b85c60)
+  Thanks [@benjie](https://github.com/benjie)! - Ability to detect TSDoc tags
+  and output appropriately
+
+- [#2859](https://github.com/graphile/crystal/pull/2859)
+  [`53e0af2`](https://github.com/graphile/crystal/commit/53e0af2bda2aad9abe430e00b52a37ea5f3e81c3)
+  Thanks [@benjie](https://github.com/benjie)! - Inflection debugging now
+  outputs much more detail about inflectors, including which plugins
+  added/overrode the inflector.
+
+- [#2859](https://github.com/graphile/crystal/pull/2859)
+  [`65d9556`](https://github.com/graphile/crystal/commit/65d9556cf18c54a7cd9c291aa10aa9806adb3c7a)
+  Thanks [@benjie](https://github.com/benjie)! - Add tracing to inflectors
+
+- Updated dependencies
+  [[`c2ae685`](https://github.com/graphile/crystal/commit/c2ae685a5ce001f79356c4a994613b16cdb01475),
+  [`1e45a3d`](https://github.com/graphile/crystal/commit/1e45a3d6495cfea45bfdde95af889a453b82def3),
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36),
+  [`a60ed2a`](https://github.com/graphile/crystal/commit/a60ed2acc7abbdfce727eaef48f6ca0349c24635),
+  [`1606298`](https://github.com/graphile/crystal/commit/1606298cdac2938e02675d0e7e5e134364ac7bcf),
+  [`a565503`](https://github.com/graphile/crystal/commit/a5655035dfee7000c1d37e4791354d7a2ba35792),
+  [`d9ccc82`](https://github.com/graphile/crystal/commit/d9ccc82a30ca6167f480e5c8bc15d17df51c0d1c),
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c),
+  [`2e770df`](https://github.com/graphile/crystal/commit/2e770df354db58d39aead55c3aeca8ee2fb41833),
+  [`456d387`](https://github.com/graphile/crystal/commit/456d387887bb6fb9a880d2c3cd8cc6ece8391cf0),
+  [`4ca27c1`](https://github.com/graphile/crystal/commit/4ca27c1f543359d5a7dc53fae35fc35caddb4076),
+  [`a258427`](https://github.com/graphile/crystal/commit/a2584278e78535dc3c611c5257c332e515c280bc),
+  [`65d9556`](https://github.com/graphile/crystal/commit/65d9556cf18c54a7cd9c291aa10aa9806adb3c7a)]:
+  - postgraphile@5.0.0-rc.4
+  - graphile-build@5.0.0-rc.3
+  - graphile-config@1.0.0-rc.3
+
 ## 5.0.0-rc.2
 
 ### Patch Changes

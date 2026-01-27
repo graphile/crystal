@@ -1,10 +1,12 @@
-import * as assert from "../assert";
-import type { Deferred } from "../deferred";
-import { defer } from "../deferred";
-import { isDev, noop } from "../dev";
-import type { Maybe } from "../interfaces";
-import type { Step } from "../step";
-import { arrayOfLength, isPromiseLike, sleep } from "../utils";
+import * as assert from "../assert.ts";
+import { isDev, noop } from "../dev.ts";
+import type { Maybe } from "../interfaces.ts";
+import {
+  type PromiseWithResolve,
+  promiseWithResolve,
+} from "../promiseWithResolve.ts";
+import type { Step } from "../step.ts";
+import { arrayOfLength, isPromiseLike, sleep } from "../utils.ts";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
@@ -97,13 +99,12 @@ export function distributor<TData>(
   const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 
   // Easy way to resolve a promise for slowing down the fastest consumer
-  let wmi: Deferred<void> | null = null;
+  let wmi: PromiseWithResolve<void> | null = null;
   function lowWaterMarkIncreased(): PromiseLike<void> {
     if (wmi === null) {
-      const d = defer<void>();
-      wmi = d;
+      wmi = promiseWithResolve<void>();
     }
-    return wmi;
+    return wmi.promise;
   }
 
   /**

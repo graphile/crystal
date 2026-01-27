@@ -9,14 +9,15 @@ export function tagToString(
   return Array.isArray(str) ? str.join("\n") : str === true ? " " : str;
 }
 
-enum MODE {
-  EXPECT_ARG = 0,
-  ARG = 1,
-  EXPECT_PARAM_NAME = 2,
-  PARAM_NAME = 3,
-  EXPECT_PARAM_VALUE = 4,
-  PARAM_VALUE = 5,
-}
+const MODE = {
+  EXPECT_ARG: 0,
+  ARG: 1,
+  EXPECT_PARAM_NAME: 2,
+  PARAM_NAME: 3,
+  EXPECT_PARAM_VALUE: 4,
+  PARAM_VALUE: 5,
+} as const;
+type MODE = (typeof MODE)[keyof typeof MODE];
 
 // NOTE: Do **NOT** add `<>` as parens; it will break arrows `->`
 const OPEN_PARENS = ["(", "{", "["];

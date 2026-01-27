@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "schema with simple collections by default, but relay for people",

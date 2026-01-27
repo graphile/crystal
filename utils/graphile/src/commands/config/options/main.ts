@@ -6,7 +6,7 @@ import {
   configVfs,
   prettyDisplayParts,
   prettyDocumentation,
-} from "../../../utils/typescriptVfs.js";
+} from "../../../utils/typescriptVfs.ts";
 
 const FORBIDDEN = [
   // PostGraphile V4 workarounds

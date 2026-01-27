@@ -6,9 +6,9 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { SafeError } from "./error.js";
-import type { __TrackedValueStep } from "./steps/index.js";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { SafeError } from "./error.ts";
+import type { __TrackedValueStep } from "./steps/index.ts";
 
 const {
   GraphQLError,

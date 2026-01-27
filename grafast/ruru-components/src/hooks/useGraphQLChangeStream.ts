@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import type { RuruProps } from "../interfaces.js";
+import type { RuruProps } from "../interfaces.ts";
 
 export const useGraphQLChangeStream = (
   props: RuruProps,

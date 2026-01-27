@@ -1,4 +1,4 @@
-import { arraysMatch } from "./utils.js";
+import { arraysMatch } from "./utils.ts";
 
 /**
  * Marks that `thing` is exported from the `grafast` module as

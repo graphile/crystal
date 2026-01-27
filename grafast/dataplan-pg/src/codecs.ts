@@ -15,7 +15,7 @@ import type {
   PgPath,
   PgPoint,
   PgPolygon,
-} from "./codecUtils/index.js";
+} from "./codecUtils/index.ts";
 import {
   parseBox,
   parseCircle,
@@ -34,8 +34,8 @@ import {
   stringifyPath,
   stringifyPoint,
   stringifyPolygon,
-} from "./codecUtils/index.js";
-import type { PgExecutor } from "./executor.js";
+} from "./codecUtils/index.ts";
+import type { PgExecutor } from "./executor.ts";
 import type {
   PgCodec,
   PgCodecExtensions,
@@ -44,8 +44,8 @@ import type {
   PgEncode,
   PgEnumCodec,
   PgEnumValue,
-} from "./interfaces.js";
-import { makeParseArrayWithTransform, parseArray } from "./parseArray.js";
+} from "./interfaces.ts";
+import { makeParseArrayWithTransform, parseArray } from "./parseArray.ts";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;

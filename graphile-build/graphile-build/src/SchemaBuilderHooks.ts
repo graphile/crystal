@@ -1,4 +1,4 @@
-import "./global.js";
+import "./global.ts";
 
 /**
  * Returns a new object with arrays for each supported schema hook, ready for

@@ -3,9 +3,9 @@ import { exportAs, operationPlan, UnbatchedStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
-import { TYPES } from "../codecs.js";
-import type { PgResource } from "../datasource.js";
+import type { PgCodecAttribute } from "../codecs.ts";
+import { TYPES } from "../codecs.ts";
+import type { PgResource } from "../datasource.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -16,15 +16,15 @@ import type {
   PgRegistry,
   PgSQLCallbackOrDirect,
   PgTypedStep,
-} from "../interfaces.js";
-import type { PlantimeEmbeddable } from "../utils.js";
-import { makeScopedSQL } from "../utils.js";
+} from "../interfaces.ts";
+import type { PlantimeEmbeddable } from "../utils.ts";
+import { makeScopedSQL } from "../utils.ts";
 import {
   pgClassExpression,
   PgClassExpressionStep,
-} from "./pgClassExpression.js";
-import type { PgSelectMode } from "./pgSelect.js";
-import { PgSelectStep } from "./pgSelect.js";
+} from "./pgClassExpression.ts";
+import type { PgSelectMode } from "./pgSelect.ts";
+import { PgSelectStep } from "./pgSelect.ts";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgSelectSingleStep:plan");

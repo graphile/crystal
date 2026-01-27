@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "prints a schema from non-root role, with RBAC ignored",

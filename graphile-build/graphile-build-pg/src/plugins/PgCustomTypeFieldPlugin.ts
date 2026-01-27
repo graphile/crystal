@@ -2,7 +2,7 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
-import "./PgProceduresPlugin.js";
+import "./PgProceduresPlugin.ts";
 import "graphile-config";
 
 import type {
@@ -58,8 +58,8 @@ import type {
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { exportNameHint, tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { exportNameHint, tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 const EMPTY_ARRAY = Object.freeze([]);
 const makeEmptyArray = EXPORTABLE(

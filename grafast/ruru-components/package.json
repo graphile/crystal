@@ -1,6 +1,6 @@
 {
   "name": "ruru-components",
-  "version": "2.0.0-rc.3",
+  "version": "2.0.0-rc.4",
   "description": "Grafast-flavoured GraphiQL distribution; the underlying React components",
   "main": "./dist/index.js",
   "type": "module",
@@ -52,10 +52,11 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-error-boundary": "^6.0.0",
+    "ruru-types": "workspace:^",
     "tslib": "^2.8.1"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=22"
   },
   "peerDependencies": {
     "graphql": "^16.9.0"

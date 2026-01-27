@@ -5,13 +5,13 @@ import type {
   Context as LambdaContext,
 } from "aws-lambda";
 
-import { GrafservBase } from "../../../core/base.js";
+import { GrafservBase } from "../../../core/base.ts";
 import type {
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../../interfaces.js";
-import { processHeaders } from "../../../utils.js";
+} from "../../../interfaces.ts";
+import { processHeaders } from "../../../utils.ts";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

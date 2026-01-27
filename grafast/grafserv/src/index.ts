@@ -14,13 +14,13 @@ import type {
   RequestContentType,
   Result,
   RuruHTMLEvent,
-} from "./interfaces.js";
+} from "./interfaces.ts";
 
 export {
   convertErrorToErrorResult,
   convertHandlerResultToResult,
   GrafservBase,
-} from "./core/base.js";
+} from "./core/base.ts";
 export type {
   BufferResult,
   BufferStreamResult,
@@ -48,12 +48,12 @@ export type {
   Result,
   TextHandlerResult,
   ValidatedGraphQLBody,
-} from "./interfaces.js";
+} from "./interfaces.ts";
 
 /** @deprecated Use EventStreamHandlerResult instead */
-export type { EventStreamHandlerResult as EventStreamHeandlerResult } from "./interfaces.js";
-export { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "./middleware/graphql.js";
-export { defaultMaskError } from "./options.js";
+export type { EventStreamHandlerResult as EventStreamHeandlerResult } from "./interfaces.ts";
+export { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "./middleware/graphql.ts";
+export { defaultMaskError } from "./options.ts";
 export {
   getBodyFromFrameworkBody,
   getBodyFromRequest,
@@ -65,7 +65,7 @@ export {
   normalizeRequest,
   parseGraphQLJSONBody,
   processHeaders,
-} from "./utils.js";
+} from "./utils.ts";
 
 declare global {
   namespace Grafast {

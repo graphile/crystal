@@ -5,8 +5,8 @@ import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { Secret, SignOptions } from "jsonwebtoken";
 import { sign as signJwt } from "jsonwebtoken";
 
-import { parseDatabaseIdentifier, parseDatabaseIdentifiers } from "../utils.js";
-import { version } from "../version.js";
+import { parseDatabaseIdentifier, parseDatabaseIdentifiers } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileBuild {

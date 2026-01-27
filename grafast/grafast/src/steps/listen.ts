@@ -1,13 +1,13 @@
-import { isDev } from "../dev.js";
-import { SafeError } from "../index.js";
+import { isDev } from "../dev.ts";
+import { SafeError } from "../index.ts";
 import type {
   ExecutionDetails,
   GrafastResultStreamList,
   GrafastSubscriber,
-} from "../interfaces.js";
-import { isExecutableStep, Step } from "../step.js";
-import type { __ItemStep } from "./__item.js";
-import { constant } from "./constant.js";
+} from "../interfaces.ts";
+import { isExecutableStep, Step } from "../step.ts";
+import type { __ItemStep } from "./__item.ts";
+import { constant } from "./constant.ts";
 
 /**
  * Subscribes to the given `pubsubOrPlan` to get realtime updates on a given
@@ -37,18 +37,20 @@ export class ListenStep<
 
   private initialEventDep: number | null = null;
 
+  public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep;
   constructor(
     pubsubOrPlan:
       | Step<GrafastSubscriber<TTopics> | null>
       | GrafastSubscriber<TTopics>
       | null,
     topicOrPlan: Step<TTopic> | string,
-    public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
+    itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
       $item,
     ) => $item as any,
     $initialEvent?: Step<TTopics[TTopic]>,
   ) {
     super();
+    this.itemPlan = itemPlan;
     const $topic =
       typeof topicOrPlan === "string" ? constant(topicOrPlan) : topicOrPlan;
     const $pubsub = isExecutableStep(pubsubOrPlan)

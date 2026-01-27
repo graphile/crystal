@@ -14,7 +14,7 @@ import { EXPORTABLE } from "graphile-build";
 import type { GraphileConfig } from "graphile-config";
 import type { GraphQLEnumType, GraphQLFieldConfigArgumentMap } from "graphql";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

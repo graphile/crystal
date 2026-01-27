@@ -6,7 +6,7 @@ import {
   OBJECT_SEQUENCE,
   OBJECT_TABLE,
   parseAcls,
-} from "./acl.js";
+} from "./acl.ts";
 import type {
   Introspection,
   PgAttribute,
@@ -19,9 +19,9 @@ import type {
   PgRange,
   PgRoles,
   PgType,
-} from "./introspection.js";
-import type { PgSmartTagsAndDescription } from "./smartComments.js";
-import { parseSmartComment } from "./smartComments.js";
+} from "./introspection.ts";
+import type { PgSmartTagsAndDescription } from "./smartComments.ts";
+import { parseSmartComment } from "./smartComments.ts";
 
 /**
  * Only suitable for functions that accept no arguments.

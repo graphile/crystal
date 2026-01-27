@@ -1,5 +1,5 @@
-import type { InputObjectTypeBakedInfo } from "../index.js";
-import { Modifier } from "./applyInput.js";
+import type { InputObjectTypeBakedInfo } from "../index.ts";
+import { Modifier } from "./applyInput.ts";
 
 export interface SetterCapable<TObj extends Record<string, any>> {
   set<TKey extends keyof TObj>(key: TKey, value: TObj[TKey]): void;

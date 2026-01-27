@@ -47,6 +47,7 @@ flexible method 2 is what you want.
 // Method 1: wrap individual resolvers of known fields
 function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 
 interface PlanWrapperRules {
@@ -64,6 +65,25 @@ interface PlanWrapperRule {
    * when your plan wrapper calls the underlying plan.
    */
   autoApplyFieldArgs?: boolean;
+}
+
+interface WrapPlansOptions {
+  /** The name to give this plugin, to make debugging easier */
+  name?: string;
+  /** Optional version of the plugin */
+  version?: string;
+  /** Optional description of the plugin, to make debugging easier */
+  description?: string;
+
+  /**
+   * Set this `true` if you know that the given plans will never be called in
+   * the context of resolver emulation, and thus wrapping `defaultPlanResolver`
+   * will not cause issues.
+   *
+   * @see {@link https://err.red/pwpr}
+   *
+   */
+  disableResolverEmulationWarnings?: boolean;
 }
 
 type PlanWrapperFn = (
@@ -87,8 +107,15 @@ function wrapPlans<T>(
     field: GrafastFieldConfig,
   ) => T | null,
   rule: (match: T) => PlanWrapperRule | PlanWrapperFn,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
+
+Both signatures accept an optional `options` argument. Set
+`disableResolverEmulationWarnings: true` to silence the resolver emulation
+warning. This warning is irrelevant when your schema uses only Gra*fast* plan
+resolvers and contains no traditional resolvers. Read more at [wrapPlans
+resolver emulation warning](https://err.red/pwpr).
 
 ## Method 1: wrapping individual resolvers of known fields
 
@@ -96,6 +123,7 @@ function wrapPlans<T>(
 // Method 1: wrap individual resolvers of known fields
 function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
 
@@ -238,6 +266,7 @@ function wrapPlans<T>(
     field: GrafastFieldConfig,
   ) => T | null,
   rule: (match: T) => PlanWrapperRule | PlanWrapperFn,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
 

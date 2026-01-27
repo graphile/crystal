@@ -10,7 +10,7 @@ import { resolvePreset } from "graphile-config";
 import { exportSchema } from "graphile-export";
 import * as jsonwebtoken from "jsonwebtoken";
 
-import { getPool, makeSharedPresetAndClient } from "./config.js";
+import { getPool, makeSharedPresetAndClient } from "./config.ts";
 
 const pool = getPool();
 

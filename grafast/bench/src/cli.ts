@@ -8,8 +8,8 @@ import { resolvePreset } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 
-import type { GrafastBenchConfig } from "./index.js";
-import { bench } from "./index.js";
+import type { GrafastBenchConfig } from "./index.ts";
+import { bench } from "./index.ts";
 
 export function options(yargs: Argv) {
   return yargs

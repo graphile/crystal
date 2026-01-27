@@ -2,11 +2,11 @@ import LRU from "@graphile/lru";
 import debugFactory from "debug";
 import type { GraphQLSchema, OperationDefinitionNode } from "graphql";
 
-import { $$cacheByOperation, $$timeout, $$ts } from "./constants.js";
-import type { Constraint } from "./constraints.js";
-import { matchesConstraints } from "./constraints.js";
-import { isDev, noop } from "./dev.js";
-import { OperationPlan, SafeError } from "./index.js";
+import { $$cacheByOperation, $$timeout, $$ts } from "./constants.ts";
+import type { Constraint } from "./constraints.ts";
+import { matchesConstraints } from "./constraints.ts";
+import { isDev, noop } from "./dev.ts";
+import { OperationPlan, SafeError } from "./index.ts";
 import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
@@ -14,9 +14,9 @@ import type {
   EstablishOperationPlanResult,
   Fragments,
   LinkedList,
-} from "./interfaces.js";
-import type { GrafastOperationOptions } from "./prepare.js";
-import { timeSource } from "./timeSource.js";
+} from "./interfaces.ts";
+import type { GrafastOperationOptions } from "./prepare.ts";
+import { timeSource } from "./timeSource.ts";
 
 const debug = debugFactory("grafast:establishOperationPlan");
 

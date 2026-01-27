@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-rc.3",
+  "version": "2.0.0-rc.4",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -54,12 +54,12 @@
     "graphile-config": "workspace:^",
     "graphql": "^16.9.0",
     "http-proxy": "^1.18.1",
-    "ruru-components": "workspace:^",
+    "ruru-types": "workspace:^",
     "tslib": "^2.8.1",
     "yargs": "^17.7.2"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=22"
   },
   "peerDependencies": {
     "graphile-config": "workspace:^",

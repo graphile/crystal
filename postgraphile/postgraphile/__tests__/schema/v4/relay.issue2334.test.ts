@@ -1,7 +1,7 @@
 import { assertInputObjectType } from "graphql";
 
-import { PostGraphileRelayPreset } from "../../../src/presets/relay.js";
-import * as core from "./core.js";
+import { PostGraphileRelayPreset } from "../../../src/presets/relay.ts";
+import * as core from "./core.ts";
 
 test(
   "prints a schema optimized for Relay",

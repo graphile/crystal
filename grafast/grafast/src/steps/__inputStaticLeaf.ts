@@ -9,9 +9,9 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import { operationPlan } from "../global.js";
-import { UnbatchedStep } from "../step.js";
-import { constant } from "./constant.js";
+import { operationPlan } from "../global.ts";
+import { UnbatchedStep } from "../step.ts";
+import { constant } from "./constant.ts";
 
 const { valueFromAST } = graphql;
 
@@ -26,9 +26,11 @@ export class __InputStaticLeafStep<TLeaf = any> extends UnbatchedStep<TLeaf> {
     exportName: "__InputStaticLeafStep",
   };
   isSyncAndSafe = true;
+  private readonly coercedValue: any;
 
-  constructor(private readonly coercedValue: any) {
+  constructor(coercedValue: any) {
     super();
+    this.coercedValue = coercedValue;
   }
 
   unbatchedExecute(): TLeaf {

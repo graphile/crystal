@@ -36,15 +36,15 @@ import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import { PgSubscriber } from "../src/adaptors/pg.js";
-import { makeExampleSchema } from "../src/examples/exampleSchema.js";
+import { PgSubscriber } from "../src/adaptors/pg.ts";
+import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 //import prettier from "prettier";
-import type { PgClientQuery } from "../src/index.js";
+import type { PgClientQuery } from "../src/index.ts";
 import {
   createTestDatabase,
   dropTestDatabase,
   withTestWithPgClient,
-} from "./sharedHelpers.js";
+} from "./sharedHelpers.ts";
 
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.

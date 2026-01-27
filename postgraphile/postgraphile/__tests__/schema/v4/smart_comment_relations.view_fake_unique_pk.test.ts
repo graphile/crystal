@@ -4,7 +4,7 @@ import {
   isObjectType,
 } from "grafast/graphql";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "view with fake unique constraints and primary key",

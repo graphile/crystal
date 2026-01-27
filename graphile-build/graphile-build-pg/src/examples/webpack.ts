@@ -14,7 +14,7 @@ import { exportSchema } from "graphile-export";
 import { Pool } from "pg";
 import webpack from "webpack";
 
-import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { defaultPreset as graphileBuildPgPreset } from "../index.ts";
 
 /**
  * Set this to 'false' for production and the bundle will be minified.

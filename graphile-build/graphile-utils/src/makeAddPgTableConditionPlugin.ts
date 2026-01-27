@@ -3,7 +3,7 @@ import { sqlValueWithCodec } from "@dataplan/pg";
 import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
-import { EXPORTABLE } from "./exportable.js";
+import { EXPORTABLE } from "./exportable.ts";
 
 export function addPgTableCondition(
   match: { serviceName?: string; schemaName: string; tableName: string },

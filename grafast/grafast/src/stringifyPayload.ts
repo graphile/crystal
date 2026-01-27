@@ -1,4 +1,4 @@
-import type { JSONObject } from "./interfaces.js";
+import type { JSONObject } from "./interfaces.ts";
 
 export function stringifyPayload(
   payload: JSONObject,

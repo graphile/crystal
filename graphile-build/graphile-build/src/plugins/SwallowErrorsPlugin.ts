@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import swallowError from "../swallowError.js";
-import { version } from "../version.js";
+import swallowError from "../swallowError.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

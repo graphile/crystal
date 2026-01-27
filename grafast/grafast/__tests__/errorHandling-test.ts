@@ -39,11 +39,10 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
-  constructor(
-    $dep: Step<TIn>,
-    private callback: (val: TIn) => PromiseOrDirect<TOut>,
-  ) {
+  private callback: (val: TIn) => PromiseOrDirect<TOut>;
+  constructor($dep: Step<TIn>, callback: (val: TIn) => PromiseOrDirect<TOut>) {
     super();
+    this.callback = callback;
     this.addDependency($dep);
   }
   execute({

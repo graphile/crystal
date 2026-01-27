@@ -1,15 +1,15 @@
 import type { GraphQLInputObjectType } from "graphql";
 import * as graphql from "graphql";
 
-import { inputStep } from "../input.js";
+import { inputStep } from "../input.ts";
 import type {
   AnyInputStep,
   NotVariableValueNode,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import { UnbatchedStep } from "../step.js";
-import { defaultValueToValueNode } from "../utils.js";
-import { constant } from "./constant.js";
+} from "../interfaces.ts";
+import { UnbatchedStep } from "../step.ts";
+import { defaultValueToValueNode } from "../utils.ts";
+import { constant } from "./constant.ts";
 
 const { Kind } = graphql;
 
@@ -28,11 +28,15 @@ export class __InputObjectStep<
   private inputFields: {
     [fieldName: string]: { dependencyIndex: number; step: AnyInputStep };
   } = Object.create(null);
+  private inputObjectType: TInputType;
+  private inputValues: NotVariableValueNode | undefined;
   constructor(
-    private inputObjectType: TInputType,
-    private inputValues: NotVariableValueNode | undefined,
+    inputObjectType: TInputType,
+    inputValues: NotVariableValueNode | undefined,
   ) {
     super();
+    this.inputObjectType = inputObjectType;
+    this.inputValues = inputValues;
     const inputFieldDefinitions = inputObjectType.getFields();
     const inputFields =
       inputValues?.kind === "ObjectValue" ? inputValues.fields : undefined;

@@ -1,7 +1,7 @@
 import type { PgCodec } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 interface State {
   ltreeCodec: PgCodec<string, any, any, any, undefined, any, any>;

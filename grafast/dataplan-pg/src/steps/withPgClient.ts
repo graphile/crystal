@@ -20,7 +20,7 @@ import type {
   PgExecutor,
   PgExecutorContext,
   WithPgClient,
-} from "../executor";
+} from "../executor.ts";
 
 export type SideEffectWithPgClientStepCallback<
   TData,
@@ -60,18 +60,20 @@ export class SideEffectWithPgClientStep<
    * The id for the data plan.
    */
   private dataId: number;
+  private callback: SideEffectWithPgClientStepCallback<
+    TData,
+    TResult,
+    TPgClient
+  >;
 
   constructor(
     executor: PgExecutor,
     $data: Step<TData>,
-    private callback: SideEffectWithPgClientStepCallback<
-      TData,
-      TResult,
-      TPgClient
-    >,
+    callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
   ) {
     super();
     this.executor = executor;
+    this.callback = callback;
     this.contextId = this.addDependency(this.executor.context());
     this.dataId = this.addDependency($data);
 

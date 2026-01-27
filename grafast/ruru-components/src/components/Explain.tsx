@@ -4,11 +4,11 @@ import type { FC } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
-import type { ExplainHelpers } from "../hooks/useExplain.js";
-import type { ExplainResults } from "../hooks/useFetcher.js";
-import { Copy } from "./Copy.js";
-import { FormatSQL } from "./FormatSQL.js";
-import { Mermaid } from "./Mermaid.js";
+import type { ExplainHelpers } from "../hooks/useExplain.ts";
+import type { ExplainResults } from "../hooks/useFetcher.ts";
+import { Copy } from "./Copy.tsx";
+import { FormatSQL } from "./FormatSQL.tsx";
+import { Mermaid } from "./Mermaid.tsx";
 
 export const Explain: FC<{
   explain: boolean;

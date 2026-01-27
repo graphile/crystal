@@ -3,8 +3,8 @@ import "graphile-config";
 import type { ExecutableStep, FieldArgs, Maybe, NodeIdHandler } from "grafast";
 import { lambda } from "grafast";
 
-import { EXPORTABLE, exportNameHint } from "../utils.js";
-import { version } from "../version.js";
+import { EXPORTABLE, exportNameHint } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

@@ -17,8 +17,8 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecAttributeVia,
-} from "./codecs.js";
-import { TYPES } from "./codecs.js";
+} from "./codecs.ts";
+import { TYPES } from "./codecs.ts";
 import type {
   PgClientResult,
   PgExecutor,
@@ -26,7 +26,7 @@ import type {
   PgExecutorInput,
   PgExecutorMutationOptions,
   PgExecutorOptions,
-} from "./executor.js";
+} from "./executor.ts";
 import type {
   Expand,
   GetPgCodecAttributes,
@@ -40,20 +40,20 @@ import type {
   PgRegistry,
   PgRegistryConfig,
   PlanByUniques,
-} from "./interfaces.js";
-import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
+} from "./interfaces.ts";
+import type { PgClassExpressionStep } from "./steps/pgClassExpression.ts";
 import type {
   PgSelectArgumentDigest,
   PgSelectArgumentSpec,
   PgSelectIdentifierSpec,
   PgSelectMode,
   PgSelectStep,
-} from "./steps/pgSelect.js";
-import { pgSelect } from "./steps/pgSelect.js";
+} from "./steps/pgSelect.ts";
+import { pgSelect } from "./steps/pgSelect.ts";
 import type {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
-} from "./steps/pgSelectSingle.js";
+} from "./steps/pgSelectSingle.ts";
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,

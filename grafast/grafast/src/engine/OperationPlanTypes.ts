@@ -9,11 +9,11 @@ import type {
   SelectionNode,
 } from "graphql";
 
-import type { SelectionSetDigest } from "../graphqlCollectFields";
-import type { LocationDetails, Maybe } from "../interfaces";
-import type { Step } from "../step";
-import type { LayerPlan, LayerPlanReasonListItemStream } from "./LayerPlan";
-import type { OutputPlan } from "./OutputPlan";
+import type { SelectionSetDigest } from "../graphqlCollectFields.ts";
+import type { LocationDetails, Maybe } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import type { LayerPlan, LayerPlanReasonListItemStream } from "./LayerPlan.ts";
+import type { OutputPlan } from "./OutputPlan.ts";
 
 export type StreamDetails = {
   if: Step<boolean>;

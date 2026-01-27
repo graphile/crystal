@@ -1,7 +1,7 @@
 import type { PgCodec, PgCodecAnyScalar } from "@dataplan/pg";
 import type {} from "graphile-config";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 const ENUM_DOMAIN_SUFFIX = "_enum_domain";
 

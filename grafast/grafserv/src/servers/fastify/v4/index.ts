@@ -11,21 +11,21 @@ import { makeHandler } from "graphql-ws/use/@fastify/websocket";
 import {
   convertHandlerResultToResult,
   GrafservBase,
-} from "../../../core/base.js";
+} from "../../../core/base.ts";
 import type {
   EventStreamHandlerResult,
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../../interfaces.js";
+} from "../../../interfaces.ts";
 import {
   getBodyFromFrameworkBody,
   makeGraphQLWSConfig,
   noop,
   normalizeRequest,
   processHeaders,
-} from "../../../utils.js";
-import { DEFAULT_WEBSOCKET_KEEPALIVE } from "../../../websocketKeepalive.js";
+} from "../../../utils.ts";
+import { DEFAULT_WEBSOCKET_KEEPALIVE } from "../../../websocketKeepalive.ts";
 
 declare global {
   namespace Grafast {

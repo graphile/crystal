@@ -4,8 +4,8 @@ import type {
   CallbackOrDescriptor,
   FunctionalityObject,
   UnwrapCallback,
-} from "./interfaces.js";
-import { sortWithBeforeAfterProvides } from "./sort.js";
+} from "./interfaces.ts";
+import { sortWithBeforeAfterProvides } from "./sort.ts";
 
 // TypeScript nonsense
 const isCallbackDescriptor = <T extends AnyCallback>(

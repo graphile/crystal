@@ -7,22 +7,22 @@ import {
   ALL_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
   TRAPPABLE_FLAGS,
-} from "./constants.js";
-import { isDev, noop } from "./dev.js";
+} from "./constants.ts";
+import { isDev, noop } from "./dev.ts";
 import type {
   LayerPlan,
   LayerPlanReasonSubroutine,
-} from "./engine/LayerPlan.js";
+} from "./engine/LayerPlan.ts";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
   withGlobalLayerPlan,
-} from "./engine/lib/withGlobalLayerPlan.js";
-import { $$unlock } from "./engine/lock.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { flagError } from "./error.js";
-import { getDebug } from "./global.js";
-import { inspect } from "./inspect.js";
+} from "./engine/lib/withGlobalLayerPlan.ts";
+import { $$unlock } from "./engine/lock.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { flagError } from "./error.ts";
+import { getDebug } from "./global.ts";
+import { inspect } from "./inspect.ts";
 import type {
   AddDependencyOptions,
   AddUnaryDependencyOptions,
@@ -37,10 +37,10 @@ import type {
   StepOptimizeOptions,
   StepOptions,
   UnbatchedExecutionExtra,
-} from "./interfaces.js";
-import type { __FlagStep, __ItemStep } from "./steps/index.js";
-import { buildOptimizedExecute } from "./unbatchedStepExecute.js";
-import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
+} from "./interfaces.ts";
+import type { __FlagStep, __ItemStep } from "./steps/index.ts";
+import { buildOptimizedExecute } from "./unbatchedStepExecute.ts";
+import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.ts";
 
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)

@@ -2,12 +2,12 @@
 
 import type { ESLint, Linter, Rule } from "eslint";
 
-import { ExhaustiveDeps } from "./ExhaustiveDeps.js";
-import { ExportInstances } from "./ExportInstances.js";
-import { ExportMethods } from "./ExportMethods.js";
-import { ExportPlans } from "./ExportPlans.js";
-import { ExportSubclasses } from "./ExportSubclasses.js";
-import { NoNested } from "./NoNested.js";
+import { ExhaustiveDeps } from "./ExhaustiveDeps.ts";
+import { ExportInstances } from "./ExportInstances.ts";
+import { ExportMethods } from "./ExportMethods.ts";
+import { ExportPlans } from "./ExportPlans.ts";
+import { ExportSubclasses } from "./ExportSubclasses.ts";
+import { NoNested } from "./NoNested.ts";
 
 export const configs = {
   recommended: {

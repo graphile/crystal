@@ -12,16 +12,16 @@ import { SafeError } from "grafast";
 import { CloseCode, makeServer } from "graphql-ws";
 import type WebSocket from "ws";
 
-import { GrafservBase } from "../../core/base.js";
-import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
-import type { OptionsFromConfig } from "../../options.js";
+import { GrafservBase } from "../../core/base.ts";
+import type { GrafservConfig, RequestDigest } from "../../interfaces.ts";
+import type { OptionsFromConfig } from "../../options.ts";
 import {
   getBodyFromRequest,
   makeGraphQLWSConfig,
   noop,
   processHeaders,
-} from "../../utils.js";
-import { handleWebSocketKeepalive } from "../../websocketKeepalive.js";
+} from "../../utils.ts";
+import { handleWebSocketKeepalive } from "../../websocketKeepalive.ts";
 
 declare global {
   namespace Grafast {

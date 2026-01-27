@@ -4,8 +4,8 @@ title: Deploying with Docker
 
 :::warning
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+This documentation has not yet been tested with PostGraphile V5. Please get in
+touch if you have used it!
 
 :::
 
@@ -16,7 +16,7 @@ https://hub.docker.com/r/graphile/postgraphile/
 
 Our Docker images are versioned:
 
-- `graphile/postgraphile:4` will give you the latest stable in the "v4.x.x" line
+- `graphile/postgraphile:5` will give you the latest stable in the "v5.x.x" line
   (no alphas, betas, rcs); **this is the recommended version to use**
 - Every new versioned git tag will be available using the exact same tag; e.g.
   `v5.6.7-alpha.8` would become `graphile/postgraphile:v5.6.7-alpha.8`
@@ -27,10 +27,10 @@ Our Docker images are versioned:
 - `graphile/postgraphile:next` will give you the equivalent of what's on
   `master` right now (i.e. pre-release/bleeding edge/nightly)
 
-From time to time `graphile/postgraphile:4` may lag behind where it should be
+From time to time `graphile/postgraphile:5` may lag behind where it should be
 because it's the only manual step in the above. If this happens, give Benjie a
-poke over Discord and he'll push the latest v4.x.y tag to the `v4` branch via
-`git push origin v4.x.y:v4`.
+poke over Discord and he'll push the latest v5.x.y tag to the `v5` branch via
+`git push origin v5.x.y:v5`.
 
 A request was made for clarification on why there are Docker versions with dots
 and other Docker versions with dashes; hopefully this clears things up:
@@ -52,7 +52,7 @@ multi-stage build.
 There's a few critical things to keep in mind:
 
 - PostGraphile CLI listens, by default, on `localhost`; you may need to override
-  this, e.g. with `--host 0.0.0.0`
+  this, e.g. with `preset.grafserv.host = "0.0.0.0"`
 - PostGraphile needs to be able to connect to your database; ensure that Docker
   is networked such that this is possible
 
@@ -76,62 +76,117 @@ node_modules
 ```
 
 The content of your `Dockerfile` will vary greatly depending on your repository
-setup, but here's an example for inspiration:
+setup, but here's an example for inspiration, using Yarn v4:
 
 ```dockerfile
 # Dockerfile
 
 # Global args, set before the first FROM, shared by all stages
 ARG NODE_ENV="production"
+ARG GRAPHILE_ENV="production"
 
 ################################################################################
 # Build stage 1 - `yarn build`
 
-FROM node:12-alpine as builder
+FROM node:24-alpine AS builder
 # Import our shared args
 ARG NODE_ENV
+ARG GRAPHILE_ENV
 
 # Cache node_modules for as long as possible
-COPY package.json yarn.lock /app/
+COPY .yarn/ /app/.yarn/
+COPY .yarnrc.yml package.json yarn.lock tsconfig.json /app/
 WORKDIR /app/
-RUN yarn install --frozen-lockfile --production=false --no-progress
+RUN ["corepack", "enable"]
+RUN ["yarn", "install", "--immutable"]
 
 # Copy over the server source code
-COPY server/ /app/server/
+COPY src/ /app/src/
 
 # Finally run the build script
-RUN yarn run build
+RUN ["yarn", "run", "build"]
 
 ################################################################################
 # Build stage 2 - COPY the relevant things (multiple steps)
 
-FROM node:12-alpine as clean
+FROM node:24-alpine AS clean
 # Import our shared args
 ARG NODE_ENV
+ARG GRAPHILE_ENV
 
 # Copy over selectively just the tings we need, try and avoid the rest
-COPY --from=builder /app/package.json /app/yarn.lock /app/
-COPY --from=builder /app/server/dist/ /app/server/dist/
+COPY --from=builder /app/.yarnrc.yml /app/package.json /app/yarn.lock /app/
+COPY --from=builder /app/.yarn/releases/ /app/.yarn/releases/
+COPY --from=builder /app/dist/ /app/dist/
 
 ################################################################################
 # Build stage FINAL - COPY everything, once, and then do a clean `yarn install`
 
-FROM node:12-alpine
+FROM node:24-alpine
 # Import our shared args
 ARG NODE_ENV
+ARG GRAPHILE_ENV
 
-EXPOSE 5000
+EXPOSE 5678
 WORKDIR /app/
 # Copy everything from stage 2, it's already been filtered
 COPY --from=clean /app/ /app/
 
 # Install yarn ASAP because it's the slowest
-RUN yarn install --frozen-lockfile --production=true --no-progress
+RUN ["corepack", "enable"]
+RUN ["yarn", "workspaces", "focus", "-A", "--production"]
 
 LABEL description="My PostGraphile-powered server"
 
-# You might want to disable GRAPHILE_TURBO if you have issues
-ENV GRAPHILE_TURBO=1
+ENV HOST="0.0.0.0"
 ENV NODE_ENV=$NODE_ENV
-ENTRYPOINT yarn start
+ENV GRAPHILE_ENV=$GRAPHILE_ENV
+ENTRYPOINT ["yarn", "start:production"]
 ```
+
+Build via:
+
+```
+docker build -t mypostgraphileproject .
+```
+
+This builds the Docker image from the `Dockerfile` in the current directory, and tags it as `mypostgraphileproject`.
+
+Run via:
+
+```
+docker run \
+  --rm \
+  -it \
+  -p 5678:5678 \
+  -e DATABASE_URL="postgres://username:password@host:port/db" \
+  mypostgraphileproject
+```
+
+- `--rm` removes the container automatically when it exits
+- `-it` runs the container interactively with TTY attached, useful for logs and Ctrl-C
+- `-p 5678:5678` publishes port 5678 from the container to port 5678 on the host
+- `-e DATABASE_URL=…` sets the database connection string at runtime
+- `mypostgraphileproject` is the image to run (named via `-t` in the
+  `docker build` command above
+
+See it working in [benjie/ouch](https://github.com/benjie.ouch).
+
+:::tip[Connecting to database on host machine]
+
+Use the docker argument `--add-host=host.docker.internal:host-gateway` and the
+connection string `postgres://username:password@host.docker.internal/mydb` to
+connect to the `mydb` db on the host machine. For this to work, you'll also need
+to ensure your `listen_address` is set correctly:
+
+```ini title='postgresql.conf'
+# ...
+listen_address = 'localhost,172.17.0.1'
+port = 5432
+# ...
+```
+
+And you may need to restart PostgreSQL after you've started the Docker daemon so
+that the port binds correctly.
+
+:::

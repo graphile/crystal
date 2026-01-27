@@ -1,5 +1,5 @@
 import "graphile-config";
-import "../../src/index.js";
+import "../../src/index.ts";
 
 import { createWithPgClient } from "@dataplan/pg/adaptors/pg";
 

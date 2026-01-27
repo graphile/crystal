@@ -1,14 +1,14 @@
-import { operationPlan } from "../../global.js";
+import { operationPlan } from "../../global.ts";
 import type {
   ExecutionDetailsStream,
   Maybe,
   StepStreamOptions,
-} from "../../interfaces";
-import type { Step } from "../../step";
-import { constant } from "../../steps/constant";
-import { lambda } from "../../steps/lambda.js";
-import { object } from "../../steps/object.js";
-import type { LayerPlan } from "../LayerPlan";
+} from "../../interfaces.ts";
+import type { Step } from "../../step.ts";
+import { constant } from "../../steps/constant.ts";
+import { lambda } from "../../steps/lambda.ts";
+import { object } from "../../steps/object.ts";
+import type { LayerPlan } from "../LayerPlan.ts";
 
 let globalData_layerPlan: LayerPlan | undefined = undefined;
 let globalData_polymorphicPaths: ReadonlySet<string> | null | undefined =

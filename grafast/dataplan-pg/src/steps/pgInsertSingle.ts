@@ -10,9 +10,9 @@ import { access, exportAs, inspect, isDev, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
-import { sqlValueWithCodec } from "../codecs.js";
-import type { PgResource } from "../datasource.js";
+import type { PgCodecAttribute } from "../codecs.ts";
+import { sqlValueWithCodec } from "../codecs.ts";
+import type { PgResource } from "../datasource.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -22,9 +22,9 @@ import type {
   PgQueryBuilder,
   PgTypedStep,
   ReadonlyArrayOrDirect,
-} from "../interfaces.js";
-import type { PgClassExpressionStep } from "./pgClassExpression.js";
-import { pgClassExpression } from "./pgClassExpression.js";
+} from "../interfaces.ts";
+import type { PgClassExpressionStep } from "./pgClassExpression.ts";
+import { pgClassExpression } from "./pgClassExpression.ts";
 
 interface PgInsertSinglePlanFinalizeResults {
   table: SQL;

@@ -1,8 +1,8 @@
-import { $$deepDepSkip } from "../constants.js";
-import type { ExecutionDetails } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
-import { Step } from "../step.js";
-import type { __ItemStep } from "./__item.js";
+import { $$deepDepSkip } from "../constants.ts";
+import type { ExecutionDetails } from "../interfaces.ts";
+import type { ListCapableStep } from "../step.ts";
+import { Step } from "../step.ts";
+import type { __ItemStep } from "./__item.ts";
 
 export class __CloneStreamStep extends Step {
   static $$export = {

@@ -1,12 +1,12 @@
 import type { GraphQLInputType } from "graphql";
 import * as graphql from "graphql";
 
-import * as assert from "../assert.js";
-import { assertInputStep, inputStep } from "../input.js";
-import type { AnyInputStep, NotVariableValueNode } from "../interfaces.js";
-import { Step } from "../step.js";
-import { constant } from "./constant.js";
-import { list } from "./list.js";
+import * as assert from "../assert.ts";
+import { assertInputStep, inputStep } from "../input.ts";
+import type { AnyInputStep, NotVariableValueNode } from "../interfaces.ts";
+import { Step } from "../step.ts";
+import { constant } from "./constant.ts";
+import { list } from "./list.ts";
 
 const { GraphQLList, Kind } = graphql;
 
@@ -24,12 +24,14 @@ export class __InputListStep<
   isSyncAndSafe = true;
 
   private itemCount = 0;
+  private readonly inputValues: NotVariableValueNode | undefined;
 
   constructor(
     inputType: TInputType,
-    private readonly inputValues: NotVariableValueNode | undefined,
+    inputValues: NotVariableValueNode | undefined,
   ) {
     super();
+    this.inputValues = inputValues;
     assert.ok(
       inputType instanceof GraphQLList,
       "Expected inputType to be a List",

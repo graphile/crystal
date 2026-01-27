@@ -1,4 +1,3 @@
-// import generate from "@babel/generator";
 import generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";

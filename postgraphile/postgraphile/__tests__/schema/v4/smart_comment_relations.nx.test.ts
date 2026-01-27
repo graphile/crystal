@@ -1,6 +1,6 @@
 import type { PoolClient } from "pg";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 // WARNING: this function is not guaranteed to be SQL injection safe.
 const offerViewComment = (comment: string) => (pgClient: PoolClient) =>

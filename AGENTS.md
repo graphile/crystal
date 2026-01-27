@@ -1,18 +1,8 @@
 <!-- prettier-ignore -->
 # AGENTS.md
 
-**Audience:** code assistants (Aider, Cody, Copilot Chat, etc.) working on this
-repository.
-
-## Goals
-
-- Improve documentation. Be concise, clear, and accurate. Reflect nuances via
-  admonitions where appropriate. Only make essential changes, avoid stylistic
-  changes.
-- Spot mistakes in the docs where they do not correctly reflect the code.
-- When refactoring, keep changes to a minimum. For larger edits do the changes
-  in stages; for example: reorder the code first, get that committed by the
-  user, then edit the functionality.
+**Audience:** code assistants (Aider, Claude, Codex, Cody, Copilot, etc.)
+working on this repository.
 
 ## Repository Overview
 
@@ -55,7 +45,7 @@ into 4 main categories based on the root folders, each of which have a
   - `pgl` - a shortcut to the `postgraphile` binary that also takes care of
     installing all the peerDependencies for you (for compatibility with `npx`
 
-## Hard Guardrails (must follow)
+## Guardrails
 
 1. **Never edit versioned docs:** files under `*/website/versioned_docs/**` are
    snapshots taken at release time. Edit the source (unversioned) doc instead.
@@ -65,37 +55,21 @@ into 4 main categories based on the root folders, each of which have a
    - Avoid stylistic rewrites without functional gain.
    - Avoid moving/renaming files/pages unless essential.
    - Avoid changing lockfiles or versions unless essential.
+1. **Edit in stages** when performing larger edits; for example: when
+   refactoring, reorder the code first (without changes), commit, then edit the
+   functionality. Many commits are preferred as it allows stepping through the
+   work completed in logical chunks.
 
-## Non-VM Guardrails
-
-If the user says “Unlock VM mode”, these guardrails do not apply because you are
-running in a dedicated VM with limited credentials access, and you are thus
-cleared to run whatever local commands or installations are required to achieve
-your goals. Still keep in mind that changes should be minimal to achieve your
-goals though!
-
-Otherwise, you must follow these rules:
-
-1. **Never install dependencies** unless the maintainer explicitly says “Unlock
-   VM mode”. In that mode you are in a dedicated disposable VM, and you may
-   install anything needed (package managers, OS packages, background services)
-   to complete the task—but keep installs focused on the work at hand.
-1. **Never edit `package.json`** files unless specifically instructed.
-1. **Avoid shell commands unless necessary.**
-   - The user already runs compilation and websites in watch mode.
-   - The user would rather commit, rebase, and change branches themself - do not
-     do this for them.
-   - The user would generally rather that you don't run your own commands, but
-     you may do so if it is necessary to apply your automated changes to
-     code/docs.
-1. Suggest CI/test commands **in prose**; do not execute them.
-
-## Always Allowed Actions
+## Always Allowed
 
 - Read files and make changes to markdown, TypeScript, and `*.test.*` files.
 - Write tests; update fixtures and test helpers.
-- Update docs (typically under the `<category>/website` folder).
+- Improve and update documentation (typically under the `<category>/website`
+  folder). Be concise, clear, and accurate. Reflect nuances via admonitions
+  where appropriate. Only make essential changes, avoid stylistic changes.
+- Spot mistakes in the docs where they do not correctly reflect the code.
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
+- Fix typos in prose.
 
 ## Preferred Style
 

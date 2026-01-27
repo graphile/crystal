@@ -1,7 +1,7 @@
 import { fetch } from "@whatwg-node/fetch";
 import { serverAudits } from "graphql-http";
 
-import { makeExampleServer } from "./exampleServer.js";
+import { makeExampleServer } from "./exampleServer.ts";
 
 let server: Awaited<ReturnType<typeof makeExampleServer>> | null = null;
 

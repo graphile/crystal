@@ -40,9 +40,9 @@ import {
 import { useServer } from "graphql-ws/use/ws";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
-import * as ws from "ws";
+import { WebSocketServer } from "ws";
 
-import { defaultPreset as graphileBuildPgPreset } from "../index.js";
+import { defaultPreset as graphileBuildPgPreset } from "../index.ts";
 
 const pool = new Pool({
   connectionString: "graphilecrystaltest",
@@ -288,7 +288,7 @@ pool.on("error", (e) => {
 
   app.listen(4000, () => {
     console.log(`GraphQL server is running...`);
-    const wsServer = new ws.Server({
+    const wsServer = new WebSocketServer({
       server: app.server,
       path: "/graphql",
     });

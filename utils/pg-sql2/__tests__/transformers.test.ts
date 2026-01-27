@@ -1,5 +1,5 @@
-import type { Transformer } from "../src/index.js";
-import sql from "../src/index.js";
+import type { Transformer } from "../src/index.ts";
+import sql from "../src/index.ts";
 
 const numberToValue: Transformer<number> = (sql, value) => {
   if (typeof value === "number") {

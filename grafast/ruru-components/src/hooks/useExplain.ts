@@ -1,7 +1,7 @@
 import { createContext, useCallback, useState } from "react";
 
-import type { ExplainResults } from "./useFetcher.js";
-import type { RuruStorage } from "./useStorage.js";
+import type { ExplainResults } from "./useFetcher.ts";
+import type { RuruStorage } from "./useStorage.ts";
 
 export interface ExplainHelpers {
   showExplain: boolean;

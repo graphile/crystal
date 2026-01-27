@@ -1,4 +1,4 @@
-import { parseSmartTagsOptsString } from "../src/utils.js";
+import { parseSmartTagsOptsString } from "../src/utils.ts";
 
 const EXPECTED_VALUE_1 = {
   args: ["TOPIC"],

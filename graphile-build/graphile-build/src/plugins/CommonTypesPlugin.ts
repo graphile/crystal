@@ -5,8 +5,8 @@ import type {
   GraphQLScalarValueParser,
 } from "grafast/graphql";
 
-import { EXPORTABLE } from "../utils.js";
-import { version } from "../version.js";
+import { EXPORTABLE } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -58,7 +58,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           "graphile-build built-in (BigInt type)",
         );
         build.registerCursorConnection?.({
-          typeName: "BigInt",
+          typeName: inflection.builtin("BigInt"),
           scope: {},
           nonNullNode: false,
         });
@@ -78,7 +78,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           "graphile-build built-in (BigFloat type)",
         );
         build.registerCursorConnection?.({
-          typeName: "BigFloat",
+          typeName: inflection.builtin("BigFloat"),
           scope: {},
           nonNullNode: false,
         });
@@ -98,7 +98,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           "graphile-build built-in (Datetime type)",
         );
         build.registerCursorConnection?.({
-          typeName: "Datetime",
+          typeName: inflection.builtin("Datetime"),
           scope: {},
           nonNullNode: false,
         });
@@ -118,7 +118,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           "graphile-build built-in (Datetype)",
         );
         build.registerCursorConnection?.({
-          typeName: "Date",
+          typeName: inflection.builtin("Date"),
           scope: {},
           nonNullNode: false,
         });
@@ -152,7 +152,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           "graphile-build built-in (UUID type)",
         );
         build.registerCursorConnection?.({
-          typeName: "UUID",
+          typeName: inflection.builtin("UUID"),
           scope: {},
           nonNullNode: false,
         });
@@ -246,7 +246,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           );
         }
         build.registerCursorConnection?.({
-          typeName: "JSON",
+          typeName: inflection.builtin("JSON"),
           scope: {},
           nonNullNode: false,
         });
@@ -263,7 +263,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
           "graphile-build built-in (XML type)",
         );
         build.registerCursorConnection?.({
-          typeName: "XML",
+          typeName: inflection.builtin("XML"),
           scope: {},
           nonNullNode: false,
         });

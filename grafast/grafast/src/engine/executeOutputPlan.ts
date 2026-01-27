@@ -1,11 +1,11 @@
 import debugFactory from "debug";
 import type { GraphQLError } from "graphql";
 
-import * as assert from "../assert.js";
-import type { Bucket, RequestTools } from "../bucket.js";
-import { isDev } from "../dev.js";
-import type { ErrorBehavior, JSONValue } from "../interfaces.js";
-import type { OutputPlan } from "./OutputPlan.js";
+import * as assert from "../assert.ts";
+import type { Bucket, RequestTools } from "../bucket.ts";
+import { isDev } from "../dev.ts";
+import type { ErrorBehavior, JSONValue } from "../interfaces.ts";
+import type { OutputPlan } from "./OutputPlan.ts";
 
 const debug = debugFactory("grafast:OutputPlan");
 const debugVerbose = debug.extend("verbose");

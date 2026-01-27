@@ -1,27 +1,27 @@
-import { $$subroutine, ALL_FLAGS } from "../constants.js";
-import { isDev } from "../dev.js";
-import type { OperationPlan } from "../index.js";
-import { inspect } from "../inspect.js";
+import { $$subroutine, ALL_FLAGS } from "../constants.ts";
+import { isDev } from "../dev.ts";
+import type { OperationPlan } from "../index.ts";
+import { inspect } from "../inspect.ts";
 import type {
   AddDependencyOptions,
   AddUnaryDependencyOptions,
-} from "../interfaces.js";
-import { Step } from "../step.js";
-import { __FlagStep } from "../steps/__flag.js";
+} from "../interfaces.ts";
+import { Step } from "../step.ts";
+import { __FlagStep } from "../steps/__flag.ts";
 import {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   sudo,
   writeableArray,
-} from "../utils.js";
+} from "../utils.ts";
 import type {
   LayerPlan,
   LayerPlanReasonCombined,
   LayerPlanReasonSubroutine,
   LayerPlanReasonsWithParentStep,
-} from "./LayerPlan.js";
-import { lock } from "./lock.js";
-import type { OutputPlan } from "./OutputPlan.js";
+} from "./LayerPlan.ts";
+import { lock } from "./lock.ts";
+import type { OutputPlan } from "./OutputPlan.ts";
 
 /**
  * This class keeps track of all of our steps, and the dependencies between
@@ -83,7 +83,11 @@ export class StepTracker {
 
   public nextStepIdToDeduplicate = 0;
 
-  constructor(private readonly operationPlan: OperationPlan) {}
+  private readonly operationPlan: OperationPlan;
+
+  constructor(operationPlan: OperationPlan) {
+    this.operationPlan = operationPlan;
+  }
 
   public newStepsSince(oldStepCount: number) {
     return (this.stepById as Step[]).slice(oldStepCount);

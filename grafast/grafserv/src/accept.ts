@@ -161,18 +161,19 @@ function isToken(charCode: number) {
   );
 }
 
-enum State {
-  EXPECT_TYPE = 0,
-  CONTINUE_TYPE = 1,
-  EXPECT_SUBTYPE = 2,
-  CONTINUE_SUBTYPE = 3,
-  EXPECT_COMMA_OR_SEMICOLON = 4,
-  EXPECT_PARAMETER_NAME = 5,
-  CONTINUE_PARAMETER_NAME = 6,
-  EXPECT_PARAMETER_VALUE = 7,
-  CONTINUE_PARAMETER_VALUE = 8,
-  CONTINUE_QUOTED_PARAMETER_VALUE = 9,
-}
+const State = {
+  EXPECT_TYPE: 0,
+  CONTINUE_TYPE: 1,
+  EXPECT_SUBTYPE: 2,
+  CONTINUE_SUBTYPE: 3,
+  EXPECT_COMMA_OR_SEMICOLON: 4,
+  EXPECT_PARAMETER_NAME: 5,
+  CONTINUE_PARAMETER_NAME: 6,
+  EXPECT_PARAMETER_VALUE: 7,
+  CONTINUE_PARAMETER_VALUE: 8,
+  CONTINUE_QUOTED_PARAMETER_VALUE: 9,
+} as const;
+type State = (typeof State)[keyof typeof State];
 
 // PERF: we could increase the speed of this significantly by checking the
 // type/subtype against the supported types/subtypes, and if a match is not
@@ -188,7 +189,7 @@ enum State {
  */
 function parseAccepts(acceptHeader: string) {
   const accepts: Accept[] = [];
-  let state = State.EXPECT_TYPE;
+  let state: State = State.EXPECT_TYPE;
   let currentAccept: Accept | null = null;
   let currentParameterName = "";
   let currentParameterValue = "";

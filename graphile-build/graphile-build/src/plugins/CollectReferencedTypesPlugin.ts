@@ -2,8 +2,8 @@ import "graphile-config";
 
 import type { GraphQLNamedType } from "graphql";
 
-import { collectReferencedTypes } from "../vendor/collectReferencedTypes.js";
-import { version } from "../version.js";
+import { collectReferencedTypes } from "../vendor/collectReferencedTypes.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

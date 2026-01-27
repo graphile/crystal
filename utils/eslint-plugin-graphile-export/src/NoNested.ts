@@ -1,8 +1,8 @@
 import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
-import { reportProblem } from "./common.js";
-import { isExportableCall } from "./utils.js";
+import { reportProblem } from "./common.ts";
+import { isExportableCall } from "./utils.ts";
 
 interface CommonOptions {
   disableAutofix: boolean;

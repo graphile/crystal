@@ -6,23 +6,23 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { inspect } from "./inspect.js";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { inspect } from "./inspect.ts";
 import type {
   AnyInputStep,
   FieldArg,
   FieldArgs,
   TrackedArguments,
-} from "./interfaces.js";
-import type { Step } from "./step.js";
-import { __InputObjectStep } from "./steps/__inputObject.js";
-import type { __ItemStep } from "./steps/__item.js";
-import { __TrackedValueStep } from "./steps/__trackedValue.js";
-import { applyInput } from "./steps/applyInput.js";
-import { bakedInput } from "./steps/bakedInput.js";
-import { ConstantStep } from "./steps/constant.js";
-import { object } from "./steps/object.js";
-import { assertNotPromise } from "./utils.js";
+} from "./interfaces.ts";
+import type { Step } from "./step.ts";
+import { __InputObjectStep } from "./steps/__inputObject.ts";
+import type { __ItemStep } from "./steps/__item.ts";
+import { __TrackedValueStep } from "./steps/__trackedValue.ts";
+import { applyInput } from "./steps/applyInput.ts";
+import { bakedInput } from "./steps/bakedInput.ts";
+import { ConstantStep } from "./steps/constant.ts";
+import { object } from "./steps/object.ts";
+import { assertNotPromise } from "./utils.ts";
 
 const { getNullableType, isInputObjectType, isListType } = graphql;
 

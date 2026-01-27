@@ -27,7 +27,7 @@ import type {
   ItemType,
   LocationData,
   NpcData,
-} from "./dcc-data.js";
+} from "./dcc-data.ts";
 import {
   batchGetClubById,
   batchGetConsumableById,
@@ -44,9 +44,9 @@ import {
   batchGetStairwellById,
   batchGetUtilityItemById,
   makeDb,
-} from "./dcc-data.js";
-import { typedMakeGrafastSchema } from "./dcc-types.js";
-import { delegate } from "./delegate.js";
+} from "./dcc-data.ts";
+import { typedMakeGrafastSchema } from "./dcc-types.ts";
+import { delegate } from "./delegate.ts";
 
 const resolvedPreset = resolvePreset({
   grafast: {

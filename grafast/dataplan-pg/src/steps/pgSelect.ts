@@ -39,14 +39,14 @@ import {
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
-import type { PgCodecAttributes } from "../codecs.js";
-import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.js";
+import type { PgCodecAttributes } from "../codecs.ts";
+import { listOfCodec, sqlValueWithCodec, TYPES } from "../codecs.ts";
 import type {
   PgResource,
   PgResourceParameter,
   PgResourceUnique,
-} from "../datasource.js";
-import type { PgExecutorContext, PgExecutorInput } from "../executor.js";
+} from "../datasource.ts";
+import type { PgExecutorContext, PgExecutorInput } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -60,25 +60,25 @@ import type {
   PgSQLCallbackOrDirect,
   PgTypedStep,
   ReadonlyArrayOrDirect,
-} from "../interfaces.js";
-import { parseArray } from "../parseArray.js";
-import { PgLocker } from "../pgLocker.js";
+} from "../interfaces.ts";
+import { parseArray } from "../parseArray.ts";
+import { PgLocker } from "../pgLocker.ts";
 import type {
   PlantimeEmbeddable,
   RuntimeEmbeddable,
   RuntimeSQLThunk,
-} from "../utils.js";
-import { runtimeScopedSQL } from "../utils.js";
-import { PgClassExpressionStep } from "./pgClassExpression.js";
+} from "../utils.ts";
+import { runtimeScopedSQL } from "../utils.ts";
+import { PgClassExpressionStep } from "./pgClassExpression.ts";
 import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
-} from "./pgCondition.js";
-import { PgCondition } from "./pgCondition.js";
-import type { PgCursorDetails } from "./pgCursor.js";
-import { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
-import { PgSelectSingleStep } from "./pgSelectSingle.js";
+} from "./pgCondition.ts";
+import { PgCondition } from "./pgCondition.ts";
+import type { PgCursorDetails } from "./pgCursor.ts";
+import { PgCursorStep } from "./pgCursor.ts";
+import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.ts";
+import { PgSelectSingleStep } from "./pgSelectSingle.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -86,15 +86,15 @@ import type {
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   ResolvedPgStmtCommonQueryInfo,
-} from "./pgStmt.js";
+} from "./pgStmt.ts";
 import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
   getUnary,
   makeValues,
   PgStmtBaseStep,
-} from "./pgStmt.js";
-import { validateParsedCursor } from "./pgValidateParsedCursor.js";
+} from "./pgStmt.ts";
+import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
 
 const ALWAYS_ALLOWED = true;
 
@@ -2418,14 +2418,18 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
   >;
   private parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
   public isSyncAndSafe = true;
+  private from: (...args: PgSelectArgumentDigest[]) => SQL;
+  private parameters: readonly PgResourceParameter[];
   constructor(
-    private from: (...args: PgSelectArgumentDigest[]) => SQL,
-    private parameters: readonly PgResourceParameter[],
+    from: (...args: PgSelectArgumentDigest[]) => SQL,
+    parameters: readonly PgResourceParameter[],
     digests: ReadonlyArray<
       PgSelectArgumentPlaceholder | PgSelectArgumentUnaryStep
     >,
   ) {
     super();
+    this.from = from;
+    this.parameters = parameters;
     if (this.getAndFreezeIsUnary() !== true) {
       throw new Error(`PgFromExpressionStep must be unary`);
     }
@@ -3494,9 +3498,11 @@ class PgSelectInlineApplyStep<
   private applyDepIds: number[];
 
   private skipJoin: boolean;
+  private identifier: string;
+  private viaSubquery: boolean;
   constructor(
-    private identifier: string,
-    private viaSubquery: boolean,
+    identifier: string,
+    viaSubquery: boolean,
     details: {
       staticInfo: StaticInfo<TResource>;
       $first: Step | null;
@@ -3510,6 +3516,8 @@ class PgSelectInlineApplyStep<
     },
   ) {
     super();
+    this.identifier = identifier;
+    this.viaSubquery = viaSubquery;
     const {
       staticInfo,
       $first,

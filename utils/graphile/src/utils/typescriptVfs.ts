@@ -38,7 +38,7 @@ export function configVfs(options: {
   const BASE_CONTENT = `\
 /// <reference types="node" />
 import "graphile-config";
-import {} from './${filenameInJs}';
+import {} from './${filenameInJs}.js';
 type Digest<T> = { [TKey in keyof T]: T[TKey] } & {};
 ${initialCode}`;
   fsMap.set(FAKE_FILENAME, BASE_CONTENT);

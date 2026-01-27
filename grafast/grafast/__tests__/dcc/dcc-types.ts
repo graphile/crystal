@@ -212,12 +212,11 @@ export type ItemEdge = {
   node?: Maybe<Item>;
 };
 
-export enum ItemType {
-  Consumable = 'Consumable',
-  Equipment = 'Equipment',
-  MiscItem = 'MiscItem',
-  UtilityItem = 'UtilityItem'
-}
+export type ItemType =
+  | 'Consumable'
+  | 'Equipment'
+  | 'MiscItem'
+  | 'UtilityItem';
 
 export type Location = {
   floors: Array<Floor>;
@@ -372,16 +371,15 @@ export type SecurityFriendsArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export enum Species {
-  Bopca = 'BOPCA',
-  Cat = 'CAT',
-  Changeling = 'CHANGELING',
-  Crocodilian = 'CROCODILIAN',
-  Gondii = 'GONDII',
-  HalfElf = 'HALF_ELF',
-  Human = 'HUMAN',
-  RockMonster = 'ROCK_MONSTER'
-}
+export type Species =
+  | 'BOPCA'
+  | 'CAT'
+  | 'CHANGELING'
+  | 'CROCODILIAN'
+  | 'GONDII'
+  | 'HALF_ELF'
+  | 'HUMAN'
+  | 'ROCK_MONSTER';
 
 export type Staff = Character & HasInventory & Npc & {
   __typename?: 'Staff';

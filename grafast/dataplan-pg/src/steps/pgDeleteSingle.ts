@@ -8,12 +8,12 @@ import { access, exportAs, inspect, isDev, SafeError, Step } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
+import type { PgCodecAttribute } from "../codecs.ts";
 import type {
   PgCodecWithAttributes,
   PgResource,
   PgResourceUnique,
-} from "../index.js";
+} from "../index.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -22,9 +22,9 @@ import type {
   PgQueryBuilder,
   PlanByUniques,
   ReadonlyArrayOrDirect,
-} from "../interfaces.js";
-import type { PgClassExpressionStep } from "./pgClassExpression.js";
-import { pgClassExpression } from "./pgClassExpression.js";
+} from "../interfaces.ts";
+import type { PgClassExpressionStep } from "./pgClassExpression.ts";
+import { pgClassExpression } from "./pgClassExpression.ts";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,

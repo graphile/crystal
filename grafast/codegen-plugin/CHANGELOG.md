@@ -1,5 +1,14 @@
 # graphql-codegen-grafast
 
+## 1.0.0-rc.3
+
+### Patch Changes
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
 ## 1.0.0-rc.2
 
 ### Patch Changes

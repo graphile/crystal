@@ -4,9 +4,9 @@ import type { ExecutableStep } from "grafast";
 import { lambda } from "grafast";
 import type { GraphQLInterfaceType } from "grafast/graphql";
 
-import { EXPORTABLE } from "../utils.js";
-import { version } from "../version.js";
-import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";
+import { EXPORTABLE } from "../utils.ts";
+import { version } from "../version.ts";
+import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.ts";
 
 declare global {
   namespace GraphileConfig {

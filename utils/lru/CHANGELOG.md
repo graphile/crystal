@@ -1,5 +1,19 @@
 # @graphile/lru
 
+## 5.0.0-rc.3
+
+### Patch Changes
+
+- [#2873](https://github.com/graphile/crystal/pull/2873)
+  [`0772086`](https://github.com/graphile/crystal/commit/0772086411a55d56b4e345cff1eef133eee31b36)
+  Thanks [@benjie](https://github.com/benjie)! - Update TypeScript configuration
+  to support Node 22 minimum
+
+- [#2888](https://github.com/graphile/crystal/pull/2888)
+  [`1a56db2`](https://github.com/graphile/crystal/commit/1a56db2f53bc455a3d3ba6555a2cd777b27b271c)
+  Thanks [@benjaie](https://github.com/benjaie)! - Node v22+ is required for
+  this module.
+
 ## 5.0.0-rc.2
 
 ### Patch Changes

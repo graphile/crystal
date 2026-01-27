@@ -19,12 +19,10 @@ export function delegate(
 class DelegateStep extends Step {
   // Don't export
   static $$export = null;
-  constructor(
-    $primary: Step,
-    private delegatedAttributes: string[],
-    $secondary: Step,
-  ) {
+  private delegatedAttributes: string[];
+  constructor($primary: Step, delegatedAttributes: string[], $secondary: Step) {
     super();
+    this.delegatedAttributes = delegatedAttributes;
     this.addStrongDependency($primary);
     this.addStrongDependency($secondary);
   }

@@ -9,8 +9,8 @@ import { createClient } from "graphql-ws";
 import { Hono } from "hono";
 import { WebSocket } from "ws";
 
-import type { GrafservConfig } from "../src/interfaces.js";
-import { grafserv } from "../src/servers/hono/v4/index.js";
+import type { GrafservConfig } from "../src/interfaces.ts";
+import { grafserv } from "../src/servers/hono/v4/index.ts";
 
 const PORT = 7777;
 

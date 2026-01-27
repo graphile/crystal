@@ -12,8 +12,8 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 import {
   createTestDatabase,
   dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { makeAddPgTableConditionPlugin } from "../src/index.js";
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import { makeAddPgTableConditionPlugin } from "../src/index.ts";
 
 const clean = (data: any): any => {
   if (Array.isArray(data)) {

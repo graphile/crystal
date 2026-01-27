@@ -1,16 +1,16 @@
 import chalk from "chalk";
 
-import type { Step } from "../step.js";
-import { isListCapableStep } from "../step.js";
-import type { __ItemStep } from "./__item.js";
-import type { ItemsStep, StepRepresentingList } from "./connection.js";
-import { each } from "./each.js";
+import type { Step } from "../step.ts";
+import { isListCapableStep } from "../step.ts";
+import type { __ItemStep } from "./__item.ts";
+import type { ItemsStep, StepRepresentingList } from "./connection.ts";
+import { each } from "./each.ts";
 import type {
   __ListTransformStep,
   ListTransformItemPlanCallback,
   ListTransformReduce,
-} from "./listTransform.js";
-import { listTransform } from "./listTransform.js";
+} from "./listTransform.ts";
+import { listTransform } from "./listTransform.ts";
 
 type Reduce = ListTransformReduce<unknown[][], number>;
 

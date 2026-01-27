@@ -13,12 +13,12 @@ import type {
   PgGroupSpec,
   PgQueryRootStep,
   PgTypedStep,
-} from "../interfaces.js";
-import type { PgLocker } from "../pgLocker.js";
-import { makeScopedSQL } from "../utils.js";
-import type { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectParsedCursorStep } from "./pgSelect.js";
-import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+} from "../interfaces.ts";
+import type { PgLocker } from "../pgLocker.ts";
+import { makeScopedSQL } from "../utils.ts";
+import type { PgCursorStep } from "./pgCursor.ts";
+import type { PgSelectParsedCursorStep } from "./pgSelect.ts";
+import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
 
 export interface QueryValue {
   dependencyIndex: number;

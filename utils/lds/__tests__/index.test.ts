@@ -1,5 +1,5 @@
-import subscribeToLogicalDecoding from "../src/index.js";
-import { DATABASE_URL, withClient } from "./helpers.js";
+import subscribeToLogicalDecoding from "../src/index.ts";
+import { DATABASE_URL, withClient } from "./helpers.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

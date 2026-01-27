@@ -20,7 +20,7 @@ import {
   assertNotIterable,
   resolveStreamDefer,
   streamToArray,
-} from "./incrementalUtils.js";
+} from "./incrementalUtils.ts";
 
 const resolvedPreset = resolvePreset({
   grafast: {

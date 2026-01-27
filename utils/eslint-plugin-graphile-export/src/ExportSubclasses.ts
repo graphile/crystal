@@ -3,8 +3,8 @@ import type { Rule } from "eslint";
 import type { Node as ESTreeNode, PropertyDefinition } from "estree";
 import { basename } from "path";
 
-import { reportProblem } from "./common.js";
-import { hasExportableParent } from "./NoNested.js";
+import { reportProblem } from "./common.ts";
+import { hasExportableParent } from "./NoNested.ts";
 
 interface CommonOptions {
   disableAutofix: boolean;

@@ -15,8 +15,8 @@ import {
   parseDatabaseIdentifier,
   parseDatabaseIdentifiers,
   parseSmartTagsOptsString,
-} from "../utils.js";
-import { version } from "../version.js";
+} from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

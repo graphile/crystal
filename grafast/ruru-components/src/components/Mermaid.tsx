@@ -1,7 +1,7 @@
 import type { GrafastPlanJSON } from "grafast";
 import type { FC } from "react";
 import { lazy, Suspense } from "react";
-const MermaidReal = lazy(() => import("./MermaidReal.js"));
+const MermaidReal = lazy(() => import("./MermaidReal.tsx"));
 
 export const Mermaid: FC<{ plan: GrafastPlanJSON }> = ({ plan }) => {
   return (

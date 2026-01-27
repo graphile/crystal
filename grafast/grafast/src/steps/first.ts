@@ -1,13 +1,13 @@
-import { $$deepDepSkip } from "../constants.js";
+import { $$deepDepSkip } from "../constants.ts";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import { Step } from "../step.js";
-import type { StepRepresentingList } from "./connection.js";
-import { itemsOrStep } from "./connection.js";
-import { ListStep } from "./list.js";
+} from "../interfaces.ts";
+import { Step } from "../step.ts";
+import type { StepRepresentingList } from "./connection.ts";
+import { itemsOrStep } from "./connection.ts";
+import { ListStep } from "./list.ts";
 
 function unbatchedExecute(_extra: UnbatchedExecutionExtra, list: any[]) {
   return list?.[0];

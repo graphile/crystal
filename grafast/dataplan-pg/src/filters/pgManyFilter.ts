@@ -1,9 +1,9 @@
 import { Modifier } from "grafast";
 import sql from "pg-sql2";
 
-import type { PgResource } from "../datasource.js";
-import { PgTempTable } from "../steps/pgTempTable.js";
-import { PgClassFilter } from "./pgClassFilter.js";
+import type { PgResource } from "../datasource.ts";
+import { PgTempTable } from "../steps/pgTempTable.ts";
+import { PgClassFilter } from "./pgClassFilter.ts";
 
 export class PgManyFilter<
   TChildResource extends PgResource<any, any, any, any, any>,
@@ -14,13 +14,19 @@ export class PgManyFilter<
   };
 
   public someTemp: PgTempTable<TChildResource> | null = null;
+  public childDataSource: TChildResource;
+  private myAttrs: string[];
+  private theirAttrs: string[];
   constructor(
     $parentFilterPlan: PgClassFilter,
-    public childDataSource: TChildResource,
-    private myAttrs: string[],
-    private theirAttrs: string[],
+    childDataSource: TChildResource,
+    myAttrs: string[],
+    theirAttrs: string[],
   ) {
     super($parentFilterPlan);
+    this.childDataSource = childDataSource;
+    this.myAttrs = myAttrs;
+    this.theirAttrs = theirAttrs;
     if (myAttrs.length !== theirAttrs.length) {
       throw new Error(
         "Expected the local and remote attributes to have the same number of entries.",

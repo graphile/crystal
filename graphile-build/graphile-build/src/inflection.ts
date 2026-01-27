@@ -1,6 +1,6 @@
 import pluralize from "pluralize";
 
-import { camelCase, constantCase, upperCamelCase } from "./utils.js";
+import { camelCase, constantCase, upperCamelCase } from "./utils.ts";
 
 /**
  * Builds the base inflection object that will be passed into the inflection

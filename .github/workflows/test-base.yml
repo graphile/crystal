@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres-version: [12, 17] #, 11, 13, 14, 15]
+        postgres-version: [12, 14, 18] #, 15, 16, 17]
         node-version: [22.x]
 
     services:
@@ -59,6 +59,7 @@ jobs:
           cache: "yarn"
       - name: Configure PostgreSQL
         run: |
+          if [ "${{ matrix.postgres-version }}" == "18" ]; then echo 'ln -s /var/lib/postgresql/18/docker /var/lib/postgresql/data' | docker exec -i postgres bash; fi
           cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
           cat .github/workflows/ci/docker-entrypoint-initdb.d/020-wal2json.sh | docker exec -i postgres bash
           cat .github/workflows/ci/docker-entrypoint-initdb.d/030-setup.sh | docker exec -i postgres bash

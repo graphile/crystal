@@ -18,9 +18,9 @@ import type {
 import type { Context, ID, SubscribePayload } from "graphql-ws";
 import type { RuruConfig, RuruHTMLParts } from "ruru/server";
 
-import type { GrafservBase } from ".";
-import type { makeParseAndValidateFunction } from "./middleware/graphql";
-import type { OptionsFromConfig } from "./options";
+import type { GrafservBase } from "./index.ts";
+import type { makeParseAndValidateFunction } from "./middleware/graphql.ts";
+import type { OptionsFromConfig } from "./options.ts";
 
 export type ContextCallback = (
   requestContext: Grafast.RequestContext,

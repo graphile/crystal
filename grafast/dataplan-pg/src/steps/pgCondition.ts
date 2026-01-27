@@ -2,9 +2,9 @@ import { Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
-import type { PgConditionLike, PgSQLCallbackOrDirect } from "../interfaces.js";
-import type { RuntimeEmbeddable } from "../utils.js";
-import { runtimeScopedSQL } from "../utils.js";
+import type { PgConditionLike, PgSQLCallbackOrDirect } from "../interfaces.ts";
+import type { RuntimeEmbeddable } from "../utils.ts";
+import { runtimeScopedSQL } from "../utils.ts";
 
 export type PgWhereConditionSpec<
   TAttribute extends string,
@@ -71,13 +71,15 @@ export class PgCondition<
 
   public extensions: DataplanPg.PgConditionExtensions = Object.create(null);
   public readonly resolvedMode: PgConditionResolvedMode;
+  private isHaving: boolean;
 
   constructor(
     parent: TParent,
-    private isHaving = false,
+    isHaving = false,
     mode: PgConditionMode = "PASS_THRU",
   ) {
     super(parent);
+    this.isHaving = isHaving;
     if (typeof mode === "string") {
       this.resolvedMode = { mode };
     } else {

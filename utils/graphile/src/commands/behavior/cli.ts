@@ -1,6 +1,6 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 
-import * as debugCmd from "./debug/cli.js";
+import * as debugCmd from "./debug/cli.ts";
 
 export function options(yargs: Argv) {
   return yargs

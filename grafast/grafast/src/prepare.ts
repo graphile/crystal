@@ -2,12 +2,12 @@ import * as graphql from "graphql";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
-} from "graphql/execution/execute";
-import { buildExecutionContext } from "graphql/execution/execute";
+} from "graphql/execution/execute.js";
+import { buildExecutionContext } from "graphql/execution/execute.js";
 import { isAsyncIterable } from "iterall";
 
-import * as assert from "./assert.js";
-import type { Bucket, RequestTools } from "./bucket.js";
+import * as assert from "./assert.ts";
+import type { Bucket, RequestTools } from "./bucket.ts";
 import {
   $$contextPlanCache,
   $$eventEmitter,
@@ -15,32 +15,30 @@ import {
   $$streamMore,
   FLAG_ERROR,
   NO_FLAGS,
-} from "./constants.js";
-import type { Deferred } from "./deferred.js";
-import { defer } from "./deferred.js";
-import { isDev } from "./dev.js";
+} from "./constants.ts";
+import { isDev } from "./dev.ts";
 import {
   batchExecutionValue,
   executeBucket,
   newBucket,
   unaryExecutionValue,
-} from "./engine/executeBucket.js";
+} from "./engine/executeBucket.ts";
 import type {
   OutputPlanContext,
   PayloadRoot,
   SubsequentPayloadSpec,
   SubsequentStreamSpec,
-} from "./engine/executeOutputPlan.js";
-import { executeOutputPlan } from "./engine/executeOutputPlan.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
-import type { OutputPlan } from "./engine/OutputPlan.js";
+} from "./engine/executeOutputPlan.ts";
+import { executeOutputPlan } from "./engine/executeOutputPlan.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.ts";
+import type { OutputPlan } from "./engine/OutputPlan.ts";
 import {
   coerceError,
   getChildBucketAndIndex,
   getDirectLayerPlanChild,
-} from "./engine/OutputPlan.js";
-import { establishOperationPlan } from "./establishOperationPlan.js";
+} from "./engine/OutputPlan.ts";
+import { establishOperationPlan } from "./establishOperationPlan.ts";
 import type {
   ErrorBehavior,
   EstablishOperationPlanEvent,
@@ -50,13 +48,14 @@ import type {
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   StreamMoreableArray,
-} from "./interfaces.js";
-import { timeSource } from "./timeSource.js";
+} from "./interfaces.ts";
+import { promiseWithResolve } from "./promiseWithResolve.ts";
+import { timeSource } from "./timeSource.ts";
 import {
   arrayOfLength,
   asyncIteratorWithCleanup,
   isPromiseLike,
-} from "./utils.js";
+} from "./utils.ts";
 
 const { GraphQLError } = graphql;
 
@@ -481,10 +480,11 @@ function executePreemptive(
       const stream = arr[$$streamMore];
       // Do the async iterable
       let stopped = false;
-      const abort = defer<undefined>();
+      const { promise: abortPromise, resolve: resolveAbort } =
+        promiseWithResolve<void>();
       const iterator = newIterator((e) => {
         stopped = true;
-        abort.resolve(undefined);
+        resolveAbort();
         if (e != null) {
           try {
             const result = stream.throw?.(e);
@@ -509,7 +509,7 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await Promise.race([abort, stream.next()]);
+          const next = await Promise.race([abortPromise, stream.next()]);
           if (stopped || !next) {
             break;
           }
@@ -522,7 +522,7 @@ function executePreemptive(
             break;
           }
           const payload = await Promise.race([
-            abort,
+            abortPromise,
             executeStreamPayload(value, i),
           ]);
           if (payload === undefined) {
@@ -825,7 +825,8 @@ async function processStream(
   outputDataAsString: boolean,
 ): Promise<void> {
   /** Resolve this when finished */
-  const whenDone = defer();
+  const whenDone = Promise.withResolvers<void>();
+  whenDone.promise.catch(noop); // Guard against unhandledPromiseRejection
 
   type ResultTuple = [any, number];
 
@@ -1001,7 +1002,7 @@ async function processStream(
     }
     // TODO: cleanup
   }
-  return whenDone;
+  return whenDone.promise;
 }
 
 function processSingleDeferred(
@@ -1112,7 +1113,7 @@ function processBatches(
     RequestTools,
     Map<OutputPlan, Array<[ResultIterator, SubsequentPayloadSpec]>>
   >,
-  whenDone: Deferred<void>,
+  whenDone: PromiseWithResolvers<void>,
   asString: boolean,
 ) {
   try {
@@ -1168,8 +1169,8 @@ type DBBRC = Map<
 >;
 let deferredBatchesByRequestToolsAsString: DBBRC = new Map();
 let deferredBatchesByRequestToolsNotAsString: DBBRC = new Map();
-let nextBatchAsString: Deferred<void> | null = null;
-let nextBatchNotAsString: Deferred<void> | null = null;
+let nextBatchAsString: PromiseWithResolvers<void> | null = null;
+let nextBatchNotAsString: PromiseWithResolvers<void> | null = null;
 
 function processDeferred(
   requestContext: RequestTools,
@@ -1193,16 +1194,18 @@ function processDeferred(
   }
   if (outputDataAsString) {
     if (!nextBatchAsString) {
-      nextBatchAsString = defer();
+      nextBatchAsString = Promise.withResolvers();
+      nextBatchAsString.promise.catch(noop); // Guard against unhandledPromiseRejection
       setTimeout(processBatchAsString, 1);
     }
-    return nextBatchAsString;
+    return nextBatchAsString.promise;
   } else {
     if (!nextBatchNotAsString) {
-      nextBatchNotAsString = defer();
+      nextBatchNotAsString = Promise.withResolvers();
+      nextBatchNotAsString.promise.catch(noop); // Guard against unhandledPromiseRejection
       setTimeout(processBatchNotAsString, 1);
     }
-    return nextBatchNotAsString;
+    return nextBatchNotAsString.promise;
   }
 }
 

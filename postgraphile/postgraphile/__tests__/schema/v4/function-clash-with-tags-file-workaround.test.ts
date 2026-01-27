@@ -2,7 +2,7 @@ import { stripAnsi } from "grafast";
 import type { PgClass } from "graphile-build-pg/pg-introspection";
 import { makePgSmartTagsPlugin } from "graphile-utils";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 let consoleWarnSpy: ReturnType<typeof jest.spyOn>;
 beforeAll(() => {

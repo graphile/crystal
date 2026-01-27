@@ -31,7 +31,7 @@ import {
   makePgAdaptorWithPgClient,
   PgSubscriber,
 } from "../dist/adaptors/pg.js";
-import { makeExampleSchema } from "../dist/examples/exampleSchema.js";
+import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 
 const schema = makeExampleSchema();
 

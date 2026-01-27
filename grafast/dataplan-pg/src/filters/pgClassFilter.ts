@@ -2,13 +2,13 @@ import { Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL } from "pg-sql2";
 
-import type { PgConditionLike } from "../index.js";
+import type { PgConditionLike } from "../index.ts";
 import type {
   PgCondition,
   PgConditionCapableParent,
-} from "../steps/pgCondition.js";
-import type { RuntimeSQLThunk } from "../utils.js";
-import { runtimeScopedSQL } from "../utils.js";
+} from "../steps/pgCondition.ts";
+import type { RuntimeSQLThunk } from "../utils.ts";
+import { runtimeScopedSQL } from "../utils.ts";
 
 export class PgClassFilter<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
@@ -23,12 +23,11 @@ export class PgClassFilter<
 
   private conditions: SQL[] = [];
   private havingConditions: SQL[] = [];
+  public readonly alias: SQL;
 
-  constructor(
-    parent: PgCondition<TParent>,
-    public readonly alias: SQL,
-  ) {
+  constructor(parent: PgCondition<TParent>, alias: SQL) {
     super(parent);
+    this.alias = alias;
   }
 
   where(condition: RuntimeSQLThunk) {

@@ -55,6 +55,14 @@ Use subscriptions when:
 
 [Find out more about subscriptions in PostGraphile](./subscriptions).
 
+:::note[Live queries are not yet available in V5]
+
+Live queries are planned for a future PostGraphile V5 release, but are not yet
+implemented. If this feature matters to you, please sponsor it or reach out to
+collaborate.
+
+:::
+
 <!--
 
 ### Live queries [EXPERIMENTAL]
