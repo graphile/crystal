@@ -124,12 +124,7 @@ const config = {
     "sort-imports": "off",
     "import/order": "off",
 
-    "import/extensions": [
-      "error",
-      "ignorePackages",
-      // TODO: fix this properly, rather than turning off 'ts'/'tsx'
-      { ts: "never", tsx: "never" },
-    ],
+    "import/extensions": ["error", "ignorePackages"],
     "import/no-deprecated": "warn",
 
     // Apply has been more optimised than spread, use whatever feels right.
@@ -216,8 +211,6 @@ const oldConfig = {
       rules: {
         "no-dupe-class-members": "off",
         "no-undef": "off",
-        // This rule doesn't understand import of './js'
-        "import/no-unresolved": "off",
       },
     },
 
