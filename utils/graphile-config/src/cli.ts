@@ -2,7 +2,7 @@ import type { Argv } from "yargs";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-export { Argv };
+export type { Argv };
 
 export type OptionsFunction<TArgs> = (yargs: Argv) => Argv<TArgs>;
 

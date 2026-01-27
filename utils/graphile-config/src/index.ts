@@ -2,16 +2,11 @@ import "./interfaces.js";
 
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
-export { GraphileConfig };
+export type { GraphileConfig };
 
 export { orderedApply } from "./functionality.js";
-export {
-  applyHooks,
-  AsyncHooks,
-  HookObject,
-  PluginHook,
-  PluginHookObject,
-} from "./hooks.js";
+export type { HookObject, PluginHook, PluginHookObject } from "./hooks.js";
+export { applyHooks, AsyncHooks } from "./hooks.js";
 export type {
   CallbackDescriptor,
   CallbackOrDescriptor,

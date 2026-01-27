@@ -84,9 +84,10 @@ import { GraphileBuildLibPreset } from "./preset.js";
 import { EXPORTABLE } from "./utils.js";
 
 // export globals for TypeDoc
-export { GraphileBuild, GraphileConfig };
+export type { GraphileBuild, GraphileConfig };
 
-export { NewWithHooksFunction, SchemaBuilder };
+export type { NewWithHooksFunction };
+export { SchemaBuilder };
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
@@ -575,7 +576,7 @@ export {
   SwallowErrorsPlugin,
   TrimEmptyDescriptionsPlugin,
 };
-export { GatherPluginContext } from "./interfaces.js";
+export type { GatherPluginContext } from "./interfaces.js";
 export { defaultPreset } from "./preset.js";
 
 export interface SchemaResult {
