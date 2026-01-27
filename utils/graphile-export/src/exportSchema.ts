@@ -55,7 +55,9 @@ import { reservedWords } from "./reservedWords.ts";
 import { isImportable, isNotNullish } from "./utils.ts";
 import { wellKnown } from "./wellKnown.ts";
 
-const traverse = traverseModule as unknown as typeof import("@babel/traverse")["default"];
+const traverse =
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  traverseModule as unknown as (typeof import("@babel/traverse"))["default"];
 
 // Cannot import sql because it's optional
 //     import { sql } from "pg-sql2";

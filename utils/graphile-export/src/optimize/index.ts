@@ -21,7 +21,9 @@ patch(NodePath.prototype);
 
 Error.stackTraceLimit = 100;
 
-const traverse = traverseModule as unknown as typeof import("@babel/traverse")["default"];
+const traverse =
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  traverseModule as unknown as (typeof import("@babel/traverse"))["default"];
 
 function isSimpleArg(
   arg: t.Node,
