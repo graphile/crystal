@@ -7,31 +7,37 @@ export {
   addPgTableCondition,
   makeAddPgTableConditionPlugin,
 } from "./makeAddPgTableConditionPlugin.js";
-export {
-  addPgTableOrderBy,
-  makeAddPgTableOrderByPlugin,
+export type {
   MakeAddPgTableOrderByPluginOrders,
   NullsSortMethod,
-  orderByAscDesc,
   OrderByAscDescOptions,
 } from "./makeAddPgTableOrderByPlugin.js";
 export {
-  changeNullability,
+  addPgTableOrderBy,
+  makeAddPgTableOrderByPlugin,
+  orderByAscDesc,
+} from "./makeAddPgTableOrderByPlugin.js";
+export type {
   ChangeNullabilityRules,
   ChangeNullabilityTypeRules,
-  makeChangeNullabilityPlugin,
   NullabilitySpec,
   NullabilitySpecString,
 } from "./makeChangeNullabilityPlugin.js";
 export {
+  changeNullability,
+  makeChangeNullabilityPlugin,
+} from "./makeChangeNullabilityPlugin.js";
+export type {
   EnumResolver,
-  extendSchema,
   ExtensionDefinition,
-  makeExtendSchemaPlugin,
   ObjectPlan,
   ObjectResolver,
   Plans,
   Resolvers,
+} from "./makeExtendSchemaPlugin.js";
+export {
+  extendSchema,
+  makeExtendSchemaPlugin,
 } from "./makeExtendSchemaPlugin.js";
 export {
   jsonPgSmartTags,
@@ -46,16 +52,15 @@ export {
   makeProcessSchemaPlugin,
   processSchema,
 } from "./makeProcessSchemaPlugin.js";
-export {
-  makeWrapPlansPlugin,
+export type {
   PlanWrapperFilter,
   PlanWrapperFilterRule,
   PlanWrapperFn,
   PlanWrapperRule,
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
-  wrapPlans,
 } from "./makeWrapPlansPlugin.js";
+export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.js";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {

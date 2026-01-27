@@ -37,7 +37,7 @@ import type {
 export { default as reservedWords } from "./reservedWords.js";
 export { parseSmartComment } from "./smartComments.js";
 
-export {
+export type {
   Introspection,
   PgAttribute,
   PgAuthMembers,
@@ -60,13 +60,8 @@ export {
   PgType,
 };
 
-export {
-  aclContainsRole,
-  AclObject,
-  entityPermissions,
-  expandRoles,
-  resolvePermissions,
-};
+export type { AclObject };
+export { aclContainsRole, entityPermissions, expandRoles, resolvePermissions };
 
 export function parseIntrospectionResults(
   introspectionResults: string,
@@ -75,7 +70,7 @@ export function parseIntrospectionResults(
   return augmentIntrospection(introspectionResults, includeExtensionResources);
 }
 
-export { PgSmartTagsAndDescription, PgSmartTagsDict };
+export type { PgSmartTagsAndDescription, PgSmartTagsDict };
 
 declare module "./introspection.js" {
   interface Introspection {

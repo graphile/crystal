@@ -6,7 +6,11 @@ import type {
   RuruHTMLParts,
 } from "./interfaces.js";
 import { version } from "./version.js";
-export { RuruClientConfig, RuruConfig, RuruHTMLParts } from "./interfaces.js";
+export type {
+  RuruClientConfig,
+  RuruConfig,
+  RuruHTMLParts,
+} from "./interfaces.js";
 
 const DEFAULT_STATIC_PATH = `https://unpkg.com/ruru@${version}/static/`;
 

@@ -1,7 +1,7 @@
 import type { Fetcher } from "@graphiql/toolkit";
 import type { GraphiQLProps } from "graphiql";
 
-export { Fetcher };
+export type { Fetcher };
 
 /**
  * The `EventSource` specification only specifies the `withCredentials` option,

@@ -598,7 +598,7 @@ function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
   return out.join("\n");
 }
 
-export * from "./planJSONInterfaces.js";
+export type * from "./planJSONInterfaces.js";
 
 function trim(string: string, length = 15): string {
   if (string.length > length) {
