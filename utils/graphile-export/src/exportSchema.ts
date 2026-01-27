@@ -2,12 +2,12 @@ import { writeFile } from "node:fs/promises";
 import type { URL } from "node:url";
 import { inspect } from "node:util";
 
-import { generate } from "@babel/generator";
+import generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import type { NodePath } from "@babel/traverse";
-import traverseModule from "@babel/traverse";
+import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import type {
   GraphQLArgumentConfig,
@@ -54,10 +54,6 @@ import { optimize } from "./optimize/index.ts";
 import { reservedWords } from "./reservedWords.ts";
 import { isImportable, isNotNullish } from "./utils.ts";
 import { wellKnown } from "./wellKnown.ts";
-
-const traverse =
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  traverseModule as unknown as (typeof import("@babel/traverse"))["default"];
 
 // Cannot import sql because it's optional
 //     import { sql } from "pg-sql2";
@@ -1423,7 +1419,7 @@ function parseExpressionViaDoc(funcString: string) {
   });
   let result: null | NodePath<t.Expression> = null as any;
   traverse(doc, {
-    VariableDeclaration(path: NodePath<t.VariableDeclaration>) {
+    VariableDeclaration(path) {
       result = path.get("declarations.0.init") as NodePath<t.Expression>;
       path.stop();
     },
