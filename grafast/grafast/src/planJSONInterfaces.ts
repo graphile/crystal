@@ -1,4 +1,4 @@
-import type { ExecutionEntryFlags } from "./interfaces";
+import type { ExecutionEntryFlags } from "./interfaces.ts";
 
 export interface GrafastPlanJSON {
   version: "v1" | "v2";

@@ -1,4 +1,4 @@
-import "./PgTablesPlugin.js";
+import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type {
@@ -10,7 +10,7 @@ import type {
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

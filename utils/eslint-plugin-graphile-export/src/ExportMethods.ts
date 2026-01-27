@@ -2,8 +2,8 @@ import type { Expression, Identifier, Method, Property } from "@babel/types";
 import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
-import { reportProblem } from "./common.js";
-import { hasExportableParent } from "./NoNested.js";
+import { reportProblem } from "./common.ts";
+import { hasExportableParent } from "./NoNested.ts";
 
 const dev = process.env.GRAPHILE_ENV === "development";
 

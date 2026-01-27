@@ -1,9 +1,9 @@
-import type { Thunk } from "./interfaces.js";
-import { Step } from "./step.js";
-import { constant } from "./steps/constant.js";
-import { list } from "./steps/list.js";
-import { object } from "./steps/object.js";
-import { isTuple } from "./utils.js";
+import type { Thunk } from "./interfaces.ts";
+import { Step } from "./step.ts";
+import { constant } from "./steps/constant.ts";
+import { list } from "./steps/list.ts";
+import { object } from "./steps/object.ts";
+import { isTuple } from "./utils.ts";
 
 /**
  * When using this, always use `const`! Otherwise tuples will show up as arrays

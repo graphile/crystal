@@ -3,7 +3,7 @@ import "graphile-config";
 import { gatherConfig } from "graphile-build";
 import type { PgClass, PgProc } from "graphile-build-pg/pg-introspection";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

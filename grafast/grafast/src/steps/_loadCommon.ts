@@ -1,19 +1,19 @@
-import { noop } from "../dev.js";
+import { noop } from "../dev.ts";
 import type {
   ExecutionDetails,
   Maybe,
   PromiseOrDirect,
-} from "../interfaces.js";
-import type { Multistep, UnwrapMultistep } from "../multistep";
-import type { Step } from "../step.js";
-import { isListLikeStep, isObjectLikeStep } from "../step.js";
+} from "../interfaces.ts";
+import type { Multistep, UnwrapMultistep } from "../multistep.ts";
+import type { Step } from "../step.ts";
+import { isListLikeStep, isObjectLikeStep } from "../step.ts";
 import {
   arraysMatch,
   isTuple,
   recordsMatch,
   stableStringSortFirstTupleEntry,
-} from "../utils.js";
-import { access } from "./access.js";
+} from "../utils.ts";
+import { access } from "./access.ts";
 
 export const nextTick: (cb: () => void) => void =
   typeof process !== "undefined" && typeof process.nextTick === "function"

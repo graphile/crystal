@@ -1,6 +1,6 @@
 import { isObjectType } from "grafast/graphql";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "referencing other view (specifying attributes, no PK)",

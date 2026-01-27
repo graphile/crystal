@@ -2,12 +2,12 @@ import * as graphql from "graphql";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
-} from "graphql/execution/execute";
-import { buildExecutionContext } from "graphql/execution/execute";
+} from "graphql/execution/execute.js";
+import { buildExecutionContext } from "graphql/execution/execute.js";
 import { isAsyncIterable } from "iterall";
 
-import * as assert from "./assert.js";
-import type { Bucket, RequestTools } from "./bucket.js";
+import * as assert from "./assert.ts";
+import type { Bucket, RequestTools } from "./bucket.ts";
 import {
   $$contextPlanCache,
   $$eventEmitter,
@@ -15,30 +15,30 @@ import {
   $$streamMore,
   FLAG_ERROR,
   NO_FLAGS,
-} from "./constants.js";
-import { isDev } from "./dev.js";
+} from "./constants.ts";
+import { isDev } from "./dev.ts";
 import {
   batchExecutionValue,
   executeBucket,
   newBucket,
   unaryExecutionValue,
-} from "./engine/executeBucket.js";
+} from "./engine/executeBucket.ts";
 import type {
   OutputPlanContext,
   PayloadRoot,
   SubsequentPayloadSpec,
   SubsequentStreamSpec,
-} from "./engine/executeOutputPlan.js";
-import { executeOutputPlan } from "./engine/executeOutputPlan.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
-import type { OutputPlan } from "./engine/OutputPlan.js";
+} from "./engine/executeOutputPlan.ts";
+import { executeOutputPlan } from "./engine/executeOutputPlan.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.ts";
+import type { OutputPlan } from "./engine/OutputPlan.ts";
 import {
   coerceError,
   getChildBucketAndIndex,
   getDirectLayerPlanChild,
-} from "./engine/OutputPlan.js";
-import { establishOperationPlan } from "./establishOperationPlan.js";
+} from "./engine/OutputPlan.ts";
+import { establishOperationPlan } from "./establishOperationPlan.ts";
 import type {
   ErrorBehavior,
   EstablishOperationPlanEvent,
@@ -48,14 +48,14 @@ import type {
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   StreamMoreableArray,
-} from "./interfaces.js";
-import { promiseWithResolve } from "./promiseWithResolve.js";
-import { timeSource } from "./timeSource.js";
+} from "./interfaces.ts";
+import { promiseWithResolve } from "./promiseWithResolve.ts";
+import { timeSource } from "./timeSource.ts";
 import {
   arrayOfLength,
   asyncIteratorWithCleanup,
   isPromiseLike,
-} from "./utils.js";
+} from "./utils.ts";
 
 const { GraphQLError } = graphql;
 

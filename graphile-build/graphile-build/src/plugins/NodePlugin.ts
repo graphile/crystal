@@ -4,7 +4,7 @@ import type { NodeIdCodec, NodeIdHandler } from "grafast";
 import { inspect, isDev, makeDecodeNodeId } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
-import { EXPORTABLE, exportNameHint } from "../utils.js";
+import { EXPORTABLE, exportNameHint } from "../utils.ts";
 
 declare global {
   namespace GraphileConfig {

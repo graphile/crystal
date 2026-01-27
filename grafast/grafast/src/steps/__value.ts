@@ -1,7 +1,7 @@
-import type { GrafastResultsList, JSONValue } from "../interfaces.js";
-import { $$noExec, Step } from "../step.js";
-import type { AccessStep } from "./access.js";
-import { access } from "./access.js";
+import type { GrafastResultsList, JSONValue } from "../interfaces.ts";
+import { $$noExec, Step } from "../step.ts";
+import type { AccessStep } from "./access.ts";
+import { access } from "./access.ts";
 
 /**
  * Implements `__ValueStep(operationPlan)` which is never executed; it's purely

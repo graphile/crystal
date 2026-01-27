@@ -7,13 +7,13 @@ import { makeSchema } from "graphile-build";
 import { exportSchemaAsString } from "graphile-export";
 import type { PoolClient } from "pg";
 
-import AmberPreset from "../../../src/presets/amber.js";
+import AmberPreset from "../../../src/presets/amber.ts";
 import {
   snapshot,
   StripOidsPlugin,
   SwallowAllErrorsPlugin,
   withPoolClientTransaction,
-} from "../../helpers.js";
+} from "../../helpers.ts";
 
 jest.setTimeout(60000);
 

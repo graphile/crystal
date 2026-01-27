@@ -1,4 +1,4 @@
-import type EventEmitter from "eventemitter3";
+import type { EventEmitter } from "eventemitter3";
 import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
@@ -27,22 +27,22 @@ import type {
 } from "graphql";
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
-import type { Bucket, RequestTools } from "./bucket.js";
+import type { Bucket, RequestTools } from "./bucket.ts";
 import type {
   $$streamMore,
   $$timeout,
   $$ts,
   ExecutionEntryFlags,
-} from "./constants.js";
-import type { Constraint } from "./constraints.js";
-import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { FlaggedValue, SafeError } from "./error.js";
-import type { GrafastOperationOptions } from "./prepare.js";
-import type { Step } from "./step.js";
-import type { __InputDefaultStep } from "./steps/__inputDefault.js";
-import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import type { ApplyableStep } from "./steps/applyInput.js";
+} from "./constants.ts";
+import type { Constraint } from "./constraints.ts";
+import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import type { FlaggedValue, SafeError } from "./error.ts";
+import type { GrafastOperationOptions } from "./prepare.ts";
+import type { Step } from "./step.ts";
+import type { __InputDefaultStep } from "./steps/__inputDefault.ts";
+import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
+import type { ApplyableStep } from "./steps/applyInput.ts";
 import type {
   __InputListStep,
   __InputObjectStep,
@@ -52,7 +52,7 @@ import type {
   __TrackedValueStepWithDollars,
   ConstantStep,
   ObjectStep,
-} from "./steps/index.js";
+} from "./steps/index.ts";
 
 export type { ExecutionEntryFlags };
 
@@ -783,7 +783,7 @@ export interface GrafastArgs extends GraphQLArgs {
 }
 export type Maybe<T> = T | null | undefined;
 
-export type * from "./planJSONInterfaces.js";
+export type * from "./planJSONInterfaces.ts";
 
 export interface BaseDependencyOptions<TStep extends Step = Step> {
   step: TStep;

@@ -6,20 +6,20 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import * as graphql from "graphql";
-import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
+import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue.js";
 
-import { $$queryCache } from "./constants.js";
-import { SafeError } from "./error.js";
-import { execute } from "./execute.js";
-import { hookArgs } from "./index.js";
+import { $$queryCache } from "./constants.ts";
+import { SafeError } from "./error.ts";
+import { execute } from "./execute.ts";
+import { hookArgs } from "./index.ts";
 import type {
   GrafastArgs,
   GrafastExecutionArgs,
   ParseAndValidateEvent,
   ValidateSchemaEvent,
-} from "./interfaces.js";
-import { getGrafastMiddleware } from "./middleware.js";
-import { isPromiseLike } from "./utils.js";
+} from "./interfaces.ts";
+import { getGrafastMiddleware } from "./middleware.ts";
+import { isPromiseLike } from "./utils.ts";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
 

@@ -1,6 +1,6 @@
 import type { AsyncHooks } from "graphile-config";
 
-import type { EXPORTABLE } from "./utils.js";
+import type { EXPORTABLE } from "./utils.ts";
 
 /**
  * The base details in the 'info' object passed as the first argument to all gather

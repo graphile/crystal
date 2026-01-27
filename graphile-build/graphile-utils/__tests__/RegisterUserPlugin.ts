@@ -12,7 +12,7 @@ import {
 import type { GraphQLObjectType } from "graphql";
 import { DatabaseError } from "pg";
 
-import { extendSchema, gql } from "../src/index.js";
+import { extendSchema, gql } from "../src/index.ts";
 
 // Changes to this file should be reflected in `postgraphile/website/postgraphile/extend-schema.md`
 

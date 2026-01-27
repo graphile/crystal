@@ -3,8 +3,8 @@ import { MagnifyingGlassIcon } from "@graphiql/react";
 import type { FC } from "react";
 import { useContext } from "react";
 
-import { Explain } from "../components/Explain.js";
-import { ExplainContext } from "../hooks/useExplain.js";
+import { Explain } from "../components/Explain.tsx";
+import { ExplainContext } from "../hooks/useExplain.ts";
 
 const ExplainPanel: FC = () => {
   const { explainHelpers, explain, explainResults, setExplain } =

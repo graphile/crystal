@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { isDev } from "grafast";
 
-import { indent } from "./extend.js";
+import { indent } from "./extend.ts";
 export const $$arrayHints = Symbol("hints");
 export type WithArrayHints<T> = T & { [$$arrayHints]?: string[] };
 

@@ -6,15 +6,15 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
-import { context, flagError } from "../index.js";
+import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.ts";
+import { context, flagError } from "../index.ts";
 import type {
   PlanTypeInfo,
   TrackedArguments,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import { Step, UnbatchedStep } from "../step.js";
-import { isPromiseLike } from "../utils.js";
+} from "../interfaces.ts";
+import { Step, UnbatchedStep } from "../step.ts";
+import { isPromiseLike } from "../utils.ts";
 
 const { defaultTypeResolver } = graphql;
 
@@ -39,20 +39,32 @@ export class GraphQLResolverStep extends UnbatchedStep {
 
   /** root fields can have null parent */
   private isNotRoot: boolean;
+  private resolver:
+    | (GraphQLFieldResolver<any, any> & { displayName?: string })
+    | null
+    | undefined;
+  private subscriber:
+    | (GraphQLFieldResolver<any, any> & { displayName?: string })
+    | null
+    | undefined;
+  private resolveInfoBase: ResolveInfoBase;
   constructor(
-    private resolver:
+    resolver:
       | (GraphQLFieldResolver<any, any> & { displayName?: string })
       | null
       | undefined,
-    private subscriber:
+    subscriber:
       | (GraphQLFieldResolver<any, any> & { displayName?: string })
       | null
       | undefined,
     $plan: Step,
     $args: ObjectStep<TrackedArguments>,
-    private resolveInfoBase: ResolveInfoBase,
+    resolveInfoBase: ResolveInfoBase,
   ) {
     super();
+    this.resolver = resolver;
+    this.subscriber = subscriber;
+    this.resolveInfoBase = resolveInfoBase;
     this.addDependency($plan);
     this.addDependency($args);
     this.addDependency(context());

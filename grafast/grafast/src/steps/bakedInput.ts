@@ -6,11 +6,11 @@ import type {
 } from "graphql";
 import { getNullableType, isInputObjectType, isListType } from "graphql";
 
-import { operationPlan } from "../global.js";
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { inputArgsApply } from "./applyInput.js";
+import { operationPlan } from "../global.ts";
+import type { UnbatchedExecutionExtra } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { inputArgsApply } from "./applyInput.ts";
 
 export class BakedInputStep<TData = any> extends UnbatchedStep<TData> {
   static $$export = {
@@ -20,11 +20,13 @@ export class BakedInputStep<TData = any> extends UnbatchedStep<TData> {
   public isSyncAndSafe = true;
 
   valueDepId: 0;
+  private inputType: GraphQLInputObjectType | GraphQLList<any>;
   constructor(
-    private inputType: GraphQLInputObjectType | GraphQLList<any>,
+    inputType: GraphQLInputObjectType | GraphQLList<any>,
     $value: Step,
   ) {
     super();
+    this.inputType = inputType;
     this.valueDepId = this.addUnaryDependency($value) as 0;
     if (!this._isUnary) {
       throw new Error(`bakedInput() must be unary`);

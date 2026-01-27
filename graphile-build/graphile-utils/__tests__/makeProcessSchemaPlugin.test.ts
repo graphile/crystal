@@ -15,7 +15,7 @@ import {
   SubscriptionPlugin,
 } from "graphile-build";
 
-import { makeProcessSchemaPlugin } from "../src/index.js";
+import { makeProcessSchemaPlugin } from "../src/index.ts";
 
 declare global {
   namespace GraphileBuild {

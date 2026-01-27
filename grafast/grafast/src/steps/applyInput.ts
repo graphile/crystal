@@ -8,11 +8,11 @@ import {
   isScalarType,
 } from "graphql";
 
-import { operationPlan } from "../global.js";
-import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { constant, ConstantStep } from "./constant.js";
+import { operationPlan } from "../global.ts";
+import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { constant, ConstantStep } from "./constant.ts";
 
 let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;
@@ -31,10 +31,18 @@ export class ApplyInputStep<
 
   valueDepId: 0;
   scopeDepId: 1 | null;
+  private inputType: GraphQLInputType;
+  private getTargetFromParent:
+    | ((
+        parent: TParent,
+        inputValue: any,
+        info: { scope: unknown },
+      ) => TTarget | undefined | (() => TTarget))
+    | undefined;
   constructor(
-    private inputType: GraphQLInputType,
+    inputType: GraphQLInputType,
     $value: AnyInputStep,
-    private getTargetFromParent:
+    getTargetFromParent:
       | ((
           parent: TParent,
           inputValue: any,
@@ -44,6 +52,8 @@ export class ApplyInputStep<
     $scope?: Step | null,
   ) {
     super();
+    this.inputType = inputType;
+    this.getTargetFromParent = getTargetFromParent;
     this.valueDepId = this.addUnaryDependency($value) as 0;
     this.scopeDepId = $scope ? (this.addUnaryDependency($scope) as 1) : null;
     if (!this._isUnary) {
@@ -285,7 +295,10 @@ export abstract class Modifier<TParent> {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
-  constructor(protected readonly parent: TParent) {
+  protected readonly parent: TParent;
+
+  constructor(parent: TParent) {
+    this.parent = parent;
     if (applyingModifiers) {
       throw new Error(
         `Must not create new modifier whilst modifiers are being applied!`,

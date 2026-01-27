@@ -9,7 +9,7 @@ import { sqlValueWithCodec } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphQLInputType } from "graphql";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

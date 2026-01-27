@@ -1,7 +1,7 @@
-import { FLAG_INHIBITED, FLAG_NULL } from "../constants.js";
-import type { Maybe, UnbatchedExecutionExtra } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
+import { FLAG_INHIBITED, FLAG_NULL } from "../constants.ts";
+import type { Maybe, UnbatchedExecutionExtra } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
 
 export class CoalesceStep<T> extends UnbatchedStep<T | null> {
   static $$export = {

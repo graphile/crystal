@@ -1,4 +1,4 @@
-import type { Maybe, Step } from "../../dist";
+import type { Maybe, Step } from "../../dist/index.js";
 import type {
   ClubData,
   ConsumableData,
@@ -11,7 +11,7 @@ import type {
   NpcData,
   SafeRoomData,
   UtilityItemData,
-} from "./dcc-data";
+} from "./dcc-data.ts";
 
 // IMPORTANT: Steps must represent the nullable version (suitable for returning
 // from a plan resolver). Should you wish to specify a different (non-nullable)

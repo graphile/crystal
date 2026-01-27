@@ -28,9 +28,9 @@ import {
 } from "grafast/graphql";
 import { inspect } from "util";
 
-import type { ScopeForType, SpecForType } from "../global.js";
-import type SchemaBuilder from "../SchemaBuilder.js";
-import { EXPORTABLE } from "../utils.js";
+import type { ScopeForType, SpecForType } from "../global.ts";
+import type SchemaBuilder from "../SchemaBuilder.ts";
+import { EXPORTABLE } from "../utils.ts";
 
 const isString = (str: unknown): str is string => typeof str === "string";
 

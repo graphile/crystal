@@ -2,8 +2,8 @@ import type {
   CallbackOrDescriptor,
   FunctionalityObject,
   PromiseOrDirect,
-} from "./interfaces.js";
-import { isPromiseLike } from "./utils.js";
+} from "./interfaces.ts";
+import { isPromiseLike } from "./utils.ts";
 
 export interface MiddlewareNext<TRawResult> {
   (): TRawResult;

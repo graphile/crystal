@@ -1,5 +1,5 @@
-import type { SQLQuery } from "../src/index.js";
-import sql from "../src/index.js";
+import type { SQLQuery } from "../src/index.ts";
+import sql from "../src/index.ts";
 
 const $$type = Object.getOwnPropertySymbols(sql.blank)[0];
 

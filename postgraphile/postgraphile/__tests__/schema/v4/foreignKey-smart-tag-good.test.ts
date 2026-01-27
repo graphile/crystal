@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "doesn't raise an error when a foreignKey references a unique combination of attributes",

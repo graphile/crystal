@@ -19,7 +19,7 @@ import {
 } from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
-import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
+import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);
@@ -27,7 +27,11 @@ const LOOK_UP = "👆".repeat(30);
 const $$FINISHED: unique symbol = Symbol("finished");
 
 class Wrapped<T extends Error | typeof $$FINISHED = Error | typeof $$FINISHED> {
-  constructor(public originalValue: T) {}
+  public originalValue: T;
+
+  constructor(originalValue: T) {
+    this.originalValue = originalValue;
+  }
 }
 
 let cursorCount = 0;

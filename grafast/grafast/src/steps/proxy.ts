@@ -1,12 +1,12 @@
-import { $$proxy } from "../constants.js";
+import { $$proxy } from "../constants.ts";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { arrayOfLength } from "../utils.js";
+} from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { arrayOfLength } from "../utils.ts";
 
 /**
  * @experimental

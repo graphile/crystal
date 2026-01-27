@@ -17,8 +17,8 @@ import {
 import type { DocumentNode, GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 
-import { makeAcceptMatcher } from "../accept.js";
-import type { GrafservBase } from "../index.js";
+import { makeAcceptMatcher } from "../accept.ts";
+import type { GrafservBase } from "../index.ts";
 import type {
   DynamicOptions,
   GrafservBody,
@@ -27,9 +27,9 @@ import type {
   ParsedGraphQLBody,
   RequestContentType,
   ValidatedGraphQLBody,
-} from "../interfaces.js";
-import { $$normalizedHeaders } from "../interfaces.js";
-import { httpError, noop, parseGraphQLJSONBody } from "../utils.js";
+} from "../interfaces.ts";
+import { $$normalizedHeaders } from "../interfaces.ts";
+import { httpError, noop, parseGraphQLJSONBody } from "../utils.ts";
 
 const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
 

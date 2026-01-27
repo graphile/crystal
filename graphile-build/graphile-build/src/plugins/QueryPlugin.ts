@@ -2,7 +2,7 @@ import "graphile-config";
 
 import { __ValueStep } from "grafast";
 
-import { isValidObjectType } from "../utils.js";
+import { isValidObjectType } from "../utils.ts";
 
 declare global {
   namespace GraphileConfig {
