@@ -43,10 +43,7 @@ export class RemapKeysStep extends UnbatchedStep {
 
   private mapper!: (obj: object | null) => object | null;
   private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey;
-  constructor(
-    $plan: Step,
-    actualKeyByDesiredKey: ActualKeyByDesiredKey,
-  ) {
+  constructor($plan: Step, actualKeyByDesiredKey: ActualKeyByDesiredKey) {
     super();
     this.actualKeyByDesiredKey = actualKeyByDesiredKey;
     this.addDependency($plan);

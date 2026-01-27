@@ -10,10 +10,7 @@ export class __InputDefaultStep extends UnbatchedStep {
   isSyncAndSafe = true;
   private defaultValue: unknown;
 
-  constructor(
-    $variableValue: __TrackedValueStep,
-    defaultValue: unknown,
-  ) {
+  constructor($variableValue: __TrackedValueStep, defaultValue: unknown) {
     super();
     this.defaultValue = defaultValue;
     this.addUnaryDependency($variableValue);

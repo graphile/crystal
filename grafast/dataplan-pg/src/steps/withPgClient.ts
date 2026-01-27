@@ -60,7 +60,11 @@ export class SideEffectWithPgClientStep<
    * The id for the data plan.
    */
   private dataId: number;
-  private callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>;
+  private callback: SideEffectWithPgClientStepCallback<
+    TData,
+    TResult,
+    TPgClient
+  >;
 
   constructor(
     executor: PgExecutor,

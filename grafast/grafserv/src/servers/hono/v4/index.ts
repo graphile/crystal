@@ -63,10 +63,7 @@ const utf8TextDecoder = new TextDecoder("utf-8");
 export class HonoGrafserv extends GrafservBase {
   private upgradeWebSocket?: UpgradeWebSocket;
 
-  constructor(
-    config: GrafservConfig,
-    upgradeWebSocket?: UpgradeWebSocket,
-  ) {
+  constructor(config: GrafservConfig, upgradeWebSocket?: UpgradeWebSocket) {
     super(config);
     this.upgradeWebSocket = upgradeWebSocket;
   }

@@ -25,10 +25,7 @@ export class PgClassFilter<
   private havingConditions: SQL[] = [];
   public readonly alias: SQL;
 
-  constructor(
-    parent: PgCondition<TParent>,
-    alias: SQL,
-  ) {
+  constructor(parent: PgCondition<TParent>, alias: SQL) {
     super(parent);
     this.alias = alias;
   }

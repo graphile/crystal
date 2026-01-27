@@ -62,10 +62,7 @@ export class ObjectStep<
   private cacheSize: number;
   private cacheConfig?: ObjectStepCacheConfig;
 
-  constructor(
-    obj: TPlans,
-    cacheConfig?: ObjectStepCacheConfig,
-  ) {
+  constructor(obj: TPlans, cacheConfig?: ObjectStepCacheConfig) {
     super();
     this.cacheConfig = cacheConfig;
     this.cacheSize =

@@ -1,4 +1,4 @@
-import type { ArgumentsCamelCase,Argv } from "yargs";
+import type { ArgumentsCamelCase, Argv } from "yargs";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 

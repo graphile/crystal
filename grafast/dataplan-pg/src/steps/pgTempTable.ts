@@ -18,10 +18,7 @@ export class PgTempTable<TResource extends PgResource<any, any, any, any, any>>
   public readonly conditions: SQL[] = [];
   public readonly parent: PgClassFilter;
   public readonly resource: TResource;
-  constructor(
-    parent: PgClassFilter,
-    resource: TResource,
-  ) {
+  constructor(parent: PgClassFilter, resource: TResource) {
     this.parent = parent;
     this.resource = resource;
     this.alias = sql.identifier(Symbol(`${resource.name}_filter`));

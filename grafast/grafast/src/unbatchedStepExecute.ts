@@ -1,5 +1,8 @@
 import { flagError } from "./error.ts";
-import type { ExecutionDetails, UnbatchedExecutionExtra } from "./interfaces.ts";
+import type {
+  ExecutionDetails,
+  UnbatchedExecutionExtra,
+} from "./interfaces.ts";
 import type { UnbatchedStep } from "./step.ts";
 import { arrayOfLength } from "./utils.ts";
 

@@ -24,10 +24,7 @@ export class __ItemStep<TData> extends UnbatchedStep<TData> {
   public transformStepId?: number;
   public readonly depth: number;
 
-  constructor(
-    parentPlan: Step<TData> | Step<TData[]>,
-    depth = 0,
-  ) {
+  constructor(parentPlan: Step<TData> | Step<TData[]>, depth = 0) {
     super();
     this.depth = depth;
     this.addDependency(parentPlan);

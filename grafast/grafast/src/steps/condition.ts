@@ -16,11 +16,7 @@ export class ConditionStep extends UnbatchedStep<boolean> {
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
   private op: Operator;
-  constructor(
-    op: Operator,
-    step1: Step,
-    step2?: Step,
-  ) {
+  constructor(op: Operator, step1: Step, step2?: Step) {
     super();
     this.op = op;
     if (!step2) {

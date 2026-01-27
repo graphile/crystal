@@ -17,7 +17,7 @@ export class PgLocker<TStep extends PgStmtBaseStep<any>> {
    * Determines if the PgSelectStep is "locked" - i.e. its
    * FROM,JOINs,WHERE,ORDER BY,LIMIT,OFFSET cannot be changed. Note this does
    * not prevent adding more SELECTs
-  */
+   */
   public locked = false;
 
   private parent: TStep;
