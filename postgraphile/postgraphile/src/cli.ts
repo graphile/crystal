@@ -307,5 +307,5 @@ async function loadDefaultAdaptor(): Promise<
   PgAdaptor<"@dataplan/pg/adaptors/pg">
 > {
   const mod = await import("@dataplan/pg/adaptors/pg");
-  return mod;
+  return typeof mod.makePgService === "function" ? mod : mod.default;
 }
