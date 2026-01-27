@@ -519,7 +519,7 @@ Now update `graphile.config.ts` to import and register the plugin:
 ```ts title="graphql/graphile.config.ts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
-import WrapPlansPlugin from "./plugins/wrap-plans.js";
+import WrapPlansPlugin from "./plugins/wrap-plans.ts";
 
 export default {
   extends: [PostGraphileAmberPreset],

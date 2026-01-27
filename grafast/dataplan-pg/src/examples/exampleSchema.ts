@@ -74,6 +74,13 @@ import { specifiedDirectives } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.ts";
+import { listOfCodec, sqlValueWithCodec } from "../codecs.ts";
+import {
+  makeRegistry,
+  makeRegistryBuilder,
+  pgResourceOptions,
+} from "../datasource.ts";
 //import prettier from "prettier";
 import type {
   GetPgResourceRelations,
@@ -84,14 +91,7 @@ import type {
   PgInsertSingleStep,
   PgSelectStep,
   WithPgClient,
-} from "../.js";
-import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.ts";
-import { listOfCodec, sqlValueWithCodec } from "../codecs.ts";
-import {
-  makeRegistry,
-  makeRegistryBuilder,
-  pgResourceOptions,
-} from "../datasource.ts";
+} from "../index.ts";
 import {
   enumCodec,
   PgBooleanFilter,
