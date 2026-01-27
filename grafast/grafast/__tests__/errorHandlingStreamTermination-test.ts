@@ -25,12 +25,16 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
+  private callback: (val: TIn) => PromiseOrDirect<TOut>;
+  private setStreaming: (isStreaming: boolean) => void;
   constructor(
     $dep: Step<TIn>,
-    private callback: (val: TIn) => PromiseOrDirect<TOut>,
-    private setStreaming: (isStreaming: boolean) => void,
+    callback: (val: TIn) => PromiseOrDirect<TOut>,
+    setStreaming: (isStreaming: boolean) => void,
   ) {
     super();
+    this.callback = callback;
+    this.setStreaming = setStreaming;
     this.addDependency($dep);
   }
   execute({
