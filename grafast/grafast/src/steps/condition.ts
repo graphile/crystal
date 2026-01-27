@@ -1,6 +1,6 @@
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
 
 const unaryOperators = ["null", "not null", "exists", "not exists"] as const;
 type UnaryOperator = (typeof unaryOperators)[number];
@@ -15,12 +15,14 @@ export class ConditionStep extends UnbatchedStep<boolean> {
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
+  private op: Operator;
   constructor(
-    private op: Operator,
+    op: Operator,
     step1: Step,
     step2?: Step,
   ) {
     super();
+    this.op = op;
     if (!step2) {
       // unary
       if (!unaryOperators.includes(op as UnaryOperator)) {

@@ -14,10 +14,10 @@ import type { GraphQLType } from "grafast/graphql";
 import { gatherConfig } from "graphile-build";
 import type { PgSQL, SQL } from "pg-sql2";
 
-import { getBehavior } from "../behavior.js";
-import type { PgCodecMetaLookup } from "../inputUtils.js";
-import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.js";
-import { version } from "../version.js";
+import { getBehavior } from "../behavior.ts";
+import type { PgCodecMetaLookup } from "../inputUtils.ts";
+import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

@@ -1,6 +1,6 @@
 import "./interfaces.js";
 
-import { sortWithBeforeAfterProvides } from "./sort.js";
+import { sortWithBeforeAfterProvides } from "./sort.ts";
 
 type SeenPlugins = Map<string, GraphileConfig.Plugin | null>;
 

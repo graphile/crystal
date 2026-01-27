@@ -3,18 +3,18 @@ import { access, exportAs, UnbatchedStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type { PgResource } from "../datasource.js";
+import type { PgResource } from "../datasource.ts";
 import type {
   GetPgCodecAttributes,
   PgClassSingleStep,
   PgCodec,
   PgTypedStep,
-} from "../interfaces.js";
-import { PgDeleteSingleStep } from "./pgDeleteSingle.js";
-import { PgInsertSingleStep } from "./pgInsertSingle.js";
-import { PgSelectSingleStep } from "./pgSelectSingle.js";
-import { PgUnionAllSingleStep } from "./pgUnionAll.js";
-import { PgUpdateSingleStep } from "./pgUpdateSingle.js";
+} from "../interfaces.ts";
+import { PgDeleteSingleStep } from "./pgDeleteSingle.ts";
+import { PgInsertSingleStep } from "./pgInsertSingle.ts";
+import { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { PgUnionAllSingleStep } from "./pgUnionAll.ts";
+import { PgUpdateSingleStep } from "./pgUpdateSingle.ts";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgClassExpressionStep:plan");
 // const debugExecute = debugFactory( "@dataplan/pg:PgClassExpressionStep:execute",);
@@ -59,15 +59,19 @@ export class PgClassExpressionStep<
 
   private needsPolymorphicUnwrap: boolean;
   private needsTupleAccess: boolean;
+  public readonly pgCodec: TExpressionCodec;
+  private guaranteedNotNull?: boolean;
 
   constructor(
     $table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
-    public readonly pgCodec: TExpressionCodec,
+    pgCodec: TExpressionCodec,
     strings: TemplateStringsArray,
     dependencies: ReadonlyArray<PgTypedStep<any> | SQL> = [],
-    private guaranteedNotNull?: boolean,
+    guaranteedNotNull?: boolean,
   ) {
     super();
+    this.pgCodec = pgCodec;
+    this.guaranteedNotNull = guaranteedNotNull;
     this.needsPolymorphicUnwrap =
       $table instanceof PgUnionAllSingleStep &&
       $table.getClassStep().mode === "normal";

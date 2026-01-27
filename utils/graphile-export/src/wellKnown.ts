@@ -3,7 +3,7 @@ import * as grafastStar from "grafast";
 import * as graphqlStar from "grafast/graphql";
 import * as utilStar from "util";
 
-import type { ExportOptions } from "./interfaces.js";
+import type { ExportOptions } from "./interfaces.ts";
 
 interface $$Export {
   moduleName: string;

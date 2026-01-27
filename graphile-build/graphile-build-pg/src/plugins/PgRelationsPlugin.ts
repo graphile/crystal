@@ -26,8 +26,8 @@ import sql from "pg-sql2";
 import type { TE } from "tamedevil";
 import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 
-import { resolveResourceRefPath, tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { resolveResourceRefPath, tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 const ref_connection = te.ref(connection, "connection");
 const ref_sql = te.ref(sql, "sql");

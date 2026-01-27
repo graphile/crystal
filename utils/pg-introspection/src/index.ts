@@ -19,23 +19,23 @@ import type {
   PgRange,
   PgRoles,
   PgType,
-} from "./introspection.js";
-export { makeIntrospectionQuery } from "./introspection.js";
-import type { AclObject } from "./acl.js";
+} from "./introspection.ts";
+export { makeIntrospectionQuery } from "./introspection.ts";
+import type { AclObject } from "./acl.ts";
 import {
   aclContainsRole,
   entityPermissions,
   expandRoles,
   resolvePermissions,
-} from "./acl.js";
-import { augmentIntrospection } from "./augmentIntrospection.js";
+} from "./acl.ts";
+import { augmentIntrospection } from "./augmentIntrospection.ts";
 import type {
   PgSmartTagsAndDescription,
   PgSmartTagsDict,
-} from "./smartComments.js";
+} from "./smartComments.ts";
 
-export { default as reservedWords } from "./reservedWords.js";
-export { parseSmartComment } from "./smartComments.js";
+export { default as reservedWords } from "./reservedWords.ts";
+export { parseSmartComment } from "./smartComments.ts";
 
 export type {
   Introspection,

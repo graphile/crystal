@@ -19,26 +19,26 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import * as assert from "./assert.js";
-import { isDev, noop } from "./dev.js";
+import * as assert from "./assert.ts";
+import { isDev, noop } from "./dev.ts";
 import type {
   LayerPlan,
   LayerPlanReasonDefer,
   LayerPlanReasonListItem,
   LayerPlanReasonSubscription,
-} from "./engine/LayerPlan.js";
-import type { OperationPlan } from "./engine/OperationPlan.js";
-import { SafeError } from "./error.js";
-import { inspect } from "./inspect.js";
+} from "./engine/LayerPlan.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
+import { SafeError } from "./error.ts";
+import { inspect } from "./inspect.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
   Maybe,
-} from "./interfaces.js";
-import type { Step } from "./step.js";
-import { constant } from "./steps/constant.js";
+} from "./interfaces.ts";
+import type { Step } from "./step.ts";
+import { constant } from "./steps/constant.ts";
 
 const {
   GraphQLBoolean,

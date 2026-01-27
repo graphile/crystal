@@ -10,15 +10,15 @@ import {
   makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
-} from "../../../index.js";
+} from "../../../index.ts";
 import type {
   EventStreamHandlerResult,
   GrafservBodyJSON,
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../../interfaces.js";
-import { noop } from "../../../utils.js";
+} from "../../../interfaces.ts";
+import { noop } from "../../../utils.ts";
 
 declare global {
   namespace Grafast {
@@ -61,11 +61,14 @@ function getDigest(ctx: Ctx): RequestDigest {
 }
 const utf8TextDecoder = new TextDecoder("utf-8");
 export class HonoGrafserv extends GrafservBase {
+  private upgradeWebSocket?: UpgradeWebSocket;
+
   constructor(
     config: GrafservConfig,
-    private upgradeWebSocket?: UpgradeWebSocket,
+    upgradeWebSocket?: UpgradeWebSocket,
   ) {
     super(config);
+    this.upgradeWebSocket = upgradeWebSocket;
   }
 
   public makeWsHandler(upgradeWebSocket: UpgradeWebSocket): MiddlewareHandler {

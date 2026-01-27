@@ -1,27 +1,27 @@
-import * as assert from "../assert.js";
-import type { Bucket } from "../bucket.js";
-import { $$deepDepSkip } from "../constants.js";
-import { isDev } from "../dev.js";
+import * as assert from "../assert.ts";
+import type { Bucket } from "../bucket.ts";
+import { $$deepDepSkip } from "../constants.ts";
+import { isDev } from "../dev.ts";
 import {
   batchExecutionValue,
   executeBucket,
   newBucket,
   unaryExecutionValue,
-} from "../engine/executeBucket.js";
-import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
-import { LayerPlan } from "../engine/LayerPlan.js";
-import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { __FlagStep, ExecutionDetails } from "../index.js";
-import type { GrafastResultsList, Maybe } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
-import { isListCapableStep, Step } from "../step.js";
-import { __ItemStep } from "./__item.js";
+} from "../engine/executeBucket.ts";
+import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.ts";
+import { LayerPlan } from "../engine/LayerPlan.ts";
+import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.ts";
+import type { __FlagStep, ExecutionDetails } from "../index.ts";
+import type { GrafastResultsList, Maybe } from "../interfaces.ts";
+import type { ListCapableStep } from "../step.ts";
+import { isListCapableStep, Step } from "../step.ts";
+import { __ItemStep } from "./__item.ts";
 import type {
   ConnectionOptimizedStep,
   ItemsStep,
   StepRepresentingList,
-} from "./connection.js";
-import { itemsOrStep } from "./connection.js";
+} from "./connection.ts";
+import { itemsOrStep } from "./connection.ts";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
   memo: TMemo,

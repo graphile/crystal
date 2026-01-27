@@ -7,13 +7,13 @@ import { GraphQLSchema, validateSchema } from "grafast/graphql";
 import { orderedApply } from "graphile-config";
 import { inspect } from "util";
 
-import type { BehaviorDynamicMethods } from "./behavior.js";
-import { Behavior } from "./behavior.js";
-import makeNewBuild from "./makeNewBuild.js";
-import type { NewWithHooksFunction } from "./newWithHooks/index.js";
-import { makeNewWithHooks } from "./newWithHooks/index.js";
-import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.js";
-import { bindAll } from "./utils.js";
+import type { BehaviorDynamicMethods } from "./behavior.ts";
+import { Behavior } from "./behavior.ts";
+import makeNewBuild from "./makeNewBuild.ts";
+import type { NewWithHooksFunction } from "./newWithHooks/index.ts";
+import { makeNewWithHooks } from "./newWithHooks/index.ts";
+import { makeSchemaBuilderHooks } from "./SchemaBuilderHooks.ts";
+import { bindAll } from "./utils.ts";
 
 const debug = debugFactory("graphile-build:SchemaBuilder");
 
@@ -44,11 +44,16 @@ class SchemaBuilder<
    */
   newWithHooks: NewWithHooksFunction;
 
+  public readonly resolvedPreset: GraphileConfig.ResolvedPreset;
+  private inflection: GraphileBuild.Inflection;
+
   constructor(
-    public readonly resolvedPreset: GraphileConfig.ResolvedPreset,
-    private inflection: GraphileBuild.Inflection,
+    resolvedPreset: GraphileConfig.ResolvedPreset,
+    inflection: GraphileBuild.Inflection,
   ) {
     super();
+    this.resolvedPreset = resolvedPreset;
+    this.inflection = inflection;
 
     this.options = resolvedPreset.schema ?? {};
 

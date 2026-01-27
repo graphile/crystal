@@ -4,10 +4,10 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { digestKeys } from "../utils.js";
+} from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { digestKeys } from "../utils.ts";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
 
@@ -42,11 +42,13 @@ export class RemapKeysStep extends UnbatchedStep {
   allowMultipleOptimizations = true;
 
   private mapper!: (obj: object | null) => object | null;
+  private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey;
   constructor(
     $plan: Step,
-    private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey,
+    actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
+    this.actualKeyByDesiredKey = actualKeyByDesiredKey;
     this.addDependency($plan);
     this.peerKey = digestKeys([
       ...Object.keys(this.actualKeyByDesiredKey),

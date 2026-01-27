@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /* eslint-disable no-console,curly */
-import WebSocket from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 
-import type { AnnounceCallback } from "./index.js";
-import subscribeToLogicalDecoding from "./index.js";
+import type { AnnounceCallback } from "./index.ts";
+import subscribeToLogicalDecoding from "./index.ts";
 
 const CONNECTION_STRING = process.env.LD_DATABASE_URL;
 const TABLE_PATTERN = process.env.LD_TABLE_PATTERN || "*.*";
@@ -26,7 +26,7 @@ async function main() {
     );
   }
   // Now slot is created, create websocket server
-  const wss = new WebSocket.Server({ port: PORT, host: HOST });
+  const wss = new WebSocketServer({ port: PORT, host: HOST });
   const clients: Array<WebSocket> = [];
   const channels: {
     [schema: string]: {
@@ -48,7 +48,7 @@ async function main() {
     });
   }, 25000);
 
-  wss.on("connection", function connection(ws) {
+  wss.on("connection", function connection(ws: WebSocket) {
     clients.push(ws);
 
     ws.on("close", () => {
@@ -70,7 +70,7 @@ async function main() {
       }
     });
 
-    ws.on("message", function incoming(rawMessage) {
+    ws.on("message", function incoming(rawMessage: WebSocket.RawData) {
       const message = rawMessage.toString("utf8");
       let topicJSON: string;
       let sub: boolean;

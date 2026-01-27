@@ -6,15 +6,15 @@ import { PassThrough } from "node:stream";
 import type { Context } from "koa";
 import type Koa from "koa";
 
-import { GrafservBase } from "../../../core/base.js";
-import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
-import type { OptionsFromConfig } from "../../../options.js";
+import { GrafservBase } from "../../../core/base.ts";
+import type { GrafservConfig, RequestDigest } from "../../../interfaces.ts";
+import type { OptionsFromConfig } from "../../../options.ts";
 import {
   getBodyFromFrameworkBody,
   getBodyFromRequest,
   processHeaders,
-} from "../../../utils.js";
-import { makeNodeUpgradeHandler } from "../../node/index.js";
+} from "../../../utils.ts";
+import { makeNodeUpgradeHandler } from "../../node/index.ts";
 
 declare global {
   namespace Grafast {

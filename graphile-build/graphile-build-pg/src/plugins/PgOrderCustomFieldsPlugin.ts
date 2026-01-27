@@ -9,8 +9,8 @@ import type {
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
-import { isSimpleScalarComputedColumnLike } from "./PgConditionCustomFieldsPlugin.js";
+import { version } from "../version.ts";
+import { isSimpleScalarComputedColumnLike } from "./PgConditionCustomFieldsPlugin.ts";
 
 declare global {
   namespace GraphileConfig {

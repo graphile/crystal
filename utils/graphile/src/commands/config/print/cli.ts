@@ -6,7 +6,7 @@ import { loadConfig } from "graphile-config/load";
 import type { InspectOptions } from "util";
 import { inspect } from "util";
 
-import { stripAnsi } from "../../../stripAnsi.js";
+import { stripAnsi } from "../../../stripAnsi.ts";
 
 const inspectOpts: InspectOptions = {
   colors: true,

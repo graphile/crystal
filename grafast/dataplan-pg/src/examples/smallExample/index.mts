@@ -1,6 +1,6 @@
 import { grafast } from "grafast";
 
-import { createWithPgClient } from "../../../dist/adaptors/pg.js";
+import { createWithPgClient } from "../../../dist/adaptors/pg.d.ts";
 import { schema } from "./schema.mts";
 
 async function main() {

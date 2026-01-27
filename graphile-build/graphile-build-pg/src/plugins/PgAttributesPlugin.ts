@@ -22,7 +22,7 @@ import { bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

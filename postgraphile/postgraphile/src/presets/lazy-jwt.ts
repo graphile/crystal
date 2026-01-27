@@ -10,7 +10,7 @@ import type {
 } from "jsonwebtoken";
 import { verify as verifyJwt } from "jsonwebtoken";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

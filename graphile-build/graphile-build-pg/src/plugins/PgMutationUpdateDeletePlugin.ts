@@ -24,8 +24,8 @@ import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import { tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

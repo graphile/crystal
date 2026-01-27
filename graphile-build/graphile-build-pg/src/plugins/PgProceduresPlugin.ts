@@ -20,8 +20,8 @@ import {
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 
-import { exportNameHint } from "../utils.js";
-import { version } from "../version.js";
+import { exportNameHint } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileBuild {

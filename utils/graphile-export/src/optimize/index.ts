@@ -1,7 +1,6 @@
-// import generate from "@babel/generator";
-import generate from "@babel/generator";
+import { generate } from "@babel/generator";
 import { parse } from "@babel/parser";
-import traverse, { NodePath } from "@babel/traverse";
+import traverseModule, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
 
 /** @see {@link https://github.com/babel/babel/issues/14881} */
@@ -21,6 +20,8 @@ function patch(scope: any) {
 patch(NodePath.prototype);
 
 Error.stackTraceLimit = 100;
+
+const traverse = traverseModule as unknown as typeof import("@babel/traverse")["default"];
 
 function isSimpleArg(
   arg: t.Node,
@@ -44,7 +45,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
   ast = parse(generate(ast).code, { sourceType: "module" });
   traverse(ast, {
     SpreadElement: {
-      enter(path) {
+      enter(path: NodePath<t.SpreadElement>) {
         if (
           path.node.argument.type === "NullLiteral" &&
           path.parentPath.isObjectExpression()
@@ -54,7 +55,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     VariableDeclaration: {
-      enter(path) {
+      enter(path: NodePath<t.VariableDeclaration>) {
         const node = path.node;
         if (node.declarations.length === 1) {
           const declaration = node.declarations[0];
@@ -76,7 +77,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     CallExpression: {
-      enter(path) {
+      enter(path: NodePath<t.CallExpression>) {
         const node = path.node;
 
         if (
@@ -180,7 +181,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     Program: {
-      exit(exitPath) {
+      exit(exitPath: NodePath<t.Program>) {
         // Make sure our scope information is up to date!
         exitPath.scope.crawl();
 
@@ -268,7 +269,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         }
       },
     },
-    BlockStatement(path) {
+    BlockStatement(path: NodePath<t.BlockStatement>) {
       const body = path.node.body;
 
       // Only strip if it's a statement within another block statement or the
@@ -292,7 +293,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
   // convert `fn(...["a", "b"])` to `fn("a", "b")`
   // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
   traverse(ast, {
-    IfStatement(path) {
+    IfStatement(path: NodePath<t.IfStatement>) {
       const test = path.node.test;
       if (expressionIsAlwaysFalsy(test)) {
         if (path.node.alternate) {
@@ -304,7 +305,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         path.replaceWith(path.node.consequent);
       }
     },
-    ConditionalExpression(path) {
+    ConditionalExpression(path: NodePath<t.ConditionalExpression>) {
       const test = path.node.test;
       if (expressionIsAlwaysFalsy(test)) {
         path.replaceWith(path.node.alternate);
@@ -312,7 +313,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         path.replaceWith(path.node.consequent);
       }
     },
-    ObjectProperty(path) {
+    ObjectProperty(path: NodePath<t.ObjectProperty>) {
       if (!t.isIdentifier(path.node.key)) {
         return;
       }
@@ -352,7 +353,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         ),
       );
     },
-    CallExpression(path) {
+    CallExpression(path: NodePath<t.CallExpression>) {
       const argsPath = path.get("arguments");
       if (argsPath.length === 1) {
         const argPath = argsPath[0];

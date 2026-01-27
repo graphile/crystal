@@ -1,7 +1,7 @@
-import { flagError } from "./error";
-import type { ExecutionDetails, UnbatchedExecutionExtra } from "./interfaces";
-import type { UnbatchedStep } from "./step";
-import { arrayOfLength } from "./utils";
+import { flagError } from "./error.ts";
+import type { ExecutionDetails, UnbatchedExecutionExtra } from "./interfaces.ts";
+import type { UnbatchedStep } from "./step.ts";
+import { arrayOfLength } from "./utils.ts";
 
 /**
  * Calls `callback` with an execute function that's optimized for handling

@@ -1,7 +1,7 @@
 import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedStep } from "grafast";
 
-import type { PgCodec } from "../interfaces.js";
+import type { PgCodec } from "../interfaces.ts";
 
 /**
  * Converts the given value to the representation suitable for feeding into the
@@ -17,11 +17,13 @@ export class ToPgStep extends UnbatchedStep<any> {
     exportName: "ToPgStep",
   };
   isSyncAndSafe = true;
+  private codec: PgCodec;
   constructor(
     $value: ExecutableStep,
-    private codec: PgCodec,
+    codec: PgCodec,
   ) {
     super();
+    this.codec = codec;
     this.addDependency($value);
     this.peerKey = codec.name;
   }

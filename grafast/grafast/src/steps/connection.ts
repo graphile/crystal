@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
-import * as assert from "../assert.js";
-import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.js";
+import * as assert from "../assert.ts";
+import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.ts";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -12,20 +12,20 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import { promiseWithResolve } from "../promiseWithResolve.js";
-import { Step, UnbatchedStep } from "../step.js";
+} from "../interfaces.ts";
+import { promiseWithResolve } from "../promiseWithResolve.ts";
+import { Step, UnbatchedStep } from "../step.ts";
 import {
   asyncIteratorWithCleanup,
   maybeArraysMatch,
   terminateIterable,
-} from "../utils.js";
-import { access } from "./access.js";
-import { constant, ConstantStep } from "./constant.js";
-import { each } from "./each.js";
-import { first } from "./first.js";
-import { lambda } from "./lambda.js";
-import { last } from "./last.js";
+} from "../utils.ts";
+import { access } from "./access.ts";
+import { constant, ConstantStep } from "./constant.ts";
+import { each } from "./each.ts";
+import { first } from "./first.ts";
+import { lambda } from "./lambda.ts";
+import { last } from "./last.ts";
 
 /**
  * Indicates which features are supported for pagination; support for `limit`
@@ -1275,8 +1275,10 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   private beforeDepId: number | null = null;
   private afterDepId: number | null = null;
   private streamDetailsDepIds: number[] | null = [];
-  constructor(private paginationSupport: PaginationFeatures | null) {
+  private paginationSupport: PaginationFeatures | null;
+  constructor(paginationSupport: PaginationFeatures | null) {
     super();
+    this.paginationSupport = paginationSupport;
   }
   setFirst($first: Step<Maybe<number>>) {
     if (this.firstDepId != null) throw new Error(`first already set`);

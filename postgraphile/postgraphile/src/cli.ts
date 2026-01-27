@@ -8,7 +8,7 @@ import { resolvePreset } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 
-import { postgraphile } from "./index.js";
+import { postgraphile } from "./index.ts";
 
 // The preset we recommend if the user doesn't specify one
 const RECOMMENDED_PRESET = "--preset postgraphile/presets/amber";
@@ -307,5 +307,5 @@ async function loadDefaultAdaptor(): Promise<
   PgAdaptor<"@dataplan/pg/adaptors/pg">
 > {
   const mod = await import("@dataplan/pg/adaptors/pg");
-  return typeof mod.makePgService === "function" ? mod : mod.default;
+  return mod;
 }

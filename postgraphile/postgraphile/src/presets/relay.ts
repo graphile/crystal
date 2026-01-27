@@ -2,7 +2,7 @@ import "../index.js";
 
 import type { PgCodecRelation } from "@dataplan/pg";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 const RELAY_HIDDEN_COLUMN_BEHAVIORS: readonly GraphileBuild.BehaviorString[] = [
   "-select",

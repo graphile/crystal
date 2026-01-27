@@ -1,5 +1,5 @@
-import type { __TrackedValueStep } from "./__trackedValue.js";
-import type { __ValueStep } from "./__value.js";
+import type { __TrackedValueStep } from "./__trackedValue.ts";
+import type { __ValueStep } from "./__value.ts";
 
 export {
   __FlagStep,
@@ -9,9 +9,9 @@ export {
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
-} from "./__flag.js";
-export { access, AccessStep } from "./access.js";
-export { coalesce, CoalesceStep } from "./coalesce.js";
+} from "./__flag.ts";
+export { access, AccessStep } from "./access.ts";
+export { coalesce, CoalesceStep } from "./coalesce.ts";
 export type {
   ConnectionHandlingResult,
   ConnectionHandlingStep,
@@ -19,80 +19,80 @@ export type {
   PaginationFeatures,
   PaginationParams,
   StepRepresentingList,
-} from "./connection.js";
-export { connection, ConnectionStep, EdgeStep } from "./connection.js";
-export { constant, ConstantStep } from "./constant.js";
-export { each } from "./each.js";
-export { error, ErrorStep } from "./error.js";
-export type { FilterPlanMemo } from "./filter.js";
-export { filter } from "./filter.js";
-export { first, FirstStep } from "./first.js";
-export { get } from "./get.js";
-export type { GroupByPlanMemo } from "./groupBy.js";
-export { groupBy } from "./groupBy.js";
-export { lambda, LambdaStep } from "./lambda.js";
-export { last, LastStep } from "./last.js";
-export { list, ListStep } from "./list.js";
-export { listen, ListenStep } from "./listen.js";
+} from "./connection.ts";
+export { connection, ConnectionStep, EdgeStep } from "./connection.ts";
+export { constant, ConstantStep } from "./constant.ts";
+export { each } from "./each.ts";
+export { error, ErrorStep } from "./error.ts";
+export type { FilterPlanMemo } from "./filter.ts";
+export { filter } from "./filter.ts";
+export { first, FirstStep } from "./first.ts";
+export { get } from "./get.ts";
+export type { GroupByPlanMemo } from "./groupBy.ts";
+export { groupBy } from "./groupBy.ts";
+export { lambda, LambdaStep } from "./lambda.ts";
+export { last, LastStep } from "./last.ts";
+export { list, ListStep } from "./list.ts";
+export { listen, ListenStep } from "./listen.ts";
 export type {
   ListTransformItemPlanCallback,
   ListTransformOptions,
   ListTransformReduce,
-} from "./listTransform.js";
-export { __ListTransformStep, listTransform } from "./listTransform.js";
+} from "./listTransform.ts";
+export { __ListTransformStep, listTransform } from "./listTransform.ts";
 export {
   makeDecodeNodeId,
   makeDecodeNodeIdRuntime,
   nodeIdFromNode,
   specFromNodeId,
-} from "./node.js";
-export type { ObjectPlanMeta } from "./object.js";
-export { object, ObjectStep } from "./object.js";
-export { partitionByIndex } from "./partitionByIndex.js";
-export type { ActualKeyByDesiredKey } from "./remapKeys.js";
-export { remapKeys, RemapKeysStep } from "./remapKeys.js";
-export { reverse, reverseArray, ReverseStep } from "./reverse.js";
-export type { SetterCapable } from "./setter.js";
-export { createObjectAndApplyChildren, Setter, setter } from "./setter.js";
-export { sideEffect, SideEffectStep } from "./sideEffect.js";
+} from "./node.ts";
+export type { ObjectPlanMeta } from "./object.ts";
+export { object, ObjectStep } from "./object.ts";
+export { partitionByIndex } from "./partitionByIndex.ts";
+export type { ActualKeyByDesiredKey } from "./remapKeys.ts";
+export { remapKeys, RemapKeysStep } from "./remapKeys.ts";
+export { reverse, reverseArray, ReverseStep } from "./reverse.ts";
+export type { SetterCapable } from "./setter.ts";
+export { createObjectAndApplyChildren, Setter, setter } from "./setter.ts";
+export { sideEffect, SideEffectStep } from "./sideEffect.ts";
 
 // Internal plans
-export { __InputListStep } from "./__inputList.js";
-export type { __InputObjectStepWithDollars } from "./__inputObject.js";
-export { __InputObjectStep } from "./__inputObject.js";
-export { __InputStaticLeafStep } from "./__inputStaticLeaf.js";
-export { __ItemStep } from "./__item.js";
-export type { __TrackedValueStepWithDollars } from "./__trackedValue.js";
-export { __TrackedValueStep } from "./__trackedValue.js";
-export { __ValueStep } from "./__value.js";
+export { __InputListStep } from "./__inputList.ts";
+export type { __InputObjectStepWithDollars } from "./__inputObject.ts";
+export { __InputObjectStep } from "./__inputObject.ts";
+export { __InputStaticLeafStep } from "./__inputStaticLeaf.ts";
+export { __ItemStep } from "./__item.ts";
+export type { __TrackedValueStepWithDollars } from "./__trackedValue.ts";
+export { __TrackedValueStep } from "./__trackedValue.ts";
+export { __ValueStep } from "./__value.ts";
 export {
   applyInput,
   ApplyInputStep,
   assertModifier,
   isModifier,
   Modifier,
-} from "./applyInput.js";
-export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
-export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.js";
-export { condition, ConditionStep } from "./condition.js";
-export { graphqlResolver, GraphQLResolverStep } from "./graphqlResolver.js";
-export { LoadedRecordStep } from "./loadedRecord.js";
+} from "./applyInput.ts";
+export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.ts";
+export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.ts";
+export { condition, ConditionStep } from "./condition.ts";
+export { graphqlResolver, GraphQLResolverStep } from "./graphqlResolver.ts";
+export { LoadedRecordStep } from "./loadedRecord.ts";
 export type {
   LoadManyCallback,
   LoadManyInfo,
   LoadManyLoader,
-} from "./loadMany.js";
+} from "./loadMany.ts";
 export {
   loadMany,
   loadManyCallback,
   loadManyLoader,
   LoadManyStep,
-} from "./loadMany.js";
-export type { LoadOneCallback, LoadOneInfo, LoadOneLoader } from "./loadOne.js";
+} from "./loadMany.ts";
+export type { LoadOneCallback, LoadOneInfo, LoadOneLoader } from "./loadOne.ts";
 export {
   loadOne,
   loadOneCallback,
   loadOneLoader,
   LoadOneStep,
-} from "./loadOne.js";
-export { proxy, ProxyStep } from "./proxy.js";
+} from "./loadOne.ts";
+export { proxy, ProxyStep } from "./proxy.ts";

@@ -1,10 +1,10 @@
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgResource } from "../datasource.js";
-import type { PgClassFilter } from "../filters/pgClassFilter.js";
-import type { PgConditionCapableParent } from "./pgCondition.js";
-import { PgCondition } from "./pgCondition.js";
+import type { PgResource } from "../datasource.ts";
+import type { PgClassFilter } from "../filters/pgClassFilter.ts";
+import type { PgConditionCapableParent } from "./pgCondition.ts";
+import { PgCondition } from "./pgCondition.ts";
 
 export class PgTempTable<TResource extends PgResource<any, any, any, any, any>>
   implements PgConditionCapableParent
@@ -16,10 +16,14 @@ export class PgTempTable<TResource extends PgResource<any, any, any, any, any>>
 
   public readonly alias: SQL;
   public readonly conditions: SQL[] = [];
+  public readonly parent: PgClassFilter;
+  public readonly resource: TResource;
   constructor(
-    public readonly parent: PgClassFilter,
-    public readonly resource: TResource,
+    parent: PgClassFilter,
+    resource: TResource,
   ) {
+    this.parent = parent;
+    this.resource = resource;
     this.alias = sql.identifier(Symbol(`${resource.name}_filter`));
   }
 

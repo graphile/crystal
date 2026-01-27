@@ -6,7 +6,7 @@ import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import type { GraphQLEnumType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

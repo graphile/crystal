@@ -1,4 +1,4 @@
-import type { Introspection, PgEntity, PgRoles } from "./introspection.js";
+import type { Introspection, PgEntity, PgRoles } from "./introspection.ts";
 
 export const OBJECT_COLUMN = "OBJECT_COLUMN";
 export const OBJECT_TABLE = "OBJECT_TABLE";

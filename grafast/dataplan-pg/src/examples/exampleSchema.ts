@@ -84,14 +84,14 @@ import type {
   PgInsertSingleStep,
   PgSelectStep,
   WithPgClient,
-} from "../";
-import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg";
-import { listOfCodec, sqlValueWithCodec } from "../codecs.js";
+} from "../.js";
+import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.ts";
+import { listOfCodec, sqlValueWithCodec } from "../codecs.ts";
 import {
   makeRegistry,
   makeRegistryBuilder,
   pgResourceOptions,
-} from "../datasource.js";
+} from "../datasource.ts";
 import {
   enumCodec,
   PgBooleanFilter,
@@ -111,24 +111,24 @@ import {
   PgUpdateSingleStep,
   recordCodec,
   TYPES,
-} from "../index.js";
+} from "../index.ts";
 import type {
   GetPgResourceAttributes,
   PgCodec,
   PgSelectQueryBuilderCallback,
-} from "../interfaces";
-import type { PgSelectQueryBuilder } from "../steps/pgSelect.js";
-import { sqlFromArgDigests } from "../steps/pgSelect.js";
+} from "../interfaces.ts";
+import type { PgSelectQueryBuilder } from "../steps/pgSelect.ts";
+import { sqlFromArgDigests } from "../steps/pgSelect.ts";
 import type {
   PgUnionAllQueryBuilder,
   PgUnionAllSingleStep,
   PgUnionAllStep,
-} from "../steps/pgUnionAll.js";
-import { pgUnionAll } from "../steps/pgUnionAll.js";
+} from "../steps/pgUnionAll.ts";
+import { pgUnionAll } from "../steps/pgUnionAll.ts";
 import {
   SideEffectWithPgClientStep,
   sideEffectWithPgClientTransaction,
-} from "../steps/withPgClient.js";
+} from "../steps/withPgClient.ts";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function EXPORTABLE<T, TScope extends any[]>(

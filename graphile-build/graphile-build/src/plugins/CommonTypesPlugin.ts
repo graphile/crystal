@@ -5,8 +5,8 @@ import type {
   GraphQLScalarValueParser,
 } from "grafast/graphql";
 
-import { EXPORTABLE } from "../utils.js";
-import { version } from "../version.js";
+import { EXPORTABLE } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

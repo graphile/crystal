@@ -10,9 +10,9 @@ import {
 } from "grafast/graphql";
 import { AsyncHooks, orderedApply, resolvePreset } from "graphile-config";
 
-export { isValidBehaviorString } from "./behavior.js";
-import extend from "./extend.js";
-import { makeInitialInflection } from "./inflection.js";
+export { isValidBehaviorString } from "./behavior.ts";
+import extend from "./extend.ts";
+import { makeInitialInflection } from "./inflection.ts";
 import {
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
@@ -34,8 +34,8 @@ import {
   SubscriptionPlugin,
   SwallowErrorsPlugin,
   TrimEmptyDescriptionsPlugin,
-} from "./plugins/index.js";
-import SchemaBuilder from "./SchemaBuilder.js";
+} from "./plugins/index.ts";
+import SchemaBuilder from "./SchemaBuilder.ts";
 export {
   camelCase,
   constantCase,
@@ -48,7 +48,7 @@ export {
   singularize,
   upperCamelCase,
   upperFirst,
-} from "./utils.js";
+} from "./utils.ts";
 import type {
   GrafastArgumentConfig,
   GrafastFieldConfig,
@@ -78,10 +78,10 @@ import type { PluginHook } from "graphile-config";
 import type {
   GatherPluginContext,
   GatherPluginContextBase,
-} from "./interfaces.js";
-import type { NewWithHooksFunction } from "./newWithHooks/index.js";
-import { GraphileBuildLibPreset } from "./preset.js";
-import { EXPORTABLE } from "./utils.js";
+} from "./interfaces.ts";
+import type { NewWithHooksFunction } from "./newWithHooks/index.ts";
+import { GraphileBuildLibPreset } from "./preset.ts";
+import { EXPORTABLE } from "./utils.ts";
 
 // export globals for TypeDoc
 export type { GraphileBuild, GraphileConfig };
@@ -576,8 +576,8 @@ export {
   SwallowErrorsPlugin,
   TrimEmptyDescriptionsPlugin,
 };
-export type { GatherPluginContext } from "./interfaces.js";
-export { defaultPreset } from "./preset.js";
+export type { GatherPluginContext } from "./interfaces.ts";
+export { defaultPreset } from "./preset.ts";
 
 export interface SchemaResult {
   schema: GraphQLSchema;
@@ -770,7 +770,7 @@ export async function watchSchema(
   return stopWatching;
 }
 
-export { version } from "./version.js";
+export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {

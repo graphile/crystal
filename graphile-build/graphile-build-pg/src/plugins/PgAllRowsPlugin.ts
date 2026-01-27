@@ -6,8 +6,8 @@ import { connection } from "grafast";
 import type { GraphQLObjectType, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

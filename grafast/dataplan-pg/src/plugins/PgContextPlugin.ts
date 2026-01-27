@@ -1,8 +1,8 @@
 import type {} from "grafast";
 
-import type {} from "../interfaces.js";
-import { withPgClientFromPgService } from "../pgServices.js";
-import { version } from "../version.js";
+import type {} from "../interfaces.ts";
+import { withPgClientFromPgService } from "../pgServices.ts";
+import { version } from "../version.ts";
 
 export const EMPTY_OBJECT: Record<string, never> = Object.freeze(
   Object.create(null),

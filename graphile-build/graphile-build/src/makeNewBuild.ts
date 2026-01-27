@@ -21,11 +21,11 @@ import {
 } from "grafast/graphql";
 import * as semver from "semver";
 
-import append from "./append.js";
-import extend, { indent } from "./extend.js";
-import type SchemaBuilder from "./SchemaBuilder.js";
-import { stringTypeSpec, wrapDescription } from "./utils.js";
-import { version } from "./version.js";
+import append from "./append.ts";
+import extend, { indent } from "./extend.ts";
+import type SchemaBuilder from "./SchemaBuilder.ts";
+import { stringTypeSpec, wrapDescription } from "./utils.ts";
+import { version } from "./version.ts";
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
 

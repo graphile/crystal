@@ -58,8 +58,8 @@ import type {
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { exportNameHint, tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { exportNameHint, tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 const EMPTY_ARRAY = Object.freeze([]);
 const makeEmptyArray = EXPORTABLE(

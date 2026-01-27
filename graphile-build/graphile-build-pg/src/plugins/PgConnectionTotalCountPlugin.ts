@@ -11,7 +11,7 @@ import { TYPES } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

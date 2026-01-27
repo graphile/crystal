@@ -1,6 +1,6 @@
 import { isDev } from "grafast";
 
-import type { PgStmtBaseStep } from "./steps/pgStmt";
+import type { PgStmtBaseStep } from "./steps/pgStmt.ts";
 
 export type PgLockableParameter =
   | "orderBy"
@@ -17,10 +17,14 @@ export class PgLocker<TStep extends PgStmtBaseStep<any>> {
    * Determines if the PgSelectStep is "locked" - i.e. its
    * FROM,JOINs,WHERE,ORDER BY,LIMIT,OFFSET cannot be changed. Note this does
    * not prevent adding more SELECTs
-   */
+  */
   public locked = false;
 
-  constructor(private parent: TStep) {}
+  private parent: TStep;
+
+  constructor(parent: TStep) {
+    this.parent = parent;
+  }
 
   private _beforeLock: {
     [a in PgLockableParameter]: Array<PgLockCallback<TStep>>;

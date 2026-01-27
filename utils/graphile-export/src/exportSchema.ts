@@ -2,12 +2,12 @@ import { writeFile } from "node:fs/promises";
 import type { URL } from "node:url";
 import { inspect } from "node:util";
 
-import generate from "@babel/generator";
+import { generate } from "@babel/generator";
 import { parse } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
 import type { NodePath } from "@babel/traverse";
-import traverse from "@babel/traverse";
+import traverseModule from "@babel/traverse";
 import * as t from "@babel/types";
 import type {
   GraphQLArgumentConfig,
@@ -45,15 +45,17 @@ import {
   printSchema,
   specifiedDirectives,
 } from "grafast/graphql";
-import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
+import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema.js";
 import type { PgSQL, SQL } from "pg-sql2";
 
-import { isForbidden } from "./helpers.js";
-import type { ExportOptions } from "./interfaces.js";
-import { optimize } from "./optimize/index.js";
-import { reservedWords } from "./reservedWords.js";
-import { isImportable, isNotNullish } from "./utils.js";
-import { wellKnown } from "./wellKnown.js";
+import { isForbidden } from "./helpers.ts";
+import type { ExportOptions } from "./interfaces.ts";
+import { optimize } from "./optimize/index.ts";
+import { reservedWords } from "./reservedWords.ts";
+import { isImportable, isNotNullish } from "./utils.ts";
+import { wellKnown } from "./wellKnown.ts";
+
+const traverse = traverseModule as unknown as typeof import("@babel/traverse")["default"];
 
 // Cannot import sql because it's optional
 //     import { sql } from "pg-sql2";
@@ -285,7 +287,11 @@ class CodegenFile {
   _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
     new Map();
 
-  constructor(public options: ExportOptions) {}
+  public options: ExportOptions;
+
+  constructor(options: ExportOptions) {
+    this.options = options;
+  }
 
   addStatements(statements: t.Statement | t.Statement[]): void {
     if (Array.isArray(statements)) {
@@ -1415,7 +1421,7 @@ function parseExpressionViaDoc(funcString: string) {
   });
   let result: null | NodePath<t.Expression> = null as any;
   traverse(doc, {
-    VariableDeclaration(path) {
+    VariableDeclaration(path: NodePath<t.VariableDeclaration>) {
       result = path.get("declarations.0.init") as NodePath<t.Expression>;
       path.stop();
     },

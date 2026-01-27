@@ -6,7 +6,7 @@ import { assertExecutableStep } from "grafast";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

@@ -11,7 +11,7 @@ import type {
   PgCodecAttributeViaExplicit,
   PgEnumCodecSpec,
   PgRecordTypeCodecSpec,
-} from "./codecs.js";
+} from "./codecs.ts";
 import {
   domainOfCodec,
   enumCodec,
@@ -23,7 +23,7 @@ import {
   recordCodec,
   sqlValueWithCodec,
   TYPES,
-} from "./codecs.js";
+} from "./codecs.ts";
 import type {
   PgBox,
   PgCircle,
@@ -34,7 +34,7 @@ import type {
   PgPath,
   PgPoint,
   PgPolygon,
-} from "./codecUtils/index.js";
+} from "./codecUtils/index.ts";
 import type {
   PgCodecRef,
   PgCodecRefExtensions,
@@ -48,13 +48,13 @@ import type {
   PgResourceParameter,
   PgResourceUnique,
   PgResourceUniqueExtensions,
-} from "./datasource.js";
+} from "./datasource.ts";
 import {
   makeRegistry,
   makeRegistryBuilder,
   PgResource,
   pgResourceOptions,
-} from "./datasource.js";
+} from "./datasource.ts";
 import type {
   PgClient,
   PgClientQuery,
@@ -65,12 +65,12 @@ import type {
   PgExecutorMutationOptions,
   PgExecutorOptions,
   WithPgClient,
-} from "./executor.js";
-import { PgExecutor } from "./executor.js";
-import { PgBooleanFilter } from "./filters/pgBooleanFilter.js";
-import { PgClassFilter } from "./filters/pgClassFilter.js";
-import { PgManyFilter } from "./filters/pgManyFilter.js";
-import { PgOrFilter } from "./filters/pgOrFilter.js";
+} from "./executor.ts";
+import { PgExecutor } from "./executor.ts";
+import { PgBooleanFilter } from "./filters/pgBooleanFilter.ts";
+import { PgClassFilter } from "./filters/pgClassFilter.ts";
+import { PgManyFilter } from "./filters/pgManyFilter.ts";
+import { PgOrFilter } from "./filters/pgOrFilter.ts";
 import type {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
@@ -115,33 +115,33 @@ import type {
   PgUnionAllQueryBuilderCallback,
   PlanByUniques,
   TuplePlanMap,
-} from "./interfaces.js";
-import type { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
-import type { PgAdaptor } from "./pgServices.js";
+} from "./interfaces.ts";
+import type { PgLockableParameter, PgLockCallback } from "./pgLocker.ts";
+import type { PgAdaptor } from "./pgServices.ts";
 import {
   getWithPgClientFromPgService,
   withPgClientFromPgService,
   withSuperuserPgClientFromPgService,
-} from "./pgServices.js";
-import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
+} from "./pgServices.ts";
+import { PgContextPlugin } from "./plugins/PgContextPlugin.ts";
 import {
   pgClassExpression,
   PgClassExpressionStep,
-} from "./steps/pgClassExpression.js";
+} from "./steps/pgClassExpression.ts";
 import type {
   PgConditionCapableParent,
   PgHavingConditionSpec,
   PgWhereConditionSpec,
-} from "./steps/pgCondition.js";
+} from "./steps/pgCondition.ts";
 import {
   PgCondition,
   pgWhereConditionSpecListToSQL,
-} from "./steps/pgCondition.js";
-import { PgCursorStep } from "./steps/pgCursor.js";
-import type { PgDeleteSingleQueryBuilder } from "./steps/pgDeleteSingle.js";
-import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
-import type { PgInsertSingleQueryBuilder } from "./steps/pgInsertSingle.js";
-import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.js";
+} from "./steps/pgCondition.ts";
+import { PgCursorStep } from "./steps/pgCursor.ts";
+import type { PgDeleteSingleQueryBuilder } from "./steps/pgDeleteSingle.ts";
+import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
+import type { PgInsertSingleQueryBuilder } from "./steps/pgInsertSingle.ts";
+import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
 import type {
   PgGroupDetails,
   PgSelectArgumentDigest,
@@ -152,7 +152,7 @@ import type {
   PgSelectOptions,
   PgSelectParsedCursorStep,
   PgSelectQueryBuilder,
-} from "./steps/pgSelect.js";
+} from "./steps/pgSelect.ts";
 import {
   generatePgParameterAnalysis,
   pgFromExpression,
@@ -162,14 +162,14 @@ import {
   PgSelectRowsStep,
   PgSelectStep,
   sqlFromArgDigests,
-} from "./steps/pgSelect.js";
-import type { PgSelectSinglePlanOptions } from "./steps/pgSelectSingle.js";
+} from "./steps/pgSelect.ts";
+import type { PgSelectSinglePlanOptions } from "./steps/pgSelectSingle.ts";
 import {
   pgSelectFromRecord,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
-} from "./steps/pgSelectSingle.js";
-import { PgTempTable } from "./steps/pgTempTable.js";
+} from "./steps/pgSelectSingle.ts";
+import { PgTempTable } from "./steps/pgTempTable.ts";
 import type {
   PgUnionAllQueryBuilder,
   PgUnionAllStepCondition,
@@ -177,21 +177,21 @@ import type {
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
   PgUnionAllStepOrder,
-} from "./steps/pgUnionAll.js";
+} from "./steps/pgUnionAll.ts";
 import {
   pgUnionAll,
   PgUnionAllRowsStep,
   PgUnionAllSingleStep,
   PgUnionAllStep,
-} from "./steps/pgUnionAll.js";
-import type { PgUpdateSingleQueryBuilder } from "./steps/pgUpdateSingle.js";
-import { pgUpdateSingle, PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+} from "./steps/pgUnionAll.ts";
+import type { PgUpdateSingleQueryBuilder } from "./steps/pgUpdateSingle.ts";
+import { pgUpdateSingle, PgUpdateSingleStep } from "./steps/pgUpdateSingle.ts";
 import {
   pgValidateParsedCursor,
   PgValidateParsedCursorStep,
-} from "./steps/pgValidateParsedCursor.js";
-import { toPg, ToPgStep } from "./steps/toPg.js";
-import type { SideEffectWithPgClientStepCallback } from "./steps/withPgClient.js";
+} from "./steps/pgValidateParsedCursor.ts";
+import { toPg, ToPgStep } from "./steps/toPg.ts";
+import type { SideEffectWithPgClientStepCallback } from "./steps/withPgClient.ts";
 import {
   loadManyWithPgClient,
   loadOneWithPgClient,
@@ -200,8 +200,8 @@ import {
   sideEffectWithPgClientTransaction,
   withPgClient,
   withPgClientTransaction,
-} from "./steps/withPgClient.js";
-import { assertPgClassSingleStep } from "./utils.js";
+} from "./steps/withPgClient.ts";
+import { assertPgClassSingleStep } from "./utils.ts";
 
 export type {
   GetPgCodecAttributes,
@@ -441,7 +441,7 @@ exportAsMany("@dataplan/pg", {
   PgContextPlugin,
 });
 
-export { version } from "./version.js";
+export { version } from "./version.ts";
 
 declare global {
   namespace GraphileConfig {

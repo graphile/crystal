@@ -2,22 +2,22 @@ import type { inspect, Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import type { CustomInspectFunction } from "util";
 
-import type { PgCodecAttributes } from "./codecs.js";
+import type { PgCodecAttributes } from "./codecs.ts";
 import type {
   PgCodecRefs,
   PgResource,
   PgResourceOptions,
   PgResourceParameter,
   PgResourceUnique,
-} from "./datasource.js";
-import type { PgExecutor } from "./executor.js";
-import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
-import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
-import type { PgSelectQueryBuilder } from "./steps/pgSelect.js";
-import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
-import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.js";
-import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
-import type { RuntimeSQLThunk } from "./utils.js";
+} from "./datasource.ts";
+import type { PgExecutor } from "./executor.ts";
+import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
+import type { PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
+import type { PgSelectQueryBuilder } from "./steps/pgSelect.ts";
+import type { PgSelectSingleStep } from "./steps/pgSelectSingle.ts";
+import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.ts";
+import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.ts";
+import type { RuntimeSQLThunk } from "./utils.ts";
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or

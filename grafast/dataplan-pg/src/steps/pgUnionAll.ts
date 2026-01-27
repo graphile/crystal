@@ -25,11 +25,11 @@ import {
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 
-import type { PgCodecAttributes } from "../codecs.js";
-import { TYPES } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../datasource.js";
-import type { PgExecutor, PgExecutorInput } from "../executor.js";
-import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
+import type { PgCodecAttributes } from "../codecs.ts";
+import { TYPES } from "../codecs.ts";
+import type { PgResource, PgResourceUnique } from "../datasource.ts";
+import type { PgExecutor, PgExecutorInput } from "../executor.ts";
+import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.ts";
 import type {
   PgCodec,
   PgOrderFragmentSpec,
@@ -39,21 +39,21 @@ import type {
   PgTypedStep,
   PgUnionAllQueryBuilderCallback,
   ReadonlyArrayOrDirect,
-} from "../interfaces.js";
-import { PgLocker } from "../pgLocker.js";
-import type { PlantimeEmbeddable, RuntimeSQLThunk } from "../utils.js";
-import { makeScopedSQL, runtimeScopedSQL } from "../utils.js";
-import type { PgClassExpressionStep } from "./pgClassExpression.js";
-import { pgClassExpression } from "./pgClassExpression.js";
+} from "../interfaces.ts";
+import { PgLocker } from "../pgLocker.ts";
+import type { PlantimeEmbeddable, RuntimeSQLThunk } from "../utils.ts";
+import { makeScopedSQL, runtimeScopedSQL } from "../utils.ts";
+import type { PgClassExpressionStep } from "./pgClassExpression.ts";
+import { pgClassExpression } from "./pgClassExpression.ts";
 import type {
   PgHavingConditionSpec,
   PgWhereConditionSpec,
-} from "./pgCondition.js";
-import { PgCondition } from "./pgCondition.js";
-import type { PgCursorDetails } from "./pgCursor.js";
-import { PgCursorStep } from "./pgCursor.js";
-import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
-import type { PgSelectSingleStep } from "./pgSelectSingle.js";
+} from "./pgCondition.ts";
+import { PgCondition } from "./pgCondition.ts";
+import type { PgCursorDetails } from "./pgCursor.ts";
+import { PgCursorStep } from "./pgCursor.ts";
+import { getFragmentAndCodecFromOrder } from "./pgSelect.ts";
+import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
 import type {
   MutablePgStmtCommonQueryInfo,
   PgStmtCommonQueryInfo,
@@ -61,15 +61,15 @@ import type {
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
   QueryValue,
-} from "./pgStmt.js";
+} from "./pgStmt.ts";
 import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
   getUnary,
   makeValues,
   PgStmtBaseStep,
-} from "./pgStmt.js";
-import { validateParsedCursor } from "./pgValidateParsedCursor.js";
+} from "./pgStmt.ts";
+import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
   return v != null;

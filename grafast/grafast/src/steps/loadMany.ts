@@ -2,28 +2,28 @@ import type {
   __ItemStep,
   ConnectionOptimizedStep,
   ExecutionDetails,
-} from "../index.js";
+} from "../index.ts";
 import type {
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
   Thunk,
-} from "../interfaces.js";
-import type { Multistep, UnwrapMultistep } from "../multistep.js";
-import { multistep } from "../multistep.js";
-import { Step } from "../step.js";
-import { canonicalJSONStringify, recordsMatch } from "../utils.js";
+} from "../interfaces.ts";
+import type { Multistep, UnwrapMultistep } from "../multistep.ts";
+import { multistep } from "../multistep.ts";
+import { Step } from "../step.ts";
+import { canonicalJSONStringify, recordsMatch } from "../utils.ts";
 import {
   executeLoad,
   type IOEquivalence,
   ioEquivalenceMatches,
   makeAccessMap,
   paramSig,
-} from "./_loadCommon.js";
-import { access } from "./access.js";
-import type { PaginationFeatures, PaginationParams } from "./connection.js";
-import { constant } from "./constant.js";
-import { LoadedRecordStep } from "./loadedRecord.js";
+} from "./_loadCommon.ts";
+import { access } from "./access.ts";
+import type { PaginationFeatures, PaginationParams } from "./connection.ts";
+import { constant } from "./constant.ts";
+import { LoadedRecordStep } from "./loadedRecord.ts";
 
 export interface LoadManyInfo<
   TItem,

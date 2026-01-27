@@ -1,18 +1,18 @@
 // import debugFactory from "debug";
 
-import { isDev } from "../dev.js";
+import { isDev } from "../dev.ts";
 import type {
   DataFromStep,
   ExecutionDetails,
   ExecutionExtra,
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import { isSafeObjectPropertyName } from "../tamedevilUtils";
-import { digestKeys } from "../utils.js";
-import { constant, ConstantStep } from "./constant.js";
+} from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
+import { isSafeObjectPropertyName } from "../tamedevilUtils.ts";
+import { digestKeys } from "../utils.ts";
+import { constant, ConstantStep } from "./constant.ts";
 
 const DEFAULT_CACHE_SIZE = 100;
 
@@ -60,12 +60,14 @@ export class ObjectStep<
   // Optimize needs the same 'meta' for all ObjectSteps
   optimizeMetaKey = "ObjectStep";
   private cacheSize: number;
+  private cacheConfig?: ObjectStepCacheConfig;
 
   constructor(
     obj: TPlans,
-    private cacheConfig?: ObjectStepCacheConfig,
+    cacheConfig?: ObjectStepCacheConfig,
   ) {
     super();
+    this.cacheConfig = cacheConfig;
     this.cacheSize =
       cacheConfig?.cacheSize ??
       (cacheConfig?.identifier ? DEFAULT_CACHE_SIZE : 0);

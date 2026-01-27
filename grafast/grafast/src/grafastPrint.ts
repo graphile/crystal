@@ -1,20 +1,20 @@
 import chalk from "chalk";
 
-import type { Bucket } from "./bucket.js";
+import type { Bucket } from "./bucket.ts";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
   FLAG_STOPPED,
-} from "./constants.js";
-import { bucketToString } from "./engine/executeBucket.js";
-import { LayerPlan } from "./engine/LayerPlan.js";
-import { OutputPlan } from "./engine/OutputPlan.js";
-import { inspect } from "./inspect.js";
-import { Step } from "./step.js";
-import { stripAnsi } from "./stripAnsi.js";
-import { isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils.js";
+} from "./constants.ts";
+import { bucketToString } from "./engine/executeBucket.ts";
+import { LayerPlan } from "./engine/LayerPlan.ts";
+import { OutputPlan } from "./engine/OutputPlan.ts";
+import { inspect } from "./inspect.ts";
+import { Step } from "./step.ts";
+import { stripAnsi } from "./stripAnsi.ts";
+import { isPromise, ROOT_VALUE_OBJECT, sharedNull } from "./utils.ts";
 
 /*
  * This file contains utilities used with the `debug` module primarily (but

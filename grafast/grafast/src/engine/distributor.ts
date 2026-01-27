@@ -1,12 +1,12 @@
-import * as assert from "../assert";
-import { isDev, noop } from "../dev";
-import type { Maybe } from "../interfaces";
+import * as assert from "../assert.ts";
+import { isDev, noop } from "../dev.ts";
+import type { Maybe } from "../interfaces.ts";
 import {
   type PromiseWithResolve,
   promiseWithResolve,
-} from "../promiseWithResolve";
-import type { Step } from "../step";
-import { arrayOfLength, isPromiseLike, sleep } from "../utils";
+} from "../promiseWithResolve.ts";
+import type { Step } from "../step.ts";
+import { arrayOfLength, isPromiseLike, sleep } from "../utils.ts";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;

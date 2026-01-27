@@ -1,7 +1,7 @@
-import type { Maybe, NodeIdHandler } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { constant } from "./constant.js";
-import { lambda } from "./lambda.js";
+import type { Maybe, NodeIdHandler } from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { constant } from "./constant.ts";
+import { lambda } from "./lambda.ts";
 
 /**
  * Decodes a global identifier that is expected to correspond to a specific

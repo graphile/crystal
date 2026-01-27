@@ -10,7 +10,7 @@ import type {
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

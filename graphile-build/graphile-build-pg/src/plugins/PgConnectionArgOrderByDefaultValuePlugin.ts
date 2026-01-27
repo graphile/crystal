@@ -3,7 +3,7 @@ import "graphile-config";
 
 import type { GraphQLEnumType } from "grafast/graphql";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

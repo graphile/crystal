@@ -1,9 +1,9 @@
 import chalk from "chalk";
 
-import { $$deepDepSkip } from "../constants.js";
-import type { GrafastResultsList, JSONValue } from "../index.js";
-import type { Step } from "../step.js";
-import { $$noExec, UnbatchedStep } from "../step.js";
+import { $$deepDepSkip } from "../constants.ts";
+import type { GrafastResultsList, JSONValue } from "../index.ts";
+import type { Step } from "../step.ts";
+import { $$noExec, UnbatchedStep } from "../step.ts";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
@@ -22,12 +22,14 @@ export class __ItemStep<TData> extends UnbatchedStep<TData> {
    * @internal
    */
   public transformStepId?: number;
+  public readonly depth: number;
 
   constructor(
     parentPlan: Step<TData> | Step<TData[]>,
-    public readonly depth = 0,
+    depth = 0,
   ) {
     super();
+    this.depth = depth;
     this.addDependency(parentPlan);
     this._isUnary = false;
     this._isUnaryLocked = true;
