@@ -19,8 +19,8 @@ import PostGraphileAmberPreset from "postgraphile/presets/amber";
 import {
   createTestDatabase,
   dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { EXPORTABLE, extendSchema, gql } from "../src/index.js";
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import { EXPORTABLE, extendSchema, gql } from "../src/index.ts";
 
 let pgPool: Pool | null = null;
 let connectionString = "";

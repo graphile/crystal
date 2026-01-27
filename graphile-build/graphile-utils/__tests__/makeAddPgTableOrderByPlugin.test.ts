@@ -12,9 +12,9 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 import {
   createTestDatabase,
   dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import type { NullsSortMethod } from "../src/index.js";
-import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../src/index.js";
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import type { NullsSortMethod } from "../src/index.ts";
+import { makeAddPgTableOrderByPlugin, orderByAscDesc } from "../src/index.ts";
 
 let pgPool: Pool | null = null;
 let connectionString = "";

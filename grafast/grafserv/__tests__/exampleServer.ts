@@ -4,8 +4,8 @@ import type { AddressInfo } from "node:net";
 import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePreset } from "graphile-config";
 
-import { grafserv as grafservNode } from "../src/servers/node/index.js";
-import { grafserv as grafservWhatwg } from "../src/servers/whatwg-node__server/v0/index.js";
+import { grafserv as grafservNode } from "../src/servers/node/index.ts";
+import { grafserv as grafservWhatwg } from "../src/servers/whatwg-node__server/v0/index.ts";
 
 export async function makeExampleServer(
   preset: GraphileConfig.Preset = {

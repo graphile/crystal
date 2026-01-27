@@ -7,15 +7,15 @@ import { makeSchema } from "graphile-build";
 import { exportSchemaAsString } from "graphile-export";
 import type { PoolClient } from "pg";
 
-import AmberPreset from "../../../src/presets/amber.js";
-import type { V4Options } from "../../../src/presets/v4.js";
-import { makeV4Preset } from "../../../src/presets/v4.js";
+import AmberPreset from "../../../src/presets/amber.ts";
+import type { V4Options } from "../../../src/presets/v4.ts";
+import { makeV4Preset } from "../../../src/presets/v4.ts";
 import {
   snapshot,
   StripOidsPlugin,
   SwallowAllErrorsPlugin,
   withPoolClientTransaction,
-} from "../../helpers.js";
+} from "../../helpers.ts";
 
 jest.setTimeout(60000);
 

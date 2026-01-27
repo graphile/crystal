@@ -1,4 +1,4 @@
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 const NonNullRefsPlugin: GraphileConfig.Plugin = {
   name: "NonNullRefsPlugin",
