@@ -1,4 +1,4 @@
-import type { Maybe, Step } from "../../dist.js";
+import type { Maybe, Step } from "../../dist/index.js";
 import type {
   ClubData,
   ConsumableData,
