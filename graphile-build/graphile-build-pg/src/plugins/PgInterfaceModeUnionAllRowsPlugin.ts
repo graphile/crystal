@@ -11,7 +11,7 @@ import { connection } from "grafast";
 import type { GraphQLInterfaceType, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { version } from "../version.js";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

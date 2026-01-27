@@ -14,7 +14,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import * as assert from "../assert.js";
+import * as assert from "../assert.ts";
 import {
   $$contextPlanCache,
   $$proxy,
@@ -23,18 +23,18 @@ import {
   $$ts,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
-} from "../constants.js";
-import type { Constraint } from "../constraints.js";
+} from "../constants.ts";
+import type { Constraint } from "../constraints.ts";
 import {
   graphqlCollectFields,
   newSelectionSetDigest,
-} from "../graphqlCollectFields.js";
-import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
+} from "../graphqlCollectFields.ts";
+import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.ts";
 import type {
   ErrorBehavior,
   GrafastPlanJSON,
   StepStreamOptions,
-} from "../index.js";
+} from "../index.ts";
 import {
   __FlagStep,
   __ItemStep,
@@ -49,9 +49,9 @@ import {
   SafeError,
   Step,
   stripAnsi,
-} from "../index.js";
-import { inputStep } from "../input.js";
-import { inspect } from "../inspect.js";
+} from "../index.ts";
+import { inputStep } from "../input.ts";
+import { inspect } from "../inspect.ts";
 import type {
   AbstractTypePlanner,
   AddDependencyOptions,
@@ -66,11 +66,11 @@ import type {
   Maybe,
   PlanTypeInfo,
   TrackedArguments,
-} from "../interfaces.js";
-import type { ApplyAfterModeArg } from "../operationPlan-input.js";
-import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { GrafastOperationOptions } from "../prepare.js";
-import type { UnbatchedExecutableStep } from "../step.js";
+} from "../interfaces.ts";
+import type { ApplyAfterModeArg } from "../operationPlan-input.ts";
+import { withFieldArgsForArguments } from "../operationPlan-input.ts";
+import type { GrafastOperationOptions } from "../prepare.ts";
+import type { UnbatchedExecutableStep } from "../step.ts";
 import {
   $$noExec,
   assertExecutableStep,
@@ -79,18 +79,18 @@ import {
   isUnbatchedStep,
   stepHasToRecord,
   stepHasToSpecifier,
-} from "../step.js";
-import { __cloneStream, __CloneStreamStep } from "../steps/__cloneStream.js";
-import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
-import { itemsOrStep } from "../steps/connection.js";
-import { constant, ConstantStep } from "../steps/constant.js";
-import { isSkippableEach } from "../steps/each.js";
+} from "../step.ts";
+import { __cloneStream, __CloneStreamStep } from "../steps/__cloneStream.ts";
+import type { __TrackedValueStepWithDollars } from "../steps/__trackedValue.ts";
+import { itemsOrStep } from "../steps/connection.ts";
+import { constant, ConstantStep } from "../steps/constant.ts";
+import { isSkippableEach } from "../steps/each.ts";
 import {
   graphqlResolver,
   graphqlResolveType,
-} from "../steps/graphqlResolver.js";
-import { timeSource } from "../timeSource.js";
-import type { Sudo } from "../utils.js";
+} from "../steps/graphqlResolver.ts";
+import { timeSource } from "../timeSource.ts";
+import type { Sudo } from "../utils.ts";
 import {
   arraysMatch,
   assertNotAsync,
@@ -108,7 +108,7 @@ import {
   stepADependsOnStepB,
   sudo,
   writeableArray,
-} from "../utils.js";
+} from "../utils.ts";
 import type {
   LayerPlanPhase,
   LayerPlanReasonCombined,
@@ -117,15 +117,15 @@ import type {
   LayerPlanReasonListItemStream,
   LayerPlanReasonSubroutine,
   LayerPlanReasonSubscription,
-} from "./LayerPlan.js";
-import { LayerPlan } from "./LayerPlan.js";
-import { defaultPlanResolver } from "./lib/defaultPlanResolver.js";
+} from "./LayerPlan.ts";
+import { LayerPlan } from "./LayerPlan.ts";
+import { defaultPlanResolver } from "./lib/defaultPlanResolver.ts";
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
   withGlobalLayerPlan,
-} from "./lib/withGlobalLayerPlan.js";
-import { lock, unlock } from "./lock.js";
+} from "./lib/withGlobalLayerPlan.ts";
+import { lock, unlock } from "./lock.ts";
 import type {
   CommonPlanningDetails,
   PlanFieldReturnTypeDetails,
@@ -136,10 +136,10 @@ import type {
   PolymorphicResolveTypeDetails,
   ProcessGroupedFieldSetDetails,
   StreamDetails,
-} from "./OperationPlanTypes.js";
-import type { OutputPlanTypePolymorphicObject } from "./OutputPlan.js";
-import { OutputPlan } from "./OutputPlan.js";
-import { StepTracker } from "./StepTracker.js";
+} from "./OperationPlanTypes.ts";
+import type { OutputPlanTypePolymorphicObject } from "./OutputPlan.ts";
+import { OutputPlan } from "./OutputPlan.ts";
+import { StepTracker } from "./StepTracker.ts";
 
 type ProcessStepActionDescription =
   | "deduplicate"
@@ -359,24 +359,41 @@ export class OperationPlan {
     "schema" | "operation" | "fragments"
   >;
 
+  public readonly schema: GraphQLSchema;
+  public readonly operation: OperationDefinitionNode;
+  public readonly fragments: {
+    [fragmentName: string]: FragmentDefinitionNode;
+  };
+  public readonly variableValues: { [key: string]: any };
+  public readonly context: { [key: string]: any };
+  public readonly rootValue: any;
+  public readonly errorBehavior: ErrorBehavior;
+
   private readonly planningTimeout: number | null;
   private readonly maxPlanningDepth: number;
 
   constructor(
-    public readonly schema: GraphQLSchema,
-    public readonly operation: OperationDefinitionNode,
-    public readonly fragments: {
+    schema: GraphQLSchema,
+    operation: OperationDefinitionNode,
+    fragments: {
       [fragmentName: string]: FragmentDefinitionNode;
     },
     variableValuesConstraints: Constraint[],
-    public readonly variableValues: { [key: string]: any },
+    variableValues: { [key: string]: any },
     contextConstraints: Constraint[],
-    public readonly context: { [key: string]: any },
+    context: { [key: string]: any },
     rootValueConstraints: Constraint[],
-    public readonly rootValue: any,
-    public readonly errorBehavior: ErrorBehavior,
+    rootValue: any,
+    errorBehavior: ErrorBehavior,
     options: GrafastOperationOptions,
   ) {
+    this.schema = schema;
+    this.operation = operation;
+    this.fragments = fragments;
+    this.variableValues = variableValues;
+    this.context = context;
+    this.rootValue = rootValue;
+    this.errorBehavior = errorBehavior;
     this.planningTimeout = options?.timeouts?.planning ?? null;
     this.maxPlanningDepth = options?.maxPlanningDepth ?? DEFAULT_MAX_DEPTH;
     this.resolveInfoOperationBase = {

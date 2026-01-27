@@ -1,4 +1,4 @@
-import type { Step } from "..";
+import type { Step } from "../index.ts";
 
 /**
  * Used internally to prevent steps using other steps' optimize/finalize/etc

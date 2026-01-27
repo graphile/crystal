@@ -32,8 +32,8 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import { version } from "../version.js";
-import { watchFixtures } from "../watchFixtures.js";
+import { version } from "../version.ts";
+import { watchFixtures } from "../watchFixtures.ts";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

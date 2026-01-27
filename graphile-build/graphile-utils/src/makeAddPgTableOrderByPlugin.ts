@@ -5,7 +5,7 @@ import type {
 } from "@dataplan/pg";
 import type { GraphQLEnumValueConfig } from "graphql";
 
-import { EXPORTABLE } from "./exportable.js";
+import { EXPORTABLE } from "./exportable.ts";
 
 type OrderBySpecIdentity =
   | string // Attribute name

@@ -1,6 +1,6 @@
 import { NodePlugin } from "graphile-build";
 
-import * as core from "./core.js";
+import * as core from "./core.ts";
 
 test(
   "prints a schema with the NodePlugin skipped",

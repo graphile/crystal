@@ -2,7 +2,7 @@ import type { GraphQLSchema } from "graphql";
 import { isSchema, printSchema } from "graphql";
 import type { Plugin } from "pretty-format";
 
-import { consistentlyOrderedSchema } from "./consistentlyOrderedSchema.js";
+import { consistentlyOrderedSchema } from "./consistentlyOrderedSchema.ts";
 
 export const test: Plugin["test"] = (val) => isSchema(val);
 export const serialize = (schema: GraphQLSchema): string => {

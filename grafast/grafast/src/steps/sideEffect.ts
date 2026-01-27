@@ -1,11 +1,11 @@
 import type {
   PromiseOrDirect,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import type { Multistep, UnwrapMultistep } from "../multistep.js";
-import { multistep } from "../multistep.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
+} from "../interfaces.ts";
+import type { Multistep, UnwrapMultistep } from "../multistep.ts";
+import { multistep } from "../multistep.ts";
+import type { Step } from "../step.ts";
+import { UnbatchedStep } from "../step.ts";
 
 /**
  * Calls the given callback function for each tuple
@@ -19,11 +19,13 @@ export class SideEffectStep<TIn, TOut> extends UnbatchedStep<TOut> {
   allowMultipleOptimizations = false;
 
   private planDep: number | null;
+  private fn: (value: TIn) => PromiseOrDirect<TOut>;
   constructor(
     $plan: Step<TIn> | null | undefined,
-    private fn: (value: TIn) => PromiseOrDirect<TOut>,
+    fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
+    this.fn = fn;
     this.planDep = $plan != null ? this.addDependency($plan) : null;
 
     // This must be the last thing to happen

@@ -1,4 +1,4 @@
-import type { PgClient, WithPgClient } from "./executor.js";
+import type { PgClient, WithPgClient } from "./executor.ts";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
 

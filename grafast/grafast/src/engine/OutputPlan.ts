@@ -9,23 +9,23 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import * as assert from "../assert.js";
-import type { Bucket } from "../bucket.js";
-import { $$streamMore, FLAG_ERROR } from "../constants.js";
-import { isDev } from "../dev.js";
-import { stepADependsOnStepB, stripAnsi } from "../index.js";
-import { inspect } from "../inspect.js";
+import * as assert from "../assert.ts";
+import type { Bucket } from "../bucket.ts";
+import { $$streamMore, FLAG_ERROR } from "../constants.ts";
+import { isDev } from "../dev.ts";
+import { stepADependsOnStepB, stripAnsi } from "../index.ts";
+import { inspect } from "../inspect.ts";
 import type {
   ExecutionEntryFlags,
   JSONValue,
   LocationDetails,
-} from "../interfaces.js";
-import type { Step } from "../step.js";
-import { stringifyJSON, stringifyString } from "../tamedevilUtils";
-import { pathsFromAncestorToTargetLayerPlan } from "../utils.js";
-import type { PayloadRoot } from "./executeOutputPlan.js";
-import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
-import { hasParentLayerPlan } from "./LayerPlan.js";
+} from "../interfaces.ts";
+import type { Step } from "../step.ts";
+import { stringifyJSON, stringifyString } from "../tamedevilUtils.ts";
+import { pathsFromAncestorToTargetLayerPlan } from "../utils.ts";
+import type { PayloadRoot } from "./executeOutputPlan.ts";
+import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.ts";
+import { hasParentLayerPlan } from "./LayerPlan.ts";
 
 const debug = debugFactory("grafast:OutputPlan");
 const debugVerbose = debug.extend("verbose");
@@ -220,8 +220,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     OutputPlanTypeObject | OutputPlanTypePolymorphicObject
   >[] = [];
 
+  public layerPlan: LayerPlan;
+  public readonly type: TType;
+
   constructor(
-    public layerPlan: LayerPlan,
+    layerPlan: LayerPlan,
     /**
      * For root, this should always be an object.
      *
@@ -236,9 +239,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
      * For `introspection`, `null` it's irrelevant. Use `constant(null)` or whatever.
      */
     rootStep: Step,
-    public readonly type: TType,
+    type: TType,
     locationDetails: LocationDetails,
   ) {
+    this.layerPlan = layerPlan;
+    this.type = type;
     this.locationDetails = locationDetails;
     this.rootStep = rootStep;
     layerPlan.operationPlan.stepTracker.addOutputPlan(this);

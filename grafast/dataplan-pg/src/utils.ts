@@ -2,7 +2,7 @@ import { ExecutableStep, inspect } from "grafast";
 import type { SQL, Transformer } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgResource } from "./datasource.js";
+import type { PgResource } from "./datasource.ts";
 import type {
   PgClassSingleStep,
   PgCodec,
@@ -12,11 +12,11 @@ import type {
   PgSQLCallback,
   PgSQLCallbackOrDirect,
   PgTypedStep,
-} from "./interfaces.js";
-import { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
-import { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
-import { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
-import { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
+} from "./interfaces.ts";
+import { PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
+import { PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
+import { PgSelectSingleStep } from "./steps/pgSelectSingle.ts";
+import { PgUpdateSingleStep } from "./steps/pgUpdateSingle.ts";
 
 export function assertPgClassSingleStep<
   TResource extends PgResource<any, any, any, any, any>,

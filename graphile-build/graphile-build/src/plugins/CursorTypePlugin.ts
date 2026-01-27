@@ -1,7 +1,7 @@
 import "graphile-config";
 
-import { stringTypeSpec } from "../utils.js";
-import { version } from "../version.js";
+import { stringTypeSpec } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

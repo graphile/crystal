@@ -1,12 +1,12 @@
-import { operationPlan } from "../global.js";
-import { inspect } from "../inspect.js";
+import { operationPlan } from "../global.ts";
+import { inspect } from "../inspect.ts";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   JSONValue,
-} from "../interfaces.js";
-import { Step, UnbatchedStep } from "../step.js";
-import { arrayOfLength } from "../utils.js";
+} from "../interfaces.ts";
+import { Step, UnbatchedStep } from "../step.ts";
+import { arrayOfLength } from "../utils.ts";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan
@@ -17,12 +17,16 @@ export class ConstantStep<TData> extends UnbatchedStep<TData> {
     exportName: "ConstantStep",
   };
   isSyncAndSafe = true;
+  public readonly data: TData;
+  public readonly isSensitive: boolean;
 
   constructor(
-    public readonly data: TData,
-    public readonly isSensitive = typeof data !== "boolean" && data != null,
+    data: TData,
+    isSensitive = typeof data !== "boolean" && data != null,
   ) {
     super();
+    this.data = data;
+    this.isSensitive = isSensitive;
     const t = typeof data;
     if (
       data == null ||

@@ -7,20 +7,20 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
-} from "../constants.js";
-import type { FlaggedValue } from "../error.js";
-import { $$inhibit, flagError, SafeError } from "../error.js";
-import { inspect } from "../inspect.js";
+} from "../constants.ts";
+import type { FlaggedValue } from "../error.ts";
+import { $$inhibit, flagError, SafeError } from "../error.ts";
+import { inspect } from "../inspect.ts";
 import type {
   AddDependencyOptions,
   DataFromStep,
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
-} from "../interfaces.js";
-import { isListCapableStep, Step } from "../step.js";
-import { sudo } from "../utils.js";
-import type { __ItemStep } from "./__item.js";
+} from "../interfaces.ts";
+import { isListCapableStep, Step } from "../step.ts";
+import { sudo } from "../utils.ts";
+import type { __ItemStep } from "./__item.ts";
 
 // PUBLIC FLAGS
 export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;

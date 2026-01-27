@@ -1,16 +1,16 @@
 import chalk from "chalk";
 
-import type { Maybe } from "../index.js";
-import type { ListCapableStep, Step } from "../step.js";
-import { isListCapableStep } from "../step.js";
-import { __ItemStep } from "./__item.js";
+import type { Maybe } from "../index.ts";
+import type { ListCapableStep, Step } from "../step.ts";
+import { isListCapableStep } from "../step.ts";
+import { __ItemStep } from "./__item.ts";
 import type {
   ConnectionHandlingStep,
   ConnectionOptimizedStep,
   ItemsStep,
   StepRepresentingList,
-} from "./connection.js";
-import { __ListTransformStep, listTransform } from "./listTransform.js";
+} from "./connection.ts";
+import { __ListTransformStep, listTransform } from "./listTransform.ts";
 
 const eachReduceCallback = (memo: any[], item: any) => {
   memo.push(item);

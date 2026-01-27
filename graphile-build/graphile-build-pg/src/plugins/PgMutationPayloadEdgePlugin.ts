@@ -11,8 +11,8 @@ import { connection, constant, EdgeStep, first } from "grafast";
 import type { GraphQLEnumType, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { tagToString } from "../utils.js";
-import { version } from "../version.js";
+import { tagToString } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileConfig {

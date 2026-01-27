@@ -1,5 +1,5 @@
-import type { Step } from "../step.js";
-import { access } from "./access.js";
+import type { Step } from "../step.ts";
+import { access } from "./access.ts";
 
 /**
  * If your step class has a `get` method you should implement this so users

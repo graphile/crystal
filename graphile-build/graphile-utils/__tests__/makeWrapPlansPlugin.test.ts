@@ -24,8 +24,8 @@ import type {
   PlanWrapperFilter,
   PlanWrapperFilterRule,
   PlanWrapperFn,
-} from "../src/index.js";
-import { extendSchema, gql, makeWrapPlansPlugin } from "../src/index.js";
+} from "../src/index.ts";
+import { extendSchema, gql, makeWrapPlansPlugin } from "../src/index.ts";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

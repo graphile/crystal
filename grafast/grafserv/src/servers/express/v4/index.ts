@@ -4,14 +4,14 @@ import type { Duplex } from "node:stream";
 
 import type { Express, Request, Response } from "express";
 
-import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
-import type { OptionsFromConfig } from "../../../options.js";
+import type { GrafservConfig, RequestDigest } from "../../../interfaces.ts";
+import type { OptionsFromConfig } from "../../../options.ts";
 import {
   getBodyFromFrameworkBody,
   getBodyFromRequest,
   processHeaders,
-} from "../../../utils.js";
-import { NodeGrafservBase } from "../../node/index.js";
+} from "../../../utils.ts";
+import { NodeGrafservBase } from "../../node/index.ts";
 
 declare global {
   namespace Grafast {

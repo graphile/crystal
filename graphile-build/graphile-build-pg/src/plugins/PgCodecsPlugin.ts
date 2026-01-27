@@ -21,8 +21,8 @@ import {
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 
-import { exportNameHint } from "../utils.js";
-import { version } from "../version.js";
+import { exportNameHint } from "../utils.ts";
+import { version } from "../version.ts";
 
 interface State {
   codecByTypeIdByDatabaseName: Map<

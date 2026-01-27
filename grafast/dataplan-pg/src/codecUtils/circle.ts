@@ -1,7 +1,7 @@
 import { SafeError } from "grafast";
 
-import type { PgPoint } from "./point.js";
-import { stringifyPoint } from "./point.js";
+import type { PgPoint } from "./point.ts";
+import { stringifyPoint } from "./point.ts";
 
 export interface PgCircle {
   center: PgPoint;

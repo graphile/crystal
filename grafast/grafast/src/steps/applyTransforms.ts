@@ -1,22 +1,22 @@
-import * as assert from "../assert.js";
-import type { Bucket } from "../bucket.js";
-import { FLAG_ERROR } from "../constants.js";
-import { isDev } from "../dev.js";
+import * as assert from "../assert.ts";
+import type { Bucket } from "../bucket.ts";
+import { FLAG_ERROR } from "../constants.ts";
+import { isDev } from "../dev.ts";
 import {
   batchExecutionValue,
   executeBucket,
   newBucket,
   unaryExecutionValue,
-} from "../engine/executeBucket.js";
-import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
-import { LayerPlan } from "../engine/LayerPlan.js";
-import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import { flagError } from "../error.js";
-import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
-import { isListCapableStep, Step } from "../step.js";
-import { __ItemStep } from "./__item.js";
-import type { StepRepresentingList } from "./connection.js";
-import { itemsOrStep } from "./connection.js";
+} from "../engine/executeBucket.ts";
+import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.ts";
+import { LayerPlan } from "../engine/LayerPlan.ts";
+import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.ts";
+import { flagError } from "../error.ts";
+import type { ExecutionDetails, GrafastResultsList } from "../interfaces.ts";
+import { isListCapableStep, Step } from "../step.ts";
+import { __ItemStep } from "./__item.ts";
+import type { StepRepresentingList } from "./connection.ts";
+import { itemsOrStep } from "./connection.ts";
 
 /**
  * @internal

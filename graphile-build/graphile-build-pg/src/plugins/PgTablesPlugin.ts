@@ -17,9 +17,9 @@ import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 import {
   PARTITION_EXPOSE_OPTIONS,
   type PartitionExpose,
-} from "../interfaces.js";
-import { exportNameHint } from "../utils.js";
-import { version } from "../version.js";
+} from "../interfaces.ts";
+import { exportNameHint } from "../utils.ts";
+import { version } from "../version.ts";
 
 declare global {
   namespace GraphileBuild {

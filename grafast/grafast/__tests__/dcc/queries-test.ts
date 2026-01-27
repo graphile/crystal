@@ -13,9 +13,9 @@ import {
   incsig,
   resolveStreamDefer,
   streamToArray,
-} from "../incrementalUtils.js";
-import { readSnapshot, snapshot } from "../snapshots.js";
-import { makeBaseArgs } from "./dcc-schema.js";
+} from "../incrementalUtils.ts";
+import { readSnapshot, snapshot } from "../snapshots.ts";
+import { makeBaseArgs } from "./dcc-schema.ts";
 
 const itNotCi = process.env.CI ? it.skip : it;
 

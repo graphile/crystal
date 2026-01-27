@@ -4,7 +4,7 @@ import { isAsyncIterable, isDev, isSafeError } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 
-import type { MaskErrorFn } from "./interfaces";
+import type { MaskErrorFn } from "./interfaces.ts";
 
 const { GraphQLError } = graphql;
 // Only the non-ambiguous characters

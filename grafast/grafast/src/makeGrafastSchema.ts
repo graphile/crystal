@@ -6,7 +6,7 @@ import {
   deferDefinition,
   graphqlHasStreamDefer,
   streamDefinition,
-} from "./incremental.js";
+} from "./incremental.ts";
 import type {
   AbstractTypePlanner,
   ArgumentApplyPlanResolver,
@@ -17,9 +17,9 @@ import type {
   InputObjectTypeBakedResolver,
   PlanTypeInfo,
   ScalarPlanResolver,
-} from "./interfaces.js";
-import type { Step } from "./step.js";
-import { exportNameHint } from "./utils.js";
+} from "./interfaces.ts";
+import type { Step } from "./step.ts";
+import { exportNameHint } from "./utils.ts";
 
 const {
   buildASTSchema,

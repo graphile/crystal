@@ -4,10 +4,10 @@
 
 // IMPORTANT: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
-import "../interfaces.js";
+import "../interfaces.ts";
 
 import LRU from "@graphile/lru";
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import type { GrafastSubscriber, PromiseOrDirect } from "grafast";
 import { noop } from "grafast";
 import type {
@@ -29,9 +29,9 @@ import type {
   PgNotice,
   PgRaiseSeverity,
   WithPgClient,
-} from "../executor.js";
-import type { MakePgServiceOptions } from "../interfaces.js";
-import type { PgAdaptor } from "../pgServices.js";
+} from "../executor.ts";
+import type { MakePgServiceOptions } from "../interfaces.ts";
+import type { PgAdaptor } from "../pgServices.ts";
 
 declare global {
   namespace Grafast {
@@ -508,8 +508,11 @@ export class PgSubscriber<
     Object.create(null);
   private eventEmitter = new EventEmitter();
   private alive = true;
+  private pool: Pool;
 
-  constructor(private pool: Pool) {}
+  constructor(pool: Pool) {
+    this.pool = pool;
+  }
 
   private recordNotification = (notification: Notification): void => {
     this.eventEmitter.emit(notification.channel, notification.payload);

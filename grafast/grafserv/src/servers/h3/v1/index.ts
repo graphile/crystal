@@ -23,15 +23,15 @@ import {
   makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
-} from "../../../index.js";
+} from "../../../index.ts";
 import type {
   EventStreamHandlerResult,
   GrafservBodyBuffer,
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../../interfaces.js";
-import { noop } from "../../../utils.js";
+} from "../../../interfaces.ts";
+import { noop } from "../../../utils.ts";
 
 declare global {
   namespace Grafast {

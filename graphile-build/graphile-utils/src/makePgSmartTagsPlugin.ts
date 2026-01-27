@@ -16,7 +16,7 @@ import type {
 import type {} from "graphile-config";
 import JSON5 from "json5";
 
-import { parseIdentifierParts } from "./parseIdentifierParts.js";
+import { parseIdentifierParts } from "./parseIdentifierParts.ts";
 
 type PromiseOrDirect<T> = Promise<T> | T;
 type ThunkOrDirect<T> = (() => T) | T;

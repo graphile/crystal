@@ -1,32 +1,32 @@
 import type { BaseGraphQLArguments, Step } from "grafast";
 
-export { EXPORTABLE } from "./exportable.js";
-export { gql } from "./gql.js";
-export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
+export { EXPORTABLE } from "./exportable.ts";
+export { gql } from "./gql.ts";
+export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.ts";
 export {
   addPgTableCondition,
   makeAddPgTableConditionPlugin,
-} from "./makeAddPgTableConditionPlugin.js";
+} from "./makeAddPgTableConditionPlugin.ts";
 export type {
   MakeAddPgTableOrderByPluginOrders,
   NullsSortMethod,
   OrderByAscDescOptions,
-} from "./makeAddPgTableOrderByPlugin.js";
+} from "./makeAddPgTableOrderByPlugin.ts";
 export {
   addPgTableOrderBy,
   makeAddPgTableOrderByPlugin,
   orderByAscDesc,
-} from "./makeAddPgTableOrderByPlugin.js";
+} from "./makeAddPgTableOrderByPlugin.ts";
 export type {
   ChangeNullabilityRules,
   ChangeNullabilityTypeRules,
   NullabilitySpec,
   NullabilitySpecString,
-} from "./makeChangeNullabilityPlugin.js";
+} from "./makeChangeNullabilityPlugin.ts";
 export {
   changeNullability,
   makeChangeNullabilityPlugin,
-} from "./makeChangeNullabilityPlugin.js";
+} from "./makeChangeNullabilityPlugin.ts";
 export type {
   EnumResolver,
   ExtensionDefinition,
@@ -34,11 +34,11 @@ export type {
   ObjectResolver,
   Plans,
   Resolvers,
-} from "./makeExtendSchemaPlugin.js";
+} from "./makeExtendSchemaPlugin.ts";
 export {
   extendSchema,
   makeExtendSchemaPlugin,
-} from "./makeExtendSchemaPlugin.js";
+} from "./makeExtendSchemaPlugin.ts";
 export {
   jsonPgSmartTags,
   makeJSONPgSmartTagsPlugin,
@@ -47,11 +47,11 @@ export {
   pgSmartTags,
   pgSmartTagsFromFile,
   TagsFilePlugin,
-} from "./makePgSmartTagsPlugin.js";
+} from "./makePgSmartTagsPlugin.ts";
 export {
   makeProcessSchemaPlugin,
   processSchema,
-} from "./makeProcessSchemaPlugin.js";
+} from "./makeProcessSchemaPlugin.ts";
 export type {
   PlanWrapperFilter,
   PlanWrapperFilterRule,
@@ -59,8 +59,8 @@ export type {
   PlanWrapperRule,
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
-} from "./makeWrapPlansPlugin.js";
-export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.js";
+} from "./makeWrapPlansPlugin.ts";
+export { makeWrapPlansPlugin, wrapPlans } from "./makeWrapPlansPlugin.ts";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {

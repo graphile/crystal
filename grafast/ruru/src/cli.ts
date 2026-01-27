@@ -5,9 +5,9 @@ import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import type { createProxyServer } from "http-proxy";
 
-import type { RuruConfig, RuruServerConfig } from "./server.js";
-import { ruruHTML } from "./server.js";
-import { serveStatic } from "./static.js";
+import type { RuruConfig, RuruServerConfig } from "./server.ts";
+import { ruruHTML } from "./server.ts";
+import { serveStatic } from "./static.ts";
 const DEFAULT_STATIC_PATH = "/ruru-static/";
 
 export function options(yargs: Argv) {

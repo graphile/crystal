@@ -1,24 +1,24 @@
-import "./interfaces.js";
+import "./interfaces.ts";
 
-import { sortWithBeforeAfterProvides } from "./sort.js";
+import { sortWithBeforeAfterProvides } from "./sort.ts";
 
 export type { GraphileConfig };
 
-export { orderedApply } from "./functionality.js";
-export type { HookObject, PluginHook, PluginHookObject } from "./hooks.js";
-export { applyHooks, AsyncHooks } from "./hooks.js";
+export { orderedApply } from "./functionality.ts";
+export type { HookObject, PluginHook, PluginHookObject } from "./hooks.ts";
+export { applyHooks, AsyncHooks } from "./hooks.ts";
 export type {
   CallbackDescriptor,
   CallbackOrDescriptor,
   FunctionalityObject,
-} from "./interfaces.js";
-export type { MiddlewareHandlers, MiddlewareNext } from "./middleware.js";
-export { Middleware } from "./middleware.js";
+} from "./interfaces.ts";
+export type { MiddlewareHandlers, MiddlewareNext } from "./middleware.ts";
+export { Middleware } from "./middleware.ts";
 export {
   isResolvedPreset,
   resolvePreset,
   resolvePresets,
-} from "./resolvePresets.js";
+} from "./resolvePresets.ts";
 
 export function sortedPlugins(
   plugins: GraphileConfig.Plugin[] | undefined,
