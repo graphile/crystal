@@ -23179,7 +23179,21 @@ __metadata:
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
     react-error-boundary: "npm:^6.0.0"
+    ruru-types: "workspace:^"
     tslib: "npm:^2.8.1"
+    typescript: "npm:^5.9.3"
+  peerDependencies:
+    graphql: ^16.9.0
+  languageName: unknown
+  linkType: soft
+
+"ruru-types@workspace:^, ruru-types@workspace:grafast/ruru-types":
+  version: 0.0.0-use.local
+  resolution: "ruru-types@workspace:grafast/ruru-types"
+  dependencies:
+    "@graphiql/toolkit": "npm:^0.11.3"
+    graphiql: "npm:^5.2.1"
+    graphql: "npm:^16.9.0"
     typescript: "npm:^5.9.3"
   peerDependencies:
     graphql: ^16.9.0
@@ -23201,6 +23215,7 @@ __metadata:
     http-proxy: "npm:^1.18.1"
     mini-css-extract-plugin: "npm:^2.9.4"
     ruru-components: "workspace:^"
+    ruru-types: "workspace:^"
     style-loader: "npm:^4.0.0"
     svg-inline-loader: "npm:^0.8.2"
     ts-loader: "npm:^9.5.4"
