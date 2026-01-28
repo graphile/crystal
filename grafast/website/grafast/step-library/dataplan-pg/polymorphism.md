@@ -133,8 +133,6 @@ const itemTypeNameFromType = (type: string) =>
 </details>
 
 ```ts
-// TODO: test this!
-
 const singleTableSchema = makeGrafastSchema({
   typeDefs,
   objects: {
@@ -164,38 +162,6 @@ const singleTableSchema = makeGrafastSchema({
   },
 });
 ```
-
-<!-- TODO: move this to the PostGraphile documentation?
-
-, however the codec on the source your `pgSelect` uses
-must have the `polymorphic` configuration option set to `mode: "single"` for it
-to work. Something like:
-
-```ts
-itemResource.codec.polymorphism = {
-  mode: "single",
-  typeAttributes: ["type"],
-  types: {
-    TOPIC: {
-      name: "Topic",
-    },
-    POST: {
-      name: "Post",
-    },
-    DIVIDER: {
-      name: "Divider",
-    },
-    CHECKLIST: {
-      name: "Checklist",
-    },
-    CHECKLIST_ITEM: {
-      name: "ChecklistItem",
-    },
-  },
-};
-```
-
--->
 
 ### Relational table
 
@@ -274,8 +240,6 @@ This style of polymorphism can use `pgSelect` in the same way as you would with
 regular row selection, but the `planType` is a tiny bit more complex:
 
 ```ts
-// TODO: test this!
-
 // Note: we're using the same `typeDefs` and `itemTypeNameFromType` as above
 
 const relationalSchema = makeGrafastSchema({
@@ -327,41 +291,6 @@ const relationalSchema = makeGrafastSchema({
 });
 ```
 
-<!-- TODO: move these to PostGraphile docs?
-
-, however the codec on the source your `pgSelect` uses
-must have the `polymorphic` configuration option set to `mode: "relational"`
-for it to work. Something like:
-
-```ts
-itemResource.codec.polymorphic = {
-  mode: "relational",
-  typeAttributes: ["type"],
-  types: {
-    TOPIC: {
-      name: "Topic",
-      relationName: "topic",
-    },
-    POST: {
-      name: "Post",
-      relationName: "post",
-    },
-    DIVIDER: {
-      name: "Divider",
-      relationName: "divider",
-    },
-    CHECKLIST: {
-      name: "Checklist",
-      relationName: "checklist",
-    },
-    CHECKLIST_ITEM: {
-      name: "ChecklistItem",
-      relationName: "checklistItem",
-    },
-  },
-};
-```
-
 :::info
 
 The `relationName` in the above configuration is the name of the relation that
@@ -369,9 +298,6 @@ your central source has which links to the relevant table that contains
 additional data for this type.
 
 :::
-
-
--->
 
 ### Composite type union
 

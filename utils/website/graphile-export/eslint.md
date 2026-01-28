@@ -5,7 +5,7 @@ title: ESLint Plugin
 
 # Using our ESLint plugin
 
-Tracking all these dependencies yourself can to be a royal pain in the
+Tracking all these dependencies yourself can be a royal pain in the
 aggregate, so we've written a plugin `eslint-plugin-graphile-export` to do away
 with a lot of the pain.
 
@@ -91,5 +91,5 @@ the code.
 
 ---
 
-Will it always be this messy looking at exportable code? Lets take a look at
+Will it always be this messy looking at exportable code? Let's take a look at
 the [plans for the future](./the-future.md).

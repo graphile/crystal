@@ -38,4 +38,46 @@ referencing table and should be flagged `isReferencee: true`. The forward
 relation is always unique, the backward relation may or may not be unique
 depending on if the remote attributes have a unique constraint on them or not.
 
-TODO: more documentation on how to use relations
+## Defining relations
+
+Relations are typically added via the registry builder:
+
+```ts
+// on users table: foreign_key ("organization_id") references organizations ("id")
+builder.addRelation(userCodec, "organization", organizationResourceOptions, {
+  localAttributes: ["organization_id"],
+  remoteAttributes: ["id"],
+  isUnique: true, // organizations.id is the primary key; so at most 1 match
+  isReferencee: false, // userCodec references organizations
+});
+
+// The inverse of the above relation - all the users in this org.
+builder.addRelation(organizationCodec, "users", userResourceOptions, {
+  localAttributes: ["id"],
+  remoteAttributes: ["organization_id"],
+  isUnique: false, // Many users per org_id
+  isReferencee: true, // organizationCodec is referenced by users
+});
+```
+
+The forward relation (`user -> organization`) is unique; the backward relation
+(`organization -> users`) is not.
+
+## Using relations in plans
+
+From a single-row step (`PgSelectSingleStep`) you can traverse to related rows:
+
+```ts
+const $user = users.get({ id: $id });
+const $org = $user.singleRelation("organization");
+const $team = $org.manyRelation("users");
+```
+
+From a collection step (`PgSelectStep`), `singleRelation` gives you an SQL alias
+to use in conditions:
+
+```ts
+const $users = users.find();
+const orgAlias = $users.singleRelation("organization");
+$users.where((sql) => sql`${orgAlias}.is_active = true`);
+```

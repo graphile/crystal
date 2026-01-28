@@ -40,12 +40,11 @@ const preset = {
 };
 ```
 
-<!--
-
- TODO: how does an execution timeout impact incremental delivery and/or
-subscriptions?
-
--->
+Execution timeouts apply to each execution pass. For subscriptions, each event
+triggers a fresh execution pass, so timeouts apply per event; use your transport
+or server configuration to handle long-lived connections. (`@defer` and
+`@stream` have undefined behavior for timeouts currently - they may be
+implemented holistically, or on a per-payload basis, it is not yet determined.)
 
 In either case, it may be wise to track bad actors and block/rate limit
 requests from them. You can typically do this via a middleware in your
@@ -55,7 +54,7 @@ Below, we'll go into a little more detail on each of these topics.
 
 ## Static queries
 
-Building a GraphQL query via string concatination is generally considered bad
+Building a GraphQL query via string concatenation is generally considered bad
 practice (both in Gra*fast* and in the wider GraphQL ecosystem):
 
 ```js title="🛑 Don't do this!"
@@ -144,7 +143,7 @@ GraphQL clients, but it does have a few caveats:
   malicious attacker could set `$myVar` to `2147483647` to cause your server to
   process as much data as possible. Use fixed limits, conditions and orders
   where possible, even if it means having additional static operations
-  (alternatively, have you schema enforce the presence and/or valid ranges for
+  (alternatively, have your schema enforce the presence and/or valid ranges for
   these).
 - Persisted operations do not protect you from writing expensive queries
   yourself; it may be wise to combine this technique with a cost estimation

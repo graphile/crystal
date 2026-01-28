@@ -21,22 +21,21 @@ $insertedUser.set("bio", $bio);
 // `INSERT INTO users (username, bio) VALUES ($1, $2);`
 ```
 
-## $pgInsertSingle.setPlan()
+## $pgInsertSingle.apply($step)
 
-:::danger OUT OF DATE
+Registers a callback (or list of callbacks) that will be applied to the insert
+query builder at execution-time. The `$step` represents the callback at
+plan-time and yields it at execution-time. Each callback receives a
+`PgInsertSingleQueryBuilder` and can call `set` or `setBuilder` to add
+attributes.
 
-This method no longer exists! There's a runtime equivalent now via `.apply()`.
-
-Help documenting this is welcome!
-
-:::
-
-<!-- TODO: I think the explanation below still needs a bit of an update -->
-
-Returns a `Setter` (a Modifier, rather than an Step)
-that can be useful when combined with `applyPlan` plan resolvers in arguments
-and input fields to build up the attributes to set on the inserted row bit by
-bit.
+```ts
+const $insertedUser = pgInsertSingle(usersResource);
+const $apply = constant((qb) => {
+  qb.set("username", "reese");
+});
+$insertedUser.apply($apply);
+```
 
 ## $pgInsertSingle.get(attr)
 

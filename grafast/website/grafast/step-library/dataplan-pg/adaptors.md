@@ -53,10 +53,13 @@ time in order to communicate with the database. The function accepts two
 parameters (`pgSettings` and `callback`) and it:
 
 1. creates or retrieves a `PgClient` (see below) connected to the database,
-2. if set, applies any settings from the `pgSettings` object (creating a transaction if necessary),
+2. if set, applies any settings from the `pgSettings` object (creating a
+   transaction if necessary),
 3. calls the callback, passing the client as the only argument,
-4. on success releases the client (after committing the transaction if necessary) and returns the result of the callback,
-5. on error releases the client (after rolling back the transaction if necessary) and raises the error.
+4. on success releases the client (after committing the transaction if
+   necessary) and returns the result of the callback,
+5. on error releases the client (after rolling back the transaction if
+   necessary) and raises the error.
 
 ## PgClient
 
@@ -142,4 +145,34 @@ const graphqlContext = { withPgClient, pgSubscriber };
 
 ## Writing your own adaptor
 
-TODO: document this.
+We still need to make it easier for you to define your own adaptor, and will
+update this documentation once we've had a chance to define a few more. But if
+you want to jump into the weeds, the main thing to do is to ensure that your
+adaptor exports the two expected methods:
+
+- `makePgService(options)` - returns a PgServiceConfiguration object
+  detailing how to make requests with this adaptor.
+- `createWithPgClient(options, variant?)` - constructs a `withPgClient`
+  function using this adaptor.
+
+You can check your adaptor conforms by adding this type assertion:
+
+```ts
+// This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
+const adaptor: PgAdaptor<"path/to/my/adaptor.ts"> = {
+  createWithPgClient,
+  makePgService,
+};
+```
+
+Adaptors give you a chance not only to use your own choice of Postgres client,
+but also to control the lifecycle of the client - for example,
+`@dataplan/pg/adaptors/pg` gets a Postgres client on demand, and may even use
+multiple clients during the same request; however an alternative adaptor might
+allocate a client up front, or create one the first time it is needed and reuse
+it throughout the request. It can also control the way that pgSettings are set -
+`@dataplan/pg/adaptors/pg` does so via a transaction and then setting local
+settings that are automatically removed when the transaction completes, but an
+alternative client might set them as connection settings, and manually
+synchronise them between requests to avoid unnecessary transactions and
+roundtrips.

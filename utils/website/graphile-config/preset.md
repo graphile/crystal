@@ -57,9 +57,12 @@ JavaScript for `graphile.config.ts` above; see the TypeScript docs for more on
 
 ## Supporting TypeScript ESM
 
-You can specify a `graphile.config.ts` file, but if that uses `export default`,
-and your TypeScript is configured to export ESM, then you may get an error
-telling you that you cannot `require` an ES Module:
+Graphile Config tries to load your `graphile.config.*` directly; but if it fails
+it will use the `interpret` package to try and load it using a custom loader
+such as babel, ts-node, swc, etc.
+
+If you are using TypeScript with ESM output you might see errors like the
+following:
 
 <div className="wrapcode">
 
@@ -82,14 +85,23 @@ TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /path/t
 
 </div>
 
-To solve this, use the experimental loaders API to add support for TS ESM via
-the `ts-node/esm` loader:
+If you see these, ensure Node can load TypeScript ESM.
+
+Three common options are:
+
+1. Use a newer Node version (recommended v24+).
+2. Use a Node loader (for example `ts-node/esm` or `tsx`) when running the
+   command that loads `graphile.config.ts`.
+3. Export a CJS config (`graphile.config.cjs` or `graphile.config.js`) and use
+   `module.exports`.
+
+For example, to enable the `ts-node/esm` loader:
 
 ```js
 export NODE_OPTIONS="$NODE_OPTIONS --loader ts-node/esm"
 ```
 
-Then run your command again.
+Choose the approach that fits your project tooling best.
 
 ## Preset scopes
 
