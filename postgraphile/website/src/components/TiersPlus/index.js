@@ -8,12 +8,10 @@ const TierList = [
     title: "Monthly Plan",
     tagline: "Pay month-to-month with full flexibility",
     pricing: "$999",
-    was: "$1,500",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=531702",
     buttonText: "Start Monthly Plan",
     frequency: "/mo",
     comparison: "Cancel any time",
-    badge: "Updated August 2025",
     description: (
       <>
         <ul>
@@ -23,7 +21,6 @@ const TierList = [
           <li>
             <strong>Flexible</strong>
           </li>
-          <li>New lower price for 2025</li>
           <li>
             <strong>Access to discounted consultancy packages</strong>
           </li>
