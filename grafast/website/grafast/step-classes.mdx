@@ -92,7 +92,7 @@ There are many reasons for this indirection:
   consuming code needing to change
 
 The tiny additional cost of these step functions is only incurred at plan-time,
-and plans are re-used for similar future requests; the cost of an additional
+and plans are reused for similar future requests; the cost of an additional
 function call during planning is negligible.
 
 ## Lifecycle methods
@@ -173,12 +173,13 @@ know that your dependency is a unary step (e.g. because you added it via
 `this.addUnaryDependency($step)`), you may get its singular value via `const
 value = depEv.unaryValue()` (but if it wasn't unary then this will throw!).
 
-If you have a fixed number of dependencies it common to destructure them at the
+If you have a fixed number of dependencies it's common to destructure them at the
 top of the execute method:
 
 ```ts
 class MyStep extends Step {
   constructor($a, $b, $c) {
+    super();
     this.aDepIndex = this.addUnaryDependency($a);
     this.bDepIndex = this.addDependency($b);
     this.cDepIndex = this.addDependency($c);
@@ -210,7 +211,7 @@ be any positive integer. It's therefore recommended that you use `indexMap` to
 generate your results in the vast majority of cases:
 
 ```ts
-return indexMap((i) => 42);
+return details.indexMap((i) => 42);
 ```
 
 :::
@@ -239,7 +240,7 @@ should only perform a single async action. Typically it looks like this:
 4. Map over the input values again, for each index finding the value from step 3 that correlates.
 
 Here's a hypothetical example, concentrate on the `execute()` method and see how
-the steps outline above play out:
+the steps outlined above play out:
 
 ```ts
 import { languageService } from "./services/language";
@@ -463,7 +464,7 @@ finalize() {
 :::warning[Do not communicate with other steps!]
 
 Importantly during this lifecycle event the step should only worry about its own
-concerns and should not attempt to communicate with its ancestors or descendents
+concerns and should not attempt to communicate with its ancestors or descendants
 &mdash; they may not be the steps that it remembers as they may have been
 switched out during `optimize`! If the step needs to communicate with its
 ancestors it should use the `optimize` method to do so.
@@ -739,7 +740,7 @@ case for the majority of steps!) it must add a dependency via the
 which is the index in the `execute` values tuple that represents this step.
 
 It's common to do this in the constructor, but it can be done at other stages
-too, for example during the optimize phase a step's descendent might ask it to
+too, for example during the optimize phase a step's descendant might ask it to
 do additional work, and that work might depend on another step.
 
 In the [getting started][] guide we saw the constructor for the `AddStep` step
