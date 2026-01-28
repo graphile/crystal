@@ -126,7 +126,7 @@ returning a Modifier (see [fan-out and fan-in](#fan-out-and-fan-in) below).
 
 The apply method may return `undefined`, a new parent object to use with
 children when recursing, or (for list types) a factory function which is called
-for each list item to produces a parent object for that item to use. Returning a
+for each list item to produce a parent object for that item to use. Returning a
 factory function (e.g. `() => new Thing()`) enables patterns like `OR` filters
 where each entry in a list gets its own sub-condition.
 
@@ -285,7 +285,7 @@ class MyRequestStep extends Step {
 ```
 
 Here's an example demonstrating how to use `.apply()` to dynamically change the
-order of results from a database dynamically based on user input:
+order of results from a database based on user input:
 
 ```ts
 import { Step, ExecutionDetails, GrafastResultsList, Maybe } from "grafast";
