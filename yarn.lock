@@ -17924,14 +17924,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:~4.17.0":
-  version: 4.17.21
-  resolution: "lodash@npm:4.17.21"
-  checksum: 10/c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532
-  languageName: node
-  linkType: hard
-
-"lodash@npm:^4.17.23":
+"lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.23, lodash@npm:~4.17.0":
   version: 4.17.23
   resolution: "lodash@npm:4.17.23"
   checksum: 10/82504c88250f58da7a5a4289f57a4f759c44946c005dd232821c7688b5fcfbf4a6268f6a6cdde4b792c91edd2f3b5398c1d2a0998274432cff76def48735e233
@@ -22203,7 +22196,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-compiler-runtime@npm:19.1.0-rc.1":
+"react-compiler-runtime@npm:19.1.0-rc.1, react-compiler-runtime@npm:^19.1.0-rc.1":
   version: 19.1.0-rc.1
   resolution: "react-compiler-runtime@npm:19.1.0-rc.1"
   peerDependencies:
@@ -22212,14 +22205,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.0.0, react-dom@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "react-dom@npm:19.2.0"
+"react-dom@npm:^18 || ^19, react-dom@npm:^19.0.0, react-dom@npm:^19.2.0":
+  version: 19.2.4
+  resolution: "react-dom@npm:19.2.4"
   dependencies:
     scheduler: "npm:^0.27.0"
   peerDependencies:
-    react: ^19.2.0
-  checksum: 10/3dbba071b9b1e7a19eae55f05c100f6b44f88c0aee72397d719ae338248ca66ed5028e6964c1c14870cc3e1abcecc91b22baba6dc2072f819dea81a9fd72f2fd
+    react: ^19.2.4
+  checksum: 10/ec17721a8cb131bc33480a9f738bc5bbfe4bd11b11cf69f3f473605346578a329ad26ceef6ef0761ea67a4b455803407dd7ed4ba3d8a5abd2cee8c32d221e498
   languageName: node
   linkType: hard
 
@@ -22400,10 +22393,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.0.0, react@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "react@npm:19.2.0"
-  checksum: 10/e13bcdb8e994c3cfa922743cb75ca8deb60531bf02f584d2d8dab940a8132ce8a2e6ef16f8ed7f372b4072e7a7eeff589b2812dabbedfa73e6e46201dac8a9d0
+"react@npm:^18 || ^19, react@npm:^19.0.0, react@npm:^19.2.0":
+  version: 19.2.4
+  resolution: "react@npm:19.2.4"
+  checksum: 10/18179fe217f67eb2d0bc61cd04e7ad3c282ea09a1dface7eacd71816f62609f4bbf566c447c704335284deb8397b00bca084e0cd60e6f437279a7498e2d0bfe0
   languageName: node
   linkType: hard
 
@@ -23177,6 +23170,7 @@ __metadata:
     nodemon: "npm:^3.1.11"
     prettier: "npm:^3.6.2"
     react: "npm:^19.2.0"
+    react-compiler-runtime: "npm:^19.1.0-rc.1"
     react-dom: "npm:^19.2.0"
     react-error-boundary: "npm:^6.0.0"
     ruru-types: "workspace:^"
@@ -23194,9 +23188,18 @@ __metadata:
     "@graphiql/toolkit": "npm:^0.11.3"
     graphiql: "npm:^5.2.1"
     graphql: "npm:^16.9.0"
+    react: "npm:^18 || ^19"
+    react-dom: "npm:^18 || ^19"
     typescript: "npm:^5.9.3"
   peerDependencies:
     graphql: ^16.9.0
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -23214,6 +23217,8 @@ __metadata:
     graphql: "npm:^16.9.0"
     http-proxy: "npm:^1.18.1"
     mini-css-extract-plugin: "npm:^2.9.4"
+    react: "npm:^18 || ^19"
+    react-dom: "npm:^18 || ^19"
     ruru-components: "workspace:^"
     ruru-types: "workspace:^"
     style-loader: "npm:^4.0.0"
@@ -23228,6 +23233,13 @@ __metadata:
   peerDependencies:
     graphile-config: "workspace:^"
     graphql: ^16.9.0
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
   bin:
     ruru: ./dist/cli-run.js
   languageName: unknown
