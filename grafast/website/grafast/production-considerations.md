@@ -40,11 +40,11 @@ const preset = {
 };
 ```
 
-Execution timeouts apply to each execution pass. For `@defer` and `@stream`,
-the same execution rules apply for each payload: asynchronous steps receive
-`stopTime` and should stop work once it has been reached. For subscriptions,
-each event triggers a fresh execution pass, so timeouts apply per event; use
-your transport or server configuration to handle long-lived connections.
+Execution timeouts apply to each execution pass. For subscriptions, each event
+triggers a fresh execution pass, so timeouts apply per event; use your transport
+or server configuration to handle long-lived connections. (`@defer` and
+`@stream` have undefined behavior for timeouts currently - they may be
+implemented holistically, or on a per-payload basis, it is not yet determined.)
 
 In either case, it may be wise to track bad actors and block/rate limit
 requests from them. You can typically do this via a middleware in your
