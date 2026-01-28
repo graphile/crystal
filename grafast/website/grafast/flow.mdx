@@ -173,10 +173,25 @@ possible (typically just 1!).
 
 When a `null` hits a nullable type in GraphQL, no further processing is
 required. For efficiency, Gra*fast* will create a nullable boundary layer plan
-to represent this that will filter out these nulls such that dependent steps
-never need to process these `null` values.
+to represent this that will filter out these `null` values such that dependent
+steps never need to process them.
 
-{/* TODO: polymorphism and the other boundary types */}
+### Abstract type boundaries
+
+When an abstract type (interface or union) appears in a selection set, Gra*fast*
+does not know at plan-time which concrete type each entry will be. It creates a
+layer plan boundary for that abstract position and, at execution-time, splits
+the batch into buckets by `__typename`. Each bucket then runs the steps for the
+matching concrete type, while entries that do not match a branch are marked as
+skipped and filtered out from downstream execution.
+
+### Boundary summary
+
+Layer plan boundaries are inserted whenever the batch size can change:
+
+- list boundaries increase the batch size to the number of list items
+- nullable boundaries remove `null` entries from downstream work
+- abstract type boundaries split the batch into per-`__typename` buckets
 
 ## Why "branching" feels different in Gra*fast*
 
