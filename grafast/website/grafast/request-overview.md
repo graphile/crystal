@@ -39,7 +39,7 @@ example if the request contained `@skip(if: $variable)` then a different
 operation plan would be needed depending on whether `$variable` was `true` or
 `false`. Constraints are kept as narrow and limited as possible to maximize reuse.
 
-When an operation is seen a future time, <Grafast/> looks for an existing
+When an operation is seen at a future time, <Grafast /> looks for an existing
 operation plan whose constraints fit the request. If there is one then this
 operation plan can be executed, otherwise a new operation plan is created (see
 previous paragraph).
@@ -55,8 +55,8 @@ steps related to excluded selection sets on a per-request basis.
 
 ## Execute the execution plan
 
-Gra*fast* will populate the relevant system steps in the plan
-with the variables, context value, root value, etc and will then execute the
+Gra*fast* will populate the relevant system steps in the plan with the
+variables, context value, root value, etc and will then execute the
 execution plan, the execution flowing down through the execution plan's step graph,
 executing each step exactly once (and sometimes in parallel with other steps)
 until all steps have been executed. Since each step is only executed once per
@@ -72,7 +72,7 @@ object, however for an optimization <Grafast /> may optionally output
 stringified JSON instead without ever building the intermediary JavaScript
 objects.
 
-:::note[Subscriptions and `@stream`/`@defer]
+:::note[Subscriptions and `@stream`/`@defer`]
 
 When the operation involves streams (subscription or `@stream`), the relevant
 execution and output plan steps take place for each element of the stream(s).

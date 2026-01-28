@@ -6,8 +6,9 @@ import Mermaid from "@theme/Mermaid";
 
 # loadMany
 
-Similar to [DataLoader][]'s load method, uses the given callback function to
-read many results from your business logic layer. To load just one, see
+Like [DataLoader][]'s load method but for one-to-many lookups, uses the given
+callback function to read a list of results per identifier from your business
+logic layer. To load just one, see
 [`loadOne`](./loadOne.md).
 
 ## Simple usage
@@ -22,7 +23,8 @@ function User_friends($user) {
 ```
 
 Where our `friendsByUserId` loader might be the same one that we would use with
-DataLoader; here's a fictional example of how it might look:
+DataLoader for one-to-many lookups; here's a fictional example of how it might
+look:
 
 ```ts
 import { db } from "./db"; // Assume this is your database client

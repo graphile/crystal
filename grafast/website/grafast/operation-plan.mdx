@@ -112,14 +112,14 @@ payload in the underlying stream.
 
 ## Constraints
 
-Whilst <Grafast /> is building the operation plan, it may also determined
+Whilst <Grafast /> is building the operation plan, it may also determine
 particular constraints that govern whether the operation plan may be used for a
 future request or not. For example, if the request contains
 `@skip(if: $variable)` then a different operation plan may be needed depending
 on whether `$variable` was `true` or `false`. Where possible, constraints are
 kept as narrow as possible to maximize reuse.
 
-When an operation is seen a future time, <Grafast /> first looks for an existing
+When an operation is seen at a future time, <Grafast /> first looks for an existing
 operation plan whose constraints fit the request before falling back to creating
 a new operation plan.
 

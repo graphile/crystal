@@ -1,6 +1,6 @@
 # groupBy
 
-Takes a single dimensional list step and a (plan-time) mapper that yields a
+Takes a single-dimensional list step and a (plan-time) mapper that yields a
 grouping key. Returns a step that yields a Map where the keys are the grouping
 keys and the values are lists of the original entries that match these grouping
 keys.

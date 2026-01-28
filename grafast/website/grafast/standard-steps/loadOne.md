@@ -8,7 +8,7 @@ import Mermaid from "@theme/Mermaid";
 
 Similar to [DataLoader][]'s load method, uses the given callback function to
 read a single result (e.g. a user) from your business logic layer. To load a
-list (e.g. a user's friends), see [`loadMany`](./loadMany.md).
+list per identifier (e.g. a user's friends), see [`loadMany`](./loadMany.md).
 
 ## Enhancements over DataLoader
 

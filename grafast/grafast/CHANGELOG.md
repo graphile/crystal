@@ -1517,7 +1517,7 @@
 - [#1928](https://github.com/graphile/crystal/pull/1928)
   [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a)
   Thanks [@benjie](https://github.com/benjie)! - Make new `sideEffect(...)` step
-  class to replace `const $lambda = lambda(...);$lambda.hasSideEffect=true;`
+  class to replace `const $lambda = lambda(...);$lambda.hasSideEffects=true;`
   pattern.
 
 - [#1924](https://github.com/graphile/crystal/pull/1924)
