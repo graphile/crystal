@@ -16,7 +16,7 @@ by calling `.toString()` on it:
 ```
 
 However this quickly falls down if you are using values from a parent closure
-(aka a "higher scope"):
+(also known as a "higher scope"):
 
 ```js
 > const a = 7;
