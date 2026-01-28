@@ -27,9 +27,8 @@ passing the parent object and the field's arguments (if any). This localised
 reasoning is simple to specify and enforces the "graph" nature of GraphQL (the
 [value of a node is independent of the path through which it was
 fetched](https://benjie.dev/graphql/traversal)), but its short-sighted approach
-means the next layer of data requirements are discovered only after the
-previous layer has executed. Furthermore, each entry in a list is processed
-separately,
+means the next layer of data requirements are discovered only after the previous
+layer has executed. Furthermore, each entry in a list is processed separately,
 so for a list with N items, each descendant selection may produce N additional
 fetches from the backend - this is called the N+1 problem. This quickly
 multiplies up to be even more devastating in nested lists.
