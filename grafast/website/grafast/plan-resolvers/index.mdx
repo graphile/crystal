@@ -13,7 +13,7 @@ import init from "../mermaid-init.mermaid?raw";
 Before executing a GraphQL request, <Grafast /> must have an "_operation plan_"
 that details the actions ("_steps_") that are needed to satisfy the included
 operation (query, mutation, subscription). Plans are cached so they can be
-re-used for all sufficiently similar GraphQL requests in future &mdash; plan
+reused for all sufficiently similar GraphQL requests in future &mdash; plan
 once, execute many times.
 
 The first time <Grafast /> sees a particular operation, it traverses the
@@ -259,7 +259,7 @@ each request that uses this plan.
 Although <Grafast /> uses an alternative execution model to the reference
 implementation (GraphQL.js), to make it easy for people to adopt <Grafast /> it
 has support for emulating GraphQL.js' resolvers ("traditional resolvers") via a
-set of built in plan classes. This support is pretty good &mdash; sufficient to
+set of built-in plan classes. This support is pretty good &mdash; sufficient to
 pass the integration tests of the GraphQL.js test suite &mdash; though it does
 have a few limitations (see [Using with an existing
 schema](../getting-started/existing-schema.md) for more details).
@@ -292,7 +292,7 @@ emulated.
 
 ## Specifying a field plan resolver
 
-When building a GraphQL schema programatically, plan resolvers are stored into
+When building a GraphQL schema programmatically, plan resolvers are stored into
 `extensions.grafast.plan` of the field; for a raw GraphQL.js object type this
 would look like:
 
@@ -354,8 +354,8 @@ For [GraphQL Modules](https://github.com/graphql-hive/graphql-modules) you must
 specify the resolver as an object, and then populate the `extensions` property:
 
 ```ts
-import { createModule, gql } from 'graphql-modules';
-import { constant } from "grafast";;
+import { createModule, gql } from "graphql-modules";
+import { constant } from "grafast";
 
 export const myModule = createModule({
   id: 'my-module',
