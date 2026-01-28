@@ -117,7 +117,7 @@ import pluginSource from "!!raw-loader!@site/../graphile-build/src/AllHooksNoopP
 import CodeBlock from "@theme/CodeBlock";
 
 <CodeBlock language="ts">
-{pluginSource}
+{pluginSource.replace(/^[\s\S]*?\/\*{10,}\//, '').trim()}
 </CodeBlock>
 
 [graphql-schema]: https://graphql.org/graphql-js/type/#graphqlschema

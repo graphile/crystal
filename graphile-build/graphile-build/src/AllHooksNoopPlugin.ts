@@ -1,5 +1,11 @@
-/* This file is purely for documentation, it doesn't _do_ anything. */
+/*
+ * This file is purely for documentation, it doesn't _do_ anything and isn't
+ * exported.
+ */
 
+// Everything below this line will be output in the docs at
+// http://build.graphile.org/graphile-build/next/all-hooks
+/******************************************************************************/
 import type {} from "graphile-build";
 
 // Declaration merging to expand hooked types
