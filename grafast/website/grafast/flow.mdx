@@ -152,12 +152,18 @@ special properties of the value:
 - is it unrecoverably stopped?
 
 Gra*fast* assigns these flags automatically whilst processing the results from a
-step's execution. Any value flagged with skipped due to polymorphism or
-unrecoverably stopped will be filtered out from the execution values passed to
-future step execution. By default, any values flagged as error or inhibited will
+step's execution. By default, any values flagged as error or inhibited will
 also be filtered out, but this can be overridden; e.g. the
 [`trap()`](./standard-steps/trap.mdx) step allows trapping errors or
 inhibits.
+
+:::note[Always skipped flags]
+
+Any value flagged with "skipped due to polymorphism" or "unrecoverably stopped"
+will be filtered out from the execution values passed to any future step
+execution.
+
+:::
 
 [^1]:
     except for in incremental delivery with `@stream` and `@defer`; but you
