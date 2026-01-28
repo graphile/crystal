@@ -53,10 +53,13 @@ time in order to communicate with the database. The function accepts two
 parameters (`pgSettings` and `callback`) and it:
 
 1. creates or retrieves a `PgClient` (see below) connected to the database,
-2. if set, applies any settings from the `pgSettings` object (creating a transaction if necessary),
+2. if set, applies any settings from the `pgSettings` object (creating a
+   transaction if necessary),
 3. calls the callback, passing the client as the only argument,
-4. on success releases the client (after committing the transaction if necessary) and returns the result of the callback,
-5. on error releases the client (after rolling back the transaction if necessary) and raises the error.
+4. on success releases the client (after committing the transaction if
+   necessary) and returns the result of the callback,
+5. on error releases the client (after rolling back the transaction if
+   necessary) and raises the error.
 
 ## PgClient
 
@@ -142,43 +145,20 @@ const graphqlContext = { withPgClient, pgSubscriber };
 
 ## Writing your own adaptor
 
-To write your own adaptor you need to supply two pieces:
+In practice most users do not write their own adaptors. Instead, you configure
+`makePgService` and, if you need to customise how a client is acquired, use the
+adaptor's `createWithPgClient` helper.
 
-1. A `withPgClient(pgSettings, callback)` function that acquires a client,
-   applies `pgSettings` (typically via `set_config` in a transaction), runs the
-   callback, and then releases or disposes the client.
-2. A `PgClient` implementation that provides `query({ text, values })` and
-   `withTransaction(callback)`.
+The `@dataplan/pg/adaptors/pg` adaptor exposes both:
 
-If you want realtime support, implement `PgSubscriber` as well so you can
-connect `LISTEN/NOTIFY` to the [`listen()`](/grafast/standard-steps/listen)
-step.
+- `makePgService(options)` - builds a Graphile Config pg service, wiring the
+  `withPgClient`, `pgSettings`, and optional `pgSubscriber` keys for you.
+- `createWithPgClient(options, variant?)` - constructs a `withPgClient`
+  function from a pool, pool client, or connection string.
 
-Here is a skeleton adaptor shape (pseudo-code):
-
-```ts
-type PgClient = {
-  query(opts: { text: string; values: unknown[] }): Promise<{ rows: unknown[] }>;
-  withTransaction<T>(callback: (client: PgClient) => Promise<T>): Promise<T>;
-};
-
-async function withPgClient(
-  pgSettings: Record<string, string | undefined> | null,
-  callback: (client: PgClient) => Promise<unknown>,
-) {
-  const client = await pool.acquire();
-  try {
-    return await client.withTransaction(async (tx) => {
-      if (pgSettings) {
-        await applySettings(tx, pgSettings);
-      }
-      return callback(tx);
-    });
-  } finally {
-    client.release();
-  }
-}
-```
-
-Attach the `withPgClient` function to your GraphQL context and ensure your
-`PgExecutor` context step reads it, as shown earlier on this page.
+If you really do need to build a custom adaptor, it must satisfy the
+`PgAdaptor` interface: provide a `createWithPgClient` function and a
+`makePgService` function that returns a `PgServiceConfiguration` which exposes
+the correct context keys (for `withPgClient`, `pgSettings`, and optional
+`pgSubscriber`). The `@dataplan/pg/adaptors/pg` implementation is the reference
+to follow.
