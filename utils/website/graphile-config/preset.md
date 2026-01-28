@@ -91,6 +91,12 @@ Two common options are:
 2. Export a CJS config (`graphile.config.cjs` or `graphile.config.js`) and use
    `module.exports`.
 
+For example, to enable the `ts-node/esm` loader:
+
+```js
+export NODE_OPTIONS="$NODE_OPTIONS --loader ts-node/esm"
+```
+
 Choose the approach that fits your project tooling best.
 
 ## Preset scopes
