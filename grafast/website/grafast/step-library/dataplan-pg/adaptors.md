@@ -145,20 +145,34 @@ const graphqlContext = { withPgClient, pgSubscriber };
 
 ## Writing your own adaptor
 
-In practice most users do not write their own adaptors. Instead, you configure
-`makePgService` and, if you need to customise how a client is acquired, use the
-adaptor's `createWithPgClient` helper.
+We still need to make it easier for you to define your own adaptor, and will
+update this documentation once we've had a chance to define a few more. But if
+you want to jump into the weeds, the main thing to do is to ensure that your
+adaptor exports the two expected methods:
 
-The `@dataplan/pg/adaptors/pg` adaptor exposes both:
-
-- `makePgService(options)` - builds a Graphile Config pg service, wiring the
-  `withPgClient`, `pgSettings`, and optional `pgSubscriber` keys for you.
+- `makePgService(options)` - returns a PgServiceConfiguration object
+  detailing how to make requests with this adaptor.
 - `createWithPgClient(options, variant?)` - constructs a `withPgClient`
-  function from a pool, pool client, or connection string.
+  function using this adaptor.
 
-If you really do need to build a custom adaptor, it must satisfy the
-`PgAdaptor` interface: provide a `createWithPgClient` function and a
-`makePgService` function that returns a `PgServiceConfiguration` which exposes
-the correct context keys (for `withPgClient`, `pgSettings`, and optional
-`pgSubscriber`). The `@dataplan/pg/adaptors/pg` implementation is the reference
-to follow.
+You can check your adaptor conforms by adding this type assertion:
+
+```ts
+// This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
+const adaptor: PgAdaptor<"path/to/my/adaptor.ts"> = {
+  createWithPgClient,
+  makePgService,
+};
+```
+
+Adaptors give you a chance not only to use your own choice of Postgres client,
+but also to control the lifecycle of the client - for example,
+`@dataplan/pg/adaptors/pg` gets a Postgres client on demand, and may even use
+multiple clients during the same request; however an alternative adaptor might
+allocate a client up front, or create one the first time it is needed and reuse
+it throughout the request. It can also control the way that pgSettings are set -
+`@dataplan/pg/adaptors/pg` does so via a transaction and then setting local
+settings that are automatically removed when the transaction completes, but an
+alternative client might set them as connection settings, and manually
+synchronise them between requests to avoid unnecessary transactions and
+roundtrips.
