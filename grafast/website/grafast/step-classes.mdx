@@ -192,7 +192,7 @@ class MyStep extends Step {
 
     // We must return a list of the correct length in the correct order.
     return details.indexMap((batchIndex) => {
-      // Batch depenencies may have a different value at each index.
+      // Batch dependencies may have a different value at each index.
       const b = bEv.at(batchIndex);
       const c = cEv.at(batchIndex);
 
@@ -364,7 +364,7 @@ that both `$select1` and `$select2` return each other from their
 
 Assuming <Grafast /> chooses to keep `$select1` and
 "deduplicate" (get rid of) `$select2`, <Grafast /> would then call
-`$select2.deduplicateWith($select1)`. This would give `$select2` a chance to
+`$select2.deduplicatedWith($select1)`. This would give `$select2` a chance to
 inform `$select1` that in order to be completely equivalent, it must also
 select `avatar_url`.
 
@@ -479,7 +479,7 @@ should implement the `.at(index)` method.
 
 These conventions are still evolving, and more may be added as common usage patterns are
 detected. Some likely candidates for future reserved methods include: import, export,
-defer, filter, order and merge. To avoid conflicts with built in and future methods,
+defer, filter, order and merge. To avoid conflicts with built-in and future methods,
 consider using a prefix when naming custom methods.
 
 Functions that have special meanings/expectations can be found below:
@@ -892,6 +892,19 @@ sideEffect($step, (value) => void console.log(value));
 return $step;
 ```
 
+Helper steps like `sideEffect()` set this flag for you; but you can set it
+directly on any step:
+
+```ts
+const $step = doSomething();
+
+const $log = lambda(null, () => console.log("hello world"))
+// Ensure $log will run and not be tree shaken away
+$log.hasSideEffects = true;
+
+return $step;
+```
+
 If you're looking for the equivalent of a "pure function" in Gra*fast*, the
 closest is a step that `isSyncAndSafe`...
 
@@ -914,9 +927,9 @@ schema may no longer be GraphQL compliant).
 Do not set this true unless the following hold:
 
 - The `execute` method must be a regular (not async) function
-- The `execute` method must NEVER return a promise, iterator, or similar
+- The `execute` method must NEVER return a promise, async iterator, or similar
 - The values within the list returned from `execute` must NEVER include promises,
-  iterators, or similar
+  async iterators, or `FlaggedValue` objects such as errors
 - The result of calling `execute` should not differ after a
   `step.hasSideEffects` has executed (i.e. it should be pure, only dependent on
   its deps and use no external state)
@@ -924,7 +937,7 @@ Do not set this true unless the following hold:
 It's acceptable for the `execute` method to throw if it needs to, but this will
 impact every batched value.
 
-This optimisation applies to the majority of the built in plans and allows the
+This optimisation applies to the majority of the built-in plans and allows the
 engine to execute without needing to resolve any promises which saves precious
 event-loop ticks.
 
