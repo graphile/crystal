@@ -1,10 +1,12 @@
+import UrlParam from "@site/src/components/UrlParam";
+
 # Argument applyPlan
 
 You've received this error because the `applyPlan` method on one of your
-arguments (see the error message to identify which one) has returned a value.
-Doing so
-was meaningful during part of Grafast's beta phase, but it was determined that
-this led to bad patterns and thus it was removed.
+arguments (<UrlParam param="coord" fallback="see the error message to identify
+which one" />) has returned a value. Doing so was meaningful during part of
+Grafast's beta phase, but it was determined that this led to bad patterns and
+thus it was removed.
 
 It's likely that you just returned a value by accident and did not mean for it
 to be meaningful. If so, simply remove the `return`.

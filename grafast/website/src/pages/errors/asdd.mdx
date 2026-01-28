@@ -48,15 +48,18 @@ function plan($source) {
 Now the closure doesn't reference any extant `$steps` from outside of the
 closure, it is passed or constructs the steps it needs.
 
-:::tip Guard against captured steps
+:::tip[Guard against captured steps]
 
 Add a lint or review check that flags closures capturing steps from an outer
 scope, especially in `each()` callbacks. It prevents accidental use of steps
 that have already been deleted.
 
+If you create such a lint rule, please consider contributing it back to the
+community!
+
 :::
 
-:::tip Neater code for `loadOne`/`loadMany`
+:::tip[Neater code for `loadOne`/`loadMany`]
 
 `loadOne` and `loadMany` supports the `shared` attribute being a "thunk", so
 rather than specifying the entire configuration inline, you could instead create
@@ -78,7 +81,7 @@ function plan($source) {
 
 :::
 
-:::info Why don't we solve this automatically?
+:::info[Why don't we solve this automatically?]
 
 Gra*fast* internally tracks which step IDs have been replaced with others; we
 could make it so when you add a dependency on a replaced step, it instead
