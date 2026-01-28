@@ -119,8 +119,9 @@ plan" and the following field plans have their steps planned there instead.
 
 ### Execution value
 
-An execution value is the input to the "execute" method of a step that
-represents the execution result of one of its dependencies.
+An execution value is a per-dependency input to a step's "execute" method,
+carried via the execution details. It represents the execution result of one of
+the step's dependencies.
 
 Gra*fast* executes each step in a plan diagram just once for every request[^1],
 even if that step is handling thousands of list values. For example, a step that
