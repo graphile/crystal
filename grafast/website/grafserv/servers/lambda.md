@@ -27,7 +27,5 @@ const serv = grafserv({ schema, preset });
 export const handler = serv.createHandler();
 ```
 
-[aws-lambda-nodejs]:
-  https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html
-[aws-lambda-deps]:
-  https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html
+[aws-lambda-nodejs]: https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html
+[aws-lambda-deps]: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html
