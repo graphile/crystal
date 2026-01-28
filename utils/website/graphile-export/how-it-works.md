@@ -92,4 +92,5 @@ function add(b) {
 
 Of course, if the dependency `a` were a complex value (e.g. another function,
 or a class instance), we'd also need to make that either exportable or
-importable, so lets find out more about [making values exportable or importable](./exportable.md).
+importable, so let's find out more about
+[making values exportable or importable](./exportable.md).

@@ -94,8 +94,9 @@ function we pass to `EXPORTABLE` must always be pure.
 :::warning Values are evaluated at export time
 
 Note that the `Date.now()` is evaluated once, when the schema is exported, and
-is never evaluated again &mdash; so it will always return the time when the schema
-was exported, not when the JavaScript process starts up. In fact, the function
+is never evaluated again &mdash; so it will always return the time when the
+schema was exported, not when the JavaScript process starts up. In fact, the
+function
 that appears in the exported code will likely look more like:
 
 ```ts
@@ -104,7 +105,7 @@ function getExportTime() {
 }
 ```
 
-In this way, the exported schema can often be more optimal that the code used
+In this way, the exported schema can often be more optimal than the code used
 to generate it.
 
 :::
@@ -315,12 +316,13 @@ export function EXPORTABLE(factory, args, nameHint) {
 ### Cannot find module 'graphile-export/helpers'
 
 If TypeScript gives you the error
-`Cannot find module 'graphile-export/helpers' or its corresponding type declarations.`
+`Cannot find module 'graphile-export/helpers' or its corresponding type
+declarations.`
 then it's likely you're living in the past! This error happens because your
 `tsconfig.json` is configured as if you were living in Node.js v14 (or before)
 times!
 
-The easiest solution is to use a really simple TSConfig.json such as the
+The easiest solution is to use a really simple `tsconfig.json` such as the
 `@tsconfig/node22` default which already configures TypeScript to support this:
 
 ```json title="tsconfig.json"
@@ -329,7 +331,8 @@ The easiest solution is to use a really simple TSConfig.json such as the
 }
 ```
 
-Alternatively, explicitly change the `moduleResolution` setting to `Node16` or `NodeNext`:
+Alternatively, explicitly change the `moduleResolution` setting to `Node16` or
+`NodeNext`:
 
 ```json title="tsconfig.json"
 {
@@ -342,4 +345,7 @@ Alternatively, explicitly change the `moduleResolution` setting to `Node16` or `
 
 ---
 
-Wrapping `EXPORTABLE(() => ...)` around our functions isn't too hard, but scanning through them to spot all the external dependencies can be time consuming and error prone. Let's find out how we can [use the Graphile Export ESLint plugin to autofix our EXPORTABLEs](./eslint.md).
+Wrapping `EXPORTABLE(() => ...)` around our functions isn't too hard, but
+scanning through them to spot all the external dependencies can be time
+consuming and error prone. Let's find out how we can
+[use the Graphile Export ESLint plugin to autofix our EXPORTABLEs](./eslint.md).
