@@ -119,12 +119,27 @@ plan" and the following field plans have their steps planned there instead.
 
 ### Execution value
 
+An execution value is a per-dependency input to a step's "execute" method,
+carried via the execution details. It represents the execution result of one of
+the step's dependencies.
+
 Gra*fast* executes each step in a plan diagram just once for every request[^1],
-even if that step is handling thousands of list values. For every dependency a
-step has, Gra*fast* takes the "execution value" that represents the list of
-values for that step, automatically filters out the entries that should not be
-executed (e.g. due to error or inhibition, see [flow control](#flow-control)),
-then passes the remaining values on to the step for processing.
+even if that step is handling thousands of list values. For example, a step that
+loads the author of a post will receive all author ids across all posts to which
+it relates in one batched input (one "execution value"), rather than being
+called once per author id.
+
+For every dependency a step has, Gra*fast* takes the resulting "execution
+value", automatically creates a derivative execution value if needed (stripping
+out entries that should not be executed, e.g. due to error or inhibition, see
+[flow control](#flow-control)), and passes it on to the step's `execute` method
+for processing.
+
+An "execution value" provides a common interface across both "unary" values
+(for which there will always be a single value, independent of batch size) and
+regular batched values. This allows steps to handle both types with common code
+whilst maintaining execution efficiency. (Though optimizations are possible with
+a little more code!)
 
 #### Flagged values
 
@@ -138,12 +153,18 @@ special properties of the value:
 - is it unrecoverably stopped?
 
 Gra*fast* assigns these flags automatically whilst processing the results from a
-step's execution. Any value flagged with skipped due to polymorphism or
-unrecoverably stopped will be filtered out from the execution values passed to
-future step execution. By default, any values flagged as error or inhibited will
+step's execution. By default, any values flagged as error or inhibited will
 also be filtered out, but this can be overridden; e.g. the
 [`trap()`](./standard-steps/trap.mdx) step allows trapping errors or
 inhibits.
+
+:::note[Always skipped flags]
+
+Any value flagged with "skipped due to polymorphism" or "unrecoverably stopped"
+will be filtered out from the execution values passed to any future step
+execution.
+
+:::
 
 [^1]:
     except for in incremental delivery with `@stream` and `@defer`; but you
@@ -227,7 +248,7 @@ methods, not in plans.**
 
 :::tip[Step execute methods should delegate to business logic]
 
-It's intended the step execute methods are generally lightweight if possible —
+It is intended that step execute methods are generally lightweight if possible —
 they act as the gateway between Gra*fast*-land and your business logic; they are
 not typically for actually performing business logic directly, instead they
 should delegate to external business logic.
