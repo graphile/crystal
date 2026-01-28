@@ -1,6 +1,6 @@
 # coalesce
 
-Returns a step that represents to the first non-nullish[^1] value from the
+Returns a step that represents the first non-nullish[^1] value from the
 provided steps, or `null` if they are all nullish. Steps can be passed either as
 individual arguments or as a single array.
 
