@@ -96,8 +96,7 @@ function we pass to `EXPORTABLE` must always be pure.
 Note that the `Date.now()` is evaluated once, when the schema is exported, and
 is never evaluated again &mdash; so it will always return the time when the
 schema was exported, not when the JavaScript process starts up. In fact, the
-function
-that appears in the exported code will likely look more like:
+function that appears in the exported code will likely look more like:
 
 ```ts
 function getExportTime() {
@@ -316,8 +315,7 @@ export function EXPORTABLE(factory, args, nameHint) {
 ### Cannot find module 'graphile-export/helpers'
 
 If TypeScript gives you the error
-`Cannot find module 'graphile-export/helpers' or its corresponding type
-declarations.`
+`Cannot find module 'graphile-export/helpers' or its corresponding type declarations.`
 then it's likely you're living in the past! This error happens because your
 `tsconfig.json` is configured as if you were living in Node.js v14 (or before)
 times!
