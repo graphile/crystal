@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
  * This file is purely for documentation, it doesn't _do_ anything and isn't
  * exported.
