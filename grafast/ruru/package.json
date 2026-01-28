@@ -63,7 +63,17 @@
   },
   "peerDependencies": {
     "graphile-config": "workspace:^",
-    "graphql": "^16.9.0"
+    "graphql": "^16.9.0",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "files": [
     "ruru.html",
@@ -78,6 +88,8 @@
     "file-loader": "^6.2.0",
     "graphql": "^16.9.0",
     "mini-css-extract-plugin": "^2.9.4",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19",
     "ruru-components": "workspace:^",
     "style-loader": "^4.0.0",
     "svg-inline-loader": "^0.8.2",

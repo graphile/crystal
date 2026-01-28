@@ -50,6 +50,7 @@
     "mermaid": "^11.12.1",
     "prettier": "^3.6.2",
     "react": "^19.2.0",
+    "react-compiler-runtime": "^19.1.0-rc.1",
     "react-dom": "^19.2.0",
     "react-error-boundary": "^6.0.0",
     "ruru-types": "workspace:^",

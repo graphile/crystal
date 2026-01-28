@@ -41,10 +41,22 @@
     "graphiql": "^5.2.1"
   },
   "peerDependencies": {
-    "graphql": "^16.9.0"
+    "graphql": "^16.9.0",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "graphql": "^16.9.0",
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19",
     "typescript": "^5.9.3"
   }
 }
