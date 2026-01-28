@@ -31,8 +31,10 @@ just need to run the final code without any of the underlying computations that
 shaped it. This has many benefits:
 
 - Faster startup time (build the schema directly without any computation)
-- Reduced thundering herd in the event of mass server restarts (no need to consult external data sources on startup)
-- Lower CPU/memory usage (code only required to compute the schema does not need to be loaded into memory or executed in production)
+- Reduced thundering herd in the event of mass server restarts (no need to
+  consult external data sources on startup)
+- Lower CPU/memory usage (code only required to compute the schema does not
+  need to be loaded into memory or executed in production)
 - Fewer runtime dependencies (build systems can be omitted from the bundle)
 - Much faster cold starts for serverless environments such as AWS Lambda
 - And probably more
