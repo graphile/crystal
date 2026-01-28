@@ -3,4 +3,4 @@
 ---
 
 Make new `sideEffect(...)` step class to replace
-`const $lambda = lambda(...);$lambda.hasSideEffect=true;` pattern.
+`const $lambda = lambda(...);$lambda.hasSideEffects=true;` pattern.
