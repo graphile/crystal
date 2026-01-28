@@ -5,8 +5,8 @@ sidebar_position: 1
 # pg-introspection
 
 A strongly-typed PostgreSQL introspection library for PostgreSQL built
-automatically from the
-[PostgreSQL system catalog documentation](https://www.postgresql.org/docs/current/catalogs.html),
+automatically from the [PostgreSQL system catalog
+documentation](https://www.postgresql.org/docs/current/catalogs.html),
 with the TypeScript documentation for each attribute/type also pulled from the
 PostgreSQL documentation for easy reference directly in your editor.
 
@@ -32,7 +32,7 @@ const pool = new Pool({
 async function main() {
   const sql = makeIntrospectionQuery();
   const { rows } = await pool.query(sql);
-  const introspection = parseIntrospectionResults(row[0].introspection);
+  const introspection = parseIntrospectionResults(rows[0].introspection);
 
   console.log(
     `The ${introspection.database.datname} DBA is ${
