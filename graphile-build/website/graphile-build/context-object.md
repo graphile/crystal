@@ -20,32 +20,113 @@ All contexts include these properties:
   `GraphQLEnumType`, and `GraphQLInputObjectType`.
 - `scope` - a structured object that explains why the hook was called.
 
-## Scope specialisations
+## Scope
 
-Every scope includes `directives?: DirectiveDetails[]`. Specialised scopes add
-additional fields:
+When an entity (type, field, arg, etc) is registered or created, a scope object
+is passed that provides details as to why that entity exists. Plugins can use
+this scope to ensure that they only apply changes to relevant entities.
 
-- `ScopeObject` - `isRootQuery`, `isRootMutation`, `isRootSubscription`,
-  `isMutationPayload`, `isPageInfo`.
-- `ScopeObjectFieldsField` - `fieldName`, `fieldBehaviorScope`,
-  `fieldDirectives`, `isCursorField`.
-- `ScopeObjectFieldsFieldArgsArg` - `argName`.
-- `ScopeInterface` - `supportsNodeInterface`.
-- `ScopeInterfaceFieldsField` - `fieldName`.
-- `ScopeInterfaceFieldsFieldArgsArg` - `argName`.
-- `ScopeInputObject` - `isMutationInput`.
-- `ScopeInputObjectFieldsField` - `fieldName`, `fieldBehaviorScope`.
-- `ScopeEnumValuesValue` - `valueName`.
+All plugins are free to add more scope values (and are actively encouraged to do
+so!), but it's highly recommended to use a prefix to avoid conflicts. For deeper
+hooks (such as `GraphQLObjectType_fields_field`) the scope from shallower hooks
+(such as `GraphQLObjectType`) are merged in; it's recommended to use additional
+scope-depth prefixes to avoid collisions (e.g. field scopes should include the
+term `field` in their scope names).
 
-For deeper hooks (such as `GraphQLObjectType_fields_field`) the scope from
-shallower hooks (such as `GraphQLObjectType`) are merged in; ensure that field
-hooks include `field` in their scope names to avoid collisions.
+Scope names are derived from the hook name, by removing `GraphQL` and `Type`,
+camel-casing the result, and prefixing `Scope`, e.g. the scope for the `init`
+hook is `ScopeInit` and for the `GraphQLObjectType_fields_field_args_arg` hook
+is `ScopeObjectFieldsFieldArgsArg`.
 
-## Context variants
+For `ScopeObjectFieldsField`, `ScopeInterfaceFieldsField`,
+`ScopeInputObjectFieldsField`, and all their descendents: `fieldName` is
+guaranteed to exist.
 
-The hook name determines which specialised context is used. Contexts inherit
-from their parent contexts, so properties like `Self` and `fieldWithHooks`
-remain available on deeper hooks.
+For `ScopeObjectFieldsFieldArgsArg` and `ScopeInterfaceFieldsFieldArgsArg`:
+`argName` is guaranteed to exist.
+
+For `ScopeEnumValuesValue`: `valueName` is guaranteed to exist.
+
+### Declaring scopes
+
+To tell TypeScript about your custom scope values, declare them via declaration
+merging, e.g.:
+
+```ts
+declare global {
+  namespace GraphileBuild {
+    interface ScopeObject {
+      // Add your scope properties here:
+      myCompanyIsRelevantType?: boolean;
+    }
+    interface ScopeObjectFieldsField {
+      // Add your scope properties here:
+      myCompanyIsRelevantField?: boolean;
+    }
+  }
+}
+
+const MyCompanyPlugin: GraphileConfig.Plugin = {
+  name: "MyCompanyPlugin",
+  schema: {
+    hooks: {
+      init(_, build) {
+        for (let i = 0; i < 10; i++) {
+          build.registerObjectType(
+            `MyCompanyType${i}`,
+            // Indicate this is our type
+            { myCompanyIsRelevantType: true },
+            () => ({ fields: {} }),
+            "Reason we're defining this object type",
+          );
+        }
+
+        return _;
+      },
+      GraphQLObjectType_fields(fields, build, context) {
+        // Only hook our own types
+        if (!context.scope.myCompanyIsRelevantType) return fields;
+
+        // Register a new field on this type
+        const fieldName = "myField";
+        return build.extend(
+          fields,
+          {
+            [fieldName]: context.fieldWithHooks(
+              {
+                fieldName, // Required
+                // Indicate this is our field
+                myCompanyIsRelevantField: true,
+              },
+              { type: GraphQLString },
+            ),
+          },
+          "MyCompany adding myField to __MyObject__",
+        );
+      },
+      GraphQLObjectType_fields_field(field, build, context) {
+        // Only hook our own fields
+        if (!context.scope.myCompanyIsRelevantField) return field;
+        field.description = "Yay, I found it!";
+        return field;
+      },
+    },
+  },
+};
+```
+
+## Context
+
+The context object wraps the `scope` along with additional system-defined
+details about the given entity.
+
+Context names are derived from the hook name, by removing `GraphQL` and `Type`,
+camel-casing the result, and prefixing `Context`, e.g. the context for the `init`
+hook is `ContextInit` and for the `GraphQLObjectType_fields_field_args_arg` hook
+is `ContextObjectFieldsFieldArgsArg`.
+
+Contexts inherit from their parent contexts, so properties like `Self` and
+`fieldWithHooks` remain available on deeper hooks.
 
 - `build` - `ContextBuild`
 - `init` - `ContextInit`
@@ -80,19 +161,102 @@ remain available on deeper hooks.
 - `GraphQLInterfaceType_interfaces` - `ContextInterfaceInterfaces` (includes
   `Self`)
 
-## `fieldWithHooks(scope, spec)`
+### `Self`
+
+The `context.Self` property is a reference to, where possible, the instance of
+the GraphQL type. This is present for deferred hooks, and can be used to
+determine whether or not to run the hooks logic.
+
+### `fieldWithHooks(scope, spec)`
+
+Fields can be registered directly, but doing so doesn't give other plugins
+context as to whether the field should be augmented or not:
+
+```ts title="Valid, but bad manners..."
+// Don't do this!
+const DontDoThisPlugin: GraphileBuild.Plugin = {
+  name: "DontDoThisPlugin",
+  description: "Don't do this!",
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields(fields, build, context) {
+        const isRelevant = determineIsRelevant(context);
+        if (!isRelevant) return fields;
+
+        // Don't do this, because other plugins can't easily hook it
+        fields.myNewField = {
+          description: "Special field from MyCompany",
+          type: build.graphql.GraphQLBoolean,
+        };
+
+        return fields;
+      },
+    },
+  },
+};
+```
+
+Instead, use `context.fieldWithHooks(scope, spec)` so you can indicate additional scope information:
+
+```ts
+const DoThisInsteadPlugin: GraphileBuild.Plugin = {
+  name: "DoThisInsteadPlugin",
+  schema: {
+    hooks: {
+      GraphQLObjectType_fields(fields, build, context) {
+        const isRelevant = determineIsRelevant(context);
+        if (!isRelevant) return fields;
+
+        const fieldName = "myNewField";
+        return build.extend(
+          fields,
+          {
+            // Don't do this, because other plugins can't easily hook it
+            [fieldName]: context.fieldWithHooks(
+              {
+                fieldName, // Required
+
+                // Describe why this field exists; how might someone filter
+                // so they can hook it to e.g. deprecate it, add a description,
+                // add more args, etc?
+                isMyCompanySpecialField: true,
+              },
+              {
+                description: "Special field from MyCompany",
+                type: build.graphql.GraphQLBoolean,
+              },
+            ),
+          },
+          "From DoThisInsteadPlugin",
+        );
+      },
+    },
+  },
+};
+
+declare global {
+  namespace GraphileBuild {
+    interface ScopeObjectFieldsField {
+      /** Documentation for this scope goes here */
+      isMyCompanySpecialField?: boolean;
+    }
+  }
+}
+```
 
 Available on `GraphQLObjectType_fields`, `GraphQLInputObjectType_fields`, and
 `GraphQLInterfaceType_fields`, this function registers scope for a field and
 returns the generated field spec. If you do not call it, Graphile Build will
 call it later on your behalf.
 
-For example, to add a description to the `clientMutationId` field on all
-mutation input objects:
+## Examples
+
+### AddClientMutationIdDescriptionPlugin
 
 ```js
-const MyPlugin = {
-  name: "MyPlugin",
+const AddClientMutationIdDescriptionPlugin = {
+  name: "AddClientMutationIdDescriptionPlugin",
+  description: "Adds description to all clientMutationId mutation inputs",
   version: "0.0.0",
 
   schema: {
@@ -117,47 +281,6 @@ const MyPlugin = {
             "May be used to track mutations by the client.",
         });
         // highlight-end
-      },
-    },
-  },
-};
-```
-
-And to add a field while defining a scope:
-
-```js
-const MyPlugin = {
-  name: "MyPlugin",
-  version: "0.0.0",
-
-  schema: {
-    hooks: {
-      GraphQLInputObjectType_fields(fields, build, context) {
-        const {
-          extend,
-          graphql: { GraphQLNonNull, GraphQLString },
-        } = build;
-        const { fieldWithHooks } = context;
-        return extend(
-          fields,
-          {
-            // highlight-start
-            helloWorld: fieldWithHooks(
-              // The scope
-              { fieldName: "helloWorld", isHelloWorldField: true },
-
-              // The spec generator
-              () => ({
-                type: new GraphQLNonNull(GraphQLString),
-                plan() {
-                  return constant("Hello World");
-                },
-              }),
-            ),
-            // highlight-end
-          },
-          "Adding helloWorld from 'MyPlugin'",
-        );
       },
     },
   },

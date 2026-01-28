@@ -68,9 +68,11 @@ uses a thunk callback), which allows for cyclic references or referencing the
 type itself via `context.Self`. GraphQL calls the thunk when the relevant
 property is needed, which can still be in the same tick.
 
-## Input types
+## Specification
 
-These are the input types passed as the first argument to each hook:
+The first argument to each hook is the "specification" that is to be
+manipulated. For most hooks this will be an object, but for some it will be an
+array. Here's the specification type for each hook:
 
 - `build` - `Build` (the current build object)
 - `init` - `Record<string, never>` (an empty object)
