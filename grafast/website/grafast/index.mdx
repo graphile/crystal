@@ -27,9 +27,10 @@ passing the parent object and the field's arguments (if any). This localised
 reasoning is simple to specify and enforces the "graph" nature of GraphQL (the
 [value of a node is independent of the path through which it was
 fetched](https://benjie.dev/graphql/traversal)), but its short-sighted approach
-means the next layer of data requirements are discovered only after previous
-layer has executed. Furthermore, each entry in a list is processed separately,
-so for a list with N items, each descendent selection may produce N additional
+means the next layer of data requirements are discovered only after the
+previous layer has executed. Furthermore, each entry in a list is processed
+separately,
+so for a list with N items, each descendant selection may produce N additional
 fetches from the backend - this is called the N+1 problem. This quickly
 multiplies up to be even more devastating in nested lists.
 
@@ -88,7 +89,7 @@ The GraphQL specification
 > the perceived result is equivalent._  
 > ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
 
-Gra*fast* has been written very careful by a [GraphQL Technical Steering
+Gra*fast* has been written very carefully by a [GraphQL Technical Steering
 Committee](https://github.com/graphql/graphql-wg/blob/main/GraphQL-TSC.md#tsc-members)
 member to ensure that the perceived result is equivalent; thus, despite its
 drastically different execution algorithm, it is 100% spec compliant.
@@ -139,8 +140,8 @@ The time during which a new operation plan is being established is called
 
 To establish an operation plan for a never-seen-before operation, Gra*fast*
 walks the document in a breadth-first manner and calls the relevant **plan
-resolver** for each field, argument, and abstract type that it finds. A field'
-plan resolver may construct 0 or more steps and must return eactly one **step**
+resolver** for each field, argument, and abstract type that it finds. A field's
+plan resolver may construct 0 or more steps and must return exactly one **step**
 suitable to produce its desired output.
 
 The steps from all of these plan resolvers are combined to form the **execution
@@ -550,11 +551,13 @@ object might build an optimized function to do so.
 
 ## Further optimizations
 
-&ZeroWidthSpace;<Grafast /> doesn't just help your schema to execute fewer and more efficient
-steps, it also optimizes how your data is output once it has been determined.
+&ZeroWidthSpace;<Grafast /> doesn't just help your schema to execute fewer and
+more efficient steps, it also optimizes how your data is output once it has
+been determined.
 This means that even without making a single change to your existing GraphQL
-schema (i.e. without adopting plans), running it though <Grafast /> rather than
-graphql-js should result in a modest speedup, especially if you need to output
+schema (i.e. without adopting plans), running it through <Grafast /> rather
+than graphql-js should result in a modest speedup, especially if you need to
+output
 your result as a string (e.g. over a network socket/HTTP).
 
 ## Convinced?

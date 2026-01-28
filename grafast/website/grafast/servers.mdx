@@ -30,7 +30,7 @@ Discord](https://discord.gg/graphile) or find another way of contacting us.
 [Grafserv][] is <Grafast />'s companion server; it's probably the fastest
 general-purpose GraphQL server available in Node.js, but due to its youth it
 doesn't yet have the large ecosystem of extensions that other servers have.
-Grafserv automatically implements all optimisations that we could think of for
+Grafserv automatically implements all optimizations that we could think of for
 serving GraphQL schemas over HTTP, including such optimizations as serializing
 directly to string without even building objects in memory in the first place!
 
@@ -46,7 +46,13 @@ envelop plugin which you can use alongside `useParserCache()` to get an
 optimized execution pipeline very easily, here's a snippet:
 
 ```ts
-import { envelop, useExtendContext, useSchema } from "@envelop/core";
+import {
+  envelop,
+  useExtendContext,
+  useParserCache,
+  useSchema,
+  useValidationCache,
+} from "@envelop/core";
 import { useGrafast, useMoreDetailedErrors } from "grafast/envelop";
 import { schema } from "./schema";
 
@@ -68,6 +74,9 @@ const getEnveloped = envelop({
 
     // This replaces graphql-js' `execute` with Grafast's own
     useGrafast(),
+
+    // Enable this in development only for easier debugging:
+    // useMoreDetailedErrors(),
   ],
 });
 ```
@@ -75,6 +84,6 @@ const getEnveloped = envelop({
 For more context, please refer to
 [Envelop's Documentation](https://www.envelop.dev/docs/getting-started).
 
-[grafserv]: /grafserv/
-[envelop]: https://www.envelop.dev/
-[the guild]: https://the-guild.dev/
+[grafserv]: /grafserv
+[envelop]: https://www.envelop.dev
+[the guild]: https://the-guild.dev
