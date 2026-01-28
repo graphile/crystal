@@ -1,9 +1,8 @@
 # Argument applyPlan
 
-<!-- TODO: extract the coordinate from the request hash #coord=... -->
-
-You've received this error because the `applyPlan` method on one of your arguments
-(see the error message to identify which one) has returned a value. Doing so
+You've received this error because the `applyPlan` method on one of your
+arguments (see the error message to identify which one) has returned a value.
+Doing so
 was meaningful during part of Grafast's beta phase, but it was determined that
 this led to bad patterns and thus it was removed.
 

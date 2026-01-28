@@ -85,7 +85,8 @@ for Fastify.
 Releases any resources created by the instance; no further requests should be
 handled (though currently active requests will be allowed to complete).
 
-// TODO: consider terminating subscriptions or other long-lived things.
+For long-lived transports (such as subscriptions), close the transport when
+releasing the server so new events are not delivered.
 
 ### serv.onRelease(cb)
 
