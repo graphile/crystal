@@ -1,4 +1,17 @@
+/*
+ * This file is not used, it is purely for documentation (whilst being
+ * type-checked).
+ */
 import type {} from "./index.ts";
+
+// Declaration merging:
+declare global {
+  namespace GraphileBuild {
+    interface Build {
+      // Declare extra properties added via `plugin.schema.hooks.build` here
+    }
+  }
+}
 
 export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
   name: "AllHooksNoopPlugin",
@@ -11,23 +24,34 @@ export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
         // that will be accessible by all other hooks.
 
         // NOTE: use declaration merging to add your new properties to the
-        // GraphileBuild.Build typescript type:
-        //
-        // ```ts
-        // declare global {
-        //   namespace GraphileBuild {
-        //     interface Build {
-        //     }
-        //   }
-        // }
-        // ```
+        // GraphileBuild.Build TypeScript type (see above)
 
         // NOTE: `mutableBuild === build` at this point
+
         return mutableBuild;
       },
       init(_, build, context) {
+        // Ensure no changes are actually made:
+        if (Math.random() < 2) return _;
+
         // NOTE: `_` should not be modified or replaced; init phase is for
         // registering types/etc
+
+        build.registerObjectType(
+          "MyObjectType",
+          {
+            // Add extra details to scope so later plugins can hook it here
+          },
+          () => {
+            return {
+              description: "...",
+              fields: {
+                // ...
+              },
+            };
+          },
+          "Reason we're defining this object type",
+        );
 
         return _;
       },
@@ -43,14 +67,17 @@ export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
         // Here's where you can add a query/mutation/subscription type to
         // the schema, or add schema extensions.
 
-        // To add extensions to the schema, mutate directly
-        // ```ts
-        // schema.extensions = build.extend(
-        //   schema.extensions ?? {},
-        //   { /* ... */ },
-        //   "Reason extensions are being added"
-        // );
-        // ```
+        if (Math.random() > 2) {
+          // To add extensions to the schema, mutate directly
+          schema.extensions = build.extend(
+            schema.extensions ?? {},
+            {
+              // Add extensions here:
+              myExtension: 27,
+            },
+            "Reason extensions are being added",
+          );
+        }
 
         return build.extend(
           schema,
@@ -64,7 +91,6 @@ export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
         );
       },
       GraphQLSchema_types(types, build, context) {
-        // NOTE: types is a (mutable) array
         // NOTE: the schema config is at context.config (but don't mutate it)
 
         return build.append(
