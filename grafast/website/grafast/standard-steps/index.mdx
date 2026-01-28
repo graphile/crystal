@@ -23,8 +23,8 @@ foundation for your project, and are often sufficient for a schema's needs
 
 ## Loading data
 
-- [loadOne][]: like an more powerful DataLoader.load &mdash; batch loading of single values
-- [loadMany][]: like a more powerful DataLoader.load &mdash; batch loading of lists of values
+- [loadOne][]: like a more powerful DataLoader.load &mdash; batch loading of single values
+- [loadMany][]: like a more powerful DataLoader.load for one-to-many lookups &mdash; batch loading of lists of values per identifier
 
 ## Forming objects and lists
 
@@ -33,9 +33,9 @@ foundation for your project, and are often sufficient for a schema's needs
 - [object][]: accepts an object with string keys and step values, and turns it
   into a step that yields an object where the keys are retained and values are
   those yielded from the underlying steps
-- [remapKeys][]: returns step that results in an object made up of the given renamed
+- [remapKeys][]: returns a step that results in an object made up of the given renamed
   keys and values from another object step (useful during optimization when a
-  step inlines its work into an ancestor and wishest to replace itself with
+  step inlines its work into an ancestor and wishes to replace itself with
   access to specific properties therein)
 
 ## Operating on lists
@@ -45,7 +45,7 @@ foundation for your project, and are often sufficient for a schema's needs
 - [reverse][]: returns a step representing a new list with reverse order
 - [filter][]: returns a step representing only the entries in a list that
   satisfy a callback
-- [groupBy][]: accepts a single dimensional list plan and a mapper that returns
+- [groupBy][]: accepts a single-dimensional list plan and a mapper that returns
   a grouping key. Returns a step that yields a Map where the keys are the grouping
   keys and the values are lists of the original entries that match these grouping
   keys
@@ -55,7 +55,7 @@ foundation for your project, and are often sufficient for a schema's needs
 
 ## Utility
 
-- [constant][]: creates a step representing the raw JavaScript value (number, string, etc) passed in 
+- [constant][]: creates a step representing the raw JavaScript value (number, string, etc) passed in
 - [access][]: returns a step representing accessing the property at the given path for each runtime value
 - [lambda][]: returns a step representing transforming each value with the given
   (execution-time) callback
