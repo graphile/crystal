@@ -55,13 +55,6 @@ export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
 
         return _;
       },
-      finalize(constructedSchema, build, context) {
-        // NOTE: never perform mutations in this hook, the schema has already
-        // been built! It's primarily useful for performing assertions to catch
-        // development errors.
-
-        return constructedSchema;
-      },
 
       GraphQLSchema(schema, build, context) {
         // Here's where you can add a query/mutation/subscription type to
@@ -406,6 +399,14 @@ export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
         // Or mod extensions as in GraphQLSchema hook
 
         return scalarType;
+      },
+
+      finalize(constructedSchema, build, context) {
+        // NOTE: never perform mutations in this hook, the schema has already
+        // been built! It's primarily useful for performing assertions to catch
+        // development errors.
+
+        return constructedSchema;
       },
     },
   },
