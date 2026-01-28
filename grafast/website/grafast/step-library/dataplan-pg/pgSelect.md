@@ -244,17 +244,20 @@ If the relationship is not unique then an error will be thrown.
 
 :::
 
-<!-- TODO: wherePlan() has been removed https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#500-beta39
+### $pgSelect.apply($step)
 
-### $pgSelect.wherePlan()
+Registers a callback (or list of callbacks) to be applied to the query builder
+at execution-time. The `$step` represents the callback at plan-time and yields
+it at execution-time. This is useful when an argument or input field contributes
+filters dynamically.
 
-Instead of adding conditions directly, this advanced method returns
-`PgCondition` (a "modifier" class) which allows the condition to be built up
-in a different way. This is particularly useful if you are building deep
-filtering arguments, using the `applyPlan` plan resolver on arguments and input
-fields.
-
--->
+```ts
+const $posts = postsResource.find();
+const $apply = constant((qb) => {
+  qb.where((sql) => sql`${qb.alias}.is_archived = false`);
+});
+$posts.apply($apply);
+```
 
 ### $pgSelect.setFirst($n)
 
@@ -293,16 +296,13 @@ query and only supports the SQL fragment condition form.
 When you build SQL fragments, use the callback form
 (`$pgSelect.having((sql) => ...)`) so the `sql` tag is provided.
 
-TODO: THIS METHOD IS UNTESTED!
+:::note
 
-<!-- Removed
-### $pgSelect.havingPlan()
+`having` only supports SQL fragment conditions and is only available for
+aggregate queries. Add a regression test if you rely on it in production.
 
-Like `$pgSelect.wherePlan()` but for the `HAVING` clause.
+:::
 
-TODO: THIS METHOD IS UNTESTED!
-
--->
 
 ### $pgSelect.setUnique()
 

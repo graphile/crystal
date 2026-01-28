@@ -133,8 +133,6 @@ const itemTypeNameFromType = (type: string) =>
 </details>
 
 ```ts
-// TODO: test this!
-
 const singleTableSchema = makeGrafastSchema({
   typeDefs,
   objects: {
@@ -165,37 +163,46 @@ const singleTableSchema = makeGrafastSchema({
 });
 ```
 
-<!-- TODO: move this to the PostGraphile documentation?
+:::note
 
-, however the codec on the source your `pgSelect` uses
-must have the `polymorphic` configuration option set to `mode: "single"` for it
-to work. Something like:
+If you want `pgSelect` to expose polymorphic attributes from a single table,
+set the codec polymorphism on the resource used by `pgSelect`:
 
 ```ts
 itemResource.codec.polymorphism = {
   mode: "single",
   typeAttributes: ["type"],
+  commonAttributes: ["id", "parent_id", "position"],
   types: {
     TOPIC: {
       name: "Topic",
+      attributes: [{ attribute: "title" }],
     },
     POST: {
       name: "Post",
+      attributes: [
+        { attribute: "title" },
+        { attribute: "description" },
+        { attribute: "note" },
+      ],
     },
     DIVIDER: {
       name: "Divider",
+      attributes: [{ attribute: "title" }, { attribute: "color" }],
     },
     CHECKLIST: {
       name: "Checklist",
+      attributes: [{ attribute: "title" }],
     },
     CHECKLIST_ITEM: {
       name: "ChecklistItem",
+      attributes: [{ attribute: "description" }, { attribute: "note" }],
     },
   },
 };
 ```
 
--->
+:::
 
 ### Relational table
 
@@ -274,8 +281,6 @@ This style of polymorphism can use `pgSelect` in the same way as you would with
 regular row selection, but the `planType` is a tiny bit more complex:
 
 ```ts
-// TODO: test this!
-
 // Note: we're using the same `typeDefs` and `itemTypeNameFromType` as above
 
 const relationalSchema = makeGrafastSchema({
@@ -327,35 +332,39 @@ const relationalSchema = makeGrafastSchema({
 });
 ```
 
-<!-- TODO: move these to PostGraphile docs?
+:::note
 
-, however the codec on the source your `pgSelect` uses
-must have the `polymorphic` configuration option set to `mode: "relational"`
-for it to work. Something like:
+For relational polymorphism, configure the codec with `mode: "relational"` and
+the relation to follow for each type:
 
 ```ts
-itemResource.codec.polymorphic = {
+itemResource.codec.polymorphism = {
   mode: "relational",
   typeAttributes: ["type"],
   types: {
     TOPIC: {
       name: "Topic",
+      references: "topics",
       relationName: "topic",
     },
     POST: {
       name: "Post",
+      references: "posts",
       relationName: "post",
     },
     DIVIDER: {
       name: "Divider",
+      references: "dividers",
       relationName: "divider",
     },
     CHECKLIST: {
       name: "Checklist",
+      references: "checklists",
       relationName: "checklist",
     },
     CHECKLIST_ITEM: {
       name: "ChecklistItem",
+      references: "checklist_items",
       relationName: "checklistItem",
     },
   },
@@ -370,8 +379,7 @@ additional data for this type.
 
 :::
 
-
--->
+:::
 
 ### Composite type union
 

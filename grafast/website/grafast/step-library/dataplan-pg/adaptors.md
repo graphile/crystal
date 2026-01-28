@@ -142,4 +142,43 @@ const graphqlContext = { withPgClient, pgSubscriber };
 
 ## Writing your own adaptor
 
-TODO: document this.
+To write your own adaptor you need to supply two pieces:
+
+1. A `withPgClient(pgSettings, callback)` function that acquires a client,
+   applies `pgSettings` (typically via `set_config` in a transaction), runs the
+   callback, and then releases or disposes the client.
+2. A `PgClient` implementation that provides `query({ text, values })` and
+   `withTransaction(callback)`.
+
+If you want realtime support, implement `PgSubscriber` as well so you can
+connect `LISTEN/NOTIFY` to the [`listen()`](/grafast/standard-steps/listen)
+step.
+
+Here is a skeleton adaptor shape (pseudo-code):
+
+```ts
+type PgClient = {
+  query(opts: { text: string; values: unknown[] }): Promise<{ rows: unknown[] }>;
+  withTransaction<T>(callback: (client: PgClient) => Promise<T>): Promise<T>;
+};
+
+async function withPgClient(
+  pgSettings: Record<string, string | undefined> | null,
+  callback: (client: PgClient) => Promise<unknown>,
+) {
+  const client = await pool.acquire();
+  try {
+    return await client.withTransaction(async (tx) => {
+      if (pgSettings) {
+        await applySettings(tx, pgSettings);
+      }
+      return callback(tx);
+    });
+  } finally {
+    client.release();
+  }
+}
+```
+
+Attach the `withPgClient` function to your GraphQL context and ensure your
+`PgExecutor` context step reads it, as shown earlier on this page.

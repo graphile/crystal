@@ -38,7 +38,13 @@ This configuration object has the following entries:
   paths to combine in the `union all` statement; each entry in `members` will
   become another `union all`'d `select` statement. If unspecified, we'll generate
   members for you based on `resourceByTypeName`.
-  - TODO: document subkeys of members
+  - `typeName` - the GraphQL type name for this member.
+  - `resource` - the `PgResource` to select rows from for this member.
+  - `match` - optional attribute matchers to constrain rows; a map from
+    attribute name to `{ step, codec? }`, used to add `attribute = value`
+    conditions for that member.
+  - `path` - optional relation path (an array of `{ relationName }`) to
+    traverse before selecting from the final resource.
 - `attributes` - (optional) an object defining the available common attributes
   (if any) as a map from the attribute name to a specification object
   containing the `codec` to use for the attribute; this is generally used with

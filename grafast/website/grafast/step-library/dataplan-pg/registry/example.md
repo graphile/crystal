@@ -180,5 +180,3 @@ will result in the plan being analyzed and the requests being automatically
 combined via joins and/or subqueries to produce a highly efficient SQL query
 
 :::
-
-(TODO: test this works.)
