@@ -10,7 +10,13 @@ list and migrate when a Next.js adaptor becomes available.
 ## Shape of solution
 
 If you plan to implement a Next.js adaptor, here's the kind of shape we'd expect
-it to take:
+it to take...
+
+Grafserv handles a number of API routes, so you should define one for each of
+the things you care about. It's critical that you ensure that the paths line up
+with those used in the Graphile config, otherwise the assets will not correctly
+be served/referenced, this may cause issues when communicating between [Ruru][]
+and GraphQL.
 
 ```js
 // utils/grafserv.mjs
