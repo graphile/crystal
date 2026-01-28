@@ -163,47 +163,6 @@ const singleTableSchema = makeGrafastSchema({
 });
 ```
 
-:::note
-
-If you want `pgSelect` to expose polymorphic attributes from a single table,
-set the codec polymorphism on the resource used by `pgSelect`:
-
-```ts
-itemResource.codec.polymorphism = {
-  mode: "single",
-  typeAttributes: ["type"],
-  commonAttributes: ["id", "parent_id", "position"],
-  types: {
-    TOPIC: {
-      name: "Topic",
-      attributes: [{ attribute: "title" }],
-    },
-    POST: {
-      name: "Post",
-      attributes: [
-        { attribute: "title" },
-        { attribute: "description" },
-        { attribute: "note" },
-      ],
-    },
-    DIVIDER: {
-      name: "Divider",
-      attributes: [{ attribute: "title" }, { attribute: "color" }],
-    },
-    CHECKLIST: {
-      name: "Checklist",
-      attributes: [{ attribute: "title" }],
-    },
-    CHECKLIST_ITEM: {
-      name: "ChecklistItem",
-      attributes: [{ attribute: "description" }, { attribute: "note" }],
-    },
-  },
-};
-```
-
-:::
-
 ### Relational table
 
 Similar to the single table example above, the relational table has a central
@@ -332,52 +291,11 @@ const relationalSchema = makeGrafastSchema({
 });
 ```
 
-:::note
-
-For relational polymorphism, configure the codec with `mode: "relational"` and
-the relation to follow for each type:
-
-```ts
-itemResource.codec.polymorphism = {
-  mode: "relational",
-  typeAttributes: ["type"],
-  types: {
-    TOPIC: {
-      name: "Topic",
-      references: "topics",
-      relationName: "topic",
-    },
-    POST: {
-      name: "Post",
-      references: "posts",
-      relationName: "post",
-    },
-    DIVIDER: {
-      name: "Divider",
-      references: "dividers",
-      relationName: "divider",
-    },
-    CHECKLIST: {
-      name: "Checklist",
-      references: "checklists",
-      relationName: "checklist",
-    },
-    CHECKLIST_ITEM: {
-      name: "ChecklistItem",
-      references: "checklist_items",
-      relationName: "checklistItem",
-    },
-  },
-};
-```
-
 :::info
 
 The `relationName` in the above configuration is the name of the relation that
 your central source has which links to the relevant table that contains
 additional data for this type.
-
-:::
 
 :::
 

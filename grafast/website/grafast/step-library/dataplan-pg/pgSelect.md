@@ -296,13 +296,15 @@ query and only supports the SQL fragment condition form.
 When you build SQL fragments, use the callback form
 (`$pgSelect.having((sql) => ...)`) so the `sql` tag is provided.
 
-:::note
+:::note[Untested]
 
 `having` only supports SQL fragment conditions and is only available for
-aggregate queries. Add a regression test if you rely on it in production.
+aggregate queries.
+
+Please submit a regression test if you want to rely on it in production,
+we don't have significant testing of it yet.
 
 :::
-
 
 ### $pgSelect.setUnique()
 
