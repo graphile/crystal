@@ -1,10 +1,8 @@
-/*
- * This file is not used, it is purely for documentation (whilst being
- * type-checked).
- */
-import type {} from "./index.ts";
+/* This file is purely for documentation, it doesn't _do_ anything. */
 
-// Declaration merging:
+import type {} from "graphile-build";
+
+// Declaration merging to expand hooked types
 declare global {
   namespace GraphileBuild {
     interface Build {
