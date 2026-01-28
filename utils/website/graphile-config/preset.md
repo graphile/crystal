@@ -59,8 +59,30 @@ JavaScript for `graphile.config.ts` above; see the TypeScript docs for more on
 
 Graphile Config uses the `interpret` package to load `graphile.config.*`
 variants, and it will fall back to `import()` for ESM configs. If you are using
-TypeScript with ESM output and you see errors like `ERR_UNKNOWN_FILE_EXTENSION`
-or `ERR_REQUIRE_ESM`, ensure Node can load TypeScript ESM.
+TypeScript with ESM output you might see errors like the following:
+
+<div className="wrapcode">
+
+```
+Error [ERR_REQUIRE_ESM]: Must use import to load ES Module: /path/to/graphile.config.ts
+require() of ES modules is not supported.
+require() of /path/to/graphile.config.ts from /path/to/node_modules/graphile-config/dist/loadConfig.js is an ES module file as it is a .ts file whose nearest parent package.json contains "type": "module" which defines all .ts files in that package scope as ES modules.
+Instead change the requiring code to use import(), or remove "type": "module" from /path/to/package.json.
+```
+
+</div>
+
+Or, in newer versions, an error saying unknown file extension:
+
+<div className="wrapcode">
+
+```
+TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for /path/to/graphile.config.ts
+```
+
+</div>
+
+If you see these, ensure Node can load TypeScript ESM.
 
 Two common options are:
 
