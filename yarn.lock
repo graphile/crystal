@@ -5822,6 +5822,7 @@ __metadata:
     "@types/react": "npm:^19.2.7"
     clsx: "npm:^2.1.1"
     prism-react-renderer: "npm:^2.4.1"
+    raw-loader: "npm:^4.0.2"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
   languageName: unknown
@@ -22179,6 +22180,18 @@ __metadata:
     iconv-lite: "npm:0.4.24"
     unpipe: "npm:1.0.0"
   checksum: 10/863b5171e140546a4d99f349b720abac4410338e23df5e409cfcc3752538c9caf947ce382c89129ba976f71894bd38b5806c774edac35ebf168d02aa1ac11a95
+  languageName: node
+  linkType: hard
+
+"raw-loader@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "raw-loader@npm:4.0.2"
+  dependencies:
+    loader-utils: "npm:^2.0.0"
+    schema-utils: "npm:^3.0.0"
+  peerDependencies:
+    webpack: ^4.0.0 || ^5.0.0
+  checksum: 10/51cc1b0d0e8c37c4336b5318f3b2c9c51d6998ad6f56ea09612afcfefc9c1f596341309e934a744ae907177f28efc9f1654eacd62151e82853fcc6d37450e795
   languageName: node
   linkType: hard
 

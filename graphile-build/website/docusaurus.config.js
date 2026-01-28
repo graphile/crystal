@@ -138,7 +138,7 @@ const config = {
             docId: "index",
             docsPluginId: "graphile-build-pg",
             position: "left",
-            label: "Graphile Build pg",
+            label: "Graphile Build PG",
           },
           {
             type: "docsVersionDropdown",
@@ -173,7 +173,7 @@ const config = {
                 to: "/graphile-build/",
               },
               {
-                label: "Graphile Build pg",
+                label: "Graphile Build PG",
                 to: "/graphile-build-pg/",
               },
               {
