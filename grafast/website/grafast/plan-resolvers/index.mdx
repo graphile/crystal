@@ -619,7 +619,7 @@ nothing forbids it according to the two rules above.
 ```diff
  const $before = users.get({ id: $rowId });
  const $valueBefore = $before.get("value1");
-+$valueBefore.hasSideEffect = true;
++$valueBefore.hasSideEffects = true;
 
  const $after = updateUser($rowId);
  const $valueAfter = $after.get("value1");
@@ -649,5 +649,5 @@ Now `$valueBefore` must run before `$after`, so your log shows the true “befor
 ### When to use which
 
 - Prefer **explicit data deps** when possible (e.g. make the read feed the write).
-- Use `hasSideEffect = true` when you need **ordering without data flow** (logging, metrics, authorization gates, idempotency checks).
-- Don’t sprinkle `hasSideEffect` on hot paths unnecessarily; it reduces reordering freedom.
+- Use `hasSideEffects = true` when you need **ordering without data flow** (logging, metrics, authorization gates, idempotency checks).
+- Don’t sprinkle `hasSideEffects` on hot paths unnecessarily; it reduces reordering freedom.

@@ -82,7 +82,7 @@ This will output confusing data, since `$usernames` was not actually transformed
 (it would only be transformed if we walked over it via a GraphQL list field) - you
 might end up with `Hello [object Object], [object Object]!` or similar.
 
-Instead, we must use `applyTransforms()` to force the tranforms to be applied
+Instead, we must use `applyTransforms()` to force the transforms to be applied
 before passing the step as a dependency to `lambda()`:
 
 ```ts
