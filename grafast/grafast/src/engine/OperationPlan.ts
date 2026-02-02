@@ -1534,12 +1534,9 @@ export class OperationPlan {
 
   /**
    *
-   * @param outputPlan - The output plan that this selection set is being added to
-   * @param path - The path within the outputPlan that we're adding stuff (only for root/object OutputPlans)
-   * @param parentStep - The step that represents the selection set root
-   * @param objectType - The object type that this selection set is being evaluated for (note polymorphic selection should already have been handled by this point)
-   * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
-   * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
+   * @param details - planning details for this selection set. Includes the
+   * output plan, path, parent step, position type, selections, and an
+   * `isMutation` flag to enforce serial execution.
    */
   private planSelectionSet(details: PlanSelectionSetDetails) {
     const {

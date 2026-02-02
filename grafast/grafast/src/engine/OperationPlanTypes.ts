@@ -27,11 +27,14 @@ export interface CommonPlanningDetails<
     | GraphQLInterfaceType
     | GraphQLUnionType = GraphQLOutputType,
 > {
+  /** The output plan that this selection set is being added to */
   outputPlan: OutputPlan;
   // This is the LAYER-RELATIVE path, not the absolute path! It resets!
+  /** The path within the outputPlan that we're adding stuff (only for root/object OutputPlans) */
   path: readonly string[];
   planningPath: string;
   polymorphicPaths: ReadonlySet<string> | null;
+  /** The step that represents the selection set root */
   parentStep: Step;
   positionType: TType;
   // Typically this is parentOutputPlan.layerPlan; but in the case of
@@ -65,7 +68,9 @@ export interface ProcessGroupedFieldSetDetails
 export interface PlanSelectionSetDetails
   extends CommonPlanningDetails<GraphQLObjectType> {
   resolverEmulation: boolean;
+  /** The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate */
   selections: readonly SelectionNode[];
+  /** If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan) */
   isMutation?: boolean;
 }
 

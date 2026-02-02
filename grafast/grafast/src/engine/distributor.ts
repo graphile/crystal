@@ -39,7 +39,8 @@ const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
  * @param sourceIterable - the iterable or async iterable to clone
  * @param dependentSteps - the steps we're expecting to depend on this (so we
  * know how many clones we'll need)
- * @param grafastOptions - the options (from the preset) that may be relevant
+ * @param abortSignal - signal to abort distribution
+ * @param distributorOptions - the options (from the preset) that may be relevant
  */
 export function distributor<TData>(
   sourceIterable:

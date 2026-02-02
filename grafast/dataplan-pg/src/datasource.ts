@@ -198,8 +198,10 @@ export interface PgResourceOptions<
     | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
     | null;
 
+  /** A nickname for this resource. Doesn't need to be unique (but should be). Used for making the SQL query and debug messages easier to understand */
   name: TName;
   identifier?: string;
+  /** The SQL for the `FROM`clause (without any aliasing). If this is a subquery, don't forget to wrap it in parens. */
   from: TParameters extends readonly PgResourceParameter[]
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
@@ -319,11 +321,8 @@ export class PgResource<
   public extensions: Partial<PgResourceExtensions> | undefined;
 
   /**
-   * @param from - the SQL for the `FROM` clause (without any
-   * aliasing). If this is a subquery don't forget to wrap it in parens.
-   * @param name - a nickname for this resource. Doesn't need to be unique
-   * (but should be). Used for making the SQL query and debug messages easier
-   * to understand.
+   * @param registry - the resource registry to register this resource against
+   * @param options - configuration for this resource
    */
   constructor(
     registry: TRegistry,
