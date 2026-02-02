@@ -8,6 +8,7 @@ import prettier from "eslint-config-prettier";
 import graphileExport from "eslint-plugin-graphile-export";
 import importPlugin from "eslint-plugin-import";
 import jest from "eslint-plugin-jest";
+import jsdoc from "eslint-plugin-jsdoc";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
@@ -54,6 +55,9 @@ const config = {
   },
 
   settings: {
+    jsdoc: {
+      mode: "typescript",
+    },
     react: {
       version: "detect",
     },
@@ -65,6 +69,7 @@ const config = {
 
   plugins: {
     jest,
+    jsdoc,
     "@graphql-eslint": graphql,
     tsdoc,
     "simple-import-sort": simpleImportSort,
@@ -222,6 +227,7 @@ const oldConfig = {
       },
 
       rules: {
+        "jsdoc/check-param-names": "error",
         "no-dupe-class-members": "off",
         "no-undef": "off",
       },
