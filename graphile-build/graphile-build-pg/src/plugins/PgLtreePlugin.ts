@@ -1,3 +1,5 @@
+import assert from "node:assert";
+
 import type { PgCodec } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 
@@ -56,6 +58,8 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         if (event.pgCodec) return;
 
         const { serviceName, pgType } = event;
+        const typname = pgType.typname;
+        if (typname !== "ltree" && typname !== "_ltree") return;
 
         const ltreeExt = await info.helpers.pgIntrospection.getExtensionByName(
           serviceName,
@@ -65,9 +69,10 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        if (pgType.typname === "ltree") {
+        if (typname === "ltree") {
           event.pgCodec = info.state.ltreeCodec;
-        } else if (pgType.typname === "_ltree") {
+        } else {
+          assert(typname === "_ltree");
           event.pgCodec = info.state.ltreeArrayCodec;
         }
       },
