@@ -891,3 +891,86 @@ it("enables setting apply for enum values", async () => {
     minusTwo: -2,
   });
 });
+
+class NumberStep extends Step {
+  baseValue: number;
+  operations: { opName: "add"; depId: number }[];
+  constructor(value: number) {
+    super();
+    this.baseValue = value;
+    this.operations = [];
+  }
+  add($n: Step<number>) {
+    this.operations.push({
+      opName: "add",
+      depId: this.addDependency($n),
+    });
+  }
+  execute(details: ExecutionDetails) {
+    return details.indexMap((i) => {
+      let value = this.baseValue;
+      for (const op of this.operations) {
+        const opVal = details.values[op.depId].at(i);
+        switch (op.opName) {
+          case "add": {
+            value += opVal;
+            break;
+          }
+          default: {
+            const never: never = op.opName;
+            throw new Error(`Unknown op: ${never}`);
+          }
+        }
+      }
+      return value;
+    });
+  }
+}
+
+it("supports argument plans", async () => {
+  const preset: GraphileConfig.Preset = {
+    plugins: [
+      QueryPlugin,
+      extendSchema({
+        typeDefs: gql`
+          extend type Query {
+            seven(add: Int): Int
+          }
+        `,
+        objects: {
+          Query: {
+            plans: {
+              seven: {
+                plan($parent) {
+                  return new NumberStep(7);
+                },
+                args: {
+                  add: {
+                    applyPlan($parent, $seven, input) {
+                      const $val = input.getRaw();
+                      $seven.add($val);
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    ],
+  };
+  const { schema } = await makeSchema(preset);
+  const result = await grafast({
+    schema,
+    source: /* GraphQL */ `
+      {
+        mol: seven(add: 35)
+      }
+    `,
+  });
+  expect(result).toEqual({
+    data: {
+      mol: 42,
+    },
+  });
+});
