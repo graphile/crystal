@@ -3,6 +3,8 @@ import type {
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   EnumValueConfig,
+  GrafastFieldConfig,
+  GrafastFieldConfigArgumentMap,
   GrafastSchemaConfig,
   ObjectFieldConfig,
   ObjectPlan as GrafastObjectPlan,
@@ -1403,7 +1405,10 @@ export function extendSchema(
         if (field.kind === "FieldDefinition") {
           const description = getDescription(field.description);
           const fieldName = getName(field.name);
-          const args = getArguments(field.arguments, build);
+          const args: GrafastFieldConfigArgumentMap = getArguments(
+            field.arguments,
+            build,
+          );
           const type = getType(field.type, build);
           const directives = getDirectives(field.directives);
           const deprecatedDirective = directives.find(
@@ -1419,6 +1424,20 @@ export function extendSchema(
           const possiblePlan = (
             plans[Self.name] as Maybe<DeprecatedObjectPlan>
           )?.[fieldName];
+          if (typeof possiblePlan === "object" && possiblePlan !== null) {
+            for (const argName in args) {
+              const arg = args[argName];
+              const possibleArgPlan = possiblePlan.args?.[argName];
+              if (typeof possibleArgPlan === "function") {
+                arg.applyPlan = possibleArgPlan;
+              } else if (possibleArgPlan) {
+                arg.applyPlan = possibleArgPlan?.applyPlan;
+                arg.applySubscribePlan = possibleArgPlan?.applySubscribePlan;
+                arg.extensions ??= Object.create(null);
+                Object.assign(arg.extensions!, possibleArgPlan.extensions);
+              }
+            }
+          }
           build.exportNameHint(possiblePlan, `${Self.name}_${fieldName}_plan`);
           const possibleResolver = (
             resolvers[Self.name] as Maybe<ObjectResolver>
@@ -1435,7 +1454,7 @@ export function extendSchema(
             );
           }
           const spec = possiblePlan ?? possibleResolver;
-          const fieldSpecGenerator = () => {
+          const fieldSpecGenerator = (): GrafastFieldConfig<Step> => {
             return {
               ...(deprecationReason ? { deprecationReason } : null),
               ...(description ? { description } : null),
