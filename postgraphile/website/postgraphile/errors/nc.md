@@ -26,7 +26,7 @@ first and second conflicting entities originated from.
 
 When reading about the entities, you should keep in mind that codec/PgCodec,
 resource/PgResource, and relation/PgCodecRelation relate to the concepts
-described in the [registry documentation](../registry.md).
+described in the [registry documentation](../registry.mdx).
 
 A common situation where this would occur is where you have two different
 things (e.g. a column and a relationship) that are trying to be assigned to the
