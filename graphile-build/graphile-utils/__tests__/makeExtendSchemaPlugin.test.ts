@@ -894,7 +894,7 @@ it("enables setting apply for enum values", async () => {
 
 class NumberStep extends Step {
   baseValue: number;
-  operations: { opName: "add"; depId: number }[];
+  operations: { opName: "add" | "subtract"; depId: number }[];
   constructor(value: number) {
     super();
     this.baseValue = value;
@@ -906,14 +906,25 @@ class NumberStep extends Step {
       depId: this.addDependency($n),
     });
   }
+  subtract($n: Step<number>) {
+    this.operations.push({
+      opName: "subtract",
+      depId: this.addDependency($n),
+    });
+  }
   execute(details: ExecutionDetails) {
     return details.indexMap((i) => {
       let value = this.baseValue;
       for (const op of this.operations) {
         const opVal = details.values[op.depId].at(i);
+        if (opVal == null) continue;
         switch (op.opName) {
           case "add": {
             value += opVal;
+            break;
+          }
+          case "subtract": {
+            value -= opVal;
             break;
           }
           default: {
@@ -934,7 +945,7 @@ it("supports argument plans", async () => {
       extendSchema({
         typeDefs: gql`
           extend type Query {
-            seven(add: Int): Int
+            seven(add: Int, subtract: Int): Int
           }
         `,
         objects: {
@@ -951,6 +962,10 @@ it("supports argument plans", async () => {
                       $seven.add($val);
                     },
                   },
+                  subtract($parent, $seven, input) {
+                    const $val = input.getRaw();
+                    $seven.subtract($val);
+                  },
                 },
               },
             },
@@ -964,7 +979,7 @@ it("supports argument plans", async () => {
     schema,
     source: /* GraphQL */ `
       {
-        mol: seven(add: 35)
+        mol: seven(add: 40, subtract: 5)
       }
     `,
   });
