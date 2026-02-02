@@ -227,7 +227,12 @@ const oldConfig = {
       },
 
       rules: {
-        "jsdoc/check-param-names": "error",
+        "jsdoc/check-param-names": [
+          "error",
+          {
+            checkDestructured: false,
+          },
+        ],
         "no-dupe-class-members": "off",
         "no-undef": "off",
       },
