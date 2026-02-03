@@ -168,3 +168,17 @@ which can be queried like:
 ### Advice
 
 See the advice in [the Custom Queries article](./custom-queries#advice).
+
+### Debugging computed columns
+
+If a computed column is missing or behaving unexpectedly, check the following:
+
+- the function name starts with the table name and an underscore (for example
+  `person_full_name` for a `person` table, or `person_full_name` for a `persons`
+  table)
+- the first argument is the table type (for example `person_full_name(p person)`)
+- the function is marked `stable` or `immutable` (`volatile` is the default,
+  which implies a mutation)
+- the function is defined in the same schema as the table (`create function same_schema_here.person_full_name(p same_schema_here.person)`)
+- the function runs correctly in SQL using `table.function` or
+  `function(table)` syntax (`select person_full_name(person) from person`)

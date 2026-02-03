@@ -121,6 +121,45 @@ field name.
 
 :::
 
+### Selecting record-typed columns
+
+If you select a table row directly in a view, rather than it's columns,
+PostgreSQL reports that as a column of a composite type. PostGraphile exposes it
+as a nested object using the same fields and relationships as the underlying
+table type:
+
+```sql
+create view person_with_address as
+  select person.id, person.name, person, address
+  from app_public.person person
+  inner join app_public.address address
+  on person.id = address.person_id;
+```
+
+```graphql
+{
+  personWithAddress {
+    id
+    name
+    person {
+      id
+    }
+    address {
+      country
+    }
+  }
+}
+```
+
+:::warning[Don't do this]
+
+This is not recommended since it selects the entire row for each record-typed
+column, even if the client only requests a subset of the fields. Instead, expose
+just the primary key of the related table and use the `@foreignKey` smart tag to
+create a relation to it.
+
+:::
+
 ### Authorization
 
 Authorization can be enforced using `views` as well, for example, exposing some
