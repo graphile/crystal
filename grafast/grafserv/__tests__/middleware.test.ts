@@ -26,7 +26,6 @@ test("grafserv middleware can mutate GraphQL request body", async () => {
     grafserv: {
       graphqlOverGET: true,
       graphqlPath: "/graphql",
-      dangerouslyAllowAllCORSRequests: true,
     },
   });
 
