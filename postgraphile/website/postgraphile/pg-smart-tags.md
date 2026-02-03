@@ -236,19 +236,19 @@ function pgSmartTags(
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin;
 
-interface PgSmartTagRule<
-  TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
-> {
+type PgSmartTagRule = {
   serviceName?: string;
-  kind: TKind;
-  match: string | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+  kind:
+    | "class"
+    | "attribute"
+    | "constraint"
+    | "procedure"
+    | "type"
+    | "namespace";
+  match: string | ((input: PgEntity) => boolean);
   tags?: PgSmartTagTags;
   description?: string;
-}
-
-type PgSmartTagFilterFunction<TEntity extends PgEntity> = (
-  input: TEntity,
-) => boolean;
+};
 
 type UpdatePgSmartTagRulesCallback = (
   ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
@@ -257,6 +257,25 @@ type UpdatePgSmartTagRulesCallback = (
 type SubscribeToPgSmartTagUpdatesCallback = (
   cb: UpdatePgSmartTagRulesCallback | null,
 ) => PromiseOrDirect<void>;
+```
+
+### Example
+
+Hide every table in `public` schema except `users`:
+
+```ts title="graphile.config.ts"
+import { pgSmartTags } from "postgraphile/utils";
+
+const OnlyPublicUsersPlugin = pgSmartTags({
+  kind: "class",
+  match: (t) => t.getNamespace()?.nspname === "public" && t.relname !== "users",
+  tags: { behavior: "-*" },
+});
+
+export default {
+  // ...
+  plugins: [OnlyPublicUsersPlugin],
+};
 ```
 
 ### Details
