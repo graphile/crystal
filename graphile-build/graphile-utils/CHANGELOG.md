@@ -1,5 +1,51 @@
 # graphile-utils
 
+## 5.0.0-rc.4
+
+### Patch Changes
+
+- [#2910](https://github.com/graphile/crystal/pull/2910)
+  [`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f)
+  Thanks [@benjie](https://github.com/benjie)! - Use consistent type export
+  syntax
+
+- [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactor to enable TypeScript
+  options rewriteRelativeImportExtensions and erasableSyntaxOnly (including
+  using .ts extensions in source code)
+
+- [#2924](https://github.com/graphile/crystal/pull/2924)
+  [`8b4b611`](https://github.com/graphile/crystal/commit/8b4b611b42d167e06c5b1048f532d180468637e8)
+  Thanks [@benjie](https://github.com/benjie)! - `pgSmartTags()` and related
+  functions now have more natural typing/better inference and improved
+  performance.
+
+- [#2921](https://github.com/graphile/crystal/pull/2921)
+  [`e688cc1`](https://github.com/graphile/crystal/commit/e688cc18f26b5b2d4e836e14cb44fadb544ae82c)
+  Thanks [@benjie](https://github.com/benjie)! - Give extendSchema() support for
+  argument applyPlan
+
+- [#2895](https://github.com/graphile/crystal/pull/2895)
+  [`7b20942`](https://github.com/graphile/crystal/commit/7b2094266477eab8b94c77e3009199d3897cb097)
+  Thanks [@benjie](https://github.com/benjie)! - Fix the `wrapPlans()` resolver
+  emulation warning to only occur when the type has no `assertStep`, group
+  related calls and log them together, offer an option to disable this warning
+  (along with the ability to name the plugin), and introduce an error page with
+  detailed information about the why and how to fix of the issue.
+- Updated dependencies
+  [[`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f),
+  [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1),
+  [`0f913ee`](https://github.com/graphile/crystal/commit/0f913ee4d91e9383aceda001640e171aa8a3069a),
+  [`5fc379e`](https://github.com/graphile/crystal/commit/5fc379ea1ee56ea033a3f7d8c4a1ee00a6c83de7),
+  [`1d5d63e`](https://github.com/graphile/crystal/commit/1d5d63e376999b1b4d911e75cbff77a07d4e17b9),
+  [`7ca663e`](https://github.com/graphile/crystal/commit/7ca663e055a20f8d5e3f1c424896f1d120c4443a)]:
+  - graphile-build@5.0.0-rc.4
+  - graphile-config@1.0.0-rc.4
+  - @dataplan/pg@1.0.0-rc.4
+  - grafast@1.0.0-rc.5
+  - graphile-build-pg@5.0.0-rc.4
+  - tamedevil@0.1.0-rc.4
+
 ## 5.0.0-rc.3
 
 ### Patch Changes

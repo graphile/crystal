@@ -1,6 +1,6 @@
 {
   "name": "@dataplan/json",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "description": "JSON step classes for Grafast",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

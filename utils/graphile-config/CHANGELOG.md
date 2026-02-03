@@ -1,5 +1,19 @@
 # graphile-config
 
+## 1.0.0-rc.4
+
+### Patch Changes
+
+- [#2910](https://github.com/graphile/crystal/pull/2910)
+  [`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f)
+  Thanks [@benjie](https://github.com/benjie)! - Use consistent type export
+  syntax
+
+- [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactor to enable TypeScript
+  options rewriteRelativeImportExtensions and erasableSyntaxOnly (including
+  using .ts extensions in source code)
+
 ## 1.0.0-rc.3
 
 ### Patch Changes

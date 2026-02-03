@@ -1,5 +1,30 @@
 # graphile
 
+## 5.0.0-rc.4
+
+### Patch Changes
+
+- [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactor to enable TypeScript
+  options rewriteRelativeImportExtensions and erasableSyntaxOnly (including
+  using .ts extensions in source code)
+
+- [#2893](https://github.com/graphile/crystal/pull/2893)
+  [`63828eb`](https://github.com/graphile/crystal/commit/63828eb9f1db0fbebd4ce368b85d86e7ae2d55f1)
+  Thanks [@benjie](https://github.com/benjie)! - `graphile` CLI gains
+  `graphile config print [scope]` sub-selector, and neater formatting.
+- Updated dependencies
+  [[`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f),
+  [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1),
+  [`ebe1d22`](https://github.com/graphile/crystal/commit/ebe1d22e45156d9ec2274f291bbb824405e02049),
+  [`0f913ee`](https://github.com/graphile/crystal/commit/0f913ee4d91e9383aceda001640e171aa8a3069a),
+  [`7b20942`](https://github.com/graphile/crystal/commit/7b2094266477eab8b94c77e3009199d3897cb097),
+  [`1d5d63e`](https://github.com/graphile/crystal/commit/1d5d63e376999b1b4d911e75cbff77a07d4e17b9),
+  [`7ca663e`](https://github.com/graphile/crystal/commit/7ca663e055a20f8d5e3f1c424896f1d120c4443a)]:
+  - graphile-build@5.0.0-rc.4
+  - graphile-config@1.0.0-rc.4
+  - postgraphile@5.0.0-rc.5
+
 ## 5.0.0-rc.3
 
 ### Patch Changes

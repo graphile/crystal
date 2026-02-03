@@ -1,6 +1,6 @@
 {
   "name": "ruru-types",
-  "version": "2.0.0-rc.4",
+  "version": "2.0.0-rc.5",
   "description": "Some TypeScript types for ruru-components",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -1,5 +1,30 @@
 # grafserv
 
+## 1.0.0-rc.5
+
+### Patch Changes
+
+- [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactor to enable TypeScript
+  options rewriteRelativeImportExtensions and erasableSyntaxOnly (including
+  using .ts extensions in source code)
+
+- [#2927](https://github.com/graphile/crystal/pull/2927)
+  [`1d5d63e`](https://github.com/graphile/crystal/commit/1d5d63e376999b1b4d911e75cbff77a07d4e17b9)
+  Thanks [@benjie](https://github.com/benjie)! - Added Fastify v5 adaptor
+  (copy/paste of v4 adaptor)
+
+- Updated dependencies
+  [[`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f),
+  [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1),
+  [`ebe1d22`](https://github.com/graphile/crystal/commit/ebe1d22e45156d9ec2274f291bbb824405e02049),
+  [`be9792b`](https://github.com/graphile/crystal/commit/be9792bea3b39097533b0f86e1d25ee66208909d),
+  [`5fc379e`](https://github.com/graphile/crystal/commit/5fc379ea1ee56ea033a3f7d8c4a1ee00a6c83de7)]:
+  - graphile-config@1.0.0-rc.4
+  - grafast@1.0.0-rc.5
+  - ruru@2.0.0-rc.5
+  - @graphile/lru@5.0.0-rc.4
+
 ## 1.0.0-rc.4
 
 ### Patch Changes

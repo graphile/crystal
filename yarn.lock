@@ -14813,7 +14813,7 @@ __metadata:
   peerDependencies:
     eslint: ^8.48.0 || ^9.26.0
     grafast: "workspace:^"
-    pg-sql2: "workspace:^5.0.0-rc.3"
+    pg-sql2: "workspace:^5.0.0-rc.4"
   peerDependenciesMeta:
     eslint:
       optional: true

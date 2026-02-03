@@ -1,5 +1,36 @@
 # graphile-build
 
+## 5.0.0-rc.4
+
+### Patch Changes
+
+- [#2910](https://github.com/graphile/crystal/pull/2910)
+  [`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f)
+  Thanks [@benjie](https://github.com/benjie)! - Use consistent type export
+  syntax
+
+- [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactor to enable TypeScript
+  options rewriteRelativeImportExtensions and erasableSyntaxOnly (including
+  using .ts extensions in source code)
+
+- [#2916](https://github.com/graphile/crystal/pull/2916)
+  [`0f913ee`](https://github.com/graphile/crystal/commit/0f913ee4d91e9383aceda001640e171aa8a3069a)
+  Thanks [@benjie](https://github.com/benjie)! - Mark \_\_origin as internal.
+
+- [#2897](https://github.com/graphile/crystal/pull/2897)
+  [`7ca663e`](https://github.com/graphile/crystal/commit/7ca663e055a20f8d5e3f1c424896f1d120c4443a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix various places where
+  `inflection.builtin()` was not called, and thus changes to builtin inflection
+  were not reflected. (Also adds test to prevent regression.)
+- Updated dependencies
+  [[`9eb3829`](https://github.com/graphile/crystal/commit/9eb3829ea337041e4585e0cfeb63b44e87d7d14f),
+  [`a3722d6`](https://github.com/graphile/crystal/commit/a3722d613bc6fb9e32f167aae9a31eaa422ceef1),
+  [`5fc379e`](https://github.com/graphile/crystal/commit/5fc379ea1ee56ea033a3f7d8c4a1ee00a6c83de7)]:
+  - graphile-config@1.0.0-rc.4
+  - grafast@1.0.0-rc.5
+  - tamedevil@0.1.0-rc.4
+
 ## 5.0.0-rc.3
 
 ### Patch Changes
