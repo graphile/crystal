@@ -140,3 +140,79 @@ it("applies object fields inside list inputs", async () => {
     applyFilters: ["name=1", "email=2"],
   });
 });
+
+it("applies list inputs when input is a variable", async () => {
+  const schema = makeSchema();
+  const source = /* GraphQL */ `
+    query($input: FilterSetInput) {
+      applyFilters(input: $input)
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues: {
+      input: {
+        filters: [
+          { field: "name", value: 1 },
+          { field: "email", value: 2 },
+        ],
+      },
+    },
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
+  expect(result.errors).not.to.exist;
+  expect(result.data).to.deep.equal({
+    applyFilters: ["name=1", "email=2"],
+  });
+});
+
+it("applies list inputs when input.filters is a variable", async () => {
+  const schema = makeSchema();
+  const source = /* GraphQL */ `
+    query($filters: [FilterInput!]) {
+      applyFilters(input: { filters: $filters })
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues: {
+      filters: [
+        { field: "name", value: 1 },
+        { field: "email", value: 2 },
+      ],
+    },
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
+  expect(result.errors).not.to.exist;
+  expect(result.data).to.deep.equal({
+    applyFilters: ["name=1", "email=2"],
+  });
+});
+
+it("applies list inputs when input.filters[1] is a variable", async () => {
+  const schema = makeSchema();
+  const source = /* GraphQL */ `
+    query($filter: FilterInput!) {
+      applyFilters(
+        input: { filters: [{ field: "name", value: 1 }, $filter] }
+      )
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues: {
+      filter: { field: "email", value: 2 },
+    },
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
+  expect(result.errors).not.to.exist;
+  expect(result.data).to.deep.equal({
+    applyFilters: ["name=1", "email=2"],
+  });
+});
