@@ -3,4 +3,4 @@
 ---
 
 `pgSmartTags()` and related functions now have more natural typing/better
-inference.
+inference and improved performance.
