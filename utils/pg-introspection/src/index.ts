@@ -155,6 +155,10 @@ declare module "./introspection.js" {
      * is an expression rather than a column.
      */
     getKeys(): Array<PgAttribute | null>;
+    getDescription(): string | undefined;
+    getTagsAndDescription(): PgSmartTagsAndDescription;
+    /** Convenience method for getTagsAndDescription().tags */
+    getTags(): PgSmartTagsDict;
   }
   interface PgAttribute {
     _type: "PgAttribute";

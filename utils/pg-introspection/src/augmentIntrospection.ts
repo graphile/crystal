@@ -317,6 +317,17 @@ export function augmentIntrospection(
         key === 0 ? null : attrs.find((a) => a.attnum === key)!,
       );
     });
+    entity.getDescription = memo(() =>
+      entity.getIndexClass()?.getDescription(),
+    );
+    entity.getTagsAndDescription = memo(
+      () =>
+        entity.getIndexClass()?.getTagsAndDescription() ?? {
+          tags: Object.create(null),
+          description: undefined,
+        },
+    );
+    entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.attributes.forEach((entity) => {
     entity._type = "PgAttribute";

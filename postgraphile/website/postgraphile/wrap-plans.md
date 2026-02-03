@@ -308,16 +308,28 @@ export default wrapPlans(
         );
       });
 
-      const $result = plan();
+      const $payload = plan();
 
-      sideEffect($result, (result) => {
-        console.log(`Mutation '${scope.fieldName}' result:`, result);
+      sideEffect($payload, (payload) => {
+        console.log(`Mutation '${scope.fieldName}' payload:`, payload);
       });
 
-      return $result;
+      return $payload;
     },
 );
 ```
+
+:::note[Mutations typically return `object({ result: $step })`]
+
+For built-in CRUD mutations and function mutations, the plan returned by the
+field is an object step containing a `result` property. The underlying mutation
+step (e.g. insert/update/delete or function call) lives at `result` so you can
+write `const $result = $payload.get("result")` consistently across mutation
+types. This consistency is intentional for plugin authors, and the object
+wrapper also leaves room for additional payload fields in future without
+breaking existing plans.
+
+:::
 
 ## Plan resolver wrapper functions
 

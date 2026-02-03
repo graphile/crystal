@@ -12,7 +12,7 @@ Error: Attempted to add a second resource named 'foo':
 ```
 
 This happens when PostGraphile is building the
-[resources](../registry.md#resources) for your schema, and the inflection rules
+[resources](../registry.mdx#resources) for your schema, and the inflection rules
 tell it to assign them both the same name
 
 Remember: a resource represents somewhere that you can pull data from in your

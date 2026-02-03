@@ -4,6 +4,26 @@ Sometimes you want to use your PostgreSQL client directly, e.g. to run
 arbitrary SQL, or use your specific database client's helper methods; that's
 what the `\*WithPgClient` steps are there to help you with.
 
+:::warning[withPgClient _might_ be in a transaction]
+
+`withPgClientTransaction`/`sideEffectWithPgClientTransaction` guarantee you're
+in a transaction, but `withPgClient` and `sideEffectWithPgClient` may still
+start a transaction if `pgSettings` is non-empty and your adaptor requires a
+transaction to apply those settings (the default `pg` adaptor does). Do not
+assume just because `Transaction` variants exist that the default functions
+don't use transactions.
+
+:::
+
+:::danger[Never issue `BEGIN`/`COMMIT`]
+
+Do not issue `BEGIN`/`COMMIT` manually in these callbacks. The client may
+already be inside a transaction. Instead, use `client.withTransaction(...)`
+which will create a transaction (or subtransaction/savepoint if needed depending
+on the adaptor).
+
+:::
+
 ## loadOneWithPgClient(executor, lookup, loader)
 
 ## loadManyWithPgClient(executor, lookup, loader)

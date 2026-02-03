@@ -50,6 +50,14 @@ that matches the filter; if the matching fragment has a `-` modifier then the
 entity does not possess that behavior (even if a positive fragment existed
 earlier in the behavior string) otherwise it does.
 
+:::tip
+
+Use `npx graphile behavior debug` to inspect how behaviors are derived for
+specific entities. It is a quick way to confirm which fragments are winning and
+why.
+
+:::
+
 ## Global default behavior
 
 If you want to make wide-sweeping changes to behaviors, you can add “default

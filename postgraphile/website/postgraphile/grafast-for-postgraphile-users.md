@@ -506,6 +506,10 @@ a transaction. `sideEffectWithPgClient()` may or may not wrap the callback in a
 transaction, depending on if it's necessary to create one in order to apply the
 `pgSettings`.
 
+Do not issue `BEGIN`/`COMMIT` manually inside these callbacks; instead, use
+`client.withTransaction(...)` which will create a subtransaction (savepoint) if
+needed (depending on the adaptor).
+
 ```ts
 import { object } from "postgraphile/grafast";
 import { sideEffectWithPgClientTransaction } from "postgraphile/@dataplan/pg";

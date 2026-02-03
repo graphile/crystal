@@ -658,10 +658,8 @@ type PgCodecTFromJavaScript<
  * dimensionality, so an array of an array of a type doesn't really make sense
  * to Postgres, it being the same as an array of the type.
  *
- * @param innerCodec - the codec that represents the "inner type" of the array
- * @param extensions - an optional object that you can use to associate arbitrary data with this type
- * @param typeDelim - the delimeter used to separate entries in this list when Postgres stringifies it
- * @param identifier - a pg-sql2 fragment that represents the name of this type
+ * @param listedCodec - the codec that represents the "inner type" of the array
+ * @param config - optional configuration for the list codec
  */
 export function listOfCodec<
   TInnerCodec extends PgCodec<string, any, any, any, undefined, any, any>,
@@ -679,10 +677,15 @@ export function listOfCodec<
 >(
   listedCodec: TInnerCodec,
   config?: {
+    /** Description for this list type. */
     description?: string;
+    /** Metadata to associate with this list type. */
     extensions?: Partial<PgCodecExtensions>;
+    /** Delimiter used to separate entries when Postgres stringifies it. */
     typeDelim?: string;
+    /** pg-sql2 fragment that represents the name of this type. */
     identifier?: SQL;
+    /** Name for this list type. */
     name?: TName;
   },
 ): PgCodec<
@@ -812,8 +815,11 @@ export function domainOfCodec<
   name: TName,
   identifier: SQL,
   config: {
+    /** Description for this domain. */
     description?: string;
+    /** Metadata to associate with this domain. */
     extensions?: Partial<PgCodecExtensions>;
+    /** Whether this domain is not nullable. */
     notNull?: boolean | null;
   } = {},
 ): PgCodec<
@@ -887,7 +893,9 @@ export function rangeOfCodec<
   name: TName,
   identifier: SQL,
   config: {
+    /** Description for this range. */
     description?: string;
+    /** Metadata to associate with this range. */
     extensions?: Partial<PgCodecExtensions>;
   } = {},
 ): PgCodec<

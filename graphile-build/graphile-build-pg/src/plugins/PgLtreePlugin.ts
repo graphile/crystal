@@ -1,6 +1,9 @@
+import assert from "node:assert";
+
 import type { PgCodec } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 
+// !Hide
 import { version } from "../version.ts";
 
 interface State {
@@ -9,6 +12,7 @@ interface State {
 }
 interface Cache {}
 
+// Optional: declaration merge the plugin name so users get autocomplete in `disablePlugins: [...]`
 declare global {
   namespace GraphileConfig {
     interface Plugins {
@@ -19,10 +23,11 @@ declare global {
 
 export const PgLtreePlugin: GraphileConfig.Plugin = {
   name: "PgLtreePlugin",
+  // !Hide
   version,
 
-  gather: gatherConfig({
-    initialState(cache: Cache, { lib }): State {
+  gather: gatherConfig<never, State, Cache>({
+    initialState(cache, { lib }) {
       const {
         dataplanPg: { listOfCodec },
         graphileBuild: { EXPORTABLE },
@@ -56,6 +61,8 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         if (event.pgCodec) return;
 
         const { serviceName, pgType } = event;
+        const typname = pgType.typname;
+        if (typname !== "ltree" && typname !== "_ltree") return;
 
         const ltreeExt = await info.helpers.pgIntrospection.getExtensionByName(
           serviceName,
@@ -63,11 +70,10 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         );
         if (!ltreeExt || pgType.typnamespace !== ltreeExt.extnamespace) {
           return;
-        }
-
-        if (pgType.typname === "ltree") {
+        } else if (typname === "ltree") {
           event.pgCodec = info.state.ltreeCodec;
-        } else if (pgType.typname === "_ltree") {
+        } else {
+          assert(typname === "_ltree");
           event.pgCodec = info.state.ltreeArrayCodec;
         }
       },
@@ -78,13 +84,20 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
       init(_, build) {
         const codec = build.pgCodecs.ltree;
         if (codec) {
+          // Highly recommended you use your own inflector here, choosing
+          // `builtin` will mean your users may get conflicts which they cannot
+          // then resolve through inflection.
           const ltreeTypeName = build.inflection.builtin("LTree");
+
           build.registerScalarType(
             ltreeTypeName,
             { pgCodec: codec },
             () => ({
-              description:
+              description: build.wrapDescription(
                 "Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html",
+                "type",
+              ),
+              // !Hide
               // TODO: specifiedByURL: https://postgraphile.org/scalars/ltree
             }),
             'Adding "LTree" scalar type from PgLtreePlugin.',
