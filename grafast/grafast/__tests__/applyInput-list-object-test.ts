@@ -171,7 +171,7 @@ it("applies list inputs when input is a variable", async () => {
 it("applies list inputs when input.filters is a variable", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
-    query($filters: [FilterInput!]) {
+    query($filters: [FilterInput!]!) {
       applyFilters(input: { filters: $filters })
     }
   `;
