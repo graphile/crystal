@@ -3933,6 +3933,8 @@ const registryConfig_pgResources_single_table_item_relations_single_table_item_r
     tags: {}
   }
 };
+const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
+const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
 const log_entriesUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -4001,8 +4003,6 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
   }
 };
 const relational_topic_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topic_by_id_fn");
-const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
-const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
 const first_party_vulnerabilitiesUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -4648,34 +4648,6 @@ const registryConfig = {
     relational_dividers: registryConfig_pgResources_relational_dividers_relational_dividers,
     relational_item_relations: registryConfig_pgResources_relational_item_relations_relational_item_relations,
     single_table_item_relations: registryConfig_pgResources_single_table_item_relations_single_table_item_relations,
-    log_entries: registryConfig_pgResources_log_entries_log_entries,
-    relational_posts: registryConfig_pgResources_relational_posts_relational_posts,
-    relational_topic_by_id_fn: PgResource.functionResourceOptions(registryConfig_pgResources_relational_topics_relational_topics, {
-      name: "relational_topic_by_id_fn",
-      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
-      from(...args) {
-        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "relational_topic_by_id_fn"
-        },
-        tags: {}
-      },
-      description: undefined
-    }),
     first_party_vulnerabilities_cvss_score_int: {
       executor,
       name: "first_party_vulnerabilities_cvss_score_int",
@@ -4732,6 +4704,34 @@ const registryConfig = {
       },
       description: undefined
     },
+    log_entries: registryConfig_pgResources_log_entries_log_entries,
+    relational_posts: registryConfig_pgResources_relational_posts_relational_posts,
+    relational_topic_by_id_fn: PgResource.functionResourceOptions(registryConfig_pgResources_relational_topics_relational_topics, {
+      name: "relational_topic_by_id_fn",
+      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
+      from(...args) {
+        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_topic_by_id_fn"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
     first_party_vulnerabilities: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
     third_party_vulnerabilities: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
     favorite_application: PgResource.functionResourceOptions(resourceConfig_Application, {

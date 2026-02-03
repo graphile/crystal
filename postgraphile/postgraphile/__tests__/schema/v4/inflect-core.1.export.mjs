@@ -3655,6 +3655,7 @@ const registryConfig_pgResources_compound_key_compound_key = {
     tags: {}
   }
 };
+const edge_case_computedFunctionIdentifer = sql.identifier("c", "edge_case_computed");
 const similar_table_1Uniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -3696,7 +3697,6 @@ const null_test_recordUniques = [{
     }
   }
 }];
-const edge_case_computedFunctionIdentifer = sql.identifier("c", "edge_case_computed");
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
 const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const left_armUniques = [{
@@ -3882,10 +3882,10 @@ const query_compound_type_arrayFunctionIdentifer = sql.identifier("a", "query_co
 const compound_type_array_mutationFunctionIdentifer = sql.identifier("b", "compound_type_array_mutation");
 const compound_type_array_queryFunctionIdentifer = sql.identifier("b", "compound_type_array_query");
 const post_computed_compound_type_arrayFunctionIdentifer = sql.identifier("a", "post_computed_compound_type_array");
-const post_manyFunctionIdentifer = sql.identifier("a", "post_many");
 const person_computed_outFunctionIdentifer = sql.identifier("c", "person_computed_out");
 const person_first_nameFunctionIdentifer = sql.identifier("c", "person_first_name");
 const person_computed_out_outFunctionIdentifer = sql.identifier("c", "person_computed_out_out");
+const post_manyFunctionIdentifer = sql.identifier("a", "post_many");
 const person_computed_inoutFunctionIdentifer = sql.identifier("c", "person_computed_inout");
 const person_computed_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_inout_out");
 const person_existsFunctionIdentifer = sql.identifier("c", "person_exists");
@@ -6740,6 +6740,37 @@ const registry = makeRegistry({
       }
     },
     compound_key: registryConfig_pgResources_compound_key_compound_key,
+    edge_case_computed: {
+      executor,
+      name: "edge_case_computed",
+      identifier: "main.c.edge_case_computed(c.edge_case)",
+      from(...args) {
+        return sql`${edge_case_computedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "edge_case",
+        required: true,
+        notNull: false,
+        codec: edgeCaseCodec
+      }],
+      isUnique: !false,
+      codec: TYPES.text,
+      uniques: [],
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "edge_case_computed"
+        },
+        tags: {
+          sortable: true,
+          behavior: ["orderBy order resource:connection:backwards"]
+        }
+      },
+      description: undefined
+    },
     similar_table_1: {
       executor: executor,
       name: "similar_table_1",
@@ -6830,37 +6861,6 @@ const registry = makeRegistry({
         isDeletable: true,
         tags: {}
       }
-    },
-    edge_case_computed: {
-      executor,
-      name: "edge_case_computed",
-      identifier: "main.c.edge_case_computed(c.edge_case)",
-      from(...args) {
-        return sql`${edge_case_computedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "edge_case",
-        required: true,
-        notNull: false,
-        codec: edgeCaseCodec
-      }],
-      isUnique: !false,
-      codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "edge_case_computed"
-        },
-        tags: {
-          sortable: true,
-          behavior: ["orderBy order resource:connection:backwards"]
-        }
-      },
-      description: undefined
     },
     return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, {
       name: "return_table_without_grants",
@@ -8017,32 +8017,6 @@ const registry = makeRegistry({
       },
       description: undefined
     }),
-    post_many: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
-      name: "post_many",
-      identifier: "main.a.post_many(a._post)",
-      from(...args) {
-        return sql`${post_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "posts",
-        required: true,
-        notNull: false,
-        codec: postArrayCodec
-      }],
-      returnsArray: false,
-      returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "post_many"
-        },
-        tags: {}
-      },
-      description: undefined
-    }),
     person_computed_out: {
       executor,
       name: "person_computed_out",
@@ -8136,6 +8110,32 @@ const registry = makeRegistry({
       },
       description: undefined
     },
+    post_many: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+      name: "post_many",
+      identifier: "main.a.post_many(a._post)",
+      from(...args) {
+        return sql`${post_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "posts",
+        required: true,
+        notNull: false,
+        codec: postArrayCodec
+      }],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "post_many"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
     person_computed_inout: {
       executor,
       name: "person_computed_inout",

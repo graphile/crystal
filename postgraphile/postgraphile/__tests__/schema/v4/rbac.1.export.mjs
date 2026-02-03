@@ -954,6 +954,21 @@ const unloggedCodec = recordCodec({
   },
   executor: executor
 });
+const uuidArrayCodec = listOfCodec(TYPES.uuid, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_uuid"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "uuidArray"
+});
 const foreignKeyIdentifier = sql.identifier("a", "foreign_key");
 const foreignKeyCodec = recordCodec({
   name: "foreignKey",
@@ -1067,21 +1082,6 @@ const testviewCodec = recordCodec({
     }
   },
   executor: executor
-});
-const uuidArrayCodec = listOfCodec(TYPES.uuid, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_uuid"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "uuidArray"
 });
 const viewTableIdentifier = sql.identifier("a", "view_table");
 const viewTableCodec = recordCodec({
@@ -3923,6 +3923,7 @@ const registryConfig_pgResources_person_secret_person_secret = {
     canDelete: true
   }
 };
+const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const registryConfig_pgResources_foreign_key_foreign_key = {
   executor: executor,
   name: "foreign_key",
@@ -3949,7 +3950,6 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
     canDelete: false
   }
 };
-const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const compound_keyUniques = [{
   isPrimary: true,
   attributes: ["person_id_1", "person_id_2"],
@@ -4093,11 +4093,11 @@ const registryConfig_pgResources_left_arm_left_arm = {
   }
 };
 const authenticate_manyFunctionIdentifer = sql.identifier("b", "authenticate_many");
+const types_mutationFunctionIdentifer = sql.identifier("c", "types_mutation");
+const types_queryFunctionIdentifer = sql.identifier("c", "types_query");
 const issue756_mutationFunctionIdentifer = sql.identifier("c", "issue756_mutation");
 const issue756_set_mutationFunctionIdentifer = sql.identifier("c", "issue756_set_mutation");
 const left_arm_identityFunctionIdentifer = sql.identifier("c", "left_arm_identity");
-const types_mutationFunctionIdentifer = sql.identifier("c", "types_mutation");
-const types_queryFunctionIdentifer = sql.identifier("c", "types_query");
 const authenticate_payloadFunctionIdentifer = sql.identifier("b", "authenticate_payload");
 const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
 const func_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "func_out_out_compound_type");
@@ -4343,10 +4343,10 @@ const registry = makeRegistry({
     myTable: myTableCodec,
     personSecret: personSecretCodec,
     unlogged: unloggedCodec,
-    foreignKey: foreignKeyCodec,
-    testview: testviewCodec,
     uuidArray: uuidArrayCodec,
     uuid: TYPES.uuid,
+    foreignKey: foreignKeyCodec,
+    testview: testviewCodec,
     viewTable: viewTableCodec,
     compoundKey: compoundKeyCodec,
     bool: TYPES.boolean,
@@ -7166,33 +7166,6 @@ const registry = makeRegistry({
         canDelete: false
       }
     },
-    foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
-    testview: {
-      executor: executor,
-      name: "testview",
-      identifier: "main.a.testview",
-      from: testviewIdentifier,
-      codec: testviewCodec,
-      uniques: [],
-      isVirtual: false,
-      description: undefined,
-      extensions: {
-        description: undefined,
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "testview"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      }
-    },
     list_bde_mutation: {
       executor,
       name: "list_bde_mutation",
@@ -7231,6 +7204,33 @@ const registry = makeRegistry({
         canExecute: false
       },
       description: undefined
+    },
+    foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
+    testview: {
+      executor: executor,
+      name: "testview",
+      identifier: "main.a.testview",
+      from: testviewIdentifier,
+      codec: testviewCodec,
+      uniques: [],
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "testview"
+        },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
+      }
     },
     view_table: {
       executor: executor,
@@ -7444,28 +7444,6 @@ const registry = makeRegistry({
         canDelete: false
       }
     },
-    return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, {
-      name: "return_table_without_grants",
-      identifier: "main.c.return_table_without_grants()",
-      from(...args) {
-        return sql`${return_table_without_grantsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "return_table_without_grants"
-        },
-        tags: {},
-        canExecute: true
-      },
-      description: undefined
-    }),
     edge_case: {
       executor: executor,
       name: "edge_case",
@@ -7492,6 +7470,28 @@ const registry = makeRegistry({
         canDelete: false
       }
     },
+    return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, {
+      name: "return_table_without_grants",
+      identifier: "main.c.return_table_without_grants()",
+      from(...args) {
+        return sql`${return_table_without_grantsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "return_table_without_grants"
+        },
+        tags: {},
+        canExecute: true
+      },
+      description: undefined
+    }),
     issue756: registryConfig_pgResources_issue756_issue756,
     authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
       name: "authenticate_fail",
@@ -7587,83 +7587,6 @@ const registry = makeRegistry({
         },
         tags: {},
         canExecute: false
-      },
-      description: undefined
-    }),
-    issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, {
-      name: "issue756_mutation",
-      identifier: "main.c.issue756_mutation()",
-      from(...args) {
-        return sql`${issue756_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "issue756_mutation"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, {
-      name: "issue756_set_mutation",
-      identifier: "main.c.issue756_set_mutation()",
-      from(...args) {
-        return sql`${issue756_set_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsArray: false,
-      returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "issue756_set_mutation"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    left_arm_identity: PgResource.functionResourceOptions(registryConfig_pgResources_left_arm_left_arm, {
-      name: "left_arm_identity",
-      identifier: "main.c.left_arm_identity(c.left_arm)",
-      from(...args) {
-        return sql`${left_arm_identityFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "left_arm",
-        required: true,
-        notNull: false,
-        codec: leftArmCodec,
-        extensions: {
-          variant: "base"
-        }
-      }],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "left_arm_identity"
-        },
-        tags: {
-          arg0variant: "base",
-          resultFieldName: "leftArm"
-        },
-        canExecute: true
       },
       description: undefined
     }),
@@ -7775,6 +7698,83 @@ const registry = makeRegistry({
       },
       description: undefined
     },
+    issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, {
+      name: "issue756_mutation",
+      identifier: "main.c.issue756_mutation()",
+      from(...args) {
+        return sql`${issue756_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "issue756_mutation"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    }),
+    issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, {
+      name: "issue756_set_mutation",
+      identifier: "main.c.issue756_set_mutation()",
+      from(...args) {
+        return sql`${issue756_set_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "issue756_set_mutation"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    }),
+    left_arm_identity: PgResource.functionResourceOptions(registryConfig_pgResources_left_arm_left_arm, {
+      name: "left_arm_identity",
+      identifier: "main.c.left_arm_identity(c.left_arm)",
+      from(...args) {
+        return sql`${left_arm_identityFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "left_arm",
+        required: true,
+        notNull: false,
+        codec: leftArmCodec,
+        extensions: {
+          variant: "base"
+        }
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "left_arm_identity"
+        },
+        tags: {
+          arg0variant: "base",
+          resultFieldName: "leftArm"
+        },
+        canExecute: true
+      },
+      description: undefined
+    }),
     authenticate_payload: PgResource.functionResourceOptions({
       executor: executor,
       name: "auth_payload",
