@@ -125,6 +125,11 @@
       "node": "./fwd/grafserv/fastify/v4/index.js",
       "default": "./fwd/grafserv/fastify/v4/index.js"
     },
+    "./grafserv/fastify/v5": {
+      "types": "./fwd/grafserv/fastify/v5/index.d.ts",
+      "node": "./fwd/grafserv/fastify/v5/index.js",
+      "default": "./fwd/grafserv/fastify/v5/index.js"
+    },
     "./grafserv/h3/v1": {
       "types": "./fwd/grafserv/h3/v1/index.d.ts",
       "node": "./fwd/grafserv/h3/v1/index.js",
