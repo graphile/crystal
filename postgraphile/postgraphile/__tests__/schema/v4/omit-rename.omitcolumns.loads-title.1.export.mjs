@@ -78,37 +78,6 @@ const executor = new PgExecutor({
     });
   }
 });
-const flambleIdentifier = sql.identifier("d", "flibble");
-const flambleCodec = recordCodec({
-  name: "flamble",
-  identifier: flambleIdentifier,
-  attributes: {
-    __proto__: null,
-    f: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
-    }
-  },
-  description: undefined,
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "flibble"
-    },
-    tags: {
-      __proto__: null,
-      name: "flamble"
-    }
-  },
-  executor: executor
-});
 const renamed_tableIdentifier = sql.identifier("d", "original_table");
 const renamed_tableCodec = recordCodec({
   name: "renamed_table",
@@ -138,6 +107,37 @@ const renamed_tableCodec = recordCodec({
     tags: {
       __proto__: null,
       name: "renamed_table"
+    }
+  },
+  executor: executor
+});
+const flambleIdentifier = sql.identifier("d", "flibble");
+const flambleCodec = recordCodec({
+  name: "flamble",
+  identifier: flambleIdentifier,
+  attributes: {
+    __proto__: null,
+    f: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "flibble"
+    },
+    tags: {
+      __proto__: null,
+      name: "flamble"
     }
   },
   executor: executor
@@ -731,9 +731,9 @@ const registry = makeRegistry({
   pgCodecs: {
     __proto__: null,
     int4: TYPES.int,
+    renamed_table: renamed_tableCodec,
     flamble: flambleCodec,
     text: TYPES.text,
-    renamed_table: renamed_tableCodec,
     films: filmsCodec,
     varchar: TYPES.varchar,
     studios: studiosCodec,
@@ -1092,6 +1092,30 @@ const registry = makeRegistry({
       },
       description: undefined
     },
+    renamed_table: {
+      executor: executor,
+      name: "renamed_table",
+      identifier: "main.d.original_table",
+      from: renamed_tableIdentifier,
+      codec: renamed_tableCodec,
+      uniques: [],
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "original_table"
+        },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
+        tags: {
+          name: "renamed_table"
+        }
+      }
+    },
     getflamble: PgResource.functionResourceOptions({
       executor: executor,
       name: "flamble",
@@ -1136,30 +1160,6 @@ const registry = makeRegistry({
       },
       description: undefined
     }),
-    renamed_table: {
-      executor: executor,
-      name: "renamed_table",
-      identifier: "main.d.original_table",
-      from: renamed_tableIdentifier,
-      codec: renamed_tableCodec,
-      uniques: [],
-      isVirtual: false,
-      description: undefined,
-      extensions: {
-        description: undefined,
-        pg: {
-          serviceName: "main",
-          schemaName: "d",
-          name: "original_table"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {
-          name: "renamed_table"
-        }
-      }
-    },
     films: {
       executor: executor,
       name: "films",

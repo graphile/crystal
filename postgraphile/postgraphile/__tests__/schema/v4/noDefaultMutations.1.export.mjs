@@ -2542,6 +2542,7 @@ const registryConfig_pgResources_compound_key_compound_key = {
     tags: {}
   }
 };
+const edge_case_computedFunctionIdentifer = sql.identifier("c", "edge_case_computed");
 const null_test_recordUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -2552,7 +2553,6 @@ const null_test_recordUniques = [{
     }
   }
 }];
-const edge_case_computedFunctionIdentifer = sql.identifier("c", "edge_case_computed");
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
 const left_armUniques = [{
   isPrimary: true,
@@ -4148,28 +4148,6 @@ const registry = makeRegistry({
       }
     },
     compound_key: registryConfig_pgResources_compound_key_compound_key,
-    null_test_record: {
-      executor: executor,
-      name: "null_test_record",
-      identifier: "main.c.null_test_record",
-      from: nullTestRecordIdentifier,
-      codec: nullTestRecordCodec,
-      uniques: null_test_recordUniques,
-      isVirtual: false,
-      description: undefined,
-      extensions: {
-        description: undefined,
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "null_test_record"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
-    },
     edge_case_computed: {
       executor,
       name: "edge_case_computed",
@@ -4200,6 +4178,28 @@ const registry = makeRegistry({
         }
       },
       description: undefined
+    },
+    null_test_record: {
+      executor: executor,
+      name: "null_test_record",
+      identifier: "main.c.null_test_record",
+      from: nullTestRecordIdentifier,
+      codec: nullTestRecordCodec,
+      uniques: null_test_recordUniques,
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "null_test_record"
+        },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
+        tags: {}
+      }
     },
     return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, {
       name: "return_table_without_grants",
