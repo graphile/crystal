@@ -42,15 +42,19 @@ export type PgSmartTagTags = {
   [tagName: string]: null | true | string | string[];
 };
 
-export interface PgSmartTagRule<
+type PgSmartTagRules = {
+  [TKind in PgSmartTagSupportedKinds]: {
+    serviceName?: string;
+    kind: TKind;
+    match: string | PgSmartTagFilterFunction<PgEntityByKind[NoInfer<TKind>]>;
+    tags?: PgSmartTagTags;
+    description?: string;
+  };
+};
+// Form a union of the options
+export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
-> {
-  serviceName?: string;
-  kind: TKind;
-  match: string | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
-  tags?: PgSmartTagTags;
-  description?: string;
-}
+> = PgSmartTagRules[keyof PgSmartTagRules] & { kind: TKind };
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
@@ -85,12 +89,13 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
     );
   }
 
-  const match: PgSmartTagFilterFunction<PgEntityByKind[TKind]> = (obj) => {
-    if (typeof incomingMatch === "function") {
-      // User supplied a match function; delegate to that:
-      return incomingMatch(obj);
-    } else if (typeof incomingMatch === "string") {
-      const parts = parseIdentifierParts(incomingMatch);
+  let match: PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+  if (typeof incomingMatch === "function") {
+    // User supplied a match function; use that:
+    match = incomingMatch as PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+  } else if (typeof incomingMatch === "string") {
+    const parts = parseIdentifierParts(incomingMatch);
+    match = (obj) => {
       switch (rule.kind) {
         case "class": {
           const rel = obj as PgClass;
@@ -198,12 +203,12 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           throw new Error(`Unknown kind '${never}'`);
         }
       }
-    } else {
-      throw new Error(
-        "pgSmartTags rule 'match' is neither a string nor a function",
-      );
-    }
-  };
+    };
+  } else {
+    throw new Error(
+      "pgSmartTags rule 'match' is neither a string nor a function",
+    );
+  }
   return {
     kind,
     match,
