@@ -33,11 +33,20 @@ it("runs grafast execute middleware in order", async () => {
       middleware: {
         execute(next, event) {
           calls.push("before");
+          event.args.contextValue = {
+            ...(event.args.contextValue as Record<string, unknown>),
+            middleware: "before",
+          };
           return next.callback((error, result) => {
             calls.push("after");
             if (error) {
               throw error;
             }
+            const r = result as ExecutionResult;
+            r.extensions ??= {};
+            r.extensions.contextSnapshot = JSON.stringify(
+              event.args.contextValue,
+            );
             return result;
           });
         },
@@ -54,5 +63,8 @@ it("runs grafast execute middleware in order", async () => {
   })) as ExecutionResult;
   expect(result.errors).not.to.exist;
   expect(result.data).to.deep.equal({ hello: "world" });
+  expect(result.extensions).to.deep.equal({
+    contextSnapshot: JSON.stringify({ middleware: "before" }),
+  });
   expect(calls).to.deep.equal(["before", "after"]);
 });
