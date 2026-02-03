@@ -9,13 +9,13 @@ import {
   grafast,
   makeGrafastSchema,
   Modifier,
+  Step,
   UnbatchedStep,
 } from "../dist/index.js";
 
 type FilterEntry = { field: string; value: number };
-type FilterCollector = {
-  filters: FilterEntry[];
-};
+type FilterCollector = { filters: FilterEntry[] };
+type ApplyCallback = (collector: FilterCollector) => void;
 
 class FilterModifier extends Modifier<FilterCollector> {
   private field?: string;
@@ -38,29 +38,29 @@ class FilterModifier extends Modifier<FilterCollector> {
 }
 
 class FilterCollectorStep extends UnbatchedStep<string[]> {
-  // Apply constant work at plan-time so runtime only has to handle dynamic
-  // inputs. This mirrors how applyInput can optimize constant values.
   private baseCollector: FilterCollector = { filters: [] };
+  applyDepIds: number[] = [];
 
-  apply($apply: UnbatchedStep<(collector: FilterCollector) => void>) {
+  apply($apply: Step<ApplyCallback>) {
     if ($apply instanceof ConstantStep) {
-      $apply.data(this.baseCollector);
+      // Apply constant work at plan-time.
+      const fn = $apply.data as ApplyCallback;
+      fn(this.baseCollector);
     } else {
-      this.addUnaryDependency($apply);
+      // Dynamic - must handle at execution time.
+      this.applyDepIds.push(this.addUnaryDependency($apply));
     }
   }
 
-  unbatchedExecute(
-    _extra: unknown,
-    ...applyFns: Array<(collector: FilterCollector) => void>
-  ) {
-    // Clone the plan-time base collector for runtime so each execution starts
-    // from the same optimized base state.
+  unbatchedExecute(_extra: unknown, ...deps: Array<ApplyCallback>) {
+    // Clone the plan-time base collector for execution-time so each execution
+    // starts from the same optimized base state.
     const collector: FilterCollector = {
       filters: [...this.baseCollector.filters],
     };
-    for (const fn of applyFns) {
-      fn(collector);
+    for (const idx of this.applyDepIds) {
+      const applyFn = deps[idx];
+      applyFn(collector);
     }
     return collector.filters.map((filter) => `${filter.field}=${filter.value}`);
   }
