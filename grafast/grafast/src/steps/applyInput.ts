@@ -14,9 +14,10 @@ import type { Step } from "../step.ts";
 import { UnbatchedStep } from "../step.ts";
 import { constant, ConstantStep } from "./constant.ts";
 
-let currentModifiers: Modifier<any>[] = [];
+/** Modifiers must never be added out-of-bounds */
+const FROZEN_MODIFIERS = Object.freeze([]) as never[];
+let currentModifiers: Modifier<any>[] = FROZEN_MODIFIERS;
 let applyingModifiers = false;
-let inputArgsApplyDepth = 0;
 
 export class ApplyInputStep<
   TParent extends object = any,
@@ -131,29 +132,40 @@ export function inputArgsApply<
     | undefined,
   scope: unknown,
 ): void {
-  try {
-    inputArgsApplyDepth++;
+  withModifiers(() => {
     const target = getTargetFromParent
       ? getTargetFromParent(parent, inputValue, { scope })
       : (parent as unknown as TTarget);
     if (target != null) {
       _inputArgsApply<TTarget>(schema, inputType, target, inputValue, scope);
     }
+  });
+}
+
+export function withModifiers<T>(cb: () => T): T {
+  const existingModifiers = currentModifiers;
+  currentModifiers = [];
+  let result: T;
+  try {
+    // calling the callback should push into `currentModifiers`
+    result = cb();
   } finally {
-    inputArgsApplyDepth--;
-  }
-  let l: number;
-  if (inputArgsApplyDepth === 0 && (l = currentModifiers.length) > 0) {
-    applyingModifiers = true;
-    try {
-      for (let i = l - 1; i >= 0; i--) {
-        currentModifiers[i].apply();
+    const toProcess = currentModifiers;
+    currentModifiers = existingModifiers;
+
+    const l = toProcess.length;
+    if (l > 0) {
+      try {
+        applyingModifiers = true;
+        for (let i = l - 1; i >= 0; i--) {
+          toProcess[i].apply();
+        }
+      } finally {
+        applyingModifiers = false;
       }
-    } finally {
-      applyingModifiers = false;
-      currentModifiers = [];
     }
   }
+  return result;
 }
 
 export function applyInput<
@@ -236,8 +248,11 @@ function _inputArgsApply<TArg extends object>(
       throw new Error(`Expected list in list position`);
     }
     for (const item of inputValue) {
-      const itemTarget = typeof target === "function" ? target() : target;
-      _inputArgsApply(schema, inputType.ofType, itemTarget, item, scope);
+      // Need to ensure the list items are applied in order - apply each one deeply
+      withModifiers(() => {
+        const itemTarget = typeof target === "function" ? target() : target;
+        _inputArgsApply(schema, inputType.ofType, itemTarget, item, scope);
+      });
     }
   } else if (typeof target === "function") {
     throw new Error(
