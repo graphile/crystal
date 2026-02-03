@@ -2,8 +2,6 @@
 title: Inflection
 ---
 
-import Spon from "@site/src/components/Spon";
-
 Inflection governs how things are named whilst building your PostGraphile
 schema. “Inflection” is the system of naming things; it’s composed of a large
 set of named functions, and we call each of these inflection functions an
@@ -11,8 +9,8 @@ set of named functions, and we call each of these inflection functions an
 
 The inflectors that you have available will depend on the plugins and presets
 you’re using. To get a list of the inflectors available to you, you can use
-TypeScript autocompletion, or if you’re a sponsor you can install the <Spon />`graphile`
-package and run `yarn graphile inflection list` (or equivalent for
+TypeScript autocompletion, or install the `graphile` package and run
+`yarn graphile inflection list` (or equivalent for
 other package managers).
 
 In GraphQL, types typically use singular `UpperCamelCase` (`PascalCase`);
@@ -34,7 +32,7 @@ by overriding inflectors!
 ### Overriding Naming — One-off
 
 If you want to rename just one field or type, your best bet is to use a
-[smart tag](./smart-tags.md); e.g. for a table you might do:
+[smart tag](../smart-tags.md); e.g. for a table you might do:
 
 ```sql
 COMMENT ON TABLE post IS E'@name message';
@@ -118,14 +116,14 @@ npx graphile inflection list
 
 <figure>
 
-![Initial output of the `graphile inflection list` command](./graphile-inflection-list-1.png)
+![Initial output of the `graphile inflection list` command](../graphile-inflection-list-1.png)
 
 <figcaption>Screenshot showing the initial output of the <code>graphile inflection list</code> command, including a summary of the available inflectors and their arguments.</figcaption>
 </figure>
 
 <figure>
 
-![More detailed output from later in the `graphile inflection list` command](./graphile-inflection-list-2.png)
+![More detailed output from later in the `graphile inflection list` command](../graphile-inflection-list-2.png)
 
 <figcaption>Screenshot from lower down in the output of the <code>graphile inflection list</code> command, detailing each inflector, its documentation and its rough TypeScript definition.</figcaption>
 </figure>

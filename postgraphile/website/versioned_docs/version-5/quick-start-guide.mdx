@@ -19,9 +19,10 @@ and PostgreSQL.
 
 ### Install Node
 
-You need to be running Node.js v8.6 or higher to run PostGraphile. You can check
-your current version of Node by running `node --version`. If you're running a
-recent version you can skip this section.
+You need to be running Node.js 22 or higher to run PostGraphile, and we
+recommend Node.js 24 or higher. You can check your current version of Node by
+running `node --version`. If you're running a recent version you can skip this
+section.
 
 There's many ways of installing node; if you're on macOS you might prefer
 installing with [homebrew](https://brew.sh/) via `brew install node`; if you're
@@ -33,12 +34,12 @@ the version labelled LTS. Linux users can scroll down the page and find the
 version that works with their system.
 
 Once installed run `node -v` in a terminal to check your version. It must be
-16.20.0 or higher.
+22.0.0 or higher; 24.0.0 or higher is recommended.
 
 ### Install PostgreSQL
 
 We need a PostgreSQL database to connect to. You can skip this section if you
-already have PostgreSQL version `11.0` or higher installed. If you do not use a
+already have PostgreSQL version `14.0` or higher installed. If you do not use a
 local PostgreSQL server then you'll need to modify the commands that follow to
 account for this.
 
@@ -198,7 +199,7 @@ export default preset;
 ```
 
 (Read more about `graphile.config.mjs`, including how to write it in
-TypeScript, in the [Configuration documentation](./config.mdx).)
+TypeScript, in the [Configuration documentation](./config/index.mdx).)
 
 With this configuration in place, we no longer need to pass the flags, so we
 can just run PostGraphile as:

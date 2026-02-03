@@ -118,9 +118,9 @@ object) which maps from the name of the enum value to [a
 spec](https://graphql.org/graphql-js/type/#graphqlenumtype). Importantly, these
 enum values have an associated `extensions.grafast.apply` method which will
 be used to apply the ordering to the parent PgSelectQueryBuilder via
-`queryBuilder.orderBy(...)`. The `apply` can also choose to set the order as
-unique via `queryBuilder.setOrderIsUnique()`, which will mean that the primary key
-will not need to be added to the order by clause.
+`queryBuilder.orderBy((sql) => ...)`. The `apply` can also choose to set
+the order as unique via `queryBuilder.setOrderIsUnique()`, which will mean that
+the primary key will not need to be added to the order by clause.
 
 :::tip[Use helpers]
 

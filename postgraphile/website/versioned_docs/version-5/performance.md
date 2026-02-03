@@ -2,10 +2,11 @@
 title: Performance
 ---
 
-:::warning
+:::note[Benchmarks pending for V5]
 
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
+The benchmark numbers below were recorded against PostGraphile V4 and are
+included for historical context only. We plan to refresh these figures for V5.
+You should run your own benchmarks for production planning.
 
 :::
 
@@ -152,7 +153,7 @@ things you might want to try:
   your own auth checks!)
 - Use the envvar `DEBUG=graphile-build-pg:sql` to show the SQL statements that
   are being executed; e.g.
-  `DEBUG=graphile-build-pg:sql postgraphile -c postgres:///mydb`
+  `DEBUG=graphile-build-pg:sql postgraphile`
 
 If you need help optimising your PostgreSQL database or PostGraphile API, please
 [get in touch](https://graphile.org/support/).

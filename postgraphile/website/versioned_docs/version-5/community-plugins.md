@@ -37,7 +37,9 @@ Schema extension plugins for PostGraphile:
   associations. (same concept as
   postgraphile-plugin-connection-filter-polymorphic). :question:_(Not yet ported to V5)_
 - [postgraphile-index-to-unique-constraint-plugin](https://github.com/hansololai/postgraphile-index-to-unique-constraint-plugin) -
-  extends PostGraphile’s unique constraint detection to unique indexes also. :question:_(Not yet ported to V5)_
+  extends PostGraphile’s unique constraint detection to unique indexes also.
+  See [requirements](./requirements.md#unique-indexes) for
+  a V5-compatible example.
 - [postgraphile-table-extension-plugin](https://github.com/hansololai/postgraphile-table-extension-plugin) -
   extend a table’s fields (non-association) to another table via unique foreign
   key constraint. Useful for vertical partitioned tables. :question:_(Not yet ported to V5)_

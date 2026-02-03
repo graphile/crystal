@@ -271,7 +271,6 @@ produced:
 ```ts title="Plugins inline even dynamically generated SQL"
 export const MyPlugin = extendSchema((build) => {
   const {
-    sql,
     grafast: { lambda },
     pgResources: { things },
   } = build;
@@ -297,7 +296,7 @@ export const MyPlugin = extendSchema((build) => {
                   // SQL query before it is executed
                   (queryBuilder) => {
                     if (!includeArchived) {
-                      queryBuilder.where(sql`archived_at is null`);
+                      queryBuilder.where((sql) => sql`archived_at is null`);
                     }
                   },
               ),

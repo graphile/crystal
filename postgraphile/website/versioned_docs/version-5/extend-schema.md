@@ -645,7 +645,9 @@ export const MyProductReviewsPlugin = extendSchema((build) => {
           reviews($product) {
             const $productId = $product.get("id");
             const $reviews = reviews.find();
-            $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+            $reviews.where(
+              (sql) => sql`${$reviews}.product_id = ${$productId}`,
+            );
 
             // highlight-next-line
             return connection($reviews);
@@ -896,7 +898,7 @@ import {
   ObjectStep,
   constant,
   object,
-  ExecutableStep,
+  Step,
   access,
   list,
 } from "postgraphile/grafast";
@@ -1005,10 +1007,10 @@ export const RegisterUserPlugin = extendSchema((build) => {
       UsernameConflict: {
         // Since User expects a step, our types must also expect a step. We
         // don't care what the step is though.
-        assertStep: ExecutableStep,
+        assertStep: Step,
       },
       EmailAddressConflict: {
-        assertStep: ExecutableStep,
+        assertStep: Step,
       },
     },
     unions: {

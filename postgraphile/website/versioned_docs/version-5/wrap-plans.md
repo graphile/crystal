@@ -47,6 +47,7 @@ flexible method 2 is what you want.
 // Method 1: wrap individual resolvers of known fields
 function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 
 interface PlanWrapperRules {
@@ -66,9 +67,28 @@ interface PlanWrapperRule {
   autoApplyFieldArgs?: boolean;
 }
 
+interface WrapPlansOptions {
+  /** The name to give this plugin, to make debugging easier */
+  name?: string;
+  /** Optional version of the plugin */
+  version?: string;
+  /** Optional description of the plugin, to make debugging easier */
+  description?: string;
+
+  /**
+   * Set this `true` if you know that the given plans will never be called in
+   * the context of resolver emulation, and thus wrapping `defaultPlanResolver`
+   * will not cause issues.
+   *
+   * @see {@link https://err.red/pwpr}
+   *
+   */
+  disableResolverEmulationWarnings?: boolean;
+}
+
 type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
-  $source: ExecutableStep,
+  $source: Step,
   fieldArgs: FieldArgs,
   info: FieldInfo,
 ) => any;
@@ -87,8 +107,15 @@ function wrapPlans<T>(
     field: GrafastFieldConfig,
   ) => T | null,
   rule: (match: T) => PlanWrapperRule | PlanWrapperFn,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
+
+Both signatures accept an optional `options` argument. Set
+`disableResolverEmulationWarnings: true` to silence the resolver emulation
+warning. This warning is irrelevant when your schema uses only Gra*fast* plan
+resolvers and contains no traditional resolvers. Read more at [wrapPlans
+resolver emulation warning](https://err.red/pwpr).
 
 ## Method 1: wrapping individual resolvers of known fields
 
@@ -96,6 +123,7 @@ function wrapPlans<T>(
 // Method 1: wrap individual resolvers of known fields
 function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
 
@@ -238,6 +266,7 @@ function wrapPlans<T>(
     field: GrafastFieldConfig,
   ) => T | null,
   rule: (match: T) => PlanWrapperRule | PlanWrapperFn,
+  options?: WrapPlansOptions,
 ): GraphileConfig.Plugin;
 ```
 
@@ -279,16 +308,28 @@ export default wrapPlans(
         );
       });
 
-      const $result = plan();
+      const $payload = plan();
 
-      sideEffect($result, (result) => {
-        console.log(`Mutation '${scope.fieldName}' result:`, result);
+      sideEffect($payload, (payload) => {
+        console.log(`Mutation '${scope.fieldName}' payload:`, payload);
       });
 
-      return $result;
+      return $payload;
     },
 );
 ```
+
+:::note[Mutations typically return `object({ result: $step })`]
+
+For built-in CRUD mutations and function mutations, the plan returned by the
+field is an object step containing a `result` property. The underlying mutation
+step (e.g. insert/update/delete or function call) lives at `result` so you can
+write `const $result = $payload.get("result")` consistently across mutation
+types. This consistency is intentional for plugin authors, and the object
+wrapper also leaves room for additional payload fields in future without
+breaking existing plans.
+
+:::
 
 ## Plan resolver wrapper functions
 
@@ -303,7 +344,7 @@ unmodified.
 ```ts
 type PlanWrapperFn = (
   plan: SmartFieldPlanResolver,
-  $source: ExecutableStep,
+  $source: Step,
   fieldArgs: FieldArgs,
   info: FieldInfo,
 ) => any;

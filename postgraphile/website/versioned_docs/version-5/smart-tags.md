@@ -448,7 +448,7 @@ comment on view my_view is E'@primaryKey type,identifier';
 
 ### @foreignKey
 
-The foreign key adds virtual constraints pretending to be foreign keys. It has
+The foreign key adds virtual constraints that behave like foreign keys. It has
 the following syntax which mirrors the PostgreSQL foreign key constraint:
 
 `@foreignKey (col1, ...) references [my_schema.]my_table [(col1, ...)]`

@@ -1,350 +1,4 @@
----
-title: Configuration
----
-
-# Configuration
-
-No matter whether you’re using PostGraphile CLI, library mode or schema only,
-PostGraphile (and other elements of the stack including Graphile Build,
-Gra*fast* and Grafserv) are configured via a [`graphile-config`
-“preset.”](https://star.graphile.org/graphile-config/preset)
-
-A preset is a simple JS object that contains a combination of: other presets,
-plugins, and options for the various scopes. Your configuration, your preset,
-will almost certainly need to extend an existing preset or presets; which
-preset(s) to extend depends on what you’re looking for from PostGraphile.
-
-The PostGraphile base presets are named after crystals; the first base preset
-available is `postgraphile/presets/amber`, so you’ll almost definitely want
-that.
-
-:::warning[Avoid naming conflicts!]
-
-Please don’t name your own presets after crystals, or we may end up having
-confusion!
-
-:::
-
-## PostGraphile presets
-
-PostGraphile ships a small set of presets that are designed to be composed;
-pick the foundational crystal preset that matches your starting point, and
-layer feature presets as needed.
-
-### `postgraphile/presets/amber`
-
-```ts
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
-```
-
-Amber is the current baseline preset. It wires in the Graphile Build and
-Graphile Build PG default plugin lists and sensible options and inflection for
-new PostGraphile users. Every production schema should include Amber either
-directly or transitively.
-
-### `postgraphile/presets/v4`
-
-```ts
-import { makeV4Preset } from "postgraphile/presets/v4";
-```
-
-`makeV4Preset()` extends Amber and restores many PostGraphile V4 behaviours and
-inflection rules. Use it when upgrading an existing V4 project so that the
-generated schema and runtime defaults stay aligned with what your clients
-already expect. The [V4 migration docs](./migrating-from-v4) cover this path in
-more detail.
-
-### `postgraphile/presets/relay`
-
-```ts
-import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
-```
-
-`PostGraphileRelayPreset` layers additional behaviours on top of your existing
-foundation to produce a Relay-focussed schema. It prefers connections over
-lists, hides primary-key columns that are surfaced via `nodeId`, and adjusts
-inflection so that `id` fields follow Relay conventions. Combine it with Amber
-or another foundational preset. The preset is currently marked experimental, so
-expect refinements between releases.
-
-:::warning[Where did my fields go?]
-
-The Relay preset tries to do away with primary key fields and fields that
-reference them as much as possible, opting instead for using the Node `ID` in as
-many places as possible. If you're coming from V4, probably stick with the v4
-preset unless you really want to make some significant changes to your schema.
-
-:::
-
-### `postgraphile/presets/lazy-jwt`
-
-```ts
-import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
-```
-
-`PgLazyJWTPreset` enables a convenience flow that verifies bearer JWTs inside
-Grafserv requests and populates `pgSettings` from the claims. It relies on the
-Grafserv adaptor (such as `grafserv/node`) and is intentionally limited; use
-your own `preset.grafast.context` if you need finer-grained control. Remember to
-extend Amber alongside it. For guidance on managing JWTs yourself, see the
-[JWT guide](./jwt-guide.mdx).
-
-### Third-party preset bundles
-
-Many contrib plugins now publish presets (for example,
-`postgraphile-plugin-connection-filter` and
-`@graphile-contrib/pg-many-to-many`). These presets generally expose the plugin
-with some sensible defaults. They do not pull in a foundation preset for you, so
-include Amber (or whichever crystal preset you started with) before them.
-
-:::tip[Stay on your crystal]
-
-We expect to ship more crystal-themed foundational presets over time as the
-recommended defaults evolve. When you adopt a foundational preset, plan to stay
-on it for the life of that project unless you explicitly opt into the next
-crystal. New projects should take whichever foundational preset we recommend at
-the time; existing projects can continue extending the one they started with.
-
-Right now there is only one crystal: amber.
-
-:::
-
-## Creating your configuration file
-
-Though you can build a preset anywhere in your source code and pass it to the
-relevant APIs, we recommend that you put your preset into a
-`graphile.config.mjs` (or `.ts` or `.mts` or `.js` etc) file, so that it can
-easily be picked up by the PostGraphile CLI and any other utilities (e.g. the
-`graphile` command). You may write your preset in either JS or TS, and you may
-expose it as either CommonJS (`module.exports = ...;`) or ESM (`export default
-...;`). In our examples, we’ll typically use `.mjs` since it’s modern but
-without the overhead of requiring TypeScript.
-
-Here’s an example preset which only extends the “Amber” preset:
-
-```js title="graphile.config.mjs"
-// @ts-check
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
-
-/** @type {GraphileConfig.Preset} */
-const preset = {
-  extends: [PostGraphileAmberPreset],
-};
-
-export default preset;
-```
-
-Or in TypeScript:
-
-```ts title="graphile.config.mts"
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
-
-const preset: GraphileConfig.Preset = {
-  extends: [PostGraphileAmberPreset],
-};
-
-export default preset;
-```
-
-Similarly, you can create your config as a `.js`, `.cjs`, `.ts` or `.cts` file;
-the PostGraphile CLI will pick up all of these automatically assuming that you
-have TypeScript installed locally and are running Node 24 or higher. (For Node
-22.6+ you'll need to be running with the `node --experimental-strip-types` flag,
-or have `tsx`, `ts-node`, or similar installed locally.)
-
-## General structure
-
-A preset is a plain JavaScript object, and every key in the preset is optional.
-`{}` is a valid (but not very useful!) preset. The key `default` is forbidden
-at the top level of a preset, this allows us to detect common issues with
-ESM/CommonJS interoperability.
-
-The value for the `extends` key, if specified, must be an array of other presets
-your preset wishes to inherit from.
-
-The value for the `plugins` key, if specified, must be an array of
-[`graphile-config` plugins](https://star.graphile.org/graphile-config/plugin)
-that your preset wishes to make use of. Plugins must always have unique names,
-and will be automatically de-duplicated by the system if the same plugin is
-referenced in multiple presets.
-
-The preset also accepts keys for each supported scope. `graphile-config` has no
-native scopes, but different Graphile projects can register their own scopes.
-For example: `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes; `graphile-build-pg` registers the `pgServices` scope; Gra*fast*
-registers the `grafast` scope; Grafserv registers the `grafserv` scope; and
-`ruru` registers the `ruru` scope.
-
-We highly recommend using TypeScript for dealing with your preset so that you
-get auto-completion for the options available in each scope; you can also use
-the `graphile config options` command detailed below.
-
-:::tip[The Schema Build Process]
-
-The schema build process in PostGraphile is:
-
-- Synchronously build the inflectors via the `inflection` phase - inflectors are
-  used throughout the phases
-- Asynchronously build the registry by performing database introspection in the
-  `gather` phase
-- Synchronously determine the behaviors of each of the entities in the registry during the `behavior` phase
-- Synchronously build the GraphQL schema during the `schema` phase
-
-:::
-
-### Simple example
-
-```ts title="graphile.config.mts"
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
-import { makePgService } from "postgraphile/adaptors/pg";
-
-const preset: GraphileConfig.Preset = {
-  extends: [PostGraphileAmberPreset],
-  grafserv: { port: 5678 },
-  pgServices: [makePgService({ connectionString: "postgres:///my_db" })],
-};
-```
-
-### Larger example
-
-```ts title="graphile.config.mts"
-// The standard base preset to use, includes the main PostGraphile features
-import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
-
-// More presets you might want to mix in
-import { makeV4Preset } from "postgraphile/presets/v4";
-import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
-
-// Use the 'pg' module to connect to the database
-import { makePgService } from "postgraphile/adaptors/pg";
-
-// A plugin for the system to use for persisted operations support
-import PersistedPlugin from "@grafserv/persisted";
-
-const preset: GraphileConfig.Preset = {
-  extends: [
-    PostGraphileAmberPreset,
-    /* Add more presets here, e.g.: */
-    makeV4Preset({
-      simpleCollections: "both",
-      jwtPgTypeIdentifier: '"b"."jwt_token"',
-      dynamicJson: true,
-      graphiql: true,
-      graphiqlRoute: "/",
-    }),
-    // Uncomment this to opt into a smaller Relay-focussed schema
-    //PostGraphileRelayPreset,
-  ],
-
-  plugins: [
-    /* Add plugins here, e.g.: */
-    PersistedPlugin,
-  ],
-
-  inflection: {
-    /* options for the inflection system */
-  },
-  gather: {
-    /* options for the gather phase, e.g.: */
-    pgStrictFunctions: true,
-    installWatchFixtures: true,
-  },
-  schema: {
-    /* options for the schema build phase, e.g.: */
-    retryOnInitFail: true,
-    exportSchemaSDLPath: `${process.cwd()}/latestSchema.graphql`,
-    exportSchemaIntrospectionResultPath: `${process.cwd()}/latestSchema.json`,
-    sortExport: true,
-  },
-  grafast: {
-    /* options for Grafast, including setting GraphQL context, e.g.: */
-    context: {
-      meaningOfLife: 42,
-    },
-    // explain: true, // DO NOT ENABLE IN PRODUCTION!
-  },
-  grafserv: {
-    /* options for Grafserv, e.g.: */
-    port: 5678,
-    graphqlPath: "/graphql",
-    websockets: true,
-    graphqlOverGET: true,
-    persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,
-    allowUnpersistedOperation: true,
-  },
-  ruru: {
-    /* options for customizing Ruru, e.g.: */
-    htmlParts: {
-      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
-    },
-  },
-  pgServices: [
-    /* list of PG database configurations, e.g.: */
-    makePgService({
-      // Database connection string, read from an environmental variable:
-      connectionString: process.env.DATABASE_URL,
-
-      // List of database schemas to expose:
-      schemas: ["app_public"],
-
-      // Enable LISTEN/NOTIFY:
-      pubsub: true,
-    }),
-  ],
-};
-
-export default preset;
-```
-
-### Viewing the available options
-
-Once you have a basic configuration file, you can use the `graphile` CLI to
-find out what options are available to you:
-
-```shell
-graphile config options
-```
-
-:::info[The graphile CLI is a development aid]
-
-The `graphile` CLI is a development aid only, and is not needed at runtime or
-in production (or in development really, it’s just a handy little helper). This
-utility is sponsors-only source-available software. If you’re not a sponsor
-there’s a 30 day free trial that starts as soon as you run it for the first
-time. You may sponsor at any level for access to this utility. Read the details
-in the [graphile command’s
-README](https://www.npmjs.com/package/graphile/v/alpha).
-
-:::
-
-Note that the options available will be influenced by the modules that you are
-using, so be sure to import any plugins and presets at the top of your config
-file.
-
-<figure>
-
-[![Cropped screenshot of 'graphile config options'](./graphile-config-options-screenshot.png)](./graphile-config-options-screenshot.png)
-
-<figcaption>Screenshot of part of the coloured markdown output from executing <code>graphile config options</code> showing the options available to be set inside the config file.</figcaption>
-</figure>
-
-### Viewing the resolved configuration
-
-You can also use the `graphile` CLI to print out your resolved configuration
-(once all the presets have been applied). This can help with debugging:
-
-```shell
-graphile config print
-```
-
-<figure>
-
-[![Cropped screenshot of 'graphile config print'](./graphile-config-print-screenshot.png)](./graphile-config-print-screenshot.png)
-
-<figcaption>Screenshot of part of the coloured output from executing <code>graphile config print</code> showing the options that the local configuration file is using.</figcaption>
-</figure>
-
-## Option reference
+# Overview
 
 What follows are some of the more commonly used options to serve as a quick
 reference, but this list can quickly become out of date (feel free to send a
@@ -352,13 +6,13 @@ PR!). You can use TypeScript or the `graphile config options`
 command mentioned above to see what options are available to you — different
 presets and plugins make different options available.
 
-### `inflection` options
+## `inflection` options
 
 _(TypeScript type: `GraphileBuild.InflectionOptions`)_
 
 _None at this time._
 
-### `pgServices`
+## `pgServices`
 
 _(TypeScript type: `ReadonlyArray<GraphileConfig.PgServiceConfiguration>`)_
 
@@ -446,7 +100,7 @@ context keys `otherdb_withPgClient`, `otherdb_pgSettings` and
 
 :::
 
-### `makePgService`
+## `makePgService`
 
 When PostGraphile (or, strictly, `@dataplan/pg`) wishes to communicate with
 PostgreSQL, it does so using an “adaptor”. The adaptor must expose a common set
@@ -542,7 +196,7 @@ const preset = {
 };
 ```
 
-#### `adaptorSettings`
+### `adaptorSettings`
 
 The `adaptorSettings` property is an internal configuration object that is
 created automatically when you use `makePgService()`. In general, **you
@@ -553,7 +207,7 @@ If for some advanced reason you need to manually configure `pgServices`
 (rather than using `makePgService()`), then you would need to provide
 `adaptorSettings` with whatever the adaptor requires.
 
-##### `postgraphile/adaptors/pg`
+#### `postgraphile/adaptors/pg`
 
 _(Or, equivalently, `postgraphile/@dataplan/pg/adaptors/pg` or `@dataplan/pg/adaptors/pg`)_
 
@@ -583,7 +237,7 @@ Note if `pool` is provided then `connectionString` and `poolConfig` should not
 be specified. Similarly if `superuserPool` is provided then
 `superuserConnectionString` and `superuserPoolConfig` should not be specified.
 
-### `gather` options
+## `gather` options
 
 _(TypeScript type: `GraphileBuild.GatherOptions`)_
 
@@ -603,7 +257,7 @@ Deprecated options:
   instead of the type name in the Node identifier (highly discouraged because it
   significantly increases the risk of NodeID conflicts)
 
-### `schema` options
+## `schema` options
 
 _(TypeScript type: `GraphileBuild.SchemaOptions`)_
 
@@ -615,7 +269,7 @@ to determine the options that they offer.
 :::
 
 - `defaultBehavior: string | undefined` - if set, applies a default
-  [behavior](./behavior) to all entities; for example to prefer lists
+  [behavior](../behavior) to all entities; for example to prefer lists
   over connections: `+list -connection`.
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
@@ -640,7 +294,7 @@ to determine the options that they offer.
 - `sortExport: boolean` - if true (default: `false`), sorts exported SDL and
   introspection output for stable diffs.
 
-### `grafast` options
+## `grafast` options
 
 _(TypeScript type: `GraphileConfig.GrafastOptions`)_
 
@@ -655,7 +309,7 @@ _(TypeScript type: `GraphileConfig.GrafastOptions`)_
   context object that your results will be merged into (overwriting
   pre-existing keys).
 
-### `grafserv` options
+## `grafserv` options
 
 _(TypeScript type: `GraphileConfig.GrafservOptions`)_
 
@@ -678,65 +332,6 @@ _(TypeScript type: `GraphileConfig.GrafservOptions`)_
 - `maxRequestLength: number` - The length, in bytes, for the largest request
   body that the server will accept, only used if the framework of choice
   doesn’t already handle input parsing
-
-## Making HTTP data available to plan resolvers
-
-Using the `grafast.context` callback we can extract data from the incoming HTTP
-request and make it accessible from within the Gra*fast* schema via the GraphQL context.
-
-Example:
-
-```js title="graphile.config.js"
-export default {
-  grafast: {
-    async context(requestContext, args) {
-      const req = requestContext.node?.req;
-      // You can perform asynchronous actions here if you need to; for example
-      // looking up the current user in the database.
-
-      // Return here things that your resolvers need
-      return {
-        // Return the current user from Passport.js or similar
-        user: req.user,
-
-        // Add a helper to get a header
-        getHeader(name) {
-          return req?.get(name);
-        },
-
-        // Give access to the database-owner PostgreSQL pool, for example to
-        // perform privileged actions
-        rootPgPool,
-      };
-    },
-  },
-};
-```
-
-:::warning[Use prefixes]
-
-When adding details to `grafast.context`, you must careful to not add properties that
-will clash with system context keys such as `withPgClient`, `pgSettings`,
-`pgSubscriber` and `jwtClaims` (you can see the existing context keys by
-inspecting the `contextValue` property of second argument to the `grafast.context`
-callback: `args.contextValue`).
-
-For the absolute best future compatibility, we recommend that you prefix your
-context keys with your initials, company name, or similar.
-
-:::
-
-:::tip[Use helpers]
-
-It’s _not_ a good idea to give direct access to the `req` or `res` objects
-via `grafast.context` as it binds the GraphQL context too tightly to the HTTP
-request lifecycle — this will cause you issues if you try and use the GraphQL
-schema in other contexts (e.g. directly from the application, in integration
-tests, or over alternative transports such as websockets for realtime).
-Instead, add helpers to get/set the data you need that can be implemented in
-each future situation.
-
-:::
 
 ## `pgSettings`
 
@@ -811,7 +406,7 @@ such as `role`, and will be applied by Postgres.
 
 :::
 
-### Exposing HTTP request data to PostgreSQL
+## Exposing HTTP request data to PostgreSQL
 
 Using the `pgSettings` functionality mentioned above you can extend the data
 made available within PostgreSQL through `current_setting(...)`. Remember: the
@@ -918,7 +513,7 @@ websockets, etc.
 
 :::
 
-### Accessing pgSettings data in PostgreSQL
+## Accessing pgSettings data in PostgreSQL
 
 With either of the above examples, you could write an SQL function
 `get_x_something()` to get the `myapp.headers.x_something` setting:

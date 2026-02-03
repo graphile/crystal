@@ -15,6 +15,13 @@ call these "smart comments".
 
 </div>
 
+:::note["Smart tags" vs "smart comments"]
+
+Smart tags are the annotations themselves; smart comments are one way to add
+smart tags to an entity, specifically via PostgreSQL `COMMENT` statements.
+
+:::
+
 ## Smart comment spec
 
 Comments can be added to various entities within PostgreSQL using
@@ -171,13 +178,13 @@ comment on function my_function(arg_type_1, arg_type_2) is
   E'@name my_new_function_name\nDocumentation here.';
 ```
 
-## Adding smart tags to fake constraints
+## Adding smart tags to virtual constraints
 
-If you need to apply any smart comments to a fake constraint, you cannot use
-newlines (`\n`) because they will be interpreted as separate smart comments on
-the original entity. We've added a workaround for this: you can use the pipe
-(`|`) symbol to assign smart comments to the fake constraint, for example to
-rename the fake constraint:
+If you need to apply any smart comments to a virtual constraint (sometimes
+informally called a "fake constraint"), you cannot use newlines (`\n`) because
+they will be interpreted as separate smart comments on the original entity.
+We've added a workaround for this: you can use the pipe (`|`) symbol to assign
+smart comments to the virtual constraint, for example to rename it:
 
 ```sql
 comment on materialized view my_materialized_view is

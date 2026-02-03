@@ -11,8 +11,10 @@ We recommend using the latest LTS version of Node.js and PostgreSQL, but we have
 limited support for older versions, so long as they are still LTS. Using newer
 released versions should generally work fine (we don't recommend using with
 alpha/beta versions though), but if there's any issues let us know in an issue.
+PostGraphile supports Node.js 22+ and recommends Node.js 24+ for the best
+experience (including built-in type stripping for `.ts` files).
 
-### Your PostgreSQL database
+## Your PostgreSQL database
 
 These aren't exactly "requirements", but they will impact your PostGraphile
 experience.
@@ -43,10 +45,10 @@ experience.
 - **Function restrictions**: we have pretty good support for PostgreSQL
   functions, but there's some
   [common function restrictions](./function-restrictions.md) you should check out.
-- **Use unique _constraints_** rather than unique _indexes_ when appropriate: we use
-  unique constraints to create mutations such as `updateUserByUsername`; note
-  that "PostgreSQL automatically creates a unique index when a unique constraint
-  or primary key is defined for a table." --
+- **Use unique _constraints_** rather than unique _indexes_ when appropriate:
+  we use unique constraints to create mutations such as
+  `updateUserByUsername`; note that "PostgreSQL automatically creates a unique
+  index when a unique constraint or primary key is defined for a table." --
   [PG docs](https://www.postgresql.org/docs/current/static/indexes-unique.html)
 - **Use the defaults** for formatting output; we only run tests for the
   defaults so if you change them you may face issues. (You may change
@@ -58,15 +60,89 @@ On top of this, standard PostgreSQL best practices apply: use indexes carefully
 for performance, use constraints and triggers to ensure your data is valid and
 consistent, etc.
 
-### Node.js: use the LTS
+### Unique indexes
 
-We only support LTS versions of Node.js. **Once a Node.js version reaches
+PostGraphile treats unique constraints as data guarantees, but unique
+indexes as optimisations that you might remove later; this is why it only
+creates accessors and mutations from unique constraints by default.
+
+If your tooling does not understand this subtlety and can only create unique
+indexes, you might want to opt in to treating unique indexes as if they were
+constraints by using a plugin. We've included an example plugin to achieve this
+below.
+
+<details>
+<summary>Click to view plugin to treat unique indexes as constraints.</summary>
+
+:::warning
+
+Only use this if you are confident that **all** of your unique indexes are true
+constraints.
+
+:::
+
+```ts title="plugins/PgUniqueIndexesPlugin.ts"
+// WARNING: this plugin was reworked from a GitHub issue and is currently untested
+// Ref: https://github.com/graphile/crystal/issues/2054
+
+export const PgUniqueIndexesPlugin: GraphileConfig.Plugin = {
+  name: "PgUniqueIndexesPlugin",
+  version: "0.1.0",
+  description: "Treats unique indexes as if they were unique constraints.",
+  gather: {
+    hooks: {
+      async pgTables_PgResourceOptions(_, event) {
+        const { pgClass, resourceOptions } = event;
+
+        if (pgClass.relkind !== "r") return;
+        if (resourceOptions.parameters) return;
+        if (!resourceOptions.uniques) return;
+
+        const mutableUniques = [...resourceOptions.uniques];
+        resourceOptions.uniques = mutableUniques;
+
+        const indexes = pgClass.getIndexes().filter((idx) => idx.indisunique);
+
+        const existingUniqueAttributeSets = new Set(
+          mutableUniques.map((u) => JSON.stringify(u.attributes)),
+        );
+
+        for (const idx of indexes) {
+          const attributes = idx.getKeys();
+          if (!attributes.every((a) => a != null)) continue;
+          const attributeNames = attributes.map((a) => a.attname);
+          const hash = JSON.stringify(attributeNames);
+          if (existingUniqueAttributeSets.has(hash)) continue;
+          existingUniqueAttributeSets.add(hash);
+
+          const { description, tags = Object.create(null) } =
+            idx.getIndexClass()?.getTagsAndDescription() ?? {};
+
+          mutableUniques.push({
+            isPrimary: idx.indisprimary ?? false,
+            attributes: attributeNames,
+            description,
+            extensions: { tags },
+          });
+        }
+      },
+    },
+  },
+};
+```
+
+</details>
+
+## Node.js: use the active LTS
+
+PostGraphile supports Node.js 22+ but recommends Node.js 24+ where possible. We
+only support LTS versions of Node.js. **Once a Node.js version reaches
 end-of-life we no longer support it**, and any future patch release may be
 incompatible with it. We do not see this as a violation of semver — once a
 Node.js version reaches EOL **no reasonable user should use it**, and as such a
 change to drop support for it is not a breaking change for reasonable users.
 
-### TypeScript v5.0.0+ (optional)
+## TypeScript v5.0.0+ (optional)
 
 We recommend that you use TypeScript for the best experience — auto-completion,
 inline documentation, etc.
@@ -78,6 +154,30 @@ TypeScript configuration:
 
 ```
     "moduleResolution": "node16", // Or "nodenext"
+```
+
+Instead of configuring TypeScript manually, we recommend that you use the
+appropriate [TSConfig Base](https://github.com/tsconfig/bases) for your Node.js
+version.
+
+```json title="tsconfig.json"
+{
+  "extends": "@tsconfig/node24/tsconfig.json"
+}
+```
+
+If you want to use type stripping (which limits the syntax you can use,
+but means Node can run your TS files directly), then also add the
+`@tsconfig/node-ts` preset and make sure you're running Node 24+ and TypeScript
+v5.8.0+. To use the LTS version of Node along with type stripping:
+
+```json title="tsconfig.json"
+{
+  "extends": [
+    "@tsconfig/node-lts/tsconfig.json",
+    "@tsconfig/node-ts/tsconfig.json"
+  ]
+}
 ```
 
 Our adherence to semver **does not cover types** — we _may_ make breaking
@@ -92,7 +192,7 @@ making breaking changes when their benefits outweigh the costs (as determined
 by our maintainer), and we do our best to detail in the release notes how to
 deal with these changes (if any action is necessary).
 
-#### Not using TypeScript?
+### Not using TypeScript?
 
 You do not need to use TypeScript to use PostGraphile, but without it you will
 find editors such as VSCode will highlight your import paths with error
@@ -106,28 +206,31 @@ notifications. To stop this, you can add the following to `jsconfig.json`:
 }
 ```
 
-### PostgreSQL: use latest
+## PostgreSQL: use latest
 
 For best results we recommend you use the latest stable release of PostgreSQL
-that we officially support, however it should run well on any earlier version
-of PostgreSQL that have not yet reached end-of life. Once a PostgreSQL version
-reaches end-of-life we no longer support it, and any future patch release may
-be incompatible with it. We do not see this as a violation of semver — once a
-PostgreSQL version reaches EOL **no reasonable user should use it**, and as
-such a change to drop support for it is not a breaking change for reasonable
-users.
+that we officially support, however PostGraphile should run well on any earlier
+version of PostgreSQL that has not yet reached end-of life.
 
-#### PG 11 [officially supported]
+Once a PostgreSQL version reaches end-of-life we no longer support it, and any
+future patch release may be incompatible with it. We do not see this as a
+violation of semver — once a PostgreSQL version reaches EOL **no reasonable user
+should use it**, and as such a change to drop support for it is not a breaking
+change for reasonable users.
 
-Works well.
+Currently versions 12 and 13 are EOL according to the PostgreSQL project. They
+work with PostGraphile and are exercised in CI at time of writing; however, they
+are not officially supported and may be removed from CI if they hold us back.
 
-#### PG 12 [officially supported]
+#### PG 12 [unsupported - EOL Nov 2024]
 
-Works well.
+Works well; but not officially supported and support may be dropped in a patch
+release.
 
-#### PG 13 [officially supported]
+#### PG 13 [unsupported - EOL Nov 2025]
 
-Works well.
+Works well; but not officially supported and support may be dropped in a patch
+release.
 
 #### PG 14 [officially supported]
 
@@ -137,7 +240,19 @@ Works well.
 
 Works well.
 
-### Operating system
+#### PG 16 [officially supported]
+
+Works well.
+
+#### PG 17 [officially supported]
+
+Works well.
+
+#### PG 18 [officially supported]
+
+Works well.
+
+## Operating system
 
 PostGraphile is developed on \*nix operating systems like GNU/Linux and macOS.
 As far as we know it works on Windows, but since no-one in the core team uses

@@ -7,13 +7,6 @@ testing there.
 
 ---
 
-:::warning
-
-This documentation is copied from Version 4 and has not been updated to Version
-5 yet; it may not be valid.
-
-:::
-
 ### Testing the database
 
 Making sure your database functions, triggers, permissions, etc work correctly
@@ -221,82 +214,74 @@ For more thorough test helpers (and to see this working in practice), check out
 ### Testing the GraphQL middleware
 
 Whereas testing the database functionality can be thought of as unit tests,
-testing the GraphQL middleware is more akin to integration tests — they pretend
-to go through the middleware (exercising pgSettings / JWT / etc) and you can
-place assertions on the results.
+testing the GraphQL layer is more akin to integration tests — they simulate
+requests through your Grafserv adaptor (exercising pgSettings / JWT / etc) and
+you can place assertions on the results.
 
-First, make sure that you've extracted your PostGraphile (library mode) options
-into a function that you can import in your tests; for example your PostGraphile
-server file might look like this:
-
-```js {6-11,17}
-const express = require("express");
-const { postgraphile } = require("postgraphile");
-
-const app = express();
-
-function postgraphileOptions() {
-  return {
-    dynamicJson: true,
-  };
-}
-exports.postgraphileOptions = postgraphileOptions;
-
-app.use(
-  postgraphile(
-    process.env.DATABASE_URL || "postgres:///",
-    ["app_public"],
-    postgraphileOptions(),
-  ),
-);
-
-app.listen(process.env.PORT || 3000);
-```
+First, make sure that your PostGraphile preset lives in
+`graphile.config.js` (or `.ts`) so both your server and tests can import it.
+The helper below reuses that preset to build a schema, then runs queries via
+Gra*fast* while supplying a `requestContext` that looks like the one Grafserv
+would provide. It also uses
+`makeWithPgClientViaPgClientAlreadyInTransaction()` so the GraphQL operation
+and any assertions can run inside the same transaction. This helper is only
+appropriate for tests.
 
 <details>
-<summary>(Click to expand.) Create a <tt>test_helper.ts</tt> file for running your queries,
-responsible for importing this <tt>postgraphileOptions</tt> function and setting up/tearing down
-the transaction. Don't forget to set the environment variables used by this file. </summary>
+<summary>(Click to expand.) Create a <tt>test_helper.ts</tt> file for running
+your queries, responsible for importing your preset and setting up/tearing down
+the PostGraphile instance. Don't forget to set the environment variables used
+by this file. </summary>
 
 The following code is in TypeScript; you can convert it to JavaScript via
 https://www.typescriptlang.org/play
 
-```ts
-import { Request, Response } from "express";
-import { ExecutionResult, graphql, GraphQLSchema } from "graphql";
-import { Pool, PoolClient } from "pg";
-import {
-  createPostGraphileSchema,
-  PostGraphileOptions,
-  withPostGraphileContext,
-} from "postgraphile";
+:::warning[Untested!]
 
-import { getPostGraphileOptions } from "../src/middleware/installPostGraphile";
+This code has been ported from v4 to v5 in syntax, but has not yet been tested.
+Please let us know if it works for you!
+
+:::
+
+```ts
+import { Pool } from "pg";
+import type { PostGraphileInstance } from "postgraphile";
+import { postgraphile } from "postgraphile";
+import { makeWithPgClientViaPgClientAlreadyInTransaction } from "postgraphile/adaptors/pg";
+import { execute, hookArgs } from "postgraphile/grafast";
+import type { PromiseOrDirect } from "postgraphile/grafast";
+import type { ExecutionResult, GraphQLSchema } from "postgraphile/graphql";
+import { parse, validate } from "postgraphile/graphql";
+import preset from "../src/graphile.config.ts";
 
 const MockReq = require("mock-req");
 
-let known: Record<string, { counter: number; values: Map<unknown, string> }> =
-  {};
+type Maskable = "nodeId" | "id" | "timestamp" | "email" | "username";
+type MaskCache = { counter: number; values: Map<unknown, string> };
+
+let maskCacheByType: Record<Maskable, MaskCache | undefined> = {};
+// Reset the cache before each test
 beforeEach(() => {
-  known = {};
+  maskCacheByType = {};
 });
-/*
- * This function replaces values that are expected to change with static
+
+/**
+ * Replaces values that are expected to change between test runs with static
  * placeholders so that our snapshot testing doesn't throw an error
  * every time we run the tests because time has ticked on in it's inevitable
  * march toward the future.
  */
 export function sanitize(json: any): any {
-  /* This allows us to maintain stable references whilst dealing with variable values */
-  function mask(value: unknown, type: string) {
-    if (!known[type]) {
-      known[type] = { counter: 0, values: new Map() };
+  /** Maintain stable references whilst dealing with variable values */
+  function mask(value: unknown, type: Maskable) {
+    if (!maskCacheByType[type]) {
+      maskCacheByType[type] = { counter: 0, values: new Map() };
     }
-    const o = known[type];
-    if (!o.values.has(value)) {
-      o.values.set(value, `[${type}-${++o.counter}]`);
+    const maskCache = maskCacheByType[type];
+    if (!maskCache.values.has(value)) {
+      maskCache.values.set(value, `[${type}-${++maskCache.counter}]`);
     }
-    return o.values.get(value);
+    return maskCache.values.get(value);
   }
 
   if (Array.isArray(json)) {
@@ -338,42 +323,41 @@ export function sanitize(json: any): any {
   }
 }
 
-// Contains the PostGraphile schema and rootPgPool
-interface ICtx {
-  rootPgPool: Pool;
-  options: PostGraphileOptions<Request, Response>;
-  schema: GraphQLSchema;
+function noop() {
+  /* noop */
 }
-let ctx: ICtx | null = null;
+
+interface TestContext {
+  pgl: PostGraphileInstance;
+  schema: GraphQLSchema;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  pgPool: Pool;
+}
+let ctx: TestContext | null = null;
 
 export const setup = async () => {
-  const rootPgPool = new Pool({
+  if (!process.env.TEST_DATABASE_URL) {
+    throw new Error("Cannot run tests without a TEST_DATABASE_URL");
+  }
+  const pgl = postgraphile(preset);
+  const { schema, resolvedPreset } = await pgl.getSchemaResult();
+
+  const pgPool = new Pool({
     connectionString: process.env.TEST_DATABASE_URL,
   });
+  pgPool.on("error", noop);
+  pgPool.on("connect", (client) => client.on("error", noop));
 
-  const options = getPostGraphileOptions({ rootPgPool });
-  const schema = await createPostGraphileSchema(
-    rootPgPool,
-    "app_public",
-    options,
-  );
-
-  // Store the context
-  ctx = {
-    rootPgPool,
-    options,
-    schema,
-  };
+  ctx = { pgl, schema, resolvedPreset, pgPool };
 };
 
 export const teardown = async () => {
+  if (ctx == null) return null;
   try {
-    if (!ctx) {
-      return null;
-    }
-    const { rootPgPool } = ctx;
+    const { pgl, pgPool } = ctx;
     ctx = null;
-    rootPgPool.end();
+    await pgl.release();
+    await pgPool.end();
     return null;
   } catch (e) {
     console.error(e);
@@ -381,19 +365,34 @@ export const teardown = async () => {
   }
 };
 
-export const runGraphQLQuery = async function runGraphQLQuery(
-  query: string, // The GraphQL query string
-  variables: { [key: string]: any } | null, // The GraphQL variables
-  reqOptions: { [key: string]: any } | null, // Any additional items to set on `req` (e.g. `{user: {id: 17}}`)
-  checker: (
+export async function runGraphQLQuery(args: {
+  /** The GraphQL query string */
+  query: string;
+
+  /** The GraphQL variables */
+  variableValues?: { [key: string]: any };
+
+  /** Any additional items to set on `req` (e.g. `{user: {id: 17}}`) */
+  reqOptions?: { [key: string]: any };
+
+  /** Place test assertions in this function */
+  checker?: (
     result: ExecutionResult,
-    context: { pgClient: PoolClient },
-  ) => void | ExecutionResult | Promise<void | ExecutionResult> = () => {}, // Place test assertions in this function
-) {
+    context: { contextValue: Record<string, any> },
+  ) => PromiseOrDirect<void | ExecutionResult>;
+}) {
+  const { query, variableValues = {}, reqOptions, checker = () => {} } = args;
   if (!ctx) throw new Error("No ctx!");
-  const { schema, rootPgPool, options } = ctx;
+  const { schema, resolvedPreset, pgPool } = ctx;
+
+  const document = parse(query);
+  const validationErrors = validate(schema, document);
+  if (validationErrors.length > 0) {
+    throw validationErrors[0];
+  }
+
   const req = new MockReq({
-    url: options.graphqlRoute || "/graphql",
+    url: resolvedPreset.grafserv?.graphqlPath ?? "/graphql",
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -404,95 +403,55 @@ export const runGraphQLQuery = async function runGraphQLQuery(
   const res: any = { req };
   req.res = res;
 
-  const {
-    pgSettings: pgSettingsGenerator,
-    additionalGraphQLContextFromRequest,
-  } = options;
-  const pgSettings =
-    (typeof pgSettingsGenerator === "function"
-      ? await pgSettingsGenerator(req)
-      : pgSettingsGenerator) || {};
+  const contextValue: Record<string, any> = {
+    __TESTING: true,
+  };
 
-  // Because we're connected as the database owner, we should manually switch to
-  // the authenticator role
-  if (!pgSettings.role) {
-    pgSettings.role = process.env.DATABASE_AUTHENTICATOR;
+  const args = await hookArgs({
+    schema,
+    document,
+    variableValues,
+    contextValue,
+    resolvedPreset,
+    requestContext: {
+      node: { req, res },
+      expressv4: { req, res },
+    },
+  });
+
+  const pgClient = await pgPool.connect();
+
+  try {
+    await pgClient.query("begin");
+
+    // Test-only helper: reuse a client that's already in a transaction.
+    const withPgClient = makeWithPgClientViaPgClientAlreadyInTransaction(
+      pgClient,
+      true,
+    );
+
+    // Overwrite `withPgClient` with our test version
+    args.contextValue.withPgClient = withPgClient;
+
+    const result = await execute(args);
+
+    // This is where we call the `checker` so you can do your assertions.
+    const checkResult = await checker(result as ExecutionResult, {
+      contextValue: args.contextValue,
+    });
+
+    // You don't have to keep this, I just like knowing when things change!
+    expect(sanitize(result)).toMatchSnapshot();
+
+    return checkResult == null ? result : checkResult;
+  } finally {
+    try {
+      await pgClient.query("rollback");
+    } finally {
+      pgClient.release();
+    }
   }
-
-  await withPostGraphileContext(
-    {
-      ...options,
-      pgPool: rootPgPool,
-      pgSettings,
-      pgForceTransaction: true,
-    },
-    async (context) => {
-      let checkResult;
-      const { pgClient } = context;
-      try {
-        // This runs our GraphQL query, passing the replacement client
-        const additionalContext = additionalGraphQLContextFromRequest
-          ? await additionalGraphQLContextFromRequest(req, res)
-          : null;
-        const result = await graphql(
-          schema,
-          query,
-          null,
-          {
-            ...context,
-            ...additionalContext,
-            __TESTING: true,
-          },
-          variables,
-        );
-        // Expand errors
-        if (result.errors) {
-          if (options.handleErrors) {
-            result.errors = options.handleErrors(result.errors);
-          } else {
-            // This does a similar transform that PostGraphile does to errors.
-            // It's not the same. Sorry.
-            result.errors = result.errors.map((rawErr) => {
-              const e = Object.create(rawErr);
-              Object.defineProperty(e, "originalError", {
-                value: rawErr.originalError,
-                enumerable: false,
-              });
-
-              if (e.originalError) {
-                Object.keys(e.originalError).forEach((k) => {
-                  try {
-                    e[k] = e.originalError[k];
-                  } catch (err) {
-                    // Meh.
-                  }
-                });
-              }
-              return e;
-            });
-          }
-        }
-
-        // This is were we call the `checker` so you can do your assertions.
-        // Also note that we pass the `replacementPgClient` so that you can
-        // query the data in the database from within the transaction before it
-        // gets rolled back.
-        checkResult = await checker(result, {
-          pgClient,
-        });
-
-        // You don't have to keep this, I just like knowing when things change!
-        expect(sanitize(result)).toMatchSnapshot();
-
-        return checkResult == null ? result : checkResult;
-      } finally {
-        // Rollback the transaction so no changes are written to the DB - this
-        // makes our tests fairly deterministic.
-        await pgClient.query("rollback");
-      }
-    },
-  );
-};
+}
 ```
 
 </details>
@@ -506,44 +465,49 @@ Graphile Starter:
 
 Your test might look something like this:
 
-```js {9,24-25}
-const { setup, teardown, runGraphQLQuery } = require("../test_helper");
+```ts
+import type { PgClient } from "postgraphile/@dataplan/pg";
+import { setup, teardown, runGraphQLQuery } from "../test_helper.js";
 
 beforeAll(setup);
 afterAll(teardown);
 
 test("GraphQL query nodeId", async () => {
-  await runGraphQLQuery(
+  await runGraphQLQuery({
     // GraphQL query goes here:
-    `{ __typename }`,
+    query: `{ __typename }`,
 
     // GraphQL variables go here:
-    {},
+    variableValues: {},
 
     // Any additional properties you want `req` to have (e.g. if you're using
     // `pgSettings`) go here:
-    {
+    reqOptions: {
       // Assuming you're using Passport.js / pgSettings, you could pretend
       // to be logged in by setting `req.user` to `{id: 17}`:
       user: { id: 17 },
     },
 
     // This function runs all your test assertions:
-    async (json, { pgClient }) => {
+    async checker(json, { contextValue }) {
       expect(json.errors).toBeFalsy();
       expect(json.data.__typename).toEqual("Query");
 
-      // If you need to, you can query the DB within the context of this
-      // function - e.g. to check that your mutation made the changes you'd
-      // expect.
-      const { rows } = await pgClient.query(
-        `SELECT * FROM app_public.users WHERE id = $1`,
-        [17],
+      // If you need to, you can query the DB here; for example, using the
+      // `withPgClient` helper we put on the context
+      await contextValue.withPgClient(
+        contextValue.pgSettings ?? null,
+        async (pgClient: PgClient) => {
+          const { rows } = await pgClient.query({
+            text: `select * from app_public.users where id = $1`,
+            values: [17],
+          });
+          if (rows.length !== 1) {
+            throw new Error("User not found!");
+          }
+        },
       );
-      if (rows.length !== 1) {
-        throw new Error("User not found!");
-      }
     },
-  );
+  });
 });
 ```

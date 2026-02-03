@@ -5,11 +5,37 @@ title: Views
 Views are a great solution for abstraction. PostGraphile supports reading from
 and writing to views; however PostgreSQL lacks the powerful introspection
 capabilities on views that it has on tables, so we cannot easily automatically
-infer the relations. However, you can
-[use our "smart tags" functionality to add constraints to views](./smart-tags#virtual-constraints)
-which will make them a lot more table-like (giving them a primary key so you can
-get a `nodeId` and maybe CRUD mutations; adding foreign key references between views and other views or
-tables; setting columns as non-null).
+infer the primary key, relations, etc.
+
+It is recommended that you [use "smart tags" to add "virtual" constraints to
+views](./smart-tags#virtual-constraints). This will make them behave a lot more
+table-like - you can add a `@primaryKey` or `@foreignKey` constraints between
+views and other views/tables.
+
+:::note[Introspection limitations]
+
+PostgreSQL introspection misses quite a lot of detail on views compared to
+tables:
+
+- No type modifiers (e.g. no `varchar(8)`; only `varchar`)
+- No `NOT NULL` modifiers (everything is nullable) - fix with `@notNull`
+- No contraints:
+  - No primary key - fix with `@primaryKey col1,col2`
+  - No unique constraints - fix with `@unique col1,col2`
+  - No foreign keys - fix with `@foreignKey (col1,col2) refeences other_table (other_col_1,other_col_2)`
+
+:::
+
+:::warning[No SQL inspection/inference]
+
+You might think that PostGraphile should read the underlying SQL used to
+implement your view and infer relations from that; it does not do so due to the
+complexity this would involve (and the ambiguity of what is "right").
+
+If you'd like to attempt this, we encourage you to do so by building a plugin
+&mdash; we'd love to see it!
+
+:::
 
 ### Abstract Business Logic
 
@@ -92,6 +118,45 @@ query After {
 
 You can use [smart tags](./smart-tags#name) to change the GraphQL
 field name.
+
+:::
+
+### Selecting record-typed columns
+
+If you select a table row directly in a view, rather than it's columns,
+PostgreSQL reports that as a column of a composite type. PostGraphile exposes it
+as a nested object using the same fields and relationships as the underlying
+table type:
+
+```sql
+create view person_with_address as
+  select person.id, person.name, person, address
+  from app_public.person person
+  inner join app_public.address address
+  on person.id = address.person_id;
+```
+
+```graphql
+{
+  personWithAddress {
+    id
+    name
+    person {
+      id
+    }
+    address {
+      country
+    }
+  }
+}
+```
+
+:::warning[Don't do this]
+
+This is not recommended since it selects the entire row for each record-typed
+column, even if the client only requests a subset of the fields. Instead, expose
+just the primary key of the related table and use the `@foreignKey` smart tag to
+create a relation to it.
 
 :::
 

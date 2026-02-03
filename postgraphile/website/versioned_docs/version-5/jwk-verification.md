@@ -7,7 +7,7 @@ title: JWK Verification (e.g. Auth0)
 This guide adapts [Auth0’s Node (Express)
 quickstart](https://auth0.com/docs/quickstart/backend/nodejs/01-authorization)
 so that the verified JWT payload is forwarded to PostgreSQL through
-[`pgSettings`](./config#pgsettings). It assumes you are running PostGraphile
+[`pgSettings`](./config/overview#pgsettings). It assumes you are running PostGraphile
 using the Express adaptor (`postgraphile/grafserv/express/v4`), but similar will
 apply for alternative servers.
 
@@ -22,7 +22,7 @@ Your web framework middleware will handle verification, refresh tokens,
 revocation lists, and other security concerns - the logic here is not specific
 to PostGraphile. Once you have a set of trusted claims you can expose them to
 PostgreSQL through PostGraphile's [`pgSettings`
-function](./config.mdx#pgsettings). See the [JWT guide](./jwt-guide.mdx) for
+function](./config/overview#pgsettings). See the [JWT guide](./jwt-guide.mdx) for
 the bigger picture and the
 [PostgreSQL JWT specification](./jwt-specification.md) for how claims map onto
 PostgreSQL session settings.

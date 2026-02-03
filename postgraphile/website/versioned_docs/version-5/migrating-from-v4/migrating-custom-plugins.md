@@ -113,10 +113,10 @@ yarn add --dev \
 ```json title="package.json after"
 {
   "devDependencies": {
-    "graphile-build": "^5.0.0-beta.27",
-    "graphile-build-pg": "^5.0.0-beta.31",
-    "postgraphile": "^5.0.0-beta.32",
-    "postgraphile-plugin-connection-filter": "^3.0.0-beta.5"
+    "graphile-build": "^5.0.0-rc.3",
+    "graphile-build-pg": "^5.0.0-rc.3",
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
   }
 }
 ```
@@ -139,8 +139,8 @@ now be just:
 ```json title="package.json using subpaths for graphile-build*"
 {
   "devDependencies": {
-    "postgraphile": "^5.0.0-beta.32",
-    "postgraphile-plugin-connection-filter": "^3.0.0-beta.5"
+    "postgraphile": "^5.0.0-rc.4",
+    "postgraphile-plugin-connection-filter": "^3.0.0-rc.1"
   }
 }
 ```
@@ -406,7 +406,7 @@ const MyPlugin: GraphileConfig.Plugin = {
             // Or if you prefer, you can make `assertStep` a callback that
             // throws an error if the step passed is incompatible:
             //
-            //     assertStep($step: ExecutableStep): asserts $step is ObjectStep {
+            //     assertStep($step: Step): asserts $step is ObjectStep {
             //       if (!($step instanceof ObjectStep)) {
             //         throw new Error(`Expected ObjectStep, instead received '${$step}'`);
             //       }
@@ -803,8 +803,9 @@ dealing with a `PgSelectStep` (`$pgSelect`) in V5. Note that these are
 significantly different things, but they do have some parallels:
 
 - `QueryBuilder.getTableAlias()` -> `$pgSelect.alias`
-- `QueryBuilder.where(fragment)` -> `$pgSelect.where(fragment)`
-- `QueryBuilder.orderBy(...)` -> `$pgSelect.orderBy(...)` (arguments differ, see TypeScript for details)
+- `QueryBuilder.where(...)` -> `$pgSelect.where((sql) => ...)`
+- `QueryBuilder.orderBy(...)` -> `$pgSelect.orderBy((sql) => ...)`
+  (arguments differ, see TypeScript for details)
 
 Note that it's common to be dealing with a `PgSelectSingleStep`
 (`$pgSelectSingle`) when you're looking at a single record rather than the
@@ -822,7 +823,7 @@ queryBuilder.where(sql.fragment`${parentAlias}.archived_at is not null`);
 
 // V5
 const $archivedAt = $parent.get("archived_at");
-$pgSelect.where(sql`${$archivedAt} is not null`);
+$pgSelect.where((sql) => sql`${$archivedAt} is not null`);
 ```
 
 :::info

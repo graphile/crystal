@@ -8,6 +8,15 @@ generated GraphQL schema. If you're using the `PgIndexBehaviorsPlugin` (enabled
 by default) then PostGraphile will also look at the database indexes and only
 include relations that don't require a table-scan to implement.
 
+:::warning[Views aren't tables]
+
+Views do not have constraints (foreign key or otherwise), so PostGraphile cannot
+automatically expose relations for them. If you want relations on a view, add
+"virtual constraints" with the `@foreignKey` smart tag; see the
+[views](./views.md) page for details.
+
+:::
+
 An example of a foreign key constraint when defining a table would be the
 `REFERENCES` keyword below:
 
