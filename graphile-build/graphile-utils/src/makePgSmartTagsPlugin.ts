@@ -46,7 +46,7 @@ type PgSmartTagRules = {
   [TKind in PgSmartTagSupportedKinds]: {
     serviceName?: string;
     kind: TKind;
-    match: string | PgSmartTagFilterFunction<PgEntityByKind[NoInfer<TKind>]>;
+    match: string | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
     tags?: PgSmartTagTags;
     description?: string;
   };
