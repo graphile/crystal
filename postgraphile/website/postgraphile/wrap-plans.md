@@ -319,7 +319,7 @@ export default wrapPlans(
 );
 ```
 
-:::note
+:::note[Mutations typically return `object({ result: $step })`]
 
 For built-in CRUD mutations and function mutations, the plan returned by the
 field is an object step containing a `result` property. The underlying mutation
