@@ -7,14 +7,11 @@ import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 import {
-  jsonPgSmartTags,
-  pgSmartTags,
-} from "../src/index.ts";
-import { pgSmartTagRulesFromJSON } from "../src/makePgSmartTagsPlugin.ts";
-import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
+import { jsonPgSmartTags, pgSmartTags } from "../src/index.ts";
+import { pgSmartTagRulesFromJSON } from "../src/makePgSmartTagsPlugin.ts";
 
 let pgPool: Pool | null = null;
 let connectionString = "";

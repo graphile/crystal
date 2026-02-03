@@ -6,10 +6,10 @@ import { it } from "mocha";
 
 import {
   ConstantStep,
-  Modifier,
-  UnbatchedStep,
   grafast,
   makeGrafastSchema,
+  Modifier,
+  UnbatchedStep,
 } from "../dist/index.js";
 
 type FilterEntry = { field: string; value: number };
@@ -60,9 +60,7 @@ class FilterCollectorStep extends UnbatchedStep<string[]> {
     for (const fn of applyFns) {
       fn(collector);
     }
-    return collector.filters.map(
-      (filter) => `${filter.field}=${filter.value}`,
-    );
+    return collector.filters.map((filter) => `${filter.field}=${filter.value}`);
   }
 }
 
@@ -124,10 +122,7 @@ it("applies object fields inside list inputs", async () => {
     query {
       applyFilters(
         input: {
-          filters: [
-            { field: "name", value: 1 }
-            { field: "email", value: 2 }
-          ]
+          filters: [{ field: "name", value: 1 }, { field: "email", value: 2 }]
         }
       )
     }

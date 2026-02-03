@@ -1,7 +1,4 @@
-import {
-  parseHstore,
-  stringifyHstore,
-} from "../dist/codecUtils/hstore.js";
+import { parseHstore, stringifyHstore } from "../dist/codecUtils/hstore.js";
 
 test("parses simple hstore pairs", () => {
   expect(parseHstore('"a" => "b", "c" => "d"')).toEqual({
