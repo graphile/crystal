@@ -89,6 +89,7 @@ const makeSchema = () =>
       FilterSetInput: {
         plans: {
           filters(target: FilterCollector) {
+            // This is a list; create new modifier for each list item
             return () => new FilterModifier(target);
           },
         },
