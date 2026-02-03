@@ -149,7 +149,7 @@ async function main() {
     },
   });
 
-  app.listen(4000, () => {
+  app.listen({ port: 4000 }, () => {
     /* success */
   });
   console.log(`\
