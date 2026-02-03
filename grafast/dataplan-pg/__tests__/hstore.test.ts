@@ -16,7 +16,7 @@ test("parses NULL values", () => {
 
 test("parses escaped quotes and backslashes", () => {
   expect(parseHstore(String.raw`"a\"b" => "c\\d"`)).toEqual({
-    'a"b': "c\\d",
+    'a"b': String.raw`c\d`,
   });
 });
 
@@ -27,7 +27,7 @@ test("supports __proto__ key without prototype pollution", () => {
 });
 
 test("stringifies with nulls and escapes", () => {
-  expect(stringifyHstore({ a: "b", c: null, 'a"b': "c\\d" })).toEqual(
+  expect(stringifyHstore({ a: "b", c: null, 'a"b': String.raw`c\d` })).toEqual(
     String.raw`"a" => "b", "c" => NULL, "a\"b" => "c\\d"`,
   );
 });
