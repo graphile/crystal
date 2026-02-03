@@ -286,7 +286,7 @@ pool.on("error", (e) => {
     },
   });
 
-  app.listen(4000, () => {
+  app.listen({ port: 4000 }, () => {
     console.log(`GraphQL server is running...`);
     const wsServer = new WebSocketServer({
       server: app.server,
