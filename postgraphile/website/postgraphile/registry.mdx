@@ -53,7 +53,7 @@ built-in scalar codecs are) in the `@dataplan/pg` documentation:
 When PostGraphile cannot build a codec for a database type, you can supply one
 via the `gather` phase hook `pgCodecs_findPgCodec`, then wire it into your
 GraphQL schema during the `schema` phase. Create a plugin, export it, and load
-it from your `graphile.config.mjs` preset. The core `PgLtreePlugin` is a tested
+it from your `graphile.config.ts` preset. The core `PgLtreePlugin` is a tested
 example of this pattern; the following sample embeds [its source](https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/plugins/PgLtreePlugin.ts) (renamed to
 avoid conflicts).
 
