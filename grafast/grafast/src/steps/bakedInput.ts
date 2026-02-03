@@ -10,7 +10,7 @@ import { operationPlan } from "../global.ts";
 import type { UnbatchedExecutionExtra } from "../interfaces.ts";
 import type { Step } from "../step.ts";
 import { UnbatchedStep } from "../step.ts";
-import { inputArgsApply } from "./applyInput.ts";
+import { inputArgsApply, withModifiers } from "./applyInput.ts";
 
 export class BakedInputStep<TData = any> extends UnbatchedStep<TData> {
   static $$export = {
@@ -101,31 +101,33 @@ export function bakedInputRuntime(
   } else {
     // Ooo, we're fancy! Do the thing!
     let applied = false;
-    const bakedObj = baked!(value as Record<string, any>, {
-      type: nullableInputType as GraphQLInputObjectType,
-      schema,
-      applyChildren(parent) {
-        applied = true;
+    return withModifiers(() => {
+      const bakedObj = baked!(value as Record<string, any>, {
+        type: nullableInputType as GraphQLInputObjectType,
+        schema,
+        applyChildren(parent) {
+          applied = true;
+          inputArgsApply(
+            schema,
+            nullableInputType,
+            parent,
+            value,
+            undefined,
+            undefined,
+          );
+        },
+      });
+      if (!applied) {
         inputArgsApply(
           schema,
           nullableInputType,
-          parent,
+          bakedObj,
           value,
           undefined,
           undefined,
         );
-      },
+      }
+      return bakedObj;
     });
-    if (!applied) {
-      inputArgsApply(
-        schema,
-        nullableInputType,
-        bakedObj,
-        value,
-        undefined,
-        undefined,
-      );
-    }
-    return bakedObj;
   }
 }
