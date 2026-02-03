@@ -43,6 +43,13 @@ mv /tmp/grafast-build/package.tgz ../../builds/grafast.tgz
 rm -Rf /tmp/grafast-build
 cd ../..
 
+# ruru-types
+cd grafast/ruru-types
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/ruru-types.tgz
+cd -
+
 # ruru-components
 cd grafast/ruru-components
 rm -f *.tgz

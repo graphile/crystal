@@ -8,6 +8,7 @@ PACKAGES=(
   #"$BUILD_DIR/graphile__lru.tgz"
   #"$BUILD_DIR/tamedevil.tgz"
   #"$BUILD_DIR/graphile-config.tgz"
+  #"$BUILD_DIR/ruru-types.tgz"
   #"$BUILD_DIR/ruru-components.tgz"
   #"$BUILD_DIR/ruru.tgz"
   #"$BUILD_DIR/grafast.tgz"
