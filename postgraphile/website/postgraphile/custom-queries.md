@@ -32,6 +32,15 @@ obey the following rules:
   common)
 - must be defined in one of the introspected schemas
 
+:::note[Prefer named return types]
+
+Functions that use `returns table(...)` are exposed as anonymous GraphQL types
+with auto-generated names and no attachable relationships. Always prefer named
+types, e.g. `returns setof my_type`, so you can augment the type later. (This
+also allows you to return single records: `returns my_type`.)
+
+:::
+
 For example the functions:
 
 ```sql
