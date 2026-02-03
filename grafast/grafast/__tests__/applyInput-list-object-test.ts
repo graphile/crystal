@@ -13,10 +13,9 @@ import {
 } from "../dist/index.js";
 
 type FilterEntry = { field: string; value: number };
-
-class FilterCollector {
-  filters: FilterEntry[] = [];
-}
+type FilterCollector = {
+  filters: FilterEntry[];
+};
 
 class FilterModifier extends Modifier<FilterCollector> {
   private field?: string;
@@ -39,11 +38,13 @@ class FilterModifier extends Modifier<FilterCollector> {
 }
 
 class FilterCollectorStep extends UnbatchedStep<string[]> {
-  private constantApplies: Array<(collector: FilterCollector) => void> = [];
+  // Apply constant work at plan-time so runtime only has to handle dynamic
+  // inputs. This mirrors how applyInput can optimize constant values.
+  private baseCollector: FilterCollector = { filters: [] };
 
   apply($apply: UnbatchedStep<(collector: FilterCollector) => void>) {
     if ($apply instanceof ConstantStep) {
-      this.constantApplies.push($apply.data);
+      $apply.data(this.baseCollector);
     } else {
       this.addUnaryDependency($apply);
     }
@@ -53,10 +54,11 @@ class FilterCollectorStep extends UnbatchedStep<string[]> {
     _extra: unknown,
     ...applyFns: Array<(collector: FilterCollector) => void>
   ) {
-    const collector = new FilterCollector();
-    for (const fn of this.constantApplies) {
-      fn(collector);
-    }
+    // Clone the plan-time base collector for runtime so each execution starts
+    // from the same optimized base state.
+    const collector: FilterCollector = {
+      filters: [...this.baseCollector.filters],
+    };
     for (const fn of applyFns) {
       fn(collector);
     }
