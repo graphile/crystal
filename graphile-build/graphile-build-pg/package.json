@@ -106,7 +106,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "chalk": "^4.1.2",
     "express": "^4.21.2",
-    "fastify": "^4.29.1",
+    "fastify": "^5.7.3",
     "fastify-static": "^4.7.0",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
