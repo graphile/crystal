@@ -147,8 +147,8 @@ function makeGetterForDirectory(
 
   scanDirectory().then(null, noop);
   if (scanInterval === "watch") {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- internal try/catch handles errors
-    (async () => {
+    // Internal try/catch handles errors.
+    void (async () => {
       try {
         const watcher = fsp.watch(directory, { signal, recursive: false });
         for await (const _event of watcher) {
