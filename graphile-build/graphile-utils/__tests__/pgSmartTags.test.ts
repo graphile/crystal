@@ -69,7 +69,7 @@ const makePreset = (
 });
 
 const getIntrospectionWithSmartTags = async (
-  rule: PgSmartTagRule,
+  rules: PgSmartTagRule[],
   options?: {
     setupSql?: string[];
     teardownSql?: string[];
@@ -91,7 +91,7 @@ const getIntrospectionWithSmartTags = async (
     await pgPool!.query(options.setupSql.join("\n"));
   }
   try {
-    await makeSchema(makePreset([pgSmartTags(rule), InspectSmartTagsPlugin]));
+    await makeSchema(makePreset([pgSmartTags(rules), InspectSmartTagsPlugin]));
   } finally {
     if (options?.teardownSql?.length) {
       await pgPool!.query(options.teardownSql.join("\n"));
@@ -209,12 +209,20 @@ it("pgSmartTags does not leak matches across classes", async () => {
 });
 
 it("pgSmartTags does not leak matches across attributes", async () => {
-  const DESC = "Users name via pgSmartTags";
-  const introspection = await getIntrospectionWithSmartTags({
-    kind: "attribute",
-    match: "graphile_utils.users.name",
-    description: DESC,
-  });
+  const USERS_DESC = "Users name via pgSmartTags";
+  const PETS_DESC = "Pets name via pgSmartTags";
+  const introspection = await getIntrospectionWithSmartTags([
+    {
+      kind: "attribute",
+      match: "graphile_utils.users.name",
+      description: USERS_DESC,
+    },
+    {
+      kind: "attribute",
+      match: "graphile_utils.pets.name",
+      description: PETS_DESC,
+    },
+  ]);
   const usersName = findAttribute(
     introspection,
     "graphile_utils",
@@ -227,17 +235,25 @@ it("pgSmartTags does not leak matches across attributes", async () => {
     "pets",
     "name",
   );
-  expect(usersName.getTagsAndDescription().description).toEqual(DESC);
-  expect(petsName.getTagsAndDescription().description).not.toEqual(DESC);
+  expect(usersName.getTagsAndDescription().description).toEqual(USERS_DESC);
+  expect(petsName.getTagsAndDescription().description).toEqual(PETS_DESC);
 });
 
 it("pgSmartTags does not leak matches across constraints", async () => {
-  const DESC = "Users pkey via pgSmartTags";
-  const introspection = await getIntrospectionWithSmartTags({
-    kind: "constraint",
-    match: "graphile_utils.users.users_pkey",
-    description: DESC,
-  });
+  const USERS_DESC = "Users pkey via pgSmartTags";
+  const PETS_DESC = "Pets pkey via pgSmartTags";
+  const introspection = await getIntrospectionWithSmartTags([
+    {
+      kind: "constraint",
+      match: "graphile_utils.users.users_pkey",
+      description: USERS_DESC,
+    },
+    {
+      kind: "constraint",
+      match: "graphile_utils.pets.pets_pkey",
+      description: PETS_DESC,
+    },
+  ]);
   const usersPkey = findConstraint(
     introspection,
     "graphile_utils",
@@ -250,18 +266,26 @@ it("pgSmartTags does not leak matches across constraints", async () => {
     "pets",
     "pets_pkey",
   );
-  expect(usersPkey.getTagsAndDescription().description).toEqual(DESC);
-  expect(petsPkey.getTagsAndDescription().description).not.toEqual(DESC);
+  expect(usersPkey.getTagsAndDescription().description).toEqual(USERS_DESC);
+  expect(petsPkey.getTagsAndDescription().description).toEqual(PETS_DESC);
 });
 
 it("pgSmartTags does not leak matches across procedures", async () => {
-  const DESC = "Proc one via pgSmartTags";
+  const PROC_ONE_DESC = "Proc one via pgSmartTags";
+  const PROC_TWO_DESC = "Proc two via pgSmartTags";
   const introspection = await getIntrospectionWithSmartTags(
-    {
-      kind: "procedure",
-      match: "graphile_utils.test_proc_one",
-      description: DESC,
-    },
+    [
+      {
+        kind: "procedure",
+        match: "graphile_utils.test_proc_one",
+        description: PROC_ONE_DESC,
+      },
+      {
+        kind: "procedure",
+        match: "graphile_utils.test_proc_two",
+        description: PROC_TWO_DESC,
+      },
+    ],
     {
       setupSql: [
         "create function graphile_utils.test_proc_one() returns int language sql as $$ select 1 $$;",
@@ -275,34 +299,54 @@ it("pgSmartTags does not leak matches across procedures", async () => {
   );
   const procOne = findProc(introspection, "graphile_utils", "test_proc_one");
   const procTwo = findProc(introspection, "graphile_utils", "test_proc_two");
-  expect(procOne.getTagsAndDescription().description).toEqual(DESC);
-  expect(procTwo.getTagsAndDescription().description).not.toEqual(DESC);
+  expect(procOne.getTagsAndDescription().description).toEqual(PROC_ONE_DESC);
+  expect(procTwo.getTagsAndDescription().description).toEqual(PROC_TWO_DESC);
 });
 
 it("pgSmartTags does not leak matches across types", async () => {
-  const DESC = "Complex type via pgSmartTags";
-  const introspection = await getIntrospectionWithSmartTags({
-    kind: "type",
-    match: "graphile_utils.complex",
-    description: DESC,
-  });
+  const COMPLEX_DESC = "Complex type via pgSmartTags";
+  const USERS_DESC = "Users type via pgSmartTags";
+  const introspection = await getIntrospectionWithSmartTags([
+    {
+      kind: "type",
+      match: "graphile_utils.complex",
+      description: COMPLEX_DESC,
+    },
+    {
+      kind: "type",
+      match: "graphile_utils.users",
+      description: USERS_DESC,
+    },
+  ]);
   const complexType = findType(introspection, "graphile_utils", "complex");
   const usersType = findType(introspection, "graphile_utils", "users");
-  expect(complexType.getTagsAndDescription().description).toEqual(DESC);
-  expect(usersType.getTagsAndDescription().description).not.toEqual(DESC);
+  expect(complexType.getTagsAndDescription().description).toEqual(COMPLEX_DESC);
+  expect(usersType.getTagsAndDescription().description).toEqual(USERS_DESC);
 });
 
 it("pgSmartTags does not leak matches across namespaces", async () => {
-  const DESC = "Graphile utils namespace via pgSmartTags";
-  const introspection = await getIntrospectionWithSmartTags({
-    kind: "namespace",
-    match: "graphile_utils",
-    description: DESC,
-  });
+  const GRAPHILE_UTILS_DESC = "Graphile utils namespace via pgSmartTags";
+  const GRAPHILE_UTILS_2_DESC = "Graphile utils 2 via pgSmartTags";
+  const introspection = await getIntrospectionWithSmartTags([
+    {
+      kind: "namespace",
+      match: "graphile_utils",
+      description: GRAPHILE_UTILS_DESC,
+    },
+    {
+      kind: "namespace",
+      match: "graphile_utils_2",
+      description: GRAPHILE_UTILS_2_DESC,
+    },
+  ]);
   const graphileUtils = findNamespace(introspection, "graphile_utils");
   const graphileUtils2 = findNamespace(introspection, "graphile_utils_2");
-  expect(graphileUtils.getTagsAndDescription().description).toEqual(DESC);
-  expect(graphileUtils2.getTagsAndDescription().description).not.toEqual(DESC);
+  expect(graphileUtils.getTagsAndDescription().description).toEqual(
+    GRAPHILE_UTILS_DESC,
+  );
+  expect(graphileUtils2.getTagsAndDescription().description).toEqual(
+    GRAPHILE_UTILS_2_DESC,
+  );
 });
 
 it("jsonPgSmartTags applies JSON-based rules", async () => {
