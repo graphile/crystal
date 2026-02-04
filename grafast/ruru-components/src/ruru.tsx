@@ -17,6 +17,8 @@ import {
 import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { ComponentProps, FC } from "react";
 import { useCallback, useMemo, useState } from "react";
+import type { FallbackProps } from "react-error-boundary";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { ErrorPopup } from "./components/ErrorPopup.tsx";
 import { RuruFooter } from "./components/Footer.tsx";
@@ -48,7 +50,101 @@ const plugins = [
   EXPLAIN_PLUGIN,
 ];
 
+const ERROR_PHRASES = [
+  "Dreadfully sorry; something seems to have gone wrong.",
+  "Terribly sorry old chum; something is awry.",
+  "Alas! A most grievous error hath occurred.",
+  "We beg your pardon; matters have not proceeded as intended.",
+  "Pray forgive us — an unforeseen misadventure has arisen.",
+  "Most regrettably, something has gone dreadfully awry.",
+  "Our sincerest apologies; the machinery of this endeavour has faltered.",
+  "It is with the deepest regret that we report an untoward failure.",
+  "A lamentable circumstance has befallen this operation.",
+  "We humbly apologise; the system has encountered a most vexing impediment.",
+  "An unexpected calamity has interrupted these proceedings.",
+  "Regrettably, the execution of this operation has met an unfortunate end.",
+  "We fear some internal confusion has led to this unhappy result.",
+  "Kindly accept our apologies; the apparatus has suffered a moment of distress.",
+  "A most unfortunate error has transpired.",
+  "With due contrition, we confess that something has not gone according to plan.",
+  "The operation has floundered in a manner most unbecoming.",
+];
+
+let triedAgain = false;
+
+const RuruError: FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
+  const [hardResetStage, setHardResetStage] = useState<
+    null | "confirming" | "done"
+  >(null);
+  const errorTitle = useMemo(
+    () => ERROR_PHRASES[Math.floor(ERROR_PHRASES.length * Math.random())],
+    [],
+  );
+  const tryAgain = useCallback(() => {
+    triedAgain = true;
+    resetErrorBoundary();
+  }, [resetErrorBoundary]);
+  const destructivelyTryAgain = useCallback(() => {
+    setHardResetStage("confirming");
+  }, []);
+  const deleteLocalData = useCallback(() => {
+    setHardResetStage("done");
+    localStorage.clear();
+    window.location.reload();
+  }, []);
+  const abort = useCallback(() => {
+    setHardResetStage(null);
+  }, []);
+  return (
+    <div>
+      <h2>{errorTitle}</h2>
+      <p>
+        The following particulars are provided in the hope that they may ferret
+        out the cause of this regrettable occurrence, clarity notwithstanding.
+      </p>
+      <pre>
+        <code>{error?.stack ?? error?.message ?? String(error)}</code>
+      </pre>
+      {hardResetStage === "done" ? (
+        <p>Reloading...</p>
+      ) : hardResetStage === "confirming" ? (
+        <>
+          <p>
+            <button onClick={deleteLocalData}>
+              CONFIRM! DELETE LOCAL DATA!
+            </button>
+          </p>
+          <p>
+            <button onClick={abort}>Cancel</button>
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            <button onClick={tryAgain}>Try again</button>
+          </p>
+          {triedAgain ? (
+            <p>
+              <button onClick={destructivelyTryAgain}>
+                Delete all saved data (query history, tabs, variables, headers,
+                selected panels, etc) and try again
+              </button>
+            </p>
+          ) : null}
+        </>
+      )}
+    </div>
+  );
+};
+
 export const Ruru: FC<RuruProps> = (props) => {
+  return (
+    <ErrorBoundary FallbackComponent={RuruError}>
+      <RuruMain {...props} />
+    </ErrorBoundary>
+  );
+};
+const RuruMain: FC<RuruProps> = (props) => {
   const {
     inputValueDeprecation,
     schemaDescription,
