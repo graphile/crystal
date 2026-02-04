@@ -94,20 +94,31 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
     // User supplied a match function; use that:
     match = incomingMatch;
   } else if (typeof incomingMatch === "string") {
-    const parts = Object.freeze(parseIdentifierParts(incomingMatch));
-    let index = parts.length - 1;
-    if (index < 0) {
+    const rawParts = Object.freeze(parseIdentifierParts(incomingMatch));
+    const length = rawParts.length;
+    function digest(n: 1): readonly [string];
+    function digest(n: 2): readonly [string | undefined, string];
+    function digest(
+      n: 3,
+    ): readonly [string | undefined, string | undefined, string];
+    function digest(n: number): ReadonlyArray<string | undefined> {
+      if (length > n) {
+        throw new Error(
+          `Too many parts for ${rule.kind} name '${incomingMatch}'`,
+        );
+      }
+      const result: Array<string | undefined> = [...rawParts];
+      while (result.length < n) {
+        result.unshift(undefined);
+      }
+      return result;
+    }
+    if (length === 0) {
       match = () => true;
     } else {
       switch (rule.kind) {
         case "class": {
-          const tableName = parts[index--];
-          const schemaName = parts[index--];
-          if (index >= 0) {
-            throw new Error(
-              `Too many parts for a table name '${incomingMatch}'`,
-            );
-          }
+          const [schemaName, tableName] = digest(2);
           match = (rel: PgClass) => {
             if (rel.relname !== tableName) return false;
             if (schemaName === undefined) return true;
@@ -118,14 +129,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "attribute": {
-          const colName = parts[index--];
-          const tableName = parts[index--];
-          const schemaName = parts[index--];
-          if (index >= 0) {
-            throw new Error(
-              `Too many parts for an attribute name '${incomingMatch}'`,
-            );
-          }
+          const [schemaName, tableName, colName] = digest(3);
           match = (attr: PgAttribute) => {
             if (attr.attname !== colName) return false;
             if (tableName === undefined) return true;
@@ -140,14 +144,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "constraint": {
-          const conName = parts[index--];
-          const tableName = parts[index--];
-          const schemaName = parts[index--];
-          if (index >= 0) {
-            throw new Error(
-              `Too many parts for a constraint name '${incomingMatch}'`,
-            );
-          }
+          const [schemaName, tableName, conName] = digest(3);
           match = (con: PgConstraint) => {
             if (con.conname !== conName) return false;
             if (tableName === undefined) return true;
@@ -162,13 +159,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "procedure": {
-          const procName = parts[index--];
-          const schemaName = parts[index--];
-          if (index >= 0) {
-            throw new Error(
-              `Too many parts for a proc name '${incomingMatch}'`,
-            );
-          }
+          const [schemaName, procName] = digest(2);
           match = (proc: PgProc) => {
             if (proc.proname !== procName) return false;
             if (schemaName === undefined) return true;
@@ -179,13 +170,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "type": {
-          const typeName = parts[index--];
-          const schemaName = parts[index--];
-          if (index >= 0) {
-            throw new Error(
-              `Too many parts for a type name '${incomingMatch}'`,
-            );
-          }
+          const [schemaName, typeName] = digest(2);
           match = (type: PgType) => {
             if (type.typname !== typeName) return false;
             if (schemaName === undefined) return true;
@@ -196,12 +181,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "namespace": {
-          const schemaName = parts[index--];
-          if (index >= 0) {
-            throw new Error(
-              `Too many parts for a namespace name '${incomingMatch}'`,
-            );
-          }
+          const [schemaName] = digest(1);
           match = (nsp: PgNamespace) => nsp.nspname === schemaName;
           break;
         }
