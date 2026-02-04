@@ -233,7 +233,7 @@ export function executeLoad<
       nextTick(() => {
         // Don't allow adding anything else to the batch
         meta.loadBatchesByLoad!.delete(load);
-        executeBatches(loadBatches!, loadInfo, load).then(null, noop);
+        void executeBatches(loadBatches!, loadInfo, load);
       });
     }
     return (async () => {
