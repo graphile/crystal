@@ -145,7 +145,7 @@ it("applies object fields inside list inputs", async () => {
 it("applies list inputs when input is a variable", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
-    query($input: FilterSetInput) {
+    query ($input: FilterSetInput) {
       applyFilters(input: $input)
     }
   `;
@@ -172,7 +172,7 @@ it("applies list inputs when input is a variable", async () => {
 it("applies list inputs when input.filters is a variable", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
-    query($filters: [FilterInput!]!) {
+    query ($filters: [FilterInput!]!) {
       applyFilters(input: { filters: $filters })
     }
   `;
@@ -197,10 +197,8 @@ it("applies list inputs when input.filters is a variable", async () => {
 it("applies list inputs when input.filters[1] is a variable", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
-    query($filter: FilterInput!) {
-      applyFilters(
-        input: { filters: [{ field: "name", value: 1 }, $filter] }
-      )
+    query ($filter: FilterInput!) {
+      applyFilters(input: { filters: [{ field: "name", value: 1 }, $filter] })
     }
   `;
   const result = (await grafast({
