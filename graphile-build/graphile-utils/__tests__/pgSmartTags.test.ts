@@ -66,6 +66,29 @@ it("pgSmartTags applies table descriptions", async () => {
   expect(userType.description).toEqual("Users table via pgSmartTags");
 });
 
+it("pgSmartTags does not leak matches across classes", async () => {
+  const USERS_DESC = "Users table via pgSmartTags";
+  const PETS_DESC = "Pets table via pgSmartTags";
+  const UsersDescriptionPlugin = pgSmartTags([
+    {
+      kind: "class",
+      match: "graphile_utils.users",
+      description: USERS_DESC,
+    },
+    {
+      kind: "class",
+      match: "graphile_utils.pets",
+      description: PETS_DESC,
+    },
+  ]);
+  const { schema } = await makeSchema(makePreset(UsersDescriptionPlugin));
+  const userType = schema.getType("User") as GraphQLObjectType;
+  const petType = schema.getType("Pet") as GraphQLObjectType;
+  expect(userType.description).toEqual(USERS_DESC);
+  expect(petType).toBeDefined();
+  expect(petType.description).toEqual(PETS_DESC);
+});
+
 it("jsonPgSmartTags applies JSON-based rules", async () => {
   const UsersDescriptionPlugin = jsonPgSmartTags({
     version: 1,
