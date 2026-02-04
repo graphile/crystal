@@ -1,18 +1,18 @@
 import fsp from "node:fs/promises";
 
+import LRU from "@graphile/lru";
 import type { PromiseOrDirect } from "grafast";
-import { SafeError } from "grafast";
+import { SafeError, noop } from "grafast";
 import type {
   ParsedGraphQLBody,
   ProcessGraphQLRequestBodyEvent,
 } from "grafserv";
 import type {} from "graphile-config";
 
-export type { PersistedOperationGetter } from "./interfaces.ts";
-import LRU from "@graphile/lru";
-
 import type { PersistedOperationGetter } from "./interfaces.ts";
 import { version } from "./version.ts";
+
+export type { PersistedOperationGetter } from "./interfaces.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -134,7 +134,7 @@ function makeGetterForDirectory(
       scanning = false;
       if (scanInterval === "watch") {
         if (scanAgain) {
-          scanDirectory();
+          scanDirectory().then(null, noop);
         }
       } else if (typeof scanInterval === "number" && scanInterval >= 0) {
         // We don't know how long the scanning takes, so rather than setting an
@@ -145,13 +145,13 @@ function makeGetterForDirectory(
     }
   }
 
-  scanDirectory();
+  scanDirectory().then(null, noop);
   if (scanInterval === "watch") {
     (async () => {
       try {
         const watcher = fsp.watch(directory, { signal, recursive: false });
         for await (const _event of watcher) {
-          scanDirectory();
+          scanDirectory().then(null, noop);
         }
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -182,9 +182,11 @@ function makeGetterForDirectory(
         .catch(() => null);
       operationFromHash.set(hash, operation);
       // Once resolved, replace reference to string to avoid unnecessary ticks
-      operation.then((operationText) => {
-        operationFromHash.set(hash, operationText);
-      });
+      operation
+        .then((operationText) => {
+          operationFromHash.set(hash, operationText);
+        })
+        .then(null, noop);
     }
     return operation;
   }

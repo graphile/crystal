@@ -10,6 +10,8 @@ import { Copy } from "./Copy.tsx";
 import { FormatSQL } from "./FormatSQL.tsx";
 import { Mermaid } from "./Mermaid.tsx";
 
+function noop() {}
+
 export const Explain: FC<{
   explain: boolean;
   setExplain: (newExplain: boolean) => void;
@@ -96,7 +98,8 @@ export const ExplainMain: FC<{
             URL.revokeObjectURL(a.href);
             a.parentNode!.removeChild(a);
           }, 0);
-        });
+        })
+        .then(null, noop);
     })().catch((e) => {
       alert(String(e));
     });

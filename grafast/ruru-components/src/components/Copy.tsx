@@ -1,6 +1,8 @@
 import type { FC, JSX } from "react";
 import { useCallback, useMemo, useRef } from "react";
 
+function noop() {}
+
 export const Copy: FC<{
   text?: string;
   json?: any;
@@ -19,7 +21,7 @@ export const Copy: FC<{
       el.setSelectionRange(0, 99999); /* For mobile devices */
 
       /* Copy the text inside the text field */
-      navigator.clipboard.writeText(el.value);
+      navigator.clipboard.writeText(el.value).then(null, noop);
     }
   }, []);
   return (

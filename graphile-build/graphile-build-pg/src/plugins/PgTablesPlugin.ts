@@ -6,7 +6,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, pgResourceOptions } from "@dataplan/pg";
-import { createObjectAndApplyChildren } from "grafast";
+import { createObjectAndApplyChildren, noop } from "grafast";
 import {
   EXPORTABLE,
   EXPORTABLE_OBJECT_CLONE,
@@ -599,7 +599,9 @@ select * from a where id = 1;
     hooks: {
       async pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, serviceName } = event;
-        helpers.pgTables.getResourceOptions(serviceName, pgClass);
+        helpers.pgTables
+          .getResourceOptions(serviceName, pgClass)
+          .then(null, noop);
       },
 
       async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {

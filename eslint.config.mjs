@@ -250,6 +250,13 @@ const oldConfig = {
       rules: {
         "@typescript-eslint/consistent-type-imports": "error",
         "@typescript-eslint/consistent-type-exports": "error",
+        "@typescript-eslint/no-floating-promises": [
+          "error",
+          {
+            ignoreIIFE: true,
+            ignoreVoid: false,
+          },
+        ],
       },
     },
 

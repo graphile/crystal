@@ -33,6 +33,14 @@ import type {
 } from "../../../interfaces.ts";
 import { noop } from "../../../utils.ts";
 
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return (
+    !!value &&
+    (typeof value === "object" || typeof value === "function") &&
+    typeof (value as PromiseLike<unknown>).then === "function"
+  );
+}
+
 declare global {
   namespace Grafast {
     interface RequestContext {
@@ -296,14 +304,20 @@ export class H3Grafserv extends GrafservBase {
           { socket: peer.websocket, request: peer.request },
         );
         client.closed = async (code, reason) => {
-          onClose(code, reason);
+          const result = onClose(code, reason);
+          if (isPromiseLike(result)) {
+            result.then(null, noop);
+          }
         };
       },
       message(peer, message) {
-        clients.get(peer)?.handleMessage?.(message.text());
+        clients.get(peer)?.handleMessage?.(message.text())?.then(null, noop);
       },
       close(peer, details) {
-        clients.get(peer)?.closed?.(details.code, details.reason);
+        clients
+          .get(peer)
+          ?.closed?.(details.code, details.reason)
+          ?.then(null, noop);
         clients.delete(peer);
       },
       error(peer, _error) {

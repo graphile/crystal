@@ -678,7 +678,7 @@ export class PgSubscriber<
           this.topics = Object.create(null);
         }
       }
-    });
+    }).then(null, noop);
   }
 
   private listeningClient: PoolClient | null = null;
@@ -776,7 +776,7 @@ export class PgSubscriber<
         client.release();
       };
       if (this.listeningClient) {
-        unlistenAndRelease(this.listeningClient);
+        unlistenAndRelease(this.listeningClient).then(null, noop);
       } else if (this.listeningClientPromise) {
         this.listeningClientPromise.then(unlistenAndRelease, () => {
           /* ignore */

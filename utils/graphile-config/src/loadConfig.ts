@@ -10,6 +10,8 @@ import { jsVariants } from "interpret";
 
 const extensions = Object.keys(jsVariants);
 
+function noop() {}
+
 async function exists(filePath: string): Promise<boolean> {
   try {
     await access(filePath);
@@ -93,7 +95,7 @@ async function loadDefaultExport(resolvedPath: string, extension: string) {
 
   // No luck? Let's try loading the loaders
   try {
-    registerLoader(jsVariants[extension]);
+    registerLoader(jsVariants[extension]).then(null, noop);
   } catch (e) {
     console.error(`No loader could be loaded for ${extension} files: ${e}`);
     throw originalError;

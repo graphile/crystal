@@ -2,4 +2,6 @@
 import { runCli } from "graphile-config/cli";
 import { options, run } from "postgraphile/cli";
 
-runCli(options, run);
+function noop() {}
+
+runCli(options, run).then(null, noop);
