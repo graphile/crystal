@@ -99,110 +99,109 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
       match = () => true;
     } else {
       switch (rule.kind) {
-        case "class":
-          match = (rel: PgClass) => {
-            const tableName = parts.pop();
-            if (rel.relname !== tableName) return false;
-            else if (parts.length === 0) return true;
-
-            const schemaName = parts.pop();
-            const nsp = rel.getNamespace()!;
-            if (nsp.nspname !== schemaName) return false;
-            else if (parts.length === 0) return true;
-
+        case "class": {
+          const tableName = parts.pop();
+          const schemaName = parts.pop();
+          if (parts.length > 0) {
             throw new Error(
               `Too many parts for a table name '${incomingMatch}'`,
             );
+          }
+          match = (rel: PgClass) => {
+            if (rel.relname !== tableName) return false;
+            if (schemaName === undefined) return true;
+
+            const nsp = rel.getNamespace()!;
+            return nsp.nspname === schemaName;
           };
           break;
+        }
         case "attribute": {
+          const colName = parts.pop();
+          const tableName = parts.pop();
+          const schemaName = parts.pop();
+          if (parts.length > 0) {
+            throw new Error(
+              `Too many parts for an attribute name '${incomingMatch}'`,
+            );
+          }
           match = (attr: PgAttribute) => {
-            const colName = parts.pop();
             if (attr.attname !== colName) return false;
-            else if (parts.length === 0) return true;
+            if (tableName === undefined) return true;
 
-            const tableName = parts.pop();
             const rel = attr.getClass()!;
             if (rel.relname !== tableName) return false;
-            else if (parts.length === 0) return true;
+            if (schemaName === undefined) return true;
 
-            const schemaName = parts.pop();
             const nsp = rel.getNamespace()!;
-            if (nsp.nspname !== schemaName) return false;
-            else if (parts.length === 0) return true;
-
-            throw new Error(
-              `Too many parts for a attribute name '${incomingMatch}'`,
-            );
+            return nsp.nspname === schemaName;
           };
           break;
         }
         case "constraint": {
-          match = (con: PgConstraint) => {
-            const conName = parts.pop();
-            if (con.conname !== conName) return false;
-            else if (parts.length === 0) return true;
-
-            const tableName = parts.pop();
-            const rel = con.getClass()!;
-            if (rel.relname !== tableName) return false;
-            else if (parts.length === 0) return true;
-
-            const schemaName = parts.pop();
-            const nsp = rel.getNamespace()!;
-            if (nsp.nspname !== schemaName) return false;
-            else if (parts.length === 0) return true;
-
+          const conName = parts.pop();
+          const tableName = parts.pop();
+          const schemaName = parts.pop();
+          if (parts.length > 0) {
             throw new Error(
               `Too many parts for a constraint name '${incomingMatch}'`,
             );
+          }
+          match = (con: PgConstraint) => {
+            if (con.conname !== conName) return false;
+            if (tableName === undefined) return true;
+
+            const rel = con.getClass()!;
+            if (rel.relname !== tableName) return false;
+            if (schemaName === undefined) return true;
+
+            const nsp = rel.getNamespace()!;
+            return nsp.nspname === schemaName;
           };
           break;
         }
         case "procedure": {
-          match = (proc: PgProc) => {
-            const procName = parts.pop();
-            if (proc.proname !== procName) return false;
-            else if (parts.length === 0) return true;
-
-            const schemaName = parts.pop();
-            const nsp = proc.getNamespace()!;
-            if (nsp.nspname !== schemaName) return false;
-            else if (parts.length === 0) return true;
-
+          const procName = parts.pop();
+          const schemaName = parts.pop();
+          if (parts.length > 0) {
             throw new Error(
               `Too many parts for a proc name '${incomingMatch}'`,
             );
+          }
+          match = (proc: PgProc) => {
+            if (proc.proname !== procName) return false;
+            if (schemaName === undefined) return true;
+
+            const nsp = proc.getNamespace()!;
+            return nsp.nspname === schemaName;
           };
           break;
         }
         case "type": {
-          match = (type: PgType) => {
-            const typeName = parts.pop();
-            if (type.typname !== typeName) return false;
-            else if (parts.length === 0) return true;
-
-            const schemaName = parts.pop();
-            const nsp = type.getNamespace()!;
-            if (nsp.nspname !== schemaName) return false;
-            else if (parts.length === 0) return true;
-
+          const typeName = parts.pop();
+          const schemaName = parts.pop();
+          if (parts.length > 0) {
             throw new Error(
               `Too many parts for a type name '${incomingMatch}'`,
             );
+          }
+          match = (type: PgType) => {
+            if (type.typname !== typeName) return false;
+            if (schemaName === undefined) return true;
+
+            const nsp = type.getNamespace()!;
+            return nsp.nspname === schemaName;
           };
           break;
         }
         case "namespace": {
-          match = (nsp: PgNamespace) => {
-            const schemaName = parts.pop();
-            if (nsp.nspname !== schemaName) return false;
-            else if (parts.length === 0) return true;
-
+          const schemaName = parts.pop();
+          if (parts.length > 0) {
             throw new Error(
               `Too many parts for a namespace name '${incomingMatch}'`,
             );
-          };
+          }
+          match = (nsp: PgNamespace) => nsp.nspname === schemaName;
           break;
         }
         default: {
