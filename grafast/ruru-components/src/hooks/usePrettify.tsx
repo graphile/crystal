@@ -6,6 +6,8 @@ import { useCallback, useEffect, useRef } from "react";
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+function noop() {}
+
 /**
  * Prettifies with 'prettier' if available, otherwise using GraphiQL's built in
  * prettify.
@@ -33,7 +35,7 @@ export const usePrettify = () => {
       !variableEditor ||
       !headerEditor
     ) {
-      fallbackPrettify();
+      return fallbackPrettify();
     } else {
       for (const editor of [queryEditor, variableEditor, headerEditor]) {
         const editorText = editor.getValue();
@@ -77,10 +79,11 @@ export const usePrettify = () => {
       prettierRef.current.loaded = promise;
       // Wait up to 2 seconds for Prettier to load; failing that fall back to normal prettify
       Promise.race([promise, sleep(2000)])
-        .catch(() => {})
-        .then(actualPrettify);
+        .catch(noop)
+        .then(actualPrettify)
+        .then(undefined, noop);
     } else {
-      actualPrettify();
+      actualPrettify().then(undefined, noop);
     }
   }, [actualPrettify]);
   useEffect(() => {

@@ -622,8 +622,12 @@ export class PgSubscriber<
         return;
       }
       const client = await this.getClient();
-      await this.syncWithClient(client);
-    }).then(null, () => this.resetClient());
+      try {
+        await this.syncWithClient(client);
+      } catch {
+        this.resetClient();
+      }
+    });
   }
 
   private async syncWithClient(client: PoolClient) {
@@ -776,7 +780,7 @@ export class PgSubscriber<
         client.release();
       };
       if (this.listeningClient) {
-        unlistenAndRelease(this.listeningClient);
+        unlistenAndRelease(this.listeningClient).then(null, noop);
       } else if (this.listeningClientPromise) {
         this.listeningClientPromise.then(unlistenAndRelease, () => {
           /* ignore */
@@ -786,10 +790,9 @@ export class PgSubscriber<
   }
 
   // Avoid race conditions by chaining everything
-  private promise: Promise<void> = Promise.resolve();
-  private async chain(callback: () => void | Promise<void>) {
-    this.promise = this.promise.then(callback, callback);
-    return this.promise;
+  private _chain: Promise<void> = Promise.resolve();
+  private chain(callback: () => void | Promise<void>): void {
+    this._chain = this._chain.then(callback, callback).then(null, noop);
   }
 }
 

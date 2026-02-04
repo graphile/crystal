@@ -6,7 +6,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, pgResourceOptions } from "@dataplan/pg";
-import { createObjectAndApplyChildren } from "grafast";
+import { createObjectAndApplyChildren, noop } from "grafast";
 import {
   EXPORTABLE,
   EXPORTABLE_OBJECT_CLONE,
@@ -587,6 +587,7 @@ select * from a where id = 1;
 
           return resourceOptions;
         })();
+        resourceOptions.then(undefined, noop);
         resourceOptionsByPgClass.set(pgClass, resourceOptions);
         return resourceOptions;
       },
@@ -597,9 +598,9 @@ select * from a where id = 1;
       detailsByResourceOptions: new Map(),
     }),
     hooks: {
-      async pgIntrospection_class({ helpers }, event) {
+      pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, serviceName } = event;
-        helpers.pgTables.getResourceOptions(serviceName, pgClass);
+        void helpers.pgTables.getResourceOptions(serviceName, pgClass);
       },
 
       async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {

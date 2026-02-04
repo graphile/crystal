@@ -174,6 +174,6 @@ export default async function subscribeToLogicalDecoding(
     }
     loopTimeout = setTimeout(loop, sleepDuration);
   }
-  loop();
+  void loop();
   return ldSubscription;
 }
