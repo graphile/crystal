@@ -79,10 +79,11 @@ export const usePrettify = () => {
       prettierRef.current.loaded = promise;
       // Wait up to 2 seconds for Prettier to load; failing that fall back to normal prettify
       Promise.race([promise, sleep(2000)])
+        .catch(noop)
         .then(actualPrettify)
-        .then(null, noop);
+        .then(undefined, noop);
     } else {
-      actualPrettify().then(null, noop);
+      actualPrettify().then(undefined, noop);
     }
   }, [actualPrettify]);
   useEffect(() => {
