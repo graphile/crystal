@@ -1,7 +1,6 @@
 import { PassThrough } from "node:stream";
 
 import type { Hooks, Peer } from "crossws";
-import { isPromiseLike } from "grafast";
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { App, H3Event } from "h3";
 import {
