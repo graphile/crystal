@@ -1,6 +1,7 @@
 import { PassThrough } from "node:stream";
 
 import type { Hooks, Peer } from "crossws";
+import { isPromiseLike } from "grafast";
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { App, H3Event } from "h3";
 import {
@@ -32,14 +33,6 @@ import type {
   Result,
 } from "../../../interfaces.ts";
 import { noop } from "../../../utils.ts";
-
-function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
-  return (
-    !!value &&
-    (typeof value === "object" || typeof value === "function") &&
-    typeof (value as PromiseLike<unknown>).then === "function"
-  );
-}
 
 declare global {
   namespace Grafast {
@@ -303,22 +296,15 @@ export class H3Grafserv extends GrafservBase {
           },
           { socket: peer.websocket, request: peer.request },
         );
-        client.closed = async (code, reason) => {
-          const result = onClose(code, reason);
-          if (isPromiseLike(result)) {
-            result.then(null, noop);
-          }
-        };
+        client.closed = onClose;
       },
       message(peer, message) {
-        clients.get(peer)?.handleMessage?.(message.text())?.then(null, noop);
+        return clients.get(peer)?.handleMessage?.(message.text());
       },
       close(peer, details) {
-        clients
-          .get(peer)
-          ?.closed?.(details.code, details.reason)
-          ?.then(null, noop);
+        const client = clients.get(peer);
         clients.delete(peer);
+        return client?.closed?.(details.code, details.reason);
       },
       error(peer, _error) {
         clients.delete(peer);

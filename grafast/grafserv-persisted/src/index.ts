@@ -1,6 +1,5 @@
 import fsp from "node:fs/promises";
 
-import LRU from "@graphile/lru";
 import type { PromiseOrDirect } from "grafast";
 import { SafeError } from "grafast";
 import type {
@@ -9,10 +8,11 @@ import type {
 } from "grafserv";
 import type {} from "graphile-config";
 
+export type { PersistedOperationGetter } from "./interfaces.ts";
+import LRU from "@graphile/lru";
+
 import type { PersistedOperationGetter } from "./interfaces.ts";
 import { version } from "./version.ts";
-
-export type { PersistedOperationGetter } from "./interfaces.ts";
 
 declare global {
   namespace GraphileConfig {
@@ -147,7 +147,6 @@ function makeGetterForDirectory(
 
   void scanDirectory();
   if (scanInterval === "watch") {
-    // Internal try/catch handles errors.
     void (async () => {
       try {
         const watcher = fsp.watch(directory, { signal, recursive: false });
