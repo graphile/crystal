@@ -10,8 +10,6 @@ import { Copy } from "./Copy.tsx";
 import { FormatSQL } from "./FormatSQL.tsx";
 import { Mermaid } from "./Mermaid.tsx";
 
-function noop() {}
-
 export const Explain: FC<{
   explain: boolean;
   setExplain: (newExplain: boolean) => void;
@@ -78,28 +76,24 @@ export const ExplainMain: FC<{
       const mermaid = await loadMermaid();
       const { planToMermaid } = await loadGrafastMermaid();
       const diagram = planToMermaid(selectedResult.plan);
-      mermaid.default
-        .render("id1", diagram)
-        .then(({ svg }: MermaidLib.RenderResult) => {
-          const file = new File(
-            [svg.replace(/<br>/g, "<br/>")],
-            "grafast-plan.svg",
-          );
+      const { svg } = await mermaid.default.render("id1", diagram);
+      const file = new File(
+        [svg.replace(/<br>/g, "<br/>")],
+        "grafast-plan.svg",
+      );
 
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(file);
-          a.download = file.name;
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          setSaving(false);
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(file);
+      a.download = file.name;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      setSaving(false);
 
-          setTimeout(() => {
-            URL.revokeObjectURL(a.href);
-            a.parentNode!.removeChild(a);
-          }, 0);
-        })
-        .then(null, noop);
+      setTimeout(() => {
+        URL.revokeObjectURL(a.href);
+        a.parentNode!.removeChild(a);
+      }, 0);
     })().catch((e) => {
       alert(String(e));
     });
