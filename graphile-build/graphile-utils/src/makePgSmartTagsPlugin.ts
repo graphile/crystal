@@ -94,15 +94,16 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
     // User supplied a match function; use that:
     match = incomingMatch;
   } else if (typeof incomingMatch === "string") {
-    const parts = parseIdentifierParts(incomingMatch);
-    if (parts.length === 0) {
+    const parts = Object.freeze(parseIdentifierParts(incomingMatch));
+    let index = parts.length - 1;
+    if (index < 0) {
       match = () => true;
     } else {
       switch (rule.kind) {
         case "class": {
-          const tableName = parts.pop();
-          const schemaName = parts.pop();
-          if (parts.length > 0) {
+          const tableName = parts[index--];
+          const schemaName = parts[index--];
+          if (index >= 0) {
             throw new Error(
               `Too many parts for a table name '${incomingMatch}'`,
             );
@@ -117,10 +118,10 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "attribute": {
-          const colName = parts.pop();
-          const tableName = parts.pop();
-          const schemaName = parts.pop();
-          if (parts.length > 0) {
+          const colName = parts[index--];
+          const tableName = parts[index--];
+          const schemaName = parts[index--];
+          if (index >= 0) {
             throw new Error(
               `Too many parts for an attribute name '${incomingMatch}'`,
             );
@@ -139,10 +140,10 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "constraint": {
-          const conName = parts.pop();
-          const tableName = parts.pop();
-          const schemaName = parts.pop();
-          if (parts.length > 0) {
+          const conName = parts[index--];
+          const tableName = parts[index--];
+          const schemaName = parts[index--];
+          if (index >= 0) {
             throw new Error(
               `Too many parts for a constraint name '${incomingMatch}'`,
             );
@@ -161,9 +162,9 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "procedure": {
-          const procName = parts.pop();
-          const schemaName = parts.pop();
-          if (parts.length > 0) {
+          const procName = parts[index--];
+          const schemaName = parts[index--];
+          if (index >= 0) {
             throw new Error(
               `Too many parts for a proc name '${incomingMatch}'`,
             );
@@ -178,9 +179,9 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "type": {
-          const typeName = parts.pop();
-          const schemaName = parts.pop();
-          if (parts.length > 0) {
+          const typeName = parts[index--];
+          const schemaName = parts[index--];
+          if (index >= 0) {
             throw new Error(
               `Too many parts for a type name '${incomingMatch}'`,
             );
@@ -195,8 +196,8 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
           break;
         }
         case "namespace": {
-          const schemaName = parts.pop();
-          if (parts.length > 0) {
+          const schemaName = parts[index--];
+          if (index >= 0) {
             throw new Error(
               `Too many parts for a namespace name '${incomingMatch}'`,
             );
