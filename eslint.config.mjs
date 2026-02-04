@@ -253,7 +253,7 @@ const oldConfig = {
         "@typescript-eslint/no-floating-promises": [
           "error",
           {
-            ignoreIIFE: true,
+            ignoreIIFE: false,
             ignoreVoid: false,
           },
         ],
