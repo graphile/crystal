@@ -10,8 +10,6 @@ import { jsVariants } from "interpret";
 
 const extensions = Object.keys(jsVariants);
 
-function noop() {}
-
 async function exists(filePath: string): Promise<boolean> {
   try {
     await access(filePath);
