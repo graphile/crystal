@@ -95,7 +95,7 @@ async function loadDefaultExport(resolvedPath: string, extension: string) {
 
   // No luck? Let's try loading the loaders
   try {
-    registerLoader(jsVariants[extension]).then(null, noop);
+    await registerLoader(jsVariants[extension]);
   } catch (e) {
     console.error(`No loader could be loaded for ${extension} files: ${e}`);
     throw originalError;
