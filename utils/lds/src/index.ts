@@ -5,8 +5,6 @@ import PgLogicalDecoding, {
   changeToRecord,
 } from "./pg-logical-decoding.ts";
 
-function noop() {}
-
 export interface Options {
   slotName?: string;
   tablePattern?: string;
@@ -176,6 +174,6 @@ export default async function subscribeToLogicalDecoding(
     }
     loopTimeout = setTimeout(loop, sleepDuration);
   }
-  loop().then(null, noop);
+  void loop();
   return ldSubscription;
 }

@@ -2,7 +2,7 @@ import fsp from "node:fs/promises";
 
 import LRU from "@graphile/lru";
 import type { PromiseOrDirect } from "grafast";
-import { noop, SafeError } from "grafast";
+import { SafeError } from "grafast";
 import type {
   ParsedGraphQLBody,
   ProcessGraphQLRequestBodyEvent,
@@ -134,7 +134,7 @@ function makeGetterForDirectory(
       scanning = false;
       if (scanInterval === "watch") {
         if (scanAgain) {
-          scanDirectory().then(null, noop);
+          void scanDirectory();
         }
       } else if (typeof scanInterval === "number" && scanInterval >= 0) {
         // We don't know how long the scanning takes, so rather than setting an
@@ -145,14 +145,14 @@ function makeGetterForDirectory(
     }
   }
 
-  scanDirectory().then(null, noop);
+  void scanDirectory();
   if (scanInterval === "watch") {
     // Internal try/catch handles errors.
     void (async () => {
       try {
         const watcher = fsp.watch(directory, { signal, recursive: false });
         for await (const _event of watcher) {
-          scanDirectory().then(null, noop);
+          void scanDirectory();
         }
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -183,11 +183,9 @@ function makeGetterForDirectory(
         .catch(() => null);
       operationFromHash.set(hash, operation);
       // Once resolved, replace reference to string to avoid unnecessary ticks
-      operation
-        .then((operationText) => {
-          operationFromHash.set(hash, operationText);
-        })
-        .then(null, noop);
+      void operation.then((operationText) => {
+        operationFromHash.set(hash, operationText);
+      });
     }
     return operation;
   }
