@@ -288,7 +288,7 @@ export class H3Grafserv extends GrafservBase {
               peer.send(data);
             },
             close(code, reason) {
-              peer.close(code, reason); // there are protocol standard closures
+              return peer.close(code, reason); // there are protocol standard closures
             },
             onMessage(cb) {
               client.handleMessage = cb;
