@@ -95,122 +95,120 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
     match = incomingMatch;
   } else if (typeof incomingMatch === "string") {
     const parts = parseIdentifierParts(incomingMatch);
-    switch (rule.kind) {
-      case "class":
-        match = (rel: PgClass) => {
-          if (parts.length === 0) return true;
+    if (parts.length === 0) {
+      match = () => true;
+    } else {
+      switch (rule.kind) {
+        case "class":
+          match = (rel: PgClass) => {
+            const tableName = parts.pop();
+            if (rel.relname !== tableName) return false;
+            else if (parts.length === 0) return true;
 
-          const tableName = parts.pop();
-          if (rel.relname !== tableName) return false;
-          else if (parts.length === 0) return true;
+            const schemaName = parts.pop();
+            const nsp = rel.getNamespace()!;
+            if (nsp.nspname !== schemaName) return false;
+            else if (parts.length === 0) return true;
 
-          const schemaName = parts.pop();
-          const nsp = rel.getNamespace()!;
-          if (nsp.nspname !== schemaName) return false;
-          else if (parts.length === 0) return true;
+            throw new Error(
+              `Too many parts for a table name '${incomingMatch}'`,
+            );
+          };
+          break;
+        case "attribute": {
+          match = (attr: PgAttribute) => {
+            const colName = parts.pop();
+            if (attr.attname !== colName) return false;
+            else if (parts.length === 0) return true;
 
-          throw new Error(`Too many parts for a table name '${incomingMatch}'`);
-        };
-        break;
-      case "attribute": {
-        match = (attr: PgAttribute) => {
-          if (parts.length === 0) return true;
+            const tableName = parts.pop();
+            const rel = attr.getClass()!;
+            if (rel.relname !== tableName) return false;
+            else if (parts.length === 0) return true;
 
-          const colName = parts.pop();
-          if (attr.attname !== colName) return false;
-          else if (parts.length === 0) return true;
+            const schemaName = parts.pop();
+            const nsp = rel.getNamespace()!;
+            if (nsp.nspname !== schemaName) return false;
+            else if (parts.length === 0) return true;
 
-          const tableName = parts.pop();
-          const rel = attr.getClass()!;
-          if (rel.relname !== tableName) return false;
-          else if (parts.length === 0) return true;
+            throw new Error(
+              `Too many parts for a attribute name '${incomingMatch}'`,
+            );
+          };
+          break;
+        }
+        case "constraint": {
+          match = (con: PgConstraint) => {
+            const conName = parts.pop();
+            if (con.conname !== conName) return false;
+            else if (parts.length === 0) return true;
 
-          const schemaName = parts.pop();
-          const nsp = rel.getNamespace()!;
-          if (nsp.nspname !== schemaName) return false;
-          else if (parts.length === 0) return true;
+            const tableName = parts.pop();
+            const rel = con.getClass()!;
+            if (rel.relname !== tableName) return false;
+            else if (parts.length === 0) return true;
 
-          throw new Error(
-            `Too many parts for a attribute name '${incomingMatch}'`,
-          );
-        };
-        break;
-      }
-      case "constraint": {
-        match = (con: PgConstraint) => {
-          if (parts.length === 0) return true;
+            const schemaName = parts.pop();
+            const nsp = rel.getNamespace()!;
+            if (nsp.nspname !== schemaName) return false;
+            else if (parts.length === 0) return true;
 
-          const conName = parts.pop();
-          if (con.conname !== conName) return false;
-          else if (parts.length === 0) return true;
+            throw new Error(
+              `Too many parts for a constraint name '${incomingMatch}'`,
+            );
+          };
+          break;
+        }
+        case "procedure": {
+          match = (proc: PgProc) => {
+            const procName = parts.pop();
+            if (proc.proname !== procName) return false;
+            else if (parts.length === 0) return true;
 
-          const tableName = parts.pop();
-          const rel = con.getClass()!;
-          if (rel.relname !== tableName) return false;
-          else if (parts.length === 0) return true;
+            const schemaName = parts.pop();
+            const nsp = proc.getNamespace()!;
+            if (nsp.nspname !== schemaName) return false;
+            else if (parts.length === 0) return true;
 
-          const schemaName = parts.pop();
-          const nsp = rel.getNamespace()!;
-          if (nsp.nspname !== schemaName) return false;
-          else if (parts.length === 0) return true;
+            throw new Error(
+              `Too many parts for a proc name '${incomingMatch}'`,
+            );
+          };
+          break;
+        }
+        case "type": {
+          match = (type: PgType) => {
+            const typeName = parts.pop();
+            if (type.typname !== typeName) return false;
+            else if (parts.length === 0) return true;
 
-          throw new Error(
-            `Too many parts for a constraint name '${incomingMatch}'`,
-          );
-        };
-        break;
-      }
-      case "procedure": {
-        match = (proc: PgProc) => {
-          if (parts.length === 0) return true;
+            const schemaName = parts.pop();
+            const nsp = type.getNamespace()!;
+            if (nsp.nspname !== schemaName) return false;
+            else if (parts.length === 0) return true;
 
-          const procName = parts.pop();
-          if (proc.proname !== procName) return false;
-          else if (parts.length === 0) return true;
+            throw new Error(
+              `Too many parts for a type name '${incomingMatch}'`,
+            );
+          };
+          break;
+        }
+        case "namespace": {
+          match = (nsp: PgNamespace) => {
+            const schemaName = parts.pop();
+            if (nsp.nspname !== schemaName) return false;
+            else if (parts.length === 0) return true;
 
-          const schemaName = parts.pop();
-          const nsp = proc.getNamespace()!;
-          if (nsp.nspname !== schemaName) return false;
-          else if (parts.length === 0) return true;
-
-          throw new Error(`Too many parts for a proc name '${incomingMatch}'`);
-        };
-        break;
-      }
-      case "type": {
-        match = (type: PgType) => {
-          if (parts.length === 0) return true;
-
-          const typeName = parts.pop();
-          if (type.typname !== typeName) return false;
-          else if (parts.length === 0) return true;
-
-          const schemaName = parts.pop();
-          const nsp = type.getNamespace()!;
-          if (nsp.nspname !== schemaName) return false;
-          else if (parts.length === 0) return true;
-
-          throw new Error(`Too many parts for a type name '${incomingMatch}'`);
-        };
-        break;
-      }
-      case "namespace": {
-        match = (nsp: PgNamespace) => {
-          if (parts.length === 0) return true;
-
-          const schemaName = parts.pop();
-          if (nsp.nspname !== schemaName) return false;
-          else if (parts.length === 0) return true;
-
-          throw new Error(
-            `Too many parts for a namespace name '${incomingMatch}'`,
-          );
-        };
-        break;
-      }
-      default: {
-        const never: never = rule.kind;
-        throw new Error(`Unknown kind '${never}'`);
+            throw new Error(
+              `Too many parts for a namespace name '${incomingMatch}'`,
+            );
+          };
+          break;
+        }
+        default: {
+          const never: never = rule.kind;
+          throw new Error(`Unknown kind '${never}'`);
+        }
       }
     }
   } else {
@@ -659,7 +657,6 @@ declare global {
     }
   }
 }
-
 /** @deprecated Renamed to 'pgSmartTags' */
 export const makePgSmartTagsPlugin = pgSmartTags;
 /** @deprecated Renamed to 'pgSmartTagsFromFile' */
