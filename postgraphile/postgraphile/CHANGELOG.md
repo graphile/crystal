@@ -1,5 +1,20 @@
 # postgraphile
 
+## 5.0.0-rc.6
+
+### Patch Changes
+
+- [#2934](https://github.com/graphile/crystal/pull/2934)
+  [`3bb06eb`](https://github.com/graphile/crystal/commit/3bb06eb073777029d0db1639ad303cc76aa557f9)
+  Thanks [@benjie](https://github.com/benjie)! - Fix major bug in PostGraphile
+  v5 RC5 where smart tag string matching matches all entities after the first
+  check due to mutation.
+- Updated dependencies
+  [[`3bb06eb`](https://github.com/graphile/crystal/commit/3bb06eb073777029d0db1639ad303cc76aa557f9),
+  [`fc2f84f`](https://github.com/graphile/crystal/commit/fc2f84f62777b3e6ad952121a0fe8e4595f6ec4f)]:
+  - graphile-utils@5.0.0-rc.5
+  - grafast@1.0.0-rc.6
+
 ## 5.0.0-rc.5
 
 ### Patch Changes

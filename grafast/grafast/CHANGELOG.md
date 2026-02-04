@@ -1,5 +1,15 @@
 # grafast
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- [#2932](https://github.com/graphile/crystal/pull/2932)
+  [`fc2f84f`](https://github.com/graphile/crystal/commit/fc2f84f62777b3e6ad952121a0fe8e4595f6ec4f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix `applyInput()` interaction
+  with lists - specifically make sure they're applied in expected order (not
+  reverse order!)
+
 ## 1.0.0-rc.5
 
 ### Patch Changes
