@@ -4,15 +4,15 @@
 import { createServer } from "node:http";
 import Koa from "koa";
 import { grafserv } from "grafserv/koa/v2";
-import preset from "./graphile.config.mjs";
-import schema from "./schema.mjs";
+import preset from "./graphile.config.mts";
+import schema from "./schema.mts";
 
 // Create a Koa app
 const app = new Koa();
 // (Add any Koa middleware you want here.)
 
 // Create a Node HTTP server, mounting Koa into it
-const server = createServer(app);
+const server = createServer(app.callback());
 server.on("error", (e) => {
   console.error(e);
 });

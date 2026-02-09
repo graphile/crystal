@@ -20,7 +20,7 @@ app.use(bodyParser());
 // (Add any Koa middleware you want here.)
 
 // Create a Node HTTP server, mounting Koa into it
-const server = createServer(app);
+const server = createServer(app.callback());
 server.on("error", (e) => {
   console.error(e);
 });

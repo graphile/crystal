@@ -21,7 +21,7 @@ app.use(async (ctx, next) => {
 });
 
 // Create a Node HTTP server, mounting Koa into it
-const server = createServer(app);
+const server = createServer(app.callback());
 server.on("error", (e) => {
   console.error(e);
 });
@@ -31,10 +31,7 @@ const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Koa app, and register
 // websockets if desired
-serv.addTo(app, server).catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+await serv.addTo(app, server);
 
 // Start the Koa server
 server.listen(preset.grafserv.port ?? 5678);
