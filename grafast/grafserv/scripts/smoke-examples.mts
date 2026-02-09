@@ -1,15 +1,16 @@
-import { type ChildProcess, spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { setTimeout as sleep } from "node:timers/promises";
 
 import { type Browser, chromium, type Page } from "playwright";
 
 const EXAMPLES = [
-  "example-node.mts",
   "example-express.mts",
-  "example-koa.mts",
   "example-fastify.mts",
   "example-hono.mts",
+  "example-koa.extra.mts",
+  "example-koa.mts",
+  "example-node.mts",
 ] as const;
 type Example = (typeof EXAMPLES)[number];
 
@@ -26,7 +27,7 @@ function spawnExample(example: Example, port: number) {
         GRAPHILE_ENV: "production",
         PORT: String(port),
       },
-      stdio: ["inherit", "inherit", "inherit"],
+      stdio: ["ignore", "inherit", "inherit"],
     },
   );
   let exited = false;
