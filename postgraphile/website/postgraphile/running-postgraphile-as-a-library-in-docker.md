@@ -102,11 +102,13 @@ const pgl = postgraphile(preset);
 const serv = pgl.createServ(grafserv);
 
 const server = createServer();
-serv.addTo(server).catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
-server.listen(preset.grafserv.port);
+serv.addTo(server).then(
+  () => void server.listen(preset.grafserv.port),
+  (e) => {
+    console.error(e);
+    process.exit(1);
+  },
+);
 ```
 
 ### Create PostGraphile Dockerfile

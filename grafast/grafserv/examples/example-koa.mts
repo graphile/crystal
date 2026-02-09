@@ -31,7 +31,7 @@ const serv = grafserv({ schema, preset });
 
 // Add the Grafserv instance's route handlers to the Koa app, and register
 // websockets if desired
-await serv.addTo(app, server);
-
-// Start the Koa server
-server.listen(preset.grafserv.port ?? 5678);
+serv.addTo(app, server).then(() => {
+  // Start the Koa server
+  server.listen(preset.grafserv.port ?? 5678);
+});
