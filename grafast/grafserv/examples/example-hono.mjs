@@ -20,4 +20,7 @@ serv.addTo(app).catch((e) => {
 });
 
 // Start the server with the chosen Hono adapter - here Node.js
-serve(app);
+serve({
+  fetch: app.fetch,
+  port: preset.grafserv?.port ?? 5678,
+});

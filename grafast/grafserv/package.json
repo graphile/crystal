@@ -77,7 +77,8 @@
   },
   "scripts": {
     "prepack": "tsc -b",
-    "test": "jest"
+    "test": "jest",
+    "test:smoke-examples": "node scripts/smoke-examples.mjs"
   },
   "repository": {
     "type": "git",
@@ -161,6 +162,7 @@
     "koa": "^3.0.3",
     "koa-bodyparser": "^4.4.1",
     "nodemon": "^3.1.11",
+    "playwright": "^1.54.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "ws": "^8.18.3"

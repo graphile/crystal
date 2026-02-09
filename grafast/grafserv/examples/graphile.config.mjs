@@ -8,7 +8,9 @@ import "grafserv/fastify/v4";
 /** @type {GraphileConfig.Preset} */
 const preset = {
   grafserv: {
-    port: 5678,
+    port: process.env.GRAFSERV_PORT
+      ? Number.parseInt(process.env.GRAFSERV_PORT, 10)
+      : 5678,
     outputDataAsString: true,
     graphqlOverGET: true,
     graphiqlOnGraphQLGET: true,
