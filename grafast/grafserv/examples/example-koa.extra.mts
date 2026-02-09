@@ -7,6 +7,12 @@ import bodyParser from "koa-bodyparser";
 import preset from "./graphile.config.mts";
 import schema from "./schema.mts";
 
+declare module "koa" {
+  interface Context {
+    thing?: string;
+  }
+}
+
 // Create a Koa app
 const app = new Koa();
 // Parse the body

@@ -5,6 +5,12 @@ import { grafserv } from "grafserv/fastify/v4";
 import preset from "./graphile.config.mts";
 import schema from "./schema.mts";
 
+declare module "fastify" {
+  interface FastifyRequest {
+    thing?: string;
+  }
+}
+
 // Create a Fastify app
 const app = Fastify({
   logger: true,

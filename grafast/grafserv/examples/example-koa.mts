@@ -6,6 +6,12 @@ import Koa from "koa";
 import preset from "./graphile.config.mts";
 import schema from "./schema.mts";
 
+declare module "koa" {
+  interface Context {
+    thing?: string;
+  }
+}
+
 // Create a Koa app
 const app = new Koa();
 // (Add any Koa middleware you want here.)

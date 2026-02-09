@@ -6,6 +6,12 @@ import { grafserv } from "grafserv/express/v4";
 import preset from "./graphile.config.mts";
 import schema from "./schema.mts";
 
+declare module "node:http" {
+  interface IncomingMessage {
+    thing?: string;
+  }
+}
+
 // Create an express app
 const app = express();
 // (Add any Express middleware you want here.)
