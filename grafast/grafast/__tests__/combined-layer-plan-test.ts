@@ -172,3 +172,68 @@ it("combines layer plans when both lists are empty", async () => {
     second: [],
   });
 });
+
+it("combines layer plans when one parent errors", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        first: [Notification!]!
+        second: [Notification!]!
+      }
+    `,
+    interfaces: {
+      Notification: {
+        resolveType(obj: Notification) {
+          if (obj.type === "ready") return "NotificationReady";
+          if (obj.type === "logout") return "NotificationLogout";
+        },
+      },
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return lambda(null, async () => {
+              await sleep(5);
+              throw new Error("First failed");
+            });
+          },
+          second() {
+            return lambda(null, async () => [
+              { type: "ready", id: "1", ready: true },
+              { type: "logout", id: "2", username: "benjie" },
+            ]);
+          },
+        },
+      },
+    },
+  });
+  const result = (await grafast({
+    schema,
+    source,
+  })) as ExecutionResult;
+  expect(result.data).to.deep.equal({
+    first: null,
+    second: [
+      { __typename: "NotificationReady", id: "1", ready: true },
+      { __typename: "NotificationLogout", id: "2", username: "benjie" },
+    ],
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "First failed",
+  ]);
+});
