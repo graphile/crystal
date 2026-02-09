@@ -19,5 +19,5 @@ jobs:
     name: Small package posttests
     uses: ./.github/workflows/test-base.yml
     with:
-      package: "{@dataplan/pg,pg-sql2,tamedevil}"
+      package: "{@dataplan/pg,pg-sql2,tamedevil,grafserv}"
       testcommand: "posttest"

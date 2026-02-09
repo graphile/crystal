@@ -2,8 +2,8 @@ import { serve } from "@hono/node-server";
 import { grafserv } from "grafserv/hono/v4";
 import { Hono } from "hono";
 
-import preset from "./graphile.config.mjs";
-import schema from "./schema.mjs";
+import preset from "./graphile.config.mts";
+import schema from "./schema.mts";
 
 // Create a Node HTTP server
 const app = new Hono();
@@ -20,4 +20,8 @@ serv.addTo(app).catch((e) => {
 });
 
 // Start the server with the chosen Hono adapter - here Node.js
-serve(app);
+serve({ fetch: app.fetch, port: preset.grafserv?.port ?? 5678 }, (info) => {
+  console.log(
+    `Listening on http://${info.family === "IPv6" ? `[${info.address}]` : info.address}:${info.port}`,
+  );
+});

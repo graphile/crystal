@@ -3,7 +3,7 @@ import type { Server as HTTPSServer } from "node:https";
 import type { Duplex } from "node:stream";
 import { PassThrough } from "node:stream";
 
-import type { Context } from "koa";
+import type { Context as KoaContext } from "koa";
 import type Koa from "koa";
 
 import { GrafservBase } from "../../../core/base.ts";
@@ -20,10 +20,10 @@ declare global {
   namespace Grafast {
     interface RequestContext {
       koav2: {
-        ctx: Context;
+        ctx: KoaContext;
       };
       koav3: {
-        ctx: Context;
+        ctx: KoaContext;
       };
     }
   }
@@ -31,7 +31,7 @@ declare global {
 
 function getDigest(
   dynamicOptions: OptionsFromConfig,
-  ctx: Context,
+  ctx: KoaContext,
 ): RequestDigest {
   return {
     httpVersionMajor: ctx.req.httpVersionMajor,
@@ -74,7 +74,7 @@ export class KoaGrafserv extends GrafservBase {
   }
 
   protected _createHandler(): (
-    ctx: Context,
+    ctx: KoaContext,
     next: (err?: Error) => void,
   ) => void {
     const dynamicOptions = this.dynamicOptions;
