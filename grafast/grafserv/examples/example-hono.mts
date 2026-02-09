@@ -20,7 +20,8 @@ serv.addTo(app).catch((e) => {
 });
 
 // Start the server with the chosen Hono adapter - here Node.js
-serve({
-  fetch: app.fetch,
-  port: preset.grafserv?.port ?? 5678,
+serve({ fetch: app.fetch, port: preset.grafserv?.port ?? 5678 }, (info) => {
+  console.log(
+    `Listening on http://${info.family === "IPv6" ? `[${info.address}]` : info.address}:${info.port}`,
+  );
 });
