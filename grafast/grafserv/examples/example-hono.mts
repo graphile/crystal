@@ -2,8 +2,8 @@ import { serve } from "@hono/node-server";
 import { grafserv } from "grafserv/hono/v4";
 import { Hono } from "hono";
 
-import preset from "./graphile.config.mjs";
-import schema from "./schema.mjs";
+import preset from "./graphile.config.mts";
+import schema from "./schema.mts";
 
 // Create a Node HTTP server
 const app = new Hono();

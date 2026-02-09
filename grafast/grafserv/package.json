@@ -78,7 +78,7 @@
   "scripts": {
     "prepack": "tsc -b",
     "test": "jest",
-    "test:smoke-examples": "node scripts/smoke-examples.mjs"
+    "test:smoke-examples": "node --experimental-strip-types scripts/smoke-examples.mts"
   },
   "repository": {
     "type": "git",

@@ -3,8 +3,8 @@ import { createServer } from "node:http";
 import express from "express";
 import { grafserv } from "grafserv/express/v4";
 
-import preset from "./graphile.config.mjs";
-import schema from "./schema.mjs";
+import preset from "./graphile.config.mts";
+import schema from "./schema.mts";
 
 // Create an express app
 const app = express();

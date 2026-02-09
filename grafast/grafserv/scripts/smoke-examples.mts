@@ -5,11 +5,11 @@ import { setTimeout as delay } from "node:timers/promises";
 import { chromium } from "playwright";
 
 const examples = [
-  "example-node.mjs",
-  "example-express.mjs",
-  "example-koa.mjs",
-  "example-fastify.mjs",
-  "example-hono.mjs",
+  "example-node.mts",
+  "example-express.mts",
+  "example-koa.mts",
+  "example-fastify.mts",
+  "example-hono.mts",
 ];
 
 const baseDir = new URL("../examples/", import.meta.url);
@@ -17,11 +17,11 @@ const baseDir = new URL("../examples/", import.meta.url);
 function spawnExample(example, port) {
   const child = spawn(
     process.execPath,
-    [new URL(example, baseDir).pathname],
+    ["--experimental-strip-types", new URL(example, baseDir).pathname],
     {
       env: {
         ...process.env,
-        GRAFSERV_PORT: String(port),
+        PORT: String(port),
       },
       stdio: ["ignore", "inherit", "inherit"],
     },
@@ -87,7 +87,9 @@ async function run() {
             `${url}?query=${encodeURIComponent("{ __typename }")}`,
             { waitUntil: "domcontentloaded" },
           );
-          await page.waitForSelector("#ruru-root", { timeout: 10_000 });
+          await page.waitForSelector(".graphiql-query-editor", {
+            timeout: 10_000,
+          });
           const response = await page.evaluate(async () => {
             const res = await fetch("/graphql", {
               method: "POST",

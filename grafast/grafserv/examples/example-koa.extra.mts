@@ -4,8 +4,8 @@ import { grafserv } from "grafserv/koa/v2";
 import Koa from "koa";
 import bodyParser from "koa-bodyparser";
 
-import preset from "./graphile.config.mjs";
-import schema from "./schema.mjs";
+import preset from "./graphile.config.mts";
+import schema from "./schema.mts";
 
 // Create a Koa app
 const app = new Koa();

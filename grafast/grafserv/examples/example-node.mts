@@ -2,8 +2,8 @@ import { createServer } from "node:http";
 
 import { grafserv } from "grafserv/node";
 
-import preset from "./graphile.config.mjs";
-import schema from "./schema.mjs";
+import preset from "./graphile.config.mts";
+import schema from "./schema.mts";
 
 // Create a Node HTTP server
 const server = createServer();
