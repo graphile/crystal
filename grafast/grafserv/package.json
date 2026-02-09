@@ -78,7 +78,7 @@
   "scripts": {
     "prepack": "tsc -b",
     "test": "jest",
-    "posttest": "node --experimental-strip-types scripts/smoke-examples.mts"
+    "posttest": "yarn playwright install chromium && node --experimental-strip-types scripts/smoke-examples.mts"
   },
   "repository": {
     "type": "git",
