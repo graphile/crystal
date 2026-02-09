@@ -132,7 +132,7 @@ const config = {
         checkTypeImports: true,
         pathGroupOverrides: [
           {
-            pattern: "{graphile-build-pg,postgraphile,pgl,ruru}/**",
+            pattern: "{grafserv,graphile-build-pg,postgraphile,pgl,ruru}/**",
             action: "ignore",
           },
         ],
