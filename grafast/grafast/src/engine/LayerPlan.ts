@@ -856,9 +856,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   flags = flags | FLAG_NULL;
                 }
               }
-              if (flags !== NO_FLAGS) {
-                flagUnion |= flags;
-              }
+              flagUnion |= flags;
               ev._setResult(newIndex, val, flags);
 
               polymorphicPathList[newIndex] =

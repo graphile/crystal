@@ -1497,9 +1497,7 @@ export function newBucket(
           `GrafastInternalError<9465db89-cc9d-415c-97e7-57bb19ddebe0>: attempt to write to out of bounds index ${index} for bucket of size ${size} for step ${step}`,
         );
       }
-      if (flags !== NO_FLAGS) {
-        this.flagUnion |= flags;
-      }
+      this.flagUnion |= flags;
       if (step._isUnary) {
         if (isDev && store.has(stepId)) {
           const ev = store.get(stepId);
