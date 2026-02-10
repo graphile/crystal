@@ -29,7 +29,7 @@ import type { OperationPlan } from "./OperationPlan.ts";
  * include for the combo step.
  */
 const SKIP_FLAGS =
-  FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
+  FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_NULL;
 
 /**
  * If any of these flags exist on the "$__typename" step, then the value
@@ -1233,10 +1233,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} (${stepId}) in ${this}`,
                 );
               }
-              if ((sourceStore._flagsAt(originalIndex) & SKIP_FLAGS) == 0) {
+              if ((sourceStore._flagsAt(originalIndex) & SKIP_FLAGS) === 0) {
                 ev._copyResult(newIndex, sourceStore, originalIndex);
                 break;
-              }
+              } // If no matches, it retains `FLAG_NULL | FLAG_STOPPED` from above
             }
           }
 

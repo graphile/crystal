@@ -44,6 +44,7 @@ import {
   $$inhibit,
   error,
   get,
+  inhibitOnNull,
   isDev,
   object,
   SafeError,
@@ -1966,6 +1967,18 @@ export class OperationPlan {
                     $original,
                   )
                 : $original;
+
+          // Combo layer plan filters nulls for us; since we're skipping that
+          // we need to explicitly inhibit nulls
+          commonStep = withGlobalLayerPlan(
+            commonLayerPlan,
+            polymorphicPaths,
+            planningPath,
+            null,
+            inhibitOnNull,
+            null,
+            commonStep,
+          );
 
           for (const detailsRecord of detailsRecordList) {
             detailsRecord.layerPlan = commonLayerPlan;
