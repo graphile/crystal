@@ -33,23 +33,19 @@ type RuruServer = typeof import("ruru/server");
 type RuruStatic = typeof import("ruru/static");
 
 let ruruServer: RuruServer | null = null;
-let ruruServerPromise: Promise<RuruServer> | null = null;
+let _ruruServerPromise: Promise<RuruServer> | null = null;
 function loadRuruServer() {
-  ruruServerPromise ??= import("ruru/server").then((mod) => {
-    ruruServer = mod;
-    return ruruServer;
-  });
-  return ruruServerPromise;
+  return (_ruruServerPromise ??= import("ruru/server").then(
+    (mod) => (ruruServer = mod),
+  ));
 }
 
 let ruruStatic: RuruStatic | null = null;
-let ruruStaticPromise: Promise<RuruStatic> | null = null;
+let _ruruStaticPromise: Promise<RuruStatic> | null = null;
 function loadRuruStatic() {
-  ruruStaticPromise ??= import("ruru/static").then((mod) => {
-    ruruStatic = mod;
-    return ruruStatic;
-  });
-  return ruruStaticPromise;
+  return (_ruruStaticPromise ??= import("ruru/static").then(
+    (mod) => (ruruStatic = mod),
+  ));
 }
 
 export function makeGraphiQLHandler(
