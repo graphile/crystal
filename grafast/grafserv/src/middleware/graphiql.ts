@@ -5,8 +5,6 @@ import { brotliCompress as brotliCompressCb, constants } from "node:zlib";
 import type { PromiseOrDirect } from "grafast";
 import type { Middleware } from "graphile-config";
 import type { RuruServerConfig } from "ruru/server";
-import { makeHTMLParts, ruruHTML } from "ruru/server";
-import { getStaticFile } from "ruru/static";
 
 import type {
   HandlerResult,
@@ -31,12 +29,36 @@ const BROTLI_HEADERS = {
   "content-type": "text/html; charset=utf-8",
 };
 
+type RuruServer = typeof import("ruru/server");
+type RuruStatic = typeof import("ruru/static");
+
+let ruruServer: RuruServer | null = null;
+let ruruServerPromise: Promise<RuruServer> | null = null;
+function loadRuruServer() {
+  ruruServerPromise ??= import("ruru/server").then((mod) => {
+    ruruServer = mod;
+    return ruruServer;
+  });
+  return ruruServerPromise;
+}
+
+let ruruStatic: RuruStatic | null = null;
+let ruruStaticPromise: Promise<RuruStatic> | null = null;
+function loadRuruStatic() {
+  ruruStaticPromise ??= import("ruru/static").then((mod) => {
+    ruruStatic = mod;
+    return ruruStatic;
+  });
+  return ruruStaticPromise;
+}
+
 export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
   middleware: Middleware<GraphileConfig.GrafservMiddleware> | null,
   dynamicOptions: OptionsFromConfig,
 ): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
   return async (request) => {
+    const { makeHTMLParts, ruruHTML } = ruruServer ?? (await loadRuruServer());
     const config = {
       ...resolvedPreset.ruru,
       // Override the ruru staticPath; this isn't for Ruru CLI
@@ -59,6 +81,7 @@ export function makeGraphiQLHandler(
       html = await middleware.run(
         "ruruHTML",
         {
+          _ruruServer: ruruServer!,
           resolvedPreset,
           config,
           htmlParts: { ...htmlParts },
@@ -88,6 +111,7 @@ export function makeGraphiQLStaticHandler(
   dynamicOptions: OptionsFromConfig,
 ): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
   return async (request) => {
+    const { getStaticFile } = ruruStatic ?? (await loadRuruStatic());
     const file = await getStaticFile({
       ...resolvedPreset.ruru,
       // Override the ruru staticPath; this isn't for Ruru CLI
@@ -126,5 +150,5 @@ export function makeGraphiQLStaticHandler(
 }
 
 function ruruHTMLFromEvent(event: RuruHTMLEvent) {
-  return ruruHTML(event.config, event.htmlParts);
+  return event._ruruServer.ruruHTML(event.config, event.htmlParts);
 }
