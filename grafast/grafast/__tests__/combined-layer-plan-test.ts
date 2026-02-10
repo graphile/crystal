@@ -13,10 +13,7 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
-import {
-  resolveStreamDefer,
-  streamToArray,
-} from "./incrementalUtils.ts";
+import { resolveStreamDefer, streamToArray } from "./incrementalUtils.ts";
 
 type Notification =
   | { type: "ready"; id: string; ready: boolean }
@@ -899,10 +896,7 @@ it("handles list-of-lists polymorphic positions", async () => {
                 Promise.reject(new Error("Inner list failed")),
               ],
               null,
-              [
-                { type: "logout", id: "2", username: "benjie" },
-                null,
-              ],
+              [{ type: "logout", id: "2", username: "benjie" }, null],
             ]);
           },
         },
@@ -930,15 +924,9 @@ it("handles list-of-lists polymorphic positions", async () => {
 
   expect(result.data).to.deep.equal({
     groups: [
-      [
-        { __typename: "NotificationReady", id: "1", ready: true },
-        null,
-      ],
+      [{ __typename: "NotificationReady", id: "1", ready: true }, null],
       null,
-      [
-        { __typename: "NotificationLogout", id: "2", username: "benjie" },
-        null,
-      ],
+      [{ __typename: "NotificationLogout", id: "2", username: "benjie" }, null],
     ],
   });
   expect(result.errors?.map((error) => error.message)).to.deep.equal([
@@ -984,10 +972,7 @@ it("uses toSpecifier when fanning in polymorphic positions", async () => {
             );
           },
           second() {
-            return delay(
-              [{ type: "ready", id: "3", ready: false }],
-              0,
-            );
+            return delay([{ type: "ready", id: "3", ready: false }], 0);
           },
         },
       },
@@ -1047,10 +1032,7 @@ it("streams combined polymorphic lists", async () => {
             );
           },
           second() {
-            return delay(
-              [{ type: "ready", id: "3", ready: false }],
-              0,
-            );
+            return delay([{ type: "ready", id: "3", ready: false }], 0);
           },
         },
       },
