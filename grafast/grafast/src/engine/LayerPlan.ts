@@ -628,6 +628,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> =
       this.reason.type === "mutationField" ? parentBucket.iterators : [];
     const map: Map<number, number | number[]> = new Map();
+    let flagUnion = parentBucket.flagUnion;
 
     const $parentSideEffect = this.parentSideEffectStep;
     let parentSideEffectValue: ExecutionValue | null;
@@ -855,6 +856,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   flags = flags | FLAG_NULL;
                 }
               }
+              if (flags !== NO_FLAGS) {
+                flagUnion |= flags;
+              }
               ev._setResult(newIndex, val, flags);
 
               polymorphicPathList[newIndex] =
@@ -1075,7 +1079,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         size,
         store,
         // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-        flagUnion: parentBucket.flagUnion,
+        flagUnion,
         polymorphicPathList,
         polymorphicType,
         iterators,
