@@ -16,6 +16,8 @@ import {
 type Notification =
   | { type: "ready"; id: string; ready: boolean }
   | { type: "logout"; id: string; username: string };
+type ReadyNotification = Extract<Notification, { type: "ready" }>;
+type LogoutNotification = Extract<Notification, { type: "logout" }>;
 
 interface DelayOptions<T> {
   value: T;
@@ -52,6 +54,43 @@ function notificationInterface(options?: {
     planType($specifier) {
       const $__typename = lambda($specifier, determineType, true);
       return { $__typename, planForType: () => $specifier };
+    },
+  };
+}
+
+function notificationPartitionInterface(): InterfacePlan<Notification> {
+  return {
+    planType($specifier) {
+      const $__typename = lambda(
+        $specifier,
+        (obj: Notification) =>
+          obj.type === "ready"
+            ? "NotificationReady"
+            : obj.type === "logout"
+              ? "NotificationLogout"
+              : null,
+        true,
+      );
+      return {
+        $__typename,
+        planForType(t) {
+          if (t.name === "NotificationReady") {
+            return lambda(
+              $specifier,
+              (obj: Notification) => obj as ReadyNotification,
+              true,
+            );
+          }
+          if (t.name === "NotificationLogout") {
+            return lambda(
+              $specifier,
+              (obj: Notification) => obj as LogoutNotification,
+              true,
+            );
+          }
+          return null;
+        },
+      };
     },
   };
 }
@@ -461,4 +500,124 @@ it("does not attempt polymorphic planning for list item errors", async () => {
   expect(seen).to.have.length(2);
   expect(seen).to.deep.include({ type: "ready", id: "1", ready: true });
   expect(seen).to.deep.include({ type: "logout", id: "2", username: "benjie" });
+});
+
+it("fans out via polymorphic partition when parents finish out of order", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        first: [Notification]
+        second: [Notification]
+      }
+    `,
+    interfaces: {
+      Notification: notificationPartitionInterface(),
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return lambda(null, async () => {
+              await sleep(10);
+              return [
+                { type: "ready", id: "1", ready: true },
+                { type: "logout", id: "2", username: "benjie" },
+              ];
+            });
+          },
+          second() {
+            return lambda(null, async () => [
+              { type: "ready", id: "3", ready: false },
+            ]);
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source,
+  })) as ExecutionResult;
+
+  expect(result.errors).to.be.undefined;
+  expect(result.data).to.deep.equal({
+    first: [
+      { __typename: "NotificationReady", id: "1", ready: true },
+      { __typename: "NotificationLogout", id: "2", username: "benjie" },
+    ],
+    second: [{ __typename: "NotificationReady", id: "3", ready: false }],
+  });
+});
+
+it("respects nullable boundaries before polymorphism", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        first: [Notification!]
+        second: [Notification!]
+      }
+    `,
+    interfaces: {
+      Notification: notificationInterface(),
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return lambda(null, async () => [
+              { type: "ready", id: "1", ready: true },
+              null,
+            ]);
+          },
+          second() {
+            return lambda(null, async () => [
+              { type: "logout", id: "2", username: "benjie" },
+            ]);
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source,
+  })) as ExecutionResult;
+
+  expect(result.data).to.deep.equal({
+    first: null,
+    second: [{ __typename: "NotificationLogout", id: "2", username: "benjie" }],
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Cannot return null for non-nullable field Query.first.",
+  ]);
 });
