@@ -24,6 +24,40 @@ function delay<T>(value: T, delay: number) {
   return lambda(constant({ value, delay }), _delay);
 }
 
+function notificationInterface(options?: {
+  seen?: unknown[];
+  throwOnError?: boolean;
+}) {
+  return {
+    planType($specifier: any) {
+      const $__typename = lambda(
+        $specifier,
+        (obj: Notification | Error) => {
+          options?.seen?.push(obj);
+          if (obj instanceof Error) {
+            if (options?.throwOnError) {
+              throw new Error("Saw error in planType");
+            }
+            return null;
+          }
+          return obj.type === "ready"
+            ? "NotificationReady"
+            : obj.type === "logout"
+              ? "NotificationLogout"
+              : null;
+        },
+        true,
+      );
+      return {
+        $__typename,
+        planForType() {
+          return $specifier;
+        },
+      };
+    },
+  };
+}
+
 const makeSchema = (options: {
   firstDelay: number;
   secondDelay: number;
@@ -52,12 +86,7 @@ const makeSchema = (options: {
       }
     `,
     interfaces: {
-      Notification: {
-        resolveType(obj: Notification) {
-          if (obj.type === "ready") return "NotificationReady";
-          if (obj.type === "logout") return "NotificationLogout";
-        },
-      },
+      Notification: notificationInterface(),
     },
     objects: {
       Query: {
@@ -195,12 +224,7 @@ it("combines layer plans when one parent errors (late)", async () => {
       }
     `,
     interfaces: {
-      Notification: {
-        resolveType(obj: Notification) {
-          if (obj.type === "ready") return "NotificationReady";
-          if (obj.type === "logout") return "NotificationLogout";
-        },
-      },
+      Notification: notificationInterface(),
     },
     objects: {
       Query: {
@@ -260,12 +284,7 @@ it("combines layer plans when one parent errors (early)", async () => {
       }
     `,
     interfaces: {
-      Notification: {
-        resolveType(obj: Notification) {
-          if (obj.type === "ready") return "NotificationReady";
-          if (obj.type === "logout") return "NotificationLogout";
-        },
-      },
+      Notification: notificationInterface(),
     },
     objects: {
       Query: {
@@ -327,12 +346,7 @@ it("combines layer plans when both parents error", async () => {
       }
     `,
     interfaces: {
-      Notification: {
-        resolveType(obj: Notification) {
-          if (obj.type === "ready") return "NotificationReady";
-          if (obj.type === "logout") return "NotificationLogout";
-        },
-      },
+      Notification: notificationInterface(),
     },
     objects: {
       Query: {
@@ -383,10 +397,8 @@ it("combines layer plans when both parents error", async () => {
   ]);
 });
 
-it("does not call resolveType for list item errors", async () => {
-  let sawError = false;
-  let sawReady = false;
-  let sawLogout = false;
+it("does not attempt polymorphic planning for list item errors", async () => {
+  const seen: unknown[] = [];
   const schema = makeGrafastSchema({
     typeDefs: /* GraphQL */ `
       interface Notification {
@@ -408,22 +420,7 @@ it("does not call resolveType for list item errors", async () => {
       }
     `,
     interfaces: {
-      Notification: {
-        resolveType(obj: Notification | Error) {
-          if (obj instanceof Error) {
-            sawError = true;
-            return null;
-          }
-          if (obj.type === "ready") {
-            sawReady = true;
-            return "NotificationReady";
-          }
-          if (obj.type === "logout") {
-            sawLogout = true;
-            return "NotificationLogout";
-          }
-        },
-      },
+      Notification: notificationInterface({ seen, throwOnError: true }),
     },
     objects: {
       Query: {
@@ -462,7 +459,7 @@ it("does not call resolveType for list item errors", async () => {
   expect(result.errors?.map((error) => error.message)).to.deep.equal([
     "List item failed",
   ]);
-  expect(sawError).to.equal(false);
-  expect(sawReady).to.equal(true);
-  expect(sawLogout).to.equal(true);
+  expect(seen.some((value) => value instanceof Error)).to.equal(false);
+  expect(seen).to.deep.include({ type: "ready", id: "1", ready: true });
+  expect(seen).to.deep.include({ type: "logout", id: "2", username: "benjie" });
 });
