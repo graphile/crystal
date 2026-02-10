@@ -13,6 +13,7 @@ import {
   InterfacePlan,
   lambda,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
 import { resolveStreamDefer, streamToArray } from "./incrementalUtils.ts";
 
@@ -111,12 +112,15 @@ type SpecifiedNotification = {
   username?: string;
 };
 
-function notificationToSpecifierInterface(): InterfacePlan<Notification> {
+function notificationToSpecifierInterface(): InterfacePlan<
+  SpecifiedNotification,
+  Step<Notification>
+> {
   return {
     toSpecifier($step) {
       return lambda(
         $step,
-        (obj: Notification): SpecifiedNotification => ({
+        (obj) => ({
           kind: obj.type,
           id: obj.id,
           ready: obj.type === "ready" ? obj.ready : undefined,
