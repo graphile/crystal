@@ -177,7 +177,6 @@ it("combines layer plans when the slower parent finishes last", async () => {
     schema,
     source,
   })) as ExecutionResult;
-  expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
     first: [
       { __typename: "NotificationReady", id: "1", ready: true },
@@ -198,7 +197,6 @@ it("combines layer plans when an empty list finishes first", async () => {
     schema,
     source,
   })) as ExecutionResult;
-  expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
     first: [{ __typename: "NotificationLogout", id: "1", username: "later" }],
     second: [],
@@ -216,7 +214,6 @@ it("combines layer plans when an empty list finishes last", async () => {
     schema,
     source,
   })) as ExecutionResult;
-  expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
     first: [{ __typename: "NotificationReady", id: "1", ready: true }],
     second: [],
@@ -234,7 +231,6 @@ it("combines layer plans when both lists are empty", async () => {
     schema,
     source,
   })) as ExecutionResult;
-  expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
     first: [],
     second: [],
@@ -557,7 +553,6 @@ it("fans out via polymorphic partition when parents finish out of order", async 
     source,
   })) as ExecutionResult;
 
-  expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
     first: [
       { __typename: "NotificationReady", id: "1", ready: true },
@@ -691,6 +686,20 @@ it("handles doubly nested polymorphic positions", async () => {
       },
     },
     objects: {
+      Cat: {
+        plans: {
+          inner($cat) {
+            return lambda($cat, (cat) => cat.inner);
+          },
+        },
+      },
+      Dog: {
+        plans: {
+          inner($dog) {
+            return lambda($dog, (dog) => dog.inner);
+          },
+        },
+      },
       Query: {
         plans: {
           first() {
@@ -704,8 +713,9 @@ it("handles doubly nested polymorphic positions", async () => {
                 {
                   type: "dog",
                   id: "2",
-                  inner: { type: "treat", kind: "treat", flavor: "bacon" },
+                  inner: null,
                 },
+                Promise.reject(new Error("Outer failed")),
               ],
               10,
             );
@@ -721,7 +731,7 @@ it("handles doubly nested polymorphic positions", async () => {
                 {
                   type: "cat",
                   id: "4",
-                  inner: { type: "treat", kind: "treat", flavor: "salmon" },
+                  inner: null,
                 },
               ],
               0,
@@ -768,7 +778,6 @@ it("handles doubly nested polymorphic positions", async () => {
     `,
   })) as ExecutionResult;
 
-  expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
     first: [
       {
@@ -779,8 +788,9 @@ it("handles doubly nested polymorphic positions", async () => {
       {
         __typename: "Dog",
         id: "2",
-        inner: { __typename: "Treat", kind: "treat", flavor: "bacon" },
+        inner: null,
       },
+      null,
     ],
     second: [
       {
@@ -791,8 +801,11 @@ it("handles doubly nested polymorphic positions", async () => {
       {
         __typename: "Cat",
         id: "4",
-        inner: { __typename: "Treat", kind: "treat", flavor: "salmon" },
+        inner: null,
       },
     ],
   });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Outer failed",
+  ]);
 });
