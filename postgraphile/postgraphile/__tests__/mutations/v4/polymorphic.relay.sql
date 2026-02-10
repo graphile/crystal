@@ -12,8 +12,8 @@ where (
 );
 
 select
-  __relational_items__."id"::text as "0",
-  __relational_items__."type"::text as "1"
+  __relational_items__."type"::text as "0",
+  __relational_items__."id"::text as "1"
 from "polymorphic"."relational_items" as __relational_items__
 where (
   __relational_items__."id" = $1::"int4"
@@ -46,8 +46,8 @@ where (
 );
 
 select
-  __relational_items__."id"::text as "0",
-  __relational_items__."type"::text as "1"
+  __relational_items__."type"::text as "0",
+  __relational_items__."id"::text as "1"
 from "polymorphic"."relational_items" as __relational_items__
 where (
   __relational_items__."id" = $1::"int4"
@@ -81,8 +81,8 @@ where (
 );
 
 select
-  __single_table_items__."id"::text as "0",
-  __single_table_items__."type"::text as "1"
+  __single_table_items__."type"::text as "0",
+  __single_table_items__."id"::text as "1"
 from "polymorphic"."single_table_items" as __single_table_items__
 where (
   __single_table_items__."id" = $1::"int4"
@@ -101,8 +101,8 @@ where (
 );
 
 select
-  __single_table_items__."id"::text as "0",
-  __single_table_items__."type"::text as "1"
+  __single_table_items__."type"::text as "0",
+  __single_table_items__."id"::text as "1"
 from "polymorphic"."single_table_items" as __single_table_items__
 where (
   __single_table_items__."id" = $1::"int4"
