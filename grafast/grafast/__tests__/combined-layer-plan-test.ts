@@ -37,6 +37,9 @@ function notificationInterface(options?: {
 }): InterfacePlan<Notification> {
   const determineType = (obj: Notification) => {
     options?.seen?.push(obj);
+    if (obj == null) {
+      return null;
+    }
     switch (obj.type) {
       case "ready":
         return "NotificationReady";
