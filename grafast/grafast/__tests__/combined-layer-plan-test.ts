@@ -98,6 +98,43 @@ function notificationPartitionInterface(): InterfacePlan<Notification> {
   };
 }
 
+type SpecifiedNotification = {
+  kind: "ready" | "logout";
+  id: string;
+  ready?: boolean;
+  username?: string;
+};
+
+function notificationToSpecifierInterface(): InterfacePlan<Notification> {
+  return {
+    toSpecifier($step) {
+      return lambda(
+        $step,
+        (obj: Notification): SpecifiedNotification => ({
+          kind: obj.type,
+          id: obj.id,
+          ready: obj.type === "ready" ? obj.ready : undefined,
+          username: obj.type === "logout" ? obj.username : undefined,
+        }),
+        true,
+      );
+    },
+    planType($specifier) {
+      const $__typename = lambda(
+        $specifier,
+        (obj: SpecifiedNotification) =>
+          obj.kind === "ready"
+            ? "NotificationReady"
+            : obj.kind === "logout"
+              ? "NotificationLogout"
+              : null,
+        true,
+      );
+      return { $__typename };
+    },
+  };
+}
+
 const makeSchema = (options: {
   firstDelay: number;
   secondDelay: number;
@@ -818,4 +855,148 @@ it("handles doubly nested polymorphic positions", async () => {
   expect(result.errors?.map((error) => error.message)).to.deep.equal([
     "Outer failed",
   ]);
+});
+
+it("handles list-of-lists polymorphic positions", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        groups: [[Notification]]
+      }
+    `,
+    interfaces: {
+      Notification: notificationInterface(),
+    },
+    objects: {
+      Query: {
+        plans: {
+          groups() {
+            return lambda(null, async () => [
+              [
+                { type: "ready", id: "1", ready: true },
+                Promise.reject(new Error("Inner list failed")),
+              ],
+              null,
+              [
+                { type: "logout", id: "2", username: "benjie" },
+                null,
+              ],
+            ]);
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source: /* GraphQL */ `
+      query {
+        groups {
+          __typename
+          id
+          ... on NotificationReady {
+            ready
+          }
+          ... on NotificationLogout {
+            username
+          }
+        }
+      }
+    `,
+  })) as ExecutionResult;
+
+  expect(result.data).to.deep.equal({
+    groups: [
+      [
+        { __typename: "NotificationReady", id: "1", ready: true },
+        null,
+      ],
+      null,
+      [
+        { __typename: "NotificationLogout", id: "2", username: "benjie" },
+        null,
+      ],
+    ],
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Inner list failed",
+  ]);
+});
+
+it("uses toSpecifier when fanning in polymorphic positions", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        first: [Notification]
+        second: [Notification]
+      }
+    `,
+    interfaces: {
+      Notification: notificationToSpecifierInterface(),
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return delay(
+              [
+                { type: "ready", id: "1", ready: true },
+                { type: "logout", id: "2", username: "benjie" },
+              ],
+              10,
+            );
+          },
+          second() {
+            return delay(
+              [{ type: "ready", id: "3", ready: false }],
+              0,
+            );
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source,
+  })) as ExecutionResult;
+
+  expect(result.errors).to.be.undefined;
+  expect(result.data).to.deep.equal({
+    first: [
+      { __typename: "NotificationReady", id: "1", ready: true },
+      { __typename: "NotificationLogout", id: "2", username: "benjie" },
+    ],
+    second: [{ __typename: "NotificationReady", id: "3", ready: false }],
+  });
 });
