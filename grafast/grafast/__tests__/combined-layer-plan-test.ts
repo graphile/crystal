@@ -5,7 +5,13 @@ import { expect } from "chai";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import { constant, grafast, lambda, makeGrafastSchema } from "../dist/index.js";
+import {
+  constant,
+  grafast,
+  InterfacePlan,
+  lambda,
+  makeGrafastSchema,
+} from "../dist/index.js";
 
 type Notification =
   | { type: "ready"; id: string; ready: boolean }
@@ -26,34 +32,26 @@ function delay<T>(value: T, delay: number) {
 
 function notificationInterface(options?: {
   seen?: unknown[];
-  throwOnError?: boolean;
-}) {
+}): InterfacePlan<Notification> {
+  const determineType = (obj: Notification) => {
+    options?.seen?.push(obj);
+    switch (obj.type) {
+      case "ready":
+        return "NotificationReady";
+      case "logout":
+        return "NotificationLogout";
+      default: {
+        if ((obj as any) instanceof Error) {
+          throw new Error("Saw error in planType");
+        }
+        return null;
+      }
+    }
+  };
   return {
-    planType($specifier: any) {
-      const $__typename = lambda(
-        $specifier,
-        (obj: Notification | Error) => {
-          options?.seen?.push(obj);
-          if (obj instanceof Error) {
-            if (options?.throwOnError) {
-              throw new Error("Saw error in planType");
-            }
-            return null;
-          }
-          return obj.type === "ready"
-            ? "NotificationReady"
-            : obj.type === "logout"
-              ? "NotificationLogout"
-              : null;
-        },
-        true,
-      );
-      return {
-        $__typename,
-        planForType() {
-          return $specifier;
-        },
-      };
+    planType($specifier) {
+      const $__typename = lambda($specifier, determineType, true);
+      return { $__typename, planForType: () => $specifier };
     },
   };
 }
@@ -420,7 +418,7 @@ it("does not attempt polymorphic planning for list item errors", async () => {
       }
     `,
     interfaces: {
-      Notification: notificationInterface({ seen, throwOnError: true }),
+      Notification: notificationInterface({ seen }),
     },
     objects: {
       Query: {
@@ -460,6 +458,7 @@ it("does not attempt polymorphic planning for list item errors", async () => {
     "List item failed",
   ]);
   expect(seen.some((value) => value instanceof Error)).to.equal(false);
+  expect(seen).to.have.length(2);
   expect(seen).to.deep.include({ type: "ready", id: "1", ready: true });
   expect(seen).to.deep.include({ type: "logout", id: "2", username: "benjie" });
 });
