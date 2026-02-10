@@ -689,14 +689,14 @@ it("handles doubly nested polymorphic positions", async () => {
       Cat: {
         plans: {
           inner($cat) {
-            return lambda($cat, (cat) => cat.inner);
+            return lambda($cat, (cat: any) => cat.inner);
           },
         },
       },
       Dog: {
         plans: {
           inner($dog) {
-            return lambda($dog, (dog) => dog.inner);
+            return lambda($dog, (dog: any) => dog.inner);
           },
         },
       },
@@ -716,6 +716,11 @@ it("handles doubly nested polymorphic positions", async () => {
                   inner: null,
                 },
                 Promise.reject(new Error("Outer failed")),
+                {
+                  type: "dog",
+                  id: "5",
+                  inner: { type: "toy", kind: "toy", color: "green" },
+                },
               ],
               10,
             );
@@ -791,6 +796,11 @@ it("handles doubly nested polymorphic positions", async () => {
         inner: null,
       },
       null,
+      {
+        __typename: "Dog",
+        id: "5",
+        inner: { __typename: "Toy", kind: "toy", color: "green" },
+      },
     ],
     second: [
       {
