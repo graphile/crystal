@@ -703,8 +703,9 @@ it("handles doubly nested polymorphic positions", async () => {
       Query: {
         plans: {
           first() {
-            return delay(
-              [
+            return lambda(null, async () => {
+              await sleep(10);
+              return [
                 {
                   type: "cat",
                   id: "1",
@@ -721,13 +722,13 @@ it("handles doubly nested polymorphic positions", async () => {
                   id: "5",
                   inner: { type: "toy", kind: "toy", color: "green" },
                 },
-              ],
-              10,
-            );
+              ];
+            });
           },
           second() {
-            return delay(
-              [
+            return lambda(null, async () => {
+              await sleep(0);
+              return [
                 {
                   type: "dog",
                   id: "3",
@@ -738,9 +739,8 @@ it("handles doubly nested polymorphic positions", async () => {
                   id: "4",
                   inner: null,
                 },
-              ],
-              0,
-            );
+              ];
+            });
           },
         },
       },
