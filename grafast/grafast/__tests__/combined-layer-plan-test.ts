@@ -37,10 +37,7 @@ function notificationInterface(options?: {
 }): InterfacePlan<Notification> {
   const determineType = (obj: Notification) => {
     options?.seen?.push(obj);
-    if (obj == null) {
-      return null;
-    }
-    switch (obj.type) {
+    switch (obj?.type) {
       case "ready":
         return "NotificationReady";
       case "logout":
@@ -48,6 +45,9 @@ function notificationInterface(options?: {
       default: {
         if ((obj as any) instanceof Error) {
           throw new Error("Saw error in planType");
+        }
+        if (obj == null) {
+          throw new Error(`Saw ${obj} in planType`);
         }
         return null;
       }
