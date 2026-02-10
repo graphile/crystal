@@ -504,25 +504,19 @@ export function executeBucket(
         const count = step._isUnary ? 1 : size;
         for (let dataIndex = 0; dataIndex < count; dataIndex++) {
           const val = results[dataIndex];
+          const valFlags = flags[dataIndex];
+          if (valFlags == null) {
+            throw new Error(
+              `GraphileInternalError<75df71bb-0f76-4a98-9664-9167d502296a>: result for ${step} has no flag at index ${dataIndex} (value = ${inspect(
+                val,
+              )})`,
+            );
+          }
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
-            if (flags[dataIndex] == null) {
-              throw new Error(
-                `GraphileInternalError<75df71bb-0f76-4a98-9664-9167d502296a>: result for ${step} has no flag at index ${dataIndex} (value = ${inspect(
-                  val,
-                )})`,
-              );
-            }
-            success(step, bucket, dataIndex, val, flags[dataIndex]);
+            success(step, bucket, dataIndex, val, valFlags);
           } else {
             const valSuccess = val.then(
-              (val) =>
-                void success(
-                  step,
-                  bucket,
-                  dataIndex,
-                  val,
-                  NO_FLAGS, // TODO: where does `flags[dataIndex]` come into this?
-                ),
+              (val) => void success(step, bucket, dataIndex, val, valFlags),
               (error) =>
                 void bucket.setResult(step, dataIndex, error, FLAG_ERROR),
             );
