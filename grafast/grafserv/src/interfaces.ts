@@ -94,6 +94,8 @@ export interface ProcessRequestEvent {
 }
 
 export interface RuruHTMLEvent {
+  /** @internal */
+  _ruruServer: typeof import("ruru/server");
   resolvedPreset: GraphileConfig.ResolvedPreset;
   config: RuruConfig;
   htmlParts: RuruHTMLParts;
