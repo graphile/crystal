@@ -118,10 +118,10 @@ export class GraphQLResolverStep extends UnbatchedStep {
       return flagErrorIfErrorAsync(data);
     } else {
       if (this.isNotRoot) {
-        return Promise.reject(new Error(`Invalid non-root subscribe`));
+        return flagError(new Error(`Invalid non-root subscribe`));
       }
       if (this.subscriber == null) {
-        return Promise.reject(new Error(`Cannot subscribe to field`));
+        return flagError(new Error(`Cannot subscribe to field`));
       }
       const resolveInfo: GraphQLResolveInfo = Object.assign(
         Object.create(this.resolveInfoBase),

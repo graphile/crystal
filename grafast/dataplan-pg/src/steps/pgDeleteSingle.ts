@@ -4,7 +4,15 @@ import type {
   Maybe,
   PromiseOrDirect,
 } from "grafast";
-import { access, exportAs, inspect, isDev, SafeError, Step } from "grafast";
+import {
+  access,
+  exportAs,
+  flagError,
+  inspect,
+  isDev,
+  SafeError,
+  Step,
+} from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -341,7 +349,7 @@ export class PgDeleteSingleStep<
         values: sqlValues,
       });
       if (rowCount === 0) {
-        return Promise.reject(
+        return flagError(
           new Error(
             `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
           ),
