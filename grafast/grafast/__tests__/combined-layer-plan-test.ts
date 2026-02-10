@@ -624,3 +624,175 @@ it("respects nullable boundaries before polymorphism", async () => {
     "Cannot return null for non-nullable field Query.first.",
   ]);
 });
+
+it("handles doubly nested polymorphic positions", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Outer {
+        id: ID!
+        inner: Inner
+      }
+
+      type Cat implements Outer {
+        id: ID!
+        inner: Inner
+      }
+
+      type Dog implements Outer {
+        id: ID!
+        inner: Inner
+      }
+
+      interface Inner {
+        kind: String!
+      }
+
+      type Toy implements Inner {
+        kind: String!
+        color: String!
+      }
+
+      type Treat implements Inner {
+        kind: String!
+        flavor: String!
+      }
+
+      type Query {
+        first: [Outer]
+        second: [Outer]
+      }
+    `,
+    interfaces: {
+      Outer: {
+        planType($specifier) {
+          const $__typename = lambda(
+            $specifier,
+            (obj: { type: string }) =>
+              obj.type === "cat" ? "Cat" : obj.type === "dog" ? "Dog" : null,
+            true,
+          );
+          return { $__typename, planForType: () => $specifier };
+        },
+      },
+      Inner: {
+        planType($specifier) {
+          const $__typename = lambda(
+            $specifier,
+            (obj: { type: string }) =>
+              obj.type === "toy"
+                ? "Toy"
+                : obj.type === "treat"
+                  ? "Treat"
+                  : null,
+            true,
+          );
+          return { $__typename, planForType: () => $specifier };
+        },
+      },
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return delay(
+              [
+                {
+                  type: "cat",
+                  id: "1",
+                  inner: { type: "toy", kind: "toy", color: "red" },
+                },
+                {
+                  type: "dog",
+                  id: "2",
+                  inner: { type: "treat", kind: "treat", flavor: "bacon" },
+                },
+              ],
+              10,
+            );
+          },
+          second() {
+            return delay(
+              [
+                {
+                  type: "dog",
+                  id: "3",
+                  inner: { type: "toy", kind: "toy", color: "blue" },
+                },
+                {
+                  type: "cat",
+                  id: "4",
+                  inner: { type: "treat", kind: "treat", flavor: "salmon" },
+                },
+              ],
+              0,
+            );
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source: /* GraphQL */ `
+      query {
+        first {
+          __typename
+          id
+          inner {
+            __typename
+            kind
+            ... on Toy {
+              color
+            }
+            ... on Treat {
+              flavor
+            }
+          }
+        }
+        second {
+          __typename
+          id
+          inner {
+            __typename
+            kind
+            ... on Toy {
+              color
+            }
+            ... on Treat {
+              flavor
+            }
+          }
+        }
+      }
+    `,
+  })) as ExecutionResult;
+
+  expect(result.errors).to.be.undefined;
+  expect(result.data).to.deep.equal({
+    first: [
+      {
+        __typename: "Cat",
+        id: "1",
+        inner: { __typename: "Toy", kind: "toy", color: "red" },
+      },
+      {
+        __typename: "Dog",
+        id: "2",
+        inner: { __typename: "Treat", kind: "treat", flavor: "bacon" },
+      },
+    ],
+    second: [
+      {
+        __typename: "Dog",
+        id: "3",
+        inner: { __typename: "Toy", kind: "toy", color: "blue" },
+      },
+      {
+        __typename: "Cat",
+        id: "4",
+        inner: { __typename: "Treat", kind: "treat", flavor: "salmon" },
+      },
+    ],
+  });
+});
