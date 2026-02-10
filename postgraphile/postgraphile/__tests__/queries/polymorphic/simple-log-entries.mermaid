@@ -11,10 +11,10 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 31, 11<br />2: PgSelect[8]<br />3: Connection[12]<br />4: ConnectionItems[14]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 11, 31<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 11, 31<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 11, 31<br /><br />ROOT PgSelectSingle{3}ᐸlog_entriesᐳ[18]<br />1: <br />ᐳ: 19, 20, 21<br />2: PgUnionAll[22]<br />ᐳ: 53, 26, 29, 30, 32, 33, 34"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[34]<br />Deps: 34, 33, 11"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|Organization<br />Deps: 33, 11<br />ᐳOrganization<br /><br />1: <br />ᐳ: Access[35]<br />2: PgSelect[36]<br />3: PgSelectRows[41]<br />ᐳ: 40, 42, 51"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|Person<br />Deps: 33, 11<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[43]<br />2: PgSelect[44]<br />3: PgSelectRows[49]<br />ᐳ: 48, 50, 52"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 11, 31<br /><br />ROOT PgSelectSingle{3}ᐸlog_entriesᐳ[18]<br />1: <br />ᐳ: 19, 20, 21<br />2: PgUnionAll[22]<br />ᐳ: 54, 26, 29, 30, 32, 33, 35"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[35]<br />Deps: 35, 33, 11"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|Organization<br />Deps: 33, 11<br />ᐳOrganization<br /><br />1: <br />ᐳ: Access[36]<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />ᐳ: 41, 43, 52"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|Person<br />Deps: 33, 11<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[44]<br />2: PgSelect[45]<br />3: PgSelectRows[50]<br />ᐳ: 49, 51, 53"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -52,39 +52,39 @@ graph TD
     PgSelectSingle18 --> PgClassExpression20
     PgSelectSingle18 --> PgClassExpression21
     First26{{"First[26∈4]"}}:::plan
-    Access53{{"Access[53∈4]<br />ᐸ22.itemsᐳ"}}:::plan
-    Access53 --> First26
+    Access54{{"Access[54∈4]<br />ᐸ22.itemsᐳ"}}:::plan
+    Access54 --> First26
     First26 --> Access29
     First26 --> Access30
     Lambda33{{"Lambda[33∈4]<br />ᐸtoSpecifierᐳ"}}:::plan
     List32 --> Lambda33
-    Access34{{"Access[34∈4]<br />ᐸ33.__typenameᐳ"}}:::plan
-    Lambda33 --> Access34
-    PgUnionAll22 --> Access53
-    PgSelect36[["PgSelect[36∈6]^<br />ᐸorganizationsᐳ<br />More deps:<br />- Object[11]"]]:::plan
-    Access35{{"Access[35∈6]<br />ᐸ33.organization_idᐳ<br />ᐳOrganization"}}:::plan
-    Access35 --> PgSelect36
-    Lambda33 --> Access35
-    First40{{"First[40∈6]^"}}:::plan
-    PgSelectRows41[["PgSelectRows[41∈6]^"]]:::plan
-    PgSelectRows41 --> First40
-    PgSelect36 --> PgSelectRows41
-    PgSelectSingle42{{"PgSelectSingle[42∈6]^<br />ᐸorganizationsᐳ"}}:::plan
-    First40 --> PgSelectSingle42
-    PgClassExpression51{{"PgClassExpression[51∈6]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression51
-    PgSelect44[["PgSelect[44∈7]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[11]"]]:::plan
-    Access43{{"Access[43∈7]<br />ᐸ33.person_idᐳ<br />ᐳPerson"}}:::plan
-    Access43 --> PgSelect44
-    Lambda33 --> Access43
-    First48{{"First[48∈7]^"}}:::plan
-    PgSelectRows49[["PgSelectRows[49∈7]^"]]:::plan
-    PgSelectRows49 --> First48
-    PgSelect44 --> PgSelectRows49
-    PgSelectSingle50{{"PgSelectSingle[50∈7]^<br />ᐸpeopleᐳ"}}:::plan
-    First48 --> PgSelectSingle50
-    PgClassExpression52{{"PgClassExpression[52∈7]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle50 --> PgClassExpression52
+    Access35{{"Access[35∈4]<br />ᐸ33.__typenameᐳ"}}:::plan
+    Lambda33 -->|rejectNull| Access35
+    PgUnionAll22 --> Access54
+    PgSelect37[["PgSelect[37∈6]^<br />ᐸorganizationsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Access36{{"Access[36∈6]<br />ᐸ33.organization_idᐳ<br />ᐳOrganization"}}:::plan
+    Access36 --> PgSelect37
+    Lambda33 -->|rejectNull| Access36
+    First41{{"First[41∈6]^"}}:::plan
+    PgSelectRows42[["PgSelectRows[42∈6]^"]]:::plan
+    PgSelectRows42 --> First41
+    PgSelect37 --> PgSelectRows42
+    PgSelectSingle43{{"PgSelectSingle[43∈6]^<br />ᐸorganizationsᐳ"}}:::plan
+    First41 --> PgSelectSingle43
+    PgClassExpression52{{"PgClassExpression[52∈6]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression52
+    PgSelect45[["PgSelect[45∈7]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Access44{{"Access[44∈7]<br />ᐸ33.person_idᐳ<br />ᐳPerson"}}:::plan
+    Access44 --> PgSelect45
+    Lambda33 -->|rejectNull| Access44
+    First49{{"First[49∈7]^"}}:::plan
+    PgSelectRows50[["PgSelectRows[50∈7]^"]]:::plan
+    PgSelectRows50 --> First49
+    PgSelect45 --> PgSelectRows50
+    PgSelectSingle51{{"PgSelectSingle[51∈7]^<br />ᐸpeopleᐳ"}}:::plan
+    First49 --> PgSelectSingle51
+    PgClassExpression53{{"PgClassExpression[53∈7]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle51 --> PgClassExpression53
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -94,11 +94,11 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item17,PgSelectSingle18 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgUnionAll22,First26,Access29,Access30,List32,Lambda33,Access34,Access53 bucket4
+    class Bucket4,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgUnionAll22,First26,Access29,Access30,List32,Lambda33,Access35,Access54 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,Access35,PgSelect36,First40,PgSelectRows41,PgSelectSingle42,PgClassExpression51 bucket6
+    class Bucket6,Access36,PgSelect37,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression52 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,Access43,PgSelect44,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression52 bucket7
+    class Bucket7,Access44,PgSelect45,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression53 bucket7
 

@@ -9,8 +9,8 @@ graph TD
 
     subgraph "Buckets for queries/polymorphic/manyColumnsTable"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 13, 14, 25, 27, 29, 32, 15, 28, 31<br />2: PgSelect[12]<br />3: PgSelectRows[17]<br />ᐳ: 16, 18, 19, 20, 21<br />4: PgSelect[22]<br />5: Connection[24]<br />ᐳ: Object[33]<br />6: ConnectionItems[34]"):::bucket
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ34ᐳ[37]"):::bucket
-    Bucket3("Bucket 3 (polymorphic)<br />__typename: Lambda[41]<br />Deps: 41, 39, 42"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ34ᐳ[37]<br />1: <br />ᐳ: 38, 39<br />2: __Flag[40]<br />ᐳ: Access[41], Lambda[42], Access[43]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />__typename: Lambda[42]<br />Deps: 42, 40, 43"):::bucket
     end
     Bucket0 --> Bucket2
     Bucket2 --> Bucket3
@@ -60,18 +60,20 @@ graph TD
     __Item37 --> PgSelectSingle38
     PgClassExpression39{{"PgClassExpression[39∈2]<br />ᐸ__collections__ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression39
-    PgClassExpression40{{"PgClassExpression[40∈2]<br />ᐸ(__collect...__).”type”ᐳ"}}:::plan
-    PgSelectSingle38 --> PgClassExpression40
-    Lambda41{{"Lambda[41∈2]<br />ᐸrecommendationTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression40 --> Lambda41
-    PgClassExpression42{{"PgClassExpression[42∈2]<br />ᐸ(__collections__).”id”ᐳ"}}:::plan
-    PgClassExpression39 o--o PgClassExpression42
+    __Flag40[["__Flag[40∈2]<br />ᐸ39, rejectNull, onReject: INHIBITᐳ"]]:::plan
+    PgClassExpression39 -->|rejectNull| __Flag40
+    Access41{{"Access[41∈2]<br />ᐸ40.typeᐳ"}}:::plan
+    __Flag40 --> Access41
+    Lambda42{{"Lambda[42∈2]<br />ᐸrecommendationTypeNameFromTypeᐳ"}}:::plan
+    Access41 --> Lambda42
+    Access43{{"Access[43∈2]<br />ᐸ40.idᐳ"}}:::plan
+    __Flag40 --> Access43
 
     %% define steps
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value2,Access6,PgSelect12,Access13,Access14,Object15,First16,PgSelectRows17,PgSelectSingle18,PgClassExpression19,Access20,Lambda21,PgSelect22,Connection24,Access25,Coalesce28,Access29,Lambda31,ConnectionItems34 bucket0
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item37,PgSelectSingle38,PgClassExpression39,PgClassExpression40,Lambda41,PgClassExpression42 bucket2
+    class Bucket2,__Item37,PgSelectSingle38,PgClassExpression39,__Flag40,Access41,Lambda42,Access43 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
 
