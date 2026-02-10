@@ -1,15 +1,28 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
+import { setTimeout as sleep } from "node:timers/promises";
+
 import { expect } from "chai";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import { grafast, lambda, makeGrafastSchema } from "../dist/index.js";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { constant, grafast, lambda, makeGrafastSchema } from "../dist/index.js";
 
 type Notification =
   | { type: "ready"; id: string; ready: boolean }
   | { type: "logout"; id: string; username: string };
+
+interface DelayOptions<T> {
+  value: T;
+  delay: number;
+}
+/** Runtime delay function */
+function _delay<T>({ value, delay }: DelayOptions<T>) {
+  return delay >= 0 ? sleep(delay).then(() => value) : value;
+}
+/** Plan-time delay function */
+function delay<T>(value: T, delay: number) {
+  return lambda(constant({ value, delay }), _delay);
+}
 
 const makeSchema = (options: {
   firstDelay: number;
@@ -34,8 +47,8 @@ const makeSchema = (options: {
       }
 
       type Query {
-        first: [Notification!]!
-        second: [Notification!]!
+        first: [Notification]
+        second: [Notification]
       }
     `,
     interfaces: {
@@ -49,22 +62,8 @@ const makeSchema = (options: {
     objects: {
       Query: {
         plans: {
-          first() {
-            return lambda(null, async () => {
-              if (options.firstDelay > 0) {
-                await sleep(options.firstDelay);
-              }
-              return options.first;
-            });
-          },
-          second() {
-            return lambda(null, async () => {
-              if (options.secondDelay > 0) {
-                await sleep(options.secondDelay);
-              }
-              return options.second;
-            });
-          },
+          first: () => delay(options.first, options.firstDelay),
+          second: () => delay(options.second, options.secondDelay),
         },
       },
     },
@@ -173,7 +172,7 @@ it("combines layer plans when both lists are empty", async () => {
   });
 });
 
-it("combines layer plans when one parent errors", async () => {
+it("combines layer plans when one parent errors (late)", async () => {
   const schema = makeGrafastSchema({
     typeDefs: /* GraphQL */ `
       interface Notification {
@@ -191,8 +190,8 @@ it("combines layer plans when one parent errors", async () => {
       }
 
       type Query {
-        first: [Notification!]!
-        second: [Notification!]!
+        first: [Notification]
+        second: [Notification]
       }
     `,
     interfaces: {
@@ -235,5 +234,84 @@ it("combines layer plans when one parent errors", async () => {
   });
   expect(result.errors?.map((error) => error.message)).to.deep.equal([
     "First failed",
+  ]);
+});
+
+it("combines layer plans when both parents error", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        first: [Notification]
+        second: [Notification]
+      }
+    `,
+    interfaces: {
+      Notification: {
+        resolveType(obj: Notification) {
+          if (obj.type === "ready") return "NotificationReady";
+          if (obj.type === "logout") return "NotificationLogout";
+        },
+      },
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return lambda(null, async () => {
+              return [
+                Promise.reject(new Error("First failed")),
+                { type: "ready", id: "3", ready: false },
+                Promise.reject(new Error("First failed again")),
+              ];
+            });
+          },
+          second() {
+            return lambda(null, async () => {
+              await sleep(5);
+              return [
+                { type: "ready", id: "1", ready: true },
+                Promise.reject(new Error("Second failed")),
+                { type: "logout", id: "2", username: "benjie" },
+              ];
+            });
+          },
+        },
+      },
+    },
+  });
+  const result = (await grafast({
+    schema,
+    source,
+  })) as ExecutionResult;
+  expect(result.data).to.deep.equal({
+    first: [
+      null,
+      { __typename: "NotificationReady", id: "3", ready: false },
+      null,
+    ],
+    second: [
+      { __typename: "NotificationReady", id: "1", ready: true },
+      null,
+      { __typename: "NotificationLogout", id: "2", username: "benjie" },
+    ],
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "First failed",
+    "First failed again",
+    "Second failed",
   ]);
 });
