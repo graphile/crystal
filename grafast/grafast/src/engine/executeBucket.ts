@@ -278,7 +278,7 @@ export function executeBucket(
       // **USE DEFENSIVE PROGRAMMING HERE!**
 
       /** PROMISES ADDED HERE MUST NOT REJECT */
-      let promises: PromiseLike<void>[] | undefined;
+      let promises: PromiseLike<void>[] | undefined = undefined;
 
       // TODO: it seems that if this throws an error it results in a permanent
       // hang of defers? In the mean time... Don't throw any errors here!
@@ -347,11 +347,12 @@ export function executeBucket(
               }
               replacement[i] = null;
               const index = i;
+              // Must not reject
               const promise = item.then(
                 (v) => void (replacement![index] = v),
                 (e) => void (replacement![index] = flagError(e)),
               );
-              if (!promises) {
+              if (promises === undefined) {
                 promises = [promise];
               } else {
                 promises.push(promise);
@@ -480,7 +481,7 @@ export function executeBucket(
                 );
               }
             })();
-            if (!promises) {
+            if (promises === undefined) {
               promises = [promise];
             } else {
               promises.push(promise);
@@ -520,7 +521,7 @@ export function executeBucket(
               (error) => bucket.setResult(step, dataIndex, error, FLAG_ERROR),
             );
 
-            if (!promises) {
+            if (promises === undefined) {
               promises = [valSuccess];
             } else {
               promises.push(valSuccess);
@@ -529,11 +530,7 @@ export function executeBucket(
         }
       }
 
-      if (promises !== undefined) {
-        return Promise.all(promises);
-      } else {
-        return undefined;
-      }
+      return promises === undefined ? undefined : Promise.all(promises);
     };
 
     const runSyncSteps = () => {
