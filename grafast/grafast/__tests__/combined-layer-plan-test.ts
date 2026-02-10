@@ -2,6 +2,7 @@
 import { setTimeout as sleep } from "node:timers/promises";
 
 import { expect } from "chai";
+import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
@@ -12,12 +13,19 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
+import {
+  resolveStreamDefer,
+  streamToArray,
+} from "./incrementalUtils.ts";
 
 type Notification =
   | { type: "ready"; id: string; ready: boolean }
   | { type: "logout"; id: string; username: string };
 type ReadyNotification = Extract<Notification, { type: "ready" }>;
 type LogoutNotification = Extract<Notification, { type: "logout" }>;
+
+const resolvedPreset = resolvePreset({});
+const requestContext = {};
 
 interface DelayOptions<T> {
   value: T;
@@ -990,6 +998,100 @@ it("uses toSpecifier when fanning in polymorphic positions", async () => {
     schema,
     source,
   })) as ExecutionResult;
+
+  expect(result.errors).to.be.undefined;
+  expect(result.data).to.deep.equal({
+    first: [
+      { __typename: "NotificationReady", id: "1", ready: true },
+      { __typename: "NotificationLogout", id: "2", username: "benjie" },
+    ],
+    second: [{ __typename: "NotificationReady", id: "3", ready: false }],
+  });
+});
+
+it("streams combined polymorphic lists", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        first: [Notification]
+        second: [Notification]
+      }
+    `,
+    interfaces: {
+      Notification: notificationInterface(),
+    },
+    objects: {
+      Query: {
+        plans: {
+          first() {
+            return delay(
+              [
+                { type: "ready", id: "1", ready: true },
+                { type: "logout", id: "2", username: "benjie" },
+              ],
+              10,
+            );
+          },
+          second() {
+            return delay(
+              [{ type: "ready", id: "3", ready: false }],
+              0,
+            );
+          },
+        },
+      },
+    },
+    enableDeferStream: true,
+  });
+
+  const stream = await grafast({
+    schema,
+    source: /* GraphQL */ `
+      query {
+        first @stream(initialCount: 1) {
+          __typename
+          id
+          ... on NotificationReady {
+            ready
+          }
+          ... on NotificationLogout {
+            username
+          }
+        }
+        second @stream(initialCount: 1) {
+          __typename
+          id
+          ... on NotificationReady {
+            ready
+          }
+          ... on NotificationLogout {
+            username
+          }
+        }
+      }
+    `,
+    resolvedPreset,
+    requestContext,
+  });
+
+  const payloads = await streamToArray(stream);
+  const result = Array.isArray(payloads)
+    ? resolveStreamDefer(payloads)
+    : payloads;
 
   expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
