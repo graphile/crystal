@@ -280,14 +280,6 @@ export function executeBucket(
       /** PROMISES ADDED HERE MUST NOT REJECT */
       let promises: PromiseLike<void>[] | undefined;
       let pendingPromises: PromiseLike<any>[] | undefined;
-      let pendingPromiseIndexes:
-        | Array<{
-            /** The step (results) index */
-            s: number;
-            /** The data index */
-            i: number;
-          }>
-        | undefined;
 
       // TODO: it seems that if this throws an error it results in a permanent
       // hang of defers? In the mean time... Don't throw any errors here!
@@ -522,65 +514,32 @@ export function executeBucket(
             }
             success(step, bucket, dataIndex, val, flags[dataIndex]);
           } else {
+            const valSuccess = val.then(
+              (val) =>
+                void success(
+                  step,
+                  bucket,
+                  dataIndex,
+                  val,
+                  NO_FLAGS, // TODO: where does `flags[dataIndex]` come into this?
+                ),
+              (error) =>
+                void bucket.setResult(step, dataIndex, error, FLAG_ERROR),
+            );
+
             if (!pendingPromises) {
-              pendingPromises = [val];
-              pendingPromiseIndexes = [{ s: allStepsIndex, i: dataIndex }];
+              pendingPromises = [valSuccess];
             } else {
-              pendingPromises.push(val);
-              pendingPromiseIndexes!.push({ s: allStepsIndex, i: dataIndex });
+              pendingPromises.push(valSuccess);
             }
           }
         }
       }
 
       if (pendingPromises !== undefined) {
-        return Promise.allSettled(pendingPromises)
-          .then((resultSettledResult) => {
-            for (
-              let i = 0, pendingPromisesLength = resultSettledResult.length;
-              i < pendingPromisesLength;
-              i++
-            ) {
-              const settledResult = resultSettledResult[i];
-              const { s: allStepsIndex, i: dataIndex } =
-                pendingPromiseIndexes![i];
-              const finishedStep = _allSteps[allStepsIndex];
-              if (settledResult.status === "fulfilled") {
-                success(
-                  finishedStep,
-                  bucket,
-                  dataIndex,
-                  settledResult.value,
-                  NO_FLAGS,
-                );
-              } else {
-                const error = settledResult.reason;
-                bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
-              }
-            }
-            return promises ? Promise.all(promises) : undefined;
-          })
-          .then(null, (e) => {
-            // THIS SHOULD NEVER HAPPEN!
-            console.error(
-              `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
-            );
-
-            bucket.flagUnion |= FLAG_ERROR;
-            for (
-              let i = 0, pendingPromisesLength = pendingPromises!.length;
-              i < pendingPromisesLength;
-              i++
-            ) {
-              const { s: allStepsIndex, i: dataIndex } =
-                pendingPromiseIndexes![i];
-              const finishedStep = _allSteps[allStepsIndex];
-              const error = new Error(
-                `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-              );
-              bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
-            }
-          });
+        return Promise.all(pendingPromises).then(() =>
+          promises ? Promise.all(promises) : undefined,
+        );
       } else {
         return promises ? Promise.all(promises) : undefined;
       }
