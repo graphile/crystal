@@ -223,6 +223,16 @@ export function wrapPlans<T>(
             } else if (Self.extensions?.grafast?.assertStep) {
               // It's fine; we know we must be running in step (not resolver
               // emulation) context due to assertStep
+            } else if (
+              context.scope.isConnectionEdgeType ||
+              context.scope.isPageInfo ||
+              context.scope.isPgRangeType ||
+              context.scope.isPgRangeBoundType ||
+              context.scope.isPgPointType
+            ) {
+              // These all expect to use the default plan resolver.
+              // TODO: when we have diagnostics we should point out wrapping
+              // these adds overhead where there needn't be any.
             } else {
               queueResolverEmulationWarning(`${Self.name}.${fieldName}`);
             }
