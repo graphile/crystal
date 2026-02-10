@@ -5,7 +5,7 @@ import type {
   GrafastResultsList,
   PromiseOrDirect,
 } from "grafast";
-import { access, exportAs, Step } from "grafast";
+import { access, exportAs, flagError, Step } from "grafast";
 
 export type JSONValue =
   | string
@@ -69,12 +69,12 @@ export class JSONParseStep<TJSON extends JSONValue> extends Step<TJSON> {
         try {
           return JSON.parse(v);
         } catch (e) {
-          return Promise.reject(e);
+          return flagError(e as Error);
         }
       } else if (v == null) {
         return null as any;
       } else {
-        return Promise.reject(
+        return flagError(
           new Error(
             `JSONParseStep: expected string to parse, but received ${
               Array.isArray(v) ? "array" : typeof v
