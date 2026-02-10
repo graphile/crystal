@@ -382,3 +382,87 @@ it("combines layer plans when both parents error", async () => {
     "Second failed",
   ]);
 });
+
+it("does not call resolveType for list item errors", async () => {
+  let sawError = false;
+  let sawReady = false;
+  let sawLogout = false;
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Notification {
+        id: ID!
+      }
+
+      type NotificationReady implements Notification {
+        id: ID!
+        ready: Boolean!
+      }
+
+      type NotificationLogout implements Notification {
+        id: ID!
+        username: String!
+      }
+
+      type Query {
+        notifications: [Notification]
+      }
+    `,
+    interfaces: {
+      Notification: {
+        resolveType(obj: Notification | Error) {
+          if (obj instanceof Error) {
+            sawError = true;
+            return null;
+          }
+          if (obj.type === "ready") {
+            sawReady = true;
+            return "NotificationReady";
+          }
+          if (obj.type === "logout") {
+            sawLogout = true;
+            return "NotificationLogout";
+          }
+        },
+      },
+    },
+    objects: {
+      Query: {
+        plans: {
+          notifications() {
+            return lambda(null, async () => [
+              { type: "ready", id: "1", ready: true },
+              Promise.reject(new Error("List item failed")),
+              { type: "logout", id: "2", username: "benjie" },
+            ]);
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source: /* GraphQL */ `
+      query {
+        notifications {
+          __typename
+          id
+        }
+      }
+    `,
+  })) as ExecutionResult;
+
+  expect(result.data).to.deep.equal({
+    notifications: [
+      { __typename: "NotificationReady", id: "1" },
+      null,
+      { __typename: "NotificationLogout", id: "2" },
+    ],
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "List item failed",
+  ]);
+  expect(sawError).to.equal(false);
+  expect(sawReady).to.equal(true);
+  expect(sawLogout).to.equal(true);
+});
