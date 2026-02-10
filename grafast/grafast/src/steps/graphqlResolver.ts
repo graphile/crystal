@@ -184,6 +184,7 @@ export class GraphQLResolveTypeStep extends Step {
     context: unknown,
     resolveInfo: GraphQLResolveInfo,
   ) {
+    if (data == null) return data;
     const abstractType = this.abstractType;
     if (abstractType.resolveType != null) {
       return abstractType.resolveType(data, context, resolveInfo, abstractType);
