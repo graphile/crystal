@@ -44,7 +44,6 @@ import {
   $$inhibit,
   error,
   get,
-  inhibitOnNull,
   isDev,
   object,
   SafeError,
@@ -1994,14 +1993,12 @@ export class OperationPlan {
         };
         let polymorphicTypePlanner: AbstractTypePlanner;
         try {
-          const planTypeWithInhibit = (specifier: Step, info: PlanTypeInfo) =>
-            planType(inhibitOnNull(specifier), info);
           polymorphicTypePlanner = withGlobalLayerPlan(
             commonLayerPlan,
             combinedPolymorphicPaths,
             planningPath,
             null,
-            planTypeWithInhibit,
+            planType,
             null,
             commonStep,
             info,
