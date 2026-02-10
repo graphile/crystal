@@ -279,7 +279,6 @@ export function executeBucket(
 
       /** PROMISES ADDED HERE MUST NOT REJECT */
       let promises: PromiseLike<void>[] | undefined;
-      let pendingPromises: PromiseLike<any>[] | undefined;
 
       // TODO: it seems that if this throws an error it results in a permanent
       // hang of defers? In the mean time... Don't throw any errors here!
@@ -515,27 +514,25 @@ export function executeBucket(
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
             success(step, bucket, dataIndex, val, valFlags);
           } else {
+            // Must not reject!
             const valSuccess = val.then(
-              (val) => void success(step, bucket, dataIndex, val, valFlags),
-              (error) =>
-                void bucket.setResult(step, dataIndex, error, FLAG_ERROR),
+              (val) => success(step, bucket, dataIndex, val, valFlags),
+              (error) => bucket.setResult(step, dataIndex, error, FLAG_ERROR),
             );
 
-            if (!pendingPromises) {
-              pendingPromises = [valSuccess];
+            if (!promises) {
+              promises = [valSuccess];
             } else {
-              pendingPromises.push(valSuccess);
+              promises.push(valSuccess);
             }
           }
         }
       }
 
-      if (pendingPromises !== undefined) {
-        return Promise.all(pendingPromises).then(() =>
-          promises ? Promise.all(promises) : undefined,
-        );
+      if (promises !== undefined) {
+        return Promise.all(promises);
       } else {
-        return promises ? Promise.all(promises) : undefined;
+        return undefined;
       }
     };
 
