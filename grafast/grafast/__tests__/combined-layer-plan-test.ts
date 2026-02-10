@@ -8,6 +8,7 @@ import { it } from "mocha";
 
 import {
   constant,
+  flagError,
   grafast,
   InterfacePlan,
   lambda,
@@ -506,7 +507,7 @@ it("does not attempt polymorphic planning for list item errors", async () => {
           notifications() {
             return lambda(null, async () => [
               { type: "ready", id: "1", ready: true },
-              Promise.reject(new Error("List item failed")),
+              flagError(new Error("List item failed")),
               { type: "logout", id: "2", username: "benjie" },
             ]);
           },
@@ -893,7 +894,7 @@ it("handles list-of-lists polymorphic positions", async () => {
             return lambda(null, async () => [
               [
                 { type: "ready", id: "1", ready: true },
-                Promise.reject(new Error("Inner list failed")),
+                flagError(new Error("Inner list failed")),
               ],
               null,
               [{ type: "logout", id: "2", username: "benjie" }, null],
