@@ -134,7 +134,7 @@ function makeGetterForDirectory(
       scanning = false;
       if (scanInterval === "watch") {
         if (scanAgain) {
-          scanDirectory();
+          void scanDirectory();
         }
       } else if (typeof scanInterval === "number" && scanInterval >= 0) {
         // We don't know how long the scanning takes, so rather than setting an
@@ -145,13 +145,13 @@ function makeGetterForDirectory(
     }
   }
 
-  scanDirectory();
+  void scanDirectory();
   if (scanInterval === "watch") {
-    (async () => {
+    void (async () => {
       try {
         const watcher = fsp.watch(directory, { signal, recursive: false });
         for await (const _event of watcher) {
-          scanDirectory();
+          void scanDirectory();
         }
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -182,7 +182,7 @@ function makeGetterForDirectory(
         .catch(() => null);
       operationFromHash.set(hash, operation);
       // Once resolved, replace reference to string to avoid unnecessary ticks
-      operation.then((operationText) => {
+      void operation.then((operationText) => {
         operationFromHash.set(hash, operationText);
       });
     }

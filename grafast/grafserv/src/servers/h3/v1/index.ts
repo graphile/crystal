@@ -287,7 +287,7 @@ export class H3Grafserv extends GrafservBase {
               peer.send(data);
             },
             close(code, reason) {
-              peer.close(code, reason); // there are protocol standard closures
+              return peer.close(code, reason); // there are protocol standard closures
             },
             onMessage(cb) {
               client.handleMessage = cb;
@@ -295,16 +295,15 @@ export class H3Grafserv extends GrafservBase {
           },
           { socket: peer.websocket, request: peer.request },
         );
-        client.closed = async (code, reason) => {
-          onClose(code, reason);
-        };
+        client.closed = onClose;
       },
       message(peer, message) {
-        clients.get(peer)?.handleMessage?.(message.text());
+        return clients.get(peer)?.handleMessage?.(message.text());
       },
       close(peer, details) {
-        clients.get(peer)?.closed?.(details.code, details.reason);
+        const client = clients.get(peer);
         clients.delete(peer);
+        return client?.closed?.(details.code, details.reason);
       },
       error(peer, _error) {
         clients.delete(peer);

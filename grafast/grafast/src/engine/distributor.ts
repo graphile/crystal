@@ -180,7 +180,7 @@ export function distributor<TData>(
       let advanced = false;
       while (smallest >= lowWaterMark) {
         advanced = true;
-        buffer.shift();
+        void buffer.shift();
         lowWaterMark++;
       }
 
@@ -428,7 +428,7 @@ export function distributor<TData>(
       const stepIndex = getStepIndex(stepId);
       if (!hasIterator[stepIndex]) {
         hasIterator[stepIndex] = true;
-        stop(stepIndex);
+        void stop(stepIndex);
       }
     },
   };
@@ -439,7 +439,7 @@ export function distributor<TData>(
       stepIndex++
     ) {
       hasIterator[stepIndex] = true;
-      stop(stepIndex, undefined, false);
+      void stop(stepIndex, undefined, false);
     }
     maybeAdvanceLowWaterMark();
   });

@@ -253,6 +253,7 @@ const oldConfig = {
           { disallowTypeAnnotations: false },
         ],
         "@typescript-eslint/consistent-type-exports": "error",
+        "@typescript-eslint/no-floating-promises": "error",
       },
     },
 

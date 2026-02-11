@@ -11,7 +11,17 @@ export type ArgsFromOptions<TOptionsFunction extends OptionsFunction<any>> =
 
 export type Args<TArgs> = ArgumentsCamelCase<TArgs>;
 
-export async function runCli<TArgs>(
+export function runCli<TArgs>(
+  options: OptionsFunction<TArgs>,
+  run: (args: Args<TArgs>) => Promise<void>,
+): void {
+  void _runCli(options, run).then(undefined, (e) => {
+    process.exitCode = 1;
+    console.error(e);
+  });
+}
+
+async function _runCli<TArgs>(
   options: OptionsFunction<TArgs>,
   run: (args: Args<TArgs>) => Promise<void>,
 ) {
