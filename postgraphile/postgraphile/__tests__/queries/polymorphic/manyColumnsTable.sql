@@ -115,9 +115,7 @@ select
     ((__collections__)."col_100"),
     to_char(((__collections__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text)
   ])::text end as "0",
-  (__collections__)."type" as "1",
-  (__collections__)."id" as "2",
-  (not (__collections__."id" is null))::text as "3"
+  (not (__collections__."id" is null))::text as "1"
 from "polymorphic"."collections" as __collections__
 where (
   __collections__.id = ANY($1::"text"[])

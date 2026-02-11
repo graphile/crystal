@@ -8,12 +8,12 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for subscriptions/v4/sub"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 32, 10<br />2: Lambda[9]<br />3: Listen[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 33, 10<br />2: Lambda[9]<br />3: Listen[11]"):::bucket
     Bucket1("Bucket 1 (subscription)<br />Deps: 2, 4<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 2, 4<br /><br />ROOT JSONParse{1}ᐸ12ᐳ[13]<br />1: <br />ᐳ: Access[14]<br />2: Lambda[15]<br />ᐳ: Lambda[17], Lambda[18]"):::bucket
-    Bucket3("Bucket 3 (polymorphic)<br />__typename: Lambda[18]<br />Deps: 18, 2, 17, 4"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 2, 4<br /><br />ROOT JSONParse{1}ᐸ12ᐳ[13]<br />1: <br />ᐳ: Access[14]<br />2: Lambda[15]<br />ᐳ: Lambda[18], Lambda[19]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />__typename: Lambda[19]<br />Deps: 19, 2, 18, 4"):::bucket
     Bucket4("Bucket 4 (polymorphicPartition)<br />|Query<br />Deps: 4<br />ᐳQuery"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />|X<br />Deps: 2, 17<br />ᐳX<br /><br />1: Access[24], Access[25]<br />ᐳ: Access[31], Object[26]<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />ᐳ: 27, 29, 30"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|X<br />Deps: 2, 18<br />ᐳX<br /><br />1: Access[25], Access[26]<br />ᐳ: Access[32], Object[27]<br />2: PgSelect[24]<br />3: PgSelectRows[29]<br />ᐳ: 28, 30, 31"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -23,7 +23,7 @@ graph TD
     %% plan dependencies
     Listen11[["Listen[11∈0@s] ➊"]]:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSubscriberᐳ<br />More deps:<br />- __Value[2]"}}:::plan
-    Lambda9[["Lambda[9∈0] ➊<br />More deps:<br />- Constantᐸ'x'ᐳ[32]"]]:::unbatchedplan
+    Lambda9[["Lambda[9∈0] ➊<br />More deps:<br />- Constantᐸ'x'ᐳ[33]"]]:::unbatchedplan
     Lambda10{{"Lambda[10∈0] ➊<br />ᐸinitialEventᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access8 & Lambda9 & Lambda10 --> Listen11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 3"]:::plan
@@ -35,27 +35,27 @@ graph TD
     JSONParse13 --> Access14
     Lambda15[["Lambda[15∈2]<br />ᐸnodeObjToNodeIdᐳ"]]:::unbatchedplan
     Access14 --> Lambda15
-    Lambda17{{"Lambda[17∈2]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
-    Lambda15 --> Lambda17
-    Lambda18{{"Lambda[18∈2]<br />ᐸfindTypeNameMatchᐳ"}}:::plan
-    Lambda17 --> Lambda18
-    PgSelect23[["PgSelect[23∈5]^<br />ᐸxᐳ"]]:::plan
-    Object26{{"Object[26∈5] ➊^<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access31{{"Access[31∈5]<br />ᐸ17.base64JSON.1ᐳ<br />ᐳX"}}:::plan
-    Access31 -->|rejectNull| PgSelect23
-    Object26 --> PgSelect23
-    Access24{{"Access[24∈5] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳX<br />More deps:<br />- __Value[2]"}}:::plan
-    Access25{{"Access[25∈5] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳX<br />More deps:<br />- __Value[2]"}}:::plan
-    Access24 & Access25 --> Object26
-    First27{{"First[27∈5]^"}}:::plan
-    PgSelectRows28[["PgSelectRows[28∈5]^"]]:::plan
-    PgSelectRows28 --> First27
-    PgSelect23 --> PgSelectRows28
-    PgSelectSingle29{{"PgSelectSingle[29∈5]^<br />ᐸxᐳ"}}:::plan
-    First27 --> PgSelectSingle29
-    PgClassExpression30{{"PgClassExpression[30∈5]^<br />ᐸ__x__.”name”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression30
-    Lambda17 --> Access31
+    Lambda18{{"Lambda[18∈2]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
+    Lambda15 -->|rejectNull| Lambda18
+    Lambda19{{"Lambda[19∈2]<br />ᐸfindTypeNameMatchᐳ"}}:::plan
+    Lambda18 --> Lambda19
+    PgSelect24[["PgSelect[24∈5]^<br />ᐸxᐳ"]]:::plan
+    Object27{{"Object[27∈5] ➊^<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access32{{"Access[32∈5]<br />ᐸ18.base64JSON.1ᐳ<br />ᐳX"}}:::plan
+    Access32 -->|rejectNull| PgSelect24
+    Object27 --> PgSelect24
+    Access25{{"Access[25∈5] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳX<br />More deps:<br />- __Value[2]"}}:::plan
+    Access26{{"Access[26∈5] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳX<br />More deps:<br />- __Value[2]"}}:::plan
+    Access25 & Access26 --> Object27
+    First28{{"First[28∈5]^"}}:::plan
+    PgSelectRows29[["PgSelectRows[29∈5]^"]]:::plan
+    PgSelectRows29 --> First28
+    PgSelect24 --> PgSelectRows29
+    PgSelectSingle30{{"PgSelectSingle[30∈5]^<br />ᐸxᐳ"}}:::plan
+    First28 --> PgSelectSingle30
+    PgClassExpression31{{"PgClassExpression[31∈5]^<br />ᐸ__x__.”name”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression31
+    Lambda18 --> Access32
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -63,11 +63,11 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,JSONParse13 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access14,Lambda15,Lambda17,Lambda18 bucket2
+    class Bucket2,Access14,Lambda15,Lambda18,Lambda19 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgSelect23,Access24,Access25,Object26,First27,PgSelectRows28,PgSelectSingle29,PgClassExpression30,Access31 bucket5
+    class Bucket5,PgSelect24,Access25,Access26,Object27,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression31,Access32 bucket5
 

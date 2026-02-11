@@ -278,16 +278,7 @@ export function executeBucket(
       // **USE DEFENSIVE PROGRAMMING HERE!**
 
       /** PROMISES ADDED HERE MUST NOT REJECT */
-      let promises: PromiseLike<void>[] | undefined;
-      let pendingPromises: PromiseLike<any>[] | undefined;
-      let pendingPromiseIndexes:
-        | Array<{
-            /** The step (results) index */
-            s: number;
-            /** The data index */
-            i: number;
-          }>
-        | undefined;
+      let promises: PromiseLike<void>[] | undefined = undefined;
 
       // TODO: it seems that if this throws an error it results in a permanent
       // hang of defers? In the mean time... Don't throw any errors here!
@@ -356,11 +347,12 @@ export function executeBucket(
               }
               replacement[i] = null;
               const index = i;
+              // Must not reject
               const promise = item.then(
                 (v) => void (replacement![index] = v),
                 (e) => void (replacement![index] = flagError(e)),
               );
-              if (!promises) {
+              if (promises === undefined) {
                 promises = [promise];
               } else {
                 promises.push(promise);
@@ -489,7 +481,7 @@ export function executeBucket(
                 );
               }
             })();
-            if (!promises) {
+            if (promises === undefined) {
               promises = [promise];
             } else {
               promises.push(promise);
@@ -512,78 +504,33 @@ export function executeBucket(
         const count = step._isUnary ? 1 : size;
         for (let dataIndex = 0; dataIndex < count; dataIndex++) {
           const val = results[dataIndex];
+          const valFlags = flags[dataIndex];
+          if (valFlags == null) {
+            throw new Error(
+              `GraphileInternalError<75df71bb-0f76-4a98-9664-9167d502296a>: result for ${step} has no flag at index ${dataIndex} (value = ${inspect(
+                val,
+              )})`,
+            );
+          }
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
-            if (flags[dataIndex] == null) {
-              throw new Error(
-                `GraphileInternalError<75df71bb-0f76-4a98-9664-9167d502296a>: result for ${step} has no flag at index ${dataIndex} (value = ${inspect(
-                  val,
-                )})`,
-              );
-            }
-            success(step, bucket, dataIndex, val, flags[dataIndex]);
+            success(step, bucket, dataIndex, val, valFlags);
           } else {
-            if (!pendingPromises) {
-              pendingPromises = [val];
-              pendingPromiseIndexes = [{ s: allStepsIndex, i: dataIndex }];
+            // Must not reject!
+            const valSuccess = val.then(
+              (val) => success(step, bucket, dataIndex, val, valFlags),
+              (error) => bucket.setResult(step, dataIndex, error, FLAG_ERROR),
+            );
+
+            if (promises === undefined) {
+              promises = [valSuccess];
             } else {
-              pendingPromises.push(val);
-              pendingPromiseIndexes!.push({ s: allStepsIndex, i: dataIndex });
+              promises.push(valSuccess);
             }
           }
         }
       }
 
-      if (pendingPromises !== undefined) {
-        return Promise.allSettled(pendingPromises)
-          .then((resultSettledResult) => {
-            for (
-              let i = 0, pendingPromisesLength = resultSettledResult.length;
-              i < pendingPromisesLength;
-              i++
-            ) {
-              const settledResult = resultSettledResult[i];
-              const { s: allStepsIndex, i: dataIndex } =
-                pendingPromiseIndexes![i];
-              const finishedStep = _allSteps[allStepsIndex];
-              if (settledResult.status === "fulfilled") {
-                success(
-                  finishedStep,
-                  bucket,
-                  dataIndex,
-                  settledResult.value,
-                  NO_FLAGS,
-                );
-              } else {
-                const error = settledResult.reason;
-                bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
-              }
-            }
-            return promises ? Promise.all(promises) : undefined;
-          })
-          .then(null, (e) => {
-            // THIS SHOULD NEVER HAPPEN!
-            console.error(
-              `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
-            );
-
-            bucket.flagUnion |= FLAG_ERROR;
-            for (
-              let i = 0, pendingPromisesLength = pendingPromises!.length;
-              i < pendingPromisesLength;
-              i++
-            ) {
-              const { s: allStepsIndex, i: dataIndex } =
-                pendingPromiseIndexes![i];
-              const finishedStep = _allSteps[allStepsIndex];
-              const error = new Error(
-                `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-              );
-              bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
-            }
-          });
-      } else {
-        return promises ? Promise.all(promises) : undefined;
-      }
+      return promises === undefined ? undefined : Promise.all(promises);
     };
 
     const runSyncSteps = () => {
@@ -1550,9 +1497,7 @@ export function newBucket(
           `GrafastInternalError<9465db89-cc9d-415c-97e7-57bb19ddebe0>: attempt to write to out of bounds index ${index} for bucket of size ${size} for step ${step}`,
         );
       }
-      if (flags !== NO_FLAGS) {
-        this.flagUnion |= flags;
-      }
+      this.flagUnion |= flags;
       if (step._isUnary) {
         if (isDev && store.has(stepId)) {
           const ev = store.get(stepId);
