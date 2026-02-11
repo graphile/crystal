@@ -1330,7 +1330,10 @@ function markLayerPlanAsDone(
 
           continue loop;
         }
-        const childBucket = childLayerPlan.newCombinedBucket({ sharedState });
+        const childBucket = childLayerPlan.newCombinedBucket({
+          sharedState,
+          layerPlan,
+        });
         if (childBucket !== null) {
           // Execute
           const result = executeBucket(childBucket, requestContext);

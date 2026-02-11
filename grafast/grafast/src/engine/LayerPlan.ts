@@ -1115,7 +1115,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   public newCombinedBucket(
-    finalParentBucket: Pick<Bucket, "sharedState">,
+    finalParentBucket: Pick<Bucket, "sharedState" | "layerPlan">,
   ): Bucket | null {
     const t = this.reason.type;
     if (t !== "combined") {
@@ -1124,7 +1124,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       );
     }
 
-    const { sharedState } = finalParentBucket;
+    const { sharedState, layerPlan: currentLayerPlan } = finalParentBucket;
     const { copyStepIds } = this;
 
     const store: Bucket["store"] = new Map();
@@ -1166,7 +1166,18 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
     }
 
-    if (totalSize === 0) return null;
+    if (totalSize === 0) {
+      // Every parent except the final parent was retained while waiting for all
+      // parents to complete; release those temporary retains now.
+      for (const plp of this.reason.parentLayerPlans) {
+        if (plp === currentLayerPlan) continue;
+        const parentBucket = sharedState._retainedBuckets.get(plp.id);
+        if (parentBucket != null) {
+          sharedState.release(parentBucket);
+        }
+      }
+      return null;
+    }
 
     for (const stepId of batchStepIdsToCopy) {
       const newEv = batchExecutionValue(
@@ -1221,6 +1232,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex++
         ) {
           const newIndex = originalIndex + offset;
+          let fallbackErrorSource: ExecutionValue | null = null;
 
           if (sourceStepsByLayerPlanId[plp.id]) {
             for (const stepId of sourceStepsByLayerPlanId[plp.id]) {
@@ -1231,11 +1243,23 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} (${stepId}) in ${this}`,
                 );
               }
-              if ((sourceStore._flagsAt(originalIndex) & SKIP_FLAGS) === 0) {
+              const sourceFlags = sourceStore._flagsAt(originalIndex);
+              if ((sourceFlags & SKIP_FLAGS) === 0) {
                 ev._copyResult(newIndex, sourceStore, originalIndex);
+                fallbackErrorSource = null;
                 break;
+              } else if (
+                fallbackErrorSource === null &&
+                (sourceFlags & FLAG_ERROR) === FLAG_ERROR
+              ) {
+                fallbackErrorSource = sourceStore;
               } // If no matches, it retains `FLAG_NULL | FLAG_STOPPED` from above
             }
+          }
+          if (fallbackErrorSource !== null) {
+            // No non-skipped source existed for this index; preserve the first
+            // available error instead of silently converting to stopped/null.
+            ev._copyResult(newIndex, fallbackErrorSource, originalIndex);
           }
 
           iterators[newIndex] = parentBucket.iterators[originalIndex];
@@ -1271,6 +1295,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           bucket: childBucket,
           map,
         };
+        if (plp !== currentLayerPlan) {
+          // Every parent except the final parent was retained while waiting for
+          // all parents to complete; we can now release that temporary retain.
+          sharedState.release(parentBucket);
+        }
       }
     }
 
