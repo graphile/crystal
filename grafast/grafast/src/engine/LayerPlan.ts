@@ -1123,7 +1123,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   // TODO: currently we copy nulls and errors through. Ideally we wouldn't,
   // thereby shrinking the size of the bucket.
   public newCombinedBucket(
-    finalParentBucket: Pick<Bucket, "sharedState" | "layerPlan">,
+    finalParentBucket: Pick<Bucket, "sharedState">,
   ): Bucket | null {
     const t = this.reason.type;
     if (t !== "combined") {
@@ -1132,7 +1132,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       );
     }
 
-    const { sharedState, layerPlan: firstParentLayerPlan } = finalParentBucket;
+    const { sharedState } = finalParentBucket;
     const { copyStepIds } = this;
 
     const store: Bucket["store"] = new Map();
@@ -1174,18 +1174,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
     }
 
-    if (totalSize === 0) {
-      // Every parent except the final parent was retained while waiting for all
-      // parents to complete; release those temporary retains now.
-      for (const plp of this.reason.parentLayerPlans) {
-        if (plp === firstParentLayerPlan) continue;
-        const parentBucket = sharedState._retainedBuckets.get(plp.id);
-        if (parentBucket != null) {
-          sharedState.release(parentBucket);
-        }
-      }
-      return null;
-    }
+    if (totalSize === 0) return null;
 
     for (const stepId of batchStepIdsToCopy) {
       const newEv = batchExecutionValue(
@@ -1313,11 +1302,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           bucket: childBucket,
           map,
         };
-        if (plp !== firstParentLayerPlan) {
-          // Every parent except the final parent was retained while waiting for
-          // all parents to complete; we can now release that temporary retain.
-          sharedState.release(parentBucket);
-        }
       }
     }
 
