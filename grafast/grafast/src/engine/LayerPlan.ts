@@ -38,6 +38,12 @@ const SKIP_FLAGS =
 const NO_TYPENAME_FLAGS =
   FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_NULL;
 
+/**
+ * Used to determine if we should copy the error. Should only be copied if it's
+ * NOT polymorphic skipped; so we check the result `=== FLAG_ERROR`
+ */
+const ERROR_OR_POLY_SKIPPED_FLAGS = FLAG_ERROR | FLAG_POLY_SKIPPED;
+
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
  * directions can be chosen - the plan "branches" at that point based on a
@@ -1250,7 +1256,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 break;
               } else if (
                 fallbackErrorSource === null &&
-                (sourceFlags & FLAG_ERROR) === FLAG_ERROR
+                (sourceFlags & ERROR_OR_POLY_SKIPPED_FLAGS) === FLAG_ERROR
               ) {
                 fallbackErrorSource = sourceStore;
               } // If no matches, it retains `FLAG_NULL | FLAG_STOPPED` from above
