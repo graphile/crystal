@@ -1120,6 +1120,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
   }
 
+  // TODO: currently we copy nulls and errors through. Ideally we wouldn't,
+  // thereby shrinking the size of the bucket.
   public newCombinedBucket(
     finalParentBucket: Pick<Bucket, "sharedState" | "layerPlan">,
   ): Bucket | null {
@@ -1265,7 +1267,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           if (fallbackErrorSource !== null) {
             // No non-skipped source existed for this index; preserve the first
             // available error instead of silently converting to stopped/null.
-            ev._copyResult(newIndex, fallbackErrorSource, originalIndex);
+            //
+            // Normally we'd do:
+            //
+            //     ev._copyResult(newIndex, fallbackErrorSource, originalIndex);
+            //
+            // However, we want to add FLAG_STOPPED, so we do this manually:
+            ev._setResult(
+              newIndex,
+              fallbackErrorSource.at(originalIndex),
+              fallbackErrorSource._flagsAt(originalIndex) | FLAG_STOPPED,
+            );
           }
 
           iterators[newIndex] = parentBucket.iterators[originalIndex];
