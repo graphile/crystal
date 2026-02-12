@@ -1124,7 +1124,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       );
     }
 
-    const { sharedState, layerPlan: currentLayerPlan } = finalParentBucket;
+    const { sharedState, layerPlan: firstParentLayerPlan } = finalParentBucket;
     const { copyStepIds } = this;
 
     const store: Bucket["store"] = new Map();
@@ -1170,7 +1170,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       // Every parent except the final parent was retained while waiting for all
       // parents to complete; release those temporary retains now.
       for (const plp of this.reason.parentLayerPlans) {
-        if (plp === currentLayerPlan) continue;
+        if (plp === firstParentLayerPlan) continue;
         const parentBucket = sharedState._retainedBuckets.get(plp.id);
         if (parentBucket != null) {
           sharedState.release(parentBucket);
@@ -1295,7 +1295,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           bucket: childBucket,
           map,
         };
-        if (plp !== currentLayerPlan) {
+        if (plp !== firstParentLayerPlan) {
           // Every parent except the final parent was retained while waiting for
           // all parents to complete; we can now release that temporary retain.
           sharedState.release(parentBucket);
