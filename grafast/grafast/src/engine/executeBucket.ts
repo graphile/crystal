@@ -1326,8 +1326,6 @@ function markLayerPlanAsDone(
             bucket.sharedState.retain(bucket);
           }
 
-          // TODO: MAKE SURE CANCELLED BUCKETS ARE HANDLED!
-
           continue loop;
         }
         const childBucket = childLayerPlan.newCombinedBucket({ sharedState });
