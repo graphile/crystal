@@ -23,6 +23,14 @@ type Notification =
 type ReadyNotification = Extract<Notification, { type: "ready" }>;
 type LogoutNotification = Extract<Notification, { type: "logout" }>;
 
+// Mirrors Bucket from "../src/bucket.ts"; added because Bucket is @internal
+interface Bucket {
+  layerPlan: { reason: { type: string } };
+  children: Record<string, { bucket: Bucket }>;
+  retainCount: number;
+  sharedState: { _retainedBuckets: Map<number, Bucket> };
+}
+
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
 
@@ -868,15 +876,25 @@ it("handles doubly nested polymorphic positions", async () => {
 });
 
 it("cleans up retained buckets when nested polymorphic recombination has errors", async () => {
-  let rootBucket: any = null;
-  const bucketCapturePlugin: GraphileConfig.Plugin = {
+  let rootBucket = null as Bucket | null;
+  class Cat {
+    constructor(properties: object) {
+      Object.assign(this, properties);
+    }
+  }
+  class Dog {
+    constructor(properties: object) {
+      Object.assign(this, properties);
+    }
+  }
+  const BucketCapturePlugin: GraphileConfig.Plugin = {
     name: "BucketCapturePlugin",
     grafast: {
       middleware: {
         executeStep(next, event) {
           const bucket = (event.executeDetails.extra as any)._bucket;
           if (bucket.layerPlan.reason.type === "root") {
-            rootBucket = bucket;
+            rootBucket = bucket as Bucket;
           }
           return next();
         },
@@ -924,7 +942,7 @@ it("cleans up retained buckets when nested polymorphic recombination has errors"
               obj.kind === "cat" ? "Cat" : obj.kind === "dog" ? "Dog" : null,
             true,
           );
-          return { $__typename, planForType: () => $specifier };
+          return { $__typename };
         },
       },
       Owner: {
@@ -959,6 +977,9 @@ it("cleans up retained buckets when nested polymorphic recombination has errors"
         },
       },
       Cat: {
+        planType($specifier) {
+          return lambda($specifier, (spec) => new Cat(spec));
+        },
         plans: {
           owner($cat) {
             return lambda($cat, async (_cat: any) => {
@@ -969,6 +990,9 @@ it("cleans up retained buckets when nested polymorphic recombination has errors"
         },
       },
       Dog: {
+        planType($specifier) {
+          return lambda($specifier, (spec) => new Dog(spec));
+        },
         plans: {
           owner($dog) {
             return lambda($dog, async (dog: any) => {
@@ -1009,13 +1033,17 @@ it("cleans up retained buckets when nested polymorphic recombination has errors"
         }
       }
     `,
-    resolvedPreset: resolvePreset({ plugins: [bucketCapturePlugin] }),
+    resolvedPreset: resolvePreset({ plugins: [BucketCapturePlugin] }),
   })) as ExecutionResult;
 
   expect(result.data).to.deep.equal({
     pets: [{ owner: null }, { owner: { id: "b1" } }],
   });
-  expect(rootBucket).to.exist;
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Cat owner failed",
+  ]);
+
+  if (!rootBucket) throw new Error("No root bucket!");
 
   const buckets: any[] = [];
   const seen = new Set<any>();
