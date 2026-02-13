@@ -1,87 +1,113 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import assert from "node:assert/strict";
 
-import type { ExecutionDetails, Maybe } from "grafast";
-import { grafast, lambda, makeGrafastSchema, Modifier, Step } from "grafast";
+import type { ExecutionDetails, ExecutionValue, Maybe } from "grafast";
+import { grafast, makeGrafastSchema, Modifier, Step } from "grafast";
 import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 
-type FilterRequest = {
-  andClauses: string[];
-  orClauses: string[];
-};
+interface Filterable {
+  addClause(clause: string): void;
+}
 
-type ApplyCallback = (request: FilterRequest) => void;
+type FilterApplyCallback = (request: Filterable) => void;
+type BooleanOp = "and" | "or";
 
-class OrClauseModifier extends Modifier<FilterRequest> {
+class FilterModifier extends Modifier<Filterable> implements Filterable {
+  private type: BooleanOp;
   private clauses: string[] = [];
+  constructor(input: Filterable, type: BooleanOp) {
+    super(input);
+    this.type = type;
+  }
 
   addClause(clause: string) {
     this.clauses.push(clause);
   }
 
   apply(): void {
-    if (this.clauses.length > 0) {
-      this.parent.orClauses.push(this.clauses.join(" and "));
+    if (this.clauses.length === 0) return;
+    if (this.type === "and") {
+      this.parent.addClause(this.clauses.join(" and "));
+    } else {
+      if (this.clauses.length === 1) {
+        this.parent.addClause(`(${this.clauses[0]})`);
+      } else {
+        this.parent.addClause(`((${this.clauses.join(") or (")}))`);
+      }
     }
   }
 }
 
-function pushClause(target: FilterRequest | OrClauseModifier, clause: string) {
-  if (target instanceof OrClauseModifier) {
-    target.addClause(clause);
-  } else {
-    target.andClauses.push(clause);
-  }
+type FilterCallbacks = Maybe<
+  FilterApplyCallback | ReadonlyArray<FilterApplyCallback>
+>;
+
+interface BakedAvatarPatch {
+  avatar_url: string;
+  avatar_width?: number;
 }
 
-type SearchRequestResult = {
+interface BakedUserPatch {
+  display_name?: string | null;
+  marketing_opt_in?: boolean | null;
+  avatar?: BakedAvatarPatch | null;
+}
+
+class SearchRequestStep extends Step<{
   sql: string;
-  bakedPatchJson: string;
-};
-class SearchRequestStep extends Step<SearchRequestResult> {
-  private readonly bakedPatchDepId: number;
+  patchJSON: string;
+}> {
+  private readonly patchDepId: number;
   private readonly applyDepIds: number[] = [];
 
-  constructor($bakedPatchJson: Step<string>) {
+  constructor($patch: Step<BakedUserPatch>) {
     super();
-    this.bakedPatchDepId = this.addDependency($bakedPatchJson);
+    this.patchDepId = this.addDependency($patch);
   }
 
-  apply($cb: Step<Maybe<ApplyCallback | ReadonlyArray<ApplyCallback>>>) {
+  apply($cb: Step<FilterCallbacks>) {
     this.applyDepIds.push(this.addUnaryDependency($cb));
   }
 
   execute(details: ExecutionDetails) {
-    const bakedPatchDep = details.values[this.bakedPatchDepId];
+    const patchDep = details.values[
+      this.patchDepId
+    ] as ExecutionValue<BakedUserPatch>;
+
+    const clauses: string[] = [
+      // Put any initial clauses here
+    ];
+
+    // Apply the callbacks
     const applyCallbacks = this.applyDepIds
-      .flatMap((id) => details.values[id].unaryValue())
+      .flatMap((id) => details.values[id].unaryValue() as FilterCallbacks)
       .filter((cb) => cb != null);
+    const filterable: Filterable = {
+      addClause: (clause) => void clauses.push(clause),
+    };
+    for (const callback of applyCallbacks) {
+      callback(filterable);
+    }
+
+    // Build query
+    const sql = `select * from users${
+      clauses.length > 0 ? ` where ${clauses.join(" and ")}` : ""
+    }`;
+
+    // Here's where you'd run the query - just a single call for the entire
+    // `execute`
+
+    // Finally correlate the results with the inputs
     return details.indexMap((i) => {
-      const bakedPatchJson = (bakedPatchDep.at(i) as string | null) ?? "null";
-      const request: FilterRequest = {
-        andClauses: [],
-        orClauses: [],
-      };
-
-      for (const callback of applyCallbacks) {
-        callback(request);
-      }
-
-      const whereParts = [...request.andClauses];
-      if (request.orClauses.length === 1) {
-        whereParts.push(request.orClauses[0]);
-      } else if (request.orClauses.length > 1) {
-        whereParts.push(`((${request.orClauses.join(") or (")}))`);
-      }
-
-      const whereClause =
-        whereParts.length > 0 ? ` where ${whereParts.join(" and ")}` : "";
-      const sql = `select * from users${whereClause}`;
-
-      return { sql, bakedPatchJson };
+      const patch = patchDep.at(i);
+      return { sql, patchJSON: JSON.stringify(patch) };
     });
   }
+}
+
+function searchRequest(patch: any) {
+  return new SearchRequestStep(patch);
 }
 
 const schema = makeGrafastSchema({
@@ -105,7 +131,7 @@ const schema = makeGrafastSchema({
 
     type SearchPreview {
       sql: String!
-      bakedPatch: String!
+      patchJSON: String!
     }
 
     type Query {
@@ -117,11 +143,16 @@ const schema = makeGrafastSchema({
   `,
   inputObjects: {
     AvatarPatchInput: {
+      baked(_input, info) {
+        const baked: Partial<BakedAvatarPatch> = {};
+        info.applyChildren(baked);
+        return baked as BakedAvatarPatch;
+      },
       plans: {
-        url(target: Record<string, unknown>, value: string) {
+        url(target: Partial<BakedAvatarPatch>, value: string) {
           target.avatar_url = value;
         },
-        width(target: Record<string, unknown>, value: number | null) {
+        width(target: Partial<BakedAvatarPatch>, value: number | null) {
           if (value != null) {
             target.avatar_width = value;
           }
@@ -130,47 +161,51 @@ const schema = makeGrafastSchema({
     },
     UserPatchInput: {
       baked(_input, info) {
-        const baked: Record<string, unknown> = {};
+        const baked: Partial<BakedUserPatch> = {};
         info.applyChildren(baked);
-        return baked;
+        return baked as BakedUserPatch;
       },
       plans: {
-        displayName(target: Record<string, unknown>, value: string | null) {
+        displayName(target: Partial<BakedUserPatch>, value: string | null) {
           if (value != null) {
             target.display_name = value;
           }
         },
-        marketingOptIn(target: Record<string, unknown>, value: boolean | null) {
+        marketingOptIn(target: Partial<BakedUserPatch>, value: boolean | null) {
           if (value != null) {
             target.marketing_opt_in = value;
           }
         },
-        avatar(target: Record<string, unknown>, value: unknown) {
+        avatar(target: Partial<BakedUserPatch>, value: unknown) {
           if (value == null) {
             return;
           }
-          const bakedAvatar: Record<string, unknown> = {};
-          target.avatar = bakedAvatar;
-          return bakedAvatar;
+          const bakedAvatar: Partial<BakedAvatarPatch> = {};
+          target.avatar = bakedAvatar as BakedAvatarPatch;
+          return bakedAvatar; // Recurse
         },
       },
     },
     UserFilterInput: {
       plans: {
-        usernameStartsWith(
-          target: FilterRequest | OrClauseModifier,
-          value: string,
-        ) {
-          pushClause(target, `username like '${value.replace(/'/g, "''")}%'`);
+        usernameStartsWith(target: Filterable, value: Maybe<string>) {
+          if (value == null) return;
+          target.addClause(`username ilike '${value.replace(/'/g, "''")}%'`);
         },
-        minAge(target: FilterRequest | OrClauseModifier, value: number) {
-          pushClause(target, `age >= ${value}`);
+        minAge(target: Filterable, value: Maybe<number>) {
+          if (value == null) return;
+          target.addClause(`age >= ${value}`);
         },
-        or(target: FilterRequest, value: ReadonlyArray<unknown> | null) {
-          if (value == null || value.length === 0) {
-            return;
-          }
-          return () => new OrClauseModifier(target);
+        or(target: Filterable, value: Maybe<ReadonlyArray<unknown>>) {
+          if (value == null) return;
+          if (value.length === 0) return;
+
+          // We're joining the list items with "or".
+          const or = new FilterModifier(target, "or");
+
+          // But each list item itself is an object, and the properties of
+          // those must be combined via an an "and".
+          return () => new FilterModifier(or, "and");
         },
       },
     },
@@ -179,42 +214,36 @@ const schema = makeGrafastSchema({
     Query: {
       plans: {
         previewSearch(_parent, fieldArgs) {
+          // Take the "patch" input and filter it through it's "baked"
+          // transforms, to get the transformed value.
           const $bakedPatch = fieldArgs.getBaked("patch");
-          const $bakedPatchJson = lambda($bakedPatch, (patch) =>
-            JSON.stringify(patch),
-          );
-          const $request = new SearchRequestStep($bakedPatchJson);
+
+          // Create a step representing our search request
+          const $request = searchRequest($bakedPatch);
+
+          // Apply the filters from the "filter" argument (recursively) to the
+          // request
           fieldArgs.apply($request, "filter");
+
           return $request;
         },
       },
     },
-    SearchPreview: {
-      plans: {
-        sql($preview: SearchRequestStep) {
-          return lambda($preview, (preview) => preview.sql);
-        },
-        bakedPatch($preview: SearchRequestStep) {
-          return lambda($preview, (preview) => preview.bakedPatchJson);
-        },
-      },
-    },
   },
-  enableDeferStream: false,
 });
 
 const source = /* GraphQL */ `
   query Example($filter: UserFilterInput, $patch: UserPatchInput) {
     previewSearch(filter: $filter, patch: $patch) {
       sql
-      bakedPatch
+      patchJSON
     }
   }
 `;
 
 const variableValues = {
   filter: {
-    usernameStartsWith: "ben",
+    usernameStartsWith: "benj",
     minAge: 18,
     or: [{ minAge: 30 }, { usernameStartsWith: "alice", minAge: 25 }],
   },
@@ -237,15 +266,16 @@ const result = (await grafast({
 })) as ExecutionResult;
 
 if (result.errors) {
-  throw new Error(result.errors.map((e) => e.message).join("\n"));
+  const firstError = result.errors[0];
+  throw firstError.originalError ?? firstError;
 }
 
 assert.equal(
   JSON.stringify(result.data),
   JSON.stringify({
     previewSearch: {
-      sql: "select * from users where username like 'ben%' and age >= 18 and ((age >= 30) or (username like 'alice%' and age >= 25))",
-      bakedPatch:
+      sql: "select * from users where username ilike 'benj%' and age >= 18 and ((age >= 30) or (username ilike 'alice%' and age >= 25))",
+      patchJSON:
         '{"display_name":"Benjie","marketing_opt_in":true,"avatar":{"avatar_url":"https://cdn.example.com/avatar.png","avatar_width":128}}',
     },
   }),
