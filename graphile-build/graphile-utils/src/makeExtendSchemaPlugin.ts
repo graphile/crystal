@@ -6,6 +6,7 @@ import type {
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastSchemaConfig,
+  InputObjectTypeBakedResolver,
   ObjectFieldConfig,
   ObjectPlan as GrafastObjectPlan,
   PlanTypeInfo,
@@ -89,6 +90,7 @@ export interface TypeResolver {
 
 export interface InputObjectResolver {
   __scope?: GraphileBuild.ScopeInputObject;
+  __baked?: InputObjectTypeBakedResolver;
 }
 
 /** @deprecated Use objects/scalars/etc instead */
@@ -803,12 +805,14 @@ export function extendSchema(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
+              const inputPlans = plans[name] as InputObjectResolver | undefined;
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
-                ...plans[name]?.__scope,
+                ...inputPlans?.__scope,
               };
+              const baked = inputPlans?.__baked;
               build.registerInputObjectType(
                 name,
                 scope,
@@ -816,6 +820,7 @@ export function extendSchema(
                   fields: (context) =>
                     getInputFields(build, context, definition.fields, plans),
                   ...(description ? { description } : null),
+                  ...(baked ? { extensions: { grafast: { baked } } } : null),
                 }),
                 uniquePluginName,
               );
@@ -1562,25 +1567,40 @@ export function extendSchema(
           const defaultValue = field.defaultValue
             ? getValue(field.defaultValue, type)
             : undefined;
-          const spec = (plans[Self.name] as Maybe<DeprecatedInputObjectPlan>)?.[
-            fieldName
-          ];
+          const rawSpec = (
+            plans[Self.name] as Maybe<DeprecatedInputObjectPlan>
+          )?.[fieldName];
+          const spec =
+            typeof rawSpec === "object" && rawSpec !== null
+              ? rawSpec
+              : typeof rawSpec === "function"
+                ? { apply: rawSpec }
+                : {};
           const scope: GraphileBuild.ScopeObjectFieldsField = {
             fieldDirectives: directives,
 
             // Allow user to overwrite
             ...scopeFromDirectives(directives),
-            ...(typeof spec === "object" && spec !== null
-              ? (spec as any).scope
-              : null),
+            ...(spec as any).scope,
 
             // fieldName always wins
             fieldName,
           };
+          const apply = spec.apply;
+          const extensions =
+            spec.extensions || apply
+              ? {
+                  ...spec.extensions,
+                  ...(apply
+                    ? { grafast: { ...spec.extensions?.grafast, apply } }
+                    : null),
+                }
+              : undefined;
           memo[fieldName] = context.fieldWithHooks(scope, {
             type,
             defaultValue,
             ...(description ? { description } : null),
+            ...(extensions ? { extensions } : null),
           });
         } else {
           throw new Error(
