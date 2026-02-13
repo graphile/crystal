@@ -381,7 +381,7 @@ The following example is runnable and demonstrates:
 - Applying with `fieldArgs.apply($request, "filter")`.
 - Fan-out/fan-in via `Modifier` for an `or: [UserFilterInput!]` list.
 
-import complexInputsSource from "!!raw-loader!@site/../grafast/src/examples/complexInputs.mts";
+import complexInputsSource from "!!raw-loader!@site/../grafast/examples/complexInputs.mts";
 import CodeBlock from "@theme/CodeBlock";
 
 <CodeBlock language="ts">
