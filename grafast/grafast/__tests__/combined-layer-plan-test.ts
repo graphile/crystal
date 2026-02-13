@@ -23,6 +23,14 @@ type Notification =
 type ReadyNotification = Extract<Notification, { type: "ready" }>;
 type LogoutNotification = Extract<Notification, { type: "logout" }>;
 
+// Mirrors Bucket from "../src/bucket.ts"; added because Bucket is @internal
+interface Bucket {
+  layerPlan: { reason: { type: string } };
+  children: Record<string, { bucket: Bucket }>;
+  retainCount: number;
+  sharedState: { _retainedBuckets: Map<number, Bucket> };
+}
+
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
 
@@ -865,6 +873,197 @@ it("handles doubly nested polymorphic positions", async () => {
   expect(result.errors?.map((error) => error.message)).to.deep.equal([
     "Outer failed",
   ]);
+});
+
+it("cleans up retained buckets when nested polymorphic recombination has errors", async () => {
+  let rootBucket = null as Bucket | null;
+  class Cat {
+    constructor(properties: object) {
+      Object.assign(this, properties);
+    }
+  }
+  class Dog {
+    constructor(properties: object) {
+      Object.assign(this, properties);
+    }
+  }
+  const BucketCapturePlugin: GraphileConfig.Plugin = {
+    name: "BucketCapturePlugin",
+    grafast: {
+      middleware: {
+        executeStep(next, event) {
+          const bucket = (event.executeDetails.extra as any)._bucket;
+          if (bucket.layerPlan.reason.type === "root") {
+            rootBucket = bucket as Bucket;
+          }
+          return next();
+        },
+      },
+    },
+  };
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      interface Owner {
+        id: ID!
+      }
+
+      type Human implements Owner {
+        id: ID!
+      }
+
+      type Business implements Owner {
+        id: ID!
+      }
+
+      interface Pet {
+        id: ID!
+      }
+
+      type Cat implements Pet {
+        id: ID!
+        owner: Owner
+      }
+
+      type Dog implements Pet {
+        id: ID!
+        owner: Owner
+      }
+
+      type Query {
+        pets: [Pet]!
+      }
+    `,
+    interfaces: {
+      Pet: {
+        planType($specifier) {
+          const $__typename = lambda(
+            $specifier,
+            (obj: { kind: string }) =>
+              obj.kind === "cat" ? "Cat" : obj.kind === "dog" ? "Dog" : null,
+            true,
+          );
+          return { $__typename };
+        },
+      },
+      Owner: {
+        planType($specifier) {
+          const $__typename = lambda(
+            $specifier,
+            (obj: { kind: string }) =>
+              obj.kind === "human"
+                ? "Human"
+                : obj.kind === "business"
+                  ? "Business"
+                  : null,
+            true,
+          );
+          return { $__typename, planForType: () => $specifier };
+        },
+      },
+    },
+    objects: {
+      Query: {
+        plans: {
+          pets() {
+            return lambda(null, async () => [
+              { kind: "cat", id: "c1", owner: { kind: "human", id: "h1" } },
+              {
+                kind: "dog",
+                id: "d1",
+                owner: { kind: "business", id: "b1" },
+              },
+            ]);
+          },
+        },
+      },
+      Cat: {
+        planType($specifier) {
+          return lambda($specifier, (spec) => new Cat(spec));
+        },
+        plans: {
+          owner($cat) {
+            return lambda($cat, async (_cat: any) => {
+              await sleep(1);
+              throw new Error("Cat owner failed");
+            });
+          },
+        },
+      },
+      Dog: {
+        planType($specifier) {
+          return lambda($specifier, (spec) => new Dog(spec));
+        },
+        plans: {
+          owner($dog) {
+            return lambda($dog, async (dog: any) => {
+              await sleep(5);
+              return dog.owner;
+            });
+          },
+        },
+      },
+    },
+  });
+
+  const result = (await grafast({
+    schema,
+    source: /* GraphQL */ `
+      query {
+        pets {
+          ... on Cat {
+            owner {
+              ... on Human {
+                id
+              }
+              ... on Business {
+                id
+              }
+            }
+          }
+          ... on Dog {
+            owner {
+              ... on Human {
+                id
+              }
+              ... on Business {
+                id
+              }
+            }
+          }
+        }
+      }
+    `,
+    resolvedPreset: resolvePreset({ plugins: [BucketCapturePlugin] }),
+  })) as ExecutionResult;
+
+  expect(result.data).to.deep.equal({
+    pets: [{ owner: null }, { owner: { id: "b1" } }],
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Cat owner failed",
+  ]);
+
+  if (!rootBucket) throw new Error("No root bucket!");
+
+  const buckets: any[] = [];
+  const seen = new Set<any>();
+  const queue = [rootBucket];
+  while (queue.length > 0) {
+    const bucket = queue.pop();
+    if (!bucket || seen.has(bucket)) continue;
+    seen.add(bucket);
+    buckets.push(bucket);
+    for (const child of Object.values(bucket.children)) {
+      queue.push((child as any).bucket);
+    }
+  }
+  expect(
+    buckets.some((bucket) => bucket.layerPlan.reason.type === "combined"),
+  ).to.equal(true);
+  expect(rootBucket.sharedState._retainedBuckets.size).to.equal(0);
+  for (const bucket of buckets) {
+    expect(bucket.retainCount).to.equal(0);
+  }
 });
 
 it("handles list-of-lists polymorphic positions", async () => {

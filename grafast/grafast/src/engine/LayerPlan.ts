@@ -38,6 +38,12 @@ const SKIP_FLAGS =
 const NO_TYPENAME_FLAGS =
   FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_NULL;
 
+/**
+ * Used to determine if we should copy the error. Should only be copied if it's
+ * NOT polymorphic skipped; so we check the result `=== FLAG_ERROR`
+ */
+const ERROR_OR_POLY_SKIPPED_FLAGS = FLAG_ERROR | FLAG_POLY_SKIPPED;
+
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
  * directions can be chosen - the plan "branches" at that point based on a
@@ -1114,6 +1120,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
   }
 
+  // TODO: currently we copy nulls and errors through. Ideally we wouldn't,
+  // thereby shrinking the size of the bucket.
   public newCombinedBucket(
     finalParentBucket: Pick<Bucket, "sharedState">,
   ): Bucket | null {
@@ -1221,6 +1229,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex++
         ) {
           const newIndex = originalIndex + offset;
+          let fallbackErrorSource: ExecutionValue | null = null;
 
           if (sourceStepsByLayerPlanId[plp.id]) {
             for (const stepId of sourceStepsByLayerPlanId[plp.id]) {
@@ -1231,11 +1240,33 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} (${stepId}) in ${this}`,
                 );
               }
-              if ((sourceStore._flagsAt(originalIndex) & SKIP_FLAGS) === 0) {
+              const sourceFlags = sourceStore._flagsAt(originalIndex);
+              if ((sourceFlags & SKIP_FLAGS) === 0) {
                 ev._copyResult(newIndex, sourceStore, originalIndex);
+                fallbackErrorSource = null;
                 break;
+              } else if (
+                fallbackErrorSource === null &&
+                (sourceFlags & ERROR_OR_POLY_SKIPPED_FLAGS) === FLAG_ERROR
+              ) {
+                fallbackErrorSource = sourceStore;
               } // If no matches, it retains `FLAG_NULL | FLAG_STOPPED` from above
             }
+          }
+          if (fallbackErrorSource !== null) {
+            // No non-skipped source existed for this index; preserve the first
+            // available error instead of silently converting to stopped/null.
+            //
+            // Normally we'd do:
+            //
+            //     ev._copyResult(newIndex, fallbackErrorSource, originalIndex);
+            //
+            // However, we want to add FLAG_STOPPED, so we do this manually:
+            ev._setResult(
+              newIndex,
+              fallbackErrorSource.at(originalIndex),
+              fallbackErrorSource._flagsAt(originalIndex) | FLAG_STOPPED,
+            );
           }
 
           iterators[newIndex] = parentBucket.iterators[originalIndex];

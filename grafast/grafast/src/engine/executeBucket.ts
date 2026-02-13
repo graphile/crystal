@@ -1321,16 +1321,21 @@ function markLayerPlanAsDone(
         if (!allParentLayerPlansAreReady) {
           // The last parent layer plan to complete will handle it.
           // Make sure we're retained so it can use our data!
-          // Will be released inside the "combined" branch in childLayerPlan.newBucket
+          // Released below.
           if (bucket != null) {
             bucket.sharedState.retain(bucket);
           }
 
-          // TODO: MAKE SURE CANCELLED BUCKETS ARE HANDLED!
-
           continue loop;
         }
         const childBucket = childLayerPlan.newCombinedBucket({ sharedState });
+        // Every parent except the final parent was retained while waiting for all
+        // parents to complete; release those temporary retains now.
+        for (const plp of childLayerPlan.reason.parentLayerPlans) {
+          if (plp === layerPlan) continue; // Was never retained
+          const otherBucket = sharedState._retainedBuckets.get(plp.id);
+          if (otherBucket !== undefined) sharedState.release(otherBucket);
+        }
         if (childBucket !== null) {
           // Execute
           const result = executeBucket(childBucket, requestContext);
