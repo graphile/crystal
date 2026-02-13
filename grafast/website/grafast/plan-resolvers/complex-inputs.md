@@ -385,5 +385,5 @@ import complexInputsSource from "!!raw-loader!@site/../grafast/examples/complexI
 import CodeBlock from "@theme/CodeBlock";
 
 <CodeBlock language="ts">
-{complexInputsSource.trim()}
+{complexInputsSource.replace(/^[\s\S]*?\/\*{10,}\//, '').trim()}
 </CodeBlock>

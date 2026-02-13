@@ -1,10 +1,69 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
-import assert from "node:assert/strict";
+/* eslint-disable simple-import-sort/imports, simple-import-sort/exports, import/no-duplicates */
 
-import type { ExecutionDetails, ExecutionValue, Maybe } from "grafast";
-import { grafast, makeGrafastSchema, Modifier, Step } from "grafast";
+import assert from "node:assert/strict";
+import { grafast } from "grafast";
 import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
+
+setTimeout(async () => {
+  const source = /* GraphQL */ `
+    query Example($filter: UserFilterInput, $patch: UserPatchInput) {
+      previewSearch(filter: $filter, patch: $patch) {
+        sql
+        patchJSON
+      }
+    }
+  `;
+
+  const variableValues = {
+    filter: {
+      usernameStartsWith: "benj",
+      minAge: 18,
+      or: [{ minAge: 30 }, { usernameStartsWith: "alice", minAge: 25 }],
+    },
+    patch: {
+      displayName: "Benjie",
+      marketingOptIn: true,
+      avatar: {
+        url: "https://cdn.example.com/avatar.png",
+        width: 128,
+      },
+    },
+  };
+
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    resolvedPreset: resolvePreset({}),
+    requestContext: {},
+  })) as ExecutionResult;
+
+  if (result.errors) {
+    const firstError = result.errors[0];
+    throw firstError.originalError ?? firstError;
+  }
+
+  assert.equal(
+    JSON.stringify(result.data),
+    JSON.stringify({
+      previewSearch: {
+        sql: "select * from users where username ilike 'benj%' and age >= 18 and ((age >= 30) or (username ilike 'alice%' and age >= 25))",
+        patchJSON:
+          '{"display_name":"Benjie","marketing_opt_in":true,"avatar":{"avatar_url":"https://cdn.example.com/avatar.png","avatar_width":128}}',
+      },
+    }),
+  );
+
+  console.log(JSON.stringify(result.data, null, 2));
+}, 0);
+
+// Everything below this line will be output in the docs at
+// http://build.graphile.org/graphile-build/next/all-hooks
+/******************************************************************************/
+import type { ExecutionDetails, ExecutionValue, Maybe } from "grafast";
+import { makeGrafastSchema, Modifier, Step } from "grafast";
 
 interface Filterable {
   addClause(clause: string): void;
@@ -231,54 +290,3 @@ const schema = makeGrafastSchema({
     },
   },
 });
-
-const source = /* GraphQL */ `
-  query Example($filter: UserFilterInput, $patch: UserPatchInput) {
-    previewSearch(filter: $filter, patch: $patch) {
-      sql
-      patchJSON
-    }
-  }
-`;
-
-const variableValues = {
-  filter: {
-    usernameStartsWith: "benj",
-    minAge: 18,
-    or: [{ minAge: 30 }, { usernameStartsWith: "alice", minAge: 25 }],
-  },
-  patch: {
-    displayName: "Benjie",
-    marketingOptIn: true,
-    avatar: {
-      url: "https://cdn.example.com/avatar.png",
-      width: 128,
-    },
-  },
-};
-
-const result = (await grafast({
-  schema,
-  source,
-  variableValues,
-  resolvedPreset: resolvePreset({}),
-  requestContext: {},
-})) as ExecutionResult;
-
-if (result.errors) {
-  const firstError = result.errors[0];
-  throw firstError.originalError ?? firstError;
-}
-
-assert.equal(
-  JSON.stringify(result.data),
-  JSON.stringify({
-    previewSearch: {
-      sql: "select * from users where username ilike 'benj%' and age >= 18 and ((age >= 30) or (username ilike 'alice%' and age >= 25))",
-      patchJSON:
-        '{"display_name":"Benjie","marketing_opt_in":true,"avatar":{"avatar_url":"https://cdn.example.com/avatar.png","avatar_width":128}}',
-    },
-  }),
-);
-
-console.log(JSON.stringify(result.data, null, 2));
