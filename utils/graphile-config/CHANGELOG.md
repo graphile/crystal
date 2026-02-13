@@ -1,5 +1,14 @@
 # graphile-config
 
+## 1.0.0-rc.5
+
+### Patch Changes
+
+- [#2937](https://github.com/graphile/crystal/pull/2937)
+  [`8f50146`](https://github.com/graphile/crystal/commit/8f5014605d2d3a3353ab99e2ac4bbadaadcccdca)
+  Thanks [@benjie](https://github.com/benjie)! - Eliminate dangling promises,
+  reducing chance of process exit due to unhandled promise rejection.
+
 ## 1.0.0-rc.4
 
 ### Patch Changes

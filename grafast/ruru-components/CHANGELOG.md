@@ -1,5 +1,20 @@
 # ruru-components
 
+## 2.0.0-rc.6
+
+### Patch Changes
+
+- [#2937](https://github.com/graphile/crystal/pull/2937)
+  [`8f50146`](https://github.com/graphile/crystal/commit/8f5014605d2d3a3353ab99e2ac4bbadaadcccdca)
+  Thanks [@benjie](https://github.com/benjie)! - Eliminate dangling promises,
+  reducing chance of process exit due to unhandled promise rejection.
+- Updated dependencies
+  [[`8f50146`](https://github.com/graphile/crystal/commit/8f5014605d2d3a3353ab99e2ac4bbadaadcccdca),
+  [`5e83533`](https://github.com/graphile/crystal/commit/5e83533f2d7005ba031d800c079e21f9fa1fecd5),
+  [`03e5ce5`](https://github.com/graphile/crystal/commit/03e5ce5b3feaed585b9fabef9e81a0b0564bc725),
+  [`f213a8e`](https://github.com/graphile/crystal/commit/f213a8e4813ec79beddc81fc994314e99a9b67f9)]:
+  - grafast@1.0.0-rc.7
+
 ## 2.0.0-rc.5
 
 ### Patch Changes

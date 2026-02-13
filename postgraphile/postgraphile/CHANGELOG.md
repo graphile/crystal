@@ -1,5 +1,35 @@
 # postgraphile
 
+## 5.0.0-rc.7
+
+### Patch Changes
+
+- [#2937](https://github.com/graphile/crystal/pull/2937)
+  [`8f50146`](https://github.com/graphile/crystal/commit/8f5014605d2d3a3353ab99e2ac4bbadaadcccdca)
+  Thanks [@benjie](https://github.com/benjie)! - Eliminate dangling promises,
+  reducing chance of process exit due to unhandled promise rejection.
+
+- [#2950](https://github.com/graphile/crystal/pull/2950)
+  [`f75fc20`](https://github.com/graphile/crystal/commit/f75fc20c07f71fb8e8322d14ee1267e294bc0beb)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `baked()` and
+  `apply()` in input object definitions in `extendSchema()`.
+- Updated dependencies
+  [[`04a7a75`](https://github.com/graphile/crystal/commit/04a7a75af90e03ac6949113dde1a23b493043a5b),
+  [`8f50146`](https://github.com/graphile/crystal/commit/8f5014605d2d3a3353ab99e2ac4bbadaadcccdca),
+  [`5e83533`](https://github.com/graphile/crystal/commit/5e83533f2d7005ba031d800c079e21f9fa1fecd5),
+  [`03e5ce5`](https://github.com/graphile/crystal/commit/03e5ce5b3feaed585b9fabef9e81a0b0564bc725),
+  [`cdeae97`](https://github.com/graphile/crystal/commit/cdeae97178c40cfcb1a4a4c470ea98b4376856dc),
+  [`0971ae0`](https://github.com/graphile/crystal/commit/0971ae065c952837237c2e8c0ee2021b30f82f86),
+  [`f75fc20`](https://github.com/graphile/crystal/commit/f75fc20c07f71fb8e8322d14ee1267e294bc0beb),
+  [`f213a8e`](https://github.com/graphile/crystal/commit/f213a8e4813ec79beddc81fc994314e99a9b67f9)]:
+  - grafserv@1.0.0-rc.6
+  - graphile-build-pg@5.0.0-rc.5
+  - graphile-config@1.0.0-rc.5
+  - @dataplan/pg@1.0.0-rc.5
+  - grafast@1.0.0-rc.7
+  - @dataplan/json@1.0.0-rc.5
+  - graphile-utils@5.0.0-rc.6
+
 ## 5.0.0-rc.6
 
 ### Patch Changes
