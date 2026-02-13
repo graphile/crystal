@@ -372,3 +372,18 @@ passed through during applying — these live on input objects or enums at
 
 You can freely mix the two patterns in the same schema depending on what makes
 sense for each input.
+
+## Complete example
+
+The following example is runnable and demonstrates:
+
+- Baking with `fieldArgs.getBaked("patch")` plus `inputObject.baked`.
+- Applying with `fieldArgs.apply($request, "filter")`.
+- Fan-out/fan-in via `Modifier` for an `or: [UserFilterInput!]` list.
+
+import complexInputsSource from "!!raw-loader!@site/../grafast/examples/complexInputs.mts";
+import CodeBlock from "@theme/CodeBlock";
+
+<CodeBlock language="ts">
+{complexInputsSource.replace(/^[\s\S]*?\/\*{10,}\//, '').trim()}
+</CodeBlock>
