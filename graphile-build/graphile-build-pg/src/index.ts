@@ -40,6 +40,7 @@ export { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionRes
 export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.ts";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.ts";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.ts";
+export { PgTextSearchPlugin } from "./plugins/PgTextSearchPlugin.ts";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.ts";
 export { defaultPreset } from "./preset.ts";
 export { parseDatabaseIdentifier, parseDatabaseIdentifiers } from "./utils.ts";
