@@ -352,32 +352,38 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (attributeCodec) {
               hasAtLeastOneAttribute = true;
 
-              // Mutate at will!
-              const tags = JSON.parse(JSON.stringify(rawTags));
-              const extensions: DataplanPg.PgCodecAttributeExtensions = {
-                tags,
-              };
+              const tags =
+                Object.keys(rawTags).length !== 0
+                  ? // Mutate at will!
+                    JSON.parse(JSON.stringify(rawTags))
+                  : null;
+              const extensions: Partial<DataplanPg.PgCodecAttributeExtensions> =
+                {
+                  ...(tags ? { tags } : null),
+                };
               if (attributeAttribute.attidentity === "a") {
                 // Generated ALWAYS so no insert/update
                 extensions.isInsertable = false;
                 extensions.isUpdatable = false;
               }
 
+              const notNull =
+                attributeAttribute.attnotnull === true ||
+                attributeAttribute.getType()?.typnotnull === true;
+              const hasDefault =
+                (attributeAttribute.atthasdef ?? undefined) ||
+                (attributeAttribute.attgenerated != null &&
+                  attributeAttribute.attgenerated !== "") ||
+                (attributeAttribute.attidentity != null &&
+                  attributeAttribute.attidentity !== "") ||
+                attributeAttribute.getType()?.typdefault != null;
               attributes[attributeAttribute.attname] = {
-                description,
+                ...(description ? { description } : null),
                 codec: attributeCodec,
-                notNull:
-                  attributeAttribute.attnotnull === true ||
-                  attributeAttribute.getType()?.typnotnull === true,
-                hasDefault:
-                  (attributeAttribute.atthasdef ?? undefined) ||
-                  (attributeAttribute.attgenerated != null &&
-                    attributeAttribute.attgenerated !== "") ||
-                  (attributeAttribute.attidentity != null &&
-                    attributeAttribute.attidentity !== "") ||
-                  attributeAttribute.getType()?.typdefault != null,
+                ...(notNull ? { notNull } : null),
+                ...(hasDefault ? { hasDefault } : null),
                 // PERF: identicalVia,
-                extensions,
+                ...(Object.keys(extensions).length > 0 ? { extensions } : null),
               };
               await info.process("pgCodecs_attribute", {
                 serviceName,
@@ -442,7 +448,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             name: codecName,
             identifier: sqlIdent,
             attributes,
-            description,
+            ...(description ? { description } : null),
             extensions,
             executor,
           };

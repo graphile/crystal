@@ -270,7 +270,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   return null;
                 }
                 attributes[argName] = {
-                  notNull: false,
                   codec: attributeCodec,
                   extensions: {
                     argIndex: i,
@@ -291,12 +290,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   attributes,
-                  description: undefined,
-                  extensions: {
-                    /* `The return type of our \`${name}\` ${
-                      pgProc.provolatile === "v" ? "mutation" : "query"
-                    }.`, */
-                  },
                   executor,
                   isAnonymous: true,
                 }),
