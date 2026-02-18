@@ -1241,7 +1241,11 @@ function builtinListOfCodec<TCodec extends (typeof TYPES)[keyof typeof TYPES]>(
   codec: TCodec,
   typeDelim = ",",
 ) {
-  return listOfCodec(codec, { typeDelim, extensions: { oid } });
+  return listOfCodec<TCodec, `${TCodec["name"]}Array`>(codec, {
+    name: `${codec.name}Array`,
+    typeDelim,
+    extensions: { oid },
+  });
 }
 
 export const LIST_TYPES = {
@@ -1373,7 +1377,7 @@ export const LIST_TYPES = {
     any
   >
     ? PgCodec<
-        `${UName}[]`,
+        `${UName}Array`,
         undefined,
         string,
         readonly PgCodecTFromJavaScript<(typeof TYPES)[name]>[],
