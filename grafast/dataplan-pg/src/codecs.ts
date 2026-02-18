@@ -1399,109 +1399,205 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.void;
     case "bool":
       return TYPES.boolean;
+    case "_bool":
+      return LIST_TYPES.boolean;
 
     case "bytea":
       return TYPES.bytea; // oid: 17
+    case "_bytea":
+      return LIST_TYPES.bytea; // oid: 17
 
     case "char":
       return TYPES.char;
+    case "_char":
+      return LIST_TYPES.char;
     case "bpchar":
       return TYPES.bpchar;
+    case "_bpchar":
+      return LIST_TYPES.bpchar;
     case "varchar":
       return TYPES.varchar;
+    case "_varchar":
+      return LIST_TYPES.varchar;
     case "text":
       return TYPES.text;
+    case "_text":
+      return LIST_TYPES.text;
     case "name":
       return TYPES.name;
+    case "_name":
+      return LIST_TYPES.name;
     case "uuid":
       return TYPES.uuid;
+    case "_uuid":
+      return LIST_TYPES.uuid;
 
     case "xml":
       return TYPES.xml;
+    case "_xml":
+      return LIST_TYPES.xml;
     case "json":
       return TYPES.json;
+    case "_json":
+      return LIST_TYPES.json;
     case "jsonb":
       return TYPES.jsonb;
+    case "_jsonb":
+      return LIST_TYPES.jsonb;
     case "jsonpath":
       return TYPES.jsonpath;
+    case "_jsonpath":
+      return LIST_TYPES.jsonpath;
 
     case "bit":
       return TYPES.bit;
+    case "_bit":
+      return LIST_TYPES.bit;
     case "varbit":
       return TYPES.varbit;
+    case "_varbit":
+      return LIST_TYPES.varbit;
 
     case "int2":
       return TYPES.int2;
+    case "_int2":
+      return LIST_TYPES.int2;
     case "int4":
       return TYPES.int;
+    case "_int4":
+      return LIST_TYPES.int;
     case "int8":
       return TYPES.bigint;
+    case "_int8":
+      return LIST_TYPES.bigint;
     case "float8":
       return TYPES.float;
+    case "_float8":
+      return LIST_TYPES.float;
     case "float4":
       return TYPES.float4;
+    case "_float4":
+      return LIST_TYPES.float4;
     case "numeric":
       return TYPES.numeric;
+    case "_numeric":
+      return LIST_TYPES.numeric;
     case "money":
       return TYPES.money;
+    case "_money":
+      return LIST_TYPES.money;
 
     case "box":
       return TYPES.box;
+    case "_box":
+      return LIST_TYPES.box;
     case "point":
       return TYPES.point;
+    case "_point":
+      return LIST_TYPES.point;
     case "path":
       return TYPES.path;
+    case "_path":
+      return LIST_TYPES.path;
     case "line":
       return TYPES.line;
+    case "_line":
+      return LIST_TYPES.line;
     case "lseg":
       return TYPES.lseg;
+    case "_lseg":
+      return LIST_TYPES.lseg;
     case "circle":
       return TYPES.circle;
+    case "_circle":
+      return LIST_TYPES.circle;
     case "polygon":
       return TYPES.polygon;
+    case "_polygon":
+      return LIST_TYPES.polygon;
 
     case "cidr":
       return TYPES.cidr;
+    case "_cidr":
+      return LIST_TYPES.cidr;
     case "inet":
       return TYPES.inet;
+    case "_inet":
+      return LIST_TYPES.inet;
     case "macaddr":
       return TYPES.macaddr;
+    case "_macaddr":
+      return LIST_TYPES.macaddr;
     case "macaddr8":
       return TYPES.macaddr8;
+    case "_macaddr8":
+      return LIST_TYPES.macaddr8;
 
     case "date":
       return TYPES.date;
+    case "_date":
+      return LIST_TYPES.date;
     case "timestamp":
       return TYPES.timestamp;
+    case "_timestamp":
+      return LIST_TYPES.timestamp;
     case "timestamptz":
       return TYPES.timestamptz;
+    case "_timestamptz":
+      return LIST_TYPES.timestamptz;
     case "time":
       return TYPES.time;
+    case "_time":
+      return LIST_TYPES.time;
     case "timetz":
       return TYPES.timetz;
+    case "_timetz":
+      return LIST_TYPES.timetz;
     case "interval":
       return TYPES.interval;
+    case "_interval":
+      return LIST_TYPES.interval;
 
     case "regclass":
       return TYPES.regclass;
+    case "_regclass":
+      return LIST_TYPES.regclass;
     case "regconfig":
       return TYPES.regconfig;
+    case "_regconfig":
+      return LIST_TYPES.regconfig;
     case "regdictionary":
       return TYPES.regdictionary;
+    case "_regdictionary":
+      return LIST_TYPES.regdictionary;
     case "regnamespace":
       return TYPES.regnamespace;
+    case "_regnamespace":
+      return LIST_TYPES.regnamespace;
     case "regoper":
       return TYPES.regoper;
+    case "_regoper":
+      return LIST_TYPES.regoper;
     case "regoperator":
       return TYPES.regoperator;
+    case "_regoperator":
+      return LIST_TYPES.regoperator;
     case "regproc":
       return TYPES.regproc;
+    case "_regproc":
+      return LIST_TYPES.regproc;
     case "regprocedure":
       return TYPES.regprocedure;
+    case "_regprocedure":
+      return LIST_TYPES.regprocedure;
     case "regrole":
       return TYPES.regrole;
+    case "_regrole":
+      return LIST_TYPES.regrole;
     case "regtype":
       return TYPES.regtype;
+    case "_regtype":
+      return LIST_TYPES.regtype;
   }
   return null;
 }
