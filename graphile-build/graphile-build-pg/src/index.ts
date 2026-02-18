@@ -133,7 +133,7 @@ declare global {
   namespace DataplanPg {
     interface PgResourceExtensions {
       description?: string;
-      tags: Partial<GraphileBuild.PgResourceTags>;
+      tags?: Partial<GraphileBuild.PgResourceTags>;
       singleOutputParameterName?: string;
       /** For v4 compatibility, what's the name of the actual table. */
       pg?: {
@@ -151,25 +151,25 @@ declare global {
     }
 
     interface PgResourceUniqueExtensions {
-      tags: Partial<GraphileBuild.PgResourceUniqueTags>;
+      tags?: Partial<GraphileBuild.PgResourceUniqueTags>;
     }
 
     interface PgCodecRelationExtensions {
-      tags: Partial<GraphileBuild.PgCodecRelationTags>;
+      tags?: Partial<GraphileBuild.PgCodecRelationTags>;
     }
 
     interface PgCodecRefExtensions {
-      tags: Partial<GraphileBuild.PgCodecRefTags>;
+      tags?: Partial<GraphileBuild.PgCodecRefTags>;
     }
 
     interface PgCodecAttributeExtensions {
-      tags: Partial<GraphileBuild.PgCodecAttributeTags>;
+      tags?: Partial<GraphileBuild.PgCodecAttributeTags>;
     }
 
     interface PgCodecExtensions {
       /** If false but the codec has attributes then it's probably a composite type */
       isTableLike?: boolean;
-      tags: Partial<GraphileBuild.PgCodecTags>;
+      tags?: Partial<GraphileBuild.PgCodecTags>;
       pg?: {
         /** The service from which this type originates; if it represents a built in type then it should be null */
         serviceName: string | null;

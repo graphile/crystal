@@ -214,7 +214,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         //const codec = relation.remoteResource.codec;
-        if (typeof relation.extensions?.tags.fieldName === "string") {
+        if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
         // E.g. posts(author_id) references users(id)
@@ -232,11 +232,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         if (
-          typeof relation.extensions?.tags.foreignSingleFieldName === "string"
+          typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
         ) {
           return relation.extensions.tags.foreignSingleFieldName;
         }
-        if (typeof relation.extensions?.tags.foreignFieldName === "string") {
+        if (typeof relation.extensions?.tags?.foreignFieldName === "string") {
           return relation.extensions.tags.foreignFieldName;
         }
         // E.g. posts(author_id) references users(id)
@@ -253,7 +253,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       _manyRelationRaw(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        const baseOverride = relation.extensions?.tags?.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
         }
@@ -271,7 +271,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       manyRelationConnection(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const override = relation.extensions?.tags.foreignConnectionFieldName;
+        const override = relation.extensions?.tags?.foreignConnectionFieldName;
         if (typeof override === "string") {
           return override;
         }
@@ -280,7 +280,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       manyRelationList(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const override = relation.extensions?.tags.foreignSimpleFieldName;
+        const override = relation.extensions?.tags?.foreignSimpleFieldName;
         if (typeof override === "string") {
           return override;
         }
@@ -1590,7 +1590,7 @@ function addRelations(
       connectionPlan,
       pgRefDetails,
       relatedTypeName: context.Self.name,
-      isNonNull: ref?.extensions?.tags.notNull,
+      isNonNull: ref?.extensions?.tags?.notNull,
     };
     digests.push(digest);
   }
