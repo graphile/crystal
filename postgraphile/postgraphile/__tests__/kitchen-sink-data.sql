@@ -215,6 +215,10 @@ insert into b.types values (
   null,
   null,
   null,
+  null,
+  null,
+  null,
+  null,
   null
 );
 
@@ -268,7 +272,11 @@ insert into b.types values (
   decode('12340000AAAAFFFF9876', 'base64'),
   array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
   'Top.Child1.Child2'::ltree,
-  '{Top.Child1.Child2,Top.Child3.Child4}'::ltree[]
+  '{Top.Child1.Child2,Top.Child3.Child4}'::ltree[],
+  'cat:1 mat:2 bat:1'::tsvector,
+  '{cat:1 mat:2 bat:1,sat:1 cat:1,mat:1 bat:1 fat:1 rat:1}'::tsvector[],
+  'fat & rat'::tsquery,
+  '{fat & rat,cat & sat,mat & bat}'::tsquery[]
 );
 
 -- Arrays
@@ -291,7 +299,11 @@ insert into b.lists values (
     (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
   ],
   array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
-  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
+  array['cat:1 mat:2 bat:1', 'sat:1 cat:1', 'mat:1 bat:1 fat:1 rat:1']::tsvector[],
+  array['cat:1 mat:2 bat:1', 'sat:1 cat:1', 'mat:1 bat:1 fat:1 rat:1']::tsvector[],
+  array['fat & rat', 'cat & sat', 'mat & bat']::tsquery[],
+  array['fat & rat', 'cat & sat', 'mat & bat']::tsquery[]
 ),
 
 -- Nulls
@@ -311,7 +323,11 @@ insert into b.lists values (
     (2, '3', 'green', '00000000-0000-0000-0000-000000000001', 'BAR_FOO', '', interval '3 hours', 4)::c.compound_type
   ],
   null,
-  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[]
+  array[decode('AAAA123400xXyYzZAAAA', 'base64'), decode('1234AAAA567890abcdefGHIJKAAA', 'base64')]::bytea[],
+  null,
+  array['cat:1 mat:2 bat:1', 'sat:1 cat:1', 'mat:1 bat:1 fat:1 rat:1']::tsvector[],
+  null,
+  array['fat & rat', 'cat & sat', 'mat & bat']::tsquery[]
 ),
 
 -- Empty arrays
@@ -328,7 +344,11 @@ insert into b.lists values (
   ARRAY[]::c.compound_type[],
   ARRAY[]::c.compound_type[],
   ARRAY[]::bytea[],
-  ARRAY[]::bytea[]
+  ARRAY[]::bytea[],
+  array[]::tsvector[],
+  array[]::tsvector[],
+  array[]::tsquery[],
+  array[]::tsquery[]
 );
 
 insert into c.edge_case values
