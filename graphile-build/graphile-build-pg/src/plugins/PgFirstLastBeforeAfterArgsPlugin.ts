@@ -65,6 +65,7 @@ const applyFirstArg = EXPORTABLE(
       $connection.setFirst(arg.getRaw());
     },
   [],
+  "applyFirstArg",
 );
 
 const applyLastArg = EXPORTABLE(
@@ -84,6 +85,7 @@ const applyLastArg = EXPORTABLE(
       $connection.setLast(val.getRaw());
     },
   [],
+  "applyLastArg",
 );
 
 const applyOffsetArg = EXPORTABLE(
@@ -103,6 +105,7 @@ const applyOffsetArg = EXPORTABLE(
       $connection.setOffset(val.getRaw());
     },
   [],
+  "applyOffsetArg",
 );
 
 const applyBeforeArg = EXPORTABLE(
@@ -122,6 +125,7 @@ const applyBeforeArg = EXPORTABLE(
       $connection.setBefore(val.getRaw());
     },
   [],
+  "applyBeforeArg",
 );
 
 const applyAfterArg = EXPORTABLE(
@@ -141,6 +145,7 @@ const applyAfterArg = EXPORTABLE(
       $connection.setAfter(val.getRaw());
     },
   [],
+  "applyAfterArg",
 );
 
 function commonFn(

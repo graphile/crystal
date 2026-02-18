@@ -36,7 +36,7 @@ declare global {
 
 const applyOrderByArgToConnection = EXPORTABLE(
   () =>
-    (
+    function applyOrderByArgToConnection(
       parent: any,
       $connection: ConnectionStep<
         any,
@@ -47,18 +47,25 @@ const applyOrderByArgToConnection = EXPORTABLE(
         PgSelectStep<any>
       >,
       value: FieldArg,
-    ) => {
+    ) {
       const $select = $connection.getSubplan();
       value.apply($select);
     },
   [],
+  "applyOrderByArgToConnection",
 );
 
 const applyOrderByArg = EXPORTABLE(
-  () => (parent: any, $select: PgSelectStep<any>, value: FieldArg) => {
-    value.apply($select);
-  },
+  () =>
+    function applyOrderByArg(
+      parent: any,
+      $select: PgSelectStep<any>,
+      value: FieldArg,
+    ) {
+      value.apply($select);
+    },
   [],
+  "applyOrderByArg",
 );
 
 export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {

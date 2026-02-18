@@ -68,6 +68,7 @@ const applyConditionArgToConnection = EXPORTABLE(
       arg.apply($select, qbWhereBuilder);
     },
   [qbWhereBuilder],
+  "applyConditionArgToConnection",
 );
 
 const applyConditionArg = EXPORTABLE(
@@ -76,6 +77,7 @@ const applyConditionArg = EXPORTABLE(
       arg.apply($select, qbWhereBuilder);
     },
   [qbWhereBuilder],
+  "applyConditionArg",
 );
 
 export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
