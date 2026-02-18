@@ -706,27 +706,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             namespaceName,
             typeName,
           );
+          const spec = {
+            ...(description ? { description } : null),
+            extensions,
+          };
           event.pgCodec = EXPORTABLE(
-            (
-              codecName,
-              description,
-              extensions,
-              innerCodec,
-              rangeOfCodec,
-              sqlIdent,
-            ) =>
-              rangeOfCodec(innerCodec, codecName, sqlIdent, {
-                description,
-                extensions,
-              }),
-            [
-              codecName,
-              description,
-              extensions,
-              innerCodec,
-              rangeOfCodec,
-              sqlIdent,
-            ],
+            (codecName, innerCodec, rangeOfCodec, spec, sqlIdent) =>
+              rangeOfCodec(innerCodec, codecName, sqlIdent, spec),
+            [codecName, innerCodec, rangeOfCodec, spec, sqlIdent],
             `${codecName}Codec`,
           );
           return;
@@ -777,30 +764,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               typeName,
             );
             exportNameHint(sqlIdent, `${codecName}Identifier`);
+            const spec = {
+              ...(description ? { description } : null),
+              ...(notNull ? { notNull } : null),
+              extensions,
+            };
             event.pgCodec = EXPORTABLE(
-              (
-                codecName,
-                description,
-                domainOfCodec,
-                extensions,
-                innerCodec,
-                notNull,
-                sqlIdent,
-              ) =>
-                domainOfCodec(innerCodec, codecName, sqlIdent, {
-                  description,
-                  extensions,
-                  notNull,
-                }) as PgCodec,
-              [
-                codecName,
-                description,
-                domainOfCodec,
-                extensions,
-                innerCodec,
-                notNull,
-                sqlIdent,
-              ],
+              (codecName, domainOfCodec, innerCodec, spec, sqlIdent) =>
+                domainOfCodec(innerCodec, codecName, sqlIdent, spec) as PgCodec,
+              [codecName, domainOfCodec, innerCodec, spec, sqlIdent],
               `${codecName}Codec`,
             );
             return;
