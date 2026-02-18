@@ -744,11 +744,7 @@ export function extendSchema(
                       ? { extensions }
                       : null),
                   };
-                  if (Object.keys(spec).length === 0) {
-                    return memo;
-                  } else {
-                    return { ...memo, [valueName]: spec };
-                  }
+                  return { ...memo, [valueName]: spec };
                 },
                 Object.create(null),
               );
