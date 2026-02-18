@@ -1,5 +1,7 @@
 ---
 "graphile-build-pg": minor
+"@dataplan/pg": minor
+"postgraphile": minor
 ---
 
-Add Text Search plugin
+Add tsvector and tsquery support
