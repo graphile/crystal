@@ -191,6 +191,19 @@ const applyInputToUpdateOrDelete = EXPORTABLE(
   "applyInputToUpdateOrDelete",
 );
 
+const planUpdateOrDeletePayloadResult = EXPORTABLE(
+  () =>
+    function plan(
+      $object: ObjectStep<{
+        result: PgUpdateSingleStep | PgDeleteSingleStep;
+      }>,
+    ) {
+      return $object.get("result");
+    },
+  [],
+  "planUpdateOrDeletePayloadResult",
+);
+
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
@@ -404,19 +417,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: TableType,
-                              plan: EXPORTABLE(
-                                () =>
-                                  function plan(
-                                    $object: ObjectStep<{
-                                      result:
-                                        | PgUpdateSingleStep
-                                        | PgDeleteSingleStep;
-                                    }>,
-                                  ) {
-                                    return $object.get("result");
-                                  },
-                                [],
-                              ),
+                              plan: planUpdateOrDeletePayloadResult,
                             }),
                           ),
                         }

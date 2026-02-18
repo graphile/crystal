@@ -337,6 +337,18 @@ const applyInputArgViaPgSelect = EXPORTABLE(
   "applyInputArgViaPgSelect",
 );
 
+const planCustomMutationPayloadResult = EXPORTABLE(
+  () =>
+    (
+      $object: ObjectStep<{
+        result: PgClassSingleStep;
+      }>,
+    ) => {
+      return $object.get("result");
+    },
+  [],
+);
+
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
@@ -894,17 +906,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             !resource.extensions?.tags?.notNull,
                             type,
                           ),
-                          plan: EXPORTABLE(
-                            () =>
-                              (
-                                $object: ObjectStep<{
-                                  result: PgClassSingleStep;
-                                }>,
-                              ) => {
-                                return $object.get("result");
-                              },
-                            [],
-                          ),
+                          plan: planCustomMutationPayloadResult,
                         };
                         return fields;
                       },

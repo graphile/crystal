@@ -78,7 +78,7 @@ const applyInputToInsert = EXPORTABLE(
   "applyInputToInsert",
 );
 
-const planPayloadResult = EXPORTABLE(
+const planCreatePayloadResult = EXPORTABLE(
   () =>
     function plan(
       $object: ObjectStep<{
@@ -88,7 +88,7 @@ const planPayloadResult = EXPORTABLE(
       return $object.get("result");
     },
   [],
-  "planPayloadResult",
+  "planCreatePayloadResult",
 );
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -274,7 +274,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                             {
                               description: `The \`${tableTypeName}\` that was created by this mutation.`,
                               type: TableType,
-                              plan: planPayloadResult,
+                              plan: planCreatePayloadResult,
                               ...(deprecationReason
                                 ? { deprecationReason }
                                 : null),
