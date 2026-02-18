@@ -110,6 +110,7 @@ type Query implements Node {
   ): FuncOutSetofConnection
   funcOutUnnamed: Int
   noArgsQuery: Int
+  queryIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""
   queryIntervalSet(
@@ -131,6 +132,7 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): QueryIntervalSetConnection
+  queryTextArray: [String]
 
   """Reads and enables pagination through a set of `Int8`."""
   staticBigInteger(
@@ -279,12 +281,11 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): FuncReturnsTableMultiColConnection
-  queryIntervalArray: [Interval]
-  queryTextArray: [String]
   returnTableWithoutGrants: CompoundKey
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
-  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+  tableQuery(id: Int): Post
 
   """Reads and enables pagination through a set of `CompoundType`."""
   compoundTypeSetQuery(
@@ -307,9 +308,6 @@ type Query implements Node {
     after: Cursor
   ): CompoundTypesConnection
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  tableQuery(id: Int): Post
-  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
-  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
 
   """
@@ -337,6 +335,8 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): FuncOutComplexSetofConnection
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
 
   """Reads and enables pagination through a set of `Person`."""
   badlyBehavedFunction(
@@ -1744,6 +1744,7 @@ type Post implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  computedIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""
   computedIntervalSet(
@@ -1765,7 +1766,6 @@ type Post implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): PostComputedIntervalSetConnection!
-  computedIntervalArray: [Interval]
   computedTextArray: [String]
   computedWithOptionalArg(i: Int): Int
   computedWithRequiredArg(i: Int!): Int
@@ -3080,15 +3080,15 @@ input FloatRangeBoundInput {
   inclusive: Boolean!
 }
 
-type FuncOutOutCompoundTypeRecord {
-  o1: Int
-  o2: CompoundType
-}
-
 type QueryOutputTwoRowsRecord {
   txt: String
   leftArm: LeftArm
   post: Post
+}
+
+type FuncOutOutCompoundTypeRecord {
+  o1: Int
+  o2: CompoundType
 }
 
 """A connection to a list of `CompoundType` values."""
@@ -4297,12 +4297,24 @@ type Mutation {
     """
     input: ReturnVoidMutationInput!
   ): ReturnVoidMutationPayload
+  mutationIntervalArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationIntervalArrayInput!
+  ): MutationIntervalArrayPayload
   mutationIntervalSet(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: MutationIntervalSetInput!
   ): MutationIntervalSetPayload
+  mutationTextArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationTextArrayInput!
+  ): MutationTextArrayPayload
   mutationInOut(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4443,30 +4455,18 @@ type Mutation {
     """
     input: MutationReturnsTableMultiColInput!
   ): MutationReturnsTableMultiColPayload
-  guidFn(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: GuidFnInput!
-  ): GuidFnPayload
-  mutationIntervalArray(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: MutationIntervalArrayInput!
-  ): MutationIntervalArrayPayload
-  mutationTextArray(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: MutationTextArrayInput!
-  ): MutationTextArrayPayload
   listBdeMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: ListBdeMutationInput!
   ): ListBdeMutationPayload
+  guidFn(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: GuidFnInput!
+  ): GuidFnPayload
   authenticateFail(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4479,6 +4479,12 @@ type Mutation {
     """
     input: AuthenticateInput!
   ): AuthenticatePayload
+  typesMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TypesMutationInput!
+  ): TypesMutationPayload
   leftArmIdentity(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4509,18 +4515,24 @@ type Mutation {
     """
     input: AuthenticatePayloadInput!
   ): AuthenticatePayloadPayload
-  typesMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: TypesMutationInput!
-  ): TypesMutationPayload
   mutationOutOutCompoundType(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: MutationOutOutCompoundTypeInput!
   ): MutationOutOutCompoundTypePayload
+  tableMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: TableMutationInput!
+  ): TableMutationPayload
+  postWithSuffix(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostWithSuffixInput!
+  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
   compoundTypeMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4539,18 +4551,18 @@ type Mutation {
     """
     input: ListOfCompoundTypesMutationInput!
   ): ListOfCompoundTypesMutationPayload
-  tableMutation(
+  mutationOutComplex(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: TableMutationInput!
-  ): TableMutationPayload
-  postWithSuffix(
+    input: MutationOutComplexInput!
+  ): MutationOutComplexPayload
+  mutationOutComplexSetof(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: PostWithSuffixInput!
-  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
+    input: MutationOutComplexSetofInput!
+  ): MutationOutComplexSetofPayload
   mutationCompoundTypeArray(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4569,18 +4581,6 @@ type Mutation {
     """
     input: PostManyInput!
   ): PostManyPayload
-  mutationOutComplex(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: MutationOutComplexInput!
-  ): MutationOutComplexPayload
-  mutationOutComplexSetof(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: MutationOutComplexSetofInput!
-  ): MutationOutComplexSetofPayload
   mutationOutTable(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -5602,6 +5602,30 @@ input ReturnVoidMutationInput {
   clientMutationId: String
 }
 
+"""The output of our `mutationIntervalArray` mutation."""
+type MutationIntervalArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  intervals: [Interval]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationIntervalArray` mutation."""
+input MutationIntervalArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
 """The output of our `mutationIntervalSet` mutation."""
 type MutationIntervalSetPayload {
   """
@@ -5619,6 +5643,30 @@ type MutationIntervalSetPayload {
 
 """All input for the `mutationIntervalSet` mutation."""
 input MutationIntervalSetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our `mutationTextArray` mutation."""
+type MutationTextArrayPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  strings: [String]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `mutationTextArray` mutation."""
+input MutationTextArrayInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -6210,81 +6258,6 @@ input MutationReturnsTableMultiColInput {
   i: Int
 }
 
-"""The output of our `guidFn` mutation."""
-type GuidFnPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  guid: Guid
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-scalar Guid
-
-"""All input for the `guidFn` mutation."""
-input GuidFnInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  g: Guid
-}
-
-"""The output of our `mutationIntervalArray` mutation."""
-type MutationIntervalArrayPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  intervals: [Interval]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `mutationIntervalArray` mutation."""
-input MutationIntervalArrayInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our `mutationTextArray` mutation."""
-type MutationTextArrayPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  strings: [String]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `mutationTextArray` mutation."""
-input MutationTextArrayInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
 """The output of our `listBdeMutation` mutation."""
 type ListBdeMutationPayload {
   """
@@ -6310,6 +6283,33 @@ input ListBdeMutationInput {
   b: [String]
   d: String
   e: String
+}
+
+"""The output of our `guidFn` mutation."""
+type GuidFnPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  guid: Guid
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+scalar Guid
+
+"""All input for the `guidFn` mutation."""
+input GuidFnInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  g: Guid
 }
 
 """The output of our `authenticateFail` mutation."""
@@ -6369,6 +6369,36 @@ input AuthenticateInput {
   a: Int
   b: BigFloat
   c: BigInt
+}
+
+"""The output of our `typesMutation` mutation."""
+type TypesMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  boolean: Boolean
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `typesMutation` mutation."""
+input TypesMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  a: BigInt!
+  b: Boolean!
+  c: String!
+  d: [Int]!
+  e: JSON!
+  f: FloatRangeInput!
 }
 
 """The output of our `leftArmIdentity` mutation."""
@@ -6533,36 +6563,6 @@ input AuthenticatePayloadInput {
   c: BigInt
 }
 
-"""The output of our `typesMutation` mutation."""
-type TypesMutationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  boolean: Boolean
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `typesMutation` mutation."""
-input TypesMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  a: BigInt!
-  b: Boolean!
-  c: String!
-  d: [Int]!
-  e: JSON!
-  f: FloatRangeInput!
-}
-
 """The output of our `mutationOutOutCompoundType` mutation."""
 type MutationOutOutCompoundTypePayload {
   """
@@ -6591,81 +6591,6 @@ input MutationOutOutCompoundTypeInput {
   """
   clientMutationId: String
   i1: Int
-}
-
-"""The output of our `compoundTypeMutation` mutation."""
-type CompoundTypeMutationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  compoundType: CompoundType
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `compoundTypeMutation` mutation."""
-input CompoundTypeMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  object: CompoundTypeInput
-}
-
-"""The output of our `compoundTypeSetMutation` mutation."""
-type CompoundTypeSetMutationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  compoundTypes: [CompoundType]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `compoundTypeSetMutation` mutation."""
-input CompoundTypeSetMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  object: CompoundTypeInput
-}
-
-"""The output of our `listOfCompoundTypesMutation` mutation."""
-type ListOfCompoundTypesMutationPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  compoundTypes: [CompoundType]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `listOfCompoundTypesMutation` mutation."""
-input ListOfCompoundTypesMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  records: [CompoundTypeInput]
 }
 
 """The output of our `tableMutation` mutation."""
@@ -6747,6 +6672,145 @@ input PostInput {
   comptypes: [ComptypeInput]
 }
 
+"""The output of our `compoundTypeMutation` mutation."""
+type CompoundTypeMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundType: CompoundType
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `compoundTypeMutation` mutation."""
+input CompoundTypeMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+"""The output of our `compoundTypeSetMutation` mutation."""
+type CompoundTypeSetMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `compoundTypeSetMutation` mutation."""
+input CompoundTypeSetMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+"""The output of our `listOfCompoundTypesMutation` mutation."""
+type ListOfCompoundTypesMutationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `listOfCompoundTypesMutation` mutation."""
+input ListOfCompoundTypesMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  records: [CompoundTypeInput]
+}
+
+"""The output of our `mutationOutComplex` mutation."""
+type MutationOutComplexPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: MutationOutComplexRecord
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type MutationOutComplexRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""All input for the `mutationOutComplex` mutation."""
+input MutationOutComplexInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  a: Int
+  b: String
+}
+
+"""The output of our `mutationOutComplexSetof` mutation."""
+type MutationOutComplexSetofPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  results: [MutationOutComplexSetofRecord]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+type MutationOutComplexSetofRecord {
+  x: Int
+  y: CompoundType
+  z: Person
+}
+
+"""All input for the `mutationOutComplexSetof` mutation."""
+input MutationOutComplexSetofInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  a: Int
+  b: String
+}
+
 """The output of our `mutationCompoundTypeArray` mutation."""
 type MutationCompoundTypeArrayPayload {
   """
@@ -6820,70 +6884,6 @@ input PostManyInput {
   """
   clientMutationId: String
   posts: [PostInput]
-}
-
-"""The output of our `mutationOutComplex` mutation."""
-type MutationOutComplexPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: MutationOutComplexRecord
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type MutationOutComplexRecord {
-  x: Int
-  y: CompoundType
-  z: Person
-}
-
-"""All input for the `mutationOutComplex` mutation."""
-input MutationOutComplexInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  a: Int
-  b: String
-}
-
-"""The output of our `mutationOutComplexSetof` mutation."""
-type MutationOutComplexSetofPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  results: [MutationOutComplexSetofRecord]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type MutationOutComplexSetofRecord {
-  x: Int
-  y: CompoundType
-  z: Person
-}
-
-"""All input for the `mutationOutComplexSetof` mutation."""
-input MutationOutComplexSetofInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  a: Int
-  b: String
 }
 
 """The output of our `mutationOutTable` mutation."""
