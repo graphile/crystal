@@ -447,22 +447,19 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           ? tags.backwardBehavior
           : tags.forwardBehavior;
         const behavior = combineBehaviors(baseBehavior, specificBehavior);
+        if (behavior.length) {
+          tags.behavior = behavior;
+        }
         const newRelation: PgCodecRelationConfig = {
           localCodec: localCodec as PgCodecWithAttributes,
           localCodecPolymorphicTypes,
           localAttributes: localAttributes.map((c) => c!.attname),
           remoteAttributes: foreignAttributes.map((c) => c!.attname),
           remoteResourceOptions: foreignResourceOptions,
-          isUnique,
-          isReferencee,
-          description:
-            typeof description === "string" ? description : undefined,
-          extensions: {
-            tags: {
-              ...tags,
-              behavior,
-            },
-          },
+          ...(isUnique ? { isUnique } : null),
+          ...(isReferencee ? { isReferencee } : null),
+          ...(description ? { description } : null),
+          ...(Object.keys(tags).length > 0 ? { extensions: { tags } } : null),
         };
         await info.process("pgRelations_relation", {
           serviceName,
@@ -887,7 +884,7 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgResource?: PgResource;
+    pgResource?: PgResource<any, any, any, any, any>;
     pgCodec: PgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     pgRefDetails?: GraphileBuild.PgRelationsPluginRefDetails;
@@ -933,7 +930,7 @@ function addRelations(
         }
       }
 
-      const isUnique = relation.isUnique;
+      const isUnique = relation.isUnique ?? false;
       const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =

@@ -518,7 +518,7 @@ export interface PgCodecRelationBase<
   /**
    * If true then there's at most one record this relationship will find.
    */
-  isUnique: boolean;
+  isUnique?: boolean;
 
   /**
    * If true then this is a reverse lookup (where our local attributes are
@@ -530,7 +530,7 @@ export interface PgCodecRelationBase<
   /**
    * Space for you to add your own metadata.
    */
-  extensions?: PgCodecRelationExtensions;
+  extensions?: DataplanPg.PgCodecRelationExtensions;
 
   description?: string;
 }

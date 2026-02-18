@@ -430,7 +430,7 @@ export const resolveResourceRefPath = (
       localAttributes,
       remoteAttributes,
       remoteResource: resource,
-      isUnique,
+      isUnique = false,
     } = relation;
     if (isReferencee) {
       result.hasReferencee = true;
