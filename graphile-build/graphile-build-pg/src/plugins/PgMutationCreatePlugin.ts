@@ -6,7 +6,7 @@ import type {
   PgResource,
 } from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
-import type { FieldArgs, ObjectStep } from "grafast";
+import type { FieldArg, FieldArgs, ObjectStep } from "grafast";
 import { assertStep, object } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
@@ -89,6 +89,29 @@ const planCreatePayloadResult = EXPORTABLE(
     },
   [],
   "planCreatePayloadResult",
+);
+
+const applyClientMutationIdForCreate = EXPORTABLE(
+  () =>
+    function apply(qb: PgInsertSingleQueryBuilder, val: any) {
+      qb.setMeta("clientMutationId", val);
+    },
+  [],
+  "applyClientMutationIdForCreate",
+);
+
+const getClientMutationIdForCreatePlan = EXPORTABLE(
+  () =>
+    function plan(
+      $mutation: ObjectStep<{
+        result: PgInsertSingleStep;
+      }>,
+    ) {
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
+    },
+  [],
+  "getClientMutationIdForCreatePlan",
 );
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
@@ -181,13 +204,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   return {
                     clientMutationId: {
                       type: GraphQLString,
-                      apply: EXPORTABLE(
-                        () =>
-                          function apply(qb: PgInsertSingleQueryBuilder, val) {
-                            qb.setMeta("clientMutationId", val);
-                          },
-                        [],
-                      ),
+                      apply: applyClientMutationIdForCreate,
                     },
                     ...(isInputType(TableInput)
                       ? {
@@ -247,18 +264,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   return {
                     clientMutationId: {
                       type: GraphQLString,
-                      plan: EXPORTABLE(
-                        () =>
-                          function plan(
-                            $mutation: ObjectStep<{
-                              result: PgInsertSingleStep;
-                            }>,
-                          ) {
-                            const $insert = $mutation.getStepForKey("result");
-                            return $insert.getMeta("clientMutationId");
-                          },
-                        [],
-                      ),
+                      plan: getClientMutationIdForCreatePlan,
                     },
                     ...(TableType &&
                     build.behavior.pgResourceMatches(

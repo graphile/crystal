@@ -350,6 +350,32 @@ const planCustomMutationPayloadResult = EXPORTABLE(
   "planCustomMutationPayloadResult",
 );
 
+const getClientMutationIdForCustomMutationPlan = EXPORTABLE(
+  () =>
+    function plan(
+      $object: ObjectStep<{
+        result:
+          | PgSelectStep
+          | PgSelectSingleStep
+          | PgClassExpressionStep<any, any>;
+      }>,
+    ) {
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
+    },
+  [],
+  "getClientMutationIdForCustomMutationPlan",
+);
+
+const applyClientMutationIdForCustomMutation = EXPORTABLE(
+  () =>
+    function apply(qb: PgSelectQueryBuilder, val: string | null) {
+      qb.setMeta("clientMutationId", val);
+    },
+  [],
+  "applyClientMutationIdForCustomMutation",
+);
+
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
@@ -811,16 +837,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             Object.assign(Object.create(null), {
                               clientMutationId: {
                                 type: GraphQLString,
-                                apply: EXPORTABLE(
-                                  () =>
-                                    function apply(
-                                      qb: PgSelectQueryBuilder,
-                                      val: string | null,
-                                    ) {
-                                      qb.setMeta("clientMutationId", val);
-                                    },
-                                  [],
-                                ),
+                                apply: applyClientMutationIdForCustomMutation,
                               },
                             }) as GrafastInputFieldConfigMap<any>,
                           );
@@ -852,22 +869,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         const fields = Object.assign(Object.create(null), {
                           clientMutationId: {
                             type: GraphQLString,
-                            plan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  $object: ObjectStep<{
-                                    result:
-                                      | PgSelectStep
-                                      | PgSelectSingleStep
-                                      | PgClassExpressionStep<any, any>;
-                                  }>,
-                                ) {
-                                  const $result =
-                                    $object.getStepForKey("result");
-                                  return $result.getMeta("clientMutationId");
-                                },
-                              [],
-                            ),
+                            plan: getClientMutationIdForCustomMutationPlan,
                           },
                         }) as Record<string, GrafastFieldConfig<any, any, any>>;
                         if (isVoid) {

@@ -204,6 +204,32 @@ const planUpdateOrDeletePayloadResult = EXPORTABLE(
   "planUpdateOrDeletePayloadResult",
 );
 
+const getClientMutationIdForUpdateOrDeletePlan = EXPORTABLE(
+  () =>
+    function plan(
+      $mutation: ObjectStep<{
+        result: PgUpdateSingleStep | PgDeleteSingleStep;
+      }>,
+    ) {
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
+    },
+  [],
+  "getClientMutationIdForUpdateOrDeletePlan",
+);
+
+const applyClientMutationIdForUpdateOrDelete = EXPORTABLE(
+  () =>
+    function apply(
+      qb: PgUpdateSingleQueryBuilder | PgDeleteSingleQueryBuilder,
+      val: string | null,
+    ) {
+      qb.setMeta("clientMutationId", val);
+    },
+  [],
+  "applyClientMutationIdForUpdateOrDelete",
+);
+
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
@@ -387,18 +413,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         "field",
                       ),
                       type: GraphQLString,
-                      plan: EXPORTABLE(
-                        () =>
-                          function plan(
-                            $mutation: ObjectStep<{
-                              result: PgUpdateSingleStep | PgDeleteSingleStep;
-                            }>,
-                          ) {
-                            const $result = $mutation.getStepForKey("result");
-                            return $result.getMeta("clientMutationId");
-                          },
-                        [],
-                      ),
+                      plan: getClientMutationIdForUpdateOrDeletePlan,
                     },
                     ...(TableType &&
                     build.behavior.pgResourceMatches(
@@ -546,18 +561,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               "field",
                             ),
                             type: GraphQLString,
-                            apply: EXPORTABLE(
-                              () =>
-                                function apply(
-                                  qb:
-                                    | PgUpdateSingleQueryBuilder
-                                    | PgDeleteSingleQueryBuilder,
-                                  val: string | null,
-                                ) {
-                                  qb.setMeta("clientMutationId", val);
-                                },
-                              [],
-                            ),
+                            apply: applyClientMutationIdForUpdateOrDelete,
                           },
                           ...(uniqueMode === "node"
                             ? {
