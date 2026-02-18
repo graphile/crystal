@@ -1,5 +1,6 @@
 import "../index.ts";
 
+import type { PgCodec } from "@dataplan/pg";
 import type { GraphQLError, GraphQLFormattedError } from "grafast/graphql";
 import { formatError as defaultFormatError } from "grafast/graphql";
 import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
@@ -192,31 +193,29 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
         pgCodecAttribute: {
           inferred(behavior, [codec, attributeName]) {
             const attribute = codec.attributes[attributeName];
-            const underlyingCodec =
+            const domainUnwrappedCodec =
               attribute.codec.domainOfCodec ?? attribute.codec;
-            const newBehavior = [behavior];
+            const innermostCodec = unwrapCodec(attribute.codec);
+            const newBehavior = new Set([behavior]);
             if (
-              underlyingCodec.name === "tsvector" ||
-              underlyingCodec.name === "tsquery"
+              innermostCodec.name === "tsvector" ||
+              innermostCodec.name === "tsquery"
             ) {
               // Undo force-enable of behavior globally
-              newBehavior.push("-condition:attribute:filterBy");
-              newBehavior.push("-attribute:orderBy");
+              newBehavior.add("-condition:attribute:filterBy");
+              newBehavior.add("-attribute:orderBy");
             }
             if (
-              underlyingCodec.arrayOfCodec ||
-              underlyingCodec.isBinary ||
-              underlyingCodec.rangeOfCodec
+              domainUnwrappedCodec.arrayOfCodec ||
+              domainUnwrappedCodec.rangeOfCodec
             ) {
-              newBehavior.push("-attribute:orderBy");
+              newBehavior.add("-attribute:orderBy");
             }
-            if (
-              underlyingCodec.isBinary ||
-              underlyingCodec.arrayOfCodec?.isBinary
-            ) {
-              newBehavior.push("-condition:attribute:filterBy");
+            if (innermostCodec.isBinary) {
+              newBehavior.add("-attribute:orderBy");
+              newBehavior.add("-condition:attribute:filterBy");
             }
-            return newBehavior;
+            return [...newBehavior];
           },
         },
       },
@@ -496,6 +495,21 @@ export const makeV4Preset = (
     },
   };
 };
+
+/**
+ * Unwraps domains, arrays and ranges to get the innermost codec.
+ */
+function unwrapCodec(codec: PgCodec): PgCodec {
+  if (codec.domainOfCodec) {
+    return unwrapCodec(codec.domainOfCodec);
+  } else if (codec.arrayOfCodec) {
+    return unwrapCodec(codec.arrayOfCodec);
+  } else if (codec.rangeOfCodec) {
+    return unwrapCodec(codec.rangeOfCodec);
+  } else {
+    return codec;
+  }
+}
 
 export const V4Preset = makeV4Preset();
 export default V4Preset;
