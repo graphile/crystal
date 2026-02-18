@@ -845,29 +845,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 serviceName,
               });
               exportNameHint(extensions, `${name}CodecExtensions`);
+              const spec = {
+                name,
+                ...(description ? { description } : null),
+                ...(typeDelim != "," ? { typeDelim } : null),
+                extensions,
+              };
               event.pgCodec = EXPORTABLE(
-                (
-                  description,
-                  extensions,
-                  innerCodec,
-                  listOfCodec,
-                  name,
-                  typeDelim,
-                ) =>
-                  listOfCodec(innerCodec, {
-                    extensions,
-                    typeDelim,
-                    description,
-                    name,
-                  }),
-                [
-                  description,
-                  extensions,
-                  innerCodec,
-                  listOfCodec,
-                  name,
-                  typeDelim,
-                ],
+                (innerCodec, listOfCodec, spec) =>
+                  listOfCodec(innerCodec, spec),
+                [innerCodec, listOfCodec, spec],
                 `${name}Codec`,
               );
               return;
