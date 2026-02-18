@@ -38,7 +38,6 @@ import {
 import type { PgExecutor } from "./executor.ts";
 import type {
   PgCodec,
-  PgCodecExtensions,
   PgCodecPolymorphism,
   PgDecode,
   PgEncode,
@@ -444,7 +443,7 @@ export type PgRecordTypeCodecSpec<
   attributes: TAttributes;
   polymorphism?: PgCodecPolymorphism<any>;
   description?: string;
-  extensions?: Partial<PgCodecExtensions>;
+  extensions?: Partial<DataplanPg.PgCodecExtensions>;
   isAnonymous?: boolean;
 };
 
@@ -579,7 +578,7 @@ export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
   identifier: SQL;
   values: Array<PgEnumValue<TValue> | TValue>;
   description?: string;
-  extensions?: Partial<PgCodecExtensions>;
+  extensions?: Partial<DataplanPg.PgCodecExtensions>;
 };
 
 /**
@@ -680,7 +679,7 @@ export function listOfCodec<
     /** Description for this list type. */
     description?: string;
     /** Metadata to associate with this list type. */
-    extensions?: Partial<PgCodecExtensions>;
+    extensions?: Partial<DataplanPg.PgCodecExtensions>;
     /** Delimiter used to separate entries when Postgres stringifies it. */
     typeDelim?: string;
     /** pg-sql2 fragment that represents the name of this type. */
@@ -818,7 +817,7 @@ export function domainOfCodec<
     /** Description for this domain. */
     description?: string;
     /** Metadata to associate with this domain. */
-    extensions?: Partial<PgCodecExtensions>;
+    extensions?: Partial<DataplanPg.PgCodecExtensions>;
     /** Whether this domain is not nullable. */
     notNull?: boolean | null;
   } = {},
@@ -896,7 +895,7 @@ export function rangeOfCodec<
     /** Description for this range. */
     description?: string;
     /** Metadata to associate with this range. */
-    extensions?: Partial<PgCodecExtensions>;
+    extensions?: Partial<DataplanPg.PgCodecExtensions>;
   } = {},
 ): PgCodec<
   TName,
