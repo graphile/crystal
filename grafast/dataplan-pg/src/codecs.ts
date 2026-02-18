@@ -1388,6 +1388,10 @@ export const LIST_TYPES = {
       >
     : never;
 };
+exportAs("@dataplan/pg", LIST_TYPES, "LIST_TYPES");
+for (const [name, codec] of Object.entries(LIST_TYPES)) {
+  exportAs("@dataplan/pg", codec, ["LIST_TYPES", name]);
+}
 
 /**
  * For supported builtin type names ('void', 'bool', etc) that will be found in
