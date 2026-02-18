@@ -468,14 +468,14 @@ select * from a where id = 1;
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
               const unique: PgResourceUnique = {
-                isPrimary: pgConstraint.contype === "p",
+                ...(pgConstraint.contype === "p" ? { isPrimary: true } : null),
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
-                description,
-                extensions: {
-                  tags,
-                },
+                ...(description ? { description } : null),
+                ...(Object.keys(tags).length > 0
+                  ? { extensions: { tags } }
+                  : null),
               };
               await info.process("pgTables_unique", {
                 serviceName,
