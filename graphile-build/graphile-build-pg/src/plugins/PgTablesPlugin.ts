@@ -521,7 +521,7 @@ select * from a where id = 1;
           const hasPartitions = pgClass.relkind === "p";
 
           const extensions: DataplanPg.PgResourceExtensions = {
-            description,
+            ...(description ? { description } : null),
             pg: {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
@@ -530,9 +530,9 @@ select * from a where id = 1;
                 ? { persistence: pgClass.relpersistence }
                 : null),
             },
-            isInsertable,
-            isUpdatable,
-            isDeletable,
+            ...(isInsertable === false ? { isInsertable } : null),
+            ...(isUpdatable === false ? { isUpdatable } : null),
+            ...(isDeletable === false ? { isDeletable } : null),
             ...(hasPartitions ? { hasPartitions } : null),
             ...(partitionParent
               ? {
@@ -542,9 +542,9 @@ select * from a where id = 1;
                   },
                 }
               : null),
-            tags: {
-              ...tags,
-            },
+            ...(Object.keys(tags).length > 0
+              ? { tags: JSON.parse(JSON.stringify(tags)) }
+              : null),
           } as const;
           const options = {
             executor,
@@ -552,9 +552,9 @@ select * from a where id = 1;
             identifier,
             from: codec.sqlType,
             codec,
-            uniques,
-            isVirtual,
-            description,
+            ...(uniques.length ? { uniques } : null),
+            ...(isVirtual ? { isVirtual } : null),
+            ...(description ? { description } : null),
             extensions,
           } as const;
 
