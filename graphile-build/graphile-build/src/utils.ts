@@ -160,6 +160,7 @@ export function isValidObjectType(
 function toString(value: any) {
   return "" + value;
 }
+exportNameHint(toString, "toString");
 
 // Copied from GraphQL v14, MIT license (c) GraphQL Contributors.
 /**
