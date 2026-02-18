@@ -42,7 +42,6 @@ import { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionRes
 import { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.ts";
 import { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.ts";
 import { PgTablesPlugin } from "./plugins/PgTablesPlugin.ts";
-import { PgTextSearchPlugin } from "./plugins/PgTextSearchPlugin.ts";
 import { PgTypesPlugin } from "./plugins/PgTypesPlugin.ts";
 import { version } from "./version.ts";
 
@@ -82,7 +81,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgRefsPlugin,
     PgIntrospectionPlugin,
     PgTablesPlugin,
-    PgTextSearchPlugin,
     PgMutationCreatePlugin,
     PgProceduresPlugin,
     PgAttributesPlugin,
