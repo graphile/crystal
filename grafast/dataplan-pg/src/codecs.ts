@@ -1237,94 +1237,157 @@ for (const [name, codec] of Object.entries(TYPES)) {
 }
 
 function builtinListOfCodec<TCodec extends (typeof TYPES)[keyof typeof TYPES]>(
+  oid: string,
   codec: TCodec,
 ) {
   return listOfCodec<TCodec, `_${TCodec["name"]}`>(codec, {
     name: `_${codec.name}`,
+    identifier: sql`_${codec.sqlType}`,
+    extensions: {
+      oid,
+    },
   });
 }
 
-export const LIST_TYPES =
+export const LIST_TYPES = {
   /*
-    Object.fromEntries(
-      Object.entries(TYPES).filter(([name]) => name != "void").map(([name, codec]) => [name, listOfCodec(codec)]),
-    );
+  ```sql
+  with names as (
+    select name, idx
+    from unnest(array[
+      'boolean',
+      'int2',
+      'int',
+      'bigint',
+      'float4',
+      'float',
+      'money',
+      'numeric',
+      'char',
+      'bpchar',
+      'varchar',
+      'text',
+      'name',
+      'json',
+      'jsonb',
+      'jsonpath',
+      'xml',
+      'citext',
+      'uuid',
+      'timestamp',
+      'timestamptz',
+      'date',
+      'time',
+      'timetz',
+      'inet',
+      'regproc',
+      'regprocedure',
+      'regoper',
+      'regoperator',
+      'regclass',
+      'regtype',
+      'regrole',
+      'regnamespace',
+      'regconfig',
+      'regdictionary',
+      'cidr',
+      'macaddr',
+      'macaddr8',
+      'interval',
+      'bit',
+      'varbit',
+      'point',
+      'line',
+      'lseg',
+      'box',
+      'path',
+      'polygon',
+      'circle',
+      'hstore',
+      'bytea'
+    ]) with ordinality as names(name, idx)
+  )
+  select name || ': builtinListOfCodec("' || oid || '", TYPES.' || name || '),'
+  from names
+  inner join pg_type t
+  on t.oid = (select typarray from pg_type t2 where t2.oid = name::regtype)
+  order by idx asc;
+  ```
   */
-  {
-    boolean: builtinListOfCodec(TYPES.boolean),
-    int2: builtinListOfCodec(TYPES.int2),
-    int: builtinListOfCodec(TYPES.int),
-    bigint: builtinListOfCodec(TYPES.bigint),
-    float4: builtinListOfCodec(TYPES.float4),
-    float: builtinListOfCodec(TYPES.float),
-    money: builtinListOfCodec(TYPES.money),
-    numeric: builtinListOfCodec(TYPES.numeric),
-    char: builtinListOfCodec(TYPES.char),
-    bpchar: builtinListOfCodec(TYPES.bpchar),
-    varchar: builtinListOfCodec(TYPES.varchar),
-    text: builtinListOfCodec(TYPES.text),
-    name: builtinListOfCodec(TYPES.name),
-    json: builtinListOfCodec(TYPES.json),
-    jsonb: builtinListOfCodec(TYPES.jsonb),
-    jsonpath: builtinListOfCodec(TYPES.jsonpath),
-    xml: builtinListOfCodec(TYPES.xml),
-    citext: builtinListOfCodec(TYPES.citext),
-    uuid: builtinListOfCodec(TYPES.uuid),
-    timestamp: builtinListOfCodec(TYPES.timestamp),
-    timestamptz: builtinListOfCodec(TYPES.timestamptz),
-    date: builtinListOfCodec(TYPES.date),
-    time: builtinListOfCodec(TYPES.time),
-    timetz: builtinListOfCodec(TYPES.timetz),
-    inet: builtinListOfCodec(TYPES.inet),
-    regproc: builtinListOfCodec(TYPES.regproc),
-    regprocedure: builtinListOfCodec(TYPES.regprocedure),
-    regoper: builtinListOfCodec(TYPES.regoper),
-    regoperator: builtinListOfCodec(TYPES.regoperator),
-    regclass: builtinListOfCodec(TYPES.regclass),
-    regtype: builtinListOfCodec(TYPES.regtype),
-    regrole: builtinListOfCodec(TYPES.regrole),
-    regnamespace: builtinListOfCodec(TYPES.regnamespace),
-    regconfig: builtinListOfCodec(TYPES.regconfig),
-    regdictionary: builtinListOfCodec(TYPES.regdictionary),
-    cidr: builtinListOfCodec(TYPES.cidr),
-    macaddr: builtinListOfCodec(TYPES.macaddr),
-    macaddr8: builtinListOfCodec(TYPES.macaddr8),
-    interval: builtinListOfCodec(TYPES.interval),
-    bit: builtinListOfCodec(TYPES.bit),
-    varbit: builtinListOfCodec(TYPES.varbit),
-    point: builtinListOfCodec(TYPES.point),
-    line: builtinListOfCodec(TYPES.line),
-    lseg: builtinListOfCodec(TYPES.lseg),
-    box: builtinListOfCodec(TYPES.box),
-    path: builtinListOfCodec(TYPES.path),
-    polygon: builtinListOfCodec(TYPES.polygon),
-    circle: builtinListOfCodec(TYPES.circle),
-    hstore: builtinListOfCodec(TYPES.hstore),
-    bytea: builtinListOfCodec(TYPES.bytea),
-  } satisfies {
-    [name in Exclude<
-      keyof typeof TYPES,
-      "void"
-    >]: (typeof TYPES)[name] extends PgCodec<
-      infer UName,
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
-      ? PgCodec<
-          `_${UName}`,
-          undefined,
-          string,
-          readonly PgCodecTFromJavaScript<(typeof TYPES)[name]>[],
-          (typeof TYPES)[name],
-          undefined,
-          undefined
-        >
-      : never;
-  };
+  boolean: builtinListOfCodec("1000", TYPES.boolean),
+  int2: builtinListOfCodec("1005", TYPES.int2),
+  int: builtinListOfCodec("1007", TYPES.int),
+  bigint: builtinListOfCodec("1016", TYPES.bigint),
+  float4: builtinListOfCodec("1021", TYPES.float4),
+  float: builtinListOfCodec("1022", TYPES.float),
+  money: builtinListOfCodec("791", TYPES.money),
+  numeric: builtinListOfCodec("1231", TYPES.numeric),
+  char: builtinListOfCodec("1014", TYPES.char),
+  bpchar: builtinListOfCodec("1014", TYPES.bpchar),
+  varchar: builtinListOfCodec("1015", TYPES.varchar),
+  text: builtinListOfCodec("1009", TYPES.text),
+  name: builtinListOfCodec("1003", TYPES.name),
+  json: builtinListOfCodec("199", TYPES.json),
+  jsonb: builtinListOfCodec("3807", TYPES.jsonb),
+  jsonpath: builtinListOfCodec("4073", TYPES.jsonpath),
+  xml: builtinListOfCodec("143", TYPES.xml),
+  citext: builtinListOfCodec("20277428", TYPES.citext),
+  uuid: builtinListOfCodec("2951", TYPES.uuid),
+  timestamp: builtinListOfCodec("1115", TYPES.timestamp),
+  timestamptz: builtinListOfCodec("1185", TYPES.timestamptz),
+  date: builtinListOfCodec("1182", TYPES.date),
+  time: builtinListOfCodec("1183", TYPES.time),
+  timetz: builtinListOfCodec("1270", TYPES.timetz),
+  inet: builtinListOfCodec("1041", TYPES.inet),
+  regproc: builtinListOfCodec("1008", TYPES.regproc),
+  regprocedure: builtinListOfCodec("2207", TYPES.regprocedure),
+  regoper: builtinListOfCodec("2208", TYPES.regoper),
+  regoperator: builtinListOfCodec("2209", TYPES.regoperator),
+  regclass: builtinListOfCodec("2210", TYPES.regclass),
+  regtype: builtinListOfCodec("2211", TYPES.regtype),
+  regrole: builtinListOfCodec("4097", TYPES.regrole),
+  regnamespace: builtinListOfCodec("4090", TYPES.regnamespace),
+  regconfig: builtinListOfCodec("3735", TYPES.regconfig),
+  regdictionary: builtinListOfCodec("3770", TYPES.regdictionary),
+  cidr: builtinListOfCodec("651", TYPES.cidr),
+  macaddr: builtinListOfCodec("1040", TYPES.macaddr),
+  macaddr8: builtinListOfCodec("775", TYPES.macaddr8),
+  interval: builtinListOfCodec("1187", TYPES.interval),
+  bit: builtinListOfCodec("1561", TYPES.bit),
+  varbit: builtinListOfCodec("1563", TYPES.varbit),
+  point: builtinListOfCodec("1017", TYPES.point),
+  line: builtinListOfCodec("629", TYPES.line),
+  lseg: builtinListOfCodec("1018", TYPES.lseg),
+  box: builtinListOfCodec("1020", TYPES.box),
+  path: builtinListOfCodec("1019", TYPES.path),
+  polygon: builtinListOfCodec("1027", TYPES.polygon),
+  circle: builtinListOfCodec("719", TYPES.circle),
+  hstore: builtinListOfCodec("20278122", TYPES.hstore),
+  bytea: builtinListOfCodec("1001", TYPES.bytea),
+} satisfies {
+  [name in Exclude<
+    keyof typeof TYPES,
+    "void"
+  >]: (typeof TYPES)[name] extends PgCodec<
+    infer UName,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >
+    ? PgCodec<
+        `_${UName}`,
+        undefined,
+        string,
+        readonly PgCodecTFromJavaScript<(typeof TYPES)[name]>[],
+        (typeof TYPES)[name],
+        undefined,
+        undefined
+      >
+    : never;
+};
 
 /**
  * For supported builtin type names ('void', 'bool', etc) that will be found in
