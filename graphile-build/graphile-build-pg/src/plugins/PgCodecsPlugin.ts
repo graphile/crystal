@@ -422,7 +422,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           // Do NOT mark `extensions` as `EXPORTABLE` otherwise changes
           // implemented through hooks will not be represented in the export.
-          const extensions: DataplanPg.PgCodecExtensions = {
+          const extensions: Partial<DataplanPg.PgCodecExtensions> = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             pg: {
@@ -435,7 +435,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   }
                 : null),
             },
-            tags,
+            ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
           const executor =
             info.helpers.pgIntrospection.getExecutorForService(serviceName);
@@ -607,14 +607,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           });
           const enumLabels = enumValues.map((e) => e.enumlabel);
           const { tags, description } = type.getTagsAndDescription();
-          const extensions = {
+          const extensions: Partial<DataplanPg.PgCodecExtensions> = {
             oid: type._id,
             pg: {
               serviceName,
               schemaName: type.getNamespace()!.nspname,
               name: type.typname,
             },
-            tags,
+            ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
           await info.process("pgCodecs_enumType_extensions", {
             serviceName,
@@ -686,14 +686,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           const { tags, description } = type.getTagsAndDescription();
 
-          const extensions: DataplanPg.PgCodecExtensions = {
+          const extensions: Partial<DataplanPg.PgCodecExtensions> = {
             oid: type._id,
             pg: {
               serviceName,
               schemaName: type.getNamespace()!.nspname,
               name: type.typname,
             },
-            tags,
+            ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
           await info.process("pgCodecs_rangeOfCodec_extensions", {
             serviceName,
@@ -753,14 +753,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const typeName = type.typname;
           if (innerCodec) {
             const { tags, description } = type.getTagsAndDescription();
-            const extensions: DataplanPg.PgCodecExtensions = {
+            const extensions: Partial<DataplanPg.PgCodecExtensions> = {
               oid: type._id,
               pg: {
                 serviceName,
                 schemaName: type.getNamespace()!.nspname,
                 name: type.typname,
               },
-              tags,
+              ...(Object.keys(tags).length > 0 ? { tags } : null),
             };
             await info.process("pgCodecs_domainOfCodec_extensions", {
               serviceName,
@@ -825,14 +825,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (innerCodec) {
               const typeDelim = innerType.typdelim!;
               const { tags, description } = type.getTagsAndDescription();
-              const extensions: DataplanPg.PgCodecExtensions = {
+              const extensions: Partial<DataplanPg.PgCodecExtensions> = {
                 oid: type._id,
                 pg: {
                   serviceName,
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
                 },
-                tags,
+                ...(Object.keys(tags).length > 0 ? { tags } : null),
               };
               await info.process("pgCodecs_listOfCodec_extensions", {
                 serviceName,
