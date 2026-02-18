@@ -44,7 +44,8 @@ with indexed_tables as (
       i.relname as index_name,
       string_agg(a.attname::text, ', ' order by array_position(ix.indkey, a.attnum)) as column_names,
       ix.indrelid,
-      array_agg(a.attnum order by array_position(ix.indkey, a.attnum))::smallint[] as indkey
+      -- cast int2vector to smallint[]
+      string_to_array(ix.indkey::text, ' ')::smallint[] as indkey
   from pg_class i
   join pg_index ix on i.oid = ix.indrelid
   join pg_class t on ix.indrelid = t.oid
