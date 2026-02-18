@@ -148,7 +148,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
       },
 
       GraphQLObjectType_fields_field_args(args, build, context) {
-        const { EXPORTABLE } = build;
         const { scope, Self } = context;
 
         const {

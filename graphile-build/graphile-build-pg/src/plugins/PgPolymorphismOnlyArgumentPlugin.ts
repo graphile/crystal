@@ -171,7 +171,6 @@ function makeFieldsHook(isInterface: boolean) {
     const {
       getTypeByName,
       graphql: { GraphQLList, GraphQLNonNull },
-      grafast: { lambda, ConstantStep },
       inflection,
     } = build;
     const {

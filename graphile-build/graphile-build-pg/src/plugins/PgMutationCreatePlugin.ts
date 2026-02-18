@@ -6,7 +6,7 @@ import type {
   PgResource,
 } from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
-import type { FieldArg, FieldArgs, ObjectStep } from "grafast";
+import type { FieldArgs, ObjectStep } from "grafast";
 import { assertStep, object } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";

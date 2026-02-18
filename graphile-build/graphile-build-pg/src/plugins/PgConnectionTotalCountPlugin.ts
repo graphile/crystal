@@ -78,7 +78,6 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
           extend,
           inflection,
           graphql: { GraphQLInt, GraphQLNonNull },
-          sql,
         } = build;
         const {
           scope: { isPgConnectionRelated, isConnectionType, pgCodec: codec },
