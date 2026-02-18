@@ -1462,6 +1462,18 @@ const typesCodec = recordCodec({
     },
     ltree_array: {
       codec: spec_types_attributes_ltree_array_codec_ltree_
+    },
+    tsvector: {
+      codec: TYPES.tsvector
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector
+    },
+    tsquery: {
+      codec: TYPES.tsquery
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery
     }
   },
   extensions: {
@@ -1811,6 +1823,10 @@ const registry = makeRegistry({
     byteaArray: LIST_TYPES.bytea,
     ltree: spec_types_attributes_ltree_codec_ltree,
     "ltree[]": spec_types_attributes_ltree_array_codec_ltree_,
+    tsvector: TYPES.tsvector,
+    tsvectorArray: LIST_TYPES.tsvector,
+    tsquery: TYPES.tsquery,
+    tsqueryArray: LIST_TYPES.tsquery,
     bpchar: TYPES.bpchar,
     typesArray: listOfCodec(typesCodec, {
       name: "typesArray",
