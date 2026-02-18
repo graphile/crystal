@@ -392,16 +392,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               */
               parameters.push({
                 name: argName,
-                required,
-                notNull,
                 codec: argCodec,
-                ...(variant
-                  ? {
-                      extensions: {
-                        variant,
-                      },
-                    }
-                  : null),
+                ...(required ? { required } : null),
+                ...(notNull ? { notNull } : null),
+                ...(variant ? { extensions: { variant } } : null),
               });
             }
           }

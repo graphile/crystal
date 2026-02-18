@@ -115,10 +115,10 @@ declare global {
         ): readonly PgSelectArgumentRuntimeValue[];
         argDetails: Array<{
           graphqlArgName: string;
-          postgresArgName: string | null;
+          postgresArgName?: string | null;
           pgCodec: PgCodec;
           inputType: GraphQLInputType;
-          required: boolean;
+          required?: boolean;
         }>;
         parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
       };
@@ -536,11 +536,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   : listType;
               return {
                 graphqlArgName: argName,
-                postgresArgName: param.name,
+                ...(param.name ? { postgresArgName: param.name } : null),
                 pgCodec: param.codec,
                 inputType,
-                required: param.required,
-                fetcher,
+                ...(param.required ? { required: true } : null),
+                ...(fetcher ? { fetcher } : null),
               };
             });
 
@@ -572,10 +572,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       fetcher,
                     }) => ({
                       graphqlArgName,
-                      postgresArgName,
+                      ...(postgresArgName ? { postgresArgName } : null),
                       pgCodec,
-                      required,
-                      fetcher,
+                      ...(required ? { required } : null),
+                      ...(fetcher ? { fetcher } : null),
                     }),
                   );
             exportNameHint(
@@ -1531,9 +1531,9 @@ const makeArg = EXPORTABLE(
       args: FieldArgs,
       details: {
         graphqlArgName: string;
-        postgresArgName: string | null;
+        postgresArgName?: string | null;
         pgCodec: PgCodec;
-        fetcher:
+        fetcher?:
           | null
           | ((
               $nodeId: Step<Maybe<string>>,
@@ -1572,9 +1572,9 @@ const makeArgRuntime = EXPORTABLE(
       input: Record<string, any>,
       details: {
         graphqlArgName: string;
-        postgresArgName: string | null;
+        postgresArgName?: string | null;
         pgCodec: PgCodec;
-        fetcher:
+        fetcher?:
           | null
           | ((
               $nodeId: Step<Maybe<string>>,

@@ -119,7 +119,7 @@ export interface PgResourceParameter<
   /**
    * If true, then this parameter must be supplied, otherwise it's optional.
    */
-  required: boolean;
+  required?: boolean;
   /**
    * If true and the parameter is supplied, then the parameter must not be
    * null.
