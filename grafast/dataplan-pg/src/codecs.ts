@@ -1239,8 +1239,9 @@ for (const [name, codec] of Object.entries(TYPES)) {
 function builtinListOfCodec<TCodec extends (typeof TYPES)[keyof typeof TYPES]>(
   oid: string,
   codec: TCodec,
+  typeDelim = ",",
 ) {
-  return listOfCodec(codec, { extensions: { oid } });
+  return listOfCodec(codec, { typeDelim, extensions: { oid } });
 }
 
 export const LIST_TYPES = {
@@ -1301,7 +1302,7 @@ export const LIST_TYPES = {
       'bytea'
     ]) with ordinality as names(name, idx)
   )
-  select name || ': builtinListOfCodec("' || oid || '", TYPES.' || name || '),'
+  select name || ': builtinListOfCodec("' || oid || '", TYPES.' || name || (case when typdelim = ',' then '' else ', "' || typdelim::text || '"' end) || '),'
   from names
   inner join pg_type t
   on t.oid = (select typarray from pg_type t2 where t2.oid = name::regtype)
@@ -1352,7 +1353,7 @@ export const LIST_TYPES = {
   point: builtinListOfCodec("1017", TYPES.point),
   line: builtinListOfCodec("629", TYPES.line),
   lseg: builtinListOfCodec("1018", TYPES.lseg),
-  box: builtinListOfCodec("1020", TYPES.box),
+  box: builtinListOfCodec("1020", TYPES.box, ";"),
   path: builtinListOfCodec("1019", TYPES.path),
   polygon: builtinListOfCodec("1027", TYPES.polygon),
   circle: builtinListOfCodec("719", TYPES.circle),
