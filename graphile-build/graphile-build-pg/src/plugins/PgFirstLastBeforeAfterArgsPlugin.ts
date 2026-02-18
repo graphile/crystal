@@ -2,7 +2,11 @@ import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
-import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
+import type {
+  ConnectionStep,
+  FieldArg,
+  GrafastFieldConfigArgumentMap,
+} from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.ts";
@@ -43,6 +47,101 @@ export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
     },
   },
 };
+
+const applyFirstArg = EXPORTABLE(
+  () =>
+    function applyFirstPlan(
+      _: any,
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep
+      >,
+      arg: FieldArg,
+    ) {
+      $connection.setFirst(arg.getRaw());
+    },
+  [],
+);
+
+const applyLastArg = EXPORTABLE(
+  () =>
+    function plan(
+      _: any,
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep
+      >,
+      val: FieldArg,
+    ) {
+      $connection.setLast(val.getRaw());
+    },
+  [],
+);
+
+const applyOffsetArg = EXPORTABLE(
+  () =>
+    function plan(
+      _: any,
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep
+      >,
+      val: FieldArg,
+    ) {
+      $connection.setOffset(val.getRaw());
+    },
+  [],
+);
+
+const applyBeforeArg = EXPORTABLE(
+  () =>
+    function plan(
+      _: any,
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep
+      >,
+      val: FieldArg,
+    ) {
+      $connection.setBefore(val.getRaw());
+    },
+  [],
+);
+
+const applyAfterArg = EXPORTABLE(
+  () =>
+    function plan(
+      _: any,
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep
+      >,
+      val: FieldArg,
+    ) {
+      $connection.setAfter(val.getRaw());
+    },
+  [],
+);
 
 function commonFn(
   args: GrafastFieldConfigArgumentMap,
@@ -101,24 +200,7 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
-        applyPlan: EXPORTABLE(
-          () =>
-            function plan(
-              _: any,
-              $connection: ConnectionStep<
-                any,
-                PgSelectSingleStep,
-                any,
-                any,
-                null | readonly any[],
-                PgSelectStep
-              >,
-              arg,
-            ) {
-              $connection.setFirst(arg.getRaw());
-            },
-          [],
-        ),
+        applyPlan: applyFirstArg,
       },
       ...(canPaginateBackwards
         ? {
@@ -128,24 +210,7 @@ function commonFn(
                 "arg",
               ),
               type: GraphQLInt,
-              applyPlan: EXPORTABLE(
-                () =>
-                  function plan(
-                    _: any,
-                    $connection: ConnectionStep<
-                      any,
-                      PgSelectSingleStep,
-                      any,
-                      any,
-                      null | readonly any[],
-                      PgSelectStep
-                    >,
-                    val,
-                  ) {
-                    $connection.setLast(val.getRaw());
-                  },
-                [],
-              ),
+              applyPlan: applyLastArg,
             },
           }
         : null),
@@ -157,24 +222,7 @@ function commonFn(
           "arg",
         ),
         type: GraphQLInt,
-        applyPlan: EXPORTABLE(
-          () =>
-            function plan(
-              _: any,
-              $connection: ConnectionStep<
-                any,
-                PgSelectSingleStep,
-                any,
-                any,
-                null | readonly any[],
-                PgSelectStep
-              >,
-              val,
-            ) {
-              $connection.setOffset(val.getRaw());
-            },
-          [],
-        ),
+        applyPlan: applyOffsetArg,
       },
       ...(canPaginateBackwards
         ? {
@@ -184,24 +232,7 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
-              applyPlan: EXPORTABLE(
-                () =>
-                  function plan(
-                    _: any,
-                    $connection: ConnectionStep<
-                      any,
-                      PgSelectSingleStep,
-                      any,
-                      any,
-                      null | readonly any[],
-                      PgSelectStep
-                    >,
-                    val,
-                  ) {
-                    $connection.setBefore(val.getRaw());
-                  },
-                [],
-              ),
+              applyPlan: applyBeforeArg,
             },
           }
         : null),
@@ -213,24 +244,7 @@ function commonFn(
                 "arg",
               ),
               type: Cursor,
-              applyPlan: EXPORTABLE(
-                () =>
-                  function plan(
-                    _: any,
-                    $connection: ConnectionStep<
-                      any,
-                      PgSelectSingleStep,
-                      any,
-                      any,
-                      null | readonly any[],
-                      PgSelectStep
-                    >,
-                    val,
-                  ) {
-                    $connection.setAfter(val.getRaw());
-                  },
-                [],
-              ),
+              applyPlan: applyAfterArg,
             },
           }
         : null),
