@@ -981,9 +981,5 @@ export {
 
 /** @deprecated Use isStep instead */
 export const isExecutableStep = isStep;
-/** @deprecated Use isStep instead */
-export function assertExecutableStep<TData>(
-  step: unknown,
-): asserts step is Step<TData> {
-  return assertStep(step);
-}
+/** @deprecated Use assertStep instead */
+export const assertExecutableStep = assertStep;

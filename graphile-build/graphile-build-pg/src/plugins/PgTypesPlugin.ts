@@ -2,7 +2,7 @@ import "./PgBasicsPlugin.ts";
 import "graphile-config";
 
 import type { PgHStore } from "@dataplan/pg";
-import { assertExecutableStep } from "grafast";
+import { assertStep } from "grafast";
 import type { GraphQLInputFieldConfigMap, ValueNode } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -450,7 +450,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
             inflection.builtin("Interval"),
             { isPgIntervalType: true },
             () => ({
-              assertStep: assertExecutableStep,
+              assertStep,
               description: build.wrapDescription(
                 "An interval of time that has passed where the smallest distinct unit is a second.",
                 "type",
