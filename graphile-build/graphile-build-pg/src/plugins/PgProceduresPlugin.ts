@@ -432,7 +432,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               schemaName: pgProc.getNamespace()!.nspname,
               name: pgProc.proname,
             },
-            tags,
+            ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {
@@ -508,14 +508,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const options: PgFunctionResourceOptions = {
               name,
               identifier,
+              ...(description ? { description } : null),
               from: fromCallback,
               parameters,
-              returnsArray,
+              ...(returnsArray ? { returnsArray } : null),
               returnsSetof,
-              isMutation,
-              hasImplicitOrder,
+              ...(isMutation ? { isMutation } : null),
+              ...(hasImplicitOrder ? { hasImplicitOrder } : null),
               extensions,
-              description,
             };
 
             await info.process("pgProcedures_functionResourceOptions", {
@@ -543,47 +543,19 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, pgResourceOptions],
             );
           } else {
-            const options: PgResourceOptions = EXPORTABLE(
-              (
-                description,
-                executor,
-                extensions,
-                fromCallback,
-                hasImplicitOrder,
-                identifier,
-                isMutation,
-                name,
-                parameters,
-                returnCodec,
-                returnsSetof,
-              ) => ({
-                executor,
-                name,
-                identifier,
-                from: fromCallback,
-                parameters,
-                isUnique: !returnsSetof,
-                codec: returnCodec,
-                uniques: [],
-                isMutation,
-                hasImplicitOrder,
-                extensions,
-                description,
-              }),
-              [
-                description,
-                executor,
-                extensions,
-                fromCallback,
-                hasImplicitOrder,
-                identifier,
-                isMutation,
-                name,
-                parameters,
-                returnCodec,
-                returnsSetof,
-              ],
-            );
+            const options: PgResourceOptions = {
+              executor,
+              name,
+              identifier,
+              ...(description ? { description } : null),
+              from: fromCallback,
+              parameters,
+              ...(!returnsSetof ? { isUnique: true } : null),
+              codec: returnCodec,
+              ...(isMutation ? { isMutation } : null),
+              hasImplicitOrder,
+              extensions,
+            };
 
             await info.process("pgProcedures_PgResourceOptions", {
               serviceName,

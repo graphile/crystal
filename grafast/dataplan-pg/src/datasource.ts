@@ -206,7 +206,7 @@ export interface PgResourceOptions<
     ? (...args: PgSelectArgumentDigest[]) => SQL
     : SQL;
   uniques?: TUniques;
-  extensions?: PgResourceExtensions;
+  extensions?: DataplanPg.PgResourceExtensions;
   parameters?: TParameters;
   description?: string;
   /**
@@ -247,9 +247,9 @@ export interface PgFunctionResourceOptions<
   from: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
   returnsSetof: boolean;
-  returnsArray: boolean;
+  returnsArray?: boolean;
   uniques?: TUniques;
-  extensions?: PgResourceExtensions;
+  extensions?: DataplanPg.PgResourceExtensions;
   isMutation?: boolean;
   hasImplicitOrder?: boolean;
   selectAuth?:
@@ -318,7 +318,7 @@ export class PgResource<
    */
   public readonly isVirtual: boolean;
 
-  public extensions: Partial<PgResourceExtensions> | undefined;
+  public extensions: Partial<DataplanPg.PgResourceExtensions> | undefined;
 
   /**
    * @param registry - the resource registry to register this resource against
@@ -458,7 +458,7 @@ export class PgResource<
       from: fnFrom,
       parameters,
       returnsSetof,
-      returnsArray,
+      returnsArray = false,
       uniques,
       extensions,
       isMutation,
