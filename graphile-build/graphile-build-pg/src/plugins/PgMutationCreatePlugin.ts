@@ -64,6 +64,31 @@ const isInsertable = (
   return build.behavior.pgResourceMatches(resource, "resource:insert") === true;
 };
 
+const applyInputToInsert = EXPORTABLE(
+  () =>
+    function applyInputToInsert(
+      _: any,
+      $object: ObjectStep<{
+        result: PgInsertSingleStep;
+      }>,
+    ) {
+      return $object;
+    },
+  [],
+);
+
+const planPayloadResult = EXPORTABLE(
+  () =>
+    function plan(
+      $object: ObjectStep<{
+        result: PgInsertSingleStep;
+      }>,
+    ) {
+      return $object.get("result");
+    },
+  [],
+);
+
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   name: "PgMutationCreatePlugin",
   description: "Adds 'create' mutation for supported table-like sources",
@@ -214,6 +239,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     "output",
                   ) as GraphQLOutputType | undefined;
                   const fieldBehaviorScope = `insert:resource:select`;
+                  const deprecationReason = tagToString(
+                    resource.extensions?.tags?.deprecated,
+                  );
                   return {
                     clientMutationId: {
                       type: GraphQLString,
@@ -244,20 +272,10 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                             {
                               description: `The \`${tableTypeName}\` that was created by this mutation.`,
                               type: TableType,
-                              plan: EXPORTABLE(
-                                () =>
-                                  function plan(
-                                    $object: ObjectStep<{
-                                      result: PgInsertSingleStep;
-                                    }>,
-                                  ) {
-                                    return $object.get("result");
-                                  },
-                                [],
-                              ),
-                              deprecationReason: tagToString(
-                                resource.extensions?.tags?.deprecated,
-                              ),
+                              plan: planPayloadResult,
+                              ...(deprecationReason
+                                ? { deprecationReason }
+                                : null),
                             },
                           ),
                         }
@@ -297,6 +315,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             const mutationInputType = build.getInputTypeByName(
               inflection.createInputType(resource),
             );
+            const deprecationReason = tagToString(
+              resource.extensions?.tags?.deprecated,
+            );
 
             return build.extend(
               memo,
@@ -312,42 +333,23 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                     args: {
                       input: {
                         type: new GraphQLNonNull(mutationInputType),
-                        applyPlan: EXPORTABLE(
-                          () =>
-                            function plan(
-                              _: any,
-                              $object: ObjectStep<{
-                                result: PgInsertSingleStep;
-                              }>,
-                            ) {
-                              return $object;
-                            },
-                          [],
-                        ),
+                        applyPlan: applyInputToInsert,
                       },
                     },
                     type: payloadType,
                     description: `Creates a single \`${inflection.tableType(
                       resource.codec,
                     )}\`.`,
-                    deprecationReason: tagToString(
-                      resource.extensions?.tags?.deprecated,
-                    ),
                     plan: EXPORTABLE(
                       (object, pgInsertSingle, resource) =>
                         function plan(_: any, args: FieldArgs) {
-                          const $insert = pgInsertSingle(
-                            resource,
-                            Object.create(null),
-                          );
+                          const $insert = pgInsertSingle(resource);
                           args.apply($insert);
-                          const plan = object({
-                            result: $insert,
-                          });
-                          return plan;
+                          return object({ result: $insert });
                         },
                       [object, pgInsertSingle, resource],
                     ),
+                    ...(deprecationReason ? { deprecationReason } : null),
                   },
                 ),
               },

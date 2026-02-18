@@ -290,6 +290,32 @@ declare global {
   }
 }
 
+const pgSelectFromPayload = EXPORTABLE(
+  (PgSelectStep) =>
+    function pgSelectFromPayload(
+      $payload: ObjectStep<{
+        result:
+          | PgSelectStep
+          | PgSelectSingleStep
+          | PgClassExpressionStep<any, any>;
+      }>,
+    ) {
+      const $result = $payload.getStepForKey("result");
+      const $parent =
+        "getParentStep" in $result
+          ? ($result.getParentStep() as PgSelectSingleStep)
+          : $result;
+      const $pgSelect =
+        "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+      if ($pgSelect instanceof PgSelectStep) {
+        return $pgSelect;
+      } else {
+        throw new Error(`Could not determine PgSelectStep for ${$result}`);
+      }
+    },
+  [PgSelectStep],
+);
+
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
   description:
@@ -1168,22 +1194,22 @@ function modFields(
           if (!(inputType instanceof GraphQLInputObjectType)) {
             return memo;
           }
+          const deprecationReason = tagToString(
+            resource.extensions?.tags?.deprecated,
+          );
           memo[fieldName] = fieldWithHooks(
             { fieldName, fieldBehaviorScope: "mutationField" },
             {
-              description: resource.description,
-              deprecationReason: tagToString(
-                resource.extensions?.tags?.deprecated,
-              ),
               type: payloadType,
               args: {
                 input: {
                   type: new GraphQLNonNull(inputType),
+                  // Mostly so `clientMutationId` works!
                   applyPlan: EXPORTABLE(
-                    (PgSelectStep) =>
+                    (pgSelectFromPayload) =>
                       function plan(
                         _: any,
-                        $object: ObjectStep<{
+                        $payload: ObjectStep<{
                           result:
                             | PgSelectStep
                             | PgSelectSingleStep
@@ -1191,31 +1217,18 @@ function modFields(
                         }>,
                         arg,
                       ) {
-                        // We might have any number of step types here; we need
-                        // to get back to the underlying pgSelect.
-                        const $result = $object.getStepForKey("result");
-                        const $parent =
-                          "getParentStep" in $result
-                            ? ($result.getParentStep() as PgSelectSingleStep)
-                            : $result;
-                        const $pgSelect =
-                          "getClassStep" in $parent
-                            ? $parent.getClassStep()
-                            : $parent;
-                        if ($pgSelect instanceof PgSelectStep) {
-                          // Mostly so `clientMutationId` works!
-                          arg.apply($pgSelect);
-                        } else {
-                          throw new Error(
-                            `Could not determine PgSelectStep for ${$result}`,
-                          );
-                        }
+                        const $pgSelect = pgSelectFromPayload($payload);
+                        arg.apply($pgSelect);
                       },
-                    [PgSelectStep],
+                    [pgSelectFromPayload],
                   ),
                 },
               },
               plan: getSelectPlanFromParentAndArgs as any,
+              ...(resource.description
+                ? { description: resource.description }
+                : null),
+              ...(deprecationReason ? { deprecationReason } : null),
             },
           );
         } else if (resource.isUnique) {
@@ -1230,6 +1243,9 @@ function modFields(
           const fieldName = isRootQuery
             ? inflection.customQueryField({ resource })
             : inflection.computedAttributeField({ resource });
+          const deprecationReason = tagToString(
+            resource.extensions?.tags?.deprecated,
+          );
           memo[fieldName] = fieldWithHooks(
             {
               fieldName,
@@ -1238,16 +1254,16 @@ function modFields(
                 : "typeField:single",
             },
             {
-              description: resource.description,
-              deprecationReason: tagToString(
-                resource.extensions?.tags?.deprecated,
-              ),
               type: build.nullableIf(
                 !resource.extensions?.tags?.notNull,
                 type!,
               ),
               args: makeFieldArgs(),
               plan: getSelectPlanFromParentAndArgs as any,
+              ...(resource.description
+                ? { description: resource.description }
+                : null),
+              ...(deprecationReason ? { deprecationReason } : null),
             },
           );
         } else {
@@ -1305,6 +1321,9 @@ function modFields(
               : null;
 
             if (ConnectionType) {
+              const deprecationReason = tagToString(
+                resource.extensions?.tags?.deprecated,
+              );
               memo = build.recoverable(memo, () =>
                 build.extend(
                   memo,
@@ -1322,9 +1341,6 @@ function modFields(
                           `Reads and enables pagination through a set of \`${inflection.tableType(
                             resource.codec,
                           )}\`.`,
-                        deprecationReason: tagToString(
-                          resource.extensions?.tags?.deprecated,
-                        ),
                         type: build.nullableIf(
                           isRootQuery ?? false,
                           ConnectionType,
@@ -1346,6 +1362,7 @@ function modFields(
                             },
                           [connection, getSelectPlanFromParentAndArgs],
                         ),
+                        ...(deprecationReason ? { deprecationReason } : null),
                       },
                     ),
                   },
@@ -1367,6 +1384,9 @@ function modFields(
                 : inflection.computedAttributeListField({
                     resource,
                   });
+            const deprecationReason = tagToString(
+              resource.extensions?.tags?.deprecated,
+            );
             memo = build.recoverable(memo, () =>
               build.extend(
                 memo,
@@ -1381,10 +1401,6 @@ function modFields(
                       pgFieldResource: resource,
                     },
                     {
-                      description: resource.description,
-                      deprecationReason: tagToString(
-                        resource.extensions?.tags?.deprecated,
-                      ),
                       type: build.nullableIf(
                         !resource.extensions?.tags?.notNull,
                         new GraphQLList(
@@ -1398,6 +1414,10 @@ function modFields(
                       ),
                       args: makeFieldArgs(),
                       plan: getSelectPlanFromParentAndArgs as any,
+                      ...(resource.description
+                        ? { description: resource.description }
+                        : null),
+                      ...(deprecationReason ? { deprecationReason } : null),
                     },
                   ),
                 },

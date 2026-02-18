@@ -160,6 +160,10 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               isSafeObjectPropertyName(attributeName),
             );
 
+          const deprecationReason = tagToString(
+            codec.extensions?.tags?.deprecation ??
+              pgResource?.extensions?.tags?.deprecated,
+          );
           build.registerNodeIdHandler({
             typeName: tableTypeName,
             codec: build.getNodeIdCodec!(
@@ -167,10 +171,6 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                 pgResource?.extensions?.tags?.nodeIdCodec ??
                 build.options?.defaultNodeIdCodec ??
                 "base64JSON",
-            ),
-            deprecationReason: tagToString(
-              codec.extensions?.tags?.deprecation ??
-                pgResource?.extensions?.tags?.deprecated,
             ),
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
@@ -234,6 +234,7 @@ return function (access, inhibitOnNull) {
               },
               [identifier],
             ),
+            ...(deprecationReason ? { deprecationReason } : null),
           });
         }
 

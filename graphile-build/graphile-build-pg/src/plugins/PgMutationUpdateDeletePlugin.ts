@@ -177,6 +177,19 @@ const isDeletable = (
   return !!build.behavior.pgResourceMatches(resource, "resource:delete");
 };
 
+const applyInputToUpdateOrDelete = EXPORTABLE(
+  () =>
+    function applyInputToUpdateOrDelete(
+      _: any,
+      $object: ObjectStep<{
+        result: PgUpdateSingleStep | PgDeleteSingleStep;
+      }>,
+    ) {
+      return $object;
+    },
+  [],
+);
+
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
@@ -813,6 +826,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         [handler, nodeIdFieldName, specFromNodeId],
                         `specFromArgs_${handler!.typeName}`,
                       );
+                const deprecationReason = tagToString(
+                  resource.extensions?.tags?.deprecated,
+                );
 
                 return build.extend(
                   fields,
@@ -830,20 +846,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         args: {
                           input: {
                             type: new GraphQLNonNull(mutationInputType),
-                            applyPlan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  _: any,
-                                  $object: ObjectStep<{
-                                    result:
-                                      | PgUpdateSingleStep
-                                      | PgDeleteSingleStep;
-                                  }>,
-                                ) {
-                                  return $object;
-                                },
-                              [],
-                            ),
+                            applyPlan: applyInputToUpdateOrDelete,
                           },
                         },
                         type: payloadType,
@@ -856,9 +859,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             ? "using a unique key"
                             : "using its globally unique id"
                         }${mode === "resource:update" ? " and a patch" : ""}.`,
-                        deprecationReason: tagToString(
-                          resource.extensions?.tags?.deprecated,
-                        ),
                         plan:
                           mode === "resource:update"
                             ? specFromArgsString
@@ -941,6 +941,7 @@ return (_$root, args) => {
                                     specFromArgs,
                                   ],
                                 ) as any),
+                        ...(deprecationReason ? { deprecationReason } : null),
                       },
                     ),
                   },

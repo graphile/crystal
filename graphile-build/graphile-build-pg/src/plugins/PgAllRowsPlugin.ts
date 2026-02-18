@@ -115,6 +115,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
             build.behavior.pgResourceMatches(resource, "query:resource:list")
           ) {
             const fieldName = build.inflection.allRowsList(resource);
+            const deprecationReason = tagToString(
+              resource.extensions?.tags?.deprecated,
+            );
             fields = build.extend(
               fields,
               {
@@ -132,9 +135,6 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                     description: `Reads a set of \`${build.inflection.tableType(
                       resource.codec,
                     )}\`.`,
-                    deprecationReason: tagToString(
-                      resource.extensions?.tags?.deprecated,
-                    ),
                     plan: EXPORTABLE(
                       (resource) =>
                         function plan() {
@@ -142,6 +142,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                         },
                       [resource],
                     ),
+                    ...(deprecationReason ? { deprecationReason } : null),
                   }),
                 ),
               },
@@ -160,6 +161,9 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
               build.inflection.tableConnectionType(resource.codec),
             ) as GraphQLObjectType | undefined;
             if (connectionType) {
+              const deprecationReason = tagToString(
+                resource.extensions?.tags?.deprecated,
+              );
               fields = build.extend(
                 fields,
                 {
@@ -175,9 +179,6 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                       description: `Reads and enables pagination through a set of \`${build.inflection.tableType(
                         resource.codec,
                       )}\`.`,
-                      deprecationReason: tagToString(
-                        resource.extensions?.tags?.deprecated,
-                      ),
                       plan: EXPORTABLE(
                         (connection, resource) =>
                           function plan() {
@@ -185,6 +186,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
                           },
                         [connection, resource],
                       ),
+                      ...(deprecationReason ? { deprecationReason } : null),
                     }),
                   ),
                 },
