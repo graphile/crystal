@@ -31,6 +31,7 @@ import {
 import type {
   __InputObjectStep,
   __TrackedValueStep,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -314,6 +315,26 @@ const pgSelectFromPayload = EXPORTABLE(
       }
     },
   [PgSelectStep],
+  "pgSelectFromPayload",
+);
+
+const applyInputArgViaPgSelect = EXPORTABLE(
+  (pgSelectFromPayload) =>
+    function plan(
+      _: any,
+      $payload: ObjectStep<{
+        result:
+          | PgSelectStep
+          | PgSelectSingleStep
+          | PgClassExpressionStep<any, any>;
+      }>,
+      arg: FieldArg,
+    ) {
+      const $pgSelect = pgSelectFromPayload($payload);
+      arg.apply($pgSelect);
+    },
+  [pgSelectFromPayload],
+  "applyInputArgViaPgSelect",
 );
 
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
@@ -1205,23 +1226,7 @@ function modFields(
                 input: {
                   type: new GraphQLNonNull(inputType),
                   // Mostly so `clientMutationId` works!
-                  applyPlan: EXPORTABLE(
-                    (pgSelectFromPayload) =>
-                      function plan(
-                        _: any,
-                        $payload: ObjectStep<{
-                          result:
-                            | PgSelectStep
-                            | PgSelectSingleStep
-                            | PgClassExpressionStep<any, any>;
-                        }>,
-                        arg,
-                      ) {
-                        const $pgSelect = pgSelectFromPayload($payload);
-                        arg.apply($pgSelect);
-                      },
-                    [pgSelectFromPayload],
-                  ),
+                  applyPlan: applyInputArgViaPgSelect,
                 },
               },
               plan: getSelectPlanFromParentAndArgs as any,

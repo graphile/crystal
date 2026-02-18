@@ -75,6 +75,7 @@ const applyInputToInsert = EXPORTABLE(
       return $object;
     },
   [],
+  "applyInputToInsert",
 );
 
 const planPayloadResult = EXPORTABLE(
@@ -87,6 +88,7 @@ const planPayloadResult = EXPORTABLE(
       return $object.get("result");
     },
   [],
+  "planPayloadResult",
 );
 
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {

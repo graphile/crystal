@@ -244,6 +244,7 @@ const applyConnectionLimitToTypes = EXPORTABLE(
       }
     },
   [ConstantStep, lambda, limitToTypes],
+  "applyConnectionLimitToTypes",
 );
 
 const applyLimitToTypes = EXPORTABLE(
@@ -257,4 +258,5 @@ const applyLimitToTypes = EXPORTABLE(
       }
     },
   [ConstantStep, lambda, limitToTypes],
+  "applyLimitToTypes",
 );

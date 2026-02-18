@@ -188,6 +188,7 @@ const applyInputToUpdateOrDelete = EXPORTABLE(
       return $object;
     },
   [],
+  "applyInputToUpdateOrDelete",
 );
 
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
