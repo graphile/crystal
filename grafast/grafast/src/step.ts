@@ -980,6 +980,15 @@ export {
 };
 
 /** @deprecated Use isStep instead */
-export const isExecutableStep = isStep;
+export function isExecutableStep<TData = any>(
+  step: unknown,
+): step is Step<TData> {
+  return isStep(step);
+}
+
 /** @deprecated Use assertStep instead */
-export const assertExecutableStep = assertStep;
+export function assertExecutableStep<TData>(
+  step: unknown,
+): asserts step is Step<TData> {
+  assertStep(step);
+}
