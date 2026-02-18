@@ -72,7 +72,7 @@ export interface PgCodecAttribute<
   /**
    * Is the column/attribute guaranteed to not be null?
    */
-  notNull: TNotNull;
+  notNull?: TNotNull;
   hasDefault?: boolean;
 
   /**
