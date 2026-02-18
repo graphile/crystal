@@ -18,6 +18,15 @@ declare global {
   }
 }
 
+const queryPlan = EXPORTABLE(
+  (rootValue) =>
+    function plan() {
+      return rootValue();
+    },
+  [rootValue],
+  "queryPlan",
+);
+
 /**
  * Adds a 'query' field to each mutation payload object type; this often turns
  * out to be quite helpful but if you don't want it in your schema then it's
@@ -53,13 +62,7 @@ export const MutationPayloadQueryPlugin: GraphileConfig.Plugin = {
                 description:
                   "Our root query field type. Allows us to run any query from our mutation payload.",
                 type: Query,
-                plan: EXPORTABLE(
-                  (rootValue) =>
-                    function plan() {
-                      return rootValue();
-                    },
-                  [rootValue],
-                ),
+                plan: queryPlan,
               },
             },
             `Adding 'query' field to mutation payload ${Self.name}`,

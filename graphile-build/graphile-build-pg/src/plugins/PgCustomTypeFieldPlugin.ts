@@ -347,6 +347,7 @@ const planCustomMutationPayloadResult = EXPORTABLE(
       return $object.get("result");
     },
   [],
+  "planCustomMutationPayloadResult",
 );
 
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
