@@ -33,7 +33,7 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_pipeString_pipeString = {
+const pipeStringNodeIdCodec = {
   name: "pipeString",
   encode: Object.assign(function pipeStringEncode(value) {
     return Array.isArray(value) ? value.join("|") : null;
@@ -51,22 +51,18 @@ const nodeIdCodecs = {
   raw: nodeIdHandler_Query.codec,
   base64JSON: {
     name: "base64JSON",
-    encode: (() => {
-      function base64JSONEncode(value) {
-        return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-      }
-      base64JSONEncode.isSyncAndSafe = true; // Optimization
-      return base64JSONEncode;
-    })(),
-    decode: (() => {
-      function base64JSONDecode(value) {
-        return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-      }
-      base64JSONDecode.isSyncAndSafe = true; // Optimization
-      return base64JSONDecode;
-    })()
+    encode: Object.assign(function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }, {
+      isSyncAndSafe: true
+    })
   },
-  pipeString: nodeIdCodecs_pipeString_pipeString
+  pipeString: pipeStringNodeIdCodec
 };
 const EMPTY_ARRAY = [];
 const makeArgs_person_full_name = () => EMPTY_ARRAY;
@@ -75,7 +71,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -87,10 +83,7 @@ const renamed_tableCodec = recordCodec({
   attributes: {
     __proto__: null,
     col1: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
         tags: {
           name: "colA"
@@ -98,7 +91,6 @@ const renamed_tableCodec = recordCodec({
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -120,16 +112,9 @@ const flambleCodec = recordCodec({
   attributes: {
     __proto__: null,
     f: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
@@ -151,34 +136,19 @@ const filmsCodec = recordCodec({
   attributes: {
     __proto__: null,
     code: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     title: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "films"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -190,34 +160,19 @@ const studiosCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "studios"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -229,43 +184,23 @@ const postCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     body: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     author_id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "post"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -277,43 +212,22 @@ const tvEpisodesCodec = recordCodec({
   attributes: {
     __proto__: null,
     code: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     title: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     },
     show_id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "tv_episodes"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -325,43 +239,22 @@ const tvShowsCodec = recordCodec({
   attributes: {
     __proto__: null,
     code: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     title: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     },
     studio_id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "tv_shows"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -373,43 +266,21 @@ const jwtTokenCodec = recordCodec({
   attributes: {
     __proto__: null,
     role: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     exp: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     a: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "jwt_token"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -421,36 +292,18 @@ const personCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     first_name: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     },
     last_name: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     },
     col_no_create: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -460,9 +313,7 @@ const personCodec = recordCodec({
       }
     },
     col_no_update: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -472,9 +323,7 @@ const personCodec = recordCodec({
       }
     },
     col_no_order: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -484,9 +333,7 @@ const personCodec = recordCodec({
       }
     },
     col_no_filter: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -496,9 +343,7 @@ const personCodec = recordCodec({
       }
     },
     col_no_create_update: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -508,9 +353,7 @@ const personCodec = recordCodec({
       }
     },
     col_no_create_update_order_filter: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -520,9 +363,7 @@ const personCodec = recordCodec({
       }
     },
     col_no_anything: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {
@@ -532,16 +373,12 @@ const personCodec = recordCodec({
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "person"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -549,150 +386,91 @@ const personCodec = recordCodec({
 const original_functionFunctionIdentifer = sql.identifier("d", "original_function");
 const getflambleFunctionIdentifer = sql.identifier("d", "getflamble");
 const filmsUniques = [{
-  isPrimary: true,
   attributes: ["code"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const studiosUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_studios_studios = {
+const studios_resourceOptionsConfig = {
   executor: executor,
   name: "studios",
   identifier: "main.d.studios",
   from: studiosIdentifier,
   codec: studiosCodec,
-  uniques: studiosUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "studios"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: studiosUniques
 };
 const postUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_post_post = {
+const post_resourceOptionsConfig = {
   executor: executor,
   name: "post",
   identifier: "main.d.post",
   from: postIdentifier,
   codec: postCodec,
-  uniques: postUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "post"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: postUniques
 };
 const tv_episodesUniques = [{
-  isPrimary: true,
   attributes: ["code"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_tv_episodes_tv_episodes = {
+const tv_episodes_resourceOptionsConfig = {
   executor: executor,
   name: "tv_episodes",
   identifier: "main.d.tv_episodes",
   from: tvEpisodesIdentifier,
   codec: tvEpisodesCodec,
-  uniques: tv_episodesUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "tv_episodes"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: tv_episodesUniques
 };
 const tv_showsUniques = [{
-  isPrimary: true,
   attributes: ["code"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_tv_shows_tv_shows = {
+const tv_shows_resourceOptionsConfig = {
   executor: executor,
   name: "tv_shows",
   identifier: "main.d.tv_shows",
   from: tvShowsIdentifier,
   codec: tvShowsCodec,
-  uniques: tv_showsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "tv_shows"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: tv_showsUniques
 };
 const authenticateFunctionIdentifer = sql.identifier("d", "authenticate");
 const person_full_nameFunctionIdentifer = sql.identifier("d", "person_full_name");
 const search_postsFunctionIdentifer = sql.identifier("d", "search_posts");
 const personUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
+  isPrimary: true,
   extensions: {
     tags: {
       __proto__: null,
@@ -700,27 +478,20 @@ const personUniques = [{
     }
   }
 }];
-const registryConfig_pgResources_person_person = {
+const person_resourceOptionsConfig = {
   executor: executor,
   name: "person",
   identifier: "main.d.person",
   from: personIdentifier,
   codec: personCodec,
-  uniques: personUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "person"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: personUniques
 };
 const registryConfig = {
   pgExecutors: {
@@ -1067,17 +838,14 @@ const registryConfig = {
   pgResources: {
     __proto__: null,
     renamed_function: {
-      executor,
+      executor: executor,
       name: "renamed_function",
       identifier: "main.d.original_function()",
       from(...args) {
         return sql`${original_functionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -1089,7 +857,7 @@ const registryConfig = {
           name: "renamed_function"
         }
       },
-      description: undefined
+      isUnique: true
     },
     renamed_table: {
       executor: executor,
@@ -1097,19 +865,12 @@ const registryConfig = {
       identifier: "main.d.original_table",
       from: renamed_tableIdentifier,
       codec: renamed_tableCodec,
-      uniques: [],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "d",
           name: "original_table"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
         tags: {
           name: "renamed_table"
         }
@@ -1121,11 +882,7 @@ const registryConfig = {
       identifier: "main.d.flibble",
       from: flambleIdentifier,
       codec: flambleCodec,
-      uniques: [],
-      isVirtual: true,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "d",
@@ -1137,7 +894,8 @@ const registryConfig = {
         tags: {
           name: "flamble"
         }
-      }
+      },
+      isVirtual: true
     }, {
       name: "getflamble",
       identifier: "main.d.getflamble()",
@@ -1145,19 +903,16 @@ const registryConfig = {
         return sql`${getflambleFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "d",
           name: "getflamble"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
     films: {
       executor: executor,
@@ -1165,37 +920,26 @@ const registryConfig = {
       identifier: "main.d.films",
       from: filmsIdentifier,
       codec: filmsCodec,
-      uniques: filmsUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "d",
           name: "films"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: filmsUniques
     },
-    studios: registryConfig_pgResources_studios_studios,
-    post: registryConfig_pgResources_post_post,
-    tv_episodes: registryConfig_pgResources_tv_episodes_tv_episodes,
-    tv_shows: registryConfig_pgResources_tv_shows_tv_shows,
+    studios: studios_resourceOptionsConfig,
+    post: post_resourceOptionsConfig,
+    tv_episodes: tv_episodes_resourceOptionsConfig,
+    tv_shows: tv_shows_resourceOptionsConfig,
     login: PgResource.functionResourceOptions({
       executor: executor,
       name: "jwt_token",
       identifier: "main.d.jwt_token",
       from: jwtTokenIdentifier,
       codec: jwtTokenCodec,
-      uniques: [],
-      isVirtual: true,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "d",
@@ -1203,9 +947,9 @@ const registryConfig = {
         },
         isInsertable: false,
         isUpdatable: false,
-        isDeletable: false,
-        tags: {}
-      }
+        isDeletable: false
+      },
+      isVirtual: true
     }, {
       name: "login",
       identifier: "main.d.authenticate(int4)",
@@ -1214,14 +958,10 @@ const registryConfig = {
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -1233,10 +973,10 @@ const registryConfig = {
           resultFieldName: "token"
         }
       },
-      description: undefined
+      isMutation: true
     }),
     person_full_name: {
-      executor,
+      executor: executor,
       name: "person_full_name",
       identifier: "main.d.person_full_name(d.person)",
       from(...args) {
@@ -1244,17 +984,13 @@ const registryConfig = {
       },
       parameters: [{
         name: "n",
-        required: true,
-        notNull: false,
         codec: personCodec,
+        required: true,
         extensions: {
           variant: "nodeId"
         }
       }],
-      isUnique: !false,
       codec: TYPES.varchar,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -1268,9 +1004,9 @@ const registryConfig = {
           arg0variant: "nodeId"
         }
       },
-      description: undefined
+      isUnique: true
     },
-    returnPostsMatching: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+    returnPostsMatching: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
       name: "returnPostsMatching",
       identifier: "main.d.search_posts(text)",
       from(...args) {
@@ -1278,14 +1014,10 @@ const registryConfig = {
       },
       parameters: [{
         name: "search",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -1296,9 +1028,9 @@ const registryConfig = {
           name: "returnPostsMatching"
         }
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    person: registryConfig_pgResources_person_person
+    person: person_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -1306,18 +1038,14 @@ const registryConfig = {
       __proto__: null,
       posts: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: post_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["author_id"],
-        isUnique: false,
         isReferencee: true,
-        description: undefined,
         extensions: {
           tags: {
             foreignFieldName: "posts",
-            fieldName: "author",
-            behavior: []
+            fieldName: "author"
           }
         }
       }
@@ -1326,18 +1054,14 @@ const registryConfig = {
       __proto__: null,
       author: {
         localCodec: postCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["author_id"],
         remoteAttributes: ["id"],
         isUnique: true,
-        isReferencee: false,
-        description: undefined,
         extensions: {
           tags: {
             foreignFieldName: "posts",
-            fieldName: "author",
-            behavior: []
+            fieldName: "author"
           }
         }
       }
@@ -1346,69 +1070,37 @@ const registryConfig = {
       __proto__: null,
       tvShowsByTheirStudioId: {
         localCodec: studiosCodec,
-        remoteResourceOptions: registryConfig_pgResources_tv_shows_tv_shows,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: tv_shows_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["studio_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     tvEpisodes: {
       __proto__: null,
       tvShowsByMyShowId: {
         localCodec: tvEpisodesCodec,
-        remoteResourceOptions: registryConfig_pgResources_tv_shows_tv_shows,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: tv_shows_resourceOptionsConfig,
         localAttributes: ["show_id"],
         remoteAttributes: ["code"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     tvShows: {
       __proto__: null,
       studiosByMyStudioId: {
         localCodec: tvShowsCodec,
-        remoteResourceOptions: registryConfig_pgResources_studios_studios,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: studios_resourceOptionsConfig,
         localAttributes: ["studio_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       tvEpisodesByTheirShowId: {
         localCodec: tvShowsCodec,
-        remoteResourceOptions: registryConfig_pgResources_tv_episodes_tv_episodes,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: tv_episodes_resourceOptionsConfig,
         localAttributes: ["code"],
         remoteAttributes: ["show_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     }
   }
@@ -1416,28 +1108,42 @@ const registryConfig = {
 const registry = makeRegistry(registryConfig);
 const resource_renamed_functionPgResource = registry.pgResources["renamed_function"];
 const codecResource_personPgResource = registry.pgResources["person"];
-const nodeIdHandler_Person = {
-  typeName: "Person",
-  codec: nodeIdCodecs_pipeString_pipeString,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("people", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return codecResource_personPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "people";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_Person = makeTableNodeIdHandler({
+  typeName: "Person",
+  identifier: "people",
+  nodeIdCodec: pipeStringNodeIdCodec,
+  resource: codecResource_personPgResource,
+  pk: personUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -1471,8 +1177,8 @@ const getSpec = $nodeId => {
 };
 const argDetailsSimple_person_full_name = [{
   graphqlArgName: "n",
-  postgresArgName: "n",
   pgCodec: personCodec,
+  postgresArgName: "n",
   required: true,
   fetcher($nodeId) {
     return codecResource_personPgResource.get(getSpec($nodeId));
@@ -1499,148 +1205,87 @@ const makeArgs_person_full_name2 = (args, path = []) => argDetailsSimple_person_
 const resource_person_full_namePgResource = registry.pgResources["person_full_name"];
 const argDetailsSimple_returnPostsMatching = [{
   graphqlArgName: "search",
-  postgresArgName: "search",
   pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
+  postgresArgName: "search",
+  required: true
 }];
 const makeArgs_returnPostsMatching = (args, path = []) => argDetailsSimple_returnPostsMatching.map(details => makeArg(path, args, details));
 const resource_returnPostsMatchingPgResource = registry.pgResources["returnPostsMatching"];
-const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+const returnPostsMatching_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_returnPostsMatching(args);
   return resource_returnPostsMatchingPgResource.execute(selectArgs);
 };
-const pgResource_filmsPgResource = registry.pgResources["films"];
-const nodeIdHandler_Film = {
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
+const spec_resource_filmsPgResource = registry.pgResources["films"];
+const nodeIdHandler_Film = makeTableNodeIdHandler({
   typeName: "Film",
-  codec: nodeIdCodecs_pipeString_pipeString,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("films", false), $record.get("code")]);
-  },
-  getSpec($list) {
-    return {
-      code: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_filmsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "films";
-  }
-};
+  identifier: "films",
+  nodeIdCodec: pipeStringNodeIdCodec,
+  resource: spec_resource_filmsPgResource,
+  pk: filmsUniques[0].attributes
+});
 const nodeFetcher_Film = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Film));
   return nodeIdHandler_Film.get(nodeIdHandler_Film.getSpec($decoded));
 };
-const pgResource_studiosPgResource = registry.pgResources["studios"];
-const nodeIdHandler_Studio = {
+const spec_resource_studiosPgResource = registry.pgResources["studios"];
+const nodeIdHandler_Studio = makeTableNodeIdHandler({
   typeName: "Studio",
-  codec: nodeIdCodecs_pipeString_pipeString,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("studios", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_studiosPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "studios";
-  }
-};
+  identifier: "studios",
+  nodeIdCodec: pipeStringNodeIdCodec,
+  resource: spec_resource_studiosPgResource,
+  pk: studiosUniques[0].attributes
+});
 const nodeFetcher_Studio = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Studio));
   return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec($decoded));
 };
-const pgResource_postPgResource = registry.pgResources["post"];
-const nodeIdHandler_Post = {
+const spec_resource_postPgResource = registry.pgResources["post"];
+const nodeIdHandler_Post = makeTableNodeIdHandler({
   typeName: "Post",
-  codec: nodeIdCodecs_pipeString_pipeString,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("posts", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_postPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "posts";
-  }
-};
+  identifier: "posts",
+  nodeIdCodec: pipeStringNodeIdCodec,
+  resource: spec_resource_postPgResource,
+  pk: postUniques[0].attributes
+});
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
   return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
-const pgResource_tv_episodesPgResource = registry.pgResources["tv_episodes"];
-const nodeIdHandler_TvEpisode = {
+const spec_resource_tv_episodesPgResource = registry.pgResources["tv_episodes"];
+const nodeIdHandler_TvEpisode = makeTableNodeIdHandler({
   typeName: "TvEpisode",
-  codec: nodeIdCodecs_pipeString_pipeString,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("tv_episodes", false), $record.get("code")]);
-  },
-  getSpec($list) {
-    return {
-      code: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_tv_episodesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "tv_episodes";
-  }
-};
+  identifier: "tv_episodes",
+  nodeIdCodec: pipeStringNodeIdCodec,
+  resource: spec_resource_tv_episodesPgResource,
+  pk: tv_episodesUniques[0].attributes
+});
 const nodeFetcher_TvEpisode = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvEpisode));
   return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec($decoded));
 };
-const pgResource_tv_showsPgResource = registry.pgResources["tv_shows"];
-const nodeIdHandler_TvShow = {
+const spec_resource_tv_showsPgResource = registry.pgResources["tv_shows"];
+const nodeIdHandler_TvShow = makeTableNodeIdHandler({
   typeName: "TvShow",
-  codec: nodeIdCodecs_pipeString_pipeString,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("tv_shows", false), $record.get("code")]);
-  },
-  getSpec($list) {
-    return {
-      code: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_tv_showsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "tv_shows";
-  }
-};
+  identifier: "tv_shows",
+  nodeIdCodec: pipeStringNodeIdCodec,
+  resource: spec_resource_tv_showsPgResource,
+  pk: tv_showsUniques[0].attributes
+});
 const nodeFetcher_TvShow = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvShow));
   return nodeIdHandler_TvShow.get(nodeIdHandler_TvShow.getSpec($decoded));
@@ -1652,6 +1297,14 @@ const nodeFetcher_Person = $nodeId => {
 const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -1674,6 +1327,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -1722,8 +1376,25 @@ const pgFunctionArgumentsFromArgs = (() => {
   }
   return pgFunctionArgumentsFromArgs;
 })();
-function CursorSerialize(value) {
+const scalarComputed = (resource, $in, args) => {
+  const {
+    $row,
+    selectArgs
+  } = pgFunctionArgumentsFromArgs($in, args, true);
+  const from = pgFromExpression($row, resource.from, resource.parameters, selectArgs);
+  return pgClassExpression($row, resource.codec, undefined)`${from}`;
+};
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const handlers = [nodeIdHandler_Person];
 const decodeNodeId2 = makeDecodeNodeIdRuntime(handlers);
@@ -1771,19 +1442,38 @@ const getIdentifiers3 = nodeId => {
 };
 const localAttributeCodecs3 = [TYPES.int];
 const resource_getflamblePgResource = registry.pgResources["getflamble"];
+function pgSelectFromPayload($payload) {
+  const $result = $payload.getStepForKey("result");
+  const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+  const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+  if ($pgSelect instanceof PgSelectStep) {
+    return $pgSelect;
+  } else {
+    throw new Error(`Could not determine PgSelectStep for ${$result}`);
+  }
+}
+function applyInputArgViaPgSelect(_, $payload, arg) {
+  const $pgSelect = pgSelectFromPayload($payload);
+  arg.apply($pgSelect);
+}
 const argDetailsSimple_login = [{
   graphqlArgName: "a",
-  postgresArgName: "a",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "a",
+  required: true
 }];
 const makeArgs_login = (args, path = []) => argDetailsSimple_login.map(details => makeArg(path, args, details));
 const resource_loginPgResource = registry.pgResources["login"];
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs_Film = args => {
   const $nodeId = args.getRaw(["input", "id"]);
   return specFromNodeId(nodeIdHandler_Film, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Studio = args => {
   const $nodeId = args.getRaw(["input", "id"]);
   return specFromNodeId(nodeIdHandler_Studio, $nodeId);
@@ -1828,6 +1518,34 @@ const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
+function getClientMutationIdForCustomMutationPlan($object) {
+  const $result = $object.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+const planCustomMutationPayloadResult = $object => {
+  return $object.get("result");
+};
+function queryPlan() {
+  return rootValue();
+}
+function applyClientMutationIdForCustomMutation(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -1890,6 +1608,21 @@ const getIdentifiers6 = nodeId => {
   }
   return null;
 };
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 const handlers7 = [nodeIdHandler_Person];
 const decodeNodeId8 = makeDecodeNodeIdRuntime(handlers7);
 const getIdentifiers7 = nodeId => {
@@ -3775,32 +3508,16 @@ export const objects = {
     plans: {
       allFilms: {
         plan() {
-          return connection(pgResource_filmsPgResource.find());
+          return connection(spec_resource_filmsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPeople: {
@@ -3808,59 +3525,27 @@ export const objects = {
           return connection(codecResource_personPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPosts: {
         plan() {
-          return connection(pgResource_postPgResource.find());
+          return connection(spec_resource_postPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allRenamedTables: {
@@ -3868,119 +3553,55 @@ export const objects = {
           return connection(resource_renamed_tablePgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allStudios: {
         plan() {
-          return connection(pgResource_studiosPgResource.find());
+          return connection(spec_resource_studiosPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allTvEpisodes: {
         plan() {
-          return connection(pgResource_tv_episodesPgResource.find());
+          return connection(spec_resource_tv_episodesPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allTvShows: {
         plan() {
-          return connection(pgResource_tv_showsPgResource.find());
+          return connection(spec_resource_tv_showsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       film(_$parent, args) {
@@ -4015,25 +3636,15 @@ export const objects = {
       },
       returnPostsMatching: {
         plan($parent, args, info) {
-          const $select = getSelectPlanFromParentAndArgs($parent, args, info);
+          const $select = returnPostsMatching_getSelectPlanFromParentAndArgs($parent, args, info);
           return connection($select);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
         }
       },
       studio(_$parent, args) {
@@ -4055,121 +3666,98 @@ export const objects = {
     plans: {
       createFilm: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_filmsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_filmsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPerson: {
         plan(_, args) {
-          const $insert = pgInsertSingle(codecResource_personPgResource, Object.create(null));
+          const $insert = pgInsertSingle(codecResource_personPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPost: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_postPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_postPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createRenamedTable: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_renamed_tablePgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_renamed_tablePgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createStudio: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_studiosPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_studiosPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createTvEpisode: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_tv_episodesPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_tv_episodesPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createTvShow: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_tv_showsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_tv_showsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteFilm: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_filmsPgResource, specFromArgs_Film2(args));
+          const $delete = pgDeleteSingle(spec_resource_filmsPgResource, specFromArgs_Film2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePerson: {
@@ -4181,65 +3769,55 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePost: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_postPgResource, specFromArgs_Post2(args));
+          const $delete = pgDeleteSingle(spec_resource_postPgResource, specFromArgs_Post2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteStudio: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_studiosPgResource, specFromArgs_Studio2(args));
+          const $delete = pgDeleteSingle(spec_resource_studiosPgResource, specFromArgs_Studio2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteTvEpisode: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_tv_episodesPgResource, specFromArgs_TvEpisode2(args));
+          const $delete = pgDeleteSingle(spec_resource_tv_episodesPgResource, specFromArgs_TvEpisode2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteTvShow: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_tv_showsPgResource, specFromArgs_TvShow2(args));
+          const $delete = pgDeleteSingle(spec_resource_tv_showsPgResource, specFromArgs_TvShow2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       getflamble: {
@@ -4251,19 +3829,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       login: {
@@ -4275,33 +3841,19 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       updateFilm: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_filmsPgResource, specFromArgs_Film(args));
+          const $update = pgUpdateSingle(spec_resource_filmsPgResource, specFromArgs_Film(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePerson: {
@@ -4313,65 +3865,55 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePost: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_postPgResource, specFromArgs_Post(args));
+          const $update = pgUpdateSingle(spec_resource_postPgResource, specFromArgs_Post(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateStudio: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_studiosPgResource, specFromArgs_Studio(args));
+          const $update = pgUpdateSingle(spec_resource_studiosPgResource, specFromArgs_Studio(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateTvEpisode: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_tv_episodesPgResource, specFromArgs_TvEpisode(args));
+          const $update = pgUpdateSingle(spec_resource_tv_episodesPgResource, specFromArgs_TvEpisode(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateTvShow: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_tv_showsPgResource, specFromArgs_TvShow(args));
+          const $update = pgUpdateSingle(spec_resource_tv_showsPgResource, specFromArgs_TvShow(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -4379,261 +3921,170 @@ export const objects = {
   CreateFilmPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      film($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      film: planCreatePayloadResult,
       filmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePersonPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      person($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      person: planCreatePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(codecResource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePostPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      post($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      post: planCreatePayloadResult,
       postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateRenamedTablePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      renamedTable($object) {
-        return $object.get("result");
-      }
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      renamedTable: planCreatePayloadResult
     }
   },
   CreateStudioPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      studio($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      studio: planCreatePayloadResult,
       studioEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   CreateTvEpisodePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      tvEpisode($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      tvEpisode: planCreatePayloadResult,
       tvEpisodeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   CreateTvShowPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      tvShow($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      tvShow: planCreatePayloadResult,
       tvShowEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   DeleteFilmPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedFilmId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Film.plan($record);
-        return lambda(specifier, nodeIdCodecs_pipeString_pipeString.encode);
+        return lambda(specifier, pipeStringNodeIdCodec.encode);
       },
-      film($object) {
-        return $object.get("result");
-      },
+      film: planUpdateOrDeletePayloadResult,
       filmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePersonPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPersonId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Person.plan($record);
-        return lambda(specifier, nodeIdCodecs_pipeString_pipeString.encode);
+        return lambda(specifier, pipeStringNodeIdCodec.encode);
       },
-      person($object) {
-        return $object.get("result");
-      },
+      person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(codecResource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePostPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPostId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Post.plan($record);
-        return lambda(specifier, nodeIdCodecs_pipeString_pipeString.encode);
+        return lambda(specifier, pipeStringNodeIdCodec.encode);
       },
-      post($object) {
-        return $object.get("result");
-      },
+      post: planUpdateOrDeletePayloadResult,
       postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteStudioPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedStudioId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Studio.plan($record);
-        return lambda(specifier, nodeIdCodecs_pipeString_pipeString.encode);
+        return lambda(specifier, pipeStringNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      studio($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      studio: planUpdateOrDeletePayloadResult,
       studioEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   DeleteTvEpisodePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedTvEpisodeId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_TvEpisode.plan($record);
-        return lambda(specifier, nodeIdCodecs_pipeString_pipeString.encode);
+        return lambda(specifier, pipeStringNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      tvEpisode($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      tvEpisode: planUpdateOrDeletePayloadResult,
       tvEpisodeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   DeleteTvShowPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedTvShowId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_TvShow.plan($record);
-        return lambda(specifier, nodeIdCodecs_pipeString_pipeString.encode);
+        return lambda(specifier, pipeStringNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      tvShow($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      tvShow: planUpdateOrDeletePayloadResult,
       tvShowEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -4650,15 +4101,13 @@ export const objects = {
       for (const pkCol of filmsUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_filmsPgResource.get(spec);
+      return spec_resource_filmsPgResource.get(spec);
     }
   },
   FilmsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Flamble: {
@@ -4667,16 +4116,9 @@ export const objects = {
   GetflamblePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      flambles($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      flambles: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   JwtToken: {
@@ -4685,24 +4127,15 @@ export const objects = {
   LoginPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      token($object) {
-        return $object.get("result");
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      query: queryPlan,
+      token: planCustomMutationPayloadResult
     }
   },
   PeopleConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Person: {
@@ -4737,44 +4170,23 @@ export const objects = {
         return $record.get("last_name");
       },
       name($in, args, _info) {
-        const {
-          $row,
-          selectArgs
-        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_full_name(args), true);
-        const from = pgFromExpression($row, resource_person_full_namePgResource.from, resource_person_full_namePgResource.parameters, selectArgs);
-        return pgClassExpression($row, resource_person_full_namePgResource.codec, undefined)`${from}`;
+        return scalarComputed(resource_person_full_namePgResource, $in, makeArgs_person_full_name(args));
       },
       posts: {
         plan($record) {
-          const $records = pgResource_postPgResource.find({
+          const $records = spec_resource_postPgResource.find({
             author_id: $record.get("id")
           });
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -4804,15 +4216,13 @@ export const objects = {
       for (const pkCol of postUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_postPgResource.get(spec);
+      return spec_resource_postPgResource.get(spec);
     }
   },
   PostsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   RenamedTable: {
@@ -4826,9 +4236,7 @@ export const objects = {
   RenamedTablesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Studio: {
@@ -4840,35 +4248,19 @@ export const objects = {
       },
       tvShowsByStudioId: {
         plan($record) {
-          const $records = pgResource_tv_showsPgResource.find({
+          const $records = spec_resource_tv_showsPgResource.find({
             studio_id: $record.get("id")
           });
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -4877,15 +4269,13 @@ export const objects = {
       for (const pkCol of studiosUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_studiosPgResource.get(spec);
+      return spec_resource_studiosPgResource.get(spec);
     }
   },
   StudiosConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   TvEpisode: {
@@ -4896,7 +4286,7 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_TvEpisode.codec.name].encode);
       },
       tvShowByShowId($record) {
-        return pgResource_tv_showsPgResource.get({
+        return spec_resource_tv_showsPgResource.get({
           code: $record.get("show_id")
         });
       }
@@ -4906,15 +4296,13 @@ export const objects = {
       for (const pkCol of tv_episodesUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_tv_episodesPgResource.get(spec);
+      return spec_resource_tv_episodesPgResource.get(spec);
     }
   },
   TvEpisodesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   TvShow: {
@@ -4925,41 +4313,25 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_TvShow.codec.name].encode);
       },
       studioByStudioId($record) {
-        return pgResource_studiosPgResource.get({
+        return spec_resource_studiosPgResource.get({
           id: $record.get("studio_id")
         });
       },
       tvEpisodesByShowId: {
         plan($record) {
-          const $records = pgResource_tv_episodesPgResource.find({
+          const $records = spec_resource_tv_episodesPgResource.find({
             show_id: $record.get("code")
           });
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -4968,122 +4340,78 @@ export const objects = {
       for (const pkCol of tv_showsUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_tv_showsPgResource.get(spec);
+      return spec_resource_tv_showsPgResource.get(spec);
     }
   },
   TvShowsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateFilmPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      film($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      film: planUpdateOrDeletePayloadResult,
       filmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePersonPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      person($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(codecResource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePostPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      post($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      post: planUpdateOrDeletePayloadResult,
       postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateStudioPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      studio($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      studio: planUpdateOrDeletePayloadResult,
       studioEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   UpdateTvEpisodePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      tvEpisode($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      tvEpisode: planUpdateOrDeletePayloadResult,
       tvEpisodeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   UpdateTvShowPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      tvShow($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      tvShow: planUpdateOrDeletePayloadResult,
       tvShowEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   }
@@ -5110,140 +4438,80 @@ export const interfaces = {
 export const inputObjects = {
   CreateFilmInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      film(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      film: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      person(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      person: applyCreateFields
     }
   },
   CreatePostInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      post(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      post: applyCreateFields
     }
   },
   CreateRenamedTableInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      renamedTable(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      renamedTable: applyCreateFields
     }
   },
   CreateStudioInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      studio(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      studio: applyCreateFields
     }
   },
   CreateTvEpisodeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      tvEpisode(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      tvEpisode: applyCreateFields
     }
   },
   CreateTvShowInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      tvShow(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      tvShow: applyCreateFields
     }
   },
   DeleteFilmInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePostInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteStudioInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTvEpisodeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTvShowInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   FilmCondition: {
     plans: {
       title($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "title",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("title", TYPES.varchar, $condition, val);
       }
     }
   },
@@ -5277,73 +4545,33 @@ export const inputObjects = {
   },
   GetflambleInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   LoginInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   PersonCondition: {
     plans: {
       colNoCreate($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col_no_create",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("col_no_create", TYPES.text, $condition, val);
       },
       colNoCreateUpdate($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col_no_create_update",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("col_no_create_update", TYPES.text, $condition, val);
       },
       colNoOrder($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col_no_order",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("col_no_order", TYPES.text, $condition, val);
       },
       colNoUpdate($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col_no_update",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("col_no_update", TYPES.text, $condition, val);
       },
       firstName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "first_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("first_name", TYPES.varchar, $condition, val);
       },
       lastName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("last_name", TYPES.varchar, $condition, val);
       }
     }
   },
@@ -5472,13 +4700,7 @@ export const inputObjects = {
         }
       },
       body($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "body",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("body", TYPES.text, $condition, val);
       }
     }
   },
@@ -5555,13 +4777,7 @@ export const inputObjects = {
   RenamedTableCondition: {
     plans: {
       colA($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "col1",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("col1", TYPES.int, $condition, val);
       }
     }
   },
@@ -5579,13 +4795,7 @@ export const inputObjects = {
   StudioCondition: {
     plans: {
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -5620,13 +4830,7 @@ export const inputObjects = {
   TvEpisodeCondition: {
     plans: {
       title($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "title",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("title", TYPES.varchar, $condition, val);
       },
       tvShowByShowId(condition, nodeId) {
         if (nodeId === undefined) {
@@ -5795,13 +4999,7 @@ export const inputObjects = {
         }
       },
       title($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "title",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("title", TYPES.varchar, $condition, val);
       }
     }
   },
@@ -5877,86 +5075,50 @@ export const inputObjects = {
   },
   UpdateFilmInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      filmPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      filmPatch: applyPatchFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      personPatch: applyPatchFields
     }
   },
   UpdatePostInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      postPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      postPatch: applyPatchFields
     }
   },
   UpdateStudioInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      studioPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      studioPatch: applyPatchFields
     }
   },
   UpdateTvEpisodeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      tvEpisodePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      tvEpisodePatch: applyPatchFields
     }
   },
   UpdateTvShowInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      tvShowPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      tvShowPatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

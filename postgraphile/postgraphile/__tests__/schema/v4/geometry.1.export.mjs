@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,299 +69,84 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
 });
 const geomIdentifier = sql.identifier("geometry", "geom");
-const pointArrayCodec = listOfCodec(TYPES.point, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_point"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "pointArray"
-});
-const lineArrayCodec = listOfCodec(TYPES.line, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_line"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "lineArray"
-});
-const lsegArrayCodec = listOfCodec(TYPES.lseg, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_lseg"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "lsegArray"
-});
-const boxArrayCodec = listOfCodec(TYPES.box, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_box"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ";",
-  description: undefined,
-  name: "boxArray"
-});
-const pathArrayCodec = listOfCodec(TYPES.path, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_path"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "pathArray"
-});
-const polygonArrayCodec = listOfCodec(TYPES.polygon, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_polygon"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "polygonArray"
-});
-const circleArrayCodec = listOfCodec(TYPES.circle, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_circle"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "circleArray"
-});
 const geomCodec = recordCodec({
   name: "geom",
   identifier: geomIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     point: {
-      description: undefined,
-      codec: TYPES.point,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.point
     },
     points: {
-      description: undefined,
-      codec: pointArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.point
     },
     line: {
-      description: undefined,
-      codec: TYPES.line,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.line
     },
     lines: {
-      description: undefined,
-      codec: lineArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.line
     },
     lseg: {
-      description: undefined,
-      codec: TYPES.lseg,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.lseg
     },
     lsegs: {
-      description: undefined,
-      codec: lsegArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.lseg
     },
     box: {
-      description: undefined,
-      codec: TYPES.box,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.box
     },
     boxes: {
-      description: undefined,
-      codec: boxArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.box
     },
     open_path: {
-      description: undefined,
-      codec: TYPES.path,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.path
     },
     open_paths: {
-      description: undefined,
-      codec: pathArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.path
     },
     closed_path: {
-      description: undefined,
-      codec: TYPES.path,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.path
     },
     closed_paths: {
-      description: undefined,
-      codec: pathArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.path
     },
     polygon: {
-      description: undefined,
-      codec: TYPES.polygon,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.polygon
     },
     polygons: {
-      description: undefined,
-      codec: polygonArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.polygon
     },
     circle: {
-      description: undefined,
-      codec: TYPES.circle,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.circle
     },
     circles: {
-      description: undefined,
-      codec: circleArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.circle
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "geometry",
       name: "geom"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const geomUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const resource_geomPgResource = makeRegistry({
   pgExecutors: {
@@ -380,19 +161,19 @@ const resource_geomPgResource = makeRegistry({
     int4: TYPES.int,
     point: TYPES.point,
     geom: geomCodec,
-    pointArray: pointArrayCodec,
+    pointArray: LIST_TYPES.point,
     line: TYPES.line,
-    lineArray: lineArrayCodec,
+    lineArray: LIST_TYPES.line,
     lseg: TYPES.lseg,
-    lsegArray: lsegArrayCodec,
+    lsegArray: LIST_TYPES.lseg,
     box: TYPES.box,
-    boxArray: boxArrayCodec,
+    boxArray: LIST_TYPES.box,
     path: TYPES.path,
-    pathArray: pathArrayCodec,
+    pathArray: LIST_TYPES.path,
     polygon: TYPES.polygon,
-    polygonArray: polygonArrayCodec,
+    polygonArray: LIST_TYPES.polygon,
     circle: TYPES.circle,
-    circleArray: circleArrayCodec,
+    circleArray: LIST_TYPES.circle,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -723,49 +504,56 @@ const resource_geomPgResource = makeRegistry({
       identifier: "main.geometry.geom",
       from: geomIdentifier,
       codec: geomCodec,
-      uniques: geomUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "geometry",
           name: "geom"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: geomUniques
     }
   },
   pgRelations: {
     __proto__: null
   }
 }).pgResources["geom"];
-const nodeIdHandler_Geom = {
-  typeName: "Geom",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("geoms", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_geomPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "geoms";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_Geom = makeTableNodeIdHandler({
+  typeName: "Geom",
+  identifier: "geoms",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_geomPgResource,
+  pk: geomUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -814,17 +602,32 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function CursorSerialize(value) {
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const specFromArgs_Geom = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Geom2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -845,6 +648,21 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -1436,12 +1254,11 @@ export const objects = {
     plans: {
       createGeom: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_geomPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_geomPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
           input(_, $object) {
@@ -1458,9 +1275,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteGeomById: {
@@ -1474,9 +1289,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateGeom: {
@@ -1488,9 +1301,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateGeomById: {
@@ -1504,9 +1315,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -1524,32 +1333,23 @@ export const objects = {
       geomEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_geomPgResource, geomUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteGeomPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedGeomId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Geom.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      geom($object) {
-        return $object.get("result");
-      },
+      geom: planUpdateOrDeletePayloadResult,
       geomEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_geomPgResource, geomUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   Geom: {
@@ -1591,19 +1391,12 @@ export const objects = {
   UpdateGeomPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      geom($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      geom: planUpdateOrDeletePayloadResult,
       geomEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_geomPgResource, geomUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   }
 };
@@ -1641,172 +1434,66 @@ export const inputObjects = {
   },
   DeleteGeomByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteGeomInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   GeomCondition: {
     plans: {
       box($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "box",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.box)}`;
-          }
-        });
+        return applyAttributeCondition("box", TYPES.box, $condition, val);
       },
       boxes($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "boxes",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, boxArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("boxes", LIST_TYPES.box, $condition, val);
       },
       circle($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "circle",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.circle)}`;
-          }
-        });
+        return applyAttributeCondition("circle", TYPES.circle, $condition, val);
       },
       circles($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "circles",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, circleArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("circles", LIST_TYPES.circle, $condition, val);
       },
       closedPath($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "closed_path",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
-          }
-        });
+        return applyAttributeCondition("closed_path", TYPES.path, $condition, val);
       },
       closedPaths($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "closed_paths",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pathArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("closed_paths", LIST_TYPES.path, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       line($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "line",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.line)}`;
-          }
-        });
+        return applyAttributeCondition("line", TYPES.line, $condition, val);
       },
       lines($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "lines",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, lineArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("lines", LIST_TYPES.line, $condition, val);
       },
       lseg($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "lseg",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
-          }
-        });
+        return applyAttributeCondition("lseg", TYPES.lseg, $condition, val);
       },
       lsegs($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "lsegs",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, lsegArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("lsegs", LIST_TYPES.lseg, $condition, val);
       },
       openPath($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "open_path",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
-          }
-        });
+        return applyAttributeCondition("open_path", TYPES.path, $condition, val);
       },
       openPaths($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "open_paths",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pathArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("open_paths", LIST_TYPES.path, $condition, val);
       },
       point($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "point",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-          }
-        });
+        return applyAttributeCondition("point", TYPES.point, $condition, val);
       },
       points($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "points",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pointArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("points", LIST_TYPES.point, $condition, val);
       },
       polygon($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "polygon",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
-          }
-        });
+        return applyAttributeCondition("polygon", TYPES.polygon, $condition, val);
       },
       polygons($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "polygons",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, polygonArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("polygons", LIST_TYPES.polygon, $condition, val);
       }
     }
   },
@@ -2026,38 +1713,26 @@ export const inputObjects = {
   },
   UpdateGeomByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      geomPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      geomPatch: applyPatchFields
     }
   },
   UpdateGeomInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      geomPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      geomPatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

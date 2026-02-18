@@ -8,7 +8,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -24,35 +24,22 @@ const itemTypeCodec = enumCodec({
       serviceName: "main",
       schemaName: "js_reserved",
       name: "item_type"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
-const spec_relationalTopics = {
+const relationalTopicsCodec = recordCodec({
   name: "relationalTopics",
   identifier: relationalTopicsIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      },
       identicalVia: "relationalItemsByMyId"
     },
     title: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     type: {
       codec: itemTypeCodec,
@@ -61,23 +48,18 @@ const spec_relationalTopics = {
       via: "relationalItemsByMyId",
       restrictedAccess: undefined,
       description: undefined,
-      extensions: {
-        tags: {}
-      }
+      extensions: {}
     },
     constructor: {
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
+      notNull: undefined,
+      hasDefault: undefined,
       via: "relationalItemsByMyId",
       restrictedAccess: undefined,
       description: undefined,
-      extensions: {
-        tags: {}
-      }
+      extensions: {}
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -85,14 +67,10 @@ const spec_relationalTopics = {
       schemaName: "js_reserved",
       name: "relational_topics"
     },
-    tags: {
-      __proto__: null
-    },
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+});
 const __proto__Identifier = sql.identifier("js_reserved", "__proto__");
 const __proto__Codec = recordCodec({
   name: "__proto__",
@@ -100,43 +78,23 @@ const __proto__Codec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     brand: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "__proto__"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -148,43 +106,23 @@ const buildingCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     constructor: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "building"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -196,43 +134,23 @@ const constructorCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     export: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "constructor"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -244,43 +162,23 @@ const cropCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     yield: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     amount: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "crop"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -292,43 +190,23 @@ const machineCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     input: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     constructor: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "machine"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -340,43 +218,23 @@ const materialCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     class: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     valueOf: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "material"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -388,43 +246,23 @@ const nullCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     hasOwnProperty: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     break: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "null"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -434,40 +272,20 @@ const projectCodec = recordCodec({
   name: "project",
   identifier: projectIdentifier,
   attributes: Object.fromEntries([["id", {
-    description: undefined,
     codec: TYPES.int,
     notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
+    hasDefault: true
   }], ["brand", {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+    codec: TYPES.text
   }], ["__proto__", {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+    codec: TYPES.text
   }]]),
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "project"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -479,32 +297,16 @@ const relationalStatusCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      },
       identicalVia: "relationalItemsByMyId"
     },
     description: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     note: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     type: {
       codec: itemTypeCodec,
@@ -513,32 +315,24 @@ const relationalStatusCodec = recordCodec({
       via: "relationalItemsByMyId",
       restrictedAccess: undefined,
       description: undefined,
-      extensions: {
-        tags: spec_relationalTopics.attributes.type.extensions.tags
-      }
+      extensions: {}
     },
     constructor: {
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
+      notNull: undefined,
+      hasDefault: undefined,
       via: "relationalItemsByMyId",
       restrictedAccess: undefined,
       description: undefined,
-      extensions: {
-        tags: spec_relationalTopics.attributes.constructor.extensions.tags
-      }
+      extensions: {}
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "relational_status"
-    },
-    tags: {
-      __proto__: null
     },
     relationalInterfaceCodecName: "relationalItems"
   },
@@ -551,43 +345,23 @@ const yieldCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     crop: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     export: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "yield"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -599,52 +373,26 @@ const reservedCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     null: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     case: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     do: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "reserved"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -656,34 +404,19 @@ const spec_relationalItems = {
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     type: {
-      description: undefined,
       codec: itemTypeCodec,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: spec_relationalTopics.attributes.type.extensions.tags
-      }
+      hasDefault: true
     },
     constructor: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: spec_relationalTopics.attributes.constructor.extensions.tags
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -721,373 +454,163 @@ const awaitFunctionIdentifer = sql.identifier("js_reserved", "await");
 const caseFunctionIdentifer = sql.identifier("js_reserved", "case");
 const valueOfFunctionIdentifer = sql.identifier("js_reserved", "valueOf");
 const null_yieldFunctionIdentifer = sql.identifier("js_reserved", "null_yield");
-const registryConfig_pgResources_relational_topics_relational_topics = {
+const relational_topics_resourceOptionsConfig = {
   executor: executor,
   name: "relational_topics",
   identifier: "main.js_reserved.relational_topics",
   from: relationalTopicsIdentifier,
   codec: relationalTopicsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: pkCols,
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "relational_topics"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: [{
+    attributes: pkCols,
+    isPrimary: true
+  }]
 };
 const __proto__Uniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["name"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["name"]
 }];
 const buildingUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["constructor"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["constructor"]
 }];
-const registryConfig_pgResources_building_building = {
+const building_resourceOptionsConfig = {
   executor: executor,
   name: "building",
   identifier: "main.js_reserved.building",
   from: buildingIdentifier,
   codec: buildingCodec,
-  uniques: buildingUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "building"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: buildingUniques
 };
 const constructorUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["export"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["export"]
 }, {
-  isPrimary: false,
-  attributes: ["name"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["name"]
 }];
 const cropUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["yield"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["yield"]
 }];
 const machineUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_machine_machine = {
+const machine_resourceOptionsConfig = {
   executor: executor,
   name: "machine",
   identifier: "main.js_reserved.machine",
   from: machineIdentifier,
   codec: machineCodec,
-  uniques: machineUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "machine"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: machineUniques
 };
 const materialUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["class"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["class"]
 }, {
-  isPrimary: false,
-  attributes: ["valueOf"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["valueOf"]
 }];
 const nullUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["break"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["break"]
 }, {
-  isPrimary: false,
-  attributes: ["hasOwnProperty"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["hasOwnProperty"]
 }];
 const projectUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["__proto__"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["__proto__"]
 }];
 const relational_statusUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_relational_status_relational_status = {
+const relational_status_resourceOptionsConfig = {
   executor: executor,
   name: "relational_status",
   identifier: "main.js_reserved.relational_status",
   from: relationalStatusIdentifier,
   codec: relationalStatusCodec,
-  uniques: relational_statusUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "relational_status"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: relational_statusUniques
 };
 const yieldUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["export"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["export"]
 }];
 const reservedUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["case"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["case"]
 }, {
-  isPrimary: false,
-  attributes: ["do"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["do"]
 }, {
-  isPrimary: false,
-  attributes: ["null"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["null"]
 }];
 const relational_itemsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_relational_items_relational_items = {
+const relational_items_resourceOptionsConfig = {
   executor: executor,
   name: "relational_items",
   identifier: "main.js_reserved.relational_items",
   from: relationalItemsIdentifier,
   codec: relationalItemsCodec,
-  uniques: relational_itemsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "relational_items"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       interface: "mode:relational type:type",
-      type: spec_relationalItems.extensions.tags.type
+      type: ["TOPIC references:relational_topics", "STATUS references:relational_status"]
     }
-  }
+  },
+  uniques: relational_itemsUniques
 };
 const registryConfig = {
   pgExecutors: {
@@ -1406,7 +929,7 @@ const registryConfig = {
     }
   })]]),
   pgResources: Object.fromEntries([["await", {
-    executor,
+    executor: executor,
     name: "await",
     identifier: "main.js_reserved.await(int4,int4,int4,int4)",
     from(...args) {
@@ -1414,41 +937,33 @@ const registryConfig = {
     },
     parameters: [{
       name: "yield",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "__proto__",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "constructor",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "hasOwnProperty",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }],
-    isUnique: !false,
     codec: TYPES.int,
-    uniques: [],
-    isMutation: false,
     hasImplicitOrder: false,
     extensions: {
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "await"
-      },
-      tags: {}
+      }
     },
-    description: undefined
+    isUnique: true
   }], ["case", {
-    executor,
+    executor: executor,
     name: "case",
     identifier: "main.js_reserved.case(int4,int4,int4,int4)",
     from(...args) {
@@ -1456,41 +971,33 @@ const registryConfig = {
     },
     parameters: [{
       name: "yield",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "__proto__",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "constructor",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "hasOwnProperty",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }],
-    isUnique: !false,
     codec: TYPES.int,
-    uniques: [],
-    isMutation: false,
     hasImplicitOrder: false,
     extensions: {
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "case"
-      },
-      tags: {}
+      }
     },
-    description: undefined
+    isUnique: true
   }], ["valueOf", {
-    executor,
+    executor: executor,
     name: "valueOf",
     identifier: "main.js_reserved.valueOf(int4,int4,int4,int4)",
     from(...args) {
@@ -1498,41 +1005,33 @@ const registryConfig = {
     },
     parameters: [{
       name: "yield",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "__proto__",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "constructor",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "hasOwnProperty",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }],
-    isUnique: !false,
     codec: TYPES.int,
-    uniques: [],
-    isMutation: false,
     hasImplicitOrder: false,
     extensions: {
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "valueOf"
-      },
-      tags: {}
+      }
     },
-    description: undefined
+    isUnique: true
   }], ["null_yield", {
-    executor,
+    executor: executor,
     name: "null_yield",
     identifier: "main.js_reserved.null_yield(js_reserved.null,int4,int4,int4,int4)",
     from(...args) {
@@ -1540,393 +1039,276 @@ const registryConfig = {
     },
     parameters: [{
       name: "n",
-      required: true,
-      notNull: false,
-      codec: nullCodec
+      codec: nullCodec,
+      required: true
     }, {
       name: "yield",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "__proto__",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "constructor",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }, {
       name: "valueOf",
-      required: true,
-      notNull: false,
-      codec: TYPES.int
+      codec: TYPES.int,
+      required: true
     }],
-    isUnique: !false,
     codec: TYPES.int,
-    uniques: [],
-    isMutation: false,
     hasImplicitOrder: false,
     extensions: {
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "null_yield"
-      },
-      tags: {}
+      }
     },
-    description: undefined
-  }], ["relational_topics", registryConfig_pgResources_relational_topics_relational_topics], ["__proto__", {
+    isUnique: true
+  }], ["relational_topics", relational_topics_resourceOptionsConfig], ["__proto__", {
     executor: executor,
     name: "__proto__",
     identifier: "main.js_reserved.__proto__",
     from: __proto__Identifier,
     codec: __proto__Codec,
-    uniques: __proto__Uniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "__proto__"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
-  }], ["building", registryConfig_pgResources_building_building], ["constructor", {
+      }
+    },
+    uniques: __proto__Uniques
+  }], ["building", building_resourceOptionsConfig], ["constructor", {
     executor: executor,
     name: "constructor",
     identifier: "main.js_reserved.constructor",
     from: constructorIdentifier,
     codec: constructorCodec,
-    uniques: constructorUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "constructor"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
+      }
+    },
+    uniques: constructorUniques
   }], ["crop", {
     executor: executor,
     name: "crop",
     identifier: "main.js_reserved.crop",
     from: cropIdentifier,
     codec: cropCodec,
-    uniques: cropUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "crop"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
-  }], ["machine", registryConfig_pgResources_machine_machine], ["material", {
+      }
+    },
+    uniques: cropUniques
+  }], ["machine", machine_resourceOptionsConfig], ["material", {
     executor: executor,
     name: "material",
     identifier: "main.js_reserved.material",
     from: materialIdentifier,
     codec: materialCodec,
-    uniques: materialUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "material"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
+      }
+    },
+    uniques: materialUniques
   }], ["null", {
     executor: executor,
     name: "null",
     identifier: "main.js_reserved.null",
     from: nullIdentifier,
     codec: nullCodec,
-    uniques: nullUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "null"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
+      }
+    },
+    uniques: nullUniques
   }], ["project", {
     executor: executor,
     name: "project",
     identifier: "main.js_reserved.project",
     from: projectIdentifier,
     codec: projectCodec,
-    uniques: projectUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "project"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
-  }], ["relational_status", registryConfig_pgResources_relational_status_relational_status], ["yield", {
+      }
+    },
+    uniques: projectUniques
+  }], ["relational_status", relational_status_resourceOptionsConfig], ["yield", {
     executor: executor,
     name: "yield",
     identifier: "main.js_reserved.yield",
     from: yieldIdentifier,
     codec: yieldCodec,
-    uniques: yieldUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "yield"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
+      }
+    },
+    uniques: yieldUniques
   }], ["reserved", {
     executor: executor,
     name: "reserved",
     identifier: "main.js_reserved.reserved",
     from: reservedIdentifier,
     codec: reservedCodec,
-    uniques: reservedUniques,
-    isVirtual: false,
-    description: undefined,
     extensions: {
-      description: undefined,
       pg: {
         serviceName: "main",
         schemaName: "js_reserved",
         name: "reserved"
-      },
-      isInsertable: true,
-      isUpdatable: true,
-      isDeletable: true,
-      tags: {}
-    }
-  }], ["relational_items", registryConfig_pgResources_relational_items_relational_items]]),
+      }
+    },
+    uniques: reservedUniques
+  }], ["relational_items", relational_items_resourceOptionsConfig]]),
   pgRelations: {
     __proto__: null,
     building: {
       __proto__: null,
       machinesByTheirConstructor: {
         localCodec: buildingCodec,
-        remoteResourceOptions: registryConfig_pgResources_machine_machine,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: machine_resourceOptionsConfig,
         localAttributes: ["constructor"],
         remoteAttributes: ["constructor"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       relationalItemsByTheirConstructor: {
         localCodec: buildingCodec,
-        remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: relational_items_resourceOptionsConfig,
         localAttributes: ["constructor"],
         remoteAttributes: ["constructor"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     machine: {
       __proto__: null,
       buildingByMyConstructor: {
         localCodec: machineCodec,
-        remoteResourceOptions: registryConfig_pgResources_building_building,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: building_resourceOptionsConfig,
         localAttributes: ["constructor"],
         remoteAttributes: ["constructor"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     relationalItems: {
       __proto__: null,
       buildingByMyConstructor: {
         localCodec: relationalItemsCodec,
-        remoteResourceOptions: registryConfig_pgResources_building_building,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: building_resourceOptionsConfig,
         localAttributes: ["constructor"],
         remoteAttributes: ["constructor"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       relationalTopicsByTheirId: {
         localCodec: relationalItemsCodec,
-        remoteResourceOptions: registryConfig_pgResources_relational_topics_relational_topics,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: relational_topics_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       relationalStatusByTheirId: {
         localCodec: relationalItemsCodec,
-        remoteResourceOptions: registryConfig_pgResources_relational_status_relational_status,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: relational_status_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     relationalStatus: {
       __proto__: null,
       relationalItemsByMyId: {
         localCodec: relationalStatusCodec,
-        remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: relational_items_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     relationalTopics: {
       __proto__: null,
       relationalItemsByMyId: {
         localCodec: relationalTopicsCodec,
-        remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: relational_items_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     }
   }
 };
 const registry = makeRegistry(registryConfig);
 const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const nodeIdHandler_RelationalTopic_codec_base64JSON = {
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
+};
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
-const nodeIdHandler_RelationalTopic = {
+const nodeIdHandler_RelationalTopic = makeTableNodeIdHandler({
   typeName: "RelationalTopic",
-  codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_topics", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_relational_topicsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_topics";
-  }
-};
+  identifier: "relational_topics",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_relational_topicsPgResource,
+  pk: pkCols
+});
 const nodeIdCodecs = {
   __proto__: null,
   raw: {
@@ -1942,7 +1324,7 @@ const nodeIdCodecs = {
       isSyncAndSafe: true
     })
   },
-  base64JSON: nodeIdHandler_RelationalTopic_codec_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -1959,16 +1341,93 @@ const nodeIdCodecs = {
 };
 const building_buildingPgResource = registry.pgResources["building"];
 const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
-const pgResource___proto__PgResource = registry.pgResources["__proto__"];
-const pgResource_constructorPgResource = registry.pgResources["constructor"];
-const pgResource_cropPgResource = registry.pgResources["crop"];
-const pgResource_machinePgResource = registry.pgResources["machine"];
-const pgResource_materialPgResource = registry.pgResources["material"];
-const pgResource_nullPgResource = registry.pgResources["null"];
-const pgResource_projectPgResource = registry.pgResources["project"];
-const pgResource_relational_statusPgResource = registry.pgResources["relational_status"];
-const pgResource_yieldPgResource = registry.pgResources["yield"];
-const pgResource_reservedPgResource = registry.pgResources["reserved"];
+const spec_resource___proto__PgResource = registry.pgResources["__proto__"];
+const nodeIdHandler__Proto__ = makeTableNodeIdHandler({
+  typeName: "_Proto__",
+  identifier: "__proto__S",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource___proto__PgResource,
+  pk: __proto__Uniques[0].attributes
+});
+const nodeIdHandler_Building = makeTableNodeIdHandler({
+  typeName: "Building",
+  identifier: "buildings",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: building_buildingPgResource,
+  pk: buildingUniques[0].attributes
+});
+const spec_resource_constructorPgResource = registry.pgResources["constructor"];
+const nodeIdHandler_Constructor = makeTableNodeIdHandler({
+  typeName: "Constructor",
+  identifier: "constructors",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_constructorPgResource,
+  pk: constructorUniques[0].attributes
+});
+const spec_resource_cropPgResource = registry.pgResources["crop"];
+const nodeIdHandler_Crop = makeTableNodeIdHandler({
+  typeName: "Crop",
+  identifier: "crops",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_cropPgResource,
+  pk: cropUniques[0].attributes
+});
+const spec_resource_machinePgResource = registry.pgResources["machine"];
+const nodeIdHandler_Machine = makeTableNodeIdHandler({
+  typeName: "Machine",
+  identifier: "machines",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_machinePgResource,
+  pk: machineUniques[0].attributes
+});
+const spec_resource_materialPgResource = registry.pgResources["material"];
+const nodeIdHandler_Material = makeTableNodeIdHandler({
+  typeName: "Material",
+  identifier: "materials",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_materialPgResource,
+  pk: materialUniques[0].attributes
+});
+const spec_resource_nullPgResource = registry.pgResources["null"];
+const nodeIdHandler_Null = makeTableNodeIdHandler({
+  typeName: "Null",
+  identifier: "nulls",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_nullPgResource,
+  pk: nullUniques[0].attributes
+});
+const spec_resource_projectPgResource = registry.pgResources["project"];
+const nodeIdHandler_Project = makeTableNodeIdHandler({
+  typeName: "Project",
+  identifier: "projects",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_projectPgResource,
+  pk: projectUniques[0].attributes
+});
+const spec_resource_relational_statusPgResource = registry.pgResources["relational_status"];
+const nodeIdHandler_RelationalStatus = makeTableNodeIdHandler({
+  typeName: "RelationalStatus",
+  identifier: "relational_statuses",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_relational_statusPgResource,
+  pk: relational_statusUniques[0].attributes
+});
+const spec_resource_yieldPgResource = registry.pgResources["yield"];
+const nodeIdHandler_Yield = makeTableNodeIdHandler({
+  typeName: "Yield",
+  identifier: "yields",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_yieldPgResource,
+  pk: yieldUniques[0].attributes
+});
+const spec_resource_reservedPgResource = registry.pgResources["reserved"];
+const nodeIdHandler_Reserved = makeTableNodeIdHandler({
+  typeName: "Reserved",
+  identifier: "reserveds",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_reservedPgResource,
+  pk: reservedUniques[0].attributes
+});
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: {
@@ -1991,250 +1450,17 @@ const nodeIdHandlerByTypeName = {
     }
   },
   RelationalTopic: nodeIdHandler_RelationalTopic,
-  _Proto__: {
-    typeName: "_Proto__",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("__proto__S", false), ...__proto__Uniques[0].attributes.map(attribute => $record.get(attribute))]);
-    },
-    getSpec($list) {
-      const spec = __proto__Uniques[0].attributes.reduce((memo, attribute, index) => {
-        memo[attribute] = inhibitOnNull(access($list, [index + 1]));
-        return memo;
-      }, Object.create(null));
-      return spec;
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource___proto__PgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "__proto__S";
-    }
-  },
-  Building: {
-    typeName: "Building",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("buildings", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return building_buildingPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "buildings";
-    }
-  },
-  Constructor: {
-    typeName: "Constructor",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("constructors", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_constructorPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "constructors";
-    }
-  },
-  Crop: {
-    typeName: "Crop",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("crops", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_cropPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "crops";
-    }
-  },
-  Machine: {
-    typeName: "Machine",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("machines", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_machinePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "machines";
-    }
-  },
-  Material: {
-    typeName: "Material",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("materials", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_materialPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "materials";
-    }
-  },
-  Null: {
-    typeName: "Null",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("nulls", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_nullPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "nulls";
-    }
-  },
-  Project: {
-    typeName: "Project",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("projects", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_projectPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "projects";
-    }
-  },
-  RelationalStatus: {
-    typeName: "RelationalStatus",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("relational_statuses", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_relational_statusPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "relational_statuses";
-    }
-  },
-  Yield: {
-    typeName: "Yield",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("yields", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_yieldPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "yields";
-    }
-  },
-  Reserved: {
-    typeName: "Reserved",
-    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("reserveds", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_reservedPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "reserveds";
-    }
-  }
+  _Proto__: nodeIdHandler__Proto__,
+  Building: nodeIdHandler_Building,
+  Constructor: nodeIdHandler_Constructor,
+  Crop: nodeIdHandler_Crop,
+  Machine: nodeIdHandler_Machine,
+  Material: nodeIdHandler_Material,
+  Null: nodeIdHandler_Null,
+  Project: nodeIdHandler_Project,
+  RelationalStatus: nodeIdHandler_RelationalStatus,
+  Yield: nodeIdHandler_Yield,
+  Reserved: nodeIdHandler_Reserved
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -2262,8 +1488,37 @@ const specFromRecord = $record => {
     return memo;
   }, Object.create(null));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
+}
+const applyConditionArg = (_condition, $select, arg) => {
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArg(parent, $select, value) {
+  value.apply($select);
 }
 const specFromRecord2 = $record => {
   return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
@@ -2271,14 +1526,24 @@ const specFromRecord2 = $record => {
     return memo;
   }, Object.create(null));
 };
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
 const specFromRecord3 = $record => {
   return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
     memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
     return memo;
   }, Object.create(null));
 };
-function CursorSerialize(value) {
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const detailsByAttributeName = {
   __proto__: null,
@@ -2307,28 +1572,24 @@ const detailsByAttributeName4 = Object.fromEntries([["__proto__", {
 }]]);
 const argDetailsSimple_await = [{
   graphqlArgName: "yield",
-  postgresArgName: "yield",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "yield",
+  required: true
 }, {
   graphqlArgName: "_proto__",
-  postgresArgName: "__proto__",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "__proto__",
+  required: true
 }, {
   graphqlArgName: "constructor",
-  postgresArgName: "constructor",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "constructor",
+  required: true
 }, {
   graphqlArgName: "hasOwnProperty",
-  postgresArgName: "hasOwnProperty",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "hasOwnProperty",
+  required: true
 }];
 function makeArg(path, args, details) {
   const {
@@ -2351,55 +1612,47 @@ const makeArgs_await = (args, path = []) => argDetailsSimple_await.map(details =
 const resource_awaitPgResource = registry.pgResources["await"];
 const argDetailsSimple_case = [{
   graphqlArgName: "yield",
-  postgresArgName: "yield",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "yield",
+  required: true
 }, {
   graphqlArgName: "_proto__",
-  postgresArgName: "__proto__",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "__proto__",
+  required: true
 }, {
   graphqlArgName: "constructor",
-  postgresArgName: "constructor",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "constructor",
+  required: true
 }, {
   graphqlArgName: "hasOwnProperty",
-  postgresArgName: "hasOwnProperty",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "hasOwnProperty",
+  required: true
 }];
 const makeArgs_case = (args, path = []) => argDetailsSimple_case.map(details => makeArg(path, args, details));
 const resource_casePgResource = registry.pgResources["case"];
 const argDetailsSimple_valueOf = [{
   graphqlArgName: "yield",
-  postgresArgName: "yield",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "yield",
+  required: true
 }, {
   graphqlArgName: "_proto__",
-  postgresArgName: "__proto__",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "__proto__",
+  required: true
 }, {
   graphqlArgName: "constructor",
-  postgresArgName: "constructor",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "constructor",
+  required: true
 }, {
   graphqlArgName: "hasOwnProperty",
-  postgresArgName: "hasOwnProperty",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "hasOwnProperty",
+  required: true
 }];
 const makeArgs_valueOf = (args, path = []) => argDetailsSimple_valueOf.map(details => makeArg(path, args, details));
 const resource_valueOfPgResource = registry.pgResources["valueOf"];
@@ -2433,75 +1686,72 @@ const nodeFetcher_RelationalTopic = $nodeId => {
   return nodeIdHandler_RelationalTopic.get(nodeIdHandler_RelationalTopic.getSpec($decoded));
 };
 const nodeFetcher__Proto__ = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName._Proto__));
-  return nodeIdHandlerByTypeName._Proto__.get(nodeIdHandlerByTypeName._Proto__.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler__Proto__));
+  return nodeIdHandler__Proto__.get(nodeIdHandler__Proto__.getSpec($decoded));
 };
 const nodeFetcher_Building = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Building));
-  return nodeIdHandlerByTypeName.Building.get(nodeIdHandlerByTypeName.Building.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
+  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
 };
 const nodeFetcher_Constructor = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Constructor));
-  return nodeIdHandlerByTypeName.Constructor.get(nodeIdHandlerByTypeName.Constructor.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Constructor));
+  return nodeIdHandler_Constructor.get(nodeIdHandler_Constructor.getSpec($decoded));
 };
 const nodeFetcher_Crop = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Crop));
-  return nodeIdHandlerByTypeName.Crop.get(nodeIdHandlerByTypeName.Crop.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Crop));
+  return nodeIdHandler_Crop.get(nodeIdHandler_Crop.getSpec($decoded));
 };
 const nodeFetcher_Machine = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Machine));
-  return nodeIdHandlerByTypeName.Machine.get(nodeIdHandlerByTypeName.Machine.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Machine));
+  return nodeIdHandler_Machine.get(nodeIdHandler_Machine.getSpec($decoded));
 };
 const nodeFetcher_Material = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Material));
-  return nodeIdHandlerByTypeName.Material.get(nodeIdHandlerByTypeName.Material.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Material));
+  return nodeIdHandler_Material.get(nodeIdHandler_Material.getSpec($decoded));
 };
 const nodeFetcher_Null = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Null));
-  return nodeIdHandlerByTypeName.Null.get(nodeIdHandlerByTypeName.Null.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Null));
+  return nodeIdHandler_Null.get(nodeIdHandler_Null.getSpec($decoded));
 };
 const nodeFetcher_Project = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Project));
-  return nodeIdHandlerByTypeName.Project.get(nodeIdHandlerByTypeName.Project.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Project));
+  return nodeIdHandler_Project.get(nodeIdHandler_Project.getSpec($decoded));
 };
 const nodeFetcher_RelationalStatus = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalStatus));
-  return nodeIdHandlerByTypeName.RelationalStatus.get(nodeIdHandlerByTypeName.RelationalStatus.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_RelationalStatus));
+  return nodeIdHandler_RelationalStatus.get(nodeIdHandler_RelationalStatus.getSpec($decoded));
 };
 const nodeFetcher_Yield = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Yield));
-  return nodeIdHandlerByTypeName.Yield.get(nodeIdHandlerByTypeName.Yield.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Yield));
+  return nodeIdHandler_Yield.get(nodeIdHandler_Yield.getSpec($decoded));
 };
 const nodeFetcher_Reserved = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Reserved));
-  return nodeIdHandlerByTypeName.Reserved.get(nodeIdHandlerByTypeName.Reserved.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Reserved));
+  return nodeIdHandler_Reserved.get(nodeIdHandler_Reserved.getSpec($decoded));
 };
 const argDetailsSimple_null_yield = [{
   graphqlArgName: "yield",
-  postgresArgName: "yield",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "yield",
+  required: true
 }, {
   graphqlArgName: "_proto__",
-  postgresArgName: "__proto__",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "__proto__",
+  required: true
 }, {
   graphqlArgName: "constructor",
-  postgresArgName: "constructor",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "constructor",
+  required: true
 }, {
   graphqlArgName: "valueOf",
-  postgresArgName: "valueOf",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "valueOf",
+  required: true
 }];
 const makeArgs_null_yield = (args, path = []) => argDetailsSimple_null_yield.map(details => makeArg(path, args, details));
+const resource_null_yieldPgResource = registry.pgResources["null_yield"];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -2550,14 +1800,27 @@ const pgFunctionArgumentsFromArgs = (() => {
   }
   return pgFunctionArgumentsFromArgs;
 })();
-const resource_null_yieldPgResource = registry.pgResources["null_yield"];
+const scalarComputed = (resource, $in, args) => {
+  const {
+    $row,
+    selectArgs
+  } = pgFunctionArgumentsFromArgs($in, args, true);
+  const from = pgFromExpression($row, resource.from, resource.parameters, selectArgs);
+  return pgClassExpression($row, resource.codec, undefined)`${from}`;
+};
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs__Proto__ = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName._Proto__, $nodeId);
+  return specFromNodeId(nodeIdHandler__Proto__, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
 const uniqueAttributes = [["constructor", "constructor"]];
 const specFromArgs_Building2 = args => {
@@ -2568,19 +1831,19 @@ const specFromArgs_Building2 = args => {
 };
 const specFromArgs_Constructor = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Constructor, $nodeId);
+  return specFromNodeId(nodeIdHandler_Constructor, $nodeId);
 };
 const specFromArgs_Crop = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Crop, $nodeId);
+  return specFromNodeId(nodeIdHandler_Crop, $nodeId);
 };
 const specFromArgs_Machine = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
+  return specFromNodeId(nodeIdHandler_Machine, $nodeId);
 };
 const specFromArgs_Material = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Material, $nodeId);
+  return specFromNodeId(nodeIdHandler_Material, $nodeId);
 };
 const uniqueAttributes2 = [["valueOf", "valueOf"]];
 const specFromArgs_Material2 = args => {
@@ -2591,7 +1854,7 @@ const specFromArgs_Material2 = args => {
 };
 const specFromArgs_Null = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Null, $nodeId);
+  return specFromNodeId(nodeIdHandler_Null, $nodeId);
 };
 const uniqueAttributes3 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs_Null2 = args => {
@@ -2602,7 +1865,7 @@ const specFromArgs_Null2 = args => {
 };
 const specFromArgs_Project = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Project, $nodeId);
+  return specFromNodeId(nodeIdHandler_Project, $nodeId);
 };
 const uniqueAttributes4 = [["__proto__", "_proto__"]];
 const specFromArgs_Project2 = args => {
@@ -2613,19 +1876,19 @@ const specFromArgs_Project2 = args => {
 };
 const specFromArgs_Yield = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Yield, $nodeId);
+  return specFromNodeId(nodeIdHandler_Yield, $nodeId);
 };
 const specFromArgs_Reserved = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
+  return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
 };
 const specFromArgs__Proto__2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName._Proto__, $nodeId);
+  return specFromNodeId(nodeIdHandler__Proto__, $nodeId);
 };
 const specFromArgs_Building3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs_Building4 = args => {
@@ -2636,19 +1899,19 @@ const specFromArgs_Building4 = args => {
 };
 const specFromArgs_Constructor2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Constructor, $nodeId);
+  return specFromNodeId(nodeIdHandler_Constructor, $nodeId);
 };
 const specFromArgs_Crop2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Crop, $nodeId);
+  return specFromNodeId(nodeIdHandler_Crop, $nodeId);
 };
 const specFromArgs_Machine2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
+  return specFromNodeId(nodeIdHandler_Machine, $nodeId);
 };
 const specFromArgs_Material3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Material, $nodeId);
+  return specFromNodeId(nodeIdHandler_Material, $nodeId);
 };
 const uniqueAttributes6 = [["valueOf", "valueOf"]];
 const specFromArgs_Material4 = args => {
@@ -2659,7 +1922,7 @@ const specFromArgs_Material4 = args => {
 };
 const specFromArgs_Null3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Null, $nodeId);
+  return specFromNodeId(nodeIdHandler_Null, $nodeId);
 };
 const uniqueAttributes7 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs_Null4 = args => {
@@ -2670,7 +1933,7 @@ const specFromArgs_Null4 = args => {
 };
 const specFromArgs_Project3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Project, $nodeId);
+  return specFromNodeId(nodeIdHandler_Project, $nodeId);
 };
 const uniqueAttributes8 = [["__proto__", "_proto__"]];
 const specFromArgs_Project4 = args => {
@@ -2681,12 +1944,22 @@ const specFromArgs_Project4 = args => {
 };
 const specFromArgs_Yield2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Yield, $nodeId);
+  return specFromNodeId(nodeIdHandler_Yield, $nodeId);
 };
 const specFromArgs_Reserved2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
+  return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -2707,12 +1980,35 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 const specFromRecord4 = $record => {
   return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
     memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
     return memo;
   }, Object.create(null));
 };
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 const specFromRecord5 = $record => {
   return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
     memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
@@ -7053,14 +6349,14 @@ export const objects = {
       _protoById(_$root, {
         $id
       }) {
-        return pgResource___proto__PgResource.get({
+        return spec_resource___proto__PgResource.get({
           id: $id
         });
       },
       _protoByName(_$root, {
         $name
       }) {
-        return pgResource___proto__PgResource.get({
+        return spec_resource___proto__PgResource.get({
           name: $name
         });
       },
@@ -7069,29 +6365,13 @@ export const objects = {
           return connection(building_buildingPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allBuildingsList: {
@@ -7099,361 +6379,185 @@ export const objects = {
           return building_buildingPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allConstructors: {
         plan() {
-          return connection(pgResource_constructorPgResource.find());
+          return connection(spec_resource_constructorPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allConstructorsList: {
         plan() {
-          return pgResource_constructorPgResource.find();
+          return spec_resource_constructorPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allCrops: {
         plan() {
-          return connection(pgResource_cropPgResource.find());
+          return connection(spec_resource_cropPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allCropsList: {
         plan() {
-          return pgResource_cropPgResource.find();
+          return spec_resource_cropPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allMachines: {
         plan() {
-          return connection(pgResource_machinePgResource.find());
+          return connection(spec_resource_machinePgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allMachinesList: {
         plan() {
-          return pgResource_machinePgResource.find();
+          return spec_resource_machinePgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allMaterials: {
         plan() {
-          return connection(pgResource_materialPgResource.find());
+          return connection(spec_resource_materialPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allMaterialsList: {
         plan() {
-          return pgResource_materialPgResource.find();
+          return spec_resource_materialPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allNulls: {
         plan() {
-          return connection(pgResource_nullPgResource.find());
+          return connection(spec_resource_nullPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allNullsList: {
         plan() {
-          return pgResource_nullPgResource.find();
+          return spec_resource_nullPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allProjects: {
         plan() {
-          return connection(pgResource_projectPgResource.find());
+          return connection(spec_resource_projectPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allProjectsList: {
         plan() {
-          return pgResource_projectPgResource.find();
+          return spec_resource_projectPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allProtoS: {
         plan() {
-          return connection(pgResource___proto__PgResource.find());
+          return connection(spec_resource___proto__PgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allProtoSList: {
         plan() {
-          return pgResource___proto__PgResource.find();
+          return spec_resource___proto__PgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allRelationalItems: {
@@ -7461,29 +6565,13 @@ export const objects = {
           return connection(relational_items_relational_itemsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allRelationalItemsList: {
@@ -7491,67 +6579,35 @@ export const objects = {
           return relational_items_relational_itemsPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allRelationalStatuses: {
         plan() {
-          return connection(pgResource_relational_statusPgResource.find());
+          return connection(spec_resource_relational_statusPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allRelationalStatusesList: {
         plan() {
-          return pgResource_relational_statusPgResource.find();
+          return spec_resource_relational_statusPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allRelationalTopics: {
@@ -7559,29 +6615,13 @@ export const objects = {
           return connection(resource_relational_topicsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allRelationalTopicsList: {
@@ -7589,116 +6629,60 @@ export const objects = {
           return resource_relational_topicsPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allReserveds: {
         plan() {
-          return connection(pgResource_reservedPgResource.find());
+          return connection(spec_resource_reservedPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allReservedsList: {
         plan() {
-          return pgResource_reservedPgResource.find();
+          return spec_resource_reservedPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       allYields: {
         plan() {
-          return connection(pgResource_yieldPgResource.find());
+          return connection(spec_resource_yieldPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allYieldsList: {
         plan() {
-          return pgResource_yieldPgResource.find();
+          return spec_resource_yieldPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       await($root, args, _info) {
@@ -7734,21 +6718,21 @@ export const objects = {
       constructorByExport(_$root, {
         $export
       }) {
-        return pgResource_constructorPgResource.get({
+        return spec_resource_constructorPgResource.get({
           export: $export
         });
       },
       constructorById(_$root, {
         $id
       }) {
-        return pgResource_constructorPgResource.get({
+        return spec_resource_constructorPgResource.get({
           id: $id
         });
       },
       constructorByName(_$root, {
         $name
       }) {
-        return pgResource_constructorPgResource.get({
+        return spec_resource_constructorPgResource.get({
           name: $name
         });
       },
@@ -7759,14 +6743,14 @@ export const objects = {
       cropById(_$root, {
         $id
       }) {
-        return pgResource_cropPgResource.get({
+        return spec_resource_cropPgResource.get({
           id: $id
         });
       },
       cropByYield(_$root, {
         $yield
       }) {
-        return pgResource_cropPgResource.get({
+        return spec_resource_cropPgResource.get({
           yield: $yield
         });
       },
@@ -7777,7 +6761,7 @@ export const objects = {
       machineById(_$root, {
         $id
       }) {
-        return pgResource_machinePgResource.get({
+        return spec_resource_machinePgResource.get({
           id: $id
         });
       },
@@ -7788,14 +6772,14 @@ export const objects = {
       materialByClass(_$root, {
         $class
       }) {
-        return pgResource_materialPgResource.get({
+        return spec_resource_materialPgResource.get({
           class: $class
         });
       },
       materialById(_$root, {
         $id
       }) {
-        return pgResource_materialPgResource.get({
+        return spec_resource_materialPgResource.get({
           id: $id
         });
       },
@@ -7804,7 +6788,7 @@ export const objects = {
         for (const attributeName in detailsByAttributeName2) {
           spec[attributeName] = args.getRaw(detailsByAttributeName2[attributeName].graphqlName);
         }
-        return pgResource_materialPgResource.get(spec);
+        return spec_resource_materialPgResource.get(spec);
       },
       node(_$root, fieldArgs) {
         return fieldArgs.getRaw("nodeId");
@@ -7820,7 +6804,7 @@ export const objects = {
       nullByBreak(_$root, {
         $break
       }) {
-        return pgResource_nullPgResource.get({
+        return spec_resource_nullPgResource.get({
           break: $break
         });
       },
@@ -7829,12 +6813,12 @@ export const objects = {
         for (const attributeName in detailsByAttributeName3) {
           spec[attributeName] = args.getRaw(detailsByAttributeName3[attributeName].graphqlName);
         }
-        return pgResource_nullPgResource.get(spec);
+        return spec_resource_nullPgResource.get(spec);
       },
       nullById(_$root, {
         $id
       }) {
-        return pgResource_nullPgResource.get({
+        return spec_resource_nullPgResource.get({
           id: $id
         });
       },
@@ -7845,7 +6829,7 @@ export const objects = {
       projectById(_$root, {
         $id
       }) {
-        return pgResource_projectPgResource.get({
+        return spec_resource_projectPgResource.get({
           id: $id
         });
       },
@@ -7854,7 +6838,7 @@ export const objects = {
         for (const attributeName in detailsByAttributeName4) {
           spec[attributeName] = args.getRaw(detailsByAttributeName4[attributeName].graphqlName);
         }
-        return pgResource_projectPgResource.get(spec);
+        return spec_resource_projectPgResource.get(spec);
       },
       query() {
         return rootValue();
@@ -7866,7 +6850,7 @@ export const objects = {
       relationalStatusById(_$root, {
         $id
       }) {
-        return pgResource_relational_statusPgResource.get({
+        return spec_resource_relational_statusPgResource.get({
           id: $id
         });
       },
@@ -7888,28 +6872,28 @@ export const objects = {
       reservedByCase(_$root, {
         $case
       }) {
-        return pgResource_reservedPgResource.get({
+        return spec_resource_reservedPgResource.get({
           case: $case
         });
       },
       reservedByDo(_$root, {
         $do
       }) {
-        return pgResource_reservedPgResource.get({
+        return spec_resource_reservedPgResource.get({
           do: $do
         });
       },
       reservedById(_$root, {
         $id
       }) {
-        return pgResource_reservedPgResource.get({
+        return spec_resource_reservedPgResource.get({
           id: $id
         });
       },
       reservedByNull(_$root, {
         $null
       }) {
-        return pgResource_reservedPgResource.get({
+        return spec_resource_reservedPgResource.get({
           null: $null
         });
       },
@@ -7924,14 +6908,14 @@ export const objects = {
       yieldByExport(_$root, {
         $export
       }) {
-        return pgResource_yieldPgResource.get({
+        return spec_resource_yieldPgResource.get({
           export: $export
         });
       },
       yieldById(_$root, {
         $id
       }) {
-        return pgResource_yieldPgResource.get({
+        return spec_resource_yieldPgResource.get({
           id: $id
         });
       }
@@ -7942,152 +6926,122 @@ export const objects = {
     plans: {
       createBuilding: {
         plan(_, args) {
-          const $insert = pgInsertSingle(building_buildingPgResource, Object.create(null));
+          const $insert = pgInsertSingle(building_buildingPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createConstructor: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_constructorPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_constructorPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createCrop: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_cropPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_cropPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createMachine: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_machinePgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_machinePgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createMaterial: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_materialPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_materialPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createNull: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_nullPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_nullPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createProject: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_projectPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_projectPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createProto__: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource___proto__PgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource___proto__PgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createReserved: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_reservedPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_reservedPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createYield: {
         plan(_, args) {
-          const $insert = pgInsertSingle(pgResource_yieldPgResource, Object.create(null));
+          const $insert = pgInsertSingle(spec_resource_yieldPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteBuilding: {
@@ -8099,9 +7053,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteBuildingByConstructor: {
@@ -8113,9 +7065,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteBuildingById: {
@@ -8129,28 +7079,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteConstructor: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_constructorPgResource, specFromArgs_Constructor2(args));
+          const $delete = pgDeleteSingle(spec_resource_constructorPgResource, specFromArgs_Constructor2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteConstructorByExport: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_constructorPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_constructorPgResource, {
             export: args.getRaw(['input', "export"])
           });
           args.apply($delete);
@@ -8159,14 +7105,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteConstructorById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_constructorPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_constructorPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8175,14 +7119,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteConstructorByName: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_constructorPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_constructorPgResource, {
             name: args.getRaw(['input', "name"])
           });
           args.apply($delete);
@@ -8191,28 +7133,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteCrop: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_cropPgResource, specFromArgs_Crop2(args));
+          const $delete = pgDeleteSingle(spec_resource_cropPgResource, specFromArgs_Crop2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteCropById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_cropPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_cropPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8221,14 +7159,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteCropByYield: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_cropPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_cropPgResource, {
             yield: args.getRaw(['input', "yield"])
           });
           args.apply($delete);
@@ -8237,28 +7173,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMachine: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_machinePgResource, specFromArgs_Machine2(args));
+          const $delete = pgDeleteSingle(spec_resource_machinePgResource, specFromArgs_Machine2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMachineById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_machinePgResource, {
+          const $delete = pgDeleteSingle(spec_resource_machinePgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8267,28 +7199,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMaterial: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_materialPgResource, specFromArgs_Material3(args));
+          const $delete = pgDeleteSingle(spec_resource_materialPgResource, specFromArgs_Material3(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMaterialByClass: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_materialPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_materialPgResource, {
             class: args.getRaw(['input', "class"])
           });
           args.apply($delete);
@@ -8297,14 +7225,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMaterialById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_materialPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_materialPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8313,42 +7239,36 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMaterialByValueOf: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_materialPgResource, specFromArgs_Material4(args));
+          const $delete = pgDeleteSingle(spec_resource_materialPgResource, specFromArgs_Material4(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteNull: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_nullPgResource, specFromArgs_Null3(args));
+          const $delete = pgDeleteSingle(spec_resource_nullPgResource, specFromArgs_Null3(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteNullByBreak: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_nullPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_nullPgResource, {
             break: args.getRaw(['input', "break"])
           });
           args.apply($delete);
@@ -8357,28 +7277,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteNullByHasOwnProperty: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_nullPgResource, specFromArgs_Null4(args));
+          const $delete = pgDeleteSingle(spec_resource_nullPgResource, specFromArgs_Null4(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteNullById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_nullPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_nullPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8387,28 +7303,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProject: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_projectPgResource, specFromArgs_Project3(args));
+          const $delete = pgDeleteSingle(spec_resource_projectPgResource, specFromArgs_Project3(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProjectById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_projectPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_projectPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8417,42 +7329,36 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProjectByProto__: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_projectPgResource, specFromArgs_Project4(args));
+          const $delete = pgDeleteSingle(spec_resource_projectPgResource, specFromArgs_Project4(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProto__: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource___proto__PgResource, specFromArgs__Proto__2(args));
+          const $delete = pgDeleteSingle(spec_resource___proto__PgResource, specFromArgs__Proto__2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProtoById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource___proto__PgResource, {
+          const $delete = pgDeleteSingle(spec_resource___proto__PgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8461,14 +7367,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProtoByName: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource___proto__PgResource, {
+          const $delete = pgDeleteSingle(spec_resource___proto__PgResource, {
             name: args.getRaw(['input', "name"])
           });
           args.apply($delete);
@@ -8477,28 +7381,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReserved: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_reservedPgResource, specFromArgs_Reserved2(args));
+          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, specFromArgs_Reserved2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReservedByCase: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, {
             case: args.getRaw(['input', "case"])
           });
           args.apply($delete);
@@ -8507,14 +7407,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReservedByDo: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, {
             do: args.getRaw(['input', "do"])
           });
           args.apply($delete);
@@ -8523,14 +7421,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReservedById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8539,14 +7435,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReservedByNull: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_reservedPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, {
             null: args.getRaw(['input', "null"])
           });
           args.apply($delete);
@@ -8555,28 +7449,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteYield: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_yieldPgResource, specFromArgs_Yield2(args));
+          const $delete = pgDeleteSingle(spec_resource_yieldPgResource, specFromArgs_Yield2(args));
           args.apply($delete);
           return object({
             result: $delete
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteYieldByExport: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_yieldPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_yieldPgResource, {
             export: args.getRaw(['input', "export"])
           });
           args.apply($delete);
@@ -8585,14 +7475,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteYieldById: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(pgResource_yieldPgResource, {
+          const $delete = pgDeleteSingle(spec_resource_yieldPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($delete);
@@ -8601,9 +7489,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateBuilding: {
@@ -8615,9 +7501,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateBuildingByConstructor: {
@@ -8629,9 +7513,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateBuildingById: {
@@ -8645,28 +7527,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateConstructor: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_constructorPgResource, specFromArgs_Constructor(args));
+          const $update = pgUpdateSingle(spec_resource_constructorPgResource, specFromArgs_Constructor(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateConstructorByExport: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_constructorPgResource, {
+          const $update = pgUpdateSingle(spec_resource_constructorPgResource, {
             export: args.getRaw(['input', "export"])
           });
           args.apply($update);
@@ -8675,14 +7553,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateConstructorById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_constructorPgResource, {
+          const $update = pgUpdateSingle(spec_resource_constructorPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8691,14 +7567,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateConstructorByName: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_constructorPgResource, {
+          const $update = pgUpdateSingle(spec_resource_constructorPgResource, {
             name: args.getRaw(['input', "name"])
           });
           args.apply($update);
@@ -8707,28 +7581,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateCrop: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_cropPgResource, specFromArgs_Crop(args));
+          const $update = pgUpdateSingle(spec_resource_cropPgResource, specFromArgs_Crop(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateCropById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_cropPgResource, {
+          const $update = pgUpdateSingle(spec_resource_cropPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8737,14 +7607,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateCropByYield: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_cropPgResource, {
+          const $update = pgUpdateSingle(spec_resource_cropPgResource, {
             yield: args.getRaw(['input', "yield"])
           });
           args.apply($update);
@@ -8753,28 +7621,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMachine: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_machinePgResource, specFromArgs_Machine(args));
+          const $update = pgUpdateSingle(spec_resource_machinePgResource, specFromArgs_Machine(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMachineById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_machinePgResource, {
+          const $update = pgUpdateSingle(spec_resource_machinePgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8783,28 +7647,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMaterial: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_materialPgResource, specFromArgs_Material(args));
+          const $update = pgUpdateSingle(spec_resource_materialPgResource, specFromArgs_Material(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMaterialByClass: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_materialPgResource, {
+          const $update = pgUpdateSingle(spec_resource_materialPgResource, {
             class: args.getRaw(['input', "class"])
           });
           args.apply($update);
@@ -8813,14 +7673,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMaterialById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_materialPgResource, {
+          const $update = pgUpdateSingle(spec_resource_materialPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8829,42 +7687,36 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMaterialByValueOf: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_materialPgResource, specFromArgs_Material2(args));
+          const $update = pgUpdateSingle(spec_resource_materialPgResource, specFromArgs_Material2(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateNull: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_nullPgResource, specFromArgs_Null(args));
+          const $update = pgUpdateSingle(spec_resource_nullPgResource, specFromArgs_Null(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateNullByBreak: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_nullPgResource, {
+          const $update = pgUpdateSingle(spec_resource_nullPgResource, {
             break: args.getRaw(['input', "break"])
           });
           args.apply($update);
@@ -8873,28 +7725,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateNullByHasOwnProperty: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_nullPgResource, specFromArgs_Null2(args));
+          const $update = pgUpdateSingle(spec_resource_nullPgResource, specFromArgs_Null2(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateNullById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_nullPgResource, {
+          const $update = pgUpdateSingle(spec_resource_nullPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8903,28 +7751,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProject: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_projectPgResource, specFromArgs_Project(args));
+          const $update = pgUpdateSingle(spec_resource_projectPgResource, specFromArgs_Project(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProjectById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_projectPgResource, {
+          const $update = pgUpdateSingle(spec_resource_projectPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8933,42 +7777,36 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProjectByProto__: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_projectPgResource, specFromArgs_Project2(args));
+          const $update = pgUpdateSingle(spec_resource_projectPgResource, specFromArgs_Project2(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProto__: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource___proto__PgResource, specFromArgs__Proto__(args));
+          const $update = pgUpdateSingle(spec_resource___proto__PgResource, specFromArgs__Proto__(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProtoById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource___proto__PgResource, {
+          const $update = pgUpdateSingle(spec_resource___proto__PgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -8977,14 +7815,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProtoByName: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource___proto__PgResource, {
+          const $update = pgUpdateSingle(spec_resource___proto__PgResource, {
             name: args.getRaw(['input', "name"])
           });
           args.apply($update);
@@ -8993,28 +7829,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReserved: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_reservedPgResource, specFromArgs_Reserved(args));
+          const $update = pgUpdateSingle(spec_resource_reservedPgResource, specFromArgs_Reserved(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReservedByCase: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          const $update = pgUpdateSingle(spec_resource_reservedPgResource, {
             case: args.getRaw(['input', "case"])
           });
           args.apply($update);
@@ -9023,14 +7855,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReservedByDo: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          const $update = pgUpdateSingle(spec_resource_reservedPgResource, {
             do: args.getRaw(['input', "do"])
           });
           args.apply($update);
@@ -9039,14 +7869,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReservedById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          const $update = pgUpdateSingle(spec_resource_reservedPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -9055,14 +7883,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReservedByNull: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_reservedPgResource, {
+          const $update = pgUpdateSingle(spec_resource_reservedPgResource, {
             null: args.getRaw(['input', "null"])
           });
           args.apply($update);
@@ -9071,28 +7897,24 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateYield: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_yieldPgResource, specFromArgs_Yield(args));
+          const $update = pgUpdateSingle(spec_resource_yieldPgResource, specFromArgs_Yield(args));
           args.apply($update);
           return object({
             result: $update
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateYieldByExport: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_yieldPgResource, {
+          const $update = pgUpdateSingle(spec_resource_yieldPgResource, {
             export: args.getRaw(['input', "export"])
           });
           args.apply($update);
@@ -9101,14 +7923,12 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateYieldById: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(pgResource_yieldPgResource, {
+          const $update = pgUpdateSingle(spec_resource_yieldPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -9117,9 +7937,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -9128,8 +7946,8 @@ export const objects = {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName._Proto__.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName._Proto__.codec.name].encode);
+        const specifier = nodeIdHandler__Proto__.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler__Proto__.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9137,15 +7955,13 @@ export const objects = {
       for (const pkCol of __proto__Uniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource___proto__PgResource.get(spec);
+      return spec_resource___proto__PgResource.get(spec);
     }
   },
   _Proto__SConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Building: {
@@ -9153,85 +7969,45 @@ export const objects = {
     plans: {
       machinesByConstructor: {
         plan($record) {
-          return connection(pgResource_machinePgResource.find(specFromRecord($record)));
+          return connection(spec_resource_machinePgResource.find(specFromRecord($record)));
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       machinesByConstructorList: {
         plan($record) {
-          return pgResource_machinePgResource.find(specFromRecord($record));
+          return spec_resource_machinePgResource.find(specFromRecord($record));
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Building.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Building.codec.name].encode);
+        const specifier = nodeIdHandler_Building.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Building.codec.name].encode);
       },
       relationalItemsByConstructor: {
         plan($record) {
           return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       relationalItemsByConstructorList: {
@@ -9239,18 +8015,10 @@ export const objects = {
           return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       }
     },
@@ -9265,17 +8033,15 @@ export const objects = {
   BuildingsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Constructor: {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Constructor.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Constructor.codec.name].encode);
+        const specifier = nodeIdHandler_Constructor.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Constructor.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9283,69 +8049,46 @@ export const objects = {
       for (const pkCol of constructorUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_constructorPgResource.get(spec);
+      return spec_resource_constructorPgResource.get(spec);
     }
   },
   ConstructorsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   CreateBuildingPayload: {
     assertStep: assertStep,
     plans: {
-      building($object) {
-        return $object.get("result");
-      },
+      building: planCreatePayloadResult,
       buildingEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan
     }
   },
   CreateConstructorPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      constructor($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      constructor: planCreatePayloadResult,
       constructorEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateCropPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      crop($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      crop: planCreatePayloadResult,
       cropEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateMachinePayload: {
@@ -9355,126 +8098,77 @@ export const objects = {
         const $record = $in.get("result");
         return building_buildingPgResource.get(specFromRecord4($record));
       },
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      machine($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      machine: planCreatePayloadResult,
       machineEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateMaterialPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      material($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      material: planCreatePayloadResult,
       materialEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateNullPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      null($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      null: planCreatePayloadResult,
       nullEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateProjectPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      project($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      project: planCreatePayloadResult,
       projectEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateProtoPayload: {
     assertStep: assertStep,
     plans: {
-      _proto__($object) {
-        return $object.get("result");
-      },
+      _proto__: planCreatePayloadResult,
       _protoEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan
     }
   },
   CreateReservedPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      reserved($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      reserved: planCreatePayloadResult,
       reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   CreateYieldPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      yield($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      yield: planCreatePayloadResult,
       yieldEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -9482,8 +8176,8 @@ export const objects = {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Crop.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Crop.codec.name].encode);
+        const specifier = nodeIdHandler_Crop.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Crop.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9491,84 +8185,61 @@ export const objects = {
       for (const pkCol of cropUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_cropPgResource.get(spec);
+      return spec_resource_cropPgResource.get(spec);
     }
   },
   CropsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   DeleteBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building($object) {
-        return $object.get("result");
-      },
+      building: planUpdateOrDeletePayloadResult,
       buildingEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBuildingId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Building.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Building.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteConstructorPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      constructor($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      constructor: planUpdateOrDeletePayloadResult,
       constructorEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
       },
       deletedConstructorId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Constructor.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Constructor.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteCropPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      crop($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      crop: planUpdateOrDeletePayloadResult,
       cropEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
       },
       deletedCropId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Crop.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Crop.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteMachinePayload: {
@@ -9578,161 +8249,112 @@ export const objects = {
         const $record = $in.get("result");
         return building_buildingPgResource.get(specFromRecord6($record));
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedMachineId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Machine.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Machine.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      machine($object) {
-        return $object.get("result");
-      },
+      machine: planUpdateOrDeletePayloadResult,
       machineEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteMaterialPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedMaterialId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Material.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Material.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      material($object) {
-        return $object.get("result");
-      },
+      material: planUpdateOrDeletePayloadResult,
       materialEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteNullPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedNullId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Null.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Null.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      null($object) {
-        return $object.get("result");
-      },
+      null: planUpdateOrDeletePayloadResult,
       nullEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteProjectPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedProjectId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Project.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Project.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      project($object) {
-        return $object.get("result");
-      },
+      project: planUpdateOrDeletePayloadResult,
       projectEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteProtoPayload: {
     assertStep: ObjectStep,
     plans: {
-      _proto__($object) {
-        return $object.get("result");
-      },
+      _proto__: planUpdateOrDeletePayloadResult,
       _protoEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedProtoId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName._Proto__.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler__Proto__.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteReservedPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedReservedId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Reserved.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Reserved.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      reserved($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      reserved: planUpdateOrDeletePayloadResult,
       reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   DeleteYieldPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedYieldId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandlerByTypeName.Yield.plan($record);
-        return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
+        const specifier = nodeIdHandler_Yield.plan($record);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      yield($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      yield: planUpdateOrDeletePayloadResult,
       yieldEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -9743,8 +8365,8 @@ export const objects = {
         return building_buildingPgResource.get(specFromRecord3($record));
       },
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Machine.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Machine.codec.name].encode);
+        const specifier = nodeIdHandler_Machine.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Machine.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9752,23 +8374,21 @@ export const objects = {
       for (const pkCol of machineUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_machinePgResource.get(spec);
+      return spec_resource_machinePgResource.get(spec);
     }
   },
   MachinesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Material: {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Material.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Material.codec.name].encode);
+        const specifier = nodeIdHandler_Material.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Material.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9776,31 +8396,24 @@ export const objects = {
       for (const pkCol of materialUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_materialPgResource.get(spec);
+      return spec_resource_materialPgResource.get(spec);
     }
   },
   MaterialsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Null: {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Null.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Null.codec.name].encode);
+        const specifier = nodeIdHandler_Null.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Null.codec.name].encode);
       },
       yield($in, args, _info) {
-        const {
-          $row,
-          selectArgs
-        } = pgFunctionArgumentsFromArgs($in, makeArgs_null_yield(args), true);
-        const from = pgFromExpression($row, resource_null_yieldPgResource.from, resource_null_yieldPgResource.parameters, selectArgs);
-        return pgClassExpression($row, resource_null_yieldPgResource.codec, undefined)`${from}`;
+        return scalarComputed(resource_null_yieldPgResource, $in, makeArgs_null_yield(args));
       }
     },
     planType($specifier) {
@@ -9808,15 +8421,13 @@ export const objects = {
       for (const pkCol of nullUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_nullPgResource.get(spec);
+      return spec_resource_nullPgResource.get(spec);
     }
   },
   NullsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Project: {
@@ -9826,8 +8437,8 @@ export const objects = {
         return $record.get("__proto__");
       },
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Project.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Project.codec.name].encode);
+        const specifier = nodeIdHandler_Project.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Project.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9835,23 +8446,19 @@ export const objects = {
       for (const pkCol of projectUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_projectPgResource.get(spec);
+      return spec_resource_projectPgResource.get(spec);
     }
   },
   ProjectsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   RelationalItemsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   RelationalStatus: {
@@ -9872,8 +8479,8 @@ export const objects = {
         return $buildings.single();
       },
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.RelationalStatus.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalStatus.codec.name].encode);
+        const specifier = nodeIdHandler_RelationalStatus.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_RelationalStatus.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9881,15 +8488,13 @@ export const objects = {
       for (const pkCol of relational_statusUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_relational_statusPgResource.get(spec);
+      return spec_resource_relational_statusPgResource.get(spec);
     }
   },
   RelationalStatusesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   RelationalTopic: {
@@ -9925,17 +8530,15 @@ export const objects = {
   RelationalTopicsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Reserved: {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Reserved.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Reserved.codec.name].encode);
+        const specifier = nodeIdHandler_Reserved.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Reserved.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -9943,69 +8546,46 @@ export const objects = {
       for (const pkCol of reservedUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_reservedPgResource.get(spec);
+      return spec_resource_reservedPgResource.get(spec);
     }
   },
   ReservedsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building($object) {
-        return $object.get("result");
-      },
+      building: planUpdateOrDeletePayloadResult,
       buildingEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan
     }
   },
   UpdateConstructorPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      constructor($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      constructor: planUpdateOrDeletePayloadResult,
       constructorEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateCropPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      crop($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      crop: planUpdateOrDeletePayloadResult,
       cropEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateMachinePayload: {
@@ -10015,126 +8595,77 @@ export const objects = {
         const $record = $in.get("result");
         return building_buildingPgResource.get(specFromRecord5($record));
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      machine($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      machine: planUpdateOrDeletePayloadResult,
       machineEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateMaterialPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      material($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      material: planUpdateOrDeletePayloadResult,
       materialEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateNullPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      null($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      null: planUpdateOrDeletePayloadResult,
       nullEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateProjectPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      project($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      project: planUpdateOrDeletePayloadResult,
       projectEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateProtoPayload: {
     assertStep: ObjectStep,
     plans: {
-      _proto__($object) {
-        return $object.get("result");
-      },
+      _proto__: planUpdateOrDeletePayloadResult,
       _protoEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan
     }
   },
   UpdateReservedPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      reserved($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      reserved: planUpdateOrDeletePayloadResult,
       reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
   UpdateYieldPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      yield($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      yield: planUpdateOrDeletePayloadResult,
       yieldEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(pgResource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -10142,8 +8673,8 @@ export const objects = {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
-        const specifier = nodeIdHandlerByTypeName.Yield.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Yield.codec.name].encode);
+        const specifier = nodeIdHandler_Yield.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Yield.codec.name].encode);
       }
     },
     planType($specifier) {
@@ -10151,15 +8682,13 @@ export const objects = {
       for (const pkCol of yieldUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return pgResource_yieldPgResource.get(spec);
+      return spec_resource_yieldPgResource.get(spec);
     }
   },
   YieldsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   }
 };
@@ -10269,31 +8798,13 @@ export const inputObjects = {
   _ProtoCondition: {
     plans: {
       brand($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "brand",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("brand", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -10323,31 +8834,13 @@ export const inputObjects = {
   BuildingCondition: {
     plans: {
       constructor($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constructor",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("constructor", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -10400,31 +8893,13 @@ export const inputObjects = {
   ConstructorCondition: {
     plans: {
       export($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "export",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("export", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -10476,152 +8951,74 @@ export const inputObjects = {
   },
   CreateBuildingInput: {
     plans: {
-      building(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      building: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   CreateConstructorInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      constructor(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      constructor: applyCreateFields
     }
   },
   CreateCropInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      crop(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      crop: applyCreateFields
     }
   },
   CreateMachineInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      machine(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      machine: applyCreateFields
     }
   },
   CreateMaterialInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      material(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      material: applyCreateFields
     }
   },
   CreateNullInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      null(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      null: applyCreateFields
     }
   },
   CreateProjectInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      project(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      project: applyCreateFields
     }
   },
   CreateProtoInput: {
     plans: {
-      _proto__(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      _proto__: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   CreateReservedInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      reserved(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      reserved: applyCreateFields
     }
   },
   CreateYieldInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      yield(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      yield: applyCreateFields
     }
   },
   CropCondition: {
     plans: {
       amount($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "amount",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("amount", TYPES.int, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       yield($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "yield",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("yield", TYPES.text, $condition, val);
       }
     }
   },
@@ -10673,270 +9070,184 @@ export const inputObjects = {
   },
   DeleteBuildingByConstructorInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteBuildingByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteBuildingInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteConstructorByExportInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteConstructorByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteConstructorByNameInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteConstructorInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteCropByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteCropByYieldInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteCropInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMachineByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMachineInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMaterialByClassInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMaterialByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMaterialByValueOfInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMaterialInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteNullByBreakInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteNullByHasOwnPropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteNullByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteNullInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProjectByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProjectByProtoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProjectInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProtoByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProtoByNameInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProtoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReservedByCaseInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReservedByDoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReservedByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReservedByNullInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReservedInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteYieldByExportInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteYieldByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteYieldInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   MachineCondition: {
     plans: {
       constructor($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constructor",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("constructor", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       input($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "input",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("input", TYPES.text, $condition, val);
       }
     }
   },
@@ -10989,31 +9300,13 @@ export const inputObjects = {
   MaterialCondition: {
     plans: {
       class($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "class",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("class", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       valueOf($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "valueOf",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("valueOf", TYPES.text, $condition, val);
       }
     }
   },
@@ -11066,31 +9359,13 @@ export const inputObjects = {
   NullCondition: {
     plans: {
       break($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "break",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("break", TYPES.text, $condition, val);
       },
       hasOwnProperty($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "hasOwnProperty",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("hasOwnProperty", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       }
     }
   },
@@ -11143,31 +9418,13 @@ export const inputObjects = {
   ProjectCondition: {
     plans: {
       _proto__($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "__proto__",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("__proto__", TYPES.text, $condition, val);
       },
       brand($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "brand",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("brand", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       }
     }
   },
@@ -11220,31 +9477,13 @@ export const inputObjects = {
   RelationalItemCondition: {
     plans: {
       constructor($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constructor",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("constructor", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("type", itemTypeCodec, $condition, val);
       }
     }
   },
@@ -11258,31 +9497,13 @@ export const inputObjects = {
         $condition.where(condition);
       },
       description($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "description",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("description", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       note($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "note",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("note", TYPES.text, $condition, val);
       },
       type($condition, val) {
         const queryBuilder = $condition.dangerouslyGetParent();
@@ -11303,22 +9524,10 @@ export const inputObjects = {
         $condition.where(condition);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       title($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "title",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("title", TYPES.text, $condition, val);
       },
       type($condition, val) {
         const queryBuilder = $condition.dangerouslyGetParent();
@@ -11332,40 +9541,16 @@ export const inputObjects = {
   ReservedCondition: {
     plans: {
       case($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "case",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("case", TYPES.text, $condition, val);
       },
       do($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "do",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("do", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       null($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "null",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("null", TYPES.text, $condition, val);
       }
     }
   },
@@ -11429,440 +9614,218 @@ export const inputObjects = {
   },
   UpdateBuildingByConstructorInput: {
     plans: {
-      buildingPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      buildingPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateBuildingByIdInput: {
     plans: {
-      buildingPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      buildingPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateBuildingInput: {
     plans: {
-      buildingPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      buildingPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateConstructorByExportInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      constructorPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      constructorPatch: applyPatchFields
     }
   },
   UpdateConstructorByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      constructorPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      constructorPatch: applyPatchFields
     }
   },
   UpdateConstructorByNameInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      constructorPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      constructorPatch: applyPatchFields
     }
   },
   UpdateConstructorInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      constructorPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      constructorPatch: applyPatchFields
     }
   },
   UpdateCropByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      cropPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      cropPatch: applyPatchFields
     }
   },
   UpdateCropByYieldInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      cropPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      cropPatch: applyPatchFields
     }
   },
   UpdateCropInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      cropPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      cropPatch: applyPatchFields
     }
   },
   UpdateMachineByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      machinePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      machinePatch: applyPatchFields
     }
   },
   UpdateMachineInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      machinePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      machinePatch: applyPatchFields
     }
   },
   UpdateMaterialByClassInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      materialPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      materialPatch: applyPatchFields
     }
   },
   UpdateMaterialByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      materialPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      materialPatch: applyPatchFields
     }
   },
   UpdateMaterialByValueOfInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      materialPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      materialPatch: applyPatchFields
     }
   },
   UpdateMaterialInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      materialPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      materialPatch: applyPatchFields
     }
   },
   UpdateNullByBreakInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      nullPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      nullPatch: applyPatchFields
     }
   },
   UpdateNullByHasOwnPropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      nullPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      nullPatch: applyPatchFields
     }
   },
   UpdateNullByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      nullPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      nullPatch: applyPatchFields
     }
   },
   UpdateNullInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      nullPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      nullPatch: applyPatchFields
     }
   },
   UpdateProjectByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      projectPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      projectPatch: applyPatchFields
     }
   },
   UpdateProjectByProtoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      projectPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      projectPatch: applyPatchFields
     }
   },
   UpdateProjectInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      projectPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      projectPatch: applyPatchFields
     }
   },
   UpdateProtoByIdInput: {
     plans: {
-      _protoPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      _protoPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateProtoByNameInput: {
     plans: {
-      _protoPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      _protoPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateProtoInput: {
     plans: {
-      _protoPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      _protoPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateReservedByCaseInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      reservedPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      reservedPatch: applyPatchFields
     }
   },
   UpdateReservedByDoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      reservedPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      reservedPatch: applyPatchFields
     }
   },
   UpdateReservedByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      reservedPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      reservedPatch: applyPatchFields
     }
   },
   UpdateReservedByNullInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      reservedPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      reservedPatch: applyPatchFields
     }
   },
   UpdateReservedInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      reservedPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      reservedPatch: applyPatchFields
     }
   },
   UpdateYieldByExportInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      yieldPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      yieldPatch: applyPatchFields
     }
   },
   UpdateYieldByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      yieldPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      yieldPatch: applyPatchFields
     }
   },
   UpdateYieldInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      yieldPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      yieldPatch: applyPatchFields
     }
   },
   YieldCondition: {
     plans: {
       crop($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "crop",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("crop", TYPES.text, $condition, val);
       },
       export($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "export",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("export", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       }
     }
   },
@@ -11915,13 +9878,13 @@ export const inputObjects = {
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

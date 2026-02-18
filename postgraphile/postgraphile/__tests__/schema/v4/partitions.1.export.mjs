@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,16 +81,10 @@ const entityKindsCodec = recordCodec({
   attributes: {
     __proto__: null,
     kind: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -116,25 +106,16 @@ const locationsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "locations"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -146,25 +127,16 @@ const photosCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "photos"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -176,25 +148,16 @@ const profilesCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "profiles"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -206,34 +169,21 @@ const usersCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "users"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -272,43 +222,24 @@ const locationTagsCodec = recordCodec({
   attributes: {
     __proto__: null,
     entity_kind: {
-      description: undefined,
       codec: spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     entity_id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     tag: {
-      description: undefined,
       codec: TYPES.citext,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "location_tags"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -320,52 +251,27 @@ const measurementsCodec = recordCodec({
   attributes: {
     __proto__: null,
     timestamp: {
-      description: undefined,
       codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     key: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     value: {
-      description: undefined,
-      codec: TYPES.float,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.float
     },
     user_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -377,52 +283,27 @@ const measurementsY2022Codec = recordCodec({
   attributes: {
     __proto__: null,
     timestamp: {
-      description: undefined,
       codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     key: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     value: {
-      description: undefined,
-      codec: TYPES.float,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.float
     },
     user_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements_y2022"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -434,52 +315,27 @@ const measurementsY2023Codec = recordCodec({
   attributes: {
     __proto__: null,
     timestamp: {
-      description: undefined,
       codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     key: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     value: {
-      description: undefined,
-      codec: TYPES.float,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.float
     },
     user_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements_y2023"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -491,52 +347,27 @@ const measurementsY2024Codec = recordCodec({
   attributes: {
     __proto__: null,
     timestamp: {
-      description: undefined,
       codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     key: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     value: {
-      description: undefined,
-      codec: TYPES.float,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.float
     },
     user_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements_y2024"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -548,43 +379,24 @@ const photoTagsCodec = recordCodec({
   attributes: {
     __proto__: null,
     entity_kind: {
-      description: undefined,
       codec: spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     entity_id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     tag: {
-      description: undefined,
       codec: TYPES.citext,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "photo_tags"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -596,43 +408,24 @@ const profileTagsCodec = recordCodec({
   attributes: {
     __proto__: null,
     entity_kind: {
-      description: undefined,
       codec: spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     entity_id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     tag: {
-      description: undefined,
       codec: TYPES.citext,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "profile_tags"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -644,34 +437,18 @@ const tagsCodec = recordCodec({
   attributes: {
     __proto__: null,
     entity_kind: {
-      description: undefined,
       codec: spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     entity_id: {
-      description: undefined,
       codec: TYPES.uuid,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     tag: {
-      description: undefined,
       codec: TYPES.citext,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -686,446 +463,279 @@ const tagsCodec = recordCodec({
   },
   executor: executor
 });
-const registryConfig_pgResources_entity_kinds_entity_kinds = {
+const entity_kinds_resourceOptionsConfig = {
   executor: executor,
   name: "entity_kinds",
   identifier: "main.partitions.entity_kinds",
   from: entityKindsIdentifier,
   codec: entityKindsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["kind"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "entity_kinds"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       enum: true
     }
-  }
+  },
+  uniques: [{
+    attributes: ["kind"],
+    isPrimary: true
+  }]
 };
 const locationsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_locations_locations = {
+const locations_resourceOptionsConfig = {
   executor: executor,
   name: "locations",
   identifier: "main.partitions.locations",
   from: locationsIdentifier,
   codec: locationsCodec,
-  uniques: locationsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "locations"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: locationsUniques
 };
 const photosUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_photos_photos = {
+const photos_resourceOptionsConfig = {
   executor: executor,
   name: "photos",
   identifier: "main.partitions.photos",
   from: photosIdentifier,
   codec: photosCodec,
-  uniques: photosUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "photos"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: photosUniques
 };
 const profilesUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_profiles_profiles = {
+const profiles_resourceOptionsConfig = {
   executor: executor,
   name: "profiles",
   identifier: "main.partitions.profiles",
   from: profilesIdentifier,
   codec: profilesCodec,
-  uniques: profilesUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "profiles"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: profilesUniques
 };
 const usersUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_users_users = {
+const users_resourceOptionsConfig = {
   executor: executor,
   name: "users",
   identifier: "main.partitions.users",
   from: usersIdentifier,
   codec: usersCodec,
-  uniques: usersUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "users"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: usersUniques
 };
 const measurementsUniques = [{
-  isPrimary: true,
   attributes: ["timestamp", "key"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_measurements_measurements = {
+const measurements_resourceOptionsConfig = {
   executor: executor,
   name: "measurements",
   identifier: "main.partitions.measurements",
   from: measurementsIdentifier,
   codec: measurementsCodec,
-  uniques: measurementsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    hasPartitions: true,
-    tags: {}
-  }
+    hasPartitions: true
+  },
+  uniques: measurementsUniques
 };
-const registryConfig_pgResources_tags_tags = {
+const tags_resourceOptionsConfig = {
   executor: executor,
   name: "tags",
   identifier: "main.partitions.tags",
   from: tagsIdentifier,
   codec: tagsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["entity_kind", "entity_id", "tag"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "tags"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     hasPartitions: true,
     tags: {
       partitionExpose: "child"
     }
-  }
+  },
+  uniques: [{
+    attributes: ["entity_kind", "entity_id", "tag"],
+    isPrimary: true
+  }]
 };
-const registryConfig_pgResources_measurements_y2022_measurements_y2022 = {
+const measurements_y2022_resourceOptionsConfig = {
   executor: executor,
   name: "measurements_y2022",
   identifier: "main.partitions.measurements_y2022",
   from: measurementsY2022Identifier,
   codec: measurementsY2022Codec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["timestamp", "key"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements_y2022"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     partitionParent: {
       schemaName: "partitions",
       name: "measurements"
-    },
-    tags: {}
-  }
+    }
+  },
+  uniques: [{
+    attributes: ["timestamp", "key"],
+    isPrimary: true
+  }]
 };
-const registryConfig_pgResources_measurements_y2023_measurements_y2023 = {
+const measurements_y2023_resourceOptionsConfig = {
   executor: executor,
   name: "measurements_y2023",
   identifier: "main.partitions.measurements_y2023",
   from: measurementsY2023Identifier,
   codec: measurementsY2023Codec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["timestamp", "key"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements_y2023"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     partitionParent: {
       schemaName: "partitions",
       name: "measurements"
-    },
-    tags: {}
-  }
+    }
+  },
+  uniques: [{
+    attributes: ["timestamp", "key"],
+    isPrimary: true
+  }]
 };
-const registryConfig_pgResources_measurements_y2024_measurements_y2024 = {
+const measurements_y2024_resourceOptionsConfig = {
   executor: executor,
   name: "measurements_y2024",
   identifier: "main.partitions.measurements_y2024",
   from: measurementsY2024Identifier,
   codec: measurementsY2024Codec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["timestamp", "key"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "measurements_y2024"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     partitionParent: {
       schemaName: "partitions",
       name: "measurements"
-    },
-    tags: {}
-  }
+    }
+  },
+  uniques: [{
+    attributes: ["timestamp", "key"],
+    isPrimary: true
+  }]
 };
 const location_tagsUniques = [{
-  isPrimary: true,
   attributes: ["entity_kind", "entity_id", "tag"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_location_tags_location_tags = {
+const location_tags_resourceOptionsConfig = {
   executor: executor,
   name: "location_tags",
   identifier: "main.partitions.location_tags",
   from: locationTagsIdentifier,
   codec: locationTagsCodec,
-  uniques: location_tagsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "location_tags"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     partitionParent: {
       schemaName: "partitions",
       name: "tags"
-    },
-    tags: {}
-  }
+    }
+  },
+  uniques: location_tagsUniques
 };
 const photo_tagsUniques = [{
-  isPrimary: true,
   attributes: ["entity_kind", "entity_id", "tag"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_photo_tags_photo_tags = {
+const photo_tags_resourceOptionsConfig = {
   executor: executor,
   name: "photo_tags",
   identifier: "main.partitions.photo_tags",
   from: photoTagsIdentifier,
   codec: photoTagsCodec,
-  uniques: photo_tagsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "photo_tags"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     partitionParent: {
       schemaName: "partitions",
       name: "tags"
-    },
-    tags: {}
-  }
+    }
+  },
+  uniques: photo_tagsUniques
 };
 const profile_tagsUniques = [{
-  isPrimary: true,
   attributes: ["entity_kind", "entity_id", "tag"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_profile_tags_profile_tags = {
+const profile_tags_resourceOptionsConfig = {
   executor: executor,
   name: "profile_tags",
   identifier: "main.partitions.profile_tags",
   from: profileTagsIdentifier,
   codec: profileTagsCodec,
-  uniques: profile_tagsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "partitions",
       name: "profile_tags"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     partitionParent: {
       schemaName: "partitions",
       name: "tags"
-    },
-    tags: {}
-  }
+    }
+  },
+  uniques: profile_tagsUniques
 };
 const registry = makeRegistry({
   pgExecutors: {
@@ -1453,19 +1063,19 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    entity_kinds: registryConfig_pgResources_entity_kinds_entity_kinds,
-    locations: registryConfig_pgResources_locations_locations,
-    photos: registryConfig_pgResources_photos_photos,
-    profiles: registryConfig_pgResources_profiles_profiles,
-    users: registryConfig_pgResources_users_users,
-    measurements: registryConfig_pgResources_measurements_measurements,
-    tags: registryConfig_pgResources_tags_tags,
-    measurements_y2022: registryConfig_pgResources_measurements_y2022_measurements_y2022,
-    measurements_y2023: registryConfig_pgResources_measurements_y2023_measurements_y2023,
-    measurements_y2024: registryConfig_pgResources_measurements_y2024_measurements_y2024,
-    location_tags: registryConfig_pgResources_location_tags_location_tags,
-    photo_tags: registryConfig_pgResources_photo_tags_photo_tags,
-    profile_tags: registryConfig_pgResources_profile_tags_profile_tags
+    entity_kinds: entity_kinds_resourceOptionsConfig,
+    locations: locations_resourceOptionsConfig,
+    photos: photos_resourceOptionsConfig,
+    profiles: profiles_resourceOptionsConfig,
+    users: users_resourceOptionsConfig,
+    measurements: measurements_resourceOptionsConfig,
+    tags: tags_resourceOptionsConfig,
+    measurements_y2022: measurements_y2022_resourceOptionsConfig,
+    measurements_y2023: measurements_y2023_resourceOptionsConfig,
+    measurements_y2024: measurements_y2024_resourceOptionsConfig,
+    location_tags: location_tags_resourceOptionsConfig,
+    photo_tags: photo_tags_resourceOptionsConfig,
+    profile_tags: profile_tags_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -1473,369 +1083,193 @@ const registry = makeRegistry({
       __proto__: null,
       tagsByTheirEntityKind: {
         localCodec: entityKindsCodec,
-        remoteResourceOptions: registryConfig_pgResources_tags_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: tags_resourceOptionsConfig,
         localAttributes: ["kind"],
         remoteAttributes: ["entity_kind"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       photoTagsByTheirEntityKind: {
         localCodec: entityKindsCodec,
-        remoteResourceOptions: registryConfig_pgResources_photo_tags_photo_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: photo_tags_resourceOptionsConfig,
         localAttributes: ["kind"],
         remoteAttributes: ["entity_kind"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       locationTagsByTheirEntityKind: {
         localCodec: entityKindsCodec,
-        remoteResourceOptions: registryConfig_pgResources_location_tags_location_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: location_tags_resourceOptionsConfig,
         localAttributes: ["kind"],
         remoteAttributes: ["entity_kind"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       profileTagsByTheirEntityKind: {
         localCodec: entityKindsCodec,
-        remoteResourceOptions: registryConfig_pgResources_profile_tags_profile_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: profile_tags_resourceOptionsConfig,
         localAttributes: ["kind"],
         remoteAttributes: ["entity_kind"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     locationTags: {
       __proto__: null,
       locationsByMyEntityId: {
         localCodec: locationTagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_locations_locations,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: locations_resourceOptionsConfig,
         localAttributes: ["entity_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       entityKindsByMyEntityKind: {
         localCodec: locationTagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_entity_kinds_entity_kinds,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: entity_kinds_resourceOptionsConfig,
         localAttributes: ["entity_kind"],
         remoteAttributes: ["kind"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     locations: {
       __proto__: null,
       locationTagsByTheirEntityId: {
         localCodec: locationsCodec,
-        remoteResourceOptions: registryConfig_pgResources_location_tags_location_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: location_tags_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["entity_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     measurements: {
       __proto__: null,
       usersByMyUserId: {
         localCodec: measurementsCodec,
-        remoteResourceOptions: registryConfig_pgResources_users_users,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: users_resourceOptionsConfig,
         localAttributes: ["user_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     measurementsY2022: {
       __proto__: null,
       usersByMyUserId: {
         localCodec: measurementsY2022Codec,
-        remoteResourceOptions: registryConfig_pgResources_users_users,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: users_resourceOptionsConfig,
         localAttributes: ["user_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     measurementsY2023: {
       __proto__: null,
       usersByMyUserId: {
         localCodec: measurementsY2023Codec,
-        remoteResourceOptions: registryConfig_pgResources_users_users,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: users_resourceOptionsConfig,
         localAttributes: ["user_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     measurementsY2024: {
       __proto__: null,
       usersByMyUserId: {
         localCodec: measurementsY2024Codec,
-        remoteResourceOptions: registryConfig_pgResources_users_users,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: users_resourceOptionsConfig,
         localAttributes: ["user_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     photoTags: {
       __proto__: null,
       photosByMyEntityId: {
         localCodec: photoTagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_photos_photos,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: photos_resourceOptionsConfig,
         localAttributes: ["entity_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       entityKindsByMyEntityKind: {
         localCodec: photoTagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_entity_kinds_entity_kinds,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: entity_kinds_resourceOptionsConfig,
         localAttributes: ["entity_kind"],
         remoteAttributes: ["kind"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     photos: {
       __proto__: null,
       photoTagsByTheirEntityId: {
         localCodec: photosCodec,
-        remoteResourceOptions: registryConfig_pgResources_photo_tags_photo_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: photo_tags_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["entity_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     profileTags: {
       __proto__: null,
       profilesByMyEntityId: {
         localCodec: profileTagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_profiles_profiles,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: profiles_resourceOptionsConfig,
         localAttributes: ["entity_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       entityKindsByMyEntityKind: {
         localCodec: profileTagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_entity_kinds_entity_kinds,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: entity_kinds_resourceOptionsConfig,
         localAttributes: ["entity_kind"],
         remoteAttributes: ["kind"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     profiles: {
       __proto__: null,
       profileTagsByTheirEntityId: {
         localCodec: profilesCodec,
-        remoteResourceOptions: registryConfig_pgResources_profile_tags_profile_tags,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: profile_tags_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["entity_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     tags: {
       __proto__: null,
       entityKindsByMyEntityKind: {
         localCodec: tagsCodec,
-        remoteResourceOptions: registryConfig_pgResources_entity_kinds_entity_kinds,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: entity_kinds_resourceOptionsConfig,
         localAttributes: ["entity_kind"],
         remoteAttributes: ["kind"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     users: {
       __proto__: null,
       measurementsByTheirUserId: {
         localCodec: usersCodec,
-        remoteResourceOptions: registryConfig_pgResources_measurements_measurements,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: measurements_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["user_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       measurementsY2022SByTheirUserId: {
         localCodec: usersCodec,
-        remoteResourceOptions: registryConfig_pgResources_measurements_y2022_measurements_y2022,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: measurements_y2022_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["user_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       measurementsY2023SByTheirUserId: {
         localCodec: usersCodec,
-        remoteResourceOptions: registryConfig_pgResources_measurements_y2023_measurements_y2023,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: measurements_y2023_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["user_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       measurementsY2024SByTheirUserId: {
         localCodec: usersCodec,
-        remoteResourceOptions: registryConfig_pgResources_measurements_y2024_measurements_y2024,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: measurements_y2024_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["user_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     }
   }
@@ -1848,28 +1282,42 @@ const resource_measurementsPgResource = registry.pgResources["measurements"];
 const resource_location_tagsPgResource = registry.pgResources["location_tags"];
 const resource_photo_tagsPgResource = registry.pgResources["photo_tags"];
 const resource_profile_tagsPgResource = registry.pgResources["profile_tags"];
-const nodeIdHandler_Location = {
-  typeName: "Location",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("locations", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_locationsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "locations";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_Location = makeTableNodeIdHandler({
+  typeName: "Location",
+  identifier: "locations",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_locationsPgResource,
+  pk: locationsUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -1899,197 +1347,108 @@ const nodeFetcher_Location = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Location));
   return nodeIdHandler_Location.get(nodeIdHandler_Location.getSpec($decoded));
 };
-const nodeIdHandler_Photo = {
+const nodeIdHandler_Photo = makeTableNodeIdHandler({
   typeName: "Photo",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("photos", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_photosPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "photos";
-  }
-};
+  identifier: "photos",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_photosPgResource,
+  pk: photosUniques[0].attributes
+});
 const nodeFetcher_Photo = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Photo));
   return nodeIdHandler_Photo.get(nodeIdHandler_Photo.getSpec($decoded));
 };
-const nodeIdHandler_Profile = {
+const nodeIdHandler_Profile = makeTableNodeIdHandler({
   typeName: "Profile",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("profiles", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_profilesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "profiles";
-  }
-};
+  identifier: "profiles",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_profilesPgResource,
+  pk: profilesUniques[0].attributes
+});
 const nodeFetcher_Profile = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Profile));
   return nodeIdHandler_Profile.get(nodeIdHandler_Profile.getSpec($decoded));
 };
-const nodeIdHandler_User = {
+const nodeIdHandler_User = makeTableNodeIdHandler({
   typeName: "User",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("users", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_usersPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "users";
-  }
-};
+  identifier: "users",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_usersPgResource,
+  pk: usersUniques[0].attributes
+});
 const nodeFetcher_User = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
   return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
 };
-const nodeIdHandler_Measurement = {
+const nodeIdHandler_Measurement = makeTableNodeIdHandler({
   typeName: "Measurement",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("measurements", false), $record.get("timestamp"), $record.get("key")]);
-  },
-  getSpec($list) {
-    return {
-      timestamp: inhibitOnNull(access($list, [1])),
-      key: inhibitOnNull(access($list, [2]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_measurementsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "measurements";
-  }
-};
+  identifier: "measurements",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_measurementsPgResource,
+  pk: measurementsUniques[0].attributes
+});
 const nodeFetcher_Measurement = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
   return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
 };
-const nodeIdHandler_LocationTag = {
+const nodeIdHandler_LocationTag = makeTableNodeIdHandler({
   typeName: "LocationTag",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("location_tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
-  },
-  getSpec($list) {
-    return {
-      entity_kind: inhibitOnNull(access($list, [1])),
-      entity_id: inhibitOnNull(access($list, [2])),
-      tag: inhibitOnNull(access($list, [3]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_location_tagsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "location_tags";
-  }
-};
+  identifier: "location_tags",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_location_tagsPgResource,
+  pk: location_tagsUniques[0].attributes
+});
 const nodeFetcher_LocationTag = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LocationTag));
   return nodeIdHandler_LocationTag.get(nodeIdHandler_LocationTag.getSpec($decoded));
 };
-const nodeIdHandler_PhotoTag = {
+const nodeIdHandler_PhotoTag = makeTableNodeIdHandler({
   typeName: "PhotoTag",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("photo_tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
-  },
-  getSpec($list) {
-    return {
-      entity_kind: inhibitOnNull(access($list, [1])),
-      entity_id: inhibitOnNull(access($list, [2])),
-      tag: inhibitOnNull(access($list, [3]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_photo_tagsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "photo_tags";
-  }
-};
+  identifier: "photo_tags",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_photo_tagsPgResource,
+  pk: photo_tagsUniques[0].attributes
+});
 const nodeFetcher_PhotoTag = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PhotoTag));
   return nodeIdHandler_PhotoTag.get(nodeIdHandler_PhotoTag.getSpec($decoded));
 };
-const nodeIdHandler_ProfileTag = {
+const nodeIdHandler_ProfileTag = makeTableNodeIdHandler({
   typeName: "ProfileTag",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("profile_tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
-  },
-  getSpec($list) {
-    return {
-      entity_kind: inhibitOnNull(access($list, [1])),
-      entity_id: inhibitOnNull(access($list, [2])),
-      tag: inhibitOnNull(access($list, [3]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_profile_tagsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "profile_tags";
-  }
-};
+  identifier: "profile_tags",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_profile_tagsPgResource,
+  pk: profile_tagsUniques[0].attributes
+});
 const nodeFetcher_ProfileTag = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ProfileTag));
   return nodeIdHandler_ProfileTag.get(nodeIdHandler_ProfileTag.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -2114,7 +1473,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function UUIDSerialize(value) {
+function toString(value) {
   return "" + value;
 }
 const coerce = string => {
@@ -2123,10 +1482,26 @@ const coerce = string => {
   }
   return string;
 };
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs_Location = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Location, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Photo = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Photo, $nodeId);
@@ -2187,6 +1562,16 @@ const specFromArgs_ProfileTag2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ProfileTag, $nodeId);
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -2207,6 +1592,29 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -4821,29 +4229,13 @@ export const objects = {
           return connection(resource_locationsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allLocationTags: {
@@ -4851,29 +4243,13 @@ export const objects = {
           return connection(resource_location_tagsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allMeasurements: {
@@ -4881,29 +4257,13 @@ export const objects = {
           return connection(resource_measurementsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPhotos: {
@@ -4911,29 +4271,13 @@ export const objects = {
           return connection(resource_photosPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPhotoTags: {
@@ -4941,29 +4285,13 @@ export const objects = {
           return connection(resource_photo_tagsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allProfiles: {
@@ -4971,29 +4299,13 @@ export const objects = {
           return connection(resource_profilesPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allProfileTags: {
@@ -5001,29 +4313,13 @@ export const objects = {
           return connection(resource_profile_tagsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allUsers: {
@@ -5031,29 +4327,13 @@ export const objects = {
           return connection(resource_usersPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       location(_$parent, args) {
@@ -5175,122 +4455,98 @@ export const objects = {
     plans: {
       createLocation: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_locationsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_locationsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createLocationTag: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_location_tagsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_location_tagsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createMeasurement: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_measurementsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_measurementsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPhoto: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_photosPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_photosPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPhotoTag: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_photo_tagsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_photo_tagsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createProfile: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_profilesPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_profilesPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createProfileTag: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_profile_tagsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_profile_tagsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createUser: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_usersPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_usersPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteLocation: {
@@ -5302,9 +4558,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLocationById: {
@@ -5318,9 +4572,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLocationTag: {
@@ -5332,9 +4584,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLocationTagByEntityKindAndEntityIdAndTag: {
@@ -5350,9 +4600,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMeasurement: {
@@ -5364,9 +4612,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteMeasurementByTimestampAndKey: {
@@ -5381,9 +4627,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePhoto: {
@@ -5395,9 +4639,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePhotoById: {
@@ -5411,9 +4653,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePhotoTag: {
@@ -5425,9 +4665,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePhotoTagByEntityKindAndEntityIdAndTag: {
@@ -5443,9 +4681,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProfile: {
@@ -5457,9 +4693,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProfileById: {
@@ -5473,9 +4707,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProfileTag: {
@@ -5487,9 +4719,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProfileTagByEntityKindAndEntityIdAndTag: {
@@ -5505,9 +4735,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteUser: {
@@ -5519,9 +4747,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteUserById: {
@@ -5535,9 +4761,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLocation: {
@@ -5549,9 +4773,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLocationById: {
@@ -5565,9 +4787,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLocationTag: {
@@ -5579,9 +4799,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLocationTagByEntityKindAndEntityIdAndTag: {
@@ -5597,9 +4815,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMeasurement: {
@@ -5611,9 +4827,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateMeasurementByTimestampAndKey: {
@@ -5628,9 +4842,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePhoto: {
@@ -5642,9 +4854,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePhotoById: {
@@ -5658,9 +4868,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePhotoTag: {
@@ -5672,9 +4880,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePhotoTagByEntityKindAndEntityIdAndTag: {
@@ -5690,9 +4896,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProfile: {
@@ -5704,9 +4908,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProfileById: {
@@ -5720,9 +4922,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProfileTag: {
@@ -5734,9 +4934,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProfileTagByEntityKindAndEntityIdAndTag: {
@@ -5752,9 +4950,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateUser: {
@@ -5766,9 +4962,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateUserById: {
@@ -5782,9 +4976,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -5792,60 +4984,39 @@ export const objects = {
   CreateLocationPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      location($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      location: planCreatePayloadResult,
       locationEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateLocationTagPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       locationByEntityId($record) {
         return resource_locationsPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      locationTag($object) {
-        return $object.get("result");
-      },
+      locationTag: planCreatePayloadResult,
       locationTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateMeasurementPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      measurement($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      measurement: planCreatePayloadResult,
       measurementEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_measurementsPgResource, measurementsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       userByUserId($record) {
         return resource_usersPgResource.get({
           id: $record.get("result").get("user_id")
@@ -5856,98 +5027,63 @@ export const objects = {
   CreatePhotoPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      photo($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      photo: planCreatePayloadResult,
       photoEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_photosPgResource, photosUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePhotoTagPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       photoByEntityId($record) {
         return resource_photosPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      photoTag($object) {
-        return $object.get("result");
-      },
+      photoTag: planCreatePayloadResult,
       photoTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateProfilePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      profile($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      profile: planCreatePayloadResult,
       profileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_profilesPgResource, profilesUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateProfileTagPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       profileByEntityId($record) {
         return resource_profilesPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      profileTag($object) {
-        return $object.get("result");
-      },
+      profileTag: planCreatePayloadResult,
       profileTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateUserPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      user($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      user: planCreatePayloadResult,
       userEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_usersPgResource, usersUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5956,75 +5092,54 @@ export const objects = {
   DeleteLocationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedLocationId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Location.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      location($object) {
-        return $object.get("result");
-      },
+      location: planUpdateOrDeletePayloadResult,
       locationEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteLocationTagPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedLocationTagId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_LocationTag.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       locationByEntityId($record) {
         return resource_locationsPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      locationTag($object) {
-        return $object.get("result");
-      },
+      locationTag: planUpdateOrDeletePayloadResult,
       locationTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteMeasurementPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedMeasurementId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Measurement.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      measurement($object) {
-        return $object.get("result");
-      },
+      measurement: planUpdateOrDeletePayloadResult,
       measurementEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_measurementsPgResource, measurementsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       userByUserId($record) {
         return resource_usersPgResource.get({
           id: $record.get("result").get("user_id")
@@ -6035,123 +5150,88 @@ export const objects = {
   DeletePhotoPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPhotoId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Photo.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      photo($object) {
-        return $object.get("result");
-      },
+      photo: planUpdateOrDeletePayloadResult,
       photoEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_photosPgResource, photosUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePhotoTagPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPhotoTagId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_PhotoTag.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       photoByEntityId($record) {
         return resource_photosPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      photoTag($object) {
-        return $object.get("result");
-      },
+      photoTag: planUpdateOrDeletePayloadResult,
       photoTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteProfilePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedProfileId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Profile.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      profile($object) {
-        return $object.get("result");
-      },
+      profile: planUpdateOrDeletePayloadResult,
       profileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_profilesPgResource, profilesUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteProfileTagPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedProfileTagId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_ProfileTag.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       profileByEntityId($record) {
         return resource_profilesPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      profileTag($object) {
-        return $object.get("result");
-      },
+      profileTag: planUpdateOrDeletePayloadResult,
       profileTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteUserPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedUserId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_User.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      user($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      user: planUpdateOrDeletePayloadResult,
       userEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_usersPgResource, usersUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -6168,29 +5248,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       nodeId($parent) {
@@ -6209,9 +5273,7 @@ export const objects = {
   LocationsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   LocationTag: {
@@ -6244,9 +5306,7 @@ export const objects = {
   LocationTagsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Measurement: {
@@ -6276,9 +5336,7 @@ export const objects = {
   MeasurementsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Photo: {
@@ -6296,29 +5354,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -6333,9 +5375,7 @@ export const objects = {
   PhotosConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   PhotoTag: {
@@ -6368,9 +5408,7 @@ export const objects = {
   PhotoTagsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Profile: {
@@ -6388,29 +5426,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -6425,9 +5447,7 @@ export const objects = {
   ProfilesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   ProfileTag: {
@@ -6460,68 +5480,45 @@ export const objects = {
   ProfileTagsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateLocationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      location($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      location: planUpdateOrDeletePayloadResult,
       locationEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateLocationTagPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       locationByEntityId($record) {
         return resource_locationsPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      locationTag($object) {
-        return $object.get("result");
-      },
+      locationTag: planUpdateOrDeletePayloadResult,
       locationTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateMeasurementPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      measurement($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      measurement: planUpdateOrDeletePayloadResult,
       measurementEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_measurementsPgResource, measurementsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       userByUserId($record) {
         return resource_usersPgResource.get({
           id: $record.get("result").get("user_id")
@@ -6532,98 +5529,63 @@ export const objects = {
   UpdatePhotoPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      photo($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      photo: planUpdateOrDeletePayloadResult,
       photoEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_photosPgResource, photosUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePhotoTagPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       photoByEntityId($record) {
         return resource_photosPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      photoTag($object) {
-        return $object.get("result");
-      },
+      photoTag: planUpdateOrDeletePayloadResult,
       photoTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateProfilePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      profile($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      profile: planUpdateOrDeletePayloadResult,
       profileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_profilesPgResource, profilesUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateProfileTagPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       profileByEntityId($record) {
         return resource_profilesPgResource.get({
           id: $record.get("result").get("entity_id")
         });
       },
-      profileTag($object) {
-        return $object.get("result");
-      },
+      profileTag: planUpdateOrDeletePayloadResult,
       profileTagEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateUserPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      user($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      user: planUpdateOrDeletePayloadResult,
       userEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_usersPgResource, usersUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -6640,29 +5602,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       nodeId($parent) {
@@ -6681,9 +5627,7 @@ export const objects = {
   UsersConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   }
 };
@@ -6709,222 +5653,136 @@ export const interfaces = {
 export const inputObjects = {
   CreateLocationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      location(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      location: applyCreateFields
     }
   },
   CreateLocationTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      locationTag(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      locationTag: applyCreateFields
     }
   },
   CreateMeasurementInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      measurement(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      measurement: applyCreateFields
     }
   },
   CreatePhotoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      photo(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      photo: applyCreateFields
     }
   },
   CreatePhotoTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      photoTag(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      photoTag: applyCreateFields
     }
   },
   CreateProfileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      profile(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      profile: applyCreateFields
     }
   },
   CreateProfileTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      profileTag(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      profileTag: applyCreateFields
     }
   },
   CreateUserInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      user(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      user: applyCreateFields
     }
   },
   DeleteLocationByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLocationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLocationTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLocationTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMeasurementByTimestampAndKeyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteMeasurementInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePhotoByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePhotoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePhotoTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePhotoTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProfileByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProfileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProfileTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteProfileTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteUserByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteUserInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   LocationCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.uuid, $condition, val);
       }
     }
   },
@@ -6953,31 +5811,13 @@ export const inputObjects = {
   LocationTagCondition: {
     plans: {
       entityId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "entity_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
-          }
-        });
+        return applyAttributeCondition("entity_id", TYPES.uuid, $condition, val);
       },
       entityKind($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "entity_kind",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum)}`;
-          }
-        });
+        return applyAttributeCondition("entity_kind", spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum, $condition, val);
       },
       tag($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "tag",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.citext)}`;
-          }
-        });
+        return applyAttributeCondition("tag", TYPES.citext, $condition, val);
       }
     }
   },
@@ -7030,40 +5870,16 @@ export const inputObjects = {
   MeasurementCondition: {
     plans: {
       key($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "key",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("key", TYPES.text, $condition, val);
       },
       timestamp($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamp",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        return applyAttributeCondition("timestamp", TYPES.timestamptz, $condition, val);
       },
       userId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "user_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("user_id", TYPES.int, $condition, val);
       },
       value($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "value",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-          }
-        });
+        return applyAttributeCondition("value", TYPES.float, $condition, val);
       }
     }
   },
@@ -7128,13 +5944,7 @@ export const inputObjects = {
   PhotoCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.uuid, $condition, val);
       }
     }
   },
@@ -7163,31 +5973,13 @@ export const inputObjects = {
   PhotoTagCondition: {
     plans: {
       entityId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "entity_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
-          }
-        });
+        return applyAttributeCondition("entity_id", TYPES.uuid, $condition, val);
       },
       entityKind($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "entity_kind",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum)}`;
-          }
-        });
+        return applyAttributeCondition("entity_kind", spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum, $condition, val);
       },
       tag($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "tag",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.citext)}`;
-          }
-        });
+        return applyAttributeCondition("tag", TYPES.citext, $condition, val);
       }
     }
   },
@@ -7240,13 +6032,7 @@ export const inputObjects = {
   ProfileCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.uuid, $condition, val);
       }
     }
   },
@@ -7275,31 +6061,13 @@ export const inputObjects = {
   ProfileTagCondition: {
     plans: {
       entityId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "entity_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
-          }
-        });
+        return applyAttributeCondition("entity_id", TYPES.uuid, $condition, val);
       },
       entityKind($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "entity_kind",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum)}`;
-          }
-        });
+        return applyAttributeCondition("entity_kind", spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum, $condition, val);
       },
       tag($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "tag",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.citext)}`;
-          }
-        });
+        return applyAttributeCondition("tag", TYPES.citext, $condition, val);
       }
     }
   },
@@ -7351,215 +6119,107 @@ export const inputObjects = {
   },
   UpdateLocationByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      locationPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      locationPatch: applyPatchFields
     }
   },
   UpdateLocationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      locationPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      locationPatch: applyPatchFields
     }
   },
   UpdateLocationTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      locationTagPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      locationTagPatch: applyPatchFields
     }
   },
   UpdateLocationTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      locationTagPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      locationTagPatch: applyPatchFields
     }
   },
   UpdateMeasurementByTimestampAndKeyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      measurementPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      measurementPatch: applyPatchFields
     }
   },
   UpdateMeasurementInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      measurementPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      measurementPatch: applyPatchFields
     }
   },
   UpdatePhotoByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      photoPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      photoPatch: applyPatchFields
     }
   },
   UpdatePhotoInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      photoPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      photoPatch: applyPatchFields
     }
   },
   UpdatePhotoTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      photoTagPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      photoTagPatch: applyPatchFields
     }
   },
   UpdatePhotoTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      photoTagPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      photoTagPatch: applyPatchFields
     }
   },
   UpdateProfileByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      profilePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      profilePatch: applyPatchFields
     }
   },
   UpdateProfileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      profilePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      profilePatch: applyPatchFields
     }
   },
   UpdateProfileTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      profileTagPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      profileTagPatch: applyPatchFields
     }
   },
   UpdateProfileTagInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      profileTagPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      profileTagPatch: applyPatchFields
     }
   },
   UpdateUserByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      userPatch: applyPatchFields
     }
   },
   UpdateUserInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      userPatch: applyPatchFields
     }
   },
   UserCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -7600,36 +6260,35 @@ export const inputObjects = {
 };
 export const scalars = {
   Cursor: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Datetime: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   UUID: {
-    serialize: UUIDSerialize,
+    serialize: toString,
     parseValue(value) {
       return coerce("" + value);
     },
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        // ERRORS: add name to this error
-        throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return coerce(ast.value);
       }
-      return coerce(ast.value);
+      throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
     }
   }
 };

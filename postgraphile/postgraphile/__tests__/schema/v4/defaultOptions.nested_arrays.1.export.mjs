@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,127 +81,77 @@ const workHourPartsCodec = recordCodec({
   attributes: {
     __proto__: null,
     from_hours: {
-      description: undefined,
-      codec: TYPES.int2,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int2
     },
     from_minutes: {
-      description: undefined,
-      codec: TYPES.int2,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int2
     },
     to_hours: {
-      description: undefined,
-      codec: TYPES.int2,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int2
     },
     to_minutes: {
-      description: undefined,
-      codec: TYPES.int2,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int2
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "work_hour_parts"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const workHourCodec = domainOfCodec(workHourPartsCodec, "workHour", sql.identifier("nested_arrays", "work_hour"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "work_hour"
-    },
-    tags: {
-      __proto__: null
     }
   },
   notNull: true
 });
 const workHourArrayCodec = listOfCodec(workHourCodec, {
+  name: "workHourArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "_work_hour"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "workHourArray"
+  }
 });
 const workhoursCodec = domainOfCodec(workHourArrayCodec, "workhours", sql.identifier("nested_arrays", "workhours"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "workhours"
-    },
-    tags: {
-      __proto__: null
     }
   },
   notNull: true
 });
 const workhoursArrayCodec = listOfCodec(workhoursCodec, {
+  name: "workhoursArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "_workhours"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "workhoursArray"
+  }
 });
 const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", sql.identifier("nested_arrays", "working_hours"), {
-  description: "Mo, Tu, We, Th, Fr, Sa, Su, Ho",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "working_hours"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  notNull: false
+  description: "Mo, Tu, We, Th, Fr, Sa, Su, Ho"
 });
 const tCodec = recordCodec({
   name: "t",
@@ -213,48 +159,28 @@ const tCodec = recordCodec({
   attributes: {
     __proto__: null,
     k: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     v: {
-      description: undefined,
-      codec: workingHoursCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: workingHoursCodec
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
       name: "t"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
 const tUniques = [{
-  isPrimary: true,
   attributes: ["k"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const registry = makeRegistry({
   pgExecutors: {
@@ -601,7 +527,7 @@ const registry = makeRegistry({
   pgResources: {
     __proto__: null,
     check_work_hours: {
-      executor,
+      executor: executor,
       name: "check_work_hours",
       identifier: "main.nested_arrays.check_work_hours(nested_arrays._work_hour)",
       from(...args) {
@@ -609,24 +535,20 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "wh",
+        codec: workHourArrayCodec,
         required: true,
-        notNull: true,
-        codec: workHourArrayCodec
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.boolean,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "nested_arrays",
           name: "check_work_hours"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true
     },
     t: {
       executor: executor,
@@ -634,21 +556,14 @@ const registry = makeRegistry({
       identifier: "main.nested_arrays.t",
       from: tIdentifier,
       codec: tCodec,
-      uniques: tUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "nested_arrays",
           name: "t"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: tUniques
     }
   },
   pgRelations: {
@@ -658,10 +573,9 @@ const registry = makeRegistry({
 const resource_tPgResource = registry.pgResources["t"];
 const argDetailsSimple_check_work_hours = [{
   graphqlArgName: "wh",
-  postgresArgName: "wh",
   pgCodec: workHourArrayCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "wh",
+  required: true
 }];
 function makeArg(path, args, details) {
   const {
@@ -682,28 +596,42 @@ function makeArg(path, args, details) {
 }
 const makeArgs_check_work_hours = (args, path = []) => argDetailsSimple_check_work_hours.map(details => makeArg(path, args, details));
 const resource_check_work_hoursPgResource = registry.pgResources["check_work_hours"];
-const nodeIdHandler_T = {
-  typeName: "T",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("ts", false), $record.get("k")]);
-  },
-  getSpec($list) {
-    return {
-      k: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_tPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "ts";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_T = makeTableNodeIdHandler({
+  typeName: "T",
+  identifier: "ts",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_tPgResource,
+  pk: tUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -753,17 +681,32 @@ function findTypeNameMatch(specifier) {
   return null;
 }
 const resource_frmcdc_workHourPgResource = registry.pgResources["frmcdc_workHour"];
-function CursorSerialize(value) {
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const specFromArgs_T = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_T, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_T2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_T, $nodeId);
 };
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -784,6 +727,21 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -1199,12 +1157,11 @@ export const objects = {
     plans: {
       createT: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_tPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_tPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
           input(_, $object) {
@@ -1221,9 +1178,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteTByK: {
@@ -1237,9 +1192,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateT: {
@@ -1251,9 +1204,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateTByK: {
@@ -1267,9 +1218,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -1281,9 +1230,7 @@ export const objects = {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       t($object) {
         return $object.get("result");
       },
@@ -1295,21 +1242,14 @@ export const objects = {
   DeleteTPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedTId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_T.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      t($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      t: planUpdateOrDeletePayloadResult,
       tEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_tPgResource, tUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -1350,16 +1290,9 @@ export const objects = {
   UpdateTPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      t($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      t: planUpdateOrDeletePayloadResult,
       tEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_tPgResource, tUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -1417,37 +1350,21 @@ export const inputObjects = {
   },
   DeleteTByKInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   TCondition: {
     plans: {
       k($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "k",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("k", TYPES.int, $condition, val);
       },
       v($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "v",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, workingHoursCodec)}`;
-          }
-        });
+        return applyAttributeCondition("v", workingHoursCodec, $condition, val);
       }
     }
   },
@@ -1487,26 +1404,14 @@ export const inputObjects = {
   },
   UpdateTByKInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      tPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      tPatch: applyPatchFields
     }
   },
   UpdateTInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      tPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      tPatch: applyPatchFields
     }
   },
   WorkHourInput: {
@@ -1541,13 +1446,13 @@ export const inputObjects = {
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

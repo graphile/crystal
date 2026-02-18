@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, GraphQLString, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -84,7 +80,6 @@ const registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord = recordCodec({
   attributes: {
     __proto__: null,
     first_out: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -92,19 +87,12 @@ const registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord = recordCodec({
       }
     },
     second_out: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
         argName: "second_out"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -115,7 +103,6 @@ const registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord = reco
   attributes: {
     __proto__: null,
     o1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -123,19 +110,12 @@ const registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord = reco
       }
     },
     o2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
         argName: "o2"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -146,7 +126,6 @@ const registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord = 
   attributes: {
     __proto__: null,
     column1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -154,19 +133,12 @@ const registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord = 
       }
     },
     column2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
         argName: undefined
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -177,7 +149,6 @@ const registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord = record
   attributes: {
     __proto__: null,
     first_out: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -185,19 +156,12 @@ const registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord = record
       }
     },
     second_out: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
         argName: "second_out"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -208,7 +172,6 @@ const registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecor
   attributes: {
     __proto__: null,
     o1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -216,19 +179,12 @@ const registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecor
       }
     },
     o2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
         argName: "o2"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -239,7 +195,6 @@ const registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedR
   attributes: {
     __proto__: null,
     column1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -247,19 +202,12 @@ const registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedR
       }
     },
     column2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
         argName: undefined
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -270,7 +218,6 @@ const registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecor
   attributes: {
     __proto__: null,
     id: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -278,19 +225,12 @@ const registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecor
       }
     },
     total_duration: {
-      notNull: false,
       codec: TYPES.interval,
       extensions: {
         argIndex: 1,
         argName: "total_duration"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -301,7 +241,6 @@ const registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOu
   attributes: {
     __proto__: null,
     column1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -309,7 +248,6 @@ const registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOu
       }
     },
     o2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
@@ -317,19 +255,12 @@ const registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOu
       }
     },
     column3: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 2,
         argName: ""
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -340,7 +271,6 @@ const registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutU
   attributes: {
     __proto__: null,
     column1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 0,
@@ -348,7 +278,6 @@ const registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutU
       }
     },
     o2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
@@ -356,19 +285,12 @@ const registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutU
       }
     },
     column3: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 2,
         argName: ""
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -379,7 +301,6 @@ const registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturns
   attributes: {
     __proto__: null,
     col1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 1,
@@ -387,19 +308,12 @@ const registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturns
       }
     },
     col2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 2,
         argName: "col2"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -410,7 +324,6 @@ const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMul
   attributes: {
     __proto__: null,
     col1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 3,
@@ -418,7 +331,6 @@ const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMul
       }
     },
     col2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 4,
@@ -426,58 +338,17 @@ const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMul
       }
     }
   },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
-  },
   executor,
   isAnonymous: true
 });
 const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "guid"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
-});
-const intervalArrayCodec = listOfCodec(TYPES.interval, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_interval"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "intervalArray"
-});
-const textArrayCodec = listOfCodec(TYPES.text, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_text"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "textArray"
+  }
 });
 const nonUpdatableViewIdentifier = sql.identifier("a", "non_updatable_view");
 const nonUpdatableViewCodec = recordCodec({
@@ -486,28 +357,21 @@ const nonUpdatableViewCodec = recordCodec({
   attributes: {
     __proto__: null,
     "?column?": {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "non_updatable_view"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -519,31 +383,27 @@ const inputsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: "Should output as Input",
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "inputs"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Should output as Input"
 });
 const patchsIdentifier = sql.identifier("a", "patchs");
 const patchsCodec = recordCodec({
@@ -552,31 +412,27 @@ const patchsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: "Should output as Patch",
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "patchs"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Should output as Patch"
 });
 const reservedIdentifier = sql.identifier("a", "reserved");
 const reservedCodec = recordCodec({
@@ -585,28 +441,23 @@ const reservedCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "reserved"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -618,31 +469,27 @@ const reservedPatchsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table",
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "reservedPatchs"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table"
 });
 const reservedInputIdentifier = sql.identifier("a", "reserved_input");
 const reservedInputCodec = recordCodec({
@@ -651,31 +498,27 @@ const reservedInputCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table",
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "reserved_input"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table"
 });
 const defaultValueIdentifier = sql.identifier("a", "default_value");
 const defaultValueCodec = recordCodec({
@@ -684,40 +527,33 @@ const defaultValueCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     null_value: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "default_value"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -729,76 +565,61 @@ const noPrimaryKeyCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     str: {
-      description: undefined,
       codec: TYPES.text,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "no_primary_key"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const uniqueForeignKeyIdentifier = sql.identifier("a", "unique_foreign_key");
-const spec_uniqueForeignKey = {
+const uniqueForeignKeyCodec = recordCodec({
   name: "uniqueForeignKey",
   identifier: uniqueForeignKeyIdentifier,
   attributes: {
     __proto__: null,
     compound_key_1: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     compound_key_2: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -813,8 +634,7 @@ const spec_uniqueForeignKey = {
     }
   },
   executor: executor
-};
-const uniqueForeignKeyCodec = recordCodec(spec_uniqueForeignKey);
+});
 const myTableIdentifier = sql.identifier("c", "my_table");
 const myTableCodec = recordCodec({
   name: "myTable",
@@ -822,40 +642,32 @@ const myTableCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     json_data: {
-      description: undefined,
       codec: TYPES.jsonb,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "my_table"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -867,22 +679,18 @@ const personSecretCodec = recordCodec({
   attributes: {
     __proto__: null,
     person_id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     sekrit: {
-      description: "A secret held by the associated Person",
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
+      description: "A secret held by the associated Person",
       extensions: {
         tags: {
           name: "secret"
@@ -893,7 +701,6 @@ const personSecretCodec = recordCodec({
       }
     }
   },
-  description: "Tracks the person's secret",
   extensions: {
     isTableLike: true,
     pg: {
@@ -906,7 +713,8 @@ const personSecretCodec = recordCodec({
       deprecated: "This is deprecated (comment on table c.person_secret)."
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Tracks the person's secret"
 });
 const unloggedIdentifier = sql.identifier("c", "unlogged");
 const unloggedCodec = recordCodec({
@@ -915,31 +723,26 @@ const unloggedCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nonsense: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -947,27 +750,9 @@ const unloggedCodec = recordCodec({
       schemaName: "c",
       name: "unlogged",
       persistence: "u"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
-});
-const uuidArrayCodec = listOfCodec(TYPES.uuid, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_uuid"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "uuidArray"
 });
 const foreignKeyIdentifier = sql.identifier("a", "foreign_key");
 const foreignKeyCodec = recordCodec({
@@ -976,52 +761,39 @@ const foreignKeyCodec = recordCodec({
   attributes: {
     __proto__: null,
     person_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     compound_key_1: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     compound_key_2: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "foreign_key"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1033,52 +805,39 @@ const testviewCodec = recordCodec({
   attributes: {
     __proto__: null,
     testviewid: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col1: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col2: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "testview"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1090,52 +849,41 @@ const viewTableCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col1: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col2: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "view_table"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1147,52 +895,41 @@ const compoundKeyCodec = recordCodec({
   attributes: {
     __proto__: null,
     person_id_2: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     person_id_1: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     extra: {
-      description: undefined,
       codec: TYPES.boolean,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "compound_key"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1204,64 +941,51 @@ const similarTable1Codec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col1: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col2: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col3: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "similar_table_1"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1273,64 +997,51 @@ const similarTable2Codec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col3: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col4: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     col5: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "similar_table_2"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1342,55 +1053,43 @@ const updatableViewCodec = recordCodec({
   attributes: {
     __proto__: null,
     x: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     name: {
-      description: undefined,
       codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     description: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     constant: {
-      description: "This is constantly 2",
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
+      description: "This is constantly 2",
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: "YOYOYO!!",
   extensions: {
     isTableLike: true,
     pg: {
@@ -1404,7 +1103,8 @@ const updatableViewCodec = recordCodec({
       unique: "x|@behavior -single -update -delete"
     }
   },
-  executor: executor
+  executor: executor,
+  description: "YOYOYO!!"
 });
 const nullTestRecordIdentifier = sql.identifier("c", "null_test_record");
 const nullTestRecordCodec = recordCodec({
@@ -1413,64 +1113,51 @@ const nullTestRecordCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nullable_text: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nullable_int: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     non_null_text: {
-      description: undefined,
       codec: TYPES.text,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "null_test_record"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1482,67 +1169,52 @@ const edgeCaseCodec = recordCodec({
   attributes: {
     __proto__: null,
     not_null_has_default: {
-      description: undefined,
       codec: TYPES.boolean,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     wont_cast_easy: {
-      description: undefined,
       codec: TYPES.int2,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     row_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "edge_case"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const issue756Identifier = sql.identifier("c", "issue756");
 const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sql.identifier("c", "not_null_timestamp"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "not_null_timestamp"
-    },
-    tags: {
-      __proto__: null
     }
   },
   notNull: true
@@ -1553,40 +1225,34 @@ const issue756Codec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     ts: {
-      description: undefined,
       codec: notNullTimestampCodec,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "issue756"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1598,61 +1264,27 @@ const jwtTokenCodec = recordCodec({
   attributes: {
     __proto__: null,
     role: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     exp: {
-      description: undefined,
-      codec: TYPES.bigint,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.bigint
     },
     a: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     b: {
-      description: undefined,
-      codec: TYPES.numeric,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.numeric
     },
     c: {
-      description: undefined,
-      codec: TYPES.bigint,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.bigint
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "jwt_token"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -1664,67 +1296,57 @@ const leftArmCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     person_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     length_in_metres: {
-      description: undefined,
       codec: TYPES.float,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: true,
         canUpdate: false
       }
     },
     mood: {
-      description: undefined,
       codec: TYPES.text,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: true
       }
     }
   },
-  description: "Tracks metadata about the left arms of various people",
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "left_arm"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Tracks metadata about the left arms of various people"
 });
 const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
@@ -1733,34 +1355,15 @@ const authPayloadCodec = recordCodec({
   attributes: {
     __proto__: null,
     jwt: {
-      description: undefined,
-      codec: jwtTokenCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: jwtTokenCodec
     },
     id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     admin: {
-      description: undefined,
-      codec: TYPES.boolean,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.boolean
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
@@ -1786,9 +1389,6 @@ const colorCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "color"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -1802,9 +1402,6 @@ const enumCapsCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "enum_caps"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -1818,9 +1415,6 @@ const enumWithEmptyStringCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "enum_with_empty_string"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -1830,91 +1424,40 @@ const compoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     b: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     c: {
-      description: undefined,
-      codec: colorCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: colorCodec
     },
     d: {
-      description: undefined,
-      codec: TYPES.uuid,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.uuid
     },
     e: {
-      description: undefined,
-      codec: enumCapsCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: enumCapsCodec
     },
     f: {
-      description: undefined,
-      codec: enumWithEmptyStringCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: enumWithEmptyStringCodec
     },
     g: {
-      description: undefined,
-      codec: TYPES.interval,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.interval
     },
     foo_bar: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: "Awesome feature!",
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "compound_type"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Awesome feature!"
 });
 const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord = recordCodec({
   name: "FuncOutOutCompoundTypeRecord",
@@ -1922,7 +1465,6 @@ const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTyp
   attributes: {
     __proto__: null,
     o1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 1,
@@ -1930,19 +1472,12 @@ const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTyp
       }
     },
     o2: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 2,
         argName: "o2"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -1953,7 +1488,6 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
   attributes: {
     __proto__: null,
     o1: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 1,
@@ -1961,19 +1495,12 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
       }
     },
     o2: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 2,
         argName: "o2"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -1989,26 +1516,18 @@ const anEnumCodec = enumCodec({
       serviceName: "main",
       schemaName: "a",
       name: "an_enum"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
 const anEnumArrayCodec = listOfCodec(anEnumCodec, {
+  name: "anEnumArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "_an_enum"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "anEnumArray"
+  }
 });
 const comptypeCodec = recordCodec({
   name: "comptype",
@@ -2016,52 +1535,31 @@ const comptypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     schedule: {
-      description: undefined,
-      codec: TYPES.timestamptz,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.timestamptz
     },
     is_optimised: {
-      description: undefined,
-      codec: TYPES.boolean,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.boolean
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "comptype"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const comptypeArrayCodec = listOfCodec(comptypeCodec, {
+  name: "comptypeArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "_comptype"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "comptypeArray"
+  }
 });
 const postCodec = recordCodec({
   name: "post",
@@ -2069,88 +1567,70 @@ const postCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     headline: {
-      description: undefined,
       codec: TYPES.text,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     body: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     author_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: false,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     enums: {
-      description: undefined,
       codec: anEnumArrayCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     comptypes: {
-      description: undefined,
       codec: comptypeArrayCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "post"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -2161,7 +1641,6 @@ const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord 
   attributes: {
     __proto__: null,
     txt: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 2,
@@ -2169,7 +1648,6 @@ const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord 
       }
     },
     left_arm: {
-      notNull: false,
       codec: leftArmCodec,
       extensions: {
         argIndex: 3,
@@ -2177,19 +1655,12 @@ const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord 
       }
     },
     post: {
-      notNull: false,
       codec: postCodec,
       extensions: {
         argIndex: 4,
         argName: "post"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2200,7 +1671,6 @@ const registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRec
   attributes: {
     __proto__: null,
     o1: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
@@ -2208,19 +1678,12 @@ const registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRec
       }
     },
     o2: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 2,
         argName: "o2"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2231,7 +1694,6 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   attributes: {
     __proto__: null,
     ino: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 1,
@@ -2239,7 +1701,6 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
       }
     },
     o: {
-      notNull: false,
       codec: TYPES.text,
       extensions: {
         argIndex: 2,
@@ -2247,40 +1708,25 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
       }
     }
   },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
-  },
   executor,
   isAnonymous: true
 });
 const personIdentifier = sql.identifier("c", "person");
 const emailCodec = domainOfCodec(TYPES.text, "email", sql.identifier("b", "email"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "email"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifier("b", "not_null_url"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "not_null_url"
-    },
-    tags: {
-      __proto__: null
     }
   },
   notNull: true
@@ -2291,25 +1737,16 @@ const wrappedUrlCodec = recordCodec({
   attributes: {
     __proto__: null,
     url: {
-      description: undefined,
       codec: notNullUrlCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "wrapped_url"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -2320,22 +1757,21 @@ const personCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: "The primary unique identifier for the person",
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
+      description: "The primary unique identifier for the person",
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     person_full_name: {
-      description: "The person\u2019s name",
       codec: TYPES.varchar,
       notNull: true,
-      hasDefault: false,
+      description: "The person\u2019s name",
       extensions: {
         tags: {
           name: "name"
@@ -2346,46 +1782,37 @@ const personCodec = recordCodec({
       }
     },
     aliases: {
-      description: undefined,
-      codec: textArrayCodec,
+      codec: LIST_TYPES.text,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: true,
         canUpdate: true
       }
     },
     about: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: true,
         canUpdate: true
       }
     },
     email: {
-      description: undefined,
       codec: emailCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: true,
         canUpdate: true
       }
     },
     site: {
-      description: undefined,
       codec: wrappedUrlCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
         tags: {
           deprecated: "Don\u2019t use me"
@@ -2396,79 +1823,62 @@ const personCodec = recordCodec({
       }
     },
     config: {
-      description: undefined,
       codec: TYPES.hstore,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     last_login_from_ip: {
-      description: undefined,
       codec: TYPES.inet,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     last_login_from_subnet: {
-      description: undefined,
       codec: TYPES.cidr,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     user_mac: {
-      description: undefined,
       codec: TYPES.macaddr,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     },
     created_at: {
-      description: undefined,
       codec: TYPES.timestamp,
-      notNull: false,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: true,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: "Person test comment",
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "person"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Person test comment"
 });
 const registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord = recordCodec({
   name: "PersonComputedFirstArgInoutOutRecord",
@@ -2476,7 +1886,6 @@ const registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonCompute
   attributes: {
     __proto__: null,
     person: {
-      notNull: false,
       codec: personCodec,
       extensions: {
         argIndex: 0,
@@ -2484,19 +1893,12 @@ const registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonCompute
       }
     },
     o: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 1,
         argName: "o"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2507,7 +1909,6 @@ const registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord = record
   attributes: {
     __proto__: null,
     x: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 2,
@@ -2515,7 +1916,6 @@ const registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord = record
       }
     },
     y: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 3,
@@ -2523,19 +1923,12 @@ const registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord = record
       }
     },
     z: {
-      notNull: false,
       codec: personCodec,
       extensions: {
         argIndex: 4,
         argName: "z"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2546,7 +1939,6 @@ const registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecor
   attributes: {
     __proto__: null,
     x: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 2,
@@ -2554,7 +1946,6 @@ const registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecor
       }
     },
     y: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 3,
@@ -2562,19 +1953,12 @@ const registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecor
       }
     },
     z: {
-      notNull: false,
       codec: personCodec,
       extensions: {
         argIndex: 4,
         argName: "z"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2585,7 +1969,6 @@ const registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord 
   attributes: {
     __proto__: null,
     x: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 2,
@@ -2593,7 +1976,6 @@ const registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord 
       }
     },
     y: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 3,
@@ -2601,19 +1983,12 @@ const registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord 
       }
     },
     z: {
-      notNull: false,
       codec: personCodec,
       extensions: {
         argIndex: 4,
         argName: "z"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2624,7 +1999,6 @@ const registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSe
   attributes: {
     __proto__: null,
     x: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 2,
@@ -2632,7 +2006,6 @@ const registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSe
       }
     },
     y: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 3,
@@ -2640,19 +2013,12 @@ const registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSe
       }
     },
     z: {
-      notNull: false,
       codec: personCodec,
       extensions: {
         argIndex: 4,
         argName: "z"
       }
     }
-  },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
   },
   executor,
   isAnonymous: true
@@ -2663,7 +2029,6 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   attributes: {
     __proto__: null,
     x: {
-      notNull: false,
       codec: TYPES.int,
       extensions: {
         argIndex: 3,
@@ -2671,7 +2036,6 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
       }
     },
     y: {
-      notNull: false,
       codec: compoundTypeCodec,
       extensions: {
         argIndex: 4,
@@ -2679,7 +2043,6 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
       }
     },
     z: {
-      notNull: false,
       codec: personCodec,
       extensions: {
         argIndex: 5,
@@ -2687,105 +2050,29 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
       }
     }
   },
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
-  },
   executor,
   isAnonymous: true
 });
 const listsIdentifier = sql.identifier("b", "lists");
-const int4ArrayCodec = listOfCodec(TYPES.int, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_int4"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "int4Array"
-});
 const colorArrayCodec = listOfCodec(colorCodec, {
+  name: "colorArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "_color"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "colorArray"
-});
-const dateArrayCodec = listOfCodec(TYPES.date, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_date"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "dateArray"
-});
-const timestamptzArrayCodec = listOfCodec(TYPES.timestamptz, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_timestamptz"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "timestamptzArray"
+  }
 });
 const compoundTypeArrayCodec = listOfCodec(compoundTypeCodec, {
+  name: "compoundTypeArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "_compound_type"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "compoundTypeArray"
-});
-const byteaArrayCodec = listOfCodec(TYPES.bytea, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_bytea"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "byteaArray"
+  }
 });
 const listsCodec = recordCodec({
   name: "lists",
@@ -2793,241 +2080,186 @@ const listsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     int_array: {
-      description: undefined,
-      codec: int4ArrayCodec,
-      notNull: false,
-      hasDefault: false,
+      codec: LIST_TYPES.int,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     int_array_nn: {
-      description: undefined,
-      codec: int4ArrayCodec,
+      codec: LIST_TYPES.int,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     enum_array: {
-      description: undefined,
       codec: colorArrayCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     enum_array_nn: {
-      description: undefined,
       codec: colorArrayCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     date_array: {
-      description: undefined,
-      codec: dateArrayCodec,
-      notNull: false,
-      hasDefault: false,
+      codec: LIST_TYPES.date,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     date_array_nn: {
-      description: undefined,
-      codec: dateArrayCodec,
+      codec: LIST_TYPES.date,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     timestamptz_array: {
-      description: undefined,
-      codec: timestamptzArrayCodec,
-      notNull: false,
-      hasDefault: false,
+      codec: LIST_TYPES.timestamptz,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     timestamptz_array_nn: {
-      description: undefined,
-      codec: timestamptzArrayCodec,
+      codec: LIST_TYPES.timestamptz,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     compound_type_array: {
-      description: undefined,
       codec: compoundTypeArrayCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     compound_type_array_nn: {
-      description: undefined,
       codec: compoundTypeArrayCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     bytea_array: {
-      description: undefined,
-      codec: byteaArrayCodec,
-      notNull: false,
-      hasDefault: false,
+      codec: LIST_TYPES.bytea,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     bytea_array_nn: {
-      description: undefined,
-      codec: byteaArrayCodec,
+      codec: LIST_TYPES.bytea,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "lists"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const typesIdentifier = sql.identifier("b", "types");
 const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "an_int"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const anotherIntCodec = domainOfCodec(anIntCodec, "anotherInt", sql.identifier("b", "another_int"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "another_int"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", sql.identifier("pg_catalog", "numrange"), {
-  description: "range of numerics",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "pg_catalog",
       name: "numrange"
-    },
-    tags: {
-      __proto__: null
     }
-  }
+  },
+  description: "range of numerics"
 });
 const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_catalog", "daterange"), {
-  description: "range of dates",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "pg_catalog",
       name: "daterange"
-    },
-    tags: {
-      __proto__: null
     }
-  }
+  },
+  description: "range of dates"
 });
 const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a", "an_int_range"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "an_int_range"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -3037,89 +2269,42 @@ const nestedCompoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      description: undefined,
-      codec: compoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: compoundTypeCodec
     },
     b: {
-      description: undefined,
-      codec: compoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: compoundTypeCodec
     },
     baz_buz: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "nested_compound_type"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
-const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
-  description: undefined,
+const textArrayDomainCodec = domainOfCodec(LIST_TYPES.text, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "text_array_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
-const int8ArrayCodec = listOfCodec(TYPES.bigint, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_int8"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "int8Array"
-});
-const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", sql.identifier("c", "int8_array_domain"), {
-  description: undefined,
+const int8ArrayDomainCodec = domainOfCodec(LIST_TYPES.bigint, "int8ArrayDomain", sql.identifier("c", "int8_array_domain"), {
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "int8_array_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const spec_types_attributes_ltree_codec_ltree = {
   name: "ltree",
@@ -3134,613 +2319,491 @@ const spec_types_attributes_ltree_codec_ltree = {
   attributes: undefined
 };
 const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_attributes_ltree_codec_ltree);
-const spec_types = {
+const typesCodec = recordCodec({
   name: "types",
   identifier: typesIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     smallint: {
-      description: undefined,
       codec: TYPES.int2,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     bigint: {
-      description: undefined,
       codec: TYPES.bigint,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     numeric: {
-      description: undefined,
       codec: TYPES.numeric,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     decimal: {
-      description: undefined,
       codec: TYPES.numeric,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     boolean: {
-      description: undefined,
       codec: TYPES.boolean,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     varchar: {
-      description: undefined,
       codec: TYPES.varchar,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     enum: {
-      description: undefined,
       codec: colorCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     enum_array: {
-      description: undefined,
       codec: colorArrayCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     domain: {
-      description: undefined,
       codec: anIntCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     domain2: {
-      description: undefined,
       codec: anotherIntCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     text_array: {
-      description: undefined,
-      codec: textArrayCodec,
+      codec: LIST_TYPES.text,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     json: {
-      description: undefined,
       codec: TYPES.json,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     jsonb: {
-      description: undefined,
       codec: TYPES.jsonb,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     jsonpath: {
-      description: undefined,
       codec: TYPES.jsonpath,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nullable_range: {
-      description: undefined,
       codec: numrangeCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     numrange: {
-      description: undefined,
       codec: numrangeCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     daterange: {
-      description: undefined,
       codec: daterangeCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     an_int_range: {
-      description: undefined,
       codec: anIntRangeCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     timestamp: {
-      description: undefined,
       codec: TYPES.timestamp,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     timestamptz: {
-      description: undefined,
       codec: TYPES.timestamptz,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     date: {
-      description: undefined,
       codec: TYPES.date,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     time: {
-      description: undefined,
       codec: TYPES.time,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     timetz: {
-      description: undefined,
       codec: TYPES.timetz,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     interval: {
-      description: undefined,
       codec: TYPES.interval,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     interval_array: {
-      description: undefined,
-      codec: intervalArrayCodec,
+      codec: LIST_TYPES.interval,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     money: {
-      description: undefined,
       codec: TYPES.money,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     compound_type: {
-      description: undefined,
       codec: compoundTypeCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nested_compound_type: {
-      description: undefined,
       codec: nestedCompoundTypeCodec,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nullable_compound_type: {
-      description: undefined,
       codec: compoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nullable_nested_compound_type: {
-      description: undefined,
       codec: nestedCompoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     point: {
-      description: undefined,
       codec: TYPES.point,
       notNull: true,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     nullablePoint: {
-      description: undefined,
       codec: TYPES.point,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     inet: {
-      description: undefined,
       codec: TYPES.inet,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     cidr: {
-      description: undefined,
       codec: TYPES.cidr,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     macaddr: {
-      description: undefined,
       codec: TYPES.macaddr,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regproc: {
-      description: undefined,
       codec: TYPES.regproc,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regprocedure: {
-      description: undefined,
       codec: TYPES.regprocedure,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regoper: {
-      description: undefined,
       codec: TYPES.regoper,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regoperator: {
-      description: undefined,
       codec: TYPES.regoperator,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regclass: {
-      description: undefined,
       codec: TYPES.regclass,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regtype: {
-      description: undefined,
       codec: TYPES.regtype,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regconfig: {
-      description: undefined,
       codec: TYPES.regconfig,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     regdictionary: {
-      description: undefined,
       codec: TYPES.regdictionary,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     text_array_domain: {
-      description: undefined,
       codec: textArrayDomainCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     int8_array_domain: {
-      description: undefined,
       codec: int8ArrayDomainCodec,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     bytea: {
-      description: undefined,
       codec: TYPES.bytea,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     bytea_array: {
-      description: undefined,
-      codec: byteaArrayCodec,
-      notNull: false,
-      hasDefault: false,
+      codec: LIST_TYPES.bytea,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     ltree: {
-      description: undefined,
       codec: spec_types_attributes_ltree_codec_ltree,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     },
     ltree_array: {
-      description: undefined,
       codec: spec_types_attributes_ltree_array_codec_ltree_,
-      notNull: false,
-      hasDefault: false,
       extensions: {
-        tags: {},
+        __proto__: null,
         canSelect: false,
         canInsert: false,
         canUpdate: false
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -3754,35 +2817,25 @@ const spec_types = {
     }
   },
   executor: executor
-};
-const typesCodec = recordCodec(spec_types);
+});
 const floatrangeCodec = rangeOfCodec(TYPES.float, "floatrange", sql.identifier("c", "floatrange"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "floatrange"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
 const postArrayCodec = listOfCodec(postCodec, {
+  name: "postArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "_post"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "postArray"
+  }
 });
 const current_user_idFunctionIdentifer = sql.identifier("c", "current_user_id");
 const func_outFunctionIdentifer = sql.identifier("c", "func_out");
@@ -3794,8 +2847,12 @@ const mutation_out_unnamedFunctionIdentifer = sql.identifier("c", "mutation_out_
 const no_args_mutationFunctionIdentifer = sql.identifier("c", "no_args_mutation");
 const no_args_queryFunctionIdentifer = sql.identifier("c", "no_args_query");
 const return_void_mutationFunctionIdentifer = sql.identifier("a", "return_void_mutation");
+const mutation_interval_arrayFunctionIdentifer = sql.identifier("a", "mutation_interval_array");
+const query_interval_arrayFunctionIdentifer = sql.identifier("a", "query_interval_array");
 const mutation_interval_setFunctionIdentifer = sql.identifier("a", "mutation_interval_set");
 const query_interval_setFunctionIdentifer = sql.identifier("a", "query_interval_set");
+const mutation_text_arrayFunctionIdentifer = sql.identifier("a", "mutation_text_array");
+const query_text_arrayFunctionIdentifer = sql.identifier("a", "query_text_array");
 const static_big_integerFunctionIdentifer = sql.identifier("a", "static_big_integer");
 const func_in_outFunctionIdentifer = sql.identifier("c", "func_in_out");
 const func_returns_table_one_colFunctionIdentifer = sql.identifier("c", "func_returns_table_one_col");
@@ -3841,79 +2898,50 @@ const int_set_mutationFunctionIdentifer = sql.identifier("c", "int_set_mutation"
 const int_set_queryFunctionIdentifer = sql.identifier("c", "int_set_query");
 const mutation_out_unnamed_out_out_unnamedFunctionIdentifer = sql.identifier("c", "mutation_out_unnamed_out_out_unnamed");
 const mutation_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "mutation_returns_table_multi_col");
+const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
-const mutation_interval_arrayFunctionIdentifer = sql.identifier("a", "mutation_interval_array");
-const query_interval_arrayFunctionIdentifer = sql.identifier("a", "query_interval_array");
-const mutation_text_arrayFunctionIdentifer = sql.identifier("a", "mutation_text_array");
-const query_text_arrayFunctionIdentifer = sql.identifier("a", "query_text_array");
-const registryConfig_pgResources_unique_foreign_key_unique_foreign_key = {
+const unique_foreign_key_resourceOptionsConfig = {
   executor: executor,
   name: "unique_foreign_key",
   identifier: "main.a.unique_foreign_key",
   from: uniqueForeignKeyIdentifier,
   codec: uniqueForeignKeyCodec,
-  uniques: [{
-    isPrimary: false,
-    attributes: ["compound_key_1", "compound_key_2"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "unique_foreign_key"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       omit: "create,update,delete,all,order,filter",
-      behavior: spec_uniqueForeignKey.extensions.tags.behavior
+      behavior: ["-insert -update -delete -query:resource:list -query:resource:connection -order -orderBy -filter -filterBy"]
     },
     canSelect: false,
     canInsert: false,
     canUpdate: false,
     canDelete: false
-  }
+  },
+  uniques: [{
+    attributes: ["compound_key_1", "compound_key_2"]
+  }]
 };
 const person_secretUniques = [{
-  isPrimary: true,
   attributes: ["person_id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_person_secret_person_secret = {
+const person_secret_resourceOptionsConfig = {
   executor: executor,
   name: "person_secret",
   identifier: "main.c.person_secret",
   from: personSecretIdentifier,
   codec: personSecretCodec,
-  uniques: person_secretUniques,
-  isVirtual: false,
-  description: "Tracks the person's secret",
   extensions: {
-    description: "Tracks the person's secret",
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "person_secret"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       deprecated: "This is deprecated (comment on table c.person_secret)."
     },
@@ -3921,29 +2949,22 @@ const registryConfig_pgResources_person_secret_person_secret = {
     canInsert: true,
     canUpdate: false,
     canDelete: true
-  }
+  },
+  uniques: person_secretUniques,
+  description: "Tracks the person's secret"
 };
-const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
-const registryConfig_pgResources_foreign_key_foreign_key = {
+const foreign_key_resourceOptionsConfig = {
   executor: executor,
   name: "foreign_key",
   identifier: "main.a.foreign_key",
   from: foreignKeyIdentifier,
   codec: foreignKeyCodec,
-  uniques: [],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "foreign_key"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {},
     canSelect: false,
     canInsert: false,
     canUpdate: false,
@@ -3951,90 +2972,62 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
   }
 };
 const compound_keyUniques = [{
-  isPrimary: true,
   attributes: ["person_id_1", "person_id_2"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_compound_key_compound_key = {
+const compound_key_resourceOptionsConfig = {
   executor: executor,
   name: "compound_key",
   identifier: "main.c.compound_key",
   from: compoundKeyIdentifier,
   codec: compoundKeyCodec,
-  uniques: compound_keyUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "compound_key"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {},
     canSelect: false,
     canInsert: false,
     canUpdate: false,
     canDelete: false
-  }
+  },
+  uniques: compound_keyUniques
 };
 const edge_case_computedFunctionIdentifer = sql.identifier("c", "edge_case_computed");
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
-const registryConfig_pgResources_issue756_issue756 = {
+const types_mutationFunctionIdentifer = sql.identifier("c", "types_mutation");
+const types_queryFunctionIdentifer = sql.identifier("c", "types_query");
+const issue756_resourceOptionsConfig = {
   executor: executor,
   name: "issue756",
   identifier: "main.c.issue756",
   from: issue756Identifier,
   codec: issue756Codec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "issue756"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {},
     canSelect: false,
     canInsert: false,
     canUpdate: false,
     canDelete: false
-  }
+  },
+  uniques: [{
+    attributes: ["id"],
+    isPrimary: true
+  }]
 };
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
-const resourceConfig_jwt_token = {
+const jwt_token_resourceOptionsConfig = {
   executor: executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
   from: jwtTokenIdentifier,
   codec: jwtTokenCodec,
-  uniques: [],
-  isVirtual: true,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -4042,87 +3035,85 @@ const resourceConfig_jwt_token = {
     },
     isInsertable: false,
     isUpdatable: false,
-    isDeletable: false,
-    tags: {}
-  }
+    isDeletable: false
+  },
+  isVirtual: true
 };
 const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
 const left_armUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["person_id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["person_id"]
 }];
-const registryConfig_pgResources_left_arm_left_arm = {
+const left_arm_resourceOptionsConfig = {
   executor: executor,
   name: "left_arm",
   identifier: "main.c.left_arm",
   from: leftArmIdentifier,
   codec: leftArmCodec,
-  uniques: left_armUniques,
-  isVirtual: false,
-  description: "Tracks metadata about the left arms of various people",
   extensions: {
-    description: "Tracks metadata about the left arms of various people",
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "left_arm"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {},
     canSelect: true,
     canInsert: true,
     canUpdate: true,
     canDelete: true
-  }
+  },
+  uniques: left_armUniques,
+  description: "Tracks metadata about the left arms of various people"
 };
 const authenticate_manyFunctionIdentifer = sql.identifier("b", "authenticate_many");
-const types_mutationFunctionIdentifer = sql.identifier("c", "types_mutation");
-const types_queryFunctionIdentifer = sql.identifier("c", "types_query");
 const issue756_mutationFunctionIdentifer = sql.identifier("c", "issue756_mutation");
 const issue756_set_mutationFunctionIdentifer = sql.identifier("c", "issue756_set_mutation");
 const left_arm_identityFunctionIdentifer = sql.identifier("c", "left_arm_identity");
 const authenticate_payloadFunctionIdentifer = sql.identifier("b", "authenticate_payload");
-const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
-const func_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "func_out_out_compound_type");
-const mutation_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "mutation_out_out_compound_type");
-const post_computed_interval_setFunctionIdentifer = sql.identifier("a", "post_computed_interval_set");
 const post_computed_interval_arrayFunctionIdentifer = sql.identifier("a", "post_computed_interval_array");
+const post_computed_interval_setFunctionIdentifer = sql.identifier("a", "post_computed_interval_set");
 const post_computed_text_arrayFunctionIdentifer = sql.identifier("a", "post_computed_text_array");
+const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
 const post_computed_with_optional_argFunctionIdentifer = sql.identifier("a", "post_computed_with_optional_arg");
 const post_computed_with_required_argFunctionIdentifer = sql.identifier("a", "post_computed_with_required_arg");
 const post_headline_trimmedFunctionIdentifer = sql.identifier("a", "post_headline_trimmed");
 const post_headline_trimmed_no_defaultsFunctionIdentifer = sql.identifier("a", "post_headline_trimmed_no_defaults");
 const post_headline_trimmed_strictFunctionIdentifer = sql.identifier("a", "post_headline_trimmed_strict");
+const func_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "func_out_out_compound_type");
+const mutation_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "mutation_out_out_compound_type");
 const query_output_two_rowsFunctionIdentifer = sql.identifier("c", "query_output_two_rows");
+const postUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const post_resourceOptionsConfig = {
+  executor: executor,
+  name: "post",
+  identifier: "main.a.post",
+  from: postIdentifier,
+  codec: postCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "post"
+    },
+    canSelect: true,
+    canInsert: false,
+    canUpdate: false,
+    canDelete: false
+  },
+  uniques: postUniques
+};
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
-const resourceConfig_compound_type = {
+const compound_type_resourceOptionsConfig = {
   executor: executor,
   name: "compound_type",
   identifier: "main.c.compound_type",
   from: compoundTypeIdentifier,
   codec: compoundTypeCodec,
-  uniques: [],
-  isVirtual: true,
-  description: "Awesome feature!",
   extensions: {
-    description: "Awesome feature!",
     pg: {
       serviceName: "main",
       schemaName: "c",
@@ -4130,58 +3121,23 @@ const resourceConfig_compound_type = {
     },
     isInsertable: false,
     isUpdatable: false,
-    isDeletable: false,
-    tags: {}
-  }
+    isDeletable: false
+  },
+  isVirtual: true,
+  description: "Awesome feature!"
 };
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
 const compound_type_queryFunctionIdentifer = sql.identifier("b", "compound_type_query");
 const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compound_type_set_mutation");
 const list_of_compound_types_mutationFunctionIdentifer = sql.identifier("c", "list_of_compound_types_mutation");
+const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
+const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
+const post_with_suffixFunctionIdentifer = sql.identifier("a", "post_with_suffix");
 const mutation_compound_type_arrayFunctionIdentifer = sql.identifier("a", "mutation_compound_type_array");
 const query_compound_type_arrayFunctionIdentifer = sql.identifier("a", "query_compound_type_array");
 const compound_type_array_mutationFunctionIdentifer = sql.identifier("b", "compound_type_array_mutation");
 const compound_type_array_queryFunctionIdentifer = sql.identifier("b", "compound_type_array_query");
-const postUniques = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
-}];
-const registryConfig_pgResources_post_post = {
-  executor: executor,
-  name: "post",
-  identifier: "main.a.post",
-  from: postIdentifier,
-  codec: postCodec,
-  uniques: postUniques,
-  isVirtual: false,
-  description: undefined,
-  extensions: {
-    description: undefined,
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "post"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {},
-    canSelect: true,
-    canInsert: false,
-    canUpdate: false,
-    canDelete: false
-  }
-};
 const post_computed_compound_type_arrayFunctionIdentifer = sql.identifier("a", "post_computed_compound_type_array");
-const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
-const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
-const post_with_suffixFunctionIdentifer = sql.identifier("a", "post_with_suffix");
 const post_manyFunctionIdentifer = sql.identifier("a", "post_many");
 const person_computed_outFunctionIdentifer = sql.identifier("c", "person_computed_out");
 const person_first_nameFunctionIdentifer = sql.identifier("c", "person_first_name");
@@ -4202,49 +3158,30 @@ const mutation_out_complex_setofFunctionIdentifer = sql.identifier("c", "mutatio
 const person_computed_complexFunctionIdentifer = sql.identifier("c", "person_computed_complex");
 const person_first_postFunctionIdentifer = sql.identifier("c", "person_first_post");
 const personUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["email"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["email"]
 }];
-const registryConfig_pgResources_person_person = {
+const person_resourceOptionsConfig = {
   executor: executor,
   name: "person",
   identifier: "main.c.person",
   from: personIdentifier,
   codec: personCodec,
-  uniques: personUniques,
-  isVirtual: false,
-  description: "Person test comment",
   extensions: {
-    description: "Person test comment",
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "person"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {},
     canSelect: true,
     canInsert: true,
     canUpdate: true,
     canDelete: true
-  }
+  },
+  uniques: personUniques,
+  description: "Person test comment"
 };
 const badly_behaved_functionFunctionIdentifer = sql.identifier("c", "badly_behaved_function");
 const func_out_tableFunctionIdentifer = sql.identifier("c", "func_out_table");
@@ -4256,42 +3193,30 @@ const table_set_queryFunctionIdentifer = sql.identifier("c", "table_set_query");
 const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_query_plpgsql");
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
-const registryConfig_pgResources_types_types = {
+const types_resourceOptionsConfig = {
   executor: executor,
   name: "types",
   identifier: "main.b.types",
   from: typesIdentifier,
   codec: typesCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "types"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
-      foreignKey: spec_types.extensions.tags.foreignKey
+      foreignKey: ["(smallint) references a.post", "(id) references a.post"]
     },
     canSelect: false,
     canInsert: false,
     canUpdate: false,
     canDelete: false
-  }
+  },
+  uniques: [{
+    attributes: ["id"],
+    isPrimary: true
+  }]
 };
 const type_function_connectionFunctionIdentifer = sql.identifier("b", "type_function_connection");
 const type_function_connection_mutationFunctionIdentifer = sql.identifier("b", "type_function_connection_mutation");
@@ -4311,12 +3236,14 @@ const registry = makeRegistry({
     __proto__: null,
     int4: TYPES.int,
     void: TYPES.void,
+    intervalArray: LIST_TYPES.interval,
     interval: TYPES.interval,
+    textArray: LIST_TYPES.text,
+    text: TYPES.text,
     int8: TYPES.bigint,
     json: TYPES.json,
     jsonb: TYPES.jsonb,
     FuncOutOutRecord: registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
-    text: TYPES.text,
     FuncOutOutSetofRecord: registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
     FuncOutOutUnnamedRecord: registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
     MutationOutOutRecord: registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
@@ -4326,11 +3253,11 @@ const registry = makeRegistry({
     FuncOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
     MutationOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
     MutationReturnsTableMultiColRecord: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
+    uuidArray: LIST_TYPES.uuid,
+    uuid: TYPES.uuid,
     FuncReturnsTableMultiColRecord: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
     guid: guidCodec,
     varchar: TYPES.varchar,
-    intervalArray: intervalArrayCodec,
-    textArray: textArrayCodec,
     nonUpdatableView: nonUpdatableViewCodec,
     inputs: inputsCodec,
     patchs: patchsCodec,
@@ -4343,8 +3270,6 @@ const registry = makeRegistry({
     myTable: myTableCodec,
     personSecret: personSecretCodec,
     unlogged: unloggedCodec,
-    uuidArray: uuidArrayCodec,
-    uuid: TYPES.uuid,
     foreignKey: foreignKeyCodec,
     testview: testviewCodec,
     viewTable: viewTableCodec,
@@ -4394,13 +3319,13 @@ const registry = makeRegistry({
     MutationOutComplexSetofRecord: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
     PersonComputedComplexRecord: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
     lists: listsCodec,
-    int4Array: int4ArrayCodec,
+    int4Array: LIST_TYPES.int,
     colorArray: colorArrayCodec,
-    dateArray: dateArrayCodec,
+    dateArray: LIST_TYPES.date,
     date: TYPES.date,
-    timestamptzArray: timestamptzArrayCodec,
+    timestamptzArray: LIST_TYPES.timestamptz,
     compoundTypeArray: compoundTypeArrayCodec,
-    byteaArray: byteaArrayCodec,
+    byteaArray: LIST_TYPES.bytea,
     bytea: TYPES.bytea,
     types: typesCodec,
     anInt: anIntCodec,
@@ -4428,81 +3353,49 @@ const registry = makeRegistry({
     "ltree[]": spec_types_attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     jwtTokenArray: listOfCodec(jwtTokenCodec, {
+      name: "jwtTokenArray",
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "_jwt_token"
-        },
-        tags: {
-          __proto__: null
         }
-      },
-      typeDelim: ",",
-      description: undefined,
-      name: "jwtTokenArray"
+      }
     }),
     typesArray: listOfCodec(typesCodec, {
+      name: "typesArray",
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "_types"
-        },
-        tags: {
-          __proto__: null
         }
-      },
-      typeDelim: ",",
-      description: undefined,
-      name: "typesArray"
+      }
     }),
     floatrange: floatrangeCodec,
     postArray: postArrayCodec,
-    int8Array: int8ArrayCodec,
+    int8Array: LIST_TYPES.bigint,
     tablefuncCrosstab2: recordCodec({
       name: "tablefuncCrosstab2",
       identifier: sql.identifier("a", "tablefunc_crosstab_2"),
       attributes: {
         __proto__: null,
         row_name: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_1: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_2: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         }
       },
-      description: undefined,
       extensions: {
         isTableLike: false,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "tablefunc_crosstab_2"
-        },
-        tags: {
-          __proto__: null
         }
       },
       executor: executor
@@ -4513,52 +3406,24 @@ const registry = makeRegistry({
       attributes: {
         __proto__: null,
         row_name: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_1: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_2: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_3: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         }
       },
-      description: undefined,
       extensions: {
         isTableLike: false,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "tablefunc_crosstab_3"
-        },
-        tags: {
-          __proto__: null
         }
       },
       executor: executor
@@ -4569,61 +3434,27 @@ const registry = makeRegistry({
       attributes: {
         __proto__: null,
         row_name: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_1: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_2: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_3: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         },
         category_4: {
-          description: undefined,
-          codec: TYPES.text,
-          notNull: false,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          codec: TYPES.text
         }
       },
-      description: undefined,
       extensions: {
         isTableLike: false,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "tablefunc_crosstab_4"
-        },
-        tags: {
-          __proto__: null
         }
       },
       executor: executor
@@ -4953,17 +3784,14 @@ const registry = makeRegistry({
   pgResources: {
     __proto__: null,
     current_user_id: {
-      executor,
+      executor: executor,
       name: "current_user_id",
       identifier: "main.c.current_user_id()",
       from(...args) {
         return sql`${current_user_idFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -4971,23 +3799,19 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "current_user_id"
         },
-        tags: {},
         canExecute: true
       },
-      description: undefined
+      isUnique: true
     },
     func_out: {
-      executor,
+      executor: executor,
       name: "func_out",
       identifier: "main.c.func_out(int4)",
       from(...args) {
         return sql`${func_outFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -4995,24 +3819,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out"
         },
-        tags: {},
         singleOutputParameterName: "o",
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_out_setof: {
-      executor,
+      executor: executor,
       name: "func_out_setof",
       identifier: "main.c.func_out_setof(int4)",
       from(...args) {
         return sql`${func_out_setofFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5020,24 +3840,19 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_setof"
         },
-        tags: {},
         singleOutputParameterName: "o",
         canExecute: false
-      },
-      description: undefined
+      }
     },
     func_out_unnamed: {
-      executor,
+      executor: executor,
       name: "func_out_unnamed",
       identifier: "main.c.func_out_unnamed(int4)",
       from(...args) {
         return sql`${func_out_unnamedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5045,23 +3860,19 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_unnamed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     mutation_out: {
-      executor,
+      executor: executor,
       name: "mutation_out",
       identifier: "main.c.mutation_out(int4)",
       from(...args) {
         return sql`${mutation_outFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5069,24 +3880,21 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out"
         },
-        tags: {},
         singleOutputParameterName: "o",
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mutation_out_setof: {
-      executor,
+      executor: executor,
       name: "mutation_out_setof",
       identifier: "main.c.mutation_out_setof(int4)",
       from(...args) {
         return sql`${mutation_out_setofFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5094,24 +3902,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_setof"
         },
-        tags: {},
         singleOutputParameterName: "o",
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     },
     mutation_out_unnamed: {
-      executor,
+      executor: executor,
       name: "mutation_out_unnamed",
       identifier: "main.c.mutation_out_unnamed(int4)",
       from(...args) {
         return sql`${mutation_out_unnamedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5119,23 +3923,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_unnamed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     no_args_mutation: {
-      executor,
+      executor: executor,
       name: "no_args_mutation",
       identifier: "main.c.no_args_mutation()",
       from(...args) {
         return sql`${no_args_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5143,23 +3944,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "no_args_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     no_args_query: {
-      executor,
+      executor: executor,
       name: "no_args_query",
       identifier: "main.c.no_args_query()",
       from(...args) {
         return sql`${no_args_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5167,23 +3965,19 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "no_args_query"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     return_void_mutation: {
-      executor,
+      executor: executor,
       name: "return_void_mutation",
       identifier: "main.a.return_void_mutation()",
       from(...args) {
         return sql`${return_void_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: TYPES.void,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5191,23 +3985,61 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "return_void_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
+    },
+    mutation_interval_array: {
+      executor: executor,
+      name: "mutation_interval_array",
+      identifier: "main.a.mutation_interval_array()",
+      from(...args) {
+        return sql`${mutation_interval_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: LIST_TYPES.interval,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "mutation_interval_array"
+        },
+        canExecute: false
+      },
+      isUnique: true,
+      isMutation: true
+    },
+    query_interval_array: {
+      executor: executor,
+      name: "query_interval_array",
+      identifier: "main.a.query_interval_array()",
+      from(...args) {
+        return sql`${query_interval_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: LIST_TYPES.interval,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "query_interval_array"
+        },
+        canExecute: false
+      },
+      isUnique: true
     },
     mutation_interval_set: {
-      executor,
+      executor: executor,
       name: "mutation_interval_set",
       identifier: "main.a.mutation_interval_set()",
       from(...args) {
         return sql`${mutation_interval_setFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: TYPES.interval,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5215,23 +4047,19 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_interval_set"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     },
     query_interval_set: {
-      executor,
+      executor: executor,
       name: "query_interval_set",
       identifier: "main.a.query_interval_set()",
       from(...args) {
         return sql`${query_interval_setFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: TYPES.interval,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5239,23 +4067,59 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_interval_set"
         },
-        tags: {},
+        canExecute: false
+      }
+    },
+    mutation_text_array: {
+      executor: executor,
+      name: "mutation_text_array",
+      identifier: "main.a.mutation_text_array()",
+      from(...args) {
+        return sql`${mutation_text_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: LIST_TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "mutation_text_array"
+        },
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
+    },
+    query_text_array: {
+      executor: executor,
+      name: "query_text_array",
+      identifier: "main.a.query_text_array()",
+      from(...args) {
+        return sql`${query_text_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: LIST_TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "query_text_array"
+        },
+        canExecute: false
+      },
+      isUnique: true
     },
     static_big_integer: {
-      executor,
+      executor: executor,
       name: "static_big_integer",
       identifier: "main.a.static_big_integer()",
       from(...args) {
         return sql`${static_big_integerFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: TYPES.bigint,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5263,13 +4127,11 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "static_big_integer"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     },
     func_in_out: {
-      executor,
+      executor: executor,
       name: "func_in_out",
       identifier: "main.c.func_in_out(int4,int4)",
       from(...args) {
@@ -5277,14 +4139,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5292,14 +4150,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_in_out"
         },
-        tags: {},
         singleOutputParameterName: "o",
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_returns_table_one_col: {
-      executor,
+      executor: executor,
       name: "func_returns_table_one_col",
       identifier: "main.c.func_returns_table_one_col(int4,int4)",
       from(...args) {
@@ -5307,14 +4164,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !true,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5322,14 +4175,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_returns_table_one_col"
         },
-        tags: {},
         singleOutputParameterName: "col1",
         canExecute: false
-      },
-      description: undefined
+      }
     },
     mutation_in_out: {
-      executor,
+      executor: executor,
       name: "mutation_in_out",
       identifier: "main.c.mutation_in_out(int4,int4)",
       from(...args) {
@@ -5337,14 +4188,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5352,14 +4199,14 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_in_out"
         },
-        tags: {},
         singleOutputParameterName: "o",
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mutation_returns_table_one_col: {
-      executor,
+      executor: executor,
       name: "mutation_returns_table_one_col",
       identifier: "main.c.mutation_returns_table_one_col(int4,int4)",
       from(...args) {
@@ -5367,14 +4214,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !true,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -5382,14 +4225,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_returns_table_one_col"
         },
-        tags: {},
         singleOutputParameterName: "col1",
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     },
     assert_something: {
-      executor,
+      executor: executor,
       name: "assert_something",
       identifier: "main.a.assert_something(text)",
       from(...args) {
@@ -5397,14 +4239,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "in_arg",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.void,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5412,13 +4250,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "assert_something"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     assert_something_nx: {
-      executor,
+      executor: executor,
       name: "assert_something_nx",
       identifier: "main.a.assert_something_nx(text)",
       from(...args) {
@@ -5426,14 +4263,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "in_arg",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.void,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5447,10 +4280,10 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     json_identity: {
-      executor,
+      executor: executor,
       name: "json_identity",
       identifier: "main.c.json_identity(json)",
       from(...args) {
@@ -5458,14 +4291,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        required: true,
-        notNull: false,
-        codec: TYPES.json
+        codec: TYPES.json,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.json,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5473,13 +4302,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "json_identity"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     json_identity_mutation: {
-      executor,
+      executor: executor,
       name: "json_identity_mutation",
       identifier: "main.c.json_identity_mutation(json)",
       from(...args) {
@@ -5487,14 +4315,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        required: true,
-        notNull: false,
-        codec: TYPES.json
+        codec: TYPES.json,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.json,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5502,13 +4326,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "json_identity_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     jsonb_identity: {
-      executor,
+      executor: executor,
       name: "jsonb_identity",
       identifier: "main.c.jsonb_identity(jsonb)",
       from(...args) {
@@ -5516,14 +4340,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        required: true,
-        notNull: false,
-        codec: TYPES.jsonb
+        codec: TYPES.jsonb,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.jsonb,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5531,13 +4351,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     jsonb_identity_mutation: {
-      executor,
+      executor: executor,
       name: "jsonb_identity_mutation",
       identifier: "main.c.jsonb_identity_mutation(jsonb)",
       from(...args) {
@@ -5545,14 +4364,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        required: true,
-        notNull: false,
-        codec: TYPES.jsonb
+        codec: TYPES.jsonb,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.jsonb,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5560,13 +4375,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     jsonb_identity_mutation_plpgsql: {
-      executor,
+      executor: executor,
       name: "jsonb_identity_mutation_plpgsql",
       identifier: "main.c.jsonb_identity_mutation_plpgsql(jsonb)",
       from(...args) {
@@ -5574,14 +4389,11 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "_the_json",
+        codec: TYPES.jsonb,
         required: true,
-        notNull: true,
-        codec: TYPES.jsonb
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.jsonb,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5589,13 +4401,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation_plpgsql"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     jsonb_identity_mutation_plpgsql_with_default: {
-      executor,
+      executor: executor,
       name: "jsonb_identity_mutation_plpgsql_with_default",
       identifier: "main.c.jsonb_identity_mutation_plpgsql_with_default(jsonb)",
       from(...args) {
@@ -5603,14 +4415,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "_the_json",
-        required: false,
-        notNull: true,
-        codec: TYPES.jsonb
+        codec: TYPES.jsonb,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.jsonb,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5618,13 +4426,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation_plpgsql_with_default"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     add_1_mutation: {
-      executor,
+      executor: executor,
       name: "add_1_mutation",
       identifier: "main.a.add_1_mutation(int4,int4)",
       from(...args) {
@@ -5632,19 +4440,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5657,10 +4462,12 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
+      isUnique: true,
+      isMutation: true,
       description: "lol, add some stuff 1 mutation"
     },
     add_1_query: {
-      executor,
+      executor: executor,
       name: "add_1_query",
       identifier: "main.a.add_1_query(int4,int4)",
       from(...args) {
@@ -5668,19 +4475,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5688,13 +4492,13 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_1_query"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
       description: "lol, add some stuff 1 query"
     },
     add_2_mutation: {
-      executor,
+      executor: executor,
       name: "add_2_mutation",
       identifier: "main.a.add_2_mutation(int4,int4)",
       from(...args) {
@@ -5702,19 +4506,15 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5722,13 +4522,14 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_2_mutation"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
+      isMutation: true,
       description: "lol, add some stuff 2 mutation"
     },
     add_2_query: {
-      executor,
+      executor: executor,
       name: "add_2_query",
       identifier: "main.a.add_2_query(int4,int4)",
       from(...args) {
@@ -5736,19 +4537,15 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5756,13 +4553,13 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_2_query"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
       description: "lol, add some stuff 2 query"
     },
     add_3_mutation: {
-      executor,
+      executor: executor,
       name: "add_3_mutation",
       identifier: "main.a.add_3_mutation(int4,int4)",
       from(...args) {
@@ -5770,19 +4567,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5790,13 +4582,14 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_3_mutation"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
+      isMutation: true,
       description: "lol, add some stuff 3 mutation"
     },
     add_3_query: {
-      executor,
+      executor: executor,
       name: "add_3_query",
       identifier: "main.a.add_3_query(int4,int4)",
       from(...args) {
@@ -5804,19 +4597,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5824,13 +4612,13 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_3_query"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
       description: "lol, add some stuff 3 query"
     },
     add_4_mutation: {
-      executor,
+      executor: executor,
       name: "add_4_mutation",
       identifier: "main.a.add_4_mutation(int4,int4)",
       from(...args) {
@@ -5838,19 +4626,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: false,
-        notNull: false,
         codec: TYPES.int
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5858,13 +4640,14 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_mutation"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
+      isMutation: true,
       description: "lol, add some stuff 4 mutation"
     },
     add_4_mutation_error: {
-      executor,
+      executor: executor,
       name: "add_4_mutation_error",
       identifier: "main.a.add_4_mutation_error(int4,int4)",
       from(...args) {
@@ -5872,19 +4655,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: false,
-        notNull: false,
         codec: TYPES.int
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5892,13 +4669,13 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_mutation_error"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     add_4_query: {
-      executor,
+      executor: executor,
       name: "add_4_query",
       identifier: "main.a.add_4_query(int4,int4)",
       from(...args) {
@@ -5906,19 +4683,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: false,
-        notNull: false,
         codec: TYPES.int
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5926,13 +4697,13 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_query"
         },
-        tags: {},
         canExecute: false
       },
+      isUnique: true,
       description: "lol, add some stuff 4 query"
     },
     mult_1: {
-      executor,
+      executor: executor,
       name: "mult_1",
       identifier: "main.b.mult_1(int4,int4)",
       from(...args) {
@@ -5940,19 +4711,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5960,13 +4726,13 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_1"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mult_2: {
-      executor,
+      executor: executor,
       name: "mult_2",
       identifier: "main.b.mult_2(int4,int4)",
       from(...args) {
@@ -5974,19 +4740,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -5994,13 +4755,13 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_2"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mult_3: {
-      executor,
+      executor: executor,
       name: "mult_3",
       identifier: "main.b.mult_3(int4,int4)",
       from(...args) {
@@ -6008,19 +4769,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6028,13 +4786,13 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_3"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mult_4: {
-      executor,
+      executor: executor,
       name: "mult_4",
       identifier: "main.b.mult_4(int4,int4)",
       from(...args) {
@@ -6042,19 +4800,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6062,13 +4817,13 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_4"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     func_in_inout: {
-      executor,
+      executor: executor,
       name: "func_in_inout",
       identifier: "main.c.func_in_inout(int4,int4)",
       from(...args) {
@@ -6076,19 +4831,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "ino",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6096,24 +4846,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_in_inout"
         },
-        tags: {},
         singleOutputParameterName: "ino",
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_out_out: {
-      executor,
+      executor: executor,
       name: "func_out_out",
       identifier: "main.c.func_out_out(int4,text)",
       from(...args) {
         return sql`${func_out_outFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6121,23 +4867,19 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_out_out_setof: {
-      executor,
+      executor: executor,
       name: "func_out_out_setof",
       identifier: "main.c.func_out_out_setof(int4,text)",
       from(...args) {
         return sql`${func_out_out_setofFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6145,23 +4887,18 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_setof"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     },
     func_out_out_unnamed: {
-      executor,
+      executor: executor,
       name: "func_out_out_unnamed",
       identifier: "main.c.func_out_out_unnamed(int4,text)",
       from(...args) {
         return sql`${func_out_out_unnamedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6169,13 +4906,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_unnamed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     mutation_in_inout: {
-      executor,
+      executor: executor,
       name: "mutation_in_inout",
       identifier: "main.c.mutation_in_inout(int4,int4)",
       from(...args) {
@@ -6183,19 +4919,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "ino",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6203,24 +4934,21 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_in_inout"
         },
-        tags: {},
         singleOutputParameterName: "ino",
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mutation_out_out: {
-      executor,
+      executor: executor,
       name: "mutation_out_out",
       identifier: "main.c.mutation_out_out(int4,text)",
       from(...args) {
         return sql`${mutation_out_outFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6228,23 +4956,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mutation_out_out_setof: {
-      executor,
+      executor: executor,
       name: "mutation_out_out_setof",
       identifier: "main.c.mutation_out_out_setof(int4,text)",
       from(...args) {
         return sql`${mutation_out_out_setofFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6252,23 +4977,19 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_setof"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     },
     mutation_out_out_unnamed: {
-      executor,
+      executor: executor,
       name: "mutation_out_out_unnamed",
       identifier: "main.c.mutation_out_out_unnamed(int4,text)",
       from(...args) {
         return sql`${mutation_out_out_unnamedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6276,23 +4997,20 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_unnamed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     search_test_summaries: {
-      executor,
+      executor: executor,
       name: "search_test_summaries",
       identifier: "main.c.search_test_summaries(int4,interval)",
       from(...args) {
         return sql`${search_test_summariesFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6305,11 +5023,10 @@ const registry = makeRegistry({
           behavior: ["+list -connection"]
         },
         canExecute: false
-      },
-      description: undefined
+      }
     },
     optional_missing_middle_1: {
-      executor,
+      executor: executor,
       name: "optional_missing_middle_1",
       identifier: "main.a.optional_missing_middle_1(int4,int4,int4)",
       from(...args) {
@@ -6317,24 +5034,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "c",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6342,13 +5054,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_1"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     optional_missing_middle_2: {
-      executor,
+      executor: executor,
       name: "optional_missing_middle_2",
       identifier: "main.a.optional_missing_middle_2(int4,int4,int4)",
       from(...args) {
@@ -6356,24 +5067,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "c",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6381,13 +5087,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_2"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     optional_missing_middle_3: {
-      executor,
+      executor: executor,
       name: "optional_missing_middle_3",
       identifier: "main.a.optional_missing_middle_3(int4,int4,int4)",
       from(...args) {
@@ -6395,24 +5100,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "c",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6420,13 +5120,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_3"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     optional_missing_middle_4: {
-      executor,
+      executor: executor,
       name: "optional_missing_middle_4",
       identifier: "main.a.optional_missing_middle_4(int4,int4,int4)",
       from(...args) {
@@ -6434,24 +5133,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6459,13 +5153,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_4"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     optional_missing_middle_5: {
-      executor,
+      executor: executor,
       name: "optional_missing_middle_5",
       identifier: "main.a.optional_missing_middle_5(int4,int4,int4)",
       from(...args) {
@@ -6473,24 +5166,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6498,23 +5186,19 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_5"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_out_unnamed_out_out_unnamed: {
-      executor,
+      executor: executor,
       name: "func_out_unnamed_out_out_unnamed",
       identifier: "main.c.func_out_unnamed_out_out_unnamed(int4,text,int4)",
       from(...args) {
         return sql`${func_out_unnamed_out_out_unnamedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6522,13 +5206,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_unnamed_out_out_unnamed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     int_set_mutation: {
-      executor,
+      executor: executor,
       name: "int_set_mutation",
       identifier: "main.c.int_set_mutation(int4,int4,int4)",
       from(...args) {
@@ -6536,24 +5219,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "x",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "y",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "z",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !true,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6561,13 +5238,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "int_set_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     },
     int_set_query: {
-      executor,
+      executor: executor,
       name: "int_set_query",
       identifier: "main.c.int_set_query(int4,int4,int4)",
       from(...args) {
@@ -6575,24 +5251,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "x",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "y",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "z",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !true,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6600,23 +5270,18 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "int_set_query"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     },
     mutation_out_unnamed_out_out_unnamed: {
-      executor,
+      executor: executor,
       name: "mutation_out_unnamed_out_out_unnamed",
       identifier: "main.c.mutation_out_unnamed_out_out_unnamed(int4,text,int4)",
       from(...args) {
         return sql`${mutation_out_unnamed_out_out_unnamedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6624,13 +5289,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_unnamed_out_out_unnamed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mutation_returns_table_multi_col: {
-      executor,
+      executor: executor,
       name: "mutation_returns_table_multi_col",
       identifier: "main.c.mutation_returns_table_multi_col(int4,int4,text)",
       from(...args) {
@@ -6638,14 +5303,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6653,13 +5314,45 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_returns_table_multi_col"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
+    },
+    list_bde_mutation: {
+      executor: executor,
+      name: "list_bde_mutation",
+      identifier: "main.b.list_bde_mutation(_text,text,text)",
+      from(...args) {
+        return sql`${list_bde_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "b",
+        codec: LIST_TYPES.text,
+        required: true
+      }, {
+        name: "d",
+        codec: TYPES.text,
+        required: true
+      }, {
+        name: "e",
+        codec: TYPES.text,
+        required: true
+      }],
+      codec: LIST_TYPES.uuid,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "list_bde_mutation"
+        },
+        canExecute: false
+      },
+      isUnique: true,
+      isMutation: true
     },
     func_returns_table_multi_col: {
-      executor,
+      executor: executor,
       name: "func_returns_table_multi_col",
       identifier: "main.c.func_returns_table_multi_col(int4,int4,int4,int4,text)",
       from(...args) {
@@ -6667,24 +5360,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "a",
-        required: false,
-        notNull: false,
         codec: TYPES.int
       }, {
         name: "b",
-        required: false,
-        notNull: false,
         codec: TYPES.int
       }],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -6692,13 +5377,11 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_returns_table_multi_col"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     },
     guid_fn: {
-      executor,
+      executor: executor,
       name: "guid_fn",
       identifier: "main.b.guid_fn(b.guid)",
       from(...args) {
@@ -6706,14 +5389,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "g",
-        required: true,
-        notNull: false,
-        codec: guidCodec
+        codec: guidCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: guidCodec,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -6721,106 +5400,10 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "guid_fn"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
-    },
-    mutation_interval_array: {
-      executor,
-      name: "mutation_interval_array",
-      identifier: "main.a.mutation_interval_array()",
-      from(...args) {
-        return sql`${mutation_interval_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      isUnique: !false,
-      codec: intervalArrayCodec,
-      uniques: [],
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "mutation_interval_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
-    query_interval_array: {
-      executor,
-      name: "query_interval_array",
-      identifier: "main.a.query_interval_array()",
-      from(...args) {
-        return sql`${query_interval_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      isUnique: !false,
-      codec: intervalArrayCodec,
-      uniques: [],
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "query_interval_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
-    mutation_text_array: {
-      executor,
-      name: "mutation_text_array",
-      identifier: "main.a.mutation_text_array()",
-      from(...args) {
-        return sql`${mutation_text_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      isUnique: !false,
-      codec: textArrayCodec,
-      uniques: [],
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "mutation_text_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
-    query_text_array: {
-      executor,
-      name: "query_text_array",
-      identifier: "main.a.query_text_array()",
-      from(...args) {
-        return sql`${query_text_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      isUnique: !false,
-      codec: textArrayCodec,
-      uniques: [],
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "query_text_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     non_updatable_view: {
       executor: executor,
@@ -6828,11 +5411,7 @@ const registry = makeRegistry({
       identifier: "main.a.non_updatable_view",
       from: nonUpdatableViewIdentifier,
       codec: nonUpdatableViewCodec,
-      uniques: [],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
@@ -6841,7 +5420,6 @@ const registry = makeRegistry({
         isInsertable: false,
         isUpdatable: false,
         isDeletable: false,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
@@ -6854,34 +5432,22 @@ const registry = makeRegistry({
       identifier: "main.a.inputs",
       from: inputsIdentifier,
       codec: inputsCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: "Should output as Input",
       extensions: {
-        description: "Should output as Input",
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "inputs"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }],
+      description: "Should output as Input"
     },
     patchs: {
       executor: executor,
@@ -6889,34 +5455,22 @@ const registry = makeRegistry({
       identifier: "main.a.patchs",
       from: patchsIdentifier,
       codec: patchsCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: "Should output as Patch",
       extensions: {
-        description: "Should output as Patch",
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "patchs"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }],
+      description: "Should output as Patch"
     },
     reserved: {
       executor: executor,
@@ -6924,34 +5478,21 @@ const registry = makeRegistry({
       identifier: "main.a.reserved",
       from: reservedIdentifier,
       codec: reservedCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "reserved"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
     reservedPatchs: {
       executor: executor,
@@ -6959,34 +5500,22 @@ const registry = makeRegistry({
       identifier: "main.a.reservedPatchs",
       from: reservedPatchsIdentifier,
       codec: reservedPatchsCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table",
       extensions: {
-        description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table",
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "reservedPatchs"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }],
+      description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table"
     },
     reserved_input: {
       executor: executor,
@@ -6994,34 +5523,22 @@ const registry = makeRegistry({
       identifier: "main.a.reserved_input",
       from: reservedInputIdentifier,
       codec: reservedInputCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table",
       extensions: {
-        description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table",
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "reserved_input"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }],
+      description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table"
     },
     default_value: {
       executor: executor,
@@ -7029,34 +5546,21 @@ const registry = makeRegistry({
       identifier: "main.a.default_value",
       from: defaultValueIdentifier,
       codec: defaultValueCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "default_value"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
     no_primary_key: {
       executor: executor,
@@ -7064,168 +5568,81 @@ const registry = makeRegistry({
       identifier: "main.a.no_primary_key",
       from: noPrimaryKeyIdentifier,
       codec: noPrimaryKeyCodec,
-      uniques: [{
-        isPrimary: false,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "no_primary_key"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"]
+      }]
     },
-    unique_foreign_key: registryConfig_pgResources_unique_foreign_key_unique_foreign_key,
+    unique_foreign_key: unique_foreign_key_resourceOptionsConfig,
     my_table: {
       executor: executor,
       name: "my_table",
       identifier: "main.c.my_table",
       from: myTableIdentifier,
       codec: myTableCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "my_table"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
-    person_secret: registryConfig_pgResources_person_secret_person_secret,
+    person_secret: person_secret_resourceOptionsConfig,
     unlogged: {
       executor: executor,
       name: "unlogged",
       identifier: "main.c.unlogged",
       from: unloggedIdentifier,
       codec: unloggedCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "unlogged",
           persistence: "u"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
-    },
-    list_bde_mutation: {
-      executor,
-      name: "list_bde_mutation",
-      identifier: "main.b.list_bde_mutation(_text,text,text)",
-      from(...args) {
-        return sql`${list_bde_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
-      parameters: [{
-        name: "b",
-        required: true,
-        notNull: false,
-        codec: textArrayCodec
-      }, {
-        name: "d",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
-      }, {
-        name: "e",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
-      }],
-      isUnique: !false,
-      codec: uuidArrayCodec,
-      uniques: [],
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "list_bde_mutation"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
-    foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
+    foreign_key: foreign_key_resourceOptionsConfig,
     testview: {
       executor: executor,
       name: "testview",
       identifier: "main.a.testview",
       from: testviewIdentifier,
       codec: testviewCodec,
-      uniques: [],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "testview"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
@@ -7238,38 +5655,25 @@ const registry = makeRegistry({
       identifier: "main.a.view_table",
       from: viewTableIdentifier,
       codec: viewTableCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "view_table"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
-    compound_key: registryConfig_pgResources_compound_key_compound_key,
+    compound_key: compound_key_resourceOptionsConfig,
     edge_case_computed: {
-      executor,
+      executor: executor,
       name: "edge_case_computed",
       identifier: "main.c.edge_case_computed(c.edge_case)",
       from(...args) {
@@ -7277,14 +5681,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "edge_case",
-        required: true,
-        notNull: false,
-        codec: edgeCaseCodec
+        codec: edgeCaseCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -7298,7 +5698,7 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     similar_table_1: {
       executor: executor,
@@ -7306,34 +5706,21 @@ const registry = makeRegistry({
       identifier: "main.a.similar_table_1",
       from: similarTable1Identifier,
       codec: similarTable1Codec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "similar_table_1"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
     similar_table_2: {
       executor: executor,
@@ -7341,34 +5728,21 @@ const registry = makeRegistry({
       identifier: "main.a.similar_table_2",
       from: similarTable2Identifier,
       codec: similarTable2Codec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "similar_table_2"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
     updatable_view: {
       executor: executor,
@@ -7376,29 +5750,12 @@ const registry = makeRegistry({
       identifier: "main.b.updatable_view",
       from: updatableViewIdentifier,
       codec: updatableViewCodec,
-      uniques: [{
-        isPrimary: false,
-        attributes: ["x"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null,
-            behavior: "-single -update -delete"
-          }
-        }
-      }],
-      isVirtual: false,
-      description: "YOYOYO!!",
       extensions: {
-        description: "YOYOYO!!",
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "updatable_view"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"
@@ -7407,7 +5764,17 @@ const registry = makeRegistry({
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["x"],
+        extensions: {
+          tags: {
+            __proto__: null,
+            behavior: "-single -update -delete"
+          }
+        }
+      }],
+      description: "YOYOYO!!"
     },
     null_test_record: {
       executor: executor,
@@ -7415,34 +5782,21 @@ const registry = makeRegistry({
       identifier: "main.c.null_test_record",
       from: nullTestRecordIdentifier,
       codec: nullTestRecordCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "null_test_record"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
-      }
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
     edge_case: {
       executor: executor,
@@ -7450,148 +5804,37 @@ const registry = makeRegistry({
       identifier: "main.c.edge_case",
       from: edgeCaseIdentifier,
       codec: edgeCaseCodec,
-      uniques: [],
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "edge_case"
         },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
         canSelect: false,
         canInsert: false,
         canUpdate: false,
         canDelete: false
       }
     },
-    return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, {
+    return_table_without_grants: PgResource.functionResourceOptions(compound_key_resourceOptionsConfig, {
       name: "return_table_without_grants",
       identifier: "main.c.return_table_without_grants()",
       from(...args) {
         return sql`${return_table_without_grantsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "return_table_without_grants"
         },
-        tags: {},
         canExecute: true
-      },
-      description: undefined
-    }),
-    issue756: registryConfig_pgResources_issue756_issue756,
-    authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
-      name: "authenticate_fail",
-      identifier: "main.b.authenticate_fail()",
-      from(...args) {
-        return sql`${authenticate_failFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "authenticate_fail"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
-      name: "authenticate",
-      identifier: "main.b.authenticate(int4,numeric,int8)",
-      from(...args) {
-        return sql`${authenticateFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }, {
-        name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.numeric
-      }, {
-        name: "c",
-        required: true,
-        notNull: false,
-        codec: TYPES.bigint
-      }],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "authenticate"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    left_arm: registryConfig_pgResources_left_arm_left_arm,
-    authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
-      name: "authenticate_many",
-      identifier: "main.b.authenticate_many(int4,numeric,int8)",
-      from(...args) {
-        return sql`${authenticate_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }, {
-        name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.numeric
-      }, {
-        name: "c",
-        required: true,
-        notNull: false,
-        codec: TYPES.bigint
-      }],
-      returnsArray: true,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "authenticate_many"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
+      }
     }),
     types_mutation: {
-      executor,
+      executor: executor,
       name: "types_mutation",
       identifier: "main.c.types_mutation(int8,bool,varchar,_int4,json,c.floatrange)",
       from(...args) {
@@ -7599,39 +5842,36 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.bigint,
         required: true,
-        notNull: true,
-        codec: TYPES.bigint
+        notNull: true
       }, {
         name: "b",
+        codec: TYPES.boolean,
         required: true,
-        notNull: true,
-        codec: TYPES.boolean
+        notNull: true
       }, {
         name: "c",
+        codec: TYPES.varchar,
         required: true,
-        notNull: true,
-        codec: TYPES.varchar
+        notNull: true
       }, {
         name: "d",
+        codec: LIST_TYPES.int,
         required: true,
-        notNull: true,
-        codec: int4ArrayCodec
+        notNull: true
       }, {
         name: "e",
+        codec: TYPES.json,
         required: true,
-        notNull: true,
-        codec: TYPES.json
+        notNull: true
       }, {
         name: "f",
+        codec: floatrangeCodec,
         required: true,
-        notNull: true,
-        codec: floatrangeCodec
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.boolean,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -7639,13 +5879,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "types_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     types_query: {
-      executor,
+      executor: executor,
       name: "types_query",
       identifier: "main.c.types_query(int8,bool,varchar,_int4,json,c.floatrange)",
       from(...args) {
@@ -7653,39 +5893,36 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
+        codec: TYPES.bigint,
         required: true,
-        notNull: true,
-        codec: TYPES.bigint
+        notNull: true
       }, {
         name: "b",
+        codec: TYPES.boolean,
         required: true,
-        notNull: true,
-        codec: TYPES.boolean
+        notNull: true
       }, {
         name: "c",
+        codec: TYPES.varchar,
         required: true,
-        notNull: true,
-        codec: TYPES.varchar
+        notNull: true
       }, {
         name: "d",
+        codec: LIST_TYPES.int,
         required: true,
-        notNull: true,
-        codec: int4ArrayCodec
+        notNull: true
       }, {
         name: "e",
+        codec: TYPES.json,
         required: true,
-        notNull: true,
-        codec: TYPES.json
+        notNull: true
       }, {
         name: "f",
+        codec: floatrangeCodec,
         required: true,
-        notNull: true,
-        codec: floatrangeCodec
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.boolean,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -7693,56 +5930,129 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "types_query"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
-    issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, {
+    issue756: issue756_resourceOptionsConfig,
+    authenticate_fail: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
+      name: "authenticate_fail",
+      identifier: "main.b.authenticate_fail()",
+      from(...args) {
+        return sql`${authenticate_failFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate_fail"
+        },
+        canExecute: false
+      },
+      isMutation: true
+    }),
+    authenticate: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
+      name: "authenticate",
+      identifier: "main.b.authenticate(int4,numeric,int8)",
+      from(...args) {
+        return sql`${authenticateFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        codec: TYPES.int,
+        required: true
+      }, {
+        name: "b",
+        codec: TYPES.numeric,
+        required: true
+      }, {
+        name: "c",
+        codec: TYPES.bigint,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate"
+        },
+        canExecute: false
+      },
+      isMutation: true
+    }),
+    left_arm: left_arm_resourceOptionsConfig,
+    authenticate_many: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
+      name: "authenticate_many",
+      identifier: "main.b.authenticate_many(int4,numeric,int8)",
+      from(...args) {
+        return sql`${authenticate_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        codec: TYPES.int,
+        required: true
+      }, {
+        name: "b",
+        codec: TYPES.numeric,
+        required: true
+      }, {
+        name: "c",
+        codec: TYPES.bigint,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate_many"
+        },
+        canExecute: false
+      },
+      isMutation: true,
+      returnsArray: true
+    }),
+    issue756_mutation: PgResource.functionResourceOptions(issue756_resourceOptionsConfig, {
       name: "issue756_mutation",
       identifier: "main.c.issue756_mutation()",
       from(...args) {
         return sql`${issue756_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "issue756_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     }),
-    issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, {
+    issue756_set_mutation: PgResource.functionResourceOptions(issue756_resourceOptionsConfig, {
       name: "issue756_set_mutation",
       identifier: "main.c.issue756_set_mutation()",
       from(...args) {
         return sql`${issue756_set_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "issue756_set_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
-    left_arm_identity: PgResource.functionResourceOptions(registryConfig_pgResources_left_arm_left_arm, {
+    left_arm_identity: PgResource.functionResourceOptions(left_arm_resourceOptionsConfig, {
       name: "left_arm_identity",
       identifier: "main.c.left_arm_identity(c.left_arm)",
       from(...args) {
@@ -7750,17 +6060,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "left_arm",
-        required: true,
-        notNull: false,
         codec: leftArmCodec,
+        required: true,
         extensions: {
           variant: "base"
         }
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -7773,7 +6079,7 @@ const registry = makeRegistry({
         },
         canExecute: true
       },
-      description: undefined
+      isMutation: true
     }),
     authenticate_payload: PgResource.functionResourceOptions({
       executor: executor,
@@ -7781,11 +6087,7 @@ const registry = makeRegistry({
       identifier: "main.b.auth_payload",
       from: authPayloadIdentifier,
       codec: authPayloadCodec,
-      uniques: [],
-      isVirtual: true,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "b",
@@ -7797,7 +6099,8 @@ const registry = makeRegistry({
         tags: {
           foreignKey: "(id) references c.person"
         }
-      }
+      },
+      isVirtual: true
     }, {
       name: "authenticate_payload",
       identifier: "main.b.authenticate_payload(int4,numeric,int8)",
@@ -7806,153 +6109,30 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.numeric
+        codec: TYPES.numeric,
+        required: true
       }, {
         name: "c",
-        required: true,
-        notNull: false,
-        codec: TYPES.bigint
+        codec: TYPES.bigint,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "authenticate_payload"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     }),
-    compound_type_computed_field: {
-      executor,
-      name: "compound_type_computed_field",
-      identifier: "main.c.compound_type_computed_field(c.compound_type)",
-      from(...args) {
-        return sql`${compound_type_computed_fieldFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "compound_type",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
-      }],
-      isUnique: !false,
-      codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "compound_type_computed_field"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
-    func_out_out_compound_type: {
-      executor,
-      name: "func_out_out_compound_type",
-      identifier: "main.c.func_out_out_compound_type(int4,int4,c.compound_type)",
-      from(...args) {
-        return sql`${func_out_out_compound_typeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "i1",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }],
-      isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
-      uniques: [],
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "func_out_out_compound_type"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
-    mutation_out_out_compound_type: {
-      executor,
-      name: "mutation_out_out_compound_type",
-      identifier: "main.c.mutation_out_out_compound_type(int4,int4,c.compound_type)",
-      from(...args) {
-        return sql`${mutation_out_out_compound_typeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "i1",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }],
-      isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
-      uniques: [],
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "mutation_out_out_compound_type"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
-    post_computed_interval_set: {
-      executor,
-      name: "post_computed_interval_set",
-      identifier: "main.a.post_computed_interval_set(a.post)",
-      from(...args) {
-        return sql`${post_computed_interval_setFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
-      }],
-      isUnique: !true,
-      codec: TYPES.interval,
-      uniques: [],
-      isMutation: false,
-      hasImplicitOrder: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "post_computed_interval_set"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
     post_computed_interval_array: {
-      executor,
+      executor: executor,
       name: "post_computed_interval_array",
       identifier: "main.a.post_computed_interval_array(a.post)",
       from(...args) {
@@ -7960,14 +6140,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
+        codec: postCodec,
+        required: true
       }],
-      isUnique: !false,
-      codec: intervalArrayCodec,
-      uniques: [],
-      isMutation: false,
+      codec: LIST_TYPES.interval,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -7975,13 +6151,35 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_interval_array"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
+    },
+    post_computed_interval_set: {
+      executor: executor,
+      name: "post_computed_interval_set",
+      identifier: "main.a.post_computed_interval_set(a.post)",
+      from(...args) {
+        return sql`${post_computed_interval_setFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "post",
+        codec: postCodec,
+        required: true
+      }],
+      codec: TYPES.interval,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "post_computed_interval_set"
+        },
+        canExecute: false
+      }
     },
     post_computed_text_array: {
-      executor,
+      executor: executor,
       name: "post_computed_text_array",
       identifier: "main.a.post_computed_text_array(a.post)",
       from(...args) {
@@ -7989,14 +6187,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
+        codec: postCodec,
+        required: true
       }],
-      isUnique: !false,
-      codec: textArrayCodec,
-      uniques: [],
-      isMutation: false,
+      codec: LIST_TYPES.text,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8004,13 +6198,36 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_text_array"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
+    },
+    compound_type_computed_field: {
+      executor: executor,
+      name: "compound_type_computed_field",
+      identifier: "main.c.compound_type_computed_field(c.compound_type)",
+      from(...args) {
+        return sql`${compound_type_computed_fieldFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "compound_type",
+        codec: compoundTypeCodec,
+        required: true
+      }],
+      codec: TYPES.int,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "compound_type_computed_field"
+        },
+        canExecute: false
+      },
+      isUnique: true
     },
     post_computed_with_optional_arg: {
-      executor,
+      executor: executor,
       name: "post_computed_with_optional_arg",
       identifier: "main.a.post_computed_with_optional_arg(a.post,int4)",
       from(...args) {
@@ -8018,19 +6235,15 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
+        codec: postCodec,
         required: true,
-        notNull: true,
-        codec: postCodec
+        notNull: true
       }, {
         name: "i",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8045,10 +6258,10 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     post_computed_with_required_arg: {
-      executor,
+      executor: executor,
       name: "post_computed_with_required_arg",
       identifier: "main.a.post_computed_with_required_arg(a.post,int4)",
       from(...args) {
@@ -8056,19 +6269,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
+        codec: postCodec,
         required: true,
-        notNull: true,
-        codec: postCodec
+        notNull: true
       }, {
         name: "i",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8083,10 +6293,10 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     post_headline_trimmed: {
-      executor,
+      executor: executor,
       name: "post_headline_trimmed",
       identifier: "main.a.post_headline_trimmed(a.post,int4,text)",
       from(...args) {
@@ -8094,24 +6304,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
+        codec: postCodec,
+        required: true
       }, {
         name: "length",
-        required: false,
-        notNull: false,
         codec: TYPES.int
       }, {
         name: "omission",
-        required: false,
-        notNull: false,
         codec: TYPES.text
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8119,13 +6321,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     post_headline_trimmed_no_defaults: {
-      executor,
+      executor: executor,
       name: "post_headline_trimmed_no_defaults",
       identifier: "main.a.post_headline_trimmed_no_defaults(a.post,int4,text)",
       from(...args) {
@@ -8133,24 +6334,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
+        codec: postCodec,
+        required: true
       }, {
         name: "length",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "omission",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8158,13 +6353,12 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed_no_defaults"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     post_headline_trimmed_strict: {
-      executor,
+      executor: executor,
       name: "post_headline_trimmed_strict",
       identifier: "main.a.post_headline_trimmed_strict(a.post,int4,text)",
       from(...args) {
@@ -8172,24 +6366,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
+        codec: postCodec,
         required: true,
-        notNull: true,
-        codec: postCodec
+        notNull: true
       }, {
         name: "length",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "omission",
-        required: false,
-        notNull: true,
-        codec: TYPES.text
+        codec: TYPES.text,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8197,13 +6386,61 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed_strict"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
+    },
+    func_out_out_compound_type: {
+      executor: executor,
+      name: "func_out_out_compound_type",
+      identifier: "main.c.func_out_out_compound_type(int4,int4,c.compound_type)",
+      from(...args) {
+        return sql`${func_out_out_compound_typeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "i1",
+        codec: TYPES.int,
+        required: true
+      }],
+      codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "func_out_out_compound_type"
+        },
+        canExecute: false
+      },
+      isUnique: true
+    },
+    mutation_out_out_compound_type: {
+      executor: executor,
+      name: "mutation_out_out_compound_type",
+      identifier: "main.c.mutation_out_out_compound_type(int4,int4,c.compound_type)",
+      from(...args) {
+        return sql`${mutation_out_out_compound_typeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "i1",
+        codec: TYPES.int,
+        required: true
+      }],
+      codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "mutation_out_out_compound_type"
+        },
+        canExecute: false
+      },
+      isUnique: true,
+      isMutation: true
     },
     query_output_two_rows: {
-      executor,
+      executor: executor,
       name: "query_output_two_rows",
       identifier: "main.c.query_output_two_rows(int4,int4,text,c.left_arm,a.post)",
       from(...args) {
@@ -8211,24 +6448,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "left_arm_id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "post_id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "txt",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8236,34 +6467,30 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "query_output_two_rows"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
-    compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+    post: post_resourceOptionsConfig,
+    compound_type_set_query: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "compound_type_set_query",
       identifier: "main.c.compound_type_set_query()",
       from(...args) {
         return sql`${compound_type_set_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "compound_type_set_query"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    compound_type_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+    compound_type_mutation: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "compound_type_mutation",
       identifier: "main.b.compound_type_mutation(c.compound_type)",
       from(...args) {
@@ -8271,26 +6498,21 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     }),
-    compound_type_query: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+    compound_type_query: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "compound_type_query",
       identifier: "main.b.compound_type_query(c.compound_type)",
       from(...args) {
@@ -8298,26 +6520,20 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_query"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     }),
-    compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+    compound_type_set_mutation: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "compound_type_set_mutation",
       identifier: "main.b.compound_type_set_mutation(c.compound_type)",
       from(...args) {
@@ -8325,26 +6541,22 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_set_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
-    list_of_compound_types_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
+    list_of_compound_types_mutation: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "list_of_compound_types_mutation",
       identifier: "main.c.list_of_compound_types_mutation(c._compound_type)",
       from(...args) {
@@ -8352,167 +6564,22 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "records",
-        required: true,
-        notNull: false,
-        codec: compoundTypeArrayCodec
+        codec: compoundTypeArrayCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "list_of_compound_types_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
-    }),
-    mutation_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, {
-      name: "mutation_compound_type_array",
-      identifier: "main.a.mutation_compound_type_array(c.compound_type)",
-      from(...args) {
-        return sql`${mutation_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
-      }],
-      returnsArray: true,
-      returnsSetof: false,
       isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "mutation_compound_type_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    query_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, {
-      name: "query_compound_type_array",
-      identifier: "main.a.query_compound_type_array(c.compound_type)",
-      from(...args) {
-        return sql`${query_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
-      }],
-      returnsArray: true,
-      returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "query_compound_type_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    compound_type_array_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, {
-      name: "compound_type_array_mutation",
-      identifier: "main.b.compound_type_array_mutation(c.compound_type)",
-      from(...args) {
-        return sql`${compound_type_array_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
-      }],
-      returnsArray: true,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "compound_type_array_mutation"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    compound_type_array_query: PgResource.functionResourceOptions(resourceConfig_compound_type, {
-      name: "compound_type_array_query",
-      identifier: "main.b.compound_type_array_query(c.compound_type)",
-      from(...args) {
-        return sql`${compound_type_array_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
-      }],
-      returnsArray: true,
-      returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "compound_type_array_query"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    post: registryConfig_pgResources_post_post,
-    post_computed_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, {
-      name: "post_computed_compound_type_array",
-      identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
-      from(...args) {
-        return sql`${post_computed_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
-      }, {
-        name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
-      }],
-      returnsArray: true,
-      returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "post_computed_compound_type_array"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    }),
-    table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+    table_mutation: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
       name: "table_mutation",
       identifier: "main.c.table_mutation(int4)",
       from(...args) {
@@ -8520,26 +6587,21 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "table_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     }),
-    table_query: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+    table_query: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
       name: "table_query",
       identifier: "main.c.table_query(int4)",
       from(...args) {
@@ -8547,26 +6609,20 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "table_query"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     }),
-    post_with_suffix: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+    post_with_suffix: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
       name: "post_with_suffix",
       identifier: "main.a.post_with_suffix(a.post,text)",
       from(...args) {
@@ -8574,19 +6630,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        required: true,
-        notNull: false,
-        codec: postCodec
+        codec: postCodec,
+        required: true
       }, {
         name: "suffix",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
@@ -8598,9 +6649,125 @@ const registry = makeRegistry({
         },
         canExecute: true
       },
-      description: undefined
+      isMutation: true
     }),
-    post_many: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+    mutation_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "mutation_compound_type_array",
+      identifier: "main.a.mutation_compound_type_array(c.compound_type)",
+      from(...args) {
+        return sql`${mutation_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        codec: compoundTypeCodec,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "mutation_compound_type_array"
+        },
+        canExecute: false
+      },
+      isMutation: true,
+      returnsArray: true
+    }),
+    query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "query_compound_type_array",
+      identifier: "main.a.query_compound_type_array(c.compound_type)",
+      from(...args) {
+        return sql`${query_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        codec: compoundTypeCodec,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "query_compound_type_array"
+        },
+        canExecute: false
+      },
+      returnsArray: true
+    }),
+    compound_type_array_mutation: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "compound_type_array_mutation",
+      identifier: "main.b.compound_type_array_mutation(c.compound_type)",
+      from(...args) {
+        return sql`${compound_type_array_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        codec: compoundTypeCodec,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_array_mutation"
+        },
+        canExecute: false
+      },
+      isMutation: true,
+      returnsArray: true
+    }),
+    compound_type_array_query: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "compound_type_array_query",
+      identifier: "main.b.compound_type_array_query(c.compound_type)",
+      from(...args) {
+        return sql`${compound_type_array_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        codec: compoundTypeCodec,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_array_query"
+        },
+        canExecute: false
+      },
+      returnsArray: true
+    }),
+    post_computed_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "post_computed_compound_type_array",
+      identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
+      from(...args) {
+        return sql`${post_computed_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "post",
+        codec: postCodec,
+        required: true
+      }, {
+        name: "object",
+        codec: compoundTypeCodec,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "post_computed_compound_type_array"
+        },
+        canExecute: false
+      },
+      returnsArray: true
+    }),
+    post_many: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
       name: "post_many",
       identifier: "main.a.post_many(a._post)",
       from(...args) {
@@ -8608,27 +6775,23 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "posts",
-        required: true,
-        notNull: false,
-        codec: postArrayCodec
+        codec: postArrayCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "a",
           name: "post_many"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
     person_computed_out: {
-      executor,
+      executor: executor,
       name: "person_computed_out",
       identifier: "main.c.person_computed_out(c.person,text)",
       from(...args) {
@@ -8636,14 +6799,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8660,10 +6819,10 @@ const registry = makeRegistry({
         singleOutputParameterName: "o1",
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_first_name: {
-      executor,
+      executor: executor,
       name: "person_first_name",
       identifier: "main.c.person_first_name(c.person)",
       from(...args) {
@@ -8671,14 +6830,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8692,10 +6847,11 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
+      isUnique: true,
       description: "The first name of the person."
     },
     person_computed_out_out: {
-      executor,
+      executor: executor,
       name: "person_computed_out_out",
       identifier: "main.c.person_computed_out_out(c.person,text,text)",
       from(...args) {
@@ -8703,14 +6859,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8718,13 +6870,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_out_out"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_computed_inout: {
-      executor,
+      executor: executor,
       name: "person_computed_inout",
       identifier: "main.c.person_computed_inout(c.person,text)",
       from(...args) {
@@ -8732,19 +6883,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }, {
         name: "ino",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8752,14 +6898,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_inout"
         },
-        tags: {},
         singleOutputParameterName: "ino",
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_computed_inout_out: {
-      executor,
+      executor: executor,
       name: "person_computed_inout_out",
       identifier: "main.c.person_computed_inout_out(c.person,text,text)",
       from(...args) {
@@ -8767,19 +6912,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }, {
         name: "ino",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8787,13 +6927,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_inout_out"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_exists: {
-      executor,
+      executor: executor,
       name: "person_exists",
       identifier: "main.c.person_exists(c.person,b.email)",
       from(...args) {
@@ -8801,19 +6940,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }, {
         name: "email",
-        required: true,
-        notNull: false,
-        codec: emailCodec
+        codec: emailCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.boolean,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8826,10 +6960,10 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_computed_first_arg_inout_out: {
-      executor,
+      executor: executor,
       name: "person_computed_first_arg_inout_out",
       identifier: "main.c.person_computed_first_arg_inout_out(c.person,int4)",
       from(...args) {
@@ -8837,14 +6971,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8852,13 +6982,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_first_arg_inout_out"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_optional_missing_middle_1: {
-      executor,
+      executor: executor,
       name: "person_optional_missing_middle_1",
       identifier: "main.c.person_optional_missing_middle_1(c.person,int4,int4,int4)",
       from(...args) {
@@ -8866,29 +6995,24 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
+        codec: personCodec,
         required: true,
-        notNull: true,
-        codec: personCodec
+        notNull: true
       }, {
         name: "",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "c",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8896,13 +7020,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_optional_missing_middle_1"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_optional_missing_middle_2: {
-      executor,
+      executor: executor,
       name: "person_optional_missing_middle_2",
       identifier: "main.c.person_optional_missing_middle_2(c.person,int4,int4,int4)",
       from(...args) {
@@ -8910,29 +7033,24 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
+        codec: personCodec,
         required: true,
-        notNull: true,
-        codec: personCodec
+        notNull: true
       }, {
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "c",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8940,13 +7058,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_optional_missing_middle_2"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_optional_missing_middle_3: {
-      executor,
+      executor: executor,
       name: "person_optional_missing_middle_3",
       identifier: "main.c.person_optional_missing_middle_3(c.person,int4,int4,int4)",
       from(...args) {
@@ -8954,29 +7071,24 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
+        codec: personCodec,
         required: true,
-        notNull: true,
-        codec: personCodec
+        notNull: true
       }, {
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "c",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -8984,13 +7096,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_optional_missing_middle_3"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_optional_missing_middle_4: {
-      executor,
+      executor: executor,
       name: "person_optional_missing_middle_4",
       identifier: "main.c.person_optional_missing_middle_4(c.person,int4,int4,int4)",
       from(...args) {
@@ -8998,29 +7109,24 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
+        codec: personCodec,
         required: true,
-        notNull: true,
-        codec: personCodec
+        notNull: true
       }, {
         name: "",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "b",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -9028,13 +7134,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_optional_missing_middle_4"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     person_optional_missing_middle_5: {
-      executor,
+      executor: executor,
       name: "person_optional_missing_middle_5",
       identifier: "main.c.person_optional_missing_middle_5(c.person,int4,int4,int4)",
       from(...args) {
@@ -9042,29 +7147,24 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
+        codec: personCodec,
         required: true,
-        notNull: true,
-        codec: personCodec
+        notNull: true
       }, {
         name: "a",
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }, {
         name: "",
-        required: false,
-        notNull: true,
-        codec: TYPES.int
+        codec: TYPES.int,
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -9072,13 +7172,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_optional_missing_middle_5"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_out_complex: {
-      executor,
+      executor: executor,
       name: "func_out_complex",
       identifier: "main.c.func_out_complex(int4,text,int4,c.compound_type,c.person)",
       from(...args) {
@@ -9086,19 +7185,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -9106,13 +7200,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_complex"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
     func_out_complex_setof: {
-      executor,
+      executor: executor,
       name: "func_out_complex_setof",
       identifier: "main.c.func_out_complex_setof(int4,text,int4,c.compound_type,c.person)",
       from(...args) {
@@ -9120,19 +7213,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -9140,13 +7228,11 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_complex_setof"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     },
     mutation_out_complex: {
-      executor,
+      executor: executor,
       name: "mutation_out_complex",
       identifier: "main.c.mutation_out_complex(int4,text,int4,c.compound_type,c.person)",
       from(...args) {
@@ -9154,19 +7240,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -9174,13 +7255,13 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_complex"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mutation_out_complex_setof: {
-      executor,
+      executor: executor,
       name: "mutation_out_complex_setof",
       identifier: "main.c.mutation_out_complex_setof(int4,text,int4,c.compound_type,c.person)",
       from(...args) {
@@ -9188,19 +7269,14 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !true,
       codec: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: true,
       extensions: {
         pg: {
@@ -9208,13 +7284,12 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_complex_setof"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     },
     person_computed_complex: {
-      executor,
+      executor: executor,
       name: "person_computed_complex",
       identifier: "main.c.person_computed_complex(c.person,int4,text,int4,c.compound_type,c.person)",
       from(...args) {
@@ -9222,24 +7297,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }, {
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
       codec: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
-      uniques: [],
-      isMutation: false,
       hasImplicitOrder: false,
       extensions: {
         pg: {
@@ -9247,12 +7316,11 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_complex"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isUnique: true
     },
-    person_first_post: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+    person_first_post: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
       name: "person_first_post",
       identifier: "main.c.person_first_post(c.person)",
       from(...args) {
@@ -9260,37 +7328,51 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "person_first_post"
         },
-        tags: {},
         canExecute: false
       },
       description: "The first post by the person."
     }),
-    person: registryConfig_pgResources_person_person,
-    badly_behaved_function: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    person: person_resourceOptionsConfig,
+    lists: {
+      executor: executor,
+      name: "lists",
+      identifier: "main.b.lists",
+      from: listsIdentifier,
+      codec: listsCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "lists"
+        },
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
+    },
+    badly_behaved_function: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "badly_behaved_function",
       identifier: "main.c.badly_behaved_function()",
       from(...args) {
         return sql`${badly_behaved_functionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -9302,129 +7384,107 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    func_out_table: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    func_out_table: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "func_out_table",
       identifier: "main.c.func_out_table(c.person)",
       from(...args) {
         return sql`${func_out_tableFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "func_out_table"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     }),
-    func_out_table_setof: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    func_out_table_setof: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "func_out_table_setof",
       identifier: "main.c.func_out_table_setof(c.person)",
       from(...args) {
         return sql`${func_out_table_setofFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "func_out_table_setof"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    mutation_out_table: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    mutation_out_table: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "mutation_out_table",
       identifier: "main.c.mutation_out_table(c.person)",
       from(...args) {
         return sql`${mutation_out_tableFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "mutation_out_table"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     }),
-    mutation_out_table_setof: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    mutation_out_table_setof: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "mutation_out_table_setof",
       identifier: "main.c.mutation_out_table_setof(c.person)",
       from(...args) {
         return sql`${mutation_out_table_setofFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "mutation_out_table_setof"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
-    table_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    table_set_mutation: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "table_set_mutation",
       identifier: "main.c.table_set_mutation()",
       from(...args) {
         return sql`${table_set_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "table_set_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
-    table_set_query: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    table_set_query: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "table_set_query",
       identifier: "main.c.table_set_query()",
       from(...args) {
         return sql`${table_set_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -9438,31 +7498,27 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    table_set_query_plpgsql: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    table_set_query_plpgsql: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "table_set_query_plpgsql",
       identifier: "main.c.table_set_query_plpgsql()",
       from(...args) {
         return sql`${table_set_query_plpgsqlFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "table_set_query_plpgsql"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    person_computed_first_arg_inout: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    person_computed_first_arg_inout: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "person_computed_first_arg_inout",
       identifier: "main.c.person_computed_first_arg_inout(c.person)",
       from(...args) {
@@ -9470,27 +7526,21 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "person_computed_first_arg_inout"
         },
-        tags: {},
         singleOutputParameterName: "person",
         canExecute: false
-      },
-      description: undefined
+      }
     }),
-    person_friends: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, {
+    person_friends: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "person_friends",
       identifier: "main.c.person_friends(c.person)",
       from(...args) {
@@ -9498,14 +7548,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
@@ -9518,89 +7564,47 @@ const registry = makeRegistry({
         },
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    lists: {
-      executor: executor,
-      name: "lists",
-      identifier: "main.b.lists",
-      from: listsIdentifier,
-      codec: listsCodec,
-      uniques: [{
-        isPrimary: true,
-        attributes: ["id"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null
-          }
-        }
-      }],
-      isVirtual: false,
-      description: undefined,
-      extensions: {
-        description: undefined,
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "lists"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {},
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      }
-    },
-    types: registryConfig_pgResources_types_types,
-    type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    types: types_resourceOptionsConfig,
+    type_function_connection: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_connection",
       identifier: "main.b.type_function_connection()",
       from(...args) {
         return sql`${type_function_connectionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_connection"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    type_function_connection_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_connection_mutation: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_connection_mutation",
       identifier: "main.b.type_function_connection_mutation()",
       from(...args) {
         return sql`${type_function_connection_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_connection_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
-    type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function",
       identifier: "main.b.type_function(int4)",
       from(...args) {
@@ -9608,26 +7612,20 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     }),
-    type_function_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_mutation: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_mutation",
       identifier: "main.b.type_function_mutation(int4)",
       from(...args) {
@@ -9635,26 +7633,21 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true
     }),
-    person_type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    person_type_function_connection: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "person_type_function_connection",
       identifier: "main.c.person_type_function_connection(c.person)",
       from(...args) {
@@ -9662,26 +7655,21 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "person_type_function_connection"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    person_type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    person_type_function: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "person_type_function",
       identifier: "main.c.person_type_function(c.person,int4)",
       from(...args) {
@@ -9689,75 +7677,61 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }, {
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "person_type_function"
         },
-        tags: {},
         canExecute: false
-      },
-      description: undefined
+      }
     }),
-    type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_list: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_list",
       identifier: "main.b.type_function_list()",
       from(...args) {
         return sql`${type_function_listFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_list"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      returnsArray: true
     }),
-    type_function_list_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_list_mutation: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_list_mutation",
       identifier: "main.b.type_function_list_mutation()",
       from(...args) {
         return sql`${type_function_list_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_list_mutation"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      isMutation: true,
+      returnsArray: true
     }),
-    person_type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    person_type_function_list: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "person_type_function_list",
       identifier: "main.c.person_type_function_list(c.person)",
       from(...args) {
@@ -9765,24 +7739,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        required: true,
-        notNull: false,
-        codec: personCodec
+        codec: personCodec,
+        required: true
       }],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
           name: "person_type_function_list"
         },
-        tags: {},
         canExecute: false
       },
-      description: undefined
+      returnsArray: true
     })
   },
   pgRelations: {
@@ -9791,269 +7760,142 @@ const registry = makeRegistry({
       __proto__: null,
       compoundKeyByMyCompoundKey1AndCompoundKey2: {
         localCodec: foreignKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: compound_key_resourceOptionsConfig,
         localAttributes: ["compound_key_1", "compound_key_2"],
         remoteAttributes: ["person_id_1", "person_id_2"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       personByMyPersonId: {
         localCodec: foreignKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["person_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     post: {
       __proto__: null,
       personByMyAuthorId: {
         localCodec: postCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["author_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       typesByTheirSmallint: {
         localCodec: postCodec,
-        remoteResourceOptions: registryConfig_pgResources_types_types,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: types_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["smallint"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       typesByTheirId: {
         localCodec: postCodec,
-        remoteResourceOptions: registryConfig_pgResources_types_types,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: types_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     uniqueForeignKey: {
       __proto__: null,
       compoundKeyByMyCompoundKey1AndCompoundKey2: {
         localCodec: uniqueForeignKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: compound_key_resourceOptionsConfig,
         localAttributes: ["compound_key_1", "compound_key_2"],
         remoteAttributes: ["person_id_1", "person_id_2"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     authPayload: {
       __proto__: null,
       personByMyId: {
         localCodec: authPayloadCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     types: {
       __proto__: null,
       postByMySmallint: {
         localCodec: typesCodec,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: post_resourceOptionsConfig,
         localAttributes: ["smallint"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       postByMyId: {
         localCodec: typesCodec,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: post_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     compoundKey: {
       __proto__: null,
       personByMyPersonId1: {
         localCodec: compoundKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["person_id_1"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       personByMyPersonId2: {
         localCodec: compoundKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["person_id_2"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       foreignKeysByTheirCompoundKey1AndCompoundKey2: {
         localCodec: compoundKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_foreign_key_foreign_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: foreign_key_resourceOptionsConfig,
         localAttributes: ["person_id_1", "person_id_2"],
         remoteAttributes: ["compound_key_1", "compound_key_2"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       uniqueForeignKeyByTheirCompoundKey1AndCompoundKey2: {
         localCodec: compoundKeyCodec,
-        remoteResourceOptions: registryConfig_pgResources_unique_foreign_key_unique_foreign_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: unique_foreign_key_resourceOptionsConfig,
         localAttributes: ["person_id_1", "person_id_2"],
         remoteAttributes: ["compound_key_1", "compound_key_2"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     leftArm: {
       __proto__: null,
       personByMyPersonId: {
         localCodec: leftArmCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["person_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     person: {
       __proto__: null,
       postsByTheirAuthorId: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: post_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["author_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       foreignKeysByTheirPersonId: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_foreign_key_foreign_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: foreign_key_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["person_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       personSecretByTheirPersonId: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_secret_person_secret,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_secret_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["person_id"],
         isUnique: true,
@@ -10062,73 +7904,46 @@ const registry = makeRegistry({
         extensions: {
           tags: {
             forwardDescription: "The `Person` this `PersonSecret` belongs to.",
-            backwardDescription: "This `Person`'s `PersonSecret`.",
-            behavior: []
+            backwardDescription: "This `Person`'s `PersonSecret`."
           }
         }
       },
       leftArmByTheirPersonId: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_left_arm_left_arm,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: left_arm_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["person_id"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       compoundKeysByTheirPersonId1: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: compound_key_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["person_id_1"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       compoundKeysByTheirPersonId2: {
         localCodec: personCodec,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: compound_key_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["person_id_2"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     personSecret: {
       __proto__: null,
       personByMyPersonId: {
         localCodec: personSecretCodec,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: person_resourceOptionsConfig,
         localAttributes: ["person_id"],
         remoteAttributes: ["id"],
         isUnique: true,
-        isReferencee: false,
         description: "The `Person` this `PersonSecret` belongs to.",
         extensions: {
           tags: {
             forwardDescription: "The `Person` this `PersonSecret` belongs to.",
-            backwardDescription: "This `Person`'s `PersonSecret`.",
-            behavior: []
+            backwardDescription: "This `Person`'s `PersonSecret`."
           }
         }
       }
@@ -10143,28 +7958,43 @@ const EMPTY_ARRAY = [];
 const makeArgs_current_user_id = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
-const nodeIdHandler_PersonSecret = {
-  typeName: "PersonSecret",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: "This is deprecated (comment on table c.person_secret).",
-  plan($record) {
-    return list([constant("person_secrets", false), $record.get("person_id")]);
-  },
-  getSpec($list) {
-    return {
-      person_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_person_secretPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "person_secrets";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_PersonSecret = makeTableNodeIdHandler({
+  typeName: "PersonSecret",
+  identifier: "person_secrets",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_person_secretPgResource,
+  pk: person_secretUniques[0].attributes,
+  deprecationReason: "This is deprecated (comment on table c.person_secret)."
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -10198,86 +8028,64 @@ const nodeFetcher_PersonSecret = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandler_PersonSecret);
-const nodeIdHandler_LeftArm = {
+const nodeIdHandler_LeftArm = makeTableNodeIdHandler({
   typeName: "LeftArm",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("left_arms", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_left_armPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "left_arms";
-  }
-};
+  identifier: "left_arms",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_left_armPgResource,
+  pk: left_armUniques[0].attributes
+});
 const nodeFetcher_LeftArm = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LeftArm));
   return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec($decoded));
 };
-const nodeIdHandler_Post = {
+const nodeIdHandler_Post = makeTableNodeIdHandler({
   typeName: "Post",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("posts", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_postPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "posts";
-  }
-};
+  identifier: "posts",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_postPgResource,
+  pk: postUniques[0].attributes
+});
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
   return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
-const nodeIdHandler_Person = {
+const nodeIdHandler_Person = makeTableNodeIdHandler({
   typeName: "Person",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("people", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_personPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "people";
-  }
-};
+  identifier: "people",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_personPgResource,
+  pk: personUniques[0].attributes
+});
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
   return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -10350,8 +8158,18 @@ const parseValueLiteral = (ast, variables) => {
       return undefined;
   }
 };
-function InternetAddressSerialize(value) {
+function toString(value) {
   return "" + value;
+}
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const pgFieldSource_post_computed_with_optional_argPgResource = registry.pgResources["post_computed_with_optional_arg"];
 const resource_compound_keyPgResource = registry.pgResources["compound_key"];
@@ -10359,10 +8177,9 @@ const pgFieldSource_person_computed_outPgResource = registry.pgResources["person
 const pgFieldSource_person_first_namePgResource = registry.pgResources["person_first_name"];
 const argDetailsSimple_left_arm_identity = [{
   graphqlArgName: "leftArm",
-  postgresArgName: "left_arm",
   pgCodec: leftArmCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "left_arm",
+  required: true
 }];
 function makeArg(path, args, details) {
   const {
@@ -10383,10 +8200,26 @@ function makeArg(path, args, details) {
 }
 const makeArgs_left_arm_identity = (args, path = []) => argDetailsSimple_left_arm_identity.map(details => makeArg(path, args, details));
 const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
+function pgSelectFromPayload($payload) {
+  const $result = $payload.getStepForKey("result");
+  const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+  const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+  if ($pgSelect instanceof PgSelectStep) {
+    return $pgSelect;
+  } else {
+    throw new Error(`Could not determine PgSelectStep for ${$result}`);
+  }
+}
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs_LeftArm = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
@@ -10403,6 +8236,9 @@ const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -10423,6 +8259,36 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -11715,29 +9581,13 @@ export const objects = {
           return connection(resource_left_armPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPeople: {
@@ -11745,29 +9595,13 @@ export const objects = {
           return connection(resource_personPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPersonSecrets: {
@@ -11775,29 +9609,13 @@ export const objects = {
           return connection(resource_person_secretPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPosts: {
@@ -11805,29 +9623,13 @@ export const objects = {
           return connection(resource_postPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       currentUserId($root, args, _info) {
@@ -11913,47 +9715,38 @@ export const objects = {
     plans: {
       createLeftArm: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_left_armPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_left_armPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPerson: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_personPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_personPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPersonSecret: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_person_secretPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_person_secretPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteLeftArm: {
@@ -11965,9 +9758,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLeftArmById: {
@@ -11981,9 +9772,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLeftArmByPersonId: {
@@ -11997,9 +9786,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePerson: {
@@ -12011,9 +9798,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePersonByEmail: {
@@ -12027,9 +9812,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePersonById: {
@@ -12043,9 +9826,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePersonSecret: {
@@ -12057,9 +9838,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePersonSecretByPersonId: {
@@ -12073,9 +9852,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       leftArmIdentity: {
@@ -12087,18 +9864,9 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
+          input(_, $payload, arg) {
+            const $pgSelect = pgSelectFromPayload($payload);
+            arg.apply($pgSelect);
           }
         }
       },
@@ -12111,9 +9879,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLeftArmById: {
@@ -12127,9 +9893,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLeftArmByPersonId: {
@@ -12143,9 +9907,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePerson: {
@@ -12157,9 +9919,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePersonByEmail: {
@@ -12173,9 +9933,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePersonById: {
@@ -12189,9 +9947,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -12227,13 +9983,8 @@ export const objects = {
   CreateLeftArmPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      leftArm($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      leftArm: planCreatePayloadResult,
       leftArmEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
       },
@@ -12242,67 +9993,46 @@ export const objects = {
           id: $record.get("result").get("person_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePersonPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      person($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      person: planCreatePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePersonSecretPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       personByPersonId($record) {
         return resource_personPgResource.get({
           id: $record.get("result").get("person_id")
         });
       },
-      personSecret($object) {
-        return $object.get("result");
-      },
+      personSecret: planCreatePayloadResult,
       personSecretEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteLeftArmPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedLeftArmId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_LeftArm.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      leftArm($object) {
-        return $object.get("result");
-      },
+      leftArm: planUpdateOrDeletePayloadResult,
       leftArmEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
       },
@@ -12311,60 +10041,44 @@ export const objects = {
           id: $record.get("result").get("person_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePersonPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPersonId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Person.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person($object) {
-        return $object.get("result");
-      },
+      person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePersonSecretPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPersonSecretId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_PersonSecret.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       personByPersonId($record) {
         return resource_personPgResource.get({
           id: $record.get("result").get("person_id")
         });
       },
-      personSecret($object) {
-        return $object.get("result");
-      },
+      personSecret: planUpdateOrDeletePayloadResult,
       personSecretEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   LeftArm: {
@@ -12412,25 +10126,19 @@ export const objects = {
           id: $record.get("result").get("person_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   LeftArmsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   PeopleConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Person: {
@@ -12470,29 +10178,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       site($record) {
@@ -12543,9 +10235,7 @@ export const objects = {
   PersonSecretsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Post: {
@@ -12575,21 +10265,14 @@ export const objects = {
   PostsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateLeftArmPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      leftArm($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      leftArm: planUpdateOrDeletePayloadResult,
       leftArmEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
       },
@@ -12598,27 +10281,18 @@ export const objects = {
           id: $record.get("result").get("person_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePersonPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      person($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   WrappedUrl: {
@@ -12647,94 +10321,60 @@ export const interfaces = {
 export const inputObjects = {
   CreateLeftArmInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      leftArm(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      leftArm: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      person(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      person: applyCreateFields
     }
   },
   CreatePersonSecretInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personSecret(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      personSecret: applyCreateFields
     }
   },
   DeleteLeftArmByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLeftArmInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonByEmailInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonSecretInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   LeftArmBaseInput: {
@@ -12769,40 +10409,16 @@ export const inputObjects = {
   LeftArmCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       lengthInMetres($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "length_in_metres",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-          }
-        });
+        return applyAttributeCondition("length_in_metres", TYPES.float, $condition, val);
       },
       mood($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "mood",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("mood", TYPES.text, $condition, val);
       },
       personId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
       }
     }
   },
@@ -12838,22 +10454,10 @@ export const inputObjects = {
   PersonCondition: {
     plans: {
       about($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "about",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("about", TYPES.text, $condition, val);
       },
       aliases($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "aliases",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("aliases", LIST_TYPES.text, $condition, val);
       },
       computedOut($condition, val) {
         if (val === undefined) return;
@@ -12866,85 +10470,31 @@ export const inputObjects = {
         $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_person_computed_outPgResource.codec)}`);
       },
       config($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "config",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
-          }
-        });
+        return applyAttributeCondition("config", TYPES.hstore, $condition, val);
       },
       createdAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-          }
-        });
+        return applyAttributeCondition("created_at", TYPES.timestamp, $condition, val);
       },
       email($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "email",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
-          }
-        });
+        return applyAttributeCondition("email", emailCodec, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       lastLoginFromIp($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_login_from_ip",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-          }
-        });
+        return applyAttributeCondition("last_login_from_ip", TYPES.inet, $condition, val);
       },
       lastLoginFromSubnet($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_login_from_subnet",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-          }
-        });
+        return applyAttributeCondition("last_login_from_subnet", TYPES.cidr, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_full_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("person_full_name", TYPES.varchar, $condition, val);
       },
       site($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "site",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
-          }
-        });
+        return applyAttributeCondition("site", wrappedUrlCodec, $condition, val);
       },
       userMac($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "user_mac",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-          }
-        });
+        return applyAttributeCondition("user_mac", TYPES.macaddr, $condition, val);
       }
     }
   },
@@ -13021,22 +10571,10 @@ export const inputObjects = {
   PersonSecretCondition: {
     plans: {
       personId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "person_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
       },
       secret($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "sekrit",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("sekrit", TYPES.text, $condition, val);
       }
     }
   },
@@ -13054,22 +10592,10 @@ export const inputObjects = {
   PostCondition: {
     plans: {
       authorId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("author_id", TYPES.int, $condition, val);
       },
       body($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "body",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("body", TYPES.text, $condition, val);
       },
       computedWithOptionalArg($condition, val) {
         if (val === undefined) return;
@@ -13082,95 +10608,47 @@ export const inputObjects = {
         $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_post_computed_with_optional_argPgResource.codec)}`);
       },
       headline($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "headline",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("headline", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       }
     }
   },
   UpdateLeftArmByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      leftArmPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      leftArmPatch: applyPatchFields
     }
   },
   UpdateLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      leftArmPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      leftArmPatch: applyPatchFields
     }
   },
   UpdateLeftArmInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      leftArmPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      leftArmPatch: applyPatchFields
     }
   },
   UpdatePersonByEmailInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      personPatch: applyPatchFields
     }
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      personPatch: applyPatchFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      personPatch: applyPatchFields
     }
   },
   WrappedUrlInput: {
@@ -13187,23 +10665,23 @@ export const inputObjects = {
 };
 export const scalars = {
   Cursor: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Datetime: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Email: {
@@ -13212,13 +10690,13 @@ export const scalars = {
     parseLiteral: GraphQLString.parseLiteral
   },
   InternetAddress: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   KeyValueHash: {

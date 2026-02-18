@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,28 +69,22 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
 });
 const post_tableIdentifier = sql.identifier("smart_comment_relations", "post");
-const spec_post_table = {
+const post_tableCodec = recordCodec({
   name: "post_table",
   identifier: post_tableIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -110,8 +100,7 @@ const spec_post_table = {
     }
   },
   executor: executor
-};
-const post_tableCodec = recordCodec(spec_post_table);
+});
 const postsIdentifier = sql.identifier("smart_comment_relations", "post_view");
 const postsCodec = recordCodec({
   name: "posts",
@@ -119,16 +108,10 @@ const postsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -145,31 +128,21 @@ const postsCodec = recordCodec({
   executor: executor
 });
 const offer_tableIdentifier = sql.identifier("smart_comment_relations", "offer");
-const spec_offer_table = {
+const offer_tableCodec = recordCodec({
   name: "offer_table",
   identifier: offer_tableIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     post_id: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -185,8 +158,7 @@ const spec_offer_table = {
     }
   },
   executor: executor
-};
-const offer_tableCodec = recordCodec(spec_offer_table);
+});
 const offersIdentifier = sql.identifier("smart_comment_relations", "offer_view");
 const offersCodec = recordCodec({
   name: "offers",
@@ -194,25 +166,13 @@ const offersCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     post_id: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -236,25 +196,15 @@ const streetsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -276,43 +226,25 @@ const propertiesCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     street_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     name_or_number: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "properties"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -324,67 +256,39 @@ const streetPropertyCodec = recordCodec({
   attributes: {
     __proto__: null,
     str_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     prop_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     current_owner: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "street_property"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const housesIdentifier = sql.identifier("smart_comment_relations", "houses");
-const spec_houses = {
+const housesCodec = recordCodec({
   name: "houses",
   identifier: housesIdentifier,
   attributes: {
     __proto__: null,
     building_name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     property_name_or_number: {
-      description: undefined,
       codec: TYPES.text,
       notNull: true,
-      hasDefault: false,
       extensions: {
         tags: {
           notNull: true
@@ -392,10 +296,8 @@ const spec_houses = {
       }
     },
     street_name: {
-      description: undefined,
       codec: TYPES.text,
       notNull: true,
-      hasDefault: false,
       extensions: {
         tags: {
           notNull: true
@@ -403,43 +305,20 @@ const spec_houses = {
       }
     },
     street_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     building_id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     property_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     floors: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -455,8 +334,7 @@ const spec_houses = {
     }
   },
   executor: executor
-};
-const housesCodec = recordCodec(spec_houses);
+});
 const buildingsIdentifier = sql.identifier("smart_comment_relations", "buildings");
 const buildingsCodec = recordCodec({
   name: "buildings",
@@ -464,52 +342,29 @@ const buildingsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     property_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     name: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     floors: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     is_primary: {
-      description: undefined,
       codec: TYPES.boolean,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -524,324 +379,192 @@ const buildingsCodec = recordCodec({
   },
   executor: executor
 });
-const registryConfig_pgResources_post_table_post_table = {
+const post_table_resourceOptionsConfig = {
   executor: executor,
   name: "post_table",
   identifier: "main.smart_comment_relations.post",
   from: post_tableIdentifier,
   codec: post_tableCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "post"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       name: "post_table",
       omit: true,
-      behavior: spec_post_table.extensions.tags.behavior
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     }
-  }
+  },
+  uniques: [{
+    attributes: ["id"],
+    isPrimary: true
+  }]
 };
 const postsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_posts_posts = {
+const posts_resourceOptionsConfig = {
   executor: executor,
   name: "posts",
   identifier: "main.smart_comment_relations.post_view",
   from: postsIdentifier,
   codec: postsCodec,
-  uniques: postsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "post_view"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       name: "posts",
       primaryKey: "id"
     }
-  }
+  },
+  uniques: postsUniques
 };
-const registryConfig_pgResources_offer_table_offer_table = {
+const offer_table_resourceOptionsConfig = {
   executor: executor,
   name: "offer_table",
   identifier: "main.smart_comment_relations.offer",
   from: offer_tableIdentifier,
   codec: offer_tableCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "offer"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       name: "offer_table",
       omit: true,
-      behavior: spec_offer_table.extensions.tags.behavior
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     }
-  }
+  },
+  uniques: [{
+    attributes: ["id"],
+    isPrimary: true
+  }]
 };
 const offersUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_offers_offers = {
+const offers_resourceOptionsConfig = {
   executor: executor,
   name: "offers",
   identifier: "main.smart_comment_relations.offer_view",
   from: offersIdentifier,
   codec: offersCodec,
-  uniques: offersUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "offer_view"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       name: "offers",
       primaryKey: "id",
       foreignKey: "(post_id) references post_view (id)"
     }
-  }
+  },
+  uniques: offersUniques
 };
 const streetsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["name"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["name"]
 }];
-const registryConfig_pgResources_streets_streets = {
+const streets_resourceOptionsConfig = {
   executor: executor,
   name: "streets",
   identifier: "main.smart_comment_relations.streets",
   from: streetsIdentifier,
   codec: streetsCodec,
-  uniques: streetsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "streets"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       unique: "name"
     }
-  }
+  },
+  uniques: streetsUniques
 };
 const propertiesUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_properties_properties = {
+const properties_resourceOptionsConfig = {
   executor: executor,
   name: "properties",
   identifier: "main.smart_comment_relations.properties",
   from: propertiesIdentifier,
   codec: propertiesCodec,
-  uniques: propertiesUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "properties"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: propertiesUniques
 };
 const street_propertyUniques = [{
-  isPrimary: true,
   attributes: ["str_id", "prop_id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_street_property_street_property = {
+const street_property_resourceOptionsConfig = {
   executor: executor,
   name: "street_property",
   identifier: "main.smart_comment_relations.street_property",
   from: streetPropertyIdentifier,
   codec: streetPropertyCodec,
-  uniques: street_propertyUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "street_property"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: street_propertyUniques
 };
 const housesUniques = [{
-  isPrimary: true,
   attributes: ["street_id", "property_id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["street_name", "property_id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["street_name", "property_id"]
 }, {
-  isPrimary: false,
-  attributes: ["street_id", "property_name_or_number"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["street_id", "property_name_or_number"]
 }, {
-  isPrimary: false,
-  attributes: ["street_name", "building_name"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["street_name", "building_name"]
 }];
 const buildingsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_buildings_buildings = {
+const buildings_resourceOptionsConfig = {
   executor: executor,
   name: "buildings",
   identifier: "main.smart_comment_relations.buildings",
   from: buildingsIdentifier,
   codec: buildingsCodec,
-  uniques: buildingsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
       name: "buildings"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
     }
-  }
+  },
+  uniques: buildingsUniques
 };
 const registry = makeRegistry({
   pgExecutors: {
@@ -1188,24 +911,20 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    post_table: registryConfig_pgResources_post_table_post_table,
-    posts: registryConfig_pgResources_posts_posts,
-    offer_table: registryConfig_pgResources_offer_table_offer_table,
-    offers: registryConfig_pgResources_offers_offers,
-    streets: registryConfig_pgResources_streets_streets,
-    properties: registryConfig_pgResources_properties_properties,
-    street_property: registryConfig_pgResources_street_property_street_property,
+    post_table: post_table_resourceOptionsConfig,
+    posts: posts_resourceOptionsConfig,
+    offer_table: offer_table_resourceOptionsConfig,
+    offers: offers_resourceOptionsConfig,
+    streets: streets_resourceOptionsConfig,
+    properties: properties_resourceOptionsConfig,
+    street_property: street_property_resourceOptionsConfig,
     houses: {
       executor: executor,
       name: "houses",
       identifier: "main.smart_comment_relations.houses",
       from: housesIdentifier,
       codec: housesCodec,
-      uniques: housesUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "smart_comment_relations",
@@ -1217,11 +936,12 @@ const registry = makeRegistry({
         tags: {
           name: "houses",
           primaryKey: "street_id,property_id",
-          unique: spec_houses.extensions.tags.unique
+          unique: ["street_name,property_id", "street_id,property_name_or_number", "street_name,building_name"]
         }
-      }
+      },
+      uniques: housesUniques
     },
-    buildings: registryConfig_pgResources_buildings_buildings
+    buildings: buildings_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -1229,34 +949,22 @@ const registry = makeRegistry({
       __proto__: null,
       propertiesByMyPropertyId: {
         localCodec: buildingsCodec,
-        remoteResourceOptions: registryConfig_pgResources_properties_properties,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: properties_resourceOptionsConfig,
         localAttributes: ["property_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       namedAfterStreet: {
         localCodec: buildingsCodec,
-        remoteResourceOptions: registryConfig_pgResources_streets_streets,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: streets_resourceOptionsConfig,
         localAttributes: ["name"],
         remoteAttributes: ["name"],
         isUnique: true,
-        isReferencee: false,
-        description: undefined,
         extensions: {
           tags: {
             fieldName: "namedAfterStreet",
             foreignFieldName: "buildingsNamedAfterStreet",
-            foreignSimpleFieldName: "buildingsNamedAfterStreetList",
-            behavior: []
+            foreignSimpleFieldName: "buildingsNamedAfterStreetList"
           }
         }
       }
@@ -1265,202 +973,110 @@ const registry = makeRegistry({
       __proto__: null,
       postTableByMyPostId: {
         localCodec: offer_tableCodec,
-        remoteResourceOptions: registryConfig_pgResources_post_table_post_table,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: post_table_resourceOptionsConfig,
         localAttributes: ["post_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     offers: {
       __proto__: null,
       postsByMyPostId: {
         localCodec: offersCodec,
-        remoteResourceOptions: registryConfig_pgResources_posts_posts,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: posts_resourceOptionsConfig,
         localAttributes: ["post_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     post_table: {
       __proto__: null,
       offerTablesByTheirPostId: {
         localCodec: post_tableCodec,
-        remoteResourceOptions: registryConfig_pgResources_offer_table_offer_table,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: offer_table_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["post_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     posts: {
       __proto__: null,
       offersByTheirPostId: {
         localCodec: postsCodec,
-        remoteResourceOptions: registryConfig_pgResources_offers_offers,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: offers_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["post_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     properties: {
       __proto__: null,
       streetsByMyStreetId: {
         localCodec: propertiesCodec,
-        remoteResourceOptions: registryConfig_pgResources_streets_streets,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: streets_resourceOptionsConfig,
         localAttributes: ["street_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       streetPropertiesByTheirPropId: {
         localCodec: propertiesCodec,
-        remoteResourceOptions: registryConfig_pgResources_street_property_street_property,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: street_property_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["prop_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       buildingsByTheirPropertyId: {
         localCodec: propertiesCodec,
-        remoteResourceOptions: registryConfig_pgResources_buildings_buildings,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: buildings_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["property_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     streetProperty: {
       __proto__: null,
       propertiesByMyPropId: {
         localCodec: streetPropertyCodec,
-        remoteResourceOptions: registryConfig_pgResources_properties_properties,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: properties_resourceOptionsConfig,
         localAttributes: ["prop_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       streetsByMyStrId: {
         localCodec: streetPropertyCodec,
-        remoteResourceOptions: registryConfig_pgResources_streets_streets,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: streets_resourceOptionsConfig,
         localAttributes: ["str_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     streets: {
       __proto__: null,
       propertiesByTheirStreetId: {
         localCodec: streetsCodec,
-        remoteResourceOptions: registryConfig_pgResources_properties_properties,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: properties_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["street_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       streetPropertiesByTheirStrId: {
         localCodec: streetsCodec,
-        remoteResourceOptions: registryConfig_pgResources_street_property_street_property,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: street_property_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["str_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       buildingsNamedAfterStreet: {
         localCodec: streetsCodec,
-        remoteResourceOptions: registryConfig_pgResources_buildings_buildings,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: buildings_resourceOptionsConfig,
         localAttributes: ["name"],
         remoteAttributes: ["name"],
-        isUnique: false,
         isReferencee: true,
-        description: undefined,
         extensions: {
           tags: {
             fieldName: "namedAfterStreet",
             foreignFieldName: "buildingsNamedAfterStreet",
-            foreignSimpleFieldName: "buildingsNamedAfterStreetList",
-            behavior: []
+            foreignSimpleFieldName: "buildingsNamedAfterStreetList"
           }
         }
       }
@@ -1474,28 +1090,42 @@ const resource_propertiesPgResource = registry.pgResources["properties"];
 const resource_street_propertyPgResource = registry.pgResources["street_property"];
 const resource_housesPgResource = registry.pgResources["houses"];
 const resource_buildingsPgResource = registry.pgResources["buildings"];
-const nodeIdHandler_Post = {
-  typeName: "Post",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("post_views", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_postsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "post_views";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_Post = makeTableNodeIdHandler({
+  typeName: "Post",
+  identifier: "post_views",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_postsPgResource,
+  pk: postsUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -1525,166 +1155,97 @@ const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
   return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
-const nodeIdHandler_Offer = {
+const nodeIdHandler_Offer = makeTableNodeIdHandler({
   typeName: "Offer",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("offer_views", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_offersPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "offer_views";
-  }
-};
+  identifier: "offer_views",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_offersPgResource,
+  pk: offersUniques[0].attributes
+});
 const nodeFetcher_Offer = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Offer));
   return nodeIdHandler_Offer.get(nodeIdHandler_Offer.getSpec($decoded));
 };
-const nodeIdHandler_Street = {
+const nodeIdHandler_Street = makeTableNodeIdHandler({
   typeName: "Street",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("streets", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_streetsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "streets";
-  }
-};
+  identifier: "streets",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_streetsPgResource,
+  pk: streetsUniques[0].attributes
+});
 const nodeFetcher_Street = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Street));
   return nodeIdHandler_Street.get(nodeIdHandler_Street.getSpec($decoded));
 };
-const nodeIdHandler_Property = {
+const nodeIdHandler_Property = makeTableNodeIdHandler({
   typeName: "Property",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("properties", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_propertiesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "properties";
-  }
-};
+  identifier: "properties",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_propertiesPgResource,
+  pk: propertiesUniques[0].attributes
+});
 const nodeFetcher_Property = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Property));
   return nodeIdHandler_Property.get(nodeIdHandler_Property.getSpec($decoded));
 };
-const nodeIdHandler_StreetProperty = {
+const nodeIdHandler_StreetProperty = makeTableNodeIdHandler({
   typeName: "StreetProperty",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("street_properties", false), $record.get("str_id"), $record.get("prop_id")]);
-  },
-  getSpec($list) {
-    return {
-      str_id: inhibitOnNull(access($list, [1])),
-      prop_id: inhibitOnNull(access($list, [2]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_street_propertyPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "street_properties";
-  }
-};
+  identifier: "street_properties",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_street_propertyPgResource,
+  pk: street_propertyUniques[0].attributes
+});
 const nodeFetcher_StreetProperty = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_StreetProperty));
   return nodeIdHandler_StreetProperty.get(nodeIdHandler_StreetProperty.getSpec($decoded));
 };
-const nodeIdHandler_House = {
+const nodeIdHandler_House = makeTableNodeIdHandler({
   typeName: "House",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("houses", false), $record.get("street_id"), $record.get("property_id")]);
-  },
-  getSpec($list) {
-    return {
-      street_id: inhibitOnNull(access($list, [1])),
-      property_id: inhibitOnNull(access($list, [2]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_housesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "houses";
-  }
-};
+  identifier: "houses",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_housesPgResource,
+  pk: housesUniques[0].attributes
+});
 const nodeFetcher_House = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_House));
   return nodeIdHandler_House.get(nodeIdHandler_House.getSpec($decoded));
 };
-const nodeIdHandler_Building = {
+const nodeIdHandler_Building = makeTableNodeIdHandler({
   typeName: "Building",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("buildings", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_buildingsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "buildings";
-  }
-};
+  identifier: "buildings",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_buildingsPgResource,
+  pk: buildingsUniques[0].attributes
+});
 const nodeFetcher_Building = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
   return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -1708,13 +1269,29 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function CursorSerialize(value) {
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
+function applyInputToInsert(_, $object) {
+  return $object;
 }
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Offer = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Offer, $nodeId);
@@ -1759,6 +1336,16 @@ const specFromArgs_Building2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -1779,6 +1366,29 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -4037,29 +3647,13 @@ export const objects = {
           return connection(resource_buildingsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allHouses: {
@@ -4067,29 +3661,13 @@ export const objects = {
           return connection(resource_housesPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allOffers: {
@@ -4097,29 +3675,13 @@ export const objects = {
           return connection(resource_offersPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allPosts: {
@@ -4127,29 +3689,13 @@ export const objects = {
           return connection(resource_postsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allProperties: {
@@ -4157,29 +3703,13 @@ export const objects = {
           return connection(resource_propertiesPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allStreetProperties: {
@@ -4187,29 +3717,13 @@ export const objects = {
           return connection(resource_street_propertyPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allStreets: {
@@ -4217,29 +3731,13 @@ export const objects = {
           return connection(resource_streetsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       building(_$parent, args) {
@@ -4374,92 +3872,74 @@ export const objects = {
     plans: {
       createBuilding: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_buildingsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_buildingsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createOffer: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_offersPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_offersPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPost: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_postsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_postsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createProperty: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_propertiesPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_propertiesPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createStreet: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_streetsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_streetsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createStreetProperty: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_street_propertyPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_street_propertyPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteBuilding: {
@@ -4471,9 +3951,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteBuildingById: {
@@ -4487,9 +3965,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteOffer: {
@@ -4501,9 +3977,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteOfferById: {
@@ -4517,9 +3991,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePost: {
@@ -4531,9 +4003,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePostById: {
@@ -4547,9 +4017,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteProperty: {
@@ -4561,9 +4029,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePropertyById: {
@@ -4577,9 +4043,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteStreet: {
@@ -4591,9 +4055,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteStreetById: {
@@ -4607,9 +4069,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteStreetByName: {
@@ -4623,9 +4083,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteStreetProperty: {
@@ -4637,9 +4095,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteStreetPropertyByStrIdAndPropId: {
@@ -4654,9 +4110,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateBuilding: {
@@ -4668,9 +4122,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateBuildingById: {
@@ -4684,9 +4136,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateOffer: {
@@ -4698,9 +4148,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateOfferById: {
@@ -4714,9 +4162,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePost: {
@@ -4728,9 +4174,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePostById: {
@@ -4744,9 +4188,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateProperty: {
@@ -4758,9 +4200,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePropertyById: {
@@ -4774,9 +4214,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateStreet: {
@@ -4788,9 +4226,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateStreetById: {
@@ -4804,9 +4240,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateStreetByName: {
@@ -4820,9 +4254,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateStreetProperty: {
@@ -4834,9 +4266,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateStreetPropertyByStrIdAndPropId: {
@@ -4851,9 +4281,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -4893,24 +4321,17 @@ export const objects = {
   BuildingsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   CreateBuildingPayload: {
     assertStep: assertStep,
     plans: {
-      building($object) {
-        return $object.get("result");
-      },
+      building: planCreatePayloadResult,
       buildingEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       namedAfterStreet($record) {
         return resource_streetsPgResource.get({
           name: $record.get("result").get("name")
@@ -4921,21 +4342,14 @@ export const objects = {
           id: $record.get("result").get("property_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateOfferPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      offer($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      offer: planCreatePayloadResult,
       offerEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_offersPgResource, offersUniques[0].attributes, $mutation, fieldArgs);
       },
@@ -4944,45 +4358,29 @@ export const objects = {
           id: $record.get("result").get("post_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePostPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      post($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      post: planCreatePayloadResult,
       postEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_postsPgResource, postsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePropertyPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      property($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      property: planCreatePayloadResult,
       propertyEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_propertiesPgResource, propertiesUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       streetByStreetId($record) {
         return resource_streetsPgResource.get({
           id: $record.get("result").get("street_id")
@@ -4993,16 +4391,9 @@ export const objects = {
   CreateStreetPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      street($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      street: planCreatePayloadResult,
       streetEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_streetsPgResource, streetsUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5011,26 +4402,19 @@ export const objects = {
   CreateStreetPropertyPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       propertyByPropId($record) {
         return resource_propertiesPgResource.get({
           id: $record.get("result").get("prop_id")
         });
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       streetByStrId($record) {
         return resource_streetsPgResource.get({
           id: $record.get("result").get("str_id")
         });
       },
-      streetProperty($object) {
-        return $object.get("result");
-      },
+      streetProperty: planCreatePayloadResult,
       streetPropertyEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_street_propertyPgResource, street_propertyUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5039,20 +4423,15 @@ export const objects = {
   DeleteBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building($object) {
-        return $object.get("result");
-      },
+      building: planUpdateOrDeletePayloadResult,
       buildingEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBuildingId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Building.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       namedAfterStreet($record) {
         return resource_streetsPgResource.get({
@@ -5064,26 +4443,19 @@ export const objects = {
           id: $record.get("result").get("property_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteOfferPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedOfferViewId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Offer.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      offer($object) {
-        return $object.get("result");
-      },
+      offer: planUpdateOrDeletePayloadResult,
       offerEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_offersPgResource, offersUniques[0].attributes, $mutation, fieldArgs);
       },
@@ -5092,55 +4464,39 @@ export const objects = {
           id: $record.get("result").get("post_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePostPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPostViewId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Post.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      post($object) {
-        return $object.get("result");
-      },
+      post: planUpdateOrDeletePayloadResult,
       postEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_postsPgResource, postsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePropertyPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPropertyId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Property.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      property($object) {
-        return $object.get("result");
-      },
+      property: planUpdateOrDeletePayloadResult,
       propertyEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_propertiesPgResource, propertiesUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       streetByStreetId($record) {
         return resource_streetsPgResource.get({
           id: $record.get("result").get("street_id")
@@ -5151,21 +4507,14 @@ export const objects = {
   DeleteStreetPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedStreetId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Street.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      street($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      street: planUpdateOrDeletePayloadResult,
       streetEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_streetsPgResource, streetsUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5174,31 +4523,24 @@ export const objects = {
   DeleteStreetPropertyPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedStreetPropertyId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_StreetProperty.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       propertyByPropId($record) {
         return resource_propertiesPgResource.get({
           id: $record.get("result").get("prop_id")
         });
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       streetByStrId($record) {
         return resource_streetsPgResource.get({
           id: $record.get("result").get("str_id")
         });
       },
-      streetProperty($object) {
-        return $object.get("result");
-      },
+      streetProperty: planUpdateOrDeletePayloadResult,
       streetPropertyEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_street_propertyPgResource, street_propertyUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5241,9 +4583,7 @@ export const objects = {
   HousesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Offer: {
@@ -5273,9 +4613,7 @@ export const objects = {
   OffersConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Post: {
@@ -5293,29 +4631,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -5330,17 +4652,13 @@ export const objects = {
   PostsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   PropertiesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Property: {
@@ -5354,29 +4672,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       nameOrNumber($record) {
@@ -5402,29 +4704,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -5447,29 +4733,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       nodeId($parent) {
@@ -5484,29 +4754,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       streetPropertiesByStrId: {
@@ -5517,29 +4771,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -5554,9 +4792,7 @@ export const objects = {
   StreetPropertiesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   StreetProperty: {
@@ -5597,24 +4833,17 @@ export const objects = {
   StreetsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building($object) {
-        return $object.get("result");
-      },
+      building: planUpdateOrDeletePayloadResult,
       buildingEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       namedAfterStreet($record) {
         return resource_streetsPgResource.get({
           name: $record.get("result").get("name")
@@ -5625,21 +4854,14 @@ export const objects = {
           id: $record.get("result").get("property_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateOfferPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      offer($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      offer: planUpdateOrDeletePayloadResult,
       offerEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_offersPgResource, offersUniques[0].attributes, $mutation, fieldArgs);
       },
@@ -5648,45 +4870,29 @@ export const objects = {
           id: $record.get("result").get("post_id")
         });
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePostPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      post($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      post: planUpdateOrDeletePayloadResult,
       postEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_postsPgResource, postsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePropertyPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      property($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      property: planUpdateOrDeletePayloadResult,
       propertyEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_propertiesPgResource, propertiesUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       streetByStreetId($record) {
         return resource_streetsPgResource.get({
           id: $record.get("result").get("street_id")
@@ -5697,16 +4903,9 @@ export const objects = {
   UpdateStreetPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      street($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      street: planUpdateOrDeletePayloadResult,
       streetEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_streetsPgResource, streetsUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5715,26 +4914,19 @@ export const objects = {
   UpdateStreetPropertyPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       propertyByPropId($record) {
         return resource_propertiesPgResource.get({
           id: $record.get("result").get("prop_id")
         });
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       streetByStrId($record) {
         return resource_streetsPgResource.get({
           id: $record.get("result").get("str_id")
         });
       },
-      streetProperty($object) {
-        return $object.get("result");
-      },
+      streetProperty: planUpdateOrDeletePayloadResult,
       streetPropertyEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_street_propertyPgResource, street_propertyUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5764,49 +4956,19 @@ export const inputObjects = {
   BuildingCondition: {
     plans: {
       floors($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "floors",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("floors", TYPES.int, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       isPrimary($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "is_primary",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        return applyAttributeCondition("is_primary", TYPES.boolean, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       },
       propertyId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "property_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("property_id", TYPES.int, $condition, val);
       }
     }
   },
@@ -5882,253 +5044,137 @@ export const inputObjects = {
   },
   CreateBuildingInput: {
     plans: {
-      building(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      building: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   CreateOfferInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      offer(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      offer: applyCreateFields
     }
   },
   CreatePostInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      post(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      post: applyCreateFields
     }
   },
   CreatePropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      property(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      property: applyCreateFields
     }
   },
   CreateStreetInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      street(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      street: applyCreateFields
     }
   },
   CreateStreetPropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      streetProperty(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      streetProperty: applyCreateFields
     }
   },
   DeleteBuildingByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteBuildingInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteOfferByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteOfferInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePostByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePostInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePropertyByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteStreetByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteStreetByNameInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteStreetInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteStreetPropertyByStrIdAndPropIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteStreetPropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   HouseCondition: {
     plans: {
       buildingId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "building_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("building_id", TYPES.int, $condition, val);
       },
       buildingName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "building_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("building_name", TYPES.text, $condition, val);
       },
       floors($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "floors",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("floors", TYPES.int, $condition, val);
       },
       propertyId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "property_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("property_id", TYPES.int, $condition, val);
       },
       propertyNameOrNumber($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "property_name_or_number",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("property_name_or_number", TYPES.text, $condition, val);
       },
       streetId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "street_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("street_id", TYPES.int, $condition, val);
       },
       streetName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "street_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("street_name", TYPES.text, $condition, val);
       }
     }
   },
   OfferCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       postId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "post_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("post_id", TYPES.text, $condition, val);
       }
     }
   },
@@ -6169,13 +5215,7 @@ export const inputObjects = {
   PostCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.text, $condition, val);
       }
     }
   },
@@ -6204,31 +5244,13 @@ export const inputObjects = {
   PropertyCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       nameOrNumber($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name_or_number",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name_or_number", TYPES.text, $condition, val);
       },
       streetId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "street_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("street_id", TYPES.int, $condition, val);
       }
     }
   },
@@ -6281,22 +5303,10 @@ export const inputObjects = {
   StreetCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -6337,31 +5347,13 @@ export const inputObjects = {
   StreetPropertyCondition: {
     plans: {
       currentOwner($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "current_owner",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("current_owner", TYPES.text, $condition, val);
       },
       propId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "prop_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("prop_id", TYPES.int, $condition, val);
       },
       strId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "str_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("str_id", TYPES.int, $condition, val);
       }
     }
   },
@@ -6413,170 +5405,92 @@ export const inputObjects = {
   },
   UpdateBuildingByIdInput: {
     plans: {
-      buildingPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      buildingPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateBuildingInput: {
     plans: {
-      buildingPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      buildingPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateOfferByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      offerPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      offerPatch: applyPatchFields
     }
   },
   UpdateOfferInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      offerPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      offerPatch: applyPatchFields
     }
   },
   UpdatePostByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      postPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      postPatch: applyPatchFields
     }
   },
   UpdatePostInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      postPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      postPatch: applyPatchFields
     }
   },
   UpdatePropertyByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      propertyPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      propertyPatch: applyPatchFields
     }
   },
   UpdatePropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      propertyPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      propertyPatch: applyPatchFields
     }
   },
   UpdateStreetByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      streetPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      streetPatch: applyPatchFields
     }
   },
   UpdateStreetByNameInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      streetPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      streetPatch: applyPatchFields
     }
   },
   UpdateStreetInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      streetPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      streetPatch: applyPatchFields
     }
   },
   UpdateStreetPropertyByStrIdAndPropIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      streetPropertyPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      streetPropertyPatch: applyPatchFields
     }
   },
   UpdateStreetPropertyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      streetPropertyPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      streetPropertyPatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

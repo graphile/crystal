@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import jsonwebtoken from "jsonwebtoken";
@@ -34,27 +34,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -74,24 +70,19 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
 });
 const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "guid"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const updatableViewCodec = recordCodec({
@@ -100,43 +91,19 @@ const updatableViewCodec = recordCodec({
   attributes: {
     __proto__: null,
     x: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     name: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     },
     description: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     constant: {
-      description: "This is constantly 2",
       codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      description: "This is constantly 2"
     }
   },
-  description: "YOYOYO!!",
   extensions: {
     isTableLike: true,
     pg: {
@@ -150,7 +117,8 @@ const updatableViewCodec = recordCodec({
       unique: "x|@behavior -single -update -delete"
     }
   },
-  executor: executor
+  executor: executor,
+  description: "YOYOYO!!"
 });
 const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
@@ -159,52 +127,21 @@ const jwtTokenCodec = recordCodec({
   attributes: {
     __proto__: null,
     role: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     exp: {
-      description: undefined,
-      codec: TYPES.bigint,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.bigint
     },
     a: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     b: {
-      description: undefined,
-      codec: TYPES.numeric,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.numeric
     },
     c: {
-      description: undefined,
-      codec: TYPES.bigint,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.bigint
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
@@ -219,21 +156,6 @@ const jwtTokenCodec = recordCodec({
   },
   executor: executor
 });
-const uuidArrayCodec = listOfCodec(TYPES.uuid, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_uuid"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "uuidArray"
-});
 const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
@@ -241,34 +163,15 @@ const authPayloadCodec = recordCodec({
   attributes: {
     __proto__: null,
     jwt: {
-      description: undefined,
-      codec: jwtTokenCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: jwtTokenCodec
     },
     id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     admin: {
-      description: undefined,
-      codec: TYPES.boolean,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.boolean
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
@@ -293,9 +196,6 @@ const colorCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "color"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -309,9 +209,6 @@ const enumCapsCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "enum_caps"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -325,9 +222,6 @@ const enumWithEmptyStringCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "enum_with_empty_string"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -337,182 +231,61 @@ const compoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     b: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     c: {
-      description: undefined,
-      codec: colorCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: colorCodec
     },
     d: {
-      description: undefined,
-      codec: TYPES.uuid,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.uuid
     },
     e: {
-      description: undefined,
-      codec: enumCapsCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: enumCapsCodec
     },
     f: {
-      description: undefined,
-      codec: enumWithEmptyStringCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: enumWithEmptyStringCodec
     },
     g: {
-      description: undefined,
-      codec: TYPES.interval,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.interval
     },
     foo_bar: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: "Awesome feature!",
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "compound_type"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Awesome feature!"
 });
 const listsIdentifier = sql.identifier("b", "lists");
-const int4ArrayCodec = listOfCodec(TYPES.int, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_int4"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "int4Array"
-});
 const colorArrayCodec = listOfCodec(colorCodec, {
+  name: "colorArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "_color"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "colorArray"
-});
-const dateArrayCodec = listOfCodec(TYPES.date, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_date"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "dateArray"
-});
-const timestamptzArrayCodec = listOfCodec(TYPES.timestamptz, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_timestamptz"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "timestamptzArray"
+  }
 });
 const compoundTypeArrayCodec = listOfCodec(compoundTypeCodec, {
+  name: "compoundTypeArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "_compound_type"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "compoundTypeArray"
-});
-const byteaArrayCodec = listOfCodec(TYPES.bytea, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_bytea"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "byteaArray"
+  }
 });
 const listsCodec = recordCodec({
   name: "lists",
@@ -520,234 +293,110 @@ const listsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     int_array: {
-      description: undefined,
-      codec: int4ArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.int
     },
     int_array_nn: {
-      description: undefined,
-      codec: int4ArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.int,
+      notNull: true
     },
     enum_array: {
-      description: undefined,
-      codec: colorArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: colorArrayCodec
     },
     enum_array_nn: {
-      description: undefined,
       codec: colorArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     date_array: {
-      description: undefined,
-      codec: dateArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.date
     },
     date_array_nn: {
-      description: undefined,
-      codec: dateArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.date,
+      notNull: true
     },
     timestamptz_array: {
-      description: undefined,
-      codec: timestamptzArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.timestamptz
     },
     timestamptz_array_nn: {
-      description: undefined,
-      codec: timestamptzArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.timestamptz,
+      notNull: true
     },
     compound_type_array: {
-      description: undefined,
-      codec: compoundTypeArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: compoundTypeArrayCodec
     },
     compound_type_array_nn: {
-      description: undefined,
       codec: compoundTypeArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     bytea_array: {
-      description: undefined,
-      codec: byteaArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.bytea
     },
     bytea_array_nn: {
-      description: undefined,
-      codec: byteaArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.bytea,
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "lists"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const typesIdentifier = sql.identifier("b", "types");
 const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "an_int"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const anotherIntCodec = domainOfCodec(anIntCodec, "anotherInt", sql.identifier("b", "another_int"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "another_int"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
-});
-const textArrayCodec = listOfCodec(TYPES.text, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_text"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "textArray"
+  }
 });
 const numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", sql.identifier("pg_catalog", "numrange"), {
-  description: "range of numerics",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "pg_catalog",
       name: "numrange"
-    },
-    tags: {
-      __proto__: null
     }
-  }
+  },
+  description: "range of numerics"
 });
 const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_catalog", "daterange"), {
-  description: "range of dates",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "pg_catalog",
       name: "daterange"
-    },
-    tags: {
-      __proto__: null
     }
-  }
+  },
+  description: "range of dates"
 });
 const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a", "an_int_range"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "a",
       name: "an_int_range"
-    },
-    tags: {
-      __proto__: null
     }
   }
-});
-const intervalArrayCodec = listOfCodec(TYPES.interval, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_interval"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "intervalArray"
 });
 const nestedCompoundTypeCodec = recordCodec({
   name: "nestedCompoundType",
@@ -755,89 +404,42 @@ const nestedCompoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      description: undefined,
-      codec: compoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: compoundTypeCodec
     },
     b: {
-      description: undefined,
-      codec: compoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: compoundTypeCodec
     },
     baz_buz: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "nested_compound_type"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
-const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
-  description: undefined,
+const textArrayDomainCodec = domainOfCodec(LIST_TYPES.text, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "text_array_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
-const int8ArrayCodec = listOfCodec(TYPES.bigint, {
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "pg_catalog",
-      name: "_int8"
-    },
-    tags: {
-      __proto__: null
-    }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "int8Array"
-});
-const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", sql.identifier("c", "int8_array_domain"), {
-  description: undefined,
+const int8ArrayDomainCodec = domainOfCodec(LIST_TYPES.bigint, "int8ArrayDomain", sql.identifier("c", "int8_array_domain"), {
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "int8_array_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const spec_types_attributes_ltree_codec_ltree = {
   name: "ltree",
@@ -852,463 +454,191 @@ const spec_types_attributes_ltree_codec_ltree = {
   attributes: undefined
 };
 const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_attributes_ltree_codec_ltree);
-const spec_types = {
+const typesCodec = recordCodec({
   name: "types",
   identifier: typesIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     smallint: {
-      description: undefined,
       codec: TYPES.int2,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     bigint: {
-      description: undefined,
       codec: TYPES.bigint,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     numeric: {
-      description: undefined,
       codec: TYPES.numeric,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     decimal: {
-      description: undefined,
       codec: TYPES.numeric,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     boolean: {
-      description: undefined,
       codec: TYPES.boolean,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     varchar: {
-      description: undefined,
       codec: TYPES.varchar,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     enum: {
-      description: undefined,
       codec: colorCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     enum_array: {
-      description: undefined,
       codec: colorArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     domain: {
-      description: undefined,
       codec: anIntCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     domain2: {
-      description: undefined,
       codec: anotherIntCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     text_array: {
-      description: undefined,
-      codec: textArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.text,
+      notNull: true
     },
     json: {
-      description: undefined,
       codec: TYPES.json,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     jsonb: {
-      description: undefined,
       codec: TYPES.jsonb,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     jsonpath: {
-      description: undefined,
-      codec: TYPES.jsonpath,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.jsonpath
     },
     nullable_range: {
-      description: undefined,
-      codec: numrangeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: numrangeCodec
     },
     numrange: {
-      description: undefined,
       codec: numrangeCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     daterange: {
-      description: undefined,
       codec: daterangeCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     an_int_range: {
-      description: undefined,
       codec: anIntRangeCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     timestamp: {
-      description: undefined,
       codec: TYPES.timestamp,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     timestamptz: {
-      description: undefined,
       codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     date: {
-      description: undefined,
       codec: TYPES.date,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     time: {
-      description: undefined,
       codec: TYPES.time,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     timetz: {
-      description: undefined,
       codec: TYPES.timetz,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     interval: {
-      description: undefined,
       codec: TYPES.interval,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     interval_array: {
-      description: undefined,
-      codec: intervalArrayCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.interval,
+      notNull: true
     },
     money: {
-      description: undefined,
       codec: TYPES.money,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     compound_type: {
-      description: undefined,
       codec: compoundTypeCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     nested_compound_type: {
-      description: undefined,
       codec: nestedCompoundTypeCodec,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     nullable_compound_type: {
-      description: undefined,
-      codec: compoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: compoundTypeCodec
     },
     nullable_nested_compound_type: {
-      description: undefined,
-      codec: nestedCompoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: nestedCompoundTypeCodec
     },
     point: {
-      description: undefined,
       codec: TYPES.point,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     nullablePoint: {
-      description: undefined,
-      codec: TYPES.point,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.point
     },
     inet: {
-      description: undefined,
-      codec: TYPES.inet,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.inet
     },
     cidr: {
-      description: undefined,
-      codec: TYPES.cidr,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.cidr
     },
     macaddr: {
-      description: undefined,
-      codec: TYPES.macaddr,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.macaddr
     },
     regproc: {
-      description: undefined,
-      codec: TYPES.regproc,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regproc
     },
     regprocedure: {
-      description: undefined,
-      codec: TYPES.regprocedure,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regprocedure
     },
     regoper: {
-      description: undefined,
-      codec: TYPES.regoper,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regoper
     },
     regoperator: {
-      description: undefined,
-      codec: TYPES.regoperator,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regoperator
     },
     regclass: {
-      description: undefined,
-      codec: TYPES.regclass,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regclass
     },
     regtype: {
-      description: undefined,
-      codec: TYPES.regtype,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regtype
     },
     regconfig: {
-      description: undefined,
-      codec: TYPES.regconfig,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regconfig
     },
     regdictionary: {
-      description: undefined,
-      codec: TYPES.regdictionary,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regdictionary
     },
     text_array_domain: {
-      description: undefined,
-      codec: textArrayDomainCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: textArrayDomainCodec
     },
     int8_array_domain: {
-      description: undefined,
-      codec: int8ArrayDomainCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: int8ArrayDomainCodec
     },
     bytea: {
-      description: undefined,
-      codec: TYPES.bytea,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.bytea
     },
     bytea_array: {
-      description: undefined,
-      codec: byteaArrayCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: LIST_TYPES.bytea
     },
     ltree: {
-      description: undefined,
-      codec: spec_types_attributes_ltree_codec_ltree,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: spec_types_attributes_ltree_codec_ltree
     },
     ltree_array: {
-      description: undefined,
-      codec: spec_types_attributes_ltree_array_codec_ltree_,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: spec_types_attributes_ltree_array_codec_ltree_
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -1322,18 +652,13 @@ const spec_types = {
     }
   },
   executor: executor
-};
-const typesCodec = recordCodec(spec_types);
+});
 const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifier("b", "not_null_url"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "not_null_url"
-    },
-    tags: {
-      __proto__: null
     }
   },
   notNull: true
@@ -1343,10 +668,9 @@ const mult_2FunctionIdentifer = sql.identifier("b", "mult_2");
 const mult_3FunctionIdentifer = sql.identifier("b", "mult_3");
 const mult_4FunctionIdentifer = sql.identifier("b", "mult_4");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
+const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const updatable_viewUniques = [{
-  isPrimary: false,
   attributes: ["x"],
-  description: undefined,
   extensions: {
     tags: {
       __proto__: null,
@@ -1355,17 +679,13 @@ const updatable_viewUniques = [{
   }
 }];
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
-const resourceConfig_jwt_token = {
+const jwt_token_resourceOptionsConfig = {
   executor: executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
   from: jwtTokenIdentifier,
   codec: jwtTokenCodec,
-  uniques: [],
-  isVirtual: true,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -1373,12 +693,11 @@ const resourceConfig_jwt_token = {
     },
     isInsertable: false,
     isUpdatable: false,
-    isDeletable: false,
-    tags: {}
-  }
+    isDeletable: false
+  },
+  isVirtual: true
 };
 const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
-const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const authenticate_manyFunctionIdentifer = sql.identifier("b", "authenticate_many");
 const authenticate_payloadFunctionIdentifer = sql.identifier("b", "authenticate_payload");
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
@@ -1387,48 +706,30 @@ const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compoun
 const compound_type_array_mutationFunctionIdentifer = sql.identifier("b", "compound_type_array_mutation");
 const compound_type_array_queryFunctionIdentifer = sql.identifier("b", "compound_type_array_query");
 const listsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const typesUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_types_types = {
+const types_resourceOptionsConfig = {
   executor: executor,
   name: "types",
   identifier: "main.b.types",
   from: typesIdentifier,
   codec: typesCodec,
-  uniques: typesUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "b",
       name: "types"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
-      foreignKey: spec_types.extensions.tags.foreignKey
+      foreignKey: ["(smallint) references a.post", "(id) references a.post"]
     }
-  }
+  },
+  uniques: typesUniques
 };
 const type_function_connectionFunctionIdentifer = sql.identifier("b", "type_function_connection");
 const type_function_connection_mutationFunctionIdentifer = sql.identifier("b", "type_function_connection_mutation");
@@ -1446,13 +747,13 @@ const registry = makeRegistry({
     int4: TYPES.int,
     guid: guidCodec,
     varchar: TYPES.varchar,
+    uuidArray: LIST_TYPES.uuid,
+    uuid: TYPES.uuid,
     updatableView: updatableViewCodec,
     text: TYPES.text,
     jwtToken: jwtTokenCodec,
     int8: TYPES.bigint,
     numeric: TYPES.numeric,
-    uuidArray: uuidArrayCodec,
-    uuid: TYPES.uuid,
     authPayload: authPayloadCodec,
     bool: TYPES.boolean,
     compoundType: compoundTypeCodec,
@@ -1461,20 +762,20 @@ const registry = makeRegistry({
     enumWithEmptyString: enumWithEmptyStringCodec,
     interval: TYPES.interval,
     lists: listsCodec,
-    int4Array: int4ArrayCodec,
+    int4Array: LIST_TYPES.int,
     colorArray: colorArrayCodec,
-    dateArray: dateArrayCodec,
+    dateArray: LIST_TYPES.date,
     date: TYPES.date,
-    timestamptzArray: timestamptzArrayCodec,
+    timestamptzArray: LIST_TYPES.timestamptz,
     timestamptz: TYPES.timestamptz,
     compoundTypeArray: compoundTypeArrayCodec,
-    byteaArray: byteaArrayCodec,
+    byteaArray: LIST_TYPES.bytea,
     bytea: TYPES.bytea,
     types: typesCodec,
     int2: TYPES.int2,
     anInt: anIntCodec,
     anotherInt: anotherIntCodec,
-    textArray: textArrayCodec,
+    textArray: LIST_TYPES.text,
     json: TYPES.json,
     jsonb: TYPES.jsonb,
     jsonpath: TYPES.jsonpath,
@@ -1484,7 +785,7 @@ const registry = makeRegistry({
     timestamp: TYPES.timestamp,
     time: TYPES.time,
     timetz: TYPES.timetz,
-    intervalArray: intervalArrayCodec,
+    intervalArray: LIST_TYPES.interval,
     money: TYPES.money,
     nestedCompoundType: nestedCompoundTypeCodec,
     point: TYPES.point,
@@ -1505,62 +806,43 @@ const registry = makeRegistry({
     "ltree[]": spec_types_attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     jwtTokenArray: listOfCodec(jwtTokenCodec, {
+      name: "jwtTokenArray",
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "_jwt_token"
-        },
-        tags: {
-          __proto__: null
         }
-      },
-      typeDelim: ",",
-      description: undefined,
-      name: "jwtTokenArray"
+      }
     }),
     typesArray: listOfCodec(typesCodec, {
+      name: "typesArray",
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "_types"
-        },
-        tags: {
-          __proto__: null
         }
-      },
-      typeDelim: ",",
-      description: undefined,
-      name: "typesArray"
+      }
     }),
     notNullUrl: notNullUrlCodec,
-    int8Array: int8ArrayCodec,
+    int8Array: LIST_TYPES.bigint,
     wrappedUrl: recordCodec({
       name: "wrappedUrl",
       identifier: sql.identifier("b", "wrapped_url"),
       attributes: {
         __proto__: null,
         url: {
-          description: undefined,
           codec: notNullUrlCodec,
-          notNull: true,
-          hasDefault: false,
-          extensions: {
-            tags: {}
-          }
+          notNull: true
         }
       },
-      description: undefined,
       extensions: {
         isTableLike: false,
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "wrapped_url"
-        },
-        tags: {
-          __proto__: null
         }
       },
       executor: executor
@@ -1890,7 +1172,7 @@ const registry = makeRegistry({
   pgResources: {
     __proto__: null,
     mult_1: {
-      executor,
+      executor: executor,
       name: "mult_1",
       identifier: "main.b.mult_1(int4,int4)",
       from(...args) {
@@ -1898,32 +1180,27 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "mult_1"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mult_2: {
-      executor,
+      executor: executor,
       name: "mult_2",
       identifier: "main.b.mult_2(int4,int4)",
       from(...args) {
@@ -1931,32 +1208,27 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: null,
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "mult_2"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mult_3: {
-      executor,
+      executor: executor,
       name: "mult_3",
       identifier: "main.b.mult_3(int4,int4)",
       from(...args) {
@@ -1964,32 +1236,29 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "mult_3"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     mult_4: {
-      executor,
+      executor: executor,
       name: "mult_4",
       identifier: "main.b.mult_4(int4,int4)",
       from(...args) {
@@ -1997,32 +1266,29 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }, {
         name: null,
+        codec: TYPES.int,
         required: true,
-        notNull: true,
-        codec: TYPES.int
+        notNull: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "mult_4"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
     guid_fn: {
-      executor,
+      executor: executor,
       name: "guid_fn",
       identifier: "main.b.guid_fn(b.guid)",
       from(...args) {
@@ -2030,109 +1296,23 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "g",
-        required: true,
-        notNull: false,
-        codec: guidCodec
+        codec: guidCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: guidCodec,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "guid_fn"
-        },
-        tags: {}
-      },
-      description: undefined
-    },
-    updatable_view: {
-      executor: executor,
-      name: "updatable_view",
-      identifier: "main.b.updatable_view",
-      from: updatableViewIdentifier,
-      codec: updatableViewCodec,
-      uniques: updatable_viewUniques,
-      isVirtual: false,
-      description: "YOYOYO!!",
-      extensions: {
-        description: "YOYOYO!!",
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "updatable_view"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {
-          uniqueKey: "x",
-          unique: "x|@behavior -single -update -delete"
         }
-      }
+      },
+      isUnique: true,
+      isMutation: true
     },
-    authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
-      name: "authenticate_fail",
-      identifier: "main.b.authenticate_fail()",
-      from(...args) {
-        return sql`${authenticate_failFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "authenticate_fail"
-        },
-        tags: {}
-      },
-      description: undefined
-    }),
-    authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
-      name: "authenticate",
-      identifier: "main.b.authenticate(int4,numeric,int8)",
-      from(...args) {
-        return sql`${authenticateFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }, {
-        name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.numeric
-      }, {
-        name: "c",
-        required: true,
-        notNull: false,
-        codec: TYPES.bigint
-      }],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "authenticate"
-        },
-        tags: {}
-      },
-      description: undefined
-    }),
     list_bde_mutation: {
-      executor,
+      executor: executor,
       name: "list_bde_mutation",
       identifier: "main.b.list_bde_mutation(_text,text,text)",
       from(...args) {
@@ -2140,36 +1320,96 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "b",
-        required: true,
-        notNull: false,
-        codec: textArrayCodec
+        codec: LIST_TYPES.text,
+        required: true
       }, {
         name: "d",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }, {
         name: "e",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
+        codec: TYPES.text,
+        required: true
       }],
-      isUnique: !false,
-      codec: uuidArrayCodec,
-      uniques: [],
-      isMutation: true,
+      codec: LIST_TYPES.uuid,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "list_bde_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
-    authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
+    updatable_view: {
+      executor: executor,
+      name: "updatable_view",
+      identifier: "main.b.updatable_view",
+      from: updatableViewIdentifier,
+      codec: updatableViewCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "updatable_view"
+        },
+        tags: {
+          uniqueKey: "x",
+          unique: "x|@behavior -single -update -delete"
+        }
+      },
+      uniques: updatable_viewUniques,
+      description: "YOYOYO!!"
+    },
+    authenticate_fail: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
+      name: "authenticate_fail",
+      identifier: "main.b.authenticate_fail()",
+      from(...args) {
+        return sql`${authenticate_failFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate_fail"
+        }
+      },
+      isMutation: true
+    }),
+    authenticate: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
+      name: "authenticate",
+      identifier: "main.b.authenticate(int4,numeric,int8)",
+      from(...args) {
+        return sql`${authenticateFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        codec: TYPES.int,
+        required: true
+      }, {
+        name: "b",
+        codec: TYPES.numeric,
+        required: true
+      }, {
+        name: "c",
+        codec: TYPES.bigint,
+        required: true
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate"
+        }
+      },
+      isMutation: true
+    }),
+    authenticate_many: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
       name: "authenticate_many",
       identifier: "main.b.authenticate_many(int4,numeric,int8)",
       from(...args) {
@@ -2177,33 +1417,27 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.numeric
+        codec: TYPES.numeric,
+        required: true
       }, {
         name: "c",
-        required: true,
-        notNull: false,
-        codec: TYPES.bigint
+        codec: TYPES.bigint,
+        required: true
       }],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "authenticate_many"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true,
+      returnsArray: true
     }),
     authenticate_payload: PgResource.functionResourceOptions({
       executor: executor,
@@ -2211,11 +1445,7 @@ const registry = makeRegistry({
       identifier: "main.b.auth_payload",
       from: authPayloadIdentifier,
       codec: authPayloadCodec,
-      uniques: [],
-      isVirtual: true,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "b",
@@ -2227,7 +1457,8 @@ const registry = makeRegistry({
         tags: {
           foreignKey: "(id) references c.person"
         }
-      }
+      },
+      isVirtual: true
     }, {
       name: "authenticate_payload",
       identifier: "main.b.authenticate_payload(int4,numeric,int8)",
@@ -2236,33 +1467,26 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }, {
         name: "b",
-        required: true,
-        notNull: false,
-        codec: TYPES.numeric
+        codec: TYPES.numeric,
+        required: true
       }, {
         name: "c",
-        required: true,
-        notNull: false,
-        codec: TYPES.bigint
+        codec: TYPES.bigint,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "authenticate_payload"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true
     }),
     compound_type_mutation: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
@@ -2275,23 +1499,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true
     }),
     compound_type_query: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
@@ -2304,23 +1523,17 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_query"
-        },
-        tags: {}
-      },
-      description: undefined
+        }
+      }
     }),
     compound_type_set_mutation: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
@@ -2333,23 +1546,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_set_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
     compound_type_array_mutation: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
@@ -2362,23 +1571,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_array_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true,
+      returnsArray: true
     }),
     compound_type_array_query: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
@@ -2391,23 +1596,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        required: true,
-        notNull: false,
-        codec: compoundTypeCodec
+        codec: compoundTypeCodec,
+        required: true
       }],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "compound_type_array_query"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      returnsArray: true
     }),
     lists: {
       executor: executor,
@@ -2415,66 +1615,52 @@ const registry = makeRegistry({
       identifier: "main.b.lists",
       from: listsIdentifier,
       codec: listsCodec,
-      uniques: listsUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "lists"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: listsUniques
     },
-    types: registryConfig_pgResources_types_types,
-    type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    types: types_resourceOptionsConfig,
+    type_function_connection: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_connection",
       identifier: "main.b.type_function_connection()",
       from(...args) {
         return sql`${type_function_connectionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_connection"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      hasImplicitOrder: true
     }),
-    type_function_connection_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_connection_mutation: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_connection_mutation",
       identifier: "main.b.type_function_connection_mutation()",
       from(...args) {
         return sql`${type_function_connection_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: true,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_connection_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true,
+      hasImplicitOrder: true
     }),
-    type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function",
       identifier: "main.b.type_function(int4)",
       from(...args) {
@@ -2482,25 +1668,19 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function"
-        },
-        tags: {}
-      },
-      description: undefined
+        }
+      }
     }),
-    type_function_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_mutation: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_mutation",
       identifier: "main.b.type_function_mutation(int4)",
       from(...args) {
@@ -2508,65 +1688,53 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
+        codec: TYPES.int,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true
     }),
-    type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_list: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_list",
       identifier: "main.b.type_function_list()",
       from(...args) {
         return sql`${type_function_listFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: false,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_list"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      returnsArray: true
     }),
-    type_function_list_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+    type_function_list_mutation: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_list_mutation",
       identifier: "main.b.type_function_list_mutation()",
       from(...args) {
         return sql`${type_function_list_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
-      returnsArray: true,
       returnsSetof: false,
-      isMutation: true,
-      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "b",
           name: "type_function_list_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isMutation: true,
+      returnsArray: true
     })
   },
   pgRelations: {
@@ -2577,10 +1745,9 @@ const resource_listsPgResource = registry.pgResources["lists"];
 const resource_typesPgResource = registry.pgResources["types"];
 const argDetailsSimple_compound_type_query = [{
   graphqlArgName: "object",
-  postgresArgName: "object",
   pgCodec: compoundTypeCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "object",
+  required: true
 }];
 function makeArg(path, args, details) {
   const {
@@ -2603,52 +1770,79 @@ const makeArgs_compound_type_query = (args, path = []) => argDetailsSimple_compo
 const resource_compound_type_queryPgResource = registry.pgResources["compound_type_query"];
 const argDetailsSimple_compound_type_array_query = [{
   graphqlArgName: "object",
-  postgresArgName: "object",
   pgCodec: compoundTypeCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "object",
+  required: true
 }];
 const makeArgs_compound_type_array_query = (args, path = []) => argDetailsSimple_compound_type_array_query.map(details => makeArg(path, args, details));
 const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
 const EMPTY_ARRAY = [];
 const makeArgs_type_function_connection = () => EMPTY_ARRAY;
 const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
-const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+const type_function_connection_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_type_function_connection(args);
   return resource_type_function_connectionPgResource.execute(selectArgs);
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 const argDetailsSimple_type_function = [{
   graphqlArgName: "id",
-  postgresArgName: "id",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "id",
+  required: true
 }];
 const makeArgs_type_function = (args, path = []) => argDetailsSimple_type_function.map(details => makeArg(path, args, details));
 const resource_type_functionPgResource = registry.pgResources["type_function"];
 const resource_type_function_listPgResource = registry.pgResources["type_function_list"];
-const nodeIdHandler_List = {
-  typeName: "List",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("lists", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_listsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "lists";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_List = makeTableNodeIdHandler({
+  typeName: "List",
+  identifier: "lists",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_listsPgResource,
+  pk: listsUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -2678,28 +1872,13 @@ const nodeFetcher_List = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_List));
   return nodeIdHandler_List.get(nodeIdHandler_List.getSpec($decoded));
 };
-const nodeIdHandler_Type = {
+const nodeIdHandler_Type = makeTableNodeIdHandler({
   typeName: "Type",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("types", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_typesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "types";
-  }
-};
+  identifier: "types",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_typesPgResource,
+  pk: typesUniques[0].attributes
+});
 const nodeFetcher_Type = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Type));
   return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec($decoded));
@@ -2707,6 +1886,14 @@ const nodeFetcher_Type = $nodeId => {
 const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -2726,7 +1913,7 @@ function findTypeNameMatch(specifier) {
   return null;
 }
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
-function DateSerialize(value) {
+function toString(value) {
   return "" + value;
 }
 const coerce = string => {
@@ -2739,202 +1926,199 @@ const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcd
 function LTreeParseValue(value) {
   return value;
 }
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
 const argDetailsSimple_mult_1 = [{
   graphqlArgName: "arg0",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }, {
   graphqlArgName: "arg1",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }];
 const makeArgs_mult_1 = (args, path = []) => argDetailsSimple_mult_1.map(details => makeArg(path, args, details));
 const resource_mult_1PgResource = registry.pgResources["mult_1"];
+function pgSelectFromPayload($payload) {
+  const $result = $payload.getStepForKey("result");
+  const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+  const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+  if ($pgSelect instanceof PgSelectStep) {
+    return $pgSelect;
+  } else {
+    throw new Error(`Could not determine PgSelectStep for ${$result}`);
+  }
+}
+function applyInputArgViaPgSelect(_, $payload, arg) {
+  const $pgSelect = pgSelectFromPayload($payload);
+  arg.apply($pgSelect);
+}
 const argDetailsSimple_mult_2 = [{
   graphqlArgName: "arg0",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }, {
   graphqlArgName: "arg1",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }];
 const makeArgs_mult_2 = (args, path = []) => argDetailsSimple_mult_2.map(details => makeArg(path, args, details));
 const resource_mult_2PgResource = registry.pgResources["mult_2"];
 const argDetailsSimple_mult_3 = [{
   graphqlArgName: "arg0",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }, {
   graphqlArgName: "arg1",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }];
 const makeArgs_mult_3 = (args, path = []) => argDetailsSimple_mult_3.map(details => makeArg(path, args, details));
 const resource_mult_3PgResource = registry.pgResources["mult_3"];
 const argDetailsSimple_mult_4 = [{
   graphqlArgName: "arg0",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }, {
   graphqlArgName: "arg1",
-  postgresArgName: null,
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  required: true
 }];
 const makeArgs_mult_4 = (args, path = []) => argDetailsSimple_mult_4.map(details => makeArg(path, args, details));
 const resource_mult_4PgResource = registry.pgResources["mult_4"];
 const argDetailsSimple_guid_fn = [{
   graphqlArgName: "g",
-  postgresArgName: "g",
   pgCodec: guidCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "g",
+  required: true
 }];
 const makeArgs_guid_fn = (args, path = []) => argDetailsSimple_guid_fn.map(details => makeArg(path, args, details));
 const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
-const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
-const argDetailsSimple_authenticate = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.numeric,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "c",
-  postgresArgName: "c",
-  pgCodec: TYPES.bigint,
-  required: true,
-  fetcher: null
-}];
-const makeArgs_authenticate = (args, path = []) => argDetailsSimple_authenticate.map(details => makeArg(path, args, details));
-const resource_authenticatePgResource = registry.pgResources["authenticate"];
 const argDetailsSimple_list_bde_mutation = [{
   graphqlArgName: "b",
+  pgCodec: LIST_TYPES.text,
   postgresArgName: "b",
-  pgCodec: textArrayCodec,
-  required: true,
-  fetcher: null
+  required: true
 }, {
   graphqlArgName: "d",
-  postgresArgName: "d",
   pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
+  postgresArgName: "d",
+  required: true
 }, {
   graphqlArgName: "e",
-  postgresArgName: "e",
   pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
+  postgresArgName: "e",
+  required: true
 }];
 const makeArgs_list_bde_mutation = (args, path = []) => argDetailsSimple_list_bde_mutation.map(details => makeArg(path, args, details));
 const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
-const argDetailsSimple_authenticate_many = [{
+const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
+const argDetailsSimple_authenticate = [{
   graphqlArgName: "a",
-  postgresArgName: "a",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "a",
+  required: true
 }, {
   graphqlArgName: "b",
-  postgresArgName: "b",
   pgCodec: TYPES.numeric,
-  required: true,
-  fetcher: null
+  postgresArgName: "b",
+  required: true
 }, {
   graphqlArgName: "c",
-  postgresArgName: "c",
   pgCodec: TYPES.bigint,
-  required: true,
-  fetcher: null
+  postgresArgName: "c",
+  required: true
+}];
+const makeArgs_authenticate = (args, path = []) => argDetailsSimple_authenticate.map(details => makeArg(path, args, details));
+const resource_authenticatePgResource = registry.pgResources["authenticate"];
+const argDetailsSimple_authenticate_many = [{
+  graphqlArgName: "a",
+  pgCodec: TYPES.int,
+  postgresArgName: "a",
+  required: true
+}, {
+  graphqlArgName: "b",
+  pgCodec: TYPES.numeric,
+  postgresArgName: "b",
+  required: true
+}, {
+  graphqlArgName: "c",
+  pgCodec: TYPES.bigint,
+  postgresArgName: "c",
+  required: true
 }];
 const makeArgs_authenticate_many = (args, path = []) => argDetailsSimple_authenticate_many.map(details => makeArg(path, args, details));
 const resource_authenticate_manyPgResource = registry.pgResources["authenticate_many"];
 const argDetailsSimple_authenticate_payload = [{
   graphqlArgName: "a",
-  postgresArgName: "a",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "a",
+  required: true
 }, {
   graphqlArgName: "b",
-  postgresArgName: "b",
   pgCodec: TYPES.numeric,
-  required: true,
-  fetcher: null
+  postgresArgName: "b",
+  required: true
 }, {
   graphqlArgName: "c",
-  postgresArgName: "c",
   pgCodec: TYPES.bigint,
-  required: true,
-  fetcher: null
+  postgresArgName: "c",
+  required: true
 }];
 const makeArgs_authenticate_payload = (args, path = []) => argDetailsSimple_authenticate_payload.map(details => makeArg(path, args, details));
 const resource_authenticate_payloadPgResource = registry.pgResources["authenticate_payload"];
 const argDetailsSimple_compound_type_mutation = [{
   graphqlArgName: "object",
-  postgresArgName: "object",
   pgCodec: compoundTypeCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "object",
+  required: true
 }];
 const makeArgs_compound_type_mutation = (args, path = []) => argDetailsSimple_compound_type_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_mutationPgResource = registry.pgResources["compound_type_mutation"];
 const argDetailsSimple_compound_type_set_mutation = [{
   graphqlArgName: "object",
-  postgresArgName: "object",
   pgCodec: compoundTypeCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "object",
+  required: true
 }];
 const makeArgs_compound_type_set_mutation = (args, path = []) => argDetailsSimple_compound_type_set_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
 const argDetailsSimple_compound_type_array_mutation = [{
   graphqlArgName: "object",
-  postgresArgName: "object",
   pgCodec: compoundTypeCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "object",
+  required: true
 }];
 const makeArgs_compound_type_array_mutation = (args, path = []) => argDetailsSimple_compound_type_array_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
 const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
 const argDetailsSimple_type_function_mutation = [{
   graphqlArgName: "id",
-  postgresArgName: "id",
   pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
+  postgresArgName: "id",
+  required: true
 }];
 const makeArgs_type_function_mutation = (args, path = []) => argDetailsSimple_type_function_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs_List = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_List, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
@@ -2947,6 +2131,19 @@ const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
+function getClientMutationIdForCustomMutationPlan($object) {
+  const $result = $object.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+const planCustomMutationPayloadResult = $object => {
+  return $object.get("result");
+};
+function queryPlan() {
+  return rootValue();
+}
+function applyClientMutationIdForCustomMutation(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
 const attributeNames = ["role", "exp", "a", "b", "c"];
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
@@ -2969,6 +2166,36 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -3980,6 +3207,12 @@ type Mutation {
     """
     input: GuidFnInput!
   ): GuidFnPayload
+  listBdeMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ListBdeMutationInput!
+  ): ListBdeMutationPayload
   authenticateFail(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -3992,12 +3225,6 @@ type Mutation {
     """
     input: AuthenticateInput!
   ): AuthenticatePayload
-  listBdeMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ListBdeMutationInput!
-  ): ListBdeMutationPayload
   authenticateMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4267,6 +3494,33 @@ input GuidFnInput {
   g: Guid
 }
 
+"""The output of our \`listBdeMutation\` mutation."""
+type ListBdeMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  uuids: [UUID]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`listBdeMutation\` mutation."""
+input ListBdeMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  b: [String]
+  d: String
+  e: String
+}
+
 """The output of our \`authenticateFail\` mutation."""
 type AuthenticateFailPayload {
   """
@@ -4322,33 +3576,6 @@ input AuthenticateInput {
   a: Int
   b: BigFloat
   c: BigInt
-}
-
-"""The output of our \`listBdeMutation\` mutation."""
-type ListBdeMutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  uuids: [UUID]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`listBdeMutation\` mutation."""
-input ListBdeMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  b: [String]
-  d: String
-  e: String
 }
 
 """The output of our \`authenticateMany\` mutation."""
@@ -5036,29 +4263,13 @@ export const objects = {
           return connection(resource_listsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allTypes: {
@@ -5066,29 +4277,13 @@ export const objects = {
           return connection(resource_typesPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allUpdatableViews: {
@@ -5096,29 +4291,13 @@ export const objects = {
           return connection(resource_updatable_viewPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       compoundTypeArrayQuery($root, args, _info) {
@@ -5167,25 +4346,15 @@ export const objects = {
       },
       typeFunctionConnection: {
         plan($parent, args, info) {
-          const $select = getSelectPlanFromParentAndArgs($parent, args, info);
+          const $select = type_function_connection_getSelectPlanFromParentAndArgs($parent, args, info);
           return connection($select);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
         }
       },
       typeFunctionList($root, args, _info) {
@@ -5206,19 +4375,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       authenticateFail: {
@@ -5230,19 +4387,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       authenticateMany: {
@@ -5254,19 +4399,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       authenticatePayload: {
@@ -5278,19 +4411,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       compoundTypeArrayMutation: {
@@ -5302,19 +4423,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       compoundTypeMutation: {
@@ -5326,19 +4435,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       compoundTypeSetMutation: {
@@ -5350,64 +4447,43 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       createList: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_listsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_listsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createType: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_typesPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_typesPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createUpdatableView: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_updatable_viewPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_updatable_viewPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteList: {
@@ -5419,9 +4495,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteListById: {
@@ -5435,9 +4509,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteType: {
@@ -5449,9 +4521,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteTypeById: {
@@ -5465,9 +4535,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       guidFn: {
@@ -5479,19 +4547,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       listBdeMutation: {
@@ -5503,19 +4559,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       mult1: {
@@ -5527,19 +4571,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       mult2: {
@@ -5551,19 +4583,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       mult3: {
@@ -5575,19 +4595,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       mult4: {
@@ -5599,19 +4607,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       typeFunctionConnectionMutation: {
@@ -5623,19 +4619,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       typeFunctionListMutation: {
@@ -5647,19 +4631,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       typeFunctionMutation: {
@@ -5671,19 +4643,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
-          }
+          input: applyInputArgViaPgSelect
         }
       },
       updateList: {
@@ -5695,9 +4655,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateListById: {
@@ -5711,9 +4669,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateType: {
@@ -5725,9 +4681,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateTypeById: {
@@ -5741,9 +4695,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -5751,61 +4703,33 @@ export const objects = {
   AuthenticateFailPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      jwtToken($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      jwtToken: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   AuthenticateManyPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      jwtTokens($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      jwtTokens: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   AuthenticatePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      jwtToken($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      jwtToken: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   AuthenticatePayloadPayload: {
     assertStep: ObjectStep,
     plans: {
-      authPayload($object) {
-        return $object.get("result");
-      },
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      authPayload: planCustomMutationPayloadResult,
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      query: queryPlan
     }
   },
   AuthPayload: {
@@ -5830,79 +4754,44 @@ export const objects = {
   CompoundTypeArrayMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      compoundTypes($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      compoundTypes: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   CompoundTypeMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      compoundType($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      compoundType: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   CompoundTypeSetMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      compoundTypes($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      compoundTypes: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   CreateListPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      list($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      list: planCreatePayloadResult,
       listEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateTypePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      type: planCreatePayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5911,59 +4800,38 @@ export const objects = {
   CreateUpdatableViewPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      updatableView($object) {
-        return $object.get("result");
-      }
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      updatableView: planCreatePayloadResult
     }
   },
   DeleteListPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedListId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_List.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      list($object) {
-        return $object.get("result");
-      },
+      list: planUpdateOrDeletePayloadResult,
       listEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteTypePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedTypeId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Type.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      type: planUpdateOrDeletePayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -5972,16 +4840,9 @@ export const objects = {
   GuidFnPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      guid($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      guid: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   Interval: {
@@ -6048,84 +4909,47 @@ export const objects = {
   ListBdeMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      uuids($object) {
-        return $object.get("result");
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      query: queryPlan,
+      uuids: planCustomMutationPayloadResult
     }
   },
   ListsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Mult1Payload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      integer($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      integer: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   Mult2Payload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      integer($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      integer: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   Mult3Payload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      integer($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      integer: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   Mult4Payload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      integer($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      integer: planCustomMutationPayloadResult,
+      query: queryPlan
     }
   },
   NestedCompoundType: {
@@ -6220,46 +5044,25 @@ export const objects = {
   TypeFunctionConnectionMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      types($object) {
-        return $object.get("result");
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      query: queryPlan,
+      types: planCustomMutationPayloadResult
     }
   },
   TypeFunctionListMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      types($object) {
-        return $object.get("result");
-      }
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      query: queryPlan,
+      types: planCustomMutationPayloadResult
     }
   },
   TypeFunctionMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($object) {
-        const $result = $object.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCustomMutationPlan,
+      query: queryPlan,
+      type: planCustomMutationPayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -6268,9 +5071,7 @@ export const objects = {
   TypesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdatableView: {
@@ -6286,42 +5087,26 @@ export const objects = {
   UpdatableViewsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateListPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      list($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      list: planUpdateOrDeletePayloadResult,
       listEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateTypePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      type: planUpdateOrDeletePayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -6350,37 +5135,27 @@ export const interfaces = {
 export const inputObjects = {
   AuthenticateFailInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   AuthenticateInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   AuthenticateManyInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   AuthenticatePayloadInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CompoundTypeArrayMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CompoundTypeInput: {
@@ -6438,196 +5213,96 @@ export const inputObjects = {
   },
   CompoundTypeMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CompoundTypeSetMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateListInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      list(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      list: applyCreateFields
     }
   },
   CreateTypeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      type(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      type: applyCreateFields
     }
   },
   CreateUpdatableViewInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      updatableView(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      updatableView: applyCreateFields
     }
   },
   DeleteListByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteListInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTypeByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTypeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   GuidFnInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   ListBdeMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   ListCondition: {
     plans: {
       compoundTypeArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("compound_type_array", compoundTypeArrayCodec, $condition, val);
       },
       compoundTypeArrayNn($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type_array_nn",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("compound_type_array_nn", compoundTypeArrayCodec, $condition, val);
       },
       dateArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "date_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("date_array", LIST_TYPES.date, $condition, val);
       },
       dateArrayNn($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "date_array_nn",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, dateArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("date_array_nn", LIST_TYPES.date, $condition, val);
       },
       enumArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
       },
       enumArrayNn($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array_nn",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("enum_array_nn", colorArrayCodec, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       intArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "int_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("int_array", LIST_TYPES.int, $condition, val);
       },
       intArrayNn($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "int_array_nn",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, int4ArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("int_array_nn", LIST_TYPES.int, $condition, val);
       },
       timestamptzArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("timestamptz_array", LIST_TYPES.timestamptz, $condition, val);
       },
       timestamptzArrayNn($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz_array_nn",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, timestamptzArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("timestamptz_array_nn", LIST_TYPES.timestamptz, $condition, val);
       }
     }
   },
@@ -6799,30 +5474,22 @@ export const inputObjects = {
   },
   Mult1Input: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   Mult2Input: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   Mult3Input: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   Mult4Input: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   NestedCompoundTypeInput: {
@@ -6851,458 +5518,164 @@ export const inputObjects = {
   TypeCondition: {
     plans: {
       anIntRange($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "an_int_range",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anIntRangeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("an_int_range", anIntRangeCodec, $condition, val);
       },
       bigint($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "bigint",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
+        return applyAttributeCondition("bigint", TYPES.bigint, $condition, val);
       },
       boolean($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "boolean",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        return applyAttributeCondition("boolean", TYPES.boolean, $condition, val);
       },
       cidr($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "cidr",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-          }
-        });
+        return applyAttributeCondition("cidr", TYPES.cidr, $condition, val);
       },
       compoundType($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "compound_type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("compound_type", compoundTypeCodec, $condition, val);
       },
       date($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "date",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.date)}`;
-          }
-        });
+        return applyAttributeCondition("date", TYPES.date, $condition, val);
       },
       daterange($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "daterange",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, daterangeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("daterange", daterangeCodec, $condition, val);
       },
       decimal($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "decimal",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
-          }
-        });
+        return applyAttributeCondition("decimal", TYPES.numeric, $condition, val);
       },
       domain($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anIntCodec)}`;
-          }
-        });
+        return applyAttributeCondition("domain", anIntCodec, $condition, val);
       },
       domain2($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain2",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, anotherIntCodec)}`;
-          }
-        });
+        return applyAttributeCondition("domain2", anotherIntCodec, $condition, val);
       },
       enum($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorCodec)}`;
-          }
-        });
+        return applyAttributeCondition("enum", colorCodec, $condition, val);
       },
       enumArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, colorArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       inet($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "inet",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-          }
-        });
+        return applyAttributeCondition("inet", TYPES.inet, $condition, val);
       },
       int8ArrayDomain($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "int8_array_domain",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, int8ArrayDomainCodec)}`;
-          }
-        });
+        return applyAttributeCondition("int8_array_domain", int8ArrayDomainCodec, $condition, val);
       },
       interval($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "interval",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.interval)}`;
-          }
-        });
+        return applyAttributeCondition("interval", TYPES.interval, $condition, val);
       },
       intervalArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "interval_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, intervalArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("interval_array", LIST_TYPES.interval, $condition, val);
       },
       json($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "json",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
-          }
-        });
+        return applyAttributeCondition("json", TYPES.json, $condition, val);
       },
       jsonb($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "jsonb",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-          }
-        });
+        return applyAttributeCondition("jsonb", TYPES.jsonb, $condition, val);
       },
       jsonpath($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "jsonpath",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonpath)}`;
-          }
-        });
+        return applyAttributeCondition("jsonpath", TYPES.jsonpath, $condition, val);
       },
       ltree($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "ltree",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_codec_ltree)}`;
-          }
-        });
+        return applyAttributeCondition("ltree", spec_types_attributes_ltree_codec_ltree, $condition, val);
       },
       ltreeArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "ltree_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_types_attributes_ltree_array_codec_ltree_)}`;
-          }
-        });
+        return applyAttributeCondition("ltree_array", spec_types_attributes_ltree_array_codec_ltree_, $condition, val);
       },
       macaddr($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "macaddr",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-          }
-        });
+        return applyAttributeCondition("macaddr", TYPES.macaddr, $condition, val);
       },
       money($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "money",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.money)}`;
-          }
-        });
+        return applyAttributeCondition("money", TYPES.money, $condition, val);
       },
       nestedCompoundType($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nested_compound_type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("nested_compound_type", nestedCompoundTypeCodec, $condition, val);
       },
       nullableCompoundType($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_compound_type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, compoundTypeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("nullable_compound_type", compoundTypeCodec, $condition, val);
       },
       nullableNestedCompoundType($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_nested_compound_type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, nestedCompoundTypeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("nullable_nested_compound_type", nestedCompoundTypeCodec, $condition, val);
       },
       nullablePoint($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullablePoint",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-          }
-        });
+        return applyAttributeCondition("nullablePoint", TYPES.point, $condition, val);
       },
       nullableRange($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "nullable_range",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("nullable_range", numrangeCodec, $condition, val);
       },
       numeric($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "numeric",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.numeric)}`;
-          }
-        });
+        return applyAttributeCondition("numeric", TYPES.numeric, $condition, val);
       },
       numrange($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "numrange",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, numrangeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("numrange", numrangeCodec, $condition, val);
       },
       point($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "point",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
-          }
-        });
+        return applyAttributeCondition("point", TYPES.point, $condition, val);
       },
       regclass($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regclass",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regclass)}`;
-          }
-        });
+        return applyAttributeCondition("regclass", TYPES.regclass, $condition, val);
       },
       regconfig($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regconfig",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regconfig)}`;
-          }
-        });
+        return applyAttributeCondition("regconfig", TYPES.regconfig, $condition, val);
       },
       regdictionary($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regdictionary",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regdictionary)}`;
-          }
-        });
+        return applyAttributeCondition("regdictionary", TYPES.regdictionary, $condition, val);
       },
       regoper($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regoper",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoper)}`;
-          }
-        });
+        return applyAttributeCondition("regoper", TYPES.regoper, $condition, val);
       },
       regoperator($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regoperator",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regoperator)}`;
-          }
-        });
+        return applyAttributeCondition("regoperator", TYPES.regoperator, $condition, val);
       },
       regproc($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regproc",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regproc)}`;
-          }
-        });
+        return applyAttributeCondition("regproc", TYPES.regproc, $condition, val);
       },
       regprocedure($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regprocedure",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regprocedure)}`;
-          }
-        });
+        return applyAttributeCondition("regprocedure", TYPES.regprocedure, $condition, val);
       },
       regtype($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regtype",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regtype)}`;
-          }
-        });
+        return applyAttributeCondition("regtype", TYPES.regtype, $condition, val);
       },
       smallint($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "smallint",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
-          }
-        });
+        return applyAttributeCondition("smallint", TYPES.int2, $condition, val);
       },
       textArray($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "text_array",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-          }
-        });
+        return applyAttributeCondition("text_array", LIST_TYPES.text, $condition, val);
       },
       textArrayDomain($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "text_array_domain",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayDomainCodec)}`;
-          }
-        });
+        return applyAttributeCondition("text_array_domain", textArrayDomainCodec, $condition, val);
       },
       time($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "time",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.time)}`;
-          }
-        });
+        return applyAttributeCondition("time", TYPES.time, $condition, val);
       },
       timestamp($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamp",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-          }
-        });
+        return applyAttributeCondition("timestamp", TYPES.timestamp, $condition, val);
       },
       timestamptz($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timestamptz",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        return applyAttributeCondition("timestamptz", TYPES.timestamptz, $condition, val);
       },
       timetz($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "timetz",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timetz)}`;
-          }
-        });
+        return applyAttributeCondition("timetz", TYPES.timetz, $condition, val);
       },
       varchar($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "varchar",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("varchar", TYPES.varchar, $condition, val);
       }
     }
   },
   TypeFunctionConnectionMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   TypeFunctionListMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   TypeFunctionMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   TypeInput: {
@@ -7918,40 +6291,16 @@ export const inputObjects = {
   UpdatableViewCondition: {
     plans: {
       constant($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constant",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("constant", TYPES.int, $condition, val);
       },
       description($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "description",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("description", TYPES.text, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.varchar, $condition, val);
       },
       x($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "x",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("x", TYPES.int, $condition, val);
       }
     }
   },
@@ -7986,50 +6335,26 @@ export const inputObjects = {
   },
   UpdateListByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      listPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      listPatch: applyPatchFields
     }
   },
   UpdateListInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      listPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      listPatch: applyPatchFields
     }
   },
   UpdateTypeByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      typePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      typePatch: applyPatchFields
     }
   },
   UpdateTypeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      typePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      typePatch: applyPatchFields
     }
   }
 };
@@ -8055,66 +6380,64 @@ export const scalars = {
     parseValue(data) {
       if (typeof data === "string") {
         return Buffer.from(data, "base64");
-      } else {
-        throw new GraphQLError("Base64EncodedBinary can only parse string values.");
       }
+      throw new GraphQLError("Base64EncodedBinary can only parse string values.");
     },
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        // TODO: add name to this error
-        throw new GraphQLError("Base64EncodedBinary can only parse string values");
+      if (ast.kind === Kind.STRING) {
+        return Buffer.from(ast.value, "base64");
       }
-      return Buffer.from(ast.value, "base64");
+      throw new GraphQLError("Base64EncodedBinary can only parse string values");
     }
   },
   BigFloat: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"BigFloat" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"BigFloat" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   BigInt: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Cursor: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Date: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Date" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Date" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Datetime: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Guid: {
@@ -8123,13 +6446,13 @@ export const scalars = {
     parseLiteral: GraphQLString.parseLiteral
   },
   InternetAddress: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   JSON: {
@@ -8148,13 +6471,13 @@ export const scalars = {
     }
   },
   JSONPath: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"JSONPath" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"JSONPath" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   JwtToken: {
@@ -8195,106 +6518,105 @@ export const scalars = {
     }
   },
   RegClass: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegClass" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegClass" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegConfig: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegConfig" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegConfig" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegDictionary: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegDictionary" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegDictionary" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegOper: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegOper" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegOper" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegOperator: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegOperator" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegOperator" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegProc: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegProc" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegProc" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegProcedure: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegProcedure" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegProcedure" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegType: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegType" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegType" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Time: {
-    serialize: DateSerialize,
-    parseValue: DateSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Time" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Time" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   UUID: {
-    serialize: DateSerialize,
+    serialize: toString,
     parseValue(value) {
       return coerce("" + value);
     },
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        // ERRORS: add name to this error
-        throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return coerce(ast.value);
       }
-      return coerce(ast.value);
+      throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
     }
   }
 };
