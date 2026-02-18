@@ -161,7 +161,7 @@ export function wrapPlans<T>(
           const rules = (build as any)[symbol].rules as PlanWrapperRules | null;
           const {
             EXPORTABLE,
-            grafast: { ExecutableStep, isExecutableStep, defaultPlanResolver },
+            grafast: { ExecutableStep, isStep, defaultPlanResolver },
           } = build;
           const filter = (build as any)[symbol]
             .filter as PlanWrapperFilter<T> | null;
@@ -247,7 +247,7 @@ export function wrapPlans<T>(
                 autoApplyFieldArgs,
                 fieldName,
                 inspect,
-                isExecutableStep,
+                isStep,
                 oldPlan,
                 planWrapper,
                 typeName,
@@ -289,7 +289,7 @@ export function wrapPlans<T>(
                       "Your plan wrapper didn't return anything; it must return a step or null!",
                     );
                   }
-                  if ($newPlan !== null && !isExecutableStep($newPlan)) {
+                  if ($newPlan !== null && !isStep($newPlan)) {
                     throw new Error(
                       `Your plan wrapper returned something other than a step... It must return a step (or null). (Returned: ${inspect(
                         $newPlan,
@@ -303,7 +303,7 @@ export function wrapPlans<T>(
                 autoApplyFieldArgs,
                 fieldName,
                 inspect,
-                isExecutableStep,
+                isStep,
                 oldPlan,
                 planWrapper,
                 typeName,

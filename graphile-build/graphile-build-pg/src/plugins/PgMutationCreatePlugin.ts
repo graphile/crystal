@@ -7,7 +7,7 @@ import type {
 } from "@dataplan/pg";
 import { pgInsertSingle } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
-import { assertExecutableStep, object } from "grafast";
+import { assertStep, object } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -206,7 +206,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                 pgTypeResource: resource,
               },
               () => ({
-                assertStep: assertExecutableStep,
+                assertStep,
                 description: `The output of our create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {
                   const TableType = build.getGraphQLTypeByPgCodec(

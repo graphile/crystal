@@ -74,8 +74,8 @@ import type { GrafastOperationOptions } from "../prepare.ts";
 import type { UnbatchedExecutableStep } from "../step.ts";
 import {
   $$noExec,
-  assertExecutableStep,
   assertFinalized,
+  assertStep,
   isListCapableStep,
   isUnbatchedStep,
   stepHasToRecord,
@@ -3074,7 +3074,7 @@ export class OperationPlan {
           );
         haltTree = true;
       }
-      assertExecutableStep(step);
+      assertStep(step);
 
       // `undefined` for non-lists (?)
       if (stepStreamOptions !== undefined) {

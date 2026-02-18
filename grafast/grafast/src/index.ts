@@ -571,7 +571,6 @@ exportAsMany("grafast", {
   stringifyPayload,
   __InputObjectStep,
   __InputStaticLeafStep,
-  assertExecutableStep,
   assertStep,
   assertListCapableStep,
   assertModifier,
