@@ -1242,10 +1242,7 @@ function builtinListOfCodec<TCodec extends (typeof TYPES)[keyof typeof TYPES]>(
 ) {
   return listOfCodec<TCodec, `_${TCodec["name"]}`>(codec, {
     name: `_${codec.name}`,
-    identifier: sql`_${codec.sqlType}`,
-    extensions: {
-      oid,
-    },
+    extensions: { oid },
   });
 }
 
