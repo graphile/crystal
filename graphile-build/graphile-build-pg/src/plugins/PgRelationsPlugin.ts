@@ -452,13 +452,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         }
         const newRelation: PgCodecRelationConfig = {
           localCodec: localCodec as PgCodecWithAttributes,
-          localCodecPolymorphicTypes,
           localAttributes: localAttributes.map((c) => c!.attname),
           remoteAttributes: foreignAttributes.map((c) => c!.attname),
           remoteResourceOptions: foreignResourceOptions,
           ...(isUnique ? { isUnique } : null),
           ...(isReferencee ? { isReferencee } : null),
           ...(description ? { description } : null),
+          ...(localCodecPolymorphicTypes
+            ? { localCodecPolymorphicTypes }
+            : null),
           ...(Object.keys(tags).length > 0 ? { extensions: { tags } } : null),
         };
         await info.process("pgRelations_relation", {
