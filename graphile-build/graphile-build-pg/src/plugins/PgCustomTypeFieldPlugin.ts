@@ -1136,6 +1136,7 @@ function modFields(
                 return resource.execute(selectArgs);
               },
               [makeArgs, resource],
+              `${resource.name}_getSelectPlanFromParentAndArgs`,
             )
           : isRootMutation
             ? // Mutation uses 'args.input' rather than 'args'
@@ -1148,6 +1149,7 @@ function modFields(
                   });
                 },
                 [makeArgs, object, resource],
+                `${resource.name}_getSelectPlanFromParentAndArgs`,
               )
             : // Otherwise computed:
 
@@ -1188,6 +1190,7 @@ function modFields(
                     pgFunctionArgumentsFromArgs,
                     resource,
                   ],
+                  `${resource.name}_getSelectPlanFromParentAndArgs`,
                 )
               : EXPORTABLE(
                   (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
@@ -1199,6 +1202,7 @@ function modFields(
                       return resource.execute(selectArgs);
                     },
                   [makeArgs, pgFunctionArgumentsFromArgs, resource],
+                  `${resource.name}_getSelectPlanFromParentAndArgs`,
                 );
 
         if (isRootMutation) {
