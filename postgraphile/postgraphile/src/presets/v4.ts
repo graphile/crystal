@@ -196,6 +196,14 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
               attribute.codec.domainOfCodec ?? attribute.codec;
             const newBehavior = [behavior];
             if (
+              underlyingCodec.name === "tsvector" ||
+              underlyingCodec.name === "tsquery"
+            ) {
+              // Undo force-enable of behavior globally
+              newBehavior.push("-condition:attribute:filterBy");
+              newBehavior.push("-attribute:orderBy");
+            }
+            if (
               underlyingCodec.arrayOfCodec ||
               underlyingCodec.isBinary ||
               underlyingCodec.rangeOfCodec
