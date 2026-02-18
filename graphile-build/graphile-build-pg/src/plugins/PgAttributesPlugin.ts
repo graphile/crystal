@@ -12,6 +12,7 @@ import type {
   PgSelectQueryBuilder,
   PgSelectSingleStep,
 } from "@dataplan/pg";
+import { sqlValueWithCodec } from "@dataplan/pg";
 import type {
   GrafastFieldConfig,
   InputObjectFieldApplyResolver,
@@ -21,6 +22,7 @@ import type {
 import { bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
+import sql from "pg-sql2";
 
 import { version } from "../version.ts";
 
@@ -276,6 +278,27 @@ function processAttribute(
     `Adding '${attributeName}' attribute field to GraphQL type '${Self.name}' (representing PgCodec '${pgCodec.name}')`,
   );
 }
+
+const applyAttributeCondition = EXPORTABLE(
+  (sql, sqlValueWithCodec) =>
+    function plan(
+      attributeName: string,
+      attributeCodec: PgCodec,
+      $condition: PgCondition<PgSelectQueryBuilder>,
+      val: unknown,
+    ) {
+      $condition.where({
+        type: "attribute",
+        attribute: attributeName,
+        callback: (expression) =>
+          val === null
+            ? sql`${expression} is null`
+            : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`,
+      });
+    },
+  [sql, sqlValueWithCodec],
+  "applyAttributeCondition",
+);
 
 export const PgAttributesPlugin: GraphileConfig.Plugin = {
   name: "PgAttributesPlugin",
@@ -655,24 +678,19 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   );
                 } else {
                   apply = EXPORTABLE(
-                    (attributeCodec, attributeName, sql, sqlValueWithCodec) =>
+                    (applyAttributeCondition, attributeCodec, attributeName) =>
                       function plan(
                         $condition: PgCondition<PgSelectQueryBuilder>,
                         val: unknown,
                       ) {
-                        $condition.where({
-                          type: "attribute",
-                          attribute: attributeName,
-                          callback: (expression) =>
-                            val === null
-                              ? sql`${expression} is null`
-                              : sql`${expression} = ${sqlValueWithCodec(
-                                  val,
-                                  attributeCodec,
-                                )}`,
-                        });
+                        applyAttributeCondition(
+                          attributeName,
+                          attributeCodec,
+                          $condition,
+                          val,
+                        );
                       },
-                    [attributeCodec, attributeName, sql, sqlValueWithCodec],
+                    [applyAttributeCondition, attributeCodec, attributeName],
                   );
                 }
               } else {
