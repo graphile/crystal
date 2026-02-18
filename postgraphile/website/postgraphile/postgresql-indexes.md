@@ -42,9 +42,8 @@ with indexed_tables as (
       ns.nspname,
       t.relname as table_name,
       i.relname as index_name,
-      array_to_string(array_agg(a.attname), ', ') as column_names,
-      ix.indrelid,
-      string_to_array(ix.indkey::text, ' ')::smallint[] as indkey
+      array_agg(a.attnum order by array_position(ix.indkey, a.attnum))::smallint[] as indkey,
+      ix.indrelid
   from pg_class i
   join pg_index ix on i.oid = ix.indrelid
   join pg_class t on ix.indrelid = t.oid
@@ -77,8 +76,10 @@ and not exists(
   select 1
   from indexed_tables
   where indrelid = conrelid
-  and conkey = indkey
-  or (array_length(indkey, 1) > 1 and indkey @> conkey)
+  and (
+    conkey = indkey
+    or (array_length(indkey, 1) > array_length(conkey, 1) and indkey @> conkey)
+  )
 )
 order by reltuples desc;
 ```
