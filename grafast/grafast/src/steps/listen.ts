@@ -5,7 +5,7 @@ import type {
   GrafastResultStreamList,
   GrafastSubscriber,
 } from "../interfaces.ts";
-import { isExecutableStep, Step } from "../step.ts";
+import { isStep, Step } from "../step.ts";
 import type { __ItemStep } from "./__item.ts";
 import { constant } from "./constant.ts";
 
@@ -53,7 +53,7 @@ export class ListenStep<
     this.itemPlan = itemPlan;
     const $topic =
       typeof topicOrPlan === "string" ? constant(topicOrPlan) : topicOrPlan;
-    const $pubsub = isExecutableStep(pubsubOrPlan)
+    const $pubsub = isStep(pubsubOrPlan)
       ? pubsubOrPlan
       : constant(pubsubOrPlan, false);
     this.pubsubDep = this.addDependency($pubsub);
