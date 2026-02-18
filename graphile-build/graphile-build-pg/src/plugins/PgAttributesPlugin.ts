@@ -679,17 +679,16 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                 } else {
                   apply = EXPORTABLE(
                     (applyAttributeCondition, attributeCodec, attributeName) =>
-                      function plan(
+                      (
                         $condition: PgCondition<PgSelectQueryBuilder>,
                         val: unknown,
-                      ) {
+                      ) =>
                         applyAttributeCondition(
                           attributeName,
                           attributeCodec,
                           $condition,
                           val,
-                        );
-                      },
+                        ),
                     [applyAttributeCondition, attributeCodec, attributeName],
                   );
                 }
