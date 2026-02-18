@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_SingleTableTopic_codec_base64JSON = {
@@ -19032,7 +19032,7 @@ export const objects = {
     }
   },
   CreateAwsApplicationPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       awsApplication($object) {
         return $object.get("result");
@@ -19060,7 +19060,7 @@ export const objects = {
     }
   },
   CreateFirstPartyVulnerabilityPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19078,7 +19078,7 @@ export const objects = {
     }
   },
   CreateGcpApplicationPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19106,7 +19106,7 @@ export const objects = {
     }
   },
   CreateLogEntryPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19134,7 +19134,7 @@ export const objects = {
     }
   },
   CreateOrganizationPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19152,7 +19152,7 @@ export const objects = {
     }
   },
   CreatePersonPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19170,7 +19170,7 @@ export const objects = {
     }
   },
   CreateRelationalItemRelationCompositePkPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19198,7 +19198,7 @@ export const objects = {
     }
   },
   CreateRelationalItemRelationPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19226,7 +19226,7 @@ export const objects = {
     }
   },
   CreateSingleTableItemRelationCompositePkPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19254,7 +19254,7 @@ export const objects = {
     }
   },
   CreateSingleTableItemRelationPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -19282,7 +19282,7 @@ export const objects = {
     }
   },
   CreateThirdPartyVulnerabilityPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");

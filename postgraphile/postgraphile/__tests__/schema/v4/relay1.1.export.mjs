@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -13496,7 +13496,7 @@ export const objects = {
     }
   },
   CreateCompoundKeyPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13524,7 +13524,7 @@ export const objects = {
     }
   },
   CreateEdgeCasePayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13539,7 +13539,7 @@ export const objects = {
     }
   },
   CreateIssue756Payload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13557,7 +13557,7 @@ export const objects = {
     }
   },
   CreateLeftArmPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13580,7 +13580,7 @@ export const objects = {
     }
   },
   CreateMyTablePayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13598,7 +13598,7 @@ export const objects = {
     }
   },
   CreateNullTestRecordPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13616,7 +13616,7 @@ export const objects = {
     }
   },
   CreatePersonPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13634,7 +13634,7 @@ export const objects = {
     }
   },
   CreatePersonSecretPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -13992,7 +13992,7 @@ export const objects = {
     }
   },
   Interval: {
-    assertStep: assertExecutableStep
+    assertStep: assertStep
   },
   IntSetMutationPayload: {
     assertStep: ObjectStep,

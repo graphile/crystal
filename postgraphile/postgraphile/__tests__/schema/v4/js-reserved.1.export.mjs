@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const pkCols = ["id"];
@@ -9295,7 +9295,7 @@ export const objects = {
     }
   },
   CreateBuildingPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       building($object) {
         return $object.get("result");
@@ -9313,7 +9313,7 @@ export const objects = {
     }
   },
   CreateConstructorPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -9331,7 +9331,7 @@ export const objects = {
     }
   },
   CreateCropPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -9349,7 +9349,7 @@ export const objects = {
     }
   },
   CreateMachinePayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       buildingByConstructor($in) {
         const $record = $in.get("result");
@@ -9371,7 +9371,7 @@ export const objects = {
     }
   },
   CreateMaterialPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -9389,7 +9389,7 @@ export const objects = {
     }
   },
   CreateNullPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -9407,7 +9407,7 @@ export const objects = {
     }
   },
   CreateProjectPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -9425,7 +9425,7 @@ export const objects = {
     }
   },
   CreateProtoPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       _proto__($object) {
         return $object.get("result");
@@ -9443,7 +9443,7 @@ export const objects = {
     }
   },
   CreateReservedPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -9461,7 +9461,7 @@ export const objects = {
     }
   },
   CreateYieldPayload: {
-    assertStep: assertExecutableStep,
+    assertStep: assertStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
