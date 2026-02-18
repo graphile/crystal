@@ -115,6 +115,12 @@ const HIDE_BY_DEFAULT: ReadonlyArray<PgCodec> = [
   // websearch_to_tsquery or similar), and should not be exposed by default.
   // The developer probably stores the raw search string the user entered in a
   // different column (plain text?) which should be exposed only.
+  // It's also worth noting that a raw tsquery can be extremely expensive to
+  // execute, especially if it includes a lot of `OR` or prefix searches.
+  // Allowing users to add arbitrary tsquery values into the DB is likely
+  // suboptimal. There's also the risk of side-channel attacks (such as timing
+  // attacks) which can be used to determine information about data the user
+  // isn't actually allowed to see.
   TYPES.tsquery,
 ];
 
