@@ -3,7 +3,6 @@ import type {
   PgCodecAnyScalar,
   PgCodecAttribute,
   PgCodecAttributes,
-  PgCodecExtensions,
   PgEnumCodec,
   PgRecordTypeCodecSpec,
   PgResource,
@@ -417,7 +416,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           // Do NOT mark `extensions` as `EXPORTABLE` otherwise changes
           // implemented through hooks will not be represented in the export.
-          const extensions: PgCodecExtensions = {
+          const extensions: DataplanPg.PgCodecExtensions = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             pg: {
@@ -681,7 +680,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           const { tags, description } = type.getTagsAndDescription();
 
-          const extensions: PgCodecExtensions = {
+          const extensions: DataplanPg.PgCodecExtensions = {
             oid: type._id,
             pg: {
               serviceName,
@@ -748,7 +747,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const typeName = type.typname;
           if (innerCodec) {
             const { tags, description } = type.getTagsAndDescription();
-            const extensions: PgCodecExtensions = {
+            const extensions: DataplanPg.PgCodecExtensions = {
               oid: type._id,
               pg: {
                 serviceName,
@@ -820,7 +819,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (innerCodec) {
               const typeDelim = innerType.typdelim!;
               const { tags, description } = type.getTagsAndDescription();
-              const extensions: PgCodecExtensions = {
+              const extensions: DataplanPg.PgCodecExtensions = {
                 oid: type._id,
                 pg: {
                   serviceName,
