@@ -42,8 +42,9 @@ with indexed_tables as (
       ns.nspname,
       t.relname as table_name,
       i.relname as index_name,
-      array_agg(a.attnum order by array_position(ix.indkey, a.attnum))::smallint[] as indkey,
-      ix.indrelid
+      string_agg(a.attname::text, ', ' order by array_position(ix.indkey, a.attnum)) as column_names,
+      ix.indrelid,
+      array_agg(a.attnum order by array_position(ix.indkey, a.attnum))::smallint[] as indkey
   from pg_class i
   join pg_index ix on i.oid = ix.indrelid
   join pg_class t on ix.indrelid = t.oid
@@ -78,7 +79,10 @@ and not exists(
   where indrelid = conrelid
   and (
     conkey = indkey
-    or (array_length(indkey, 1) > array_length(conkey, 1) and indkey @> conkey)
+    or (
+      array_length(indkey, 1) > array_length(conkey, 1)
+      and indkey::int[] @> conkey::int[]
+    )
   )
 )
 order by reltuples desc;
