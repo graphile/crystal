@@ -10,6 +10,7 @@ import type {
 import { TYPES } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import { EXPORTABLE } from "graphile-build";
+import sql from "pg-sql2";
 
 import { version } from "../version.ts";
 
@@ -33,6 +34,26 @@ declare global {
     }
   }
 }
+
+const totalCountConnectionPlan = EXPORTABLE(
+  (TYPES, sql) =>
+    (
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep<any> | PgUnionAllStep<any, any>,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep<any> | PgUnionAllStep<any, any>
+      >,
+    ) =>
+      $connection
+        .cloneSubplanWithoutPagination("aggregate")
+        .singleAsRecord()
+        .select(sql`count(*)`, TYPES.bigint, false) as any,
+  [TYPES, sql],
+  "totalCountConnectionPlan",
+);
 
 export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
   name: "PgConnectionTotalCountPlugin",
@@ -98,24 +119,7 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                     "field",
                   ),
                   type: new GraphQLNonNull(GraphQLInt),
-                  plan: EXPORTABLE(
-                    (TYPES, sql) =>
-                      (
-                        $connection: ConnectionStep<
-                          any,
-                          PgSelectSingleStep<any> | PgUnionAllStep<any, any>,
-                          any,
-                          any,
-                          null | readonly any[],
-                          PgSelectStep<any> | PgUnionAllStep<any, any>
-                        >,
-                      ) =>
-                        $connection
-                          .cloneSubplanWithoutPagination("aggregate")
-                          .singleAsRecord()
-                          .select(sql`count(*)`, TYPES.bigint, false) as any,
-                    [TYPES, sql],
-                  ),
+                  plan: totalCountConnectionPlan,
                 };
               },
             ),
