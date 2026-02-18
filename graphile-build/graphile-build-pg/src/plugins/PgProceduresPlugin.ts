@@ -17,7 +17,11 @@ import {
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
-import { EXPORTABLE, gatherConfig } from "graphile-build";
+import {
+  EXPORTABLE,
+  EXPORTABLE_OBJECT_CLONE,
+  gatherConfig,
+} from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 
 import { exportNameHint } from "../utils.ts";
@@ -537,19 +541,24 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, pgResourceOptions],
             );
           } else {
-            const options: PgResourceOptions = {
-              executor,
-              name,
-              identifier,
-              ...(description ? { description } : null),
-              from: fromCallback,
-              parameters,
-              ...(!returnsSetof ? { isUnique: true } : null),
-              codec: returnCodec,
-              ...(isMutation ? { isMutation } : null),
-              hasImplicitOrder,
-              extensions,
-            };
+            // Need to mark this exportable to avoid out-of-order access to
+            // variables in the export
+            const options: PgResourceOptions = EXPORTABLE_OBJECT_CLONE(
+              {
+                executor,
+                name,
+                identifier,
+                ...(description ? { description } : null),
+                from: fromCallback,
+                parameters,
+                ...(!returnsSetof ? { isUnique: true } : null),
+                codec: returnCodec,
+                ...(isMutation ? { isMutation } : null),
+                hasImplicitOrder,
+                extensions,
+              },
+              `${name}_resourceOptionsConfig`,
+            );
 
             await info.process("pgProcedures_PgResourceOptions", {
               serviceName,

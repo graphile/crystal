@@ -44,7 +44,10 @@ export function isForbidden(thing: unknown): thing is { $$export: false } {
   );
 }
 
-export function EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T): T {
+export function EXPORTABLE_OBJECT_CLONE<T extends object>(
+  obj: T,
+  name?: string,
+): T {
   if (Object.getPrototypeOf(obj) === Object.prototype) {
     const keys = Object.keys(obj);
     const values = Object.values(obj);
@@ -61,7 +64,7 @@ export function EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T): T {
       ),
     )}});`;
     // eslint-disable-next-line graphile-export/exhaustive-deps
-    return EXPORTABLE(fn, values);
+    return EXPORTABLE(fn, values, name);
   } else {
     throw new Error(
       "EXPORTABLE_OBJECT_CLONE can currently only be used with POJOs.",

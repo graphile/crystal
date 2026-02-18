@@ -566,7 +566,10 @@ select * from a where id = 1;
 
           // Need to mark this exportable to avoid out-of-order access to
           // variables in the export
-          const finalOptions = EXPORTABLE_OBJECT_CLONE(options);
+          const finalOptions = EXPORTABLE_OBJECT_CLONE(
+            options,
+            `${options.name}_resourceOptionsConfig`,
+          );
 
           const resourceOptions = EXPORTABLE(
             (finalOptions, pgResourceOptions) =>
