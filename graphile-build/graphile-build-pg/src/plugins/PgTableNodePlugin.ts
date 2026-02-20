@@ -35,6 +35,57 @@ declare global {
   }
 }
 
+interface MakeTableNodeIdHandlerSpec {
+  typeName: string;
+  nodeIdCodec: NodeIdCodec;
+  resource: PgResource;
+  identifier: string;
+  pk: readonly string[];
+  deprecationReason?: string;
+}
+
+const makeTableNodeIdHandler = EXPORTABLE(
+  (access, constant, inhibitOnNull, list) =>
+    ({
+      typeName,
+      nodeIdCodec,
+      resource,
+      identifier,
+      pk,
+      deprecationReason,
+    }: MakeTableNodeIdHandlerSpec): NodeIdHandler => {
+      return {
+        typeName,
+        codec: nodeIdCodec,
+        plan($record: PgSelectSingleStep) {
+          return list([
+            constant(identifier, false),
+            ...pk.map((attribute) => $record.get(attribute)),
+          ]);
+        },
+        getSpec($list: ListStep<any[]>) {
+          return Object.fromEntries(
+            pk.map((attribute, index) => [
+              attribute,
+              inhibitOnNull(access($list, [index + 1])),
+            ]),
+          );
+        },
+        getIdentifiers(value) {
+          return value.slice(1);
+        },
+        get(spec) {
+          return resource.get(spec);
+        },
+        match(obj) {
+          return obj[0] === identifier;
+        },
+        deprecationReason,
+      };
+    },
+  [access, constant, inhibitOnNull, list],
+);
+
 export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
   description: "Add the 'Node' interface to table types",
@@ -171,34 +222,18 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               build.options?.defaultNodeIdCodec ??
               "base64JSON",
           );
+          const spec: MakeTableNodeIdHandlerSpec = {
+            typeName: tableTypeName,
+            identifier,
+            nodeIdCodec,
+            resource: pgResource,
+            pk,
+            ...(deprecationReason ? { deprecationReason } : null),
+          };
           build.registerNodeIdHandler(
             EXPORTABLE(
-              (
-                deprecationReason,
-                identifier,
-                makeTableNodeIdHandler,
-                nodeIdCodec,
-                pgResource,
-                pk,
-                tableTypeName,
-              ) =>
-                makeTableNodeIdHandler({
-                  typeName: tableTypeName,
-                  identifier,
-                  nodeIdCodec,
-                  resource: pgResource,
-                  pk,
-                  ...(deprecationReason ? { deprecationReason } : null),
-                }),
-              [
-                deprecationReason,
-                identifier,
-                makeTableNodeIdHandler,
-                nodeIdCodec,
-                pgResource,
-                pk,
-                tableTypeName,
-              ],
+              (makeTableNodeIdHandler, spec) => makeTableNodeIdHandler(spec),
+              [makeTableNodeIdHandler, spec],
             ),
           );
         }
@@ -207,52 +242,3 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
     },
   },
 };
-
-const makeTableNodeIdHandler = EXPORTABLE(
-  (access, constant, inhibitOnNull, list) =>
-    ({
-      typeName,
-      nodeIdCodec,
-      resource,
-      identifier,
-      pk,
-      deprecationReason,
-    }: {
-      typeName: string;
-      nodeIdCodec: NodeIdCodec;
-      resource: PgResource;
-      identifier: string;
-      pk: readonly string[];
-      deprecationReason?: string;
-    }): NodeIdHandler => {
-      return {
-        typeName,
-        codec: nodeIdCodec,
-        plan($record: PgSelectSingleStep) {
-          return list([
-            constant(identifier, false),
-            ...pk.map((attribute) => $record.get(attribute)),
-          ]);
-        },
-        getSpec($list: ListStep<any[]>) {
-          return Object.fromEntries(
-            pk.map((attribute, index) => [
-              attribute,
-              inhibitOnNull(access($list, [index + 1])),
-            ]),
-          );
-        },
-        getIdentifiers(value) {
-          return value.slice(1);
-        },
-        get(spec) {
-          return resource.get(spec);
-        },
-        match(obj) {
-          return obj[0] === identifier;
-        },
-        deprecationReason,
-      };
-    },
-  [access, constant, inhibitOnNull, list],
-);
