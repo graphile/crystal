@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,37 +69,26 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
 });
 const peopleIdentifier = sql.identifier("simple_collections", "people");
-const spec_people = {
+const peopleCodec = recordCodec({
   name: "people",
   identifier: peopleIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -118,8 +103,7 @@ const spec_people = {
     }
   },
   executor: executor
-};
-const peopleCodec = recordCodec(spec_people);
+});
 const petsIdentifier = sql.identifier("simple_collections", "pets");
 const petsCodec = recordCodec({
   name: "pets",
@@ -127,113 +111,69 @@ const petsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     owner_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "simple_collections",
       name: "pets"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const peopleUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_people_people = {
+const people_resourceOptionsConfig = {
   executor: executor,
   name: "people",
   identifier: "main.simple_collections.people",
   from: peopleIdentifier,
   codec: peopleCodec,
-  uniques: peopleUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "simple_collections",
       name: "people"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       simpleCollections: "omit",
-      behavior: spec_people.extensions.tags.behavior
+      behavior: ["-list +connection"]
     }
-  }
+  },
+  uniques: peopleUniques
 };
 const petsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_pets_pets = {
+const pets_resourceOptionsConfig = {
   executor: executor,
   name: "pets",
   identifier: "main.simple_collections.pets",
   from: petsIdentifier,
   codec: petsCodec,
-  uniques: petsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "simple_collections",
       name: "pets"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: petsUniques
 };
 const people_odd_petsFunctionIdentifer = sql.identifier("simple_collections", "people_odd_pets");
 const registry = makeRegistry({
@@ -573,9 +513,9 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    people: registryConfig_pgResources_people_people,
-    pets: registryConfig_pgResources_pets_pets,
-    people_odd_pets: PgResource.functionResourceOptions(registryConfig_pgResources_pets_pets, {
+    people: people_resourceOptionsConfig,
+    pets: pets_resourceOptionsConfig,
+    people_odd_pets: PgResource.functionResourceOptions(pets_resourceOptionsConfig, {
       name: "people_odd_pets",
       identifier: "main.simple_collections.people_odd_pets(simple_collections.people)",
       from(...args) {
@@ -583,23 +523,18 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        required: true,
-        notNull: false,
-        codec: peopleCodec
+        codec: peopleCodec,
+        required: true
       }],
-      returnsArray: false,
       returnsSetof: true,
-      isMutation: false,
-      hasImplicitOrder: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "simple_collections",
           name: "people_odd_pets"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      hasImplicitOrder: true
     })
   },
   pgRelations: {
@@ -608,64 +543,62 @@ const registry = makeRegistry({
       __proto__: null,
       petsByTheirOwnerId: {
         localCodec: peopleCodec,
-        remoteResourceOptions: registryConfig_pgResources_pets_pets,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: pets_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["owner_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     pets: {
       __proto__: null,
       peopleByMyOwnerId: {
         localCodec: petsCodec,
-        remoteResourceOptions: registryConfig_pgResources_people_people,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: people_resourceOptionsConfig,
         localAttributes: ["owner_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     }
   }
 });
 const resource_peoplePgResource = registry.pgResources["people"];
 const resource_petsPgResource = registry.pgResources["pets"];
-const nodeIdHandler_Person = {
-  typeName: "Person",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("people", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_peoplePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "people";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_Person = makeTableNodeIdHandler({
+  typeName: "Person",
+  identifier: "people",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_peoplePgResource,
+  pk: peopleUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -695,34 +628,31 @@ const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
   return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
-const nodeIdHandler_Pet = {
+const nodeIdHandler_Pet = makeTableNodeIdHandler({
   typeName: "Pet",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("pets", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_petsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "pets";
-  }
-};
+  identifier: "pets",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_petsPgResource,
+  pk: petsUniques[0].attributes
+});
 const nodeFetcher_Pet = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Pet));
   return nodeIdHandler_Pet.get(nodeIdHandler_Pet.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArg = (_condition, $select, arg) => {
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArg(parent, $select, value) {
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -792,13 +722,28 @@ const pgFunctionArgumentsFromArgs = (() => {
   return pgFunctionArgumentsFromArgs;
 })();
 const resource_people_odd_petsPgResource = registry.pgResources["people_odd_pets"];
-function CursorSerialize(value) {
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
+function toString(value) {
   return "" + value;
+}
+function applyInputToInsert(_, $object) {
+  return $object;
 }
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_Pet = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Pet, $nodeId);
@@ -811,6 +756,16 @@ const specFromArgs_Pet2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Pet, $nodeId);
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -831,6 +786,29 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -1456,15 +1434,11 @@ export const objects = {
           return connection(resource_peoplePgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
+          first: applyFirstArg,
           last(_, $connection, val) {
             $connection.setLast(val.getRaw());
           },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
+          offset: applyOffsetArg,
           before(_, $connection, val) {
             $connection.setBefore(val.getRaw());
           },
@@ -1486,18 +1460,10 @@ export const objects = {
           return resource_petsPgResource.find();
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       },
       node(_$root, fieldArgs) {
@@ -1539,32 +1505,26 @@ export const objects = {
     plans: {
       createPerson: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_peoplePgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_peoplePgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createPet: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_petsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_petsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deletePerson: {
@@ -1576,9 +1536,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePersonById: {
@@ -1592,9 +1550,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePet: {
@@ -1606,9 +1562,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deletePetById: {
@@ -1622,9 +1576,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePerson: {
@@ -1636,9 +1588,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePersonById: {
@@ -1652,9 +1602,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePet: {
@@ -1666,9 +1614,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updatePetById: {
@@ -1682,9 +1628,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -1692,87 +1636,59 @@ export const objects = {
   CreatePersonPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      person($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      person: planCreatePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreatePetPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
       personByOwnerId($record) {
         return resource_peoplePgResource.get({
           id: $record.get("result").get("owner_id")
         });
       },
-      pet($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      pet: planCreatePayloadResult,
+      query: queryPlan
     }
   },
   DeletePersonPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPersonId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Person.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person($object) {
-        return $object.get("result");
-      },
+      person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeletePetPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPetId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Pet.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       personByOwnerId($record) {
         return resource_peoplePgResource.get({
           id: $record.get("result").get("owner_id")
         });
       },
-      pet($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      pet: planUpdateOrDeletePayloadResult,
+      query: queryPlan
     }
   },
   PeopleConnection: {
@@ -1792,18 +1708,12 @@ export const objects = {
       },
       oddPetsList: {
         plan($in, args, _info) {
-          const {
-            selectArgs
-          } = pgFunctionArgumentsFromArgs($in, makeArgs_people_odd_pets(args));
-          return resource_people_odd_petsPgResource.execute(selectArgs);
+          const details = pgFunctionArgumentsFromArgs($in, makeArgs_people_odd_pets(args));
+          return resource_people_odd_petsPgResource.execute(details.selectArgs);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg
         }
       },
       petsByOwnerIdList: {
@@ -1813,18 +1723,10 @@ export const objects = {
           });
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $select, value) {
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg,
+          orderBy: applyOrderByArg
         }
       }
     },
@@ -1863,39 +1765,25 @@ export const objects = {
   UpdatePersonPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      person($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdatePetPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByOwnerId($record) {
         return resource_peoplePgResource.get({
           id: $record.get("result").get("owner_id")
         });
       },
-      pet($object) {
-        return $object.get("result");
-      },
-      query() {
-        return rootValue();
-      }
+      pet: planUpdateOrDeletePayloadResult,
+      query: queryPlan
     }
   }
 };
@@ -1921,75 +1809,43 @@ export const interfaces = {
 export const inputObjects = {
   CreatePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      person(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      person: applyCreateFields
     }
   },
   CreatePetInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      pet(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      pet: applyCreateFields
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePetByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeletePetInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   PersonCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
@@ -2030,31 +1886,13 @@ export const inputObjects = {
   PetCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       },
       ownerId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "owner_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("owner_id", TYPES.int, $condition, val);
       }
     }
   },
@@ -2106,62 +1944,38 @@ export const inputObjects = {
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      personPatch: applyPatchFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      personPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      personPatch: applyPatchFields
     }
   },
   UpdatePetByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      petPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      petPatch: applyPatchFields
     }
   },
   UpdatePetInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      petPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      petPatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

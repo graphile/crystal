@@ -91,6 +91,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
           encode: rawEncode,
           decode: rawDecode,
         };
+        exportNameHint(nodeIdCodecs.raw, "rawNodeIdCodec");
 
         return build.extend(
           build,

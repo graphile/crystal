@@ -20,22 +20,32 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
           return _;
         }
         const { EXPORTABLE } = build;
-        const base64JSONEncode = EXPORTABLE(() => {
-          function base64JSONEncode(value: any): string | null {
-            return Buffer.from(JSON.stringify(value), "utf8").toString(
-              "base64",
-            );
-          }
-          base64JSONEncode.isSyncAndSafe = true; // Optimization
-          return base64JSONEncode;
-        }, []);
-        const base64JSONDecode = EXPORTABLE(() => {
-          function base64JSONDecode(value: string): any {
-            return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-          }
-          base64JSONDecode.isSyncAndSafe = true; // Optimization
-          return base64JSONDecode;
-        }, []);
+        const base64JSONEncode = EXPORTABLE(
+          () =>
+            Object.assign(
+              function base64JSONEncode(value: any): string | null {
+                return Buffer.from(JSON.stringify(value), "utf8").toString(
+                  "base64",
+                );
+              },
+              { isSyncAndSafe: true },
+            ),
+          [],
+          "base64JSONEncode",
+        );
+        const base64JSONDecode = EXPORTABLE(
+          () =>
+            Object.assign(
+              function base64JSONDecode(value: string): any {
+                return JSON.parse(
+                  Buffer.from(value, "base64").toString("utf8"),
+                );
+              },
+              { isSyncAndSafe: true },
+            ),
+          [],
+          "base64JSONDecode",
+        );
 
         build.registerNodeIdCodec(
           EXPORTABLE(
@@ -45,6 +55,7 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
               decode: base64JSONDecode,
             }),
             [base64JSONDecode, base64JSONEncode],
+            "base64JSONNodeIdCodec",
           ),
         );
         return _;

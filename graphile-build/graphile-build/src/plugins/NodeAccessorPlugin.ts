@@ -188,7 +188,6 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                 },
                 type: build.getOutputTypeByName(typeName),
                 description: `Reads a single \`${typeName}\` using its globally unique \`ID\`.`,
-                deprecationReason: fetcher.deprecationReason,
                 plan: EXPORTABLE(
                   (fetcher, nodeIdFieldName) =>
                     function plan(_$parent: ExecutableStep, args: FieldArgs) {
@@ -199,6 +198,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                     },
                   [fetcher, nodeIdFieldName],
                 ),
+                ...(fetcher.deprecationReason
+                  ? { deprecationReason: fetcher.deprecationReason }
+                  : null),
               },
             },
             `Adding ${typeName} by NodeId field`,

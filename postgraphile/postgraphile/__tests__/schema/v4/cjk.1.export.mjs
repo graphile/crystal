@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,47 +81,27 @@ const _Codec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     "\u671F\u95F4": {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "cjk",
       name: "\u671F\u95F4"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const _Uniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const resource_PgResource = makeRegistry({
   pgExecutors: {
@@ -469,51 +445,56 @@ const resource_PgResource = makeRegistry({
       identifier: "main.cjk.\u671F\u95F4",
       from: _Identifier,
       codec: _Codec,
-      uniques: _Uniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "cjk",
           name: "\u671F\u95F4"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: _Uniques
     }
   },
   pgRelations: {
     __proto__: null
   }
 }).pgResources["\u671F\u95F4"];
-const nodeIdHandler_QiJian = {
-  typeName: "QiJian",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("\u671F\u95F4", false), ..._Uniques[0].attributes.map(attribute => $record.get(attribute))]);
-  },
-  getSpec($list) {
-    const spec = _Uniques[0].attributes.reduce((memo, attribute, index) => {
-      memo[attribute] = inhibitOnNull(access($list, [index + 1]));
-      return memo;
-    }, Object.create(null));
-    return spec;
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_PgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "\u671F\u95F4";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_QiJian = makeTableNodeIdHandler({
+  typeName: "QiJian",
+  identifier: "\u671F\u95F4",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_PgResource,
+  pk: _Uniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -562,13 +543,28 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function CursorSerialize(value) {
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const specFromArgs_QiJian = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_QiJian, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -589,6 +585,14 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -928,12 +932,11 @@ export const objects = {
     plans: {
       createQiJian: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_PgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_PgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
           input(_, $object) {
@@ -950,9 +953,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateQiJianById: {
@@ -966,9 +967,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -986,9 +985,7 @@ export const objects = {
       qiJianEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_PgResource, _Uniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   QiJian: {
@@ -1031,9 +1028,7 @@ export const objects = {
       qiJianEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_PgResource, _Uniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   }
 };
@@ -1072,22 +1067,10 @@ export const inputObjects = {
   QiJianCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       qiJian($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "\u671F\u95F4",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("\u671F\u95F4", TYPES.int, $condition, val);
       }
     }
   },
@@ -1127,38 +1110,26 @@ export const inputObjects = {
   },
   UpdateQiJianByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      qiJianPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      qiJianPatch: applyPatchFields
     }
   },
   UpdateQiJianInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      qiJianPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      qiJianPatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,19 +81,11 @@ const abcdCodec = recordCodec({
   attributes: {
     __proto__: null,
     letter: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     description: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
       extensions: {
         tags: {
           enumDescription: true
@@ -105,7 +93,6 @@ const abcdCodec = recordCodec({
       }
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -128,25 +115,13 @@ const abcdViewCodec = recordCodec({
   attributes: {
     __proto__: null,
     letter: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     description: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -170,25 +145,13 @@ const simpleEnumCodec = recordCodec({
   attributes: {
     __proto__: null,
     value: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     description: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -270,43 +233,22 @@ const letterDescriptionsCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     letter: {
-      description: undefined,
       codec: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     letter_via_view: {
-      description: undefined,
       codec: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     description: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -448,127 +390,60 @@ const referencingTableCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     enum_1: {
-      description: undefined,
-      codec: spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum
     },
     enum_2: {
-      description: undefined,
-      codec: spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum
     },
     enum_3: {
-      description: undefined,
-      codec: spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum
     },
     simple_enum: {
-      description: undefined,
-      codec: spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
       name: "referencing_table"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const lotsOfEnumsIdentifier = sql.identifier("enum_tables", "lots_of_enums");
-const spec_lotsOfEnums = {
+const lotsOfEnumsCodec = recordCodec({
   name: "lotsOfEnums",
   identifier: lotsOfEnumsIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     enum_1: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     enum_2: {
-      description: undefined,
-      codec: TYPES.varchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.varchar
     },
     enum_3: {
-      description: undefined,
-      codec: TYPES.bpchar,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.bpchar
     },
     enum_4: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     description: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
@@ -583,214 +458,141 @@ const spec_lotsOfEnums = {
     }
   },
   executor: executor
-};
-const lotsOfEnumsCodec = recordCodec(spec_lotsOfEnums);
-const registryConfig_pgResources_abcd_abcd = {
+});
+const abcd_resourceOptionsConfig = {
   executor: executor,
   name: "abcd",
   identifier: "main.enum_tables.abcd",
   from: abcdIdentifier,
   codec: abcdCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["letter"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
       name: "abcd"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       enum: true,
       enumName: "LetterAToD"
     }
-  }
+  },
+  uniques: [{
+    attributes: ["letter"],
+    isPrimary: true
+  }]
 };
-const registryConfig_pgResources_abcd_view_abcd_view = {
+const abcd_view_resourceOptionsConfig = {
   executor: executor,
   name: "abcd_view",
   identifier: "main.enum_tables.abcd_view",
   from: abcdViewIdentifier,
   codec: abcdViewCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["letter"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
       name: "abcd_view"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       primaryKey: "letter",
       enum: true,
       enumName: "LetterAToDViaView"
     }
-  }
+  },
+  uniques: [{
+    attributes: ["letter"],
+    isPrimary: true
+  }]
 };
-const registryConfig_pgResources_simple_enum_simple_enum = {
+const simple_enum_resourceOptionsConfig = {
   executor: executor,
   name: "simple_enum",
   identifier: "main.enum_tables.simple_enum",
   from: simpleEnumIdentifier,
   codec: simpleEnumCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["value"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
       name: "simple_enum"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       enum: true
     }
-  }
+  },
+  uniques: [{
+    attributes: ["value"],
+    isPrimary: true
+  }]
 };
 const referencing_table_mutationFunctionIdentifer = sql.identifier("enum_tables", "referencing_table_mutation");
 const letter_descriptionsUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }, {
-  isPrimary: false,
-  attributes: ["letter"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["letter"]
 }, {
-  isPrimary: false,
-  attributes: ["letter_via_view"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  attributes: ["letter_via_view"]
 }];
-const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
+const letter_descriptions_resourceOptionsConfig = {
   executor: executor,
   name: "letter_descriptions",
   identifier: "main.enum_tables.letter_descriptions",
   from: letterDescriptionsIdentifier,
   codec: letterDescriptionsCodec,
-  uniques: letter_descriptionsUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
       name: "letter_descriptions"
     },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
     tags: {
       foreignKey: "(letter_via_view) references enum_tables.abcd_view"
     }
-  }
+  },
+  uniques: letter_descriptionsUniques
 };
 const referencing_tableUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_referencing_table_referencing_table = {
+const referencing_table_resourceOptionsConfig = {
   executor: executor,
   name: "referencing_table",
   identifier: "main.enum_tables.referencing_table",
   from: referencingTableIdentifier,
   codec: referencingTableCodec,
-  uniques: referencing_tableUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
       name: "referencing_table"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: referencing_tableUniques
 };
-const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
+const lots_of_enums_resourceOptionsConfig = {
   executor: executor,
   name: "lots_of_enums",
   identifier: "main.enum_tables.lots_of_enums",
   from: lotsOfEnumsIdentifier,
   codec: lotsOfEnumsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "lots_of_enums"
+    },
+    tags: {
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     }
+  },
+  uniques: [{
+    attributes: ["id"],
+    isPrimary: true
   }, {
-    isPrimary: false,
     attributes: ["enum_1"],
-    description: undefined,
     extensions: {
       tags: {
         __proto__: null,
@@ -799,9 +601,7 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
       }
     }
   }, {
-    isPrimary: false,
     attributes: ["enum_2"],
-    description: undefined,
     extensions: {
       tags: {
         __proto__: null,
@@ -810,9 +610,7 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
       }
     }
   }, {
-    isPrimary: false,
     attributes: ["enum_3"],
-    description: undefined,
     extensions: {
       tags: {
         __proto__: null,
@@ -820,33 +618,14 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
       }
     }
   }, {
-    isPrimary: false,
     attributes: ["enum_4"],
-    description: undefined,
     extensions: {
       tags: {
         __proto__: null,
         enum: true
       }
     }
-  }],
-  isVirtual: false,
-  description: undefined,
-  extensions: {
-    description: undefined,
-    pg: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      name: "lots_of_enums"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {
-      omit: true,
-      behavior: spec_lotsOfEnums.extensions.tags.behavior
-    }
-  }
+  }]
 };
 const registry = makeRegistry({
   pgExecutors: {
@@ -1015,11 +794,11 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    abcd: registryConfig_pgResources_abcd_abcd,
-    abcd_view: registryConfig_pgResources_abcd_view_abcd_view,
-    simple_enum: registryConfig_pgResources_simple_enum_simple_enum,
+    abcd: abcd_resourceOptionsConfig,
+    abcd_view: abcd_view_resourceOptionsConfig,
+    simple_enum: simple_enum_resourceOptionsConfig,
     referencing_table_mutation: {
-      executor,
+      executor: executor,
       name: "referencing_table_mutation",
       identifier: "main.enum_tables.referencing_table_mutation(enum_tables.referencing_table)",
       from(...args) {
@@ -1027,28 +806,24 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "t",
-        required: true,
-        notNull: false,
-        codec: referencingTableCodec
+        codec: referencingTableCodec,
+        required: true
       }],
-      isUnique: !false,
       codec: TYPES.int,
-      uniques: [],
-      isMutation: true,
       hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "enum_tables",
           name: "referencing_table_mutation"
-        },
-        tags: {}
+        }
       },
-      description: undefined
+      isUnique: true,
+      isMutation: true
     },
-    letter_descriptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
-    referencing_table: registryConfig_pgResources_referencing_table_referencing_table,
-    lots_of_enums: registryConfig_pgResources_lots_of_enums_lots_of_enums
+    letter_descriptions: letter_descriptions_resourceOptionsConfig,
+    referencing_table: referencing_table_resourceOptionsConfig,
+    lots_of_enums: lots_of_enums_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -1056,226 +831,146 @@ const registry = makeRegistry({
       __proto__: null,
       letterDescriptionsByTheirLetter: {
         localCodec: abcdCodec,
-        remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: letter_descriptions_resourceOptionsConfig,
         localAttributes: ["letter"],
         remoteAttributes: ["letter"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     abcdView: {
       __proto__: null,
       letterDescriptionsByTheirLetterViaView: {
         localCodec: abcdViewCodec,
-        remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: letter_descriptions_resourceOptionsConfig,
         localAttributes: ["letter"],
         remoteAttributes: ["letter_via_view"],
         isUnique: true,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     letterDescriptions: {
       __proto__: null,
       abcdViewByMyLetterViaView: {
         localCodec: letterDescriptionsCodec,
-        remoteResourceOptions: registryConfig_pgResources_abcd_view_abcd_view,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: abcd_view_resourceOptionsConfig,
         localAttributes: ["letter_via_view"],
         remoteAttributes: ["letter"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       abcdByMyLetter: {
         localCodec: letterDescriptionsCodec,
-        remoteResourceOptions: registryConfig_pgResources_abcd_abcd,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: abcd_resourceOptionsConfig,
         localAttributes: ["letter"],
         remoteAttributes: ["letter"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     lotsOfEnums: {
       __proto__: null,
       referencingTablesByTheirEnum1: {
         localCodec: lotsOfEnumsCodec,
-        remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: referencing_table_resourceOptionsConfig,
         localAttributes: ["enum_1"],
         remoteAttributes: ["enum_1"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       referencingTablesByTheirEnum2: {
         localCodec: lotsOfEnumsCodec,
-        remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: referencing_table_resourceOptionsConfig,
         localAttributes: ["enum_2"],
         remoteAttributes: ["enum_2"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       },
       referencingTablesByTheirEnum3: {
         localCodec: lotsOfEnumsCodec,
-        remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: referencing_table_resourceOptionsConfig,
         localAttributes: ["enum_3"],
         remoteAttributes: ["enum_3"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     referencingTable: {
       __proto__: null,
       lotsOfEnumsByMyEnum1: {
         localCodec: referencingTableCodec,
-        remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: lots_of_enums_resourceOptionsConfig,
         localAttributes: ["enum_1"],
         remoteAttributes: ["enum_1"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       lotsOfEnumsByMyEnum2: {
         localCodec: referencingTableCodec,
-        remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: lots_of_enums_resourceOptionsConfig,
         localAttributes: ["enum_2"],
         remoteAttributes: ["enum_2"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       lotsOfEnumsByMyEnum3: {
         localCodec: referencingTableCodec,
-        remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: lots_of_enums_resourceOptionsConfig,
         localAttributes: ["enum_3"],
         remoteAttributes: ["enum_3"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       },
       simpleEnumByMySimpleEnum: {
         localCodec: referencingTableCodec,
-        remoteResourceOptions: registryConfig_pgResources_simple_enum_simple_enum,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: simple_enum_resourceOptionsConfig,
         localAttributes: ["simple_enum"],
         remoteAttributes: ["value"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     },
     simpleEnum: {
       __proto__: null,
       referencingTablesByTheirSimpleEnum: {
         localCodec: simpleEnumCodec,
-        remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: referencing_table_resourceOptionsConfig,
         localAttributes: ["value"],
         remoteAttributes: ["simple_enum"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     }
   }
 });
 const resource_letter_descriptionsPgResource = registry.pgResources["letter_descriptions"];
 const resource_referencing_tablePgResource = registry.pgResources["referencing_table"];
-const nodeIdHandler_LetterDescription = {
-  typeName: "LetterDescription",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("letter_descriptions", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_letter_descriptionsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "letter_descriptions";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_LetterDescription = makeTableNodeIdHandler({
+  typeName: "LetterDescription",
+  identifier: "letter_descriptions",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_letter_descriptionsPgResource,
+  pk: letter_descriptionsUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -1305,34 +1000,42 @@ const nodeFetcher_LetterDescription = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LetterDescription));
   return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec($decoded));
 };
-const nodeIdHandler_ReferencingTable = {
+const nodeIdHandler_ReferencingTable = makeTableNodeIdHandler({
   typeName: "ReferencingTable",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("referencing_tables", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_referencing_tablePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "referencing_tables";
-  }
-};
+  identifier: "referencing_tables",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_referencing_tablePgResource,
+  pk: referencing_tableUniques[0].attributes
+});
 const nodeFetcher_ReferencingTable = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReferencingTable));
   return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -1351,15 +1054,24 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function CursorSerialize(value) {
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 const argDetailsSimple_referencing_table_mutation = [{
   graphqlArgName: "t",
-  postgresArgName: "t",
   pgCodec: referencingTableCodec,
-  required: true,
-  fetcher: null
+  postgresArgName: "t",
+  required: true
 }];
 function makeArg(path, args, details) {
   const {
@@ -1380,10 +1092,26 @@ function makeArg(path, args, details) {
 }
 const makeArgs_referencing_table_mutation = (args, path = []) => argDetailsSimple_referencing_table_mutation.map(details => makeArg(path, args, details));
 const resource_referencing_table_mutationPgResource = registry.pgResources["referencing_table_mutation"];
+function pgSelectFromPayload($payload) {
+  const $result = $payload.getStepForKey("result");
+  const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+  const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+  if ($pgSelect instanceof PgSelectStep) {
+    return $pgSelect;
+  } else {
+    throw new Error(`Could not determine PgSelectStep for ${$result}`);
+  }
+}
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs_LetterDescription = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_ReferencingTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
@@ -1396,6 +1124,16 @@ const specFromArgs_ReferencingTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
+function queryPlan() {
+  return rootValue();
+}
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -1416,6 +1154,29 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -2309,29 +2070,13 @@ export const objects = {
           return connection(resource_letter_descriptionsPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allReferencingTables: {
@@ -2339,29 +2084,13 @@ export const objects = {
           return connection(resource_referencing_tablePgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       letterDescription(_$parent, args) {
@@ -2417,32 +2146,26 @@ export const objects = {
     plans: {
       createLetterDescription: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_letter_descriptionsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_letter_descriptionsPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createReferencingTable: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_referencing_tablePgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_referencing_tablePgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteLetterDescription: {
@@ -2454,9 +2177,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLetterDescriptionById: {
@@ -2470,9 +2191,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLetterDescriptionByLetter: {
@@ -2486,9 +2205,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteLetterDescriptionByLetterViaView: {
@@ -2502,9 +2219,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReferencingTable: {
@@ -2516,9 +2231,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteReferencingTableById: {
@@ -2532,9 +2245,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       referencingTableMutation: {
@@ -2546,18 +2257,9 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object, arg) {
-            // We might have any number of step types here; we need
-            // to get back to the underlying pgSelect.
-            const $result = $object.getStepForKey("result");
-            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-            if ($pgSelect instanceof PgSelectStep) {
-              // Mostly so `clientMutationId` works!
-              arg.apply($pgSelect);
-            } else {
-              throw new Error(`Could not determine PgSelectStep for ${$result}`);
-            }
+          input(_, $payload, arg) {
+            const $pgSelect = pgSelectFromPayload($payload);
+            arg.apply($pgSelect);
           }
         }
       },
@@ -2570,9 +2272,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLetterDescriptionById: {
@@ -2586,9 +2286,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLetterDescriptionByLetter: {
@@ -2602,9 +2300,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateLetterDescriptionByLetterViaView: {
@@ -2618,9 +2314,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReferencingTable: {
@@ -2632,9 +2326,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateReferencingTableById: {
@@ -2648,9 +2340,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -2658,34 +2348,20 @@ export const objects = {
   CreateLetterDescriptionPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      letterDescription($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      letterDescription: planCreatePayloadResult,
       letterDescriptionEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateReferencingTablePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      referencingTable($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      referencingTable: planCreatePayloadResult,
       referencingTableEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2694,44 +2370,30 @@ export const objects = {
   DeleteLetterDescriptionPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedLetterDescriptionId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_LetterDescription.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      letterDescription($object) {
-        return $object.get("result");
-      },
+      letterDescription: planUpdateOrDeletePayloadResult,
       letterDescriptionEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteReferencingTablePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedReferencingTableId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_ReferencingTable.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      referencingTable($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      referencingTable: planUpdateOrDeletePayloadResult,
       referencingTableEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2759,9 +2421,7 @@ export const objects = {
   LetterDescriptionsConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   ReferencingTable: {
@@ -2802,50 +2462,32 @@ export const objects = {
       integer($object) {
         return $object.get("result");
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   ReferencingTablesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateLetterDescriptionPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      letterDescription($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      letterDescription: planUpdateOrDeletePayloadResult,
       letterDescriptionEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateReferencingTablePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      referencingTable($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      referencingTable: planUpdateOrDeletePayloadResult,
       referencingTableEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2874,107 +2516,59 @@ export const interfaces = {
 export const inputObjects = {
   CreateLetterDescriptionInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      letterDescription(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      letterDescription: applyCreateFields
     }
   },
   CreateReferencingTableInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      referencingTable(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      referencingTable: applyCreateFields
     }
   },
   DeleteLetterDescriptionByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLetterDescriptionByLetterInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLetterDescriptionByLetterViaViewInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteLetterDescriptionInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReferencingTableByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteReferencingTableInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   LetterDescriptionCondition: {
     plans: {
       description($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "description",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("description", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       letter($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "letter",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum)}`;
-          }
-        });
+        return applyAttributeCondition("letter", spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum, $condition, val);
       },
       letterViaView($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "letter_via_view",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum)}`;
-          }
-        });
+        return applyAttributeCondition("letter_via_view", spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum, $condition, val);
       }
     }
   },
@@ -3039,49 +2633,19 @@ export const inputObjects = {
   ReferencingTableCondition: {
     plans: {
       enum1($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_1",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum)}`;
-          }
-        });
+        return applyAttributeCondition("enum_1", spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum, $condition, val);
       },
       enum2($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_2",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum)}`;
-          }
-        });
+        return applyAttributeCondition("enum_2", spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum, $condition, val);
       },
       enum3($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "enum_3",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum)}`;
-          }
-        });
+        return applyAttributeCondition("enum_3", spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       simpleEnum($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "simple_enum",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum)}`;
-          }
-        });
+        return applyAttributeCondition("simple_enum", spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum, $condition, val);
       }
     }
   },
@@ -3164,86 +2728,50 @@ export const inputObjects = {
   },
   UpdateLetterDescriptionByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      letterDescriptionPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      letterDescriptionPatch: applyPatchFields
     }
   },
   UpdateLetterDescriptionByLetterInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      letterDescriptionPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      letterDescriptionPatch: applyPatchFields
     }
   },
   UpdateLetterDescriptionByLetterViaViewInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      letterDescriptionPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      letterDescriptionPatch: applyPatchFields
     }
   },
   UpdateLetterDescriptionInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      letterDescriptionPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      letterDescriptionPatch: applyPatchFields
     }
   },
   UpdateReferencingTableByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      referencingTablePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      referencingTablePatch: applyPatchFields
     }
   },
   UpdateReferencingTableInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      referencingTablePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      referencingTablePatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

@@ -177,6 +177,70 @@ const isDeletable = (
   return !!build.behavior.pgResourceMatches(resource, "resource:delete");
 };
 
+const applyInputToUpdateOrDelete = EXPORTABLE(
+  () =>
+    function applyInputToUpdateOrDelete(
+      _: any,
+      $object: ObjectStep<{
+        result: PgUpdateSingleStep | PgDeleteSingleStep;
+      }>,
+    ) {
+      return $object;
+    },
+  [],
+  "applyInputToUpdateOrDelete",
+);
+
+const planUpdateOrDeletePayloadResult = EXPORTABLE(
+  () =>
+    function plan(
+      $object: ObjectStep<{
+        result: PgUpdateSingleStep | PgDeleteSingleStep;
+      }>,
+    ) {
+      return $object.get("result");
+    },
+  [],
+  "planUpdateOrDeletePayloadResult",
+);
+
+const getClientMutationIdForUpdateOrDeletePlan = EXPORTABLE(
+  () =>
+    function plan(
+      $mutation: ObjectStep<{
+        result: PgUpdateSingleStep | PgDeleteSingleStep;
+      }>,
+    ) {
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
+    },
+  [],
+  "getClientMutationIdForUpdateOrDeletePlan",
+);
+
+const applyClientMutationIdForUpdateOrDelete = EXPORTABLE(
+  () =>
+    function apply(
+      qb: PgUpdateSingleQueryBuilder | PgDeleteSingleQueryBuilder,
+      val: string | null,
+    ) {
+      qb.setMeta("clientMutationId", val);
+    },
+  [],
+  "applyClientMutationIdForUpdateOrDelete",
+);
+
+const applyPatchFields = EXPORTABLE(
+  () =>
+    function plan(qb: PgUpdateSingleQueryBuilder, arg: any) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
+    },
+  [],
+  "applyPatchFields",
+);
+
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
@@ -360,18 +424,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         "field",
                       ),
                       type: GraphQLString,
-                      plan: EXPORTABLE(
-                        () =>
-                          function plan(
-                            $mutation: ObjectStep<{
-                              result: PgUpdateSingleStep | PgDeleteSingleStep;
-                            }>,
-                          ) {
-                            const $result = $mutation.getStepForKey("result");
-                            return $result.getMeta("clientMutationId");
-                          },
-                        [],
-                      ),
+                      plan: getClientMutationIdForUpdateOrDeletePlan,
                     },
                     ...(TableType &&
                     build.behavior.pgResourceMatches(
@@ -390,19 +443,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: TableType,
-                              plan: EXPORTABLE(
-                                () =>
-                                  function plan(
-                                    $object: ObjectStep<{
-                                      result:
-                                        | PgUpdateSingleStep
-                                        | PgDeleteSingleStep;
-                                    }>,
-                                  ) {
-                                    return $object.get("result");
-                                  },
-                                [],
-                              ),
+                              plan: planUpdateOrDeletePayloadResult,
                             }),
                           ),
                         }
@@ -531,18 +572,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                               "field",
                             ),
                             type: GraphQLString,
-                            apply: EXPORTABLE(
-                              () =>
-                                function apply(
-                                  qb:
-                                    | PgUpdateSingleQueryBuilder
-                                    | PgDeleteSingleQueryBuilder,
-                                  val: string | null,
-                                ) {
-                                  qb.setMeta("clientMutationId", val);
-                                },
-                              [],
-                            ),
+                            apply: applyClientMutationIdForUpdateOrDelete,
                           },
                           ...(uniqueMode === "node"
                             ? {
@@ -587,18 +617,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   "field",
                                 ),
                                 type: new GraphQLNonNull(TablePatch!),
-                                apply: EXPORTABLE(
-                                  () =>
-                                    function plan(
-                                      qb: PgUpdateSingleQueryBuilder,
-                                      arg: any,
-                                    ) {
-                                      if (arg != null) {
-                                        return qb.setBuilder();
-                                      }
-                                    },
-                                  [],
-                                ),
+                                apply: applyPatchFields,
                               },
                             }
                           : null,
@@ -813,6 +832,9 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         [handler, nodeIdFieldName, specFromNodeId],
                         `specFromArgs_${handler!.typeName}`,
                       );
+                const deprecationReason = tagToString(
+                  resource.extensions?.tags?.deprecated,
+                );
 
                 return build.extend(
                   fields,
@@ -830,20 +852,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         args: {
                           input: {
                             type: new GraphQLNonNull(mutationInputType),
-                            applyPlan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  _: any,
-                                  $object: ObjectStep<{
-                                    result:
-                                      | PgUpdateSingleStep
-                                      | PgDeleteSingleStep;
-                                  }>,
-                                ) {
-                                  return $object;
-                                },
-                              [],
-                            ),
+                            applyPlan: applyInputToUpdateOrDelete,
                           },
                         },
                         type: payloadType,
@@ -856,9 +865,6 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                             ? "using a unique key"
                             : "using its globally unique id"
                         }${mode === "resource:update" ? " and a patch" : ""}.`,
-                        deprecationReason: tagToString(
-                          resource.extensions?.tags?.deprecated,
-                        ),
                         plan:
                           mode === "resource:update"
                             ? specFromArgsString
@@ -941,6 +947,7 @@ return (_$root, args) => {
                                     specFromArgs,
                                   ],
                                 ) as any),
+                        ...(deprecationReason ? { deprecationReason } : null),
                       },
                     ),
                   },

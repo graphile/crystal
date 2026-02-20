@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,34 +81,21 @@ const fileCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     filename: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "inheritence",
       name: "file"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -124,34 +107,21 @@ const userCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     name: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "inheritence",
       name: "user"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -163,118 +133,70 @@ const userFileCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     filename: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     user_id: {
-      description: undefined,
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "inheritence",
       name: "user_file"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const fileUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const userUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_user_user = {
+const user_resourceOptionsConfig = {
   executor: executor,
   name: "user",
   identifier: "main.inheritence.user",
   from: userIdentifier,
   codec: userCodec,
-  uniques: userUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "inheritence",
       name: "user"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: userUniques
 };
 const user_fileUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: fileUniques[0].extensions.tags
-  }
+  isPrimary: true
 }];
-const registryConfig_pgResources_user_file_user_file = {
+const user_file_resourceOptionsConfig = {
   executor: executor,
   name: "user_file",
   identifier: "main.inheritence.user_file",
   from: userFileIdentifier,
   codec: userFileCodec,
-  uniques: user_fileUniques,
-  isVirtual: false,
-  description: undefined,
   extensions: {
-    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "inheritence",
       name: "user_file"
-    },
-    isInsertable: true,
-    isUpdatable: true,
-    isDeletable: true,
-    tags: {}
-  }
+    }
+  },
+  uniques: user_fileUniques
 };
 const registry = makeRegistry({
   pgExecutors: {
@@ -620,24 +542,17 @@ const registry = makeRegistry({
       identifier: "main.inheritence.file",
       from: fileIdentifier,
       codec: fileCodec,
-      uniques: fileUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "inheritence",
           name: "file"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: fileUniques
     },
-    user: registryConfig_pgResources_user_user,
-    user_file: registryConfig_pgResources_user_file_user_file
+    user: user_resourceOptionsConfig,
+    user_file: user_file_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -645,36 +560,20 @@ const registry = makeRegistry({
       __proto__: null,
       userFilesByTheirUserId: {
         localCodec: userCodec,
-        remoteResourceOptions: registryConfig_pgResources_user_file_user_file,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: user_file_resourceOptionsConfig,
         localAttributes: ["id"],
         remoteAttributes: ["user_id"],
-        isUnique: false,
-        isReferencee: true,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isReferencee: true
       }
     },
     userFile: {
       __proto__: null,
       userByMyUserId: {
         localCodec: userFileCodec,
-        remoteResourceOptions: registryConfig_pgResources_user_user,
-        localCodecPolymorphicTypes: undefined,
+        remoteResourceOptions: user_resourceOptionsConfig,
         localAttributes: ["user_id"],
         remoteAttributes: ["id"],
-        isUnique: true,
-        isReferencee: false,
-        description: undefined,
-        extensions: {
-          tags: {
-            behavior: []
-          }
-        }
+        isUnique: true
       }
     }
   }
@@ -682,28 +581,42 @@ const registry = makeRegistry({
 const resource_filePgResource = registry.pgResources["file"];
 const resource_userPgResource = registry.pgResources["user"];
 const resource_user_filePgResource = registry.pgResources["user_file"];
-const nodeIdHandler_File = {
-  typeName: "File",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("files", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_filePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "files";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_File = makeTableNodeIdHandler({
+  typeName: "File",
+  identifier: "files",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_filePgResource,
+  pk: fileUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -733,60 +646,53 @@ const nodeFetcher_File = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_File));
   return nodeIdHandler_File.get(nodeIdHandler_File.getSpec($decoded));
 };
-const nodeIdHandler_User = {
+const nodeIdHandler_User = makeTableNodeIdHandler({
   typeName: "User",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("users", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_userPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "users";
-  }
-};
+  identifier: "users",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_userPgResource,
+  pk: userUniques[0].attributes
+});
 const nodeFetcher_User = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
   return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
 };
-const nodeIdHandler_UserFile = {
+const nodeIdHandler_UserFile = makeTableNodeIdHandler({
   typeName: "UserFile",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("user_files", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_user_filePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "user_files";
-  }
-};
+  identifier: "user_files",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_user_filePgResource,
+  pk: user_fileUniques[0].attributes
+});
 const nodeFetcher_UserFile = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_UserFile));
   return nodeIdHandler_UserFile.get(nodeIdHandler_UserFile.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -806,13 +712,29 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function CursorSerialize(value) {
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
+function applyInputToInsert(_, $object) {
+  return $object;
 }
 const specFromArgs_File = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_File, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_User = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_User, $nodeId);
@@ -833,6 +755,16 @@ const specFromArgs_UserFile2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -853,6 +785,29 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -1827,29 +1782,13 @@ export const objects = {
           return connection(resource_filePgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allUserFiles: {
@@ -1857,29 +1796,13 @@ export const objects = {
           return connection(resource_user_filePgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allUsers: {
@@ -1887,29 +1810,13 @@ export const objects = {
           return connection(resource_userPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       file(_$parent, args) {
@@ -1962,47 +1869,38 @@ export const objects = {
     plans: {
       createFile: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_filePgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_filePgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createUser: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_userPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_userPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createUserFile: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_user_filePgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_user_filePgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteFile: {
@@ -2014,9 +1912,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteFileById: {
@@ -2030,9 +1926,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteUser: {
@@ -2044,9 +1938,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteUserById: {
@@ -2060,9 +1952,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteUserFile: {
@@ -2074,9 +1964,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteUserFileById: {
@@ -2090,9 +1978,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateFile: {
@@ -2104,9 +1990,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateFileById: {
@@ -2120,9 +2004,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateUser: {
@@ -2134,9 +2016,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateUserById: {
@@ -2150,9 +2030,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateUserFile: {
@@ -2164,9 +2042,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateUserFileById: {
@@ -2180,9 +2056,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -2190,39 +2064,25 @@ export const objects = {
   CreateFilePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      file($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      file: planCreatePayloadResult,
       fileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateUserFilePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
       userByUserId($record) {
         return resource_userPgResource.get({
           id: $record.get("result").get("user_id")
         });
       },
-      userFile($object) {
-        return $object.get("result");
-      },
+      userFile: planCreatePayloadResult,
       userFileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2231,16 +2091,9 @@ export const objects = {
   CreateUserPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      user($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      user: planCreatePayloadResult,
       userEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2249,49 +2102,35 @@ export const objects = {
   DeleteFilePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedFileId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_File.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      file($object) {
-        return $object.get("result");
-      },
+      file: planUpdateOrDeletePayloadResult,
       fileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteUserFilePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedUserFileId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_UserFile.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
+      query: queryPlan,
       userByUserId($record) {
         return resource_userPgResource.get({
           id: $record.get("result").get("user_id")
         });
       },
-      userFile($object) {
-        return $object.get("result");
-      },
+      userFile: planUpdateOrDeletePayloadResult,
       userFileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2300,21 +2139,14 @@ export const objects = {
   DeleteUserPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedUserId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_User.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      user($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      user: planUpdateOrDeletePayloadResult,
       userEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2339,47 +2171,31 @@ export const objects = {
   FilesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateFilePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      file($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      file: planUpdateOrDeletePayloadResult,
       fileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateUserFilePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
       userByUserId($record) {
         return resource_userPgResource.get({
           id: $record.get("result").get("user_id")
         });
       },
-      userFile($object) {
-        return $object.get("result");
-      },
+      userFile: planUpdateOrDeletePayloadResult,
       userFileEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2388,16 +2204,9 @@ export const objects = {
   UpdateUserPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      user($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      user: planUpdateOrDeletePayloadResult,
       userEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -2418,29 +2227,13 @@ export const objects = {
           return connection($records);
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       }
     },
@@ -2479,17 +2272,13 @@ export const objects = {
   UserFilesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UsersConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   }
 };
@@ -2515,101 +2304,59 @@ export const interfaces = {
 export const inputObjects = {
   CreateFileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      file(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      file: applyCreateFields
     }
   },
   CreateUserFileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userFile(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      userFile: applyCreateFields
     }
   },
   CreateUserInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      user(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      user: applyCreateFields
     }
   },
   DeleteFileByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteFileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteUserByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteUserFileByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteUserFileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteUserInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   FileCondition: {
     plans: {
       filename($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "filename",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("filename", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       }
     }
   },
@@ -2649,126 +2396,60 @@ export const inputObjects = {
   },
   UpdateFileByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      filePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      filePatch: applyPatchFields
     }
   },
   UpdateFileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      filePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      filePatch: applyPatchFields
     }
   },
   UpdateUserByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      userPatch: applyPatchFields
     }
   },
   UpdateUserFileByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userFilePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      userFilePatch: applyPatchFields
     }
   },
   UpdateUserFileInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userFilePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      userFilePatch: applyPatchFields
     }
   },
   UpdateUserInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      userPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      userPatch: applyPatchFields
     }
   },
   UserCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       name($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
     }
   },
   UserFileCondition: {
     plans: {
       filename($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "filename",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("filename", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       userId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "user_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("user_id", TYPES.int, $condition, val);
       }
     }
   },
@@ -2855,13 +2536,13 @@ export const inputObjects = {
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

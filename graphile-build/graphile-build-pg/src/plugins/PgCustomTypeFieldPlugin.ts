@@ -31,6 +31,7 @@ import {
 import type {
   __InputObjectStep,
   __TrackedValueStep,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
@@ -115,10 +116,10 @@ declare global {
         ): readonly PgSelectArgumentRuntimeValue[];
         argDetails: Array<{
           graphqlArgName: string;
-          postgresArgName: string | null;
+          postgresArgName?: string | null;
           pgCodec: PgCodec;
           inputType: GraphQLInputType;
-          required: boolean;
+          required?: boolean;
         }>;
         parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
       };
@@ -289,6 +290,91 @@ declare global {
     }
   }
 }
+
+const pgSelectFromPayload = EXPORTABLE(
+  (PgSelectStep) =>
+    function pgSelectFromPayload(
+      $payload: ObjectStep<{
+        result:
+          | PgSelectStep
+          | PgSelectSingleStep
+          | PgClassExpressionStep<any, any>;
+      }>,
+    ) {
+      const $result = $payload.getStepForKey("result");
+      const $parent =
+        "getParentStep" in $result
+          ? ($result.getParentStep() as PgSelectSingleStep)
+          : $result;
+      const $pgSelect =
+        "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+      if ($pgSelect instanceof PgSelectStep) {
+        return $pgSelect;
+      } else {
+        throw new Error(`Could not determine PgSelectStep for ${$result}`);
+      }
+    },
+  [PgSelectStep],
+  "pgSelectFromPayload",
+);
+
+const applyInputArgViaPgSelect = EXPORTABLE(
+  (pgSelectFromPayload) =>
+    function plan(
+      _: any,
+      $payload: ObjectStep<{
+        result:
+          | PgSelectStep
+          | PgSelectSingleStep
+          | PgClassExpressionStep<any, any>;
+      }>,
+      arg: FieldArg,
+    ) {
+      const $pgSelect = pgSelectFromPayload($payload);
+      arg.apply($pgSelect);
+    },
+  [pgSelectFromPayload],
+  "applyInputArgViaPgSelect",
+);
+
+const planCustomMutationPayloadResult = EXPORTABLE(
+  () =>
+    (
+      $object: ObjectStep<{
+        result: PgClassSingleStep;
+      }>,
+    ) => {
+      return $object.get("result");
+    },
+  [],
+  "planCustomMutationPayloadResult",
+);
+
+const getClientMutationIdForCustomMutationPlan = EXPORTABLE(
+  () =>
+    function plan(
+      $object: ObjectStep<{
+        result:
+          | PgSelectStep
+          | PgSelectSingleStep
+          | PgClassExpressionStep<any, any>;
+      }>,
+    ) {
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
+    },
+  [],
+  "getClientMutationIdForCustomMutationPlan",
+);
+
+const applyClientMutationIdForCustomMutation = EXPORTABLE(
+  () =>
+    function apply(qb: PgSelectQueryBuilder, val: string | null) {
+      qb.setMeta("clientMutationId", val);
+    },
+  [],
+  "applyClientMutationIdForCustomMutation",
+);
 
 export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   name: "PgCustomTypeFieldPlugin",
@@ -536,11 +622,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   : listType;
               return {
                 graphqlArgName: argName,
-                postgresArgName: param.name,
                 pgCodec: param.codec,
                 inputType,
-                required: param.required,
-                fetcher,
+                ...(param.name ? { postgresArgName: param.name } : null),
+                ...(param.required ? { required: true } : null),
+                ...(fetcher ? { fetcher } : null),
               };
             });
 
@@ -572,10 +658,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       fetcher,
                     }) => ({
                       graphqlArgName,
-                      postgresArgName,
                       pgCodec,
-                      required,
-                      fetcher,
+                      ...(postgresArgName ? { postgresArgName } : null),
+                      ...(required ? { required } : null),
+                      ...(fetcher ? { fetcher } : null),
                     }),
                   );
             exportNameHint(
@@ -751,16 +837,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             Object.assign(Object.create(null), {
                               clientMutationId: {
                                 type: GraphQLString,
-                                apply: EXPORTABLE(
-                                  () =>
-                                    function apply(
-                                      qb: PgSelectQueryBuilder,
-                                      val: string | null,
-                                    ) {
-                                      qb.setMeta("clientMutationId", val);
-                                    },
-                                  [],
-                                ),
+                                apply: applyClientMutationIdForCustomMutation,
                               },
                             }) as GrafastInputFieldConfigMap<any>,
                           );
@@ -792,22 +869,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         const fields = Object.assign(Object.create(null), {
                           clientMutationId: {
                             type: GraphQLString,
-                            plan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  $object: ObjectStep<{
-                                    result:
-                                      | PgSelectStep
-                                      | PgSelectSingleStep
-                                      | PgClassExpressionStep<any, any>;
-                                  }>,
-                                ) {
-                                  const $result =
-                                    $object.getStepForKey("result");
-                                  return $result.getMeta("clientMutationId");
-                                },
-                              [],
-                            ),
+                            plan: getClientMutationIdForCustomMutationPlan,
                           },
                         }) as Record<string, GrafastFieldConfig<any, any, any>>;
                         if (isVoid) {
@@ -847,17 +909,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             !resource.extensions?.tags?.notNull,
                             type,
                           ),
-                          plan: EXPORTABLE(
-                            () =>
-                              (
-                                $object: ObjectStep<{
-                                  result: PgClassSingleStep;
-                                }>,
-                              ) => {
-                                return $object.get("result");
-                              },
-                            [],
-                          ),
+                          plan: planCustomMutationPayloadResult,
                         };
                         return fields;
                       },
@@ -992,6 +1044,26 @@ const pgFunctionArgumentsFromArgs = EXPORTABLE(
   ],
 );
 
+const scalarComputed = EXPORTABLE(
+  (pgClassExpression, pgFromExpression, pgFunctionArgumentsFromArgs) =>
+    (
+      resource: PgResource,
+      $in: Step,
+      args: readonly PgSelectArgumentSpec[],
+    ) => {
+      const { $row, selectArgs } = pgFunctionArgumentsFromArgs($in, args, true);
+      const from = pgFromExpression(
+        $row,
+        resource.from,
+        resource.parameters,
+        selectArgs,
+      );
+      return pgClassExpression($row, resource.codec, undefined)`${from}`;
+    },
+  [pgClassExpression, pgFromExpression, pgFunctionArgumentsFromArgs],
+  "scalarComputed",
+);
+
 function modFields(
   fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
@@ -1084,6 +1156,7 @@ function modFields(
                 return resource.execute(selectArgs);
               },
               [makeArgs, resource],
+              `${resource.name}_getSelectPlanFromParentAndArgs`,
             )
           : isRootMutation
             ? // Mutation uses 'args.input' rather than 'args'
@@ -1096,6 +1169,7 @@ function modFields(
                   });
                 },
                 [makeArgs, object, resource],
+                `${resource.name}_getSelectPlanFromParentAndArgs`,
               )
             : // Otherwise computed:
 
@@ -1104,49 +1178,24 @@ function modFields(
                 !resource.codec.attributes &&
                 typeof resource.from === "function"
               ? EXPORTABLE(
-                  (
-                    makeArgs,
-                    pgClassExpression,
-                    pgFromExpression,
-                    pgFunctionArgumentsFromArgs,
-                    resource,
-                  ) =>
+                  (makeArgs, resource, scalarComputed) =>
                     ($in, args, _info) => {
-                      const { $row, selectArgs } = pgFunctionArgumentsFromArgs(
-                        $in,
-                        makeArgs(args),
-                        true,
-                      );
-                      const from = pgFromExpression(
-                        $row,
-                        resource.from,
-                        resource.parameters,
-                        selectArgs,
-                      );
-                      return pgClassExpression(
-                        $row,
-                        resource.codec,
-                        undefined,
-                      )`${from}`;
+                      return scalarComputed(resource, $in, makeArgs(args));
                     },
-                  [
-                    makeArgs,
-                    pgClassExpression,
-                    pgFromExpression,
-                    pgFunctionArgumentsFromArgs,
-                    resource,
-                  ],
+                  [makeArgs, resource, scalarComputed],
+                  `${resource.name}_getSelectPlanFromParentAndArgs`,
                 )
               : EXPORTABLE(
                   (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
                     ($in, args, _info) => {
-                      const { selectArgs } = pgFunctionArgumentsFromArgs(
+                      const details = pgFunctionArgumentsFromArgs(
                         $in,
                         makeArgs(args),
                       );
-                      return resource.execute(selectArgs);
+                      return resource.execute(details.selectArgs);
                     },
                   [makeArgs, pgFunctionArgumentsFromArgs, resource],
+                  `${resource.name}_getSelectPlanFromParentAndArgs`,
                 );
 
         if (isRootMutation) {
@@ -1168,54 +1217,25 @@ function modFields(
           if (!(inputType instanceof GraphQLInputObjectType)) {
             return memo;
           }
+          const deprecationReason = tagToString(
+            resource.extensions?.tags?.deprecated,
+          );
           memo[fieldName] = fieldWithHooks(
             { fieldName, fieldBehaviorScope: "mutationField" },
             {
-              description: resource.description,
-              deprecationReason: tagToString(
-                resource.extensions?.tags?.deprecated,
-              ),
               type: payloadType,
               args: {
                 input: {
                   type: new GraphQLNonNull(inputType),
-                  applyPlan: EXPORTABLE(
-                    (PgSelectStep) =>
-                      function plan(
-                        _: any,
-                        $object: ObjectStep<{
-                          result:
-                            | PgSelectStep
-                            | PgSelectSingleStep
-                            | PgClassExpressionStep<any, any>;
-                        }>,
-                        arg,
-                      ) {
-                        // We might have any number of step types here; we need
-                        // to get back to the underlying pgSelect.
-                        const $result = $object.getStepForKey("result");
-                        const $parent =
-                          "getParentStep" in $result
-                            ? ($result.getParentStep() as PgSelectSingleStep)
-                            : $result;
-                        const $pgSelect =
-                          "getClassStep" in $parent
-                            ? $parent.getClassStep()
-                            : $parent;
-                        if ($pgSelect instanceof PgSelectStep) {
-                          // Mostly so `clientMutationId` works!
-                          arg.apply($pgSelect);
-                        } else {
-                          throw new Error(
-                            `Could not determine PgSelectStep for ${$result}`,
-                          );
-                        }
-                      },
-                    [PgSelectStep],
-                  ),
+                  // Mostly so `clientMutationId` works!
+                  applyPlan: applyInputArgViaPgSelect,
                 },
               },
               plan: getSelectPlanFromParentAndArgs as any,
+              ...(resource.description
+                ? { description: resource.description }
+                : null),
+              ...(deprecationReason ? { deprecationReason } : null),
             },
           );
         } else if (resource.isUnique) {
@@ -1230,6 +1250,9 @@ function modFields(
           const fieldName = isRootQuery
             ? inflection.customQueryField({ resource })
             : inflection.computedAttributeField({ resource });
+          const deprecationReason = tagToString(
+            resource.extensions?.tags?.deprecated,
+          );
           memo[fieldName] = fieldWithHooks(
             {
               fieldName,
@@ -1238,16 +1261,16 @@ function modFields(
                 : "typeField:single",
             },
             {
-              description: resource.description,
-              deprecationReason: tagToString(
-                resource.extensions?.tags?.deprecated,
-              ),
               type: build.nullableIf(
                 !resource.extensions?.tags?.notNull,
                 type!,
               ),
               args: makeFieldArgs(),
               plan: getSelectPlanFromParentAndArgs as any,
+              ...(resource.description
+                ? { description: resource.description }
+                : null),
+              ...(deprecationReason ? { deprecationReason } : null),
             },
           );
         } else {
@@ -1305,6 +1328,9 @@ function modFields(
               : null;
 
             if (ConnectionType) {
+              const deprecationReason = tagToString(
+                resource.extensions?.tags?.deprecated,
+              );
               memo = build.recoverable(memo, () =>
                 build.extend(
                   memo,
@@ -1322,9 +1348,6 @@ function modFields(
                           `Reads and enables pagination through a set of \`${inflection.tableType(
                             resource.codec,
                           )}\`.`,
-                        deprecationReason: tagToString(
-                          resource.extensions?.tags?.deprecated,
-                        ),
                         type: build.nullableIf(
                           isRootQuery ?? false,
                           ConnectionType,
@@ -1346,6 +1369,7 @@ function modFields(
                             },
                           [connection, getSelectPlanFromParentAndArgs],
                         ),
+                        ...(deprecationReason ? { deprecationReason } : null),
                       },
                     ),
                   },
@@ -1367,6 +1391,9 @@ function modFields(
                 : inflection.computedAttributeListField({
                     resource,
                   });
+            const deprecationReason = tagToString(
+              resource.extensions?.tags?.deprecated,
+            );
             memo = build.recoverable(memo, () =>
               build.extend(
                 memo,
@@ -1381,10 +1408,6 @@ function modFields(
                       pgFieldResource: resource,
                     },
                     {
-                      description: resource.description,
-                      deprecationReason: tagToString(
-                        resource.extensions?.tags?.deprecated,
-                      ),
                       type: build.nullableIf(
                         !resource.extensions?.tags?.notNull,
                         new GraphQLList(
@@ -1398,6 +1421,10 @@ function modFields(
                       ),
                       args: makeFieldArgs(),
                       plan: getSelectPlanFromParentAndArgs as any,
+                      ...(resource.description
+                        ? { description: resource.description }
+                        : null),
+                      ...(deprecationReason ? { deprecationReason } : null),
                     },
                   ),
                 },
@@ -1531,9 +1558,9 @@ const makeArg = EXPORTABLE(
       args: FieldArgs,
       details: {
         graphqlArgName: string;
-        postgresArgName: string | null;
+        postgresArgName?: string | null;
         pgCodec: PgCodec;
-        fetcher:
+        fetcher?:
           | null
           | ((
               $nodeId: Step<Maybe<string>>,
@@ -1572,9 +1599,9 @@ const makeArgRuntime = EXPORTABLE(
       input: Record<string, any>,
       details: {
         graphqlArgName: string;
-        postgresArgName: string | null;
+        postgresArgName?: string | null;
         pgCodec: PgCodec;
-        fetcher:
+        fetcher?:
           | null
           | ((
               $nodeId: Step<Maybe<string>>,

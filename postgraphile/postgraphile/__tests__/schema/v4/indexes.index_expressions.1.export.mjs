@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,56 +81,32 @@ const employeeCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     first_name: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     },
     last_name: {
-      description: undefined,
       codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      notNull: true
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "index_expressions",
       name: "employee"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const employeeUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const resource_employeePgResource = makeRegistry({
   pgExecutors: {
@@ -478,49 +450,56 @@ const resource_employeePgResource = makeRegistry({
       identifier: "main.index_expressions.employee",
       from: employeeIdentifier,
       codec: employeeCodec,
-      uniques: employeeUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "index_expressions",
           name: "employee"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: employeeUniques
     }
   },
   pgRelations: {
     __proto__: null
   }
 }).pgResources["employee"];
-const nodeIdHandler_Employee = {
-  typeName: "Employee",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("employees", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_employeePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "employees";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_Employee = makeTableNodeIdHandler({
+  typeName: "Employee",
+  identifier: "employees",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_employeePgResource,
+  pk: employeeUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -569,8 +548,17 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function CursorSerialize(value) {
+function toString(value) {
   return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -832,44 +820,26 @@ export const inputObjects = {
   EmployeeCondition: {
     plans: {
       firstName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "first_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("first_name", TYPES.text, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       lastName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("last_name", TYPES.text, $condition, val);
       }
     }
   }
 };
 export const scalars = {
   Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

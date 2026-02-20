@@ -10,6 +10,7 @@ import type {
   GrafastFieldConfigArgumentMap,
   Maybe,
 } from "grafast";
+import { ConstantStep, lambda } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphileConfig } from "graphile-config";
 import type { GraphQLEnumType, GraphQLFieldConfigArgumentMap } from "graphql";
@@ -170,7 +171,6 @@ function makeFieldsHook(isInterface: boolean) {
     const {
       getTypeByName,
       graphql: { GraphQLList, GraphQLNonNull },
-      grafast: { lambda, ConstantStep },
       inflection,
     } = build;
     const {
@@ -206,52 +206,8 @@ function makeFieldsHook(isInterface: boolean) {
               ? null
               : {
                   applyPlan: isPgFieldConnection
-                    ? EXPORTABLE(
-                        (ConstantStep, lambda, limitToTypes) =>
-                          (
-                            $parent: any,
-                            $connection: ConnectionStep<
-                              any,
-                              any,
-                              any,
-                              any,
-                              any,
-                              PgUnionAllStep
-                            >,
-                            fieldArgs: FieldArgs,
-                          ) => {
-                            const $union = $connection.getSubplan();
-                            const $ltt = fieldArgs.getRaw();
-                            if (
-                              $ltt instanceof ConstantStep &&
-                              $ltt.data == null
-                            ) {
-                              // No action
-                            } else {
-                              $union.apply(lambda($ltt, limitToTypes));
-                            }
-                          },
-                        [ConstantStep, lambda, limitToTypes],
-                      )
-                    : EXPORTABLE(
-                        (ConstantStep, lambda, limitToTypes) =>
-                          (
-                            $parent: any,
-                            $union: PgUnionAllStep,
-                            fieldArgs: FieldArgs,
-                          ) => {
-                            const $ltt = fieldArgs.getRaw();
-                            if (
-                              $ltt instanceof ConstantStep &&
-                              $ltt.data == null
-                            ) {
-                              // No action
-                            } else {
-                              $union.apply(lambda($ltt, limitToTypes));
-                            }
-                          },
-                        [ConstantStep, lambda, limitToTypes],
-                      ),
+                    ? applyConnectionLimitToTypes
+                    : applyLimitToTypes,
                 }),
           },
         },
@@ -270,3 +226,36 @@ function limitToTypes(ltt: Maybe<string[]>): PgUnionAllQueryBuilderCallback {
     return () => {};
   }
 }
+
+const applyConnectionLimitToTypes = EXPORTABLE(
+  (ConstantStep, lambda, limitToTypes) =>
+    (
+      $parent: any,
+      $connection: ConnectionStep<any, any, any, any, any, PgUnionAllStep>,
+      fieldArgs: FieldArgs,
+    ) => {
+      const $union = $connection.getSubplan();
+      const $ltt = fieldArgs.getRaw();
+      if ($ltt instanceof ConstantStep && $ltt.data == null) {
+        // No action
+      } else {
+        $union.apply(lambda($ltt, limitToTypes));
+      }
+    },
+  [ConstantStep, lambda, limitToTypes],
+  "applyConnectionLimitToTypes",
+);
+
+const applyLimitToTypes = EXPORTABLE(
+  (ConstantStep, lambda, limitToTypes) =>
+    ($parent: any, $union: PgUnionAllStep, fieldArgs: FieldArgs) => {
+      const $ltt = fieldArgs.getRaw();
+      if ($ltt instanceof ConstantStep && $ltt.data == null) {
+        // No action
+      } else {
+        $union.apply(lambda($ltt, limitToTypes));
+      }
+    },
+  [ConstantStep, lambda, limitToTypes],
+  "applyLimitToTypes",
+);

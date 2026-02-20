@@ -125,6 +125,9 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           TableOrderByType.getValues().find((v) => v.name === primaryKeyAsc) ||
           TableOrderByType.getValues()[0];
 
+        const deprecationReason = tagToString(
+          resource.extensions?.tags?.deprecated,
+        );
         return extend(
           fields,
           {
@@ -154,9 +157,6 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       : null,
                   },
                 },
-                deprecationReason: tagToString(
-                  resource.extensions?.tags?.deprecated,
-                ),
                 plan: EXPORTABLE(
                   (pgMutationPayloadEdge, pkAttributes, resource) =>
                     (
@@ -173,6 +173,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       ),
                   [pgMutationPayloadEdge, pkAttributes, resource],
                 ),
+                ...(deprecationReason ? { deprecationReason } : null),
               }),
             ),
           },

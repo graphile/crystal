@@ -468,14 +468,14 @@ select * from a where id = 1;
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
               const unique: PgResourceUnique = {
-                isPrimary: pgConstraint.contype === "p",
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
-                description,
-                extensions: {
-                  tags,
-                },
+                ...(pgConstraint.contype === "p" ? { isPrimary: true } : null),
+                ...(description ? { description } : null),
+                ...(Object.keys(tags).length > 0
+                  ? { extensions: { tags } }
+                  : null),
               };
               await info.process("pgTables_unique", {
                 serviceName,
@@ -521,7 +521,6 @@ select * from a where id = 1;
           const hasPartitions = pgClass.relkind === "p";
 
           const extensions: DataplanPg.PgResourceExtensions = {
-            description,
             pg: {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
@@ -530,9 +529,9 @@ select * from a where id = 1;
                 ? { persistence: pgClass.relpersistence }
                 : null),
             },
-            isInsertable,
-            isUpdatable,
-            isDeletable,
+            ...(isInsertable === false ? { isInsertable } : null),
+            ...(isUpdatable === false ? { isUpdatable } : null),
+            ...(isDeletable === false ? { isDeletable } : null),
             ...(hasPartitions ? { hasPartitions } : null),
             ...(partitionParent
               ? {
@@ -542,9 +541,9 @@ select * from a where id = 1;
                   },
                 }
               : null),
-            tags: {
-              ...tags,
-            },
+            ...(Object.keys(tags).length > 0
+              ? { tags: JSON.parse(JSON.stringify(tags)) }
+              : null),
           } as const;
           const options = {
             executor,
@@ -552,10 +551,10 @@ select * from a where id = 1;
             identifier,
             from: codec.sqlType,
             codec,
-            uniques,
-            isVirtual,
-            description,
             extensions,
+            ...(uniques.length ? { uniques } : null),
+            ...(isVirtual ? { isVirtual } : null),
+            ...(description ? { description } : null),
           } as const;
 
           await info.process("pgTables_PgResourceOptions", {
@@ -566,7 +565,10 @@ select * from a where id = 1;
 
           // Need to mark this exportable to avoid out-of-order access to
           // variables in the export
-          const finalOptions = EXPORTABLE_OBJECT_CLONE(options);
+          const finalOptions = EXPORTABLE_OBJECT_CLONE(
+            options,
+            `${options.name}_resourceOptionsConfig`,
+          );
 
           const resourceOptions = EXPORTABLE(
             (finalOptions, pgResourceOptions) =>

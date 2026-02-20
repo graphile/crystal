@@ -205,6 +205,9 @@ return function (resource) {
                     return memo;
                   }
 
+                  const deprecationReason = tagToString(
+                    resource.extensions?.tags?.deprecated,
+                  );
                   return build.extend(
                     memo,
                     {
@@ -215,9 +218,6 @@ return function (resource) {
                         },
                         () => ({
                           description: `Get a single \`${type.name}\`.`,
-                          deprecationReason: tagToString(
-                            resource.extensions?.tags?.deprecated,
-                          ),
                           type,
                           args: uniqueKeys.reduce((args, attributeName) => {
                             const details =
@@ -238,6 +238,7 @@ return function (resource) {
                           }, Object.create(null)),
 
                           plan: plan as any,
+                          ...(deprecationReason ? { deprecationReason } : null),
                         }),
                       ),
                     },

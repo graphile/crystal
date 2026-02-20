@@ -727,19 +727,24 @@ export function extendSchema(
                   );
                   const valueDeprecationReason =
                     deprecatedDirective?.args.reason;
-                  return {
-                    ...memo,
-                    [valueName]: {
-                      value: valueValue,
-                      deprecationReason: valueDeprecationReason,
-                      description: valueDescription,
-                      directives: valueDirectives,
-                      extensions:
-                        Object.keys(extensions).length > 0
-                          ? extensions
-                          : undefined,
-                    },
+                  const spec = {
+                    ...(valueValue !== undefined && valueValue !== valueName
+                      ? { value: valueValue }
+                      : null),
+                    ...(valueDeprecationReason
+                      ? { deprecationReason: valueDeprecationReason }
+                      : null),
+                    ...(valueDescription
+                      ? { description: valueDescription }
+                      : null),
+                    ...(valueDirectives.length > 0
+                      ? { directives: valueDirectives }
+                      : null),
+                    ...(Object.keys(extensions).length > 0
+                      ? { extensions }
+                      : null),
                   };
+                  return { ...memo, [valueName]: spec };
                 },
                 Object.create(null),
               );
@@ -962,12 +967,12 @@ export function extendSchema(
                     ? EXPORTABLE((config) => config.parseLiteral, [config])
                     : EXPORTABLE(
                         (GraphQLError, Kind, name) => (ast: any) => {
-                          if (ast.kind !== Kind.STRING) {
-                            throw new GraphQLError(
-                              `${name} can only parse string values`,
-                            );
+                          if (ast.kind === Kind.STRING) {
+                            return ast.value;
                           }
-                          return ast.value;
+                          throw new GraphQLError(
+                            `${name} can only parse string values`,
+                          );
                         },
                         [GraphQLError, Kind, name],
                       ),
@@ -1370,9 +1375,9 @@ export function extendSchema(
           const deprecationReason = deprecatedDirective?.args.reason;
           memo[name] = {
             type,
-            deprecationReason,
             ...(defaultValue != null ? { defaultValue } : null),
             ...(description ? { description } : null),
+            ...(deprecationReason ? { deprecationReason } : null),
           } as GraphQLArgumentConfig;
         } else {
           throw new Error(

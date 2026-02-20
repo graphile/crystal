@@ -38,7 +38,6 @@ import {
 import type { PgExecutor } from "./executor.ts";
 import type {
   PgCodec,
-  PgCodecExtensions,
   PgCodecPolymorphism,
   PgDecode,
   PgEncode,
@@ -72,7 +71,7 @@ export interface PgCodecAttribute<
   /**
    * Is the column/attribute guaranteed to not be null?
    */
-  notNull: TNotNull;
+  notNull?: TNotNull;
   hasDefault?: boolean;
 
   /**
@@ -444,7 +443,7 @@ export type PgRecordTypeCodecSpec<
   attributes: TAttributes;
   polymorphism?: PgCodecPolymorphism<any>;
   description?: string;
-  extensions?: Partial<PgCodecExtensions>;
+  extensions?: Partial<DataplanPg.PgCodecExtensions>;
   isAnonymous?: boolean;
 };
 
@@ -579,7 +578,7 @@ export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
   identifier: SQL;
   values: Array<PgEnumValue<TValue> | TValue>;
   description?: string;
-  extensions?: Partial<PgCodecExtensions>;
+  extensions?: Partial<DataplanPg.PgCodecExtensions>;
 };
 
 /**
@@ -680,7 +679,7 @@ export function listOfCodec<
     /** Description for this list type. */
     description?: string;
     /** Metadata to associate with this list type. */
-    extensions?: Partial<PgCodecExtensions>;
+    extensions?: Partial<DataplanPg.PgCodecExtensions>;
     /** Delimiter used to separate entries when Postgres stringifies it. */
     typeDelim?: string;
     /** pg-sql2 fragment that represents the name of this type. */
@@ -818,7 +817,7 @@ export function domainOfCodec<
     /** Description for this domain. */
     description?: string;
     /** Metadata to associate with this domain. */
-    extensions?: Partial<PgCodecExtensions>;
+    extensions?: Partial<DataplanPg.PgCodecExtensions>;
     /** Whether this domain is not nullable. */
     notNull?: boolean | null;
   } = {},
@@ -896,7 +895,7 @@ export function rangeOfCodec<
     /** Description for this range. */
     description?: string;
     /** Metadata to associate with this range. */
-    extensions?: Partial<PgCodecExtensions>;
+    extensions?: Partial<DataplanPg.PgCodecExtensions>;
   } = {},
 ): PgCodec<
   TName,
@@ -1237,6 +1236,162 @@ for (const [name, codec] of Object.entries(TYPES)) {
   exportAs("@dataplan/pg", codec, ["TYPES", name]);
 }
 
+function builtinListOfCodec<TCodec extends (typeof TYPES)[keyof typeof TYPES]>(
+  oid: string,
+  codec: TCodec,
+  typeDelim = ",",
+) {
+  return listOfCodec<TCodec, `${TCodec["name"]}Array`>(codec, {
+    name: `${codec.name}Array`,
+    typeDelim,
+    extensions: { oid },
+  });
+}
+
+export const LIST_TYPES = {
+  /*
+  ```sql
+  with names as (
+    select name, idx
+    from unnest(array[
+      'boolean',
+      'int2',
+      'int',
+      'bigint',
+      'float4',
+      'float',
+      'money',
+      'numeric',
+      'char',
+      'bpchar',
+      'varchar',
+      'text',
+      'name',
+      'json',
+      'jsonb',
+      'jsonpath',
+      'xml',
+      'citext',
+      'uuid',
+      'timestamp',
+      'timestamptz',
+      'date',
+      'time',
+      'timetz',
+      'inet',
+      'regproc',
+      'regprocedure',
+      'regoper',
+      'regoperator',
+      'regclass',
+      'regtype',
+      'regrole',
+      'regnamespace',
+      'regconfig',
+      'regdictionary',
+      'cidr',
+      'macaddr',
+      'macaddr8',
+      'interval',
+      'bit',
+      'varbit',
+      'point',
+      'line',
+      'lseg',
+      'box',
+      'path',
+      'polygon',
+      'circle',
+      'hstore',
+      'bytea'
+    ]) with ordinality as names(name, idx)
+  )
+  select name || ': builtinListOfCodec("' || oid || '", TYPES.' || name || (case when typdelim = ',' then '' else ', "' || typdelim::text || '"' end) || '),'
+  from names
+  inner join pg_type t
+  on t.oid = (select typarray from pg_type t2 where t2.oid = name::regtype)
+  order by idx asc;
+  ```
+  */
+  boolean: builtinListOfCodec("1000", TYPES.boolean),
+  int2: builtinListOfCodec("1005", TYPES.int2),
+  int: builtinListOfCodec("1007", TYPES.int),
+  bigint: builtinListOfCodec("1016", TYPES.bigint),
+  float4: builtinListOfCodec("1021", TYPES.float4),
+  float: builtinListOfCodec("1022", TYPES.float),
+  money: builtinListOfCodec("791", TYPES.money),
+  numeric: builtinListOfCodec("1231", TYPES.numeric),
+  char: builtinListOfCodec("1014", TYPES.char),
+  bpchar: builtinListOfCodec("1014", TYPES.bpchar),
+  varchar: builtinListOfCodec("1015", TYPES.varchar),
+  text: builtinListOfCodec("1009", TYPES.text),
+  name: builtinListOfCodec("1003", TYPES.name),
+  json: builtinListOfCodec("199", TYPES.json),
+  jsonb: builtinListOfCodec("3807", TYPES.jsonb),
+  jsonpath: builtinListOfCodec("4073", TYPES.jsonpath),
+  xml: builtinListOfCodec("143", TYPES.xml),
+  citext: builtinListOfCodec("20277428", TYPES.citext),
+  uuid: builtinListOfCodec("2951", TYPES.uuid),
+  timestamp: builtinListOfCodec("1115", TYPES.timestamp),
+  timestamptz: builtinListOfCodec("1185", TYPES.timestamptz),
+  date: builtinListOfCodec("1182", TYPES.date),
+  time: builtinListOfCodec("1183", TYPES.time),
+  timetz: builtinListOfCodec("1270", TYPES.timetz),
+  inet: builtinListOfCodec("1041", TYPES.inet),
+  regproc: builtinListOfCodec("1008", TYPES.regproc),
+  regprocedure: builtinListOfCodec("2207", TYPES.regprocedure),
+  regoper: builtinListOfCodec("2208", TYPES.regoper),
+  regoperator: builtinListOfCodec("2209", TYPES.regoperator),
+  regclass: builtinListOfCodec("2210", TYPES.regclass),
+  regtype: builtinListOfCodec("2211", TYPES.regtype),
+  regrole: builtinListOfCodec("4097", TYPES.regrole),
+  regnamespace: builtinListOfCodec("4090", TYPES.regnamespace),
+  regconfig: builtinListOfCodec("3735", TYPES.regconfig),
+  regdictionary: builtinListOfCodec("3770", TYPES.regdictionary),
+  cidr: builtinListOfCodec("651", TYPES.cidr),
+  macaddr: builtinListOfCodec("1040", TYPES.macaddr),
+  macaddr8: builtinListOfCodec("775", TYPES.macaddr8),
+  interval: builtinListOfCodec("1187", TYPES.interval),
+  bit: builtinListOfCodec("1561", TYPES.bit),
+  varbit: builtinListOfCodec("1563", TYPES.varbit),
+  point: builtinListOfCodec("1017", TYPES.point),
+  line: builtinListOfCodec("629", TYPES.line),
+  lseg: builtinListOfCodec("1018", TYPES.lseg),
+  box: builtinListOfCodec("1020", TYPES.box, ";"),
+  path: builtinListOfCodec("1019", TYPES.path),
+  polygon: builtinListOfCodec("1027", TYPES.polygon),
+  circle: builtinListOfCodec("719", TYPES.circle),
+  hstore: builtinListOfCodec("20278122", TYPES.hstore),
+  bytea: builtinListOfCodec("1001", TYPES.bytea),
+} satisfies {
+  [name in Exclude<
+    keyof typeof TYPES,
+    "void"
+  >]: (typeof TYPES)[name] extends PgCodec<
+    infer UName,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >
+    ? PgCodec<
+        `${UName}Array`,
+        undefined,
+        string,
+        readonly PgCodecTFromJavaScript<(typeof TYPES)[name]>[],
+        (typeof TYPES)[name],
+        undefined,
+        undefined
+      >
+    : never;
+};
+exportAs("@dataplan/pg", LIST_TYPES, "LIST_TYPES");
+for (const [name, codec] of Object.entries(LIST_TYPES)) {
+  exportAs("@dataplan/pg", codec, ["LIST_TYPES", name]);
+}
+
 /**
  * For supported builtin type names ('void', 'bool', etc) that will be found in
  * the `pg_catalog` table this will return a PgCodec.
@@ -1247,109 +1402,205 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.void;
     case "bool":
       return TYPES.boolean;
+    case "_bool":
+      return LIST_TYPES.boolean;
 
     case "bytea":
       return TYPES.bytea; // oid: 17
+    case "_bytea":
+      return LIST_TYPES.bytea; // oid: 17
 
     case "char":
       return TYPES.char;
+    case "_char":
+      return LIST_TYPES.char;
     case "bpchar":
       return TYPES.bpchar;
+    case "_bpchar":
+      return LIST_TYPES.bpchar;
     case "varchar":
       return TYPES.varchar;
+    case "_varchar":
+      return LIST_TYPES.varchar;
     case "text":
       return TYPES.text;
+    case "_text":
+      return LIST_TYPES.text;
     case "name":
       return TYPES.name;
+    case "_name":
+      return LIST_TYPES.name;
     case "uuid":
       return TYPES.uuid;
+    case "_uuid":
+      return LIST_TYPES.uuid;
 
     case "xml":
       return TYPES.xml;
+    case "_xml":
+      return LIST_TYPES.xml;
     case "json":
       return TYPES.json;
+    case "_json":
+      return LIST_TYPES.json;
     case "jsonb":
       return TYPES.jsonb;
+    case "_jsonb":
+      return LIST_TYPES.jsonb;
     case "jsonpath":
       return TYPES.jsonpath;
+    case "_jsonpath":
+      return LIST_TYPES.jsonpath;
 
     case "bit":
       return TYPES.bit;
+    case "_bit":
+      return LIST_TYPES.bit;
     case "varbit":
       return TYPES.varbit;
+    case "_varbit":
+      return LIST_TYPES.varbit;
 
     case "int2":
       return TYPES.int2;
+    case "_int2":
+      return LIST_TYPES.int2;
     case "int4":
       return TYPES.int;
+    case "_int4":
+      return LIST_TYPES.int;
     case "int8":
       return TYPES.bigint;
+    case "_int8":
+      return LIST_TYPES.bigint;
     case "float8":
       return TYPES.float;
+    case "_float8":
+      return LIST_TYPES.float;
     case "float4":
       return TYPES.float4;
+    case "_float4":
+      return LIST_TYPES.float4;
     case "numeric":
       return TYPES.numeric;
+    case "_numeric":
+      return LIST_TYPES.numeric;
     case "money":
       return TYPES.money;
+    case "_money":
+      return LIST_TYPES.money;
 
     case "box":
       return TYPES.box;
+    case "_box":
+      return LIST_TYPES.box;
     case "point":
       return TYPES.point;
+    case "_point":
+      return LIST_TYPES.point;
     case "path":
       return TYPES.path;
+    case "_path":
+      return LIST_TYPES.path;
     case "line":
       return TYPES.line;
+    case "_line":
+      return LIST_TYPES.line;
     case "lseg":
       return TYPES.lseg;
+    case "_lseg":
+      return LIST_TYPES.lseg;
     case "circle":
       return TYPES.circle;
+    case "_circle":
+      return LIST_TYPES.circle;
     case "polygon":
       return TYPES.polygon;
+    case "_polygon":
+      return LIST_TYPES.polygon;
 
     case "cidr":
       return TYPES.cidr;
+    case "_cidr":
+      return LIST_TYPES.cidr;
     case "inet":
       return TYPES.inet;
+    case "_inet":
+      return LIST_TYPES.inet;
     case "macaddr":
       return TYPES.macaddr;
+    case "_macaddr":
+      return LIST_TYPES.macaddr;
     case "macaddr8":
       return TYPES.macaddr8;
+    case "_macaddr8":
+      return LIST_TYPES.macaddr8;
 
     case "date":
       return TYPES.date;
+    case "_date":
+      return LIST_TYPES.date;
     case "timestamp":
       return TYPES.timestamp;
+    case "_timestamp":
+      return LIST_TYPES.timestamp;
     case "timestamptz":
       return TYPES.timestamptz;
+    case "_timestamptz":
+      return LIST_TYPES.timestamptz;
     case "time":
       return TYPES.time;
+    case "_time":
+      return LIST_TYPES.time;
     case "timetz":
       return TYPES.timetz;
+    case "_timetz":
+      return LIST_TYPES.timetz;
     case "interval":
       return TYPES.interval;
+    case "_interval":
+      return LIST_TYPES.interval;
 
     case "regclass":
       return TYPES.regclass;
+    case "_regclass":
+      return LIST_TYPES.regclass;
     case "regconfig":
       return TYPES.regconfig;
+    case "_regconfig":
+      return LIST_TYPES.regconfig;
     case "regdictionary":
       return TYPES.regdictionary;
+    case "_regdictionary":
+      return LIST_TYPES.regdictionary;
     case "regnamespace":
       return TYPES.regnamespace;
+    case "_regnamespace":
+      return LIST_TYPES.regnamespace;
     case "regoper":
       return TYPES.regoper;
+    case "_regoper":
+      return LIST_TYPES.regoper;
     case "regoperator":
       return TYPES.regoperator;
+    case "_regoperator":
+      return LIST_TYPES.regoperator;
     case "regproc":
       return TYPES.regproc;
+    case "_regproc":
+      return LIST_TYPES.regproc;
     case "regprocedure":
       return TYPES.regprocedure;
+    case "_regprocedure":
+      return LIST_TYPES.regprocedure;
     case "regrole":
       return TYPES.regrole;
+    case "_regrole":
+      return LIST_TYPES.regrole;
     case "regtype":
       return TYPES.regtype;
+    case "_regtype":
+      return LIST_TYPES.regtype;
   }
   return null;
 }

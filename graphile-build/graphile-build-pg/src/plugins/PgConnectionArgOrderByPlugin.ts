@@ -2,7 +2,11 @@ import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type { PgCodec, PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
-import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
+import type {
+  ConnectionStep,
+  FieldArg,
+  GrafastFieldConfigArgumentMap,
+} from "grafast";
 import type { GraphQLEnumType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -29,6 +33,40 @@ declare global {
     }
   }
 }
+
+const applyOrderByArgToConnection = EXPORTABLE(
+  () =>
+    function applyOrderByArgToConnection(
+      parent: any,
+      $connection: ConnectionStep<
+        any,
+        PgSelectSingleStep<any>,
+        any,
+        any,
+        null | readonly any[],
+        PgSelectStep<any>
+      >,
+      value: FieldArg,
+    ) {
+      const $select = $connection.getSubplan();
+      value.apply($select);
+    },
+  [],
+  "applyOrderByArgToConnection",
+);
+
+const applyOrderByArg = EXPORTABLE(
+  () =>
+    function applyOrderByArg(
+      parent: any,
+      $select: PgSelectStep<any>,
+      value: FieldArg,
+    ) {
+      value.apply($select);
+    },
+  [],
+  "applyOrderByArg",
+);
 
 export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   name: "PgConnectionArgOrderByPlugin",
@@ -183,31 +221,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
               ),
               type: new GraphQLList(new GraphQLNonNull(TableOrderByType)),
               applyPlan: isPgFieldConnection
-                ? EXPORTABLE(
-                    () =>
-                      (
-                        parent,
-                        $connection: ConnectionStep<
-                          any,
-                          PgSelectSingleStep<any>,
-                          any,
-                          any,
-                          null | readonly any[],
-                          PgSelectStep<any>
-                        >,
-                        value,
-                      ) => {
-                        const $select = $connection.getSubplan();
-                        value.apply($select);
-                      },
-                    [],
-                  )
-                : EXPORTABLE(
-                    () => (parent, $select: PgSelectStep<any>, value) => {
-                      value.apply($select);
-                    },
-                    [],
-                  ),
+                ? applyOrderByArgToConnection
+                : applyOrderByArg,
             },
           } as GrafastFieldConfigArgumentMap,
           `Adding '${argName}' (orderBy) argument to field '${fieldName}' of '${Self.name}'`,

@@ -33,27 +33,23 @@ const nodeIdHandler_Query = {
     return constant`query`;
   }
 };
-const nodeIdCodecs_base64JSON_base64JSON = {
+const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
+  encode: Object.assign(function base64JSONEncode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  }, {
+    isSyncAndSafe: true
+  }),
+  decode: Object.assign(function base64JSONDecode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }, {
+    isSyncAndSafe: true
+  })
 };
 const nodeIdCodecs = {
   __proto__: null,
   raw: nodeIdHandler_Query.codec,
-  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
+  base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -73,7 +69,7 @@ const executor = new PgExecutor({
   context() {
     const ctx = context();
     return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      pgSettings: ctx.get("pgSettings"),
       withPgClient: ctx.get("withPgClient")
     });
   }
@@ -85,36 +81,24 @@ const alwaysAsIdentityCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {},
         isInsertable: false,
         isUpdatable: false
       }
     },
     t: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "pg11",
       name: "always_as_identity"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -126,34 +110,20 @@ const byDefaultAsIdentityCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     t: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "pg11",
       name: "by_default_as_identity"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
@@ -165,107 +135,60 @@ const networkCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     inet: {
-      description: undefined,
-      codec: TYPES.inet,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.inet
     },
     cidr: {
-      description: undefined,
-      codec: TYPES.cidr,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.cidr
     },
     macaddr: {
-      description: undefined,
-      codec: TYPES.macaddr,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.macaddr
     },
     macaddr8: {
-      description: undefined,
-      codec: TYPES.macaddr8,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.macaddr8
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "pg11",
       name: "network"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const bigintDomainCodec = domainOfCodec(TYPES.bigint, "bigintDomain", sql.identifier("c", "bigint_domain"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "bigint_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const bigintDomainArrayCodec = listOfCodec(bigintDomainCodec, {
+  name: "bigintDomainArray",
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "_bigint_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  typeDelim: ",",
-  description: undefined,
-  name: "bigintDomainArray"
+  }
 });
 const bigintDomainArrayDomainCodec = domainOfCodec(bigintDomainArrayCodec, "bigintDomainArrayDomain", sql.identifier("c", "bigint_domain_array_domain"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "bigint_domain_array_domain"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const colorCodec = enumCodec({
   name: "color",
@@ -277,9 +200,6 @@ const colorCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "color"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -293,9 +213,6 @@ const enumCapsCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "enum_caps"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -309,9 +226,6 @@ const enumWithEmptyStringCodec = enumCodec({
       serviceName: "main",
       schemaName: "b",
       name: "enum_with_empty_string"
-    },
-    tags: {
-      __proto__: null
     }
   }
 });
@@ -321,105 +235,49 @@ const compoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     },
     b: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.text
     },
     c: {
-      description: undefined,
-      codec: colorCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: colorCodec
     },
     d: {
-      description: undefined,
-      codec: TYPES.uuid,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.uuid
     },
     e: {
-      description: undefined,
-      codec: enumCapsCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: enumCapsCodec
     },
     f: {
-      description: undefined,
-      codec: enumWithEmptyStringCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: enumWithEmptyStringCodec
     },
     g: {
-      description: undefined,
-      codec: TYPES.interval,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.interval
     },
     foo_bar: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.int
     }
   },
-  description: "Awesome feature!",
   extensions: {
     isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "c",
       name: "compound_type"
-    },
-    tags: {
-      __proto__: null
     }
   },
-  executor: executor
+  executor: executor,
+  description: "Awesome feature!"
 });
 const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "domainConstrainedCompoundType", sql.identifier("pg11", "domain_constrained_compound_type"), {
-  description: undefined,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "pg11",
       name: "domain_constrained_compound_type"
-    },
-    tags: {
-      __proto__: null
     }
-  },
-  notNull: false
+  }
 });
 const typesIdentifier = sql.identifier("pg11", "types");
 const typesCodec = recordCodec({
@@ -428,104 +286,48 @@ const typesCodec = recordCodec({
   attributes: {
     __proto__: null,
     id: {
-      description: undefined,
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      extensions: {
-        tags: {}
-      }
+      hasDefault: true
     },
     regrole: {
-      description: undefined,
-      codec: TYPES.regrole,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regrole
     },
     regnamespace: {
-      description: undefined,
-      codec: TYPES.regnamespace,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: TYPES.regnamespace
     },
     bigint_domain_array_domain: {
-      description: undefined,
-      codec: bigintDomainArrayDomainCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: bigintDomainArrayDomainCodec
     },
     domain_constrained_compound_type: {
-      description: undefined,
-      codec: domainConstrainedCompoundTypeCodec,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
+      codec: domainConstrainedCompoundTypeCodec
     }
   },
-  description: undefined,
   extensions: {
     isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "pg11",
       name: "types"
-    },
-    tags: {
-      __proto__: null
     }
   },
   executor: executor
 });
 const always_as_identityUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const by_default_as_identityUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const networkUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const typesUniques = [{
-  isPrimary: true,
   attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
+  isPrimary: true
 }];
 const registry = makeRegistry({
   pgExecutors: {
@@ -889,21 +691,14 @@ const registry = makeRegistry({
       identifier: "main.pg11.always_as_identity",
       from: alwaysAsIdentityIdentifier,
       codec: alwaysAsIdentityCodec,
-      uniques: always_as_identityUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "pg11",
           name: "always_as_identity"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: always_as_identityUniques
     },
     by_default_as_identity: {
       executor: executor,
@@ -911,21 +706,14 @@ const registry = makeRegistry({
       identifier: "main.pg11.by_default_as_identity",
       from: byDefaultAsIdentityIdentifier,
       codec: byDefaultAsIdentityCodec,
-      uniques: by_default_as_identityUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "pg11",
           name: "by_default_as_identity"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: by_default_as_identityUniques
     },
     network: {
       executor: executor,
@@ -933,21 +721,14 @@ const registry = makeRegistry({
       identifier: "main.pg11.network",
       from: networkIdentifier,
       codec: networkCodec,
-      uniques: networkUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "pg11",
           name: "network"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: networkUniques
     },
     types: {
       executor: executor,
@@ -955,21 +736,14 @@ const registry = makeRegistry({
       identifier: "main.pg11.types",
       from: typesIdentifier,
       codec: typesCodec,
-      uniques: typesUniques,
-      isVirtual: false,
-      description: undefined,
       extensions: {
-        description: undefined,
         pg: {
           serviceName: "main",
           schemaName: "pg11",
           name: "types"
-        },
-        isInsertable: true,
-        isUpdatable: true,
-        isDeletable: true,
-        tags: {}
-      }
+        }
+      },
+      uniques: typesUniques
     }
   },
   pgRelations: {
@@ -980,28 +754,42 @@ const resource_always_as_identityPgResource = registry.pgResources["always_as_id
 const resource_by_default_as_identityPgResource = registry.pgResources["by_default_as_identity"];
 const resource_networkPgResource = registry.pgResources["network"];
 const resource_typesPgResource = registry.pgResources["types"];
-const nodeIdHandler_AlwaysAsIdentity = {
-  typeName: "AlwaysAsIdentity",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("always_as_identities", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_always_as_identityPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "always_as_identities";
-  }
+const makeTableNodeIdHandler = ({
+  typeName,
+  nodeIdCodec,
+  resource,
+  identifier,
+  pk,
+  deprecationReason
+}) => {
+  return {
+    typeName,
+    codec: nodeIdCodec,
+    plan($record) {
+      return list([constant(identifier, false), ...pk.map(attribute => $record.get(attribute))]);
+    },
+    getSpec($list) {
+      return Object.fromEntries(pk.map((attribute, index) => [attribute, inhibitOnNull(access($list, [index + 1]))]));
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === identifier;
+    },
+    deprecationReason
+  };
 };
+const nodeIdHandler_AlwaysAsIdentity = makeTableNodeIdHandler({
+  typeName: "AlwaysAsIdentity",
+  identifier: "always_as_identities",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_always_as_identityPgResource,
+  pk: always_as_identityUniques[0].attributes
+});
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
   const existing = specForHandlerCache.get(handler);
@@ -1031,86 +819,64 @@ const nodeFetcher_AlwaysAsIdentity = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_AlwaysAsIdentity));
   return nodeIdHandler_AlwaysAsIdentity.get(nodeIdHandler_AlwaysAsIdentity.getSpec($decoded));
 };
-const nodeIdHandler_ByDefaultAsIdentity = {
+const nodeIdHandler_ByDefaultAsIdentity = makeTableNodeIdHandler({
   typeName: "ByDefaultAsIdentity",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("by_default_as_identities", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_by_default_as_identityPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "by_default_as_identities";
-  }
-};
+  identifier: "by_default_as_identities",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_by_default_as_identityPgResource,
+  pk: by_default_as_identityUniques[0].attributes
+});
 const nodeFetcher_ByDefaultAsIdentity = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ByDefaultAsIdentity));
   return nodeIdHandler_ByDefaultAsIdentity.get(nodeIdHandler_ByDefaultAsIdentity.getSpec($decoded));
 };
-const nodeIdHandler_Network = {
+const nodeIdHandler_Network = makeTableNodeIdHandler({
   typeName: "Network",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("networks", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_networkPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "networks";
-  }
-};
+  identifier: "networks",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_networkPgResource,
+  pk: networkUniques[0].attributes
+});
 const nodeFetcher_Network = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Network));
   return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec($decoded));
 };
-const nodeIdHandler_Type = {
+const nodeIdHandler_Type = makeTableNodeIdHandler({
   typeName: "Type",
-  codec: nodeIdCodecs_base64JSON_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("types", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_typesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "types";
-  }
-};
+  identifier: "types",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_typesPgResource,
+  pk: typesUniques[0].attributes
+});
 const nodeFetcher_Type = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Type));
   return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec($decoded));
 };
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
+function applyOrderByArgToConnection(parent, $connection, value) {
+  const $select = $connection.getSubplan();
+  value.apply($select);
 }
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -1131,7 +897,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-function InternetAddressSerialize(value) {
+function toString(value) {
   return "" + value;
 }
 const resource_frmcdc_domainConstrainedCompoundTypePgResource = registry.pgResources["frmcdc_domainConstrainedCompoundType"];
@@ -1141,10 +907,26 @@ const coerce = string => {
   }
   return string;
 };
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
+function applyInputToInsert(_, $object) {
+  return $object;
+}
 const specFromArgs_AlwaysAsIdentity = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_AlwaysAsIdentity, $nodeId);
 };
+function applyInputToUpdateOrDelete(_, $object) {
+  return $object;
+}
 const specFromArgs_ByDefaultAsIdentity = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ByDefaultAsIdentity, $nodeId);
@@ -1173,6 +955,16 @@ const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
+function getClientMutationIdForCreatePlan($mutation) {
+  const $insert = $mutation.getStepForKey("result");
+  return $insert.getMeta("clientMutationId");
+}
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
+function queryPlan() {
+  return rootValue();
+}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -1193,6 +985,29 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
+}
+function planUpdateOrDeletePayloadResult($object) {
+  return $object.get("result");
+}
+function applyClientMutationIdForUpdateOrDelete(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyPatchFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -2581,29 +2396,13 @@ export const objects = {
           return connection(resource_always_as_identityPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allByDefaultAsIdentities: {
@@ -2611,29 +2410,13 @@ export const objects = {
           return connection(resource_by_default_as_identityPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allNetworks: {
@@ -2641,29 +2424,13 @@ export const objects = {
           return connection(resource_networkPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       allTypes: {
@@ -2671,29 +2438,13 @@ export const objects = {
           return connection(resource_typesPgResource.find());
         },
         args: {
-          first(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          },
-          last(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          },
-          offset(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          },
-          before(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          },
-          after(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          },
-          condition(_condition, $connection, arg) {
-            const $select = $connection.getSubplan();
-            arg.apply($select, qbWhereBuilder);
-          },
-          orderBy(parent, $connection, value) {
-            const $select = $connection.getSubplan();
-            value.apply($select);
-          }
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
         }
       },
       alwaysAsIdentity(_$parent, args) {
@@ -2757,62 +2508,50 @@ export const objects = {
     plans: {
       createAlwaysAsIdentity: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_always_as_identityPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_always_as_identityPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createByDefaultAsIdentity: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_by_default_as_identityPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_by_default_as_identityPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createNetwork: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_networkPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_networkPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       createType: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_typesPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_typesPgResource);
           args.apply($insert);
-          const plan = object({
+          return object({
             result: $insert
           });
-          return plan;
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToInsert
         }
       },
       deleteAlwaysAsIdentity: {
@@ -2824,9 +2563,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteAlwaysAsIdentityById: {
@@ -2840,9 +2577,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteByDefaultAsIdentity: {
@@ -2854,9 +2589,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteByDefaultAsIdentityById: {
@@ -2870,9 +2603,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteNetwork: {
@@ -2884,9 +2615,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteNetworkById: {
@@ -2900,9 +2629,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteType: {
@@ -2914,9 +2641,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       deleteTypeById: {
@@ -2930,9 +2655,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateAlwaysAsIdentity: {
@@ -2944,9 +2667,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateAlwaysAsIdentityById: {
@@ -2960,9 +2681,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateByDefaultAsIdentity: {
@@ -2974,9 +2693,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateByDefaultAsIdentityById: {
@@ -2990,9 +2707,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateNetwork: {
@@ -3004,9 +2719,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateNetworkById: {
@@ -3020,9 +2733,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateType: {
@@ -3034,9 +2745,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       },
       updateTypeById: {
@@ -3050,9 +2759,7 @@ export const objects = {
           });
         },
         args: {
-          input(_, $object) {
-            return $object;
-          }
+          input: applyInputToUpdateOrDelete
         }
       }
     }
@@ -3060,9 +2767,7 @@ export const objects = {
   AlwaysAsIdentitiesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   AlwaysAsIdentity: {
@@ -3084,9 +2789,7 @@ export const objects = {
   ByDefaultAsIdentitiesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   ByDefaultAsIdentity: {
@@ -3108,70 +2811,42 @@ export const objects = {
   CreateAlwaysAsIdentityPayload: {
     assertStep: assertStep,
     plans: {
-      alwaysAsIdentity($object) {
-        return $object.get("result");
-      },
+      alwaysAsIdentity: planCreatePayloadResult,
       alwaysAsIdentityEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan
     }
   },
   CreateByDefaultAsIdentityPayload: {
     assertStep: assertStep,
     plans: {
-      byDefaultAsIdentity($object) {
-        return $object.get("result");
-      },
+      byDefaultAsIdentity: planCreatePayloadResult,
       byDefaultAsIdentityEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan
     }
   },
   CreateNetworkPayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      network($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      network: planCreatePayloadResult,
       networkEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   CreateTypePayload: {
     assertStep: assertStep,
     plans: {
-      clientMutationId($mutation) {
-        const $insert = $mutation.getStepForKey("result");
-        return $insert.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForCreatePlan,
+      query: queryPlan,
+      type: planCreatePayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -3180,90 +2855,62 @@ export const objects = {
   DeleteAlwaysAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      alwaysAsIdentity($object) {
-        return $object.get("result");
-      },
+      alwaysAsIdentity: planUpdateOrDeletePayloadResult,
       alwaysAsIdentityEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedAlwaysAsIdentityId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_AlwaysAsIdentity.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteByDefaultAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      byDefaultAsIdentity($object) {
-        return $object.get("result");
-      },
+      byDefaultAsIdentity: planUpdateOrDeletePayloadResult,
       byDefaultAsIdentityEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedByDefaultAsIdentityId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_ByDefaultAsIdentity.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteNetworkPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedNetworkId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Network.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      network($object) {
-        return $object.get("result");
-      },
+      network: planUpdateOrDeletePayloadResult,
       networkEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   DeleteTypePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedTypeId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Type.plan($record);
-        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+        return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      query: queryPlan,
+      type: planUpdateOrDeletePayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -3299,9 +2946,7 @@ export const objects = {
   NetworksConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   Type: {
@@ -3332,78 +2977,48 @@ export const objects = {
   TypesConnection: {
     assertStep: ConnectionStep,
     plans: {
-      totalCount($connection) {
-        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
+      totalCount: totalCountConnectionPlan
     }
   },
   UpdateAlwaysAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      alwaysAsIdentity($object) {
-        return $object.get("result");
-      },
+      alwaysAsIdentity: planUpdateOrDeletePayloadResult,
       alwaysAsIdentityEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan
     }
   },
   UpdateByDefaultAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      byDefaultAsIdentity($object) {
-        return $object.get("result");
-      },
+      byDefaultAsIdentity: planUpdateOrDeletePayloadResult,
       byDefaultAsIdentityEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      }
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan
     }
   },
   UpdateNetworkPayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      network($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      network: planUpdateOrDeletePayloadResult,
       networkEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
       },
-      query() {
-        return rootValue();
-      }
+      query: queryPlan
     }
   },
   UpdateTypePayload: {
     assertStep: ObjectStep,
     plans: {
-      clientMutationId($mutation) {
-        const $result = $mutation.getStepForKey("result");
-        return $result.getMeta("clientMutationId");
-      },
-      query() {
-        return rootValue();
-      },
-      type($object) {
-        return $object.get("result");
-      },
+      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
+      query: queryPlan,
+      type: planUpdateOrDeletePayloadResult,
       typeEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
@@ -3433,22 +3048,10 @@ export const inputObjects = {
   AlwaysAsIdentityCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       t($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "t",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("t", TYPES.text, $condition, val);
       }
     }
   },
@@ -3477,22 +3080,10 @@ export const inputObjects = {
   ByDefaultAsIdentityCondition: {
     plans: {
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       t($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "t",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        return applyAttributeCondition("t", TYPES.text, $condition, val);
       }
     }
   },
@@ -3532,106 +3123,66 @@ export const inputObjects = {
   },
   CreateAlwaysAsIdentityInput: {
     plans: {
-      alwaysAsIdentity(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      alwaysAsIdentity: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   CreateByDefaultAsIdentityInput: {
     plans: {
-      byDefaultAsIdentity(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      byDefaultAsIdentity: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   CreateNetworkInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      network(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      network: applyCreateFields
     }
   },
   CreateTypeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      type(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      type: applyCreateFields
     }
   },
   DeleteAlwaysAsIdentityByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteAlwaysAsIdentityInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteByDefaultAsIdentityByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteByDefaultAsIdentityInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteNetworkByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteNetworkInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTypeByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DeleteTypeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   DomainConstrainedCompoundTypeInput: {
@@ -3690,49 +3241,19 @@ export const inputObjects = {
   NetworkCondition: {
     plans: {
       cidr($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "cidr",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-          }
-        });
+        return applyAttributeCondition("cidr", TYPES.cidr, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       inet($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "inet",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-          }
-        });
+        return applyAttributeCondition("inet", TYPES.inet, $condition, val);
       },
       macaddr($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "macaddr",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-          }
-        });
+        return applyAttributeCondition("macaddr", TYPES.macaddr, $condition, val);
       },
       macaddr8($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "macaddr8",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr8)}`;
-          }
-        });
+        return applyAttributeCondition("macaddr8", TYPES.macaddr8, $condition, val);
       }
     }
   },
@@ -3809,49 +3330,19 @@ export const inputObjects = {
   TypeCondition: {
     plans: {
       bigintDomainArrayDomain($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "bigint_domain_array_domain",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, bigintDomainArrayDomainCodec)}`;
-          }
-        });
+        return applyAttributeCondition("bigint_domain_array_domain", bigintDomainArrayDomainCodec, $condition, val);
       },
       domainConstrainedCompoundType($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "domain_constrained_compound_type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, domainConstrainedCompoundTypeCodec)}`;
-          }
-        });
+        return applyAttributeCondition("domain_constrained_compound_type", domainConstrainedCompoundTypeCodec, $condition, val);
       },
       id($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        return applyAttributeCondition("id", TYPES.int, $condition, val);
       },
       regnamespace($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regnamespace",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regnamespace)}`;
-          }
-        });
+        return applyAttributeCondition("regnamespace", TYPES.regnamespace, $condition, val);
       },
       regrole($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "regrole",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.regrole)}`;
-          }
-        });
+        return applyAttributeCondition("regrole", TYPES.regrole, $condition, val);
       }
     }
   },
@@ -3927,163 +3418,114 @@ export const inputObjects = {
   },
   UpdateAlwaysAsIdentityByIdInput: {
     plans: {
-      alwaysAsIdentityPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      alwaysAsIdentityPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateAlwaysAsIdentityInput: {
     plans: {
-      alwaysAsIdentityPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      alwaysAsIdentityPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateByDefaultAsIdentityByIdInput: {
     plans: {
-      byDefaultAsIdentityPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      byDefaultAsIdentityPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateByDefaultAsIdentityInput: {
     plans: {
-      byDefaultAsIdentityPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      byDefaultAsIdentityPatch: applyPatchFields,
+      clientMutationId: applyClientMutationIdForUpdateOrDelete
     }
   },
   UpdateNetworkByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      networkPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      networkPatch: applyPatchFields
     }
   },
   UpdateNetworkInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      networkPatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      networkPatch: applyPatchFields
     }
   },
   UpdateTypeByIdInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      typePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      typePatch: applyPatchFields
     }
   },
   UpdateTypeInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      typePatch(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForUpdateOrDelete,
+      typePatch: applyPatchFields
     }
   }
 };
 export const scalars = {
   BigintDomain: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   Cursor: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   InternetAddress: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegNamespace: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegNamespace" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegNamespace" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegRole: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
+    serialize: toString,
+    parseValue: toString,
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegRole" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
       }
-      return ast.value;
+      throw new GraphQLError(`${"RegRole" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
     }
   },
   UUID: {
-    serialize: InternetAddressSerialize,
+    serialize: toString,
     parseValue(value) {
       return coerce("" + value);
     },
     parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        // ERRORS: add name to this error
-        throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      if (ast.kind === Kind.STRING) {
+        return coerce(ast.value);
       }
-      return coerce(ast.value);
+      throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
     }
   }
 };

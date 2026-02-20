@@ -330,24 +330,23 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                   function parseValue(data: unknown) {
                     if (typeof data === "string") {
                       return Buffer.from(data, "base64");
-                    } else {
-                      throw new GraphQLError(
-                        "Base64EncodedBinary can only parse string values.",
-                      );
                     }
+                    throw new GraphQLError(
+                      "Base64EncodedBinary can only parse string values.",
+                    );
                   },
                 [GraphQLError],
               ),
+              // TODO: add name to this error
               parseLiteral: EXPORTABLE(
                 (GraphQLError, Kind) =>
                   function parseLiteral(ast) {
-                    if (ast.kind !== Kind.STRING) {
-                      // TODO: add name to this error
-                      throw new GraphQLError(
-                        "Base64EncodedBinary can only parse string values",
-                      );
+                    if (ast.kind === Kind.STRING) {
+                      return Buffer.from(ast.value, "base64");
                     }
-                    return Buffer.from(ast.value, "base64");
+                    throw new GraphQLError(
+                      "Base64EncodedBinary can only parse string values",
+                    );
                   },
                 [GraphQLError, Kind],
               ),

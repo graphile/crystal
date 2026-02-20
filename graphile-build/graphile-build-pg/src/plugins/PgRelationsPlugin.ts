@@ -214,7 +214,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         //const codec = relation.remoteResource.codec;
-        if (typeof relation.extensions?.tags.fieldName === "string") {
+        if (typeof relation.extensions?.tags?.fieldName === "string") {
           return relation.extensions.tags.fieldName;
         }
         // E.g. posts(author_id) references users(id)
@@ -232,11 +232,11 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
         if (
-          typeof relation.extensions?.tags.foreignSingleFieldName === "string"
+          typeof relation.extensions?.tags?.foreignSingleFieldName === "string"
         ) {
           return relation.extensions.tags.foreignSingleFieldName;
         }
-        if (typeof relation.extensions?.tags.foreignFieldName === "string") {
+        if (typeof relation.extensions?.tags?.foreignFieldName === "string") {
           return relation.extensions.tags.foreignFieldName;
         }
         // E.g. posts(author_id) references users(id)
@@ -253,7 +253,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       _manyRelationRaw(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        const baseOverride = relation.extensions?.tags?.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
         }
@@ -271,7 +271,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       manyRelationConnection(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const override = relation.extensions?.tags.foreignConnectionFieldName;
+        const override = relation.extensions?.tags?.foreignConnectionFieldName;
         if (typeof override === "string") {
           return override;
         }
@@ -280,7 +280,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
       manyRelationList(options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const override = relation.extensions?.tags.foreignSimpleFieldName;
+        const override = relation.extensions?.tags?.foreignSimpleFieldName;
         if (typeof override === "string") {
           return override;
         }
@@ -447,22 +447,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           ? tags.backwardBehavior
           : tags.forwardBehavior;
         const behavior = combineBehaviors(baseBehavior, specificBehavior);
+        if (behavior.length) {
+          tags.behavior = behavior;
+        }
         const newRelation: PgCodecRelationConfig = {
           localCodec: localCodec as PgCodecWithAttributes,
-          localCodecPolymorphicTypes,
           localAttributes: localAttributes.map((c) => c!.attname),
           remoteAttributes: foreignAttributes.map((c) => c!.attname),
           remoteResourceOptions: foreignResourceOptions,
-          isUnique,
-          isReferencee,
-          description:
-            typeof description === "string" ? description : undefined,
-          extensions: {
-            tags: {
-              ...tags,
-              behavior,
-            },
-          },
+          ...(isUnique ? { isUnique } : null),
+          ...(isReferencee ? { isReferencee } : null),
+          ...(description ? { description } : null),
+          ...(localCodecPolymorphicTypes
+            ? { localCodecPolymorphicTypes }
+            : null),
+          ...(Object.keys(tags).length > 0 ? { extensions: { tags } } : null),
         };
         await info.process("pgRelations_relation", {
           serviceName,
@@ -887,7 +886,7 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgResource?: PgResource;
+    pgResource?: PgResource<any, any, any, any, any>;
     pgCodec: PgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     pgRefDetails?: GraphileBuild.PgRelationsPluginRefDetails;
@@ -933,7 +932,7 @@ function addRelations(
         }
       }
 
-      const isUnique = relation.isUnique;
+      const isUnique = relation.isUnique ?? false;
       const otherCodec = remoteResource.codec;
       const typeName = build.inflection.tableType(otherCodec);
       const connectionTypeName =
@@ -1590,7 +1589,7 @@ function addRelations(
       connectionPlan,
       pgRefDetails,
       relatedTypeName: context.Self.name,
-      isNonNull: ref?.extensions?.tags.notNull,
+      isNonNull: ref?.extensions?.tags?.notNull,
     };
     digests.push(digest);
   }
@@ -1653,7 +1652,7 @@ function addRelations(
               // Defaults to nullable due to RLS
               type: build.nullableIf(!digest.isNonNull, OtherType),
               plan: singleRecordPlan,
-              deprecationReason,
+              ...(deprecationReason ? { deprecationReason } : null),
             },
           ),
         },
@@ -1686,7 +1685,7 @@ function addRelations(
                   `Reads and enables pagination through a set of \`${typeName}\`.`,
                 type: new GraphQLNonNull(ConnectionType as GraphQLObjectType),
                 plan: connectionPlan,
-                deprecationReason,
+                ...(deprecationReason ? { deprecationReason } : null),
               },
             ),
           },
@@ -1722,7 +1721,7 @@ function addRelations(
                 new GraphQLList(new GraphQLNonNull(OtherType)),
               ),
               plan: listPlan,
-              deprecationReason,
+              ...(deprecationReason ? { deprecationReason } : null),
             },
           ),
         },

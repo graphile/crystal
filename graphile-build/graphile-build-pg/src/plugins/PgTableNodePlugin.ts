@@ -7,9 +7,16 @@ import type {
   PgResourceUnique,
   PgSelectSingleStep,
 } from "@dataplan/pg";
-import type { ListStep } from "grafast";
+import {
+  access,
+  constant,
+  inhibitOnNull,
+  list,
+  type ListStep,
+  type NodeIdCodec,
+  type NodeIdHandler,
+} from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { tagToString } from "../utils.ts";
 import { version } from "../version.ts";
@@ -27,6 +34,57 @@ declare global {
     }
   }
 }
+
+interface MakeTableNodeIdHandlerSpec {
+  typeName: string;
+  nodeIdCodec: NodeIdCodec;
+  resource: PgResource;
+  identifier: string;
+  pk: readonly string[];
+  deprecationReason?: string;
+}
+
+const makeTableNodeIdHandler = EXPORTABLE(
+  (access, constant, inhibitOnNull, list) =>
+    ({
+      typeName,
+      nodeIdCodec,
+      resource,
+      identifier,
+      pk,
+      deprecationReason,
+    }: MakeTableNodeIdHandlerSpec): NodeIdHandler => {
+      return {
+        typeName,
+        codec: nodeIdCodec,
+        plan($record: PgSelectSingleStep) {
+          return list([
+            constant(identifier, false),
+            ...pk.map((attribute) => $record.get(attribute)),
+          ]);
+        },
+        getSpec($list: ListStep<any[]>) {
+          return Object.fromEntries(
+            pk.map((attribute, index) => [
+              attribute,
+              inhibitOnNull(access($list, [index + 1])),
+            ]),
+          );
+        },
+        getIdentifiers(value) {
+          return value.slice(1);
+        },
+        get(spec) {
+          return resource.get(spec);
+        },
+        match(obj) {
+          return obj[0] === identifier;
+        },
+        deprecationReason,
+      };
+    },
+  [access, constant, inhibitOnNull, list],
+);
 
 export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
@@ -81,9 +139,6 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
-        const {
-          grafast: { access, constant, inhibitOnNull, list },
-        } = build;
         const tableResources = Object.values(build.pgResources).filter(
           (resource) => {
             // TODO: if (!resourceCanSupportNode(resource)) return false;
@@ -154,89 +209,32 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               ? build.inflection.pluralize(pgResource.extensions.pg.name)
               : tableTypeName;
 
-          const clean =
-            isSafeObjectPropertyName(identifier) &&
-            pk.every((attributeName) =>
-              isSafeObjectPropertyName(attributeName),
-            );
-
-          build.registerNodeIdHandler({
+          const deprecationReason = tagToString(
+            codec.extensions?.tags?.deprecation ??
+              pgResource?.extensions?.tags?.deprecated,
+          );
+          const nodeIdCodec = build.getNodeIdCodec!(
+            codec.extensions?.tags?.nodeIdCodec ??
+              pgResource?.extensions?.tags?.nodeIdCodec ??
+              build.options?.defaultNodeIdCodec ??
+              "base64JSON",
+          );
+          const spec: MakeTableNodeIdHandlerSpec = {
             typeName: tableTypeName,
-            codec: build.getNodeIdCodec!(
-              codec.extensions?.tags?.nodeIdCodec ??
-                pgResource?.extensions?.tags?.nodeIdCodec ??
-                build.options?.defaultNodeIdCodec ??
-                "base64JSON",
+            identifier,
+            nodeIdCodec,
+            resource: pgResource,
+            pk,
+            ...(deprecationReason ? { deprecationReason } : null),
+          };
+          build.registerNodeIdHandler(
+            EXPORTABLE(
+              (makeTableNodeIdHandler, spec) => makeTableNodeIdHandler(spec),
+              [makeTableNodeIdHandler, spec],
+              `nodeIdHandler_${tableTypeName}`,
             ),
-            deprecationReason: tagToString(
-              codec.extensions?.tags?.deprecation ??
-                pgResource?.extensions?.tags?.deprecated,
-            ),
-            plan: clean
-              ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                EXPORTABLE(
-                  te.run`\
-return function (list, constant) {
-  return $record => list([constant(${te.lit(identifier)}, false), ${te.join(
-    pk.map((attributeName) => te`$record.get(${te.lit(attributeName)})`),
-    ", ",
-  )}]);
-}` as any,
-                  [list, constant],
-                )
-              : EXPORTABLE(
-                  (constant, identifier, list, pk) =>
-                    ($record: PgSelectSingleStep) => {
-                      return list([
-                        constant(identifier, false),
-                        ...pk.map((attribute) => $record.get(attribute)),
-                      ]);
-                    },
-                  [constant, identifier, list, pk],
-                ),
-            getSpec: clean
-              ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                EXPORTABLE(
-                  te.run`\
-return function (access, inhibitOnNull) {
-  return $list => ({ ${te.join(
-    pk.map(
-      (attributeName, index) =>
-        te`${te.safeKeyOrThrow(
-          attributeName,
-        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
-    ),
-    ", ",
-  )} });
-}` as any,
-                  [access, inhibitOnNull],
-                )
-              : EXPORTABLE(
-                  (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
-                    const spec = pk.reduce((memo, attribute, index) => {
-                      memo[attribute] = inhibitOnNull(
-                        access($list, [index + 1]),
-                      );
-                      return memo;
-                    }, Object.create(null));
-                    return spec;
-                  },
-                  [access, inhibitOnNull, pk],
-                ),
-            getIdentifiers: EXPORTABLE(() => (value) => value.slice(1), []),
-            get: EXPORTABLE(
-              (pgResource) => (spec: any) => pgResource.get(spec),
-              [pgResource],
-            ),
-            match: EXPORTABLE(
-              (identifier) => (obj) => {
-                return obj[0] === identifier;
-              },
-              [identifier],
-            ),
-          });
+          );
         }
-
         return _;
       },
     },

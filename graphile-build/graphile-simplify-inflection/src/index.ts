@@ -398,7 +398,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       _manyRelation(previous, _options, details) {
         const { registry, codec, relationName } = details;
         const relation = registry.pgRelations[codec.name]?.[relationName];
-        const baseOverride = relation.extensions?.tags.foreignFieldName;
+        const baseOverride = relation.extensions?.tags?.foreignFieldName;
         if (typeof baseOverride === "string") {
           return baseOverride;
         }
@@ -495,7 +495,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
 
       updateByKeysField(previous, options, details) {
         const { resource, unique } = details;
-        if (typeof unique.extensions?.tags.updateFieldName === "string") {
+        if (typeof unique.extensions?.tags?.updateFieldName === "string") {
           return unique.extensions.tags.updateFieldName;
         }
         if (options.schema?.pgShortPk && unique.isPrimary) {
@@ -508,7 +508,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
       deleteByKeysField(previous, options, details) {
         const { resource, unique } = details;
-        if (typeof unique.extensions?.tags.deleteFieldName === "string") {
+        if (typeof unique.extensions?.tags?.deleteFieldName === "string") {
           return unique.extensions.tags.deleteFieldName;
         }
         if (options.schema?.pgShortPk && unique.isPrimary) {
@@ -522,7 +522,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
       updateByKeysInputType(previous, options, details) {
         const { resource, unique } = details;
-        if (unique.extensions?.tags.updateFieldName) {
+        if (unique.extensions?.tags?.updateFieldName) {
           return this.upperCamelCase(
             `${unique.extensions.tags.updateFieldName}-input`,
           );
@@ -538,7 +538,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
       deleteByKeysInputType(previous, options, details) {
         const { resource, unique } = details;
-        if (unique.extensions?.tags.deleteFieldName) {
+        if (unique.extensions?.tags?.deleteFieldName) {
           return this.upperCamelCase(
             `${unique.extensions.tags.deleteFieldName}-input`,
           );

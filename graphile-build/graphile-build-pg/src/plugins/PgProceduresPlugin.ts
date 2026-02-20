@@ -17,7 +17,11 @@ import {
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
-import { EXPORTABLE, gatherConfig } from "graphile-build";
+import {
+  EXPORTABLE,
+  EXPORTABLE_OBJECT_CLONE,
+  gatherConfig,
+} from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 
 import { exportNameHint } from "../utils.ts";
@@ -270,7 +274,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   return null;
                 }
                 attributes[argName] = {
-                  notNull: false,
                   codec: attributeCodec,
                   extensions: {
                     argIndex: i,
@@ -291,12 +294,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   name: recordCodecName,
                   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
                   attributes,
-                  description: undefined,
-                  extensions: {
-                    /* `The return type of our \`${name}\` ${
-                      pgProc.provolatile === "v" ? "mutation" : "query"
-                    }.`, */
-                  },
                   executor,
                   isAnonymous: true,
                 }),
@@ -399,16 +396,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               */
               parameters.push({
                 name: argName,
-                required,
-                notNull,
                 codec: argCodec,
-                ...(variant
-                  ? {
-                      extensions: {
-                        variant,
-                      },
-                    }
-                  : null),
+                ...(required ? { required } : null),
+                ...(notNull ? { notNull } : null),
+                ...(variant ? { extensions: { variant } } : null),
               });
             }
           }
@@ -439,7 +430,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               schemaName: pgProc.getNamespace()!.nspname,
               name: pgProc.proname,
             },
-            tags,
+            ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
 
           if (outOrInoutOrTableArgModes.length === 1) {
@@ -517,12 +508,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               identifier,
               from: fromCallback,
               parameters,
-              returnsArray,
               returnsSetof,
-              isMutation,
-              hasImplicitOrder,
               extensions,
-              description,
+              ...(isMutation ? { isMutation } : null),
+              ...(returnsArray ? { returnsArray } : null),
+              ...(hasImplicitOrder ? { hasImplicitOrder } : null),
+              ...(description ? { description } : null),
             };
 
             await info.process("pgProcedures_functionResourceOptions", {
@@ -550,46 +541,23 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, pgResourceOptions],
             );
           } else {
-            const options: PgResourceOptions = EXPORTABLE(
-              (
-                description,
-                executor,
-                extensions,
-                fromCallback,
-                hasImplicitOrder,
-                identifier,
-                isMutation,
-                name,
-                parameters,
-                returnCodec,
-                returnsSetof,
-              ) => ({
+            // Need to mark this exportable to avoid out-of-order access to
+            // variables in the export
+            const options: PgResourceOptions = EXPORTABLE_OBJECT_CLONE(
+              {
                 executor,
                 name,
                 identifier,
                 from: fromCallback,
                 parameters,
-                isUnique: !returnsSetof,
                 codec: returnCodec,
-                uniques: [],
-                isMutation,
                 hasImplicitOrder,
                 extensions,
-                description,
-              }),
-              [
-                description,
-                executor,
-                extensions,
-                fromCallback,
-                hasImplicitOrder,
-                identifier,
-                isMutation,
-                name,
-                parameters,
-                returnCodec,
-                returnsSetof,
-              ],
+                ...(!returnsSetof ? { isUnique: true } : null),
+                ...(isMutation ? { isMutation } : null),
+                ...(description ? { description } : null),
+              },
+              `${name}_resourceOptionsConfig`,
             );
 
             await info.process("pgProcedures_PgResourceOptions", {
