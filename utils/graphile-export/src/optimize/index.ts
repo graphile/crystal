@@ -37,6 +37,17 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
+const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
+  if (t.isExpression(functionBody)) {
+    return functionBody;
+  } else if (functionBody.body.length === 1) {
+    const statement = functionBody.body[0];
+    if (statement.type === "ReturnStatement") {
+      return statement.argument;
+    }
+  }
+};
+
 export const optimize = (inAst: t.File, runs = 1): t.File => {
   let ast = inAst;
   // Reset the full AST
@@ -84,18 +95,6 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         ) {
           return;
         }
-        const getExpression = (
-          functionBody: t.BlockStatement | t.Expression,
-        ) => {
-          if (t.isExpression(functionBody)) {
-            return functionBody;
-          } else if (functionBody.body.length === 1) {
-            const statement = functionBody.body[0];
-            if (statement.type === "ReturnStatement") {
-              return statement.argument;
-            }
-          }
-        };
 
         const expression = getExpression(node.callee.body);
 
