@@ -234,6 +234,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             EXPORTABLE(
               (makeTableNodeIdHandler, spec) => makeTableNodeIdHandler(spec),
               [makeTableNodeIdHandler, spec],
+              `nodeIdHandler_${tableTypeName}`,
             ),
           );
         }
