@@ -506,14 +506,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const options: PgFunctionResourceOptions = {
               name,
               identifier,
-              ...(description ? { description } : null),
               from: fromCallback,
               parameters,
-              ...(returnsArray ? { returnsArray } : null),
               returnsSetof,
-              ...(isMutation ? { isMutation } : null),
-              ...(hasImplicitOrder ? { hasImplicitOrder } : null),
               extensions,
+              ...(isMutation ? { isMutation } : null),
+              ...(returnsArray ? { returnsArray } : null),
+              ...(hasImplicitOrder ? { hasImplicitOrder } : null),
+              ...(description ? { description } : null),
             };
 
             await info.process("pgProcedures_functionResourceOptions", {
@@ -548,14 +548,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 executor,
                 name,
                 identifier,
-                ...(description ? { description } : null),
                 from: fromCallback,
                 parameters,
-                ...(!returnsSetof ? { isUnique: true } : null),
                 codec: returnCodec,
-                ...(isMutation ? { isMutation } : null),
                 hasImplicitOrder,
                 extensions,
+                ...(!returnsSetof ? { isUnique: true } : null),
+                ...(isMutation ? { isMutation } : null),
+                ...(description ? { description } : null),
               },
               `${name}_resourceOptionsConfig`,
             );

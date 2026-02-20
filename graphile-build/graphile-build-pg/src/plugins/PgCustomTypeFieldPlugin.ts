@@ -622,9 +622,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   : listType;
               return {
                 graphqlArgName: argName,
-                ...(param.name ? { postgresArgName: param.name } : null),
                 pgCodec: param.codec,
                 inputType,
+                ...(param.name ? { postgresArgName: param.name } : null),
                 ...(param.required ? { required: true } : null),
                 ...(fetcher ? { fetcher } : null),
               };
@@ -658,8 +658,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       fetcher,
                     }) => ({
                       graphqlArgName,
-                      ...(postgresArgName ? { postgresArgName } : null),
                       pgCodec,
+                      ...(postgresArgName ? { postgresArgName } : null),
                       ...(required ? { required } : null),
                       ...(fetcher ? { fetcher } : null),
                     }),

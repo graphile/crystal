@@ -468,10 +468,10 @@ select * from a where id = 1;
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
               const unique: PgResourceUnique = {
-                ...(pgConstraint.contype === "p" ? { isPrimary: true } : null),
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
                 ),
+                ...(pgConstraint.contype === "p" ? { isPrimary: true } : null),
                 ...(description ? { description } : null),
                 ...(Object.keys(tags).length > 0
                   ? { extensions: { tags } }
@@ -521,7 +521,6 @@ select * from a where id = 1;
           const hasPartitions = pgClass.relkind === "p";
 
           const extensions: DataplanPg.PgResourceExtensions = {
-            ...(description ? { description } : null),
             pg: {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
@@ -542,6 +541,7 @@ select * from a where id = 1;
                   },
                 }
               : null),
+            ...(description ? { description } : null),
             ...(Object.keys(tags).length > 0
               ? { tags: JSON.parse(JSON.stringify(tags)) }
               : null),
@@ -552,10 +552,10 @@ select * from a where id = 1;
             identifier,
             from: codec.sqlType,
             codec,
+            extensions,
             ...(uniques.length ? { uniques } : null),
             ...(isVirtual ? { isVirtual } : null),
             ...(description ? { description } : null),
-            extensions,
           } as const;
 
           await info.process("pgTables_PgResourceOptions", {
