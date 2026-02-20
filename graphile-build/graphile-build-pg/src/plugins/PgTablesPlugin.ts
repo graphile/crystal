@@ -541,7 +541,6 @@ select * from a where id = 1;
                   },
                 }
               : null),
-            ...(description ? { description } : null),
             ...(Object.keys(tags).length > 0
               ? { tags: JSON.parse(JSON.stringify(tags)) }
               : null),

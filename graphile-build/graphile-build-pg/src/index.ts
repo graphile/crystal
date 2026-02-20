@@ -132,7 +132,6 @@ declare global {
    */
   namespace DataplanPg {
     interface PgResourceExtensions {
-      description?: string;
       tags?: Partial<GraphileBuild.PgResourceTags>;
       singleOutputParameterName?: string;
       /** For v4 compatibility, what's the name of the actual table. */
