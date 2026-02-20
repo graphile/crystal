@@ -28,7 +28,6 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
                   "base64",
                 );
               },
-              // Optimization
               { isSyncAndSafe: true },
             ),
           [],
@@ -42,7 +41,6 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
                   Buffer.from(value, "base64").toString("utf8"),
                 );
               },
-              // Optimization
               { isSyncAndSafe: true },
             ),
           [],
