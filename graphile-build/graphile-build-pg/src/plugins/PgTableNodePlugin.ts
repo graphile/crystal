@@ -139,9 +139,6 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
-        const {
-          grafast: { access, constant, inhibitOnNull, list },
-        } = build;
         const tableResources = Object.values(build.pgResources).filter(
           (resource) => {
             // TODO: if (!resourceCanSupportNode(resource)) return false;
