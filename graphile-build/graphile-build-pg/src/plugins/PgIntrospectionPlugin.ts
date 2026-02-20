@@ -359,38 +359,34 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
            ),
            ```
         */
+        const contextCallback =
+          pgSettingsKey != null
+            ? EXPORTABLE(
+                (context, object, pgSettingsKey, withPgClientKey) => () => {
+                  const ctx = context();
+                  return object({
+                    pgSettings: ctx.get(pgSettingsKey),
+                    withPgClient: ctx.get(withPgClientKey),
+                  }) as Step<PgExecutorContext<any>>;
+                },
+                [context, object, pgSettingsKey, withPgClientKey],
+                "contextCallback",
+              )
+            : EXPORTABLE(
+                (constant, context, object, withPgClientKey) => () => {
+                  const ctx = context();
+                  return object({
+                    pgSettings: constant(null),
+                    withPgClient: ctx.get(withPgClientKey),
+                  }) as Step<PgExecutorContext<any>>;
+                },
+                [constant, context, object, withPgClientKey],
+                "contextCallback",
+              );
         const executor = EXPORTABLE(
-          (
-            PgExecutor,
-            constant,
-            context,
-            object,
-            pgSettingsKey,
-            serviceName,
-            withPgClientKey,
-          ) =>
-            new PgExecutor({
-              name: serviceName,
-              context: () => {
-                const ctx = context();
-                return object({
-                  pgSettings:
-                    pgSettingsKey != null
-                      ? ctx.get(pgSettingsKey)
-                      : constant(null),
-                  withPgClient: ctx.get(withPgClientKey),
-                }) as Step<PgExecutorContext<any>>;
-              },
-            }),
-          [
-            PgExecutor,
-            constant,
-            context,
-            object,
-            pgSettingsKey,
-            serviceName,
-            withPgClientKey,
-          ],
+          (PgExecutor, contextCallback, serviceName) =>
+            new PgExecutor({ name: serviceName, context: contextCallback }),
+          [PgExecutor, contextCallback, serviceName],
           serviceName === "main" ? `executor` : `${serviceName}Executor`,
         );
 
