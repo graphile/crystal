@@ -230,6 +230,17 @@ const applyClientMutationIdForUpdateOrDelete = EXPORTABLE(
   "applyClientMutationIdForUpdateOrDelete",
 );
 
+const applyPatchFields = EXPORTABLE(
+  () =>
+    function plan(qb: PgUpdateSingleQueryBuilder, arg: any) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
+    },
+  [],
+  "applyPatchFields",
+);
+
 export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   name: "PgMutationUpdateDeletePlugin",
   description: "Adds 'update' and 'delete' mutations for supported sources",
@@ -606,18 +617,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   "field",
                                 ),
                                 type: new GraphQLNonNull(TablePatch!),
-                                apply: EXPORTABLE(
-                                  () =>
-                                    function plan(
-                                      qb: PgUpdateSingleQueryBuilder,
-                                      arg: any,
-                                    ) {
-                                      if (arg != null) {
-                                        return qb.setBuilder();
-                                      }
-                                    },
-                                  [],
-                                ),
+                                apply: applyPatchFields,
                               },
                             }
                           : null,

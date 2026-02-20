@@ -114,6 +114,17 @@ const getClientMutationIdForCreatePlan = EXPORTABLE(
   "getClientMutationIdForCreatePlan",
 );
 
+const applyCreateFields = EXPORTABLE(
+  () =>
+    function plan(qb: PgInsertSingleQueryBuilder, arg: any) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
+    },
+  [],
+  "applyCreateFields",
+);
+
 export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   name: "PgMutationCreatePlugin",
   description: "Adds 'create' mutation for supported table-like sources",
@@ -219,18 +230,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                                 "field",
                               ),
                               type: new GraphQLNonNull(TableInput),
-                              apply: EXPORTABLE(
-                                () =>
-                                  function plan(
-                                    qb: PgInsertSingleQueryBuilder,
-                                    arg,
-                                  ) {
-                                    if (arg != null) {
-                                      return qb.setBuilder();
-                                    }
-                                  },
-                                [],
-                              ),
+                              apply: applyCreateFields,
                             }),
                           ),
                         }
