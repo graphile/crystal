@@ -17,7 +17,6 @@ import {
   type NodeIdHandler,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
-import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { tagToString } from "../utils.ts";
 import { version } from "../version.ts";
@@ -210,7 +209,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 };
 
 const makeTableNodeIdHandler = EXPORTABLE(
-  (access, constant, inhibitOnNull, isSafeObjectPropertyName, list, te) =>
+  (access, constant, inhibitOnNull, list) =>
     ({
       typeName,
       nodeIdCodec,
@@ -226,48 +225,23 @@ const makeTableNodeIdHandler = EXPORTABLE(
       pk: readonly string[];
       deprecationReason?: string;
     }): NodeIdHandler => {
-      const clean =
-        isSafeObjectPropertyName(identifier) &&
-        pk.every((attributeName) => isSafeObjectPropertyName(attributeName));
       return {
         typeName,
         codec: nodeIdCodec,
-        plan: clean
-          ? // eslint-disable-next-line graphile-export/exhaustive-deps
-            (te.run`\
-return function (list, constant) {
-  return $record => list([constant(${te.lit(identifier)}, false), ${te.join(
-    pk.map((attributeName) => te`$record.get(${te.lit(attributeName)})`),
-    ", ",
-  )}]);
-}` as any)
-          : ($record: PgSelectSingleStep) => {
-              return list([
-                constant(identifier, false),
-                ...pk.map((attribute) => $record.get(attribute)),
-              ]);
-            },
-        getSpec: clean
-          ? // eslint-disable-next-line graphile-export/exhaustive-deps
-            (te.run`\
-return function (access, inhibitOnNull) {
-  return $list => ({ ${te.join(
-    pk.map(
-      (attributeName, index) =>
-        te`${te.safeKeyOrThrow(
-          attributeName,
-        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
-    ),
-    ", ",
-  )} });
-}` as any)
-          : ($list: ListStep<any[]>) => {
-              const spec = pk.reduce((memo, attribute, index) => {
-                memo[attribute] = inhibitOnNull(access($list, [index + 1]));
-                return memo;
-              }, Object.create(null));
-              return spec;
-            },
+        plan($record: PgSelectSingleStep) {
+          return list([
+            constant(identifier, false),
+            ...pk.map((attribute) => $record.get(attribute)),
+          ]);
+        },
+        getSpec($list: ListStep<any[]>) {
+          return Object.fromEntries(
+            pk.map((attribute, index) => [
+              attribute,
+              inhibitOnNull(access($list, [index + 1])),
+            ]),
+          );
+        },
         getIdentifiers(value) {
           return value.slice(1);
         },
@@ -280,5 +254,5 @@ return function (access, inhibitOnNull) {
         deprecationReason,
       };
     },
-  [access, constant, inhibitOnNull, isSafeObjectPropertyName, list, te],
+  [access, constant, inhibitOnNull, list],
 );
