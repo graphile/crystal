@@ -7,7 +7,15 @@ import type {
   PgResourceUnique,
   PgSelectSingleStep,
 } from "@dataplan/pg";
-import type { ListStep } from "grafast";
+import {
+  access,
+  constant,
+  inhibitOnNull,
+  list,
+  type ListStep,
+  type NodeIdCodec,
+  type NodeIdHandler,
+} from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
@@ -154,50 +162,94 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               ? build.inflection.pluralize(pgResource.extensions.pg.name)
               : tableTypeName;
 
-          const clean =
-            isSafeObjectPropertyName(identifier) &&
-            pk.every((attributeName) =>
-              isSafeObjectPropertyName(attributeName),
-            );
-
           const deprecationReason = tagToString(
             codec.extensions?.tags?.deprecation ??
               pgResource?.extensions?.tags?.deprecated,
           );
-          build.registerNodeIdHandler({
-            typeName: tableTypeName,
-            codec: build.getNodeIdCodec!(
-              codec.extensions?.tags?.nodeIdCodec ??
-                pgResource?.extensions?.tags?.nodeIdCodec ??
-                build.options?.defaultNodeIdCodec ??
-                "base64JSON",
+          const nodeIdCodec = build.getNodeIdCodec!(
+            codec.extensions?.tags?.nodeIdCodec ??
+              pgResource?.extensions?.tags?.nodeIdCodec ??
+              build.options?.defaultNodeIdCodec ??
+              "base64JSON",
+          );
+          build.registerNodeIdHandler(
+            EXPORTABLE(
+              (
+                deprecationReason,
+                identifier,
+                makeTableNodeIdHandler,
+                nodeIdCodec,
+                pgResource,
+                pk,
+                tableTypeName,
+              ) =>
+                makeTableNodeIdHandler({
+                  typeName: tableTypeName,
+                  identifier,
+                  nodeIdCodec,
+                  resource: pgResource,
+                  pk,
+                  ...(deprecationReason ? { deprecationReason } : null),
+                }),
+              [
+                deprecationReason,
+                identifier,
+                makeTableNodeIdHandler,
+                nodeIdCodec,
+                pgResource,
+                pk,
+                tableTypeName,
+              ],
             ),
-            plan: clean
-              ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                EXPORTABLE(
-                  te.run`\
+          );
+        }
+        return _;
+      },
+    },
+  },
+};
+
+const makeTableNodeIdHandler = EXPORTABLE(
+  (access, constant, inhibitOnNull, isSafeObjectPropertyName, list, te) =>
+    ({
+      typeName,
+      nodeIdCodec,
+      resource,
+      identifier,
+      pk,
+      deprecationReason,
+    }: {
+      typeName: string;
+      nodeIdCodec: NodeIdCodec;
+      resource: PgResource;
+      identifier: string;
+      pk: readonly string[];
+      deprecationReason?: string;
+    }): NodeIdHandler => {
+      const clean =
+        isSafeObjectPropertyName(identifier) &&
+        pk.every((attributeName) => isSafeObjectPropertyName(attributeName));
+      return {
+        typeName,
+        codec: nodeIdCodec,
+        plan: clean
+          ? // eslint-disable-next-line graphile-export/exhaustive-deps
+            (te.run`\
 return function (list, constant) {
   return $record => list([constant(${te.lit(identifier)}, false), ${te.join(
     pk.map((attributeName) => te`$record.get(${te.lit(attributeName)})`),
     ", ",
   )}]);
-}` as any,
-                  [list, constant],
-                )
-              : EXPORTABLE(
-                  (constant, identifier, list, pk) =>
-                    ($record: PgSelectSingleStep) => {
-                      return list([
-                        constant(identifier, false),
-                        ...pk.map((attribute) => $record.get(attribute)),
-                      ]);
-                    },
-                  [constant, identifier, list, pk],
-                ),
-            getSpec: clean
-              ? // eslint-disable-next-line graphile-export/exhaustive-deps
-                EXPORTABLE(
-                  te.run`\
+}` as any)
+          : ($record: PgSelectSingleStep) => {
+              return list([
+                constant(identifier, false),
+                ...pk.map((attribute) => $record.get(attribute)),
+              ]);
+            },
+        getSpec: clean
+          ? // eslint-disable-next-line graphile-export/exhaustive-deps
+            (te.run`\
 return function (access, inhibitOnNull) {
   return $list => ({ ${te.join(
     pk.map(
@@ -208,38 +260,25 @@ return function (access, inhibitOnNull) {
     ),
     ", ",
   )} });
-}` as any,
-                  [access, inhibitOnNull],
-                )
-              : EXPORTABLE(
-                  (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
-                    const spec = pk.reduce((memo, attribute, index) => {
-                      memo[attribute] = inhibitOnNull(
-                        access($list, [index + 1]),
-                      );
-                      return memo;
-                    }, Object.create(null));
-                    return spec;
-                  },
-                  [access, inhibitOnNull, pk],
-                ),
-            getIdentifiers: EXPORTABLE(() => (value) => value.slice(1), []),
-            get: EXPORTABLE(
-              (pgResource) => (spec: any) => pgResource.get(spec),
-              [pgResource],
-            ),
-            match: EXPORTABLE(
-              (identifier) => (obj) => {
-                return obj[0] === identifier;
-              },
-              [identifier],
-            ),
-            ...(deprecationReason ? { deprecationReason } : null),
-          });
-        }
-
-        return _;
-      },
+}` as any)
+          : ($list: ListStep<any[]>) => {
+              const spec = pk.reduce((memo, attribute, index) => {
+                memo[attribute] = inhibitOnNull(access($list, [index + 1]));
+                return memo;
+              }, Object.create(null));
+              return spec;
+            },
+        getIdentifiers(value) {
+          return value.slice(1);
+        },
+        get(spec) {
+          return resource.get(spec);
+        },
+        match(obj) {
+          return obj[0] === identifier;
+        },
+        deprecationReason,
+      };
     },
-  },
-};
+  [access, constant, inhibitOnNull, isSafeObjectPropertyName, list, te],
+);
