@@ -10,6 +10,13 @@ interface $$Export {
   exportName: string | "default" | "*" | string[];
 }
 
+function isPojo(obj: any): obj is object {
+  if (obj == null) return false;
+  if (typeof obj !== "object") return false;
+  const proto = Object.getPrototypeOf(obj);
+  return proto === null || proto === Object.prototype;
+}
+
 function makeWellKnownFromOptions(options: ExportOptions) {
   const namespaces = Object.create(null);
   const wellKnownMap = new Map<unknown, $$Export>();
@@ -40,6 +47,17 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     }
     if (!wellKnownMap.has(moduleStar)) {
       wellKnownMap.set(moduleStar, { moduleName, exportName: "*" });
+    }
+    // Node's ESM support is... interesting. Let's handle stuff hanging off of default too
+    if (isPojo(moduleStar.default)) {
+      for (const [exportName, value] of Object.entries(moduleStar.default)) {
+        if (!wellKnownMap.has(value)) {
+          wellKnownMap.set(value, {
+            moduleName,
+            exportName: ["default", exportName],
+          });
+        }
+      }
     }
   }
 

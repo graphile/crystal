@@ -1306,7 +1306,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   },
   InternetAddress: {
@@ -1316,7 +1316,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`InternetAddress can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

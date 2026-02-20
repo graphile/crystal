@@ -3473,7 +3473,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`BigInt can only parse string values (kind='${ast.kind}')`);
     }
   },
   Cursor: {
@@ -3483,7 +3483,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   },
   InternetAddress: {
@@ -3493,7 +3493,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`InternetAddress can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegNamespace: {
@@ -3503,7 +3503,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegNamespace" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegNamespace can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegRole: {
@@ -3513,7 +3513,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegRole" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegRole can only parse string values (kind='${ast.kind}')`);
     }
   },
   UUID: {
@@ -3525,7 +3525,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return coerce(ast.value);
       }
-      throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      throw new GraphQLError(`UUID can only parse string values (kind = '${ast.kind}')`);
     }
   }
 };

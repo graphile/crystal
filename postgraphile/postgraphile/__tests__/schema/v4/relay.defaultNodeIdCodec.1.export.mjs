@@ -4668,11 +4668,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Person"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Person'; expected string`);
         } else {
           const identifiers = getIdentifiers(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Person"}'`);
+            throw new Error(`Invalid node identifier for 'Person'`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.post.author.localAttributes[i];
@@ -4716,11 +4716,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Person"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Person'; expected string`);
         } else {
           const identifiers = getIdentifiers4(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Person"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'Person': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.post.author.localAttributes[i];
@@ -4754,11 +4754,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Person"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Person'; expected string`);
         } else {
           const identifiers = getIdentifiers7(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Person"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'Person': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.post.author.localAttributes[i];
@@ -4847,11 +4847,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"TvShow"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'TvShow'; expected string`);
         } else {
           const identifiers = getIdentifiers2(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"TvShow"}'`);
+            throw new Error(`Invalid node identifier for 'TvShow'`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
@@ -4904,11 +4904,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"TvShow"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'TvShow'; expected string`);
         } else {
           const identifiers = getIdentifiers5(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"TvShow"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'TvShow': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
@@ -4936,11 +4936,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"TvShow"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'TvShow'; expected string`);
         } else {
           const identifiers = getIdentifiers8(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"TvShow"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'TvShow': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
@@ -4967,11 +4967,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Studio"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Studio'; expected string`);
         } else {
           const identifiers = getIdentifiers3(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Studio"}'`);
+            throw new Error(`Invalid node identifier for 'Studio'`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
@@ -5021,11 +5021,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Studio"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Studio'; expected string`);
         } else {
           const identifiers = getIdentifiers6(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Studio"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'Studio': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
@@ -5053,11 +5053,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Studio"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Studio'; expected string`);
         } else {
           const identifiers = getIdentifiers9(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Studio"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'Studio': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
@@ -5118,7 +5118,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   }
 };

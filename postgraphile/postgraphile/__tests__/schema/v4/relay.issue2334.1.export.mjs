@@ -1627,11 +1627,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Foo"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Foo'; expected string`);
         } else {
           const identifiers = getIdentifiers(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Foo"}'`);
+            throw new Error(`Invalid node identifier for 'Foo'`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.bar.fooByMyId.localAttributes[i];
@@ -1678,11 +1678,11 @@ export const inputObjects = {
           }
           return;
         } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Foo"}'; expected string`);
+          throw new Error(`Invalid node identifier for 'Foo'; expected string`);
         } else {
           const identifiers = getIdentifiers2(nodeId);
           if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Foo"}': ${JSON.stringify(nodeId)}`);
+            throw new Error(`Invalid node identifier for 'Foo': ${JSON.stringify(nodeId)}`);
           }
           for (let i = 0; i < 1; i++) {
             const localName = registryConfig.pgRelations.bar.fooByMyId.localAttributes[i];
@@ -1781,7 +1781,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   }
 };
