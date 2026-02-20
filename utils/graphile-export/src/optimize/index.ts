@@ -385,6 +385,8 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
       return true;
     case "BooleanLiteral":
       return !test.value;
+    case "StringLiteral":
+      return !test.value;
     case "BinaryExpression": {
       switch (test.operator) {
         case "!=": {
@@ -410,6 +412,10 @@ function expressionIsAlwaysTruthy(test: t.Expression) {
   switch (test.type) {
     case "BooleanLiteral":
       return test.value;
+    case "StringLiteral":
+      return !!test.value;
+    case "NumericLiteral":
+      return !!test.value;
     default:
       return false;
   }
