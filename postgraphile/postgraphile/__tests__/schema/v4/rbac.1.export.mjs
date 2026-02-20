@@ -8250,6 +8250,22 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
   });
 }
 const pgFieldSource_post_computed_with_optional_argPgResource = registry.pgResources["post_computed_with_optional_arg"];
+const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, queryBuilder) => {
+  if (typeof pgFieldSource.from !== "function") {
+    throw new Error("Invalid computed attribute 'from'");
+  }
+  const expression = sql`${pgFieldSource.from({
+    placeholder: queryBuilder.alias
+  })}`;
+  queryBuilder.orderBy({
+    codec: pgFieldSource.codec,
+    fragment: expression,
+    direction: ascDesc.toUpperCase(),
+    ...(pgOrderByNullsLast != null ? {
+      nulls: pgOrderByNullsLast ? "LAST" : "FIRST"
+    } : null)
+  });
+};
 const resource_compound_keyPgResource = registry.pgResources["compound_key"];
 const pgFieldSource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const pgFieldSource_person_first_namePgResource = registry.pgResources["person_first_name"];
@@ -10749,7 +10765,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   },
   Datetime: {
@@ -10759,7 +10775,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
     }
   },
   Email: {
@@ -10774,7 +10790,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`InternetAddress can only parse string values (kind='${ast.kind}')`);
     }
   },
   KeyValueHash: {
@@ -10785,7 +10801,7 @@ export const scalars = {
       if (isValidHstoreObject(obj)) {
         return obj;
       }
-      throw new GraphQLError(`This is not a valid ${"KeyValueHash"} object, it must be a key/value hash where keys and values are both strings (or null).`);
+      throw new GraphQLError(`This is not a valid KeyValueHash object, it must be a key/value hash where keys and values are both strings (or null).`);
     },
     parseLiteral(ast, variables) {
       switch (ast.kind) {
@@ -10912,30 +10928,10 @@ export const enums = {
         });
       },
       COMPUTED_OUT_ASC(queryBuilder) {
-        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: pgFieldSource_person_computed_outPgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(pgFieldSource_person_computed_outPgResource, "asc", undefined, queryBuilder);
       },
       COMPUTED_OUT_DESC(queryBuilder) {
-        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: pgFieldSource_person_computed_outPgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(pgFieldSource_person_computed_outPgResource, "desc", undefined, queryBuilder);
       },
       CONFIG_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -10976,30 +10972,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       FIRST_NAME_ASC(queryBuilder) {
-        if (typeof pgFieldSource_person_first_namePgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_person_first_namePgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: pgFieldSource_person_first_namePgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(pgFieldSource_person_first_namePgResource, "asc", undefined, queryBuilder);
       },
       FIRST_NAME_DESC(queryBuilder) {
-        if (typeof pgFieldSource_person_first_namePgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_person_first_namePgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: pgFieldSource_person_first_namePgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(pgFieldSource_person_first_namePgResource, "desc", undefined, queryBuilder);
       },
       ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -11170,30 +11146,10 @@ export const enums = {
         });
       },
       COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(pgFieldSource_post_computed_with_optional_argPgResource, "asc", undefined, queryBuilder);
       },
       COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(pgFieldSource_post_computed_with_optional_argPgResource, "desc", undefined, queryBuilder);
       },
       HEADLINE_ASC(queryBuilder) {
         queryBuilder.orderBy({
