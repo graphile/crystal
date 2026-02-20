@@ -96,23 +96,23 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           return;
         }
 
+        const args = node.arguments;
+        const params = node.callee.params;
+        if (params.length !== args.length) {
+          return;
+        }
+
         const expression = getExpression(node.callee.body);
 
         if (!expression) {
           return;
         }
 
-        const args = node.arguments;
         if (!args.every(isSimpleArg)) {
           return;
         }
 
-        const params = node.callee.params;
         if (!params.every(isSimpleParam)) {
-          return;
-        }
-
-        if (params.length !== args.length) {
           return;
         }
 
@@ -276,7 +276,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       }
 
       // Don't strip a block if there's any variable declarations in it.
-      if (body.some((stmt) => stmt.type === "VariableDeclaration")) {
+      if (body.some(t.isVariableDeclaration)) {
         return;
       }
 
