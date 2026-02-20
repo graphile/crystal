@@ -378,11 +378,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   attributeAttribute.attidentity !== "") ||
                 attributeAttribute.getType()?.typdefault != null;
               attributes[attributeAttribute.attname] = {
-                ...(description ? { description } : null),
                 codec: attributeCodec,
                 ...(notNull ? { notNull } : null),
                 ...(hasDefault ? { hasDefault } : null),
                 // PERF: identicalVia,
+                ...(description ? { description } : null),
                 ...(Object.keys(extensions).length > 0 ? { extensions } : null),
               };
               await info.process("pgCodecs_attribute", {
@@ -422,7 +422,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           // Do NOT mark `extensions` as `EXPORTABLE` otherwise changes
           // implemented through hooks will not be represented in the export.
-          const extensions: Partial<DataplanPg.PgCodecExtensions> = {
+          const extensions: DataplanPg.PgCodecExtensions = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
             pg: {
@@ -430,9 +430,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
               ...(pgClass.relpersistence !== "p"
-                ? {
-                    persistence: pgClass.relpersistence,
-                  }
+                ? { persistence: pgClass.relpersistence }
                 : null),
             },
             ...(Object.keys(tags).length > 0 ? { tags } : null),
@@ -448,9 +446,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             name: codecName,
             identifier: sqlIdent,
             attributes,
-            ...(description ? { description } : null),
             extensions,
             executor,
+            ...(description ? { description } : null),
           };
           await info.process("pgCodecs_recordType_spec", {
             serviceName,
@@ -607,7 +605,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           });
           const enumLabels = enumValues.map((e) => e.enumlabel);
           const { tags, description } = type.getTagsAndDescription();
-          const extensions: Partial<DataplanPg.PgCodecExtensions> = {
+          const extensions: DataplanPg.PgCodecExtensions = {
             oid: type._id,
             pg: {
               serviceName,
@@ -686,7 +684,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           const { tags, description } = type.getTagsAndDescription();
 
-          const extensions: Partial<DataplanPg.PgCodecExtensions> = {
+          const extensions: DataplanPg.PgCodecExtensions = {
             oid: type._id,
             pg: {
               serviceName,
@@ -707,8 +705,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             typeName,
           );
           const spec = {
-            ...(description ? { description } : null),
             extensions,
+            ...(description ? { description } : null),
           };
           event.pgCodec = EXPORTABLE(
             (codecName, innerCodec, rangeOfCodec, spec, sqlIdent) =>
@@ -740,7 +738,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const typeName = type.typname;
           if (innerCodec) {
             const { tags, description } = type.getTagsAndDescription();
-            const extensions: Partial<DataplanPg.PgCodecExtensions> = {
+            const extensions: DataplanPg.PgCodecExtensions = {
               oid: type._id,
               pg: {
                 serviceName,
@@ -765,9 +763,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             );
             exportNameHint(sqlIdent, `${codecName}Identifier`);
             const spec = {
-              ...(description ? { description } : null),
-              ...(notNull ? { notNull } : null),
               extensions,
+              ...(notNull ? { notNull } : null),
+              ...(description ? { description } : null),
             };
             event.pgCodec = EXPORTABLE(
               (codecName, domainOfCodec, innerCodec, spec, sqlIdent) =>
@@ -797,7 +795,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             if (innerCodec) {
               const typeDelim = innerType.typdelim!;
               const { tags, description } = type.getTagsAndDescription();
-              const extensions: Partial<DataplanPg.PgCodecExtensions> = {
+              const extensions: DataplanPg.PgCodecExtensions = {
                 oid: type._id,
                 pg: {
                   serviceName,
@@ -819,9 +817,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               exportNameHint(extensions, `${name}CodecExtensions`);
               const spec = {
                 name,
-                ...(description ? { description } : null),
-                ...(typeDelim != "," ? { typeDelim } : null),
                 extensions,
+                ...(typeDelim != "," ? { typeDelim } : null),
+                ...(description ? { description } : null),
               };
               event.pgCodec = EXPORTABLE(
                 (innerCodec, listOfCodec, spec) =>
