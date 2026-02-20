@@ -37,6 +37,7 @@ export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
               decode: pipeStringDecode,
             }),
             [pipeStringDecode, pipeStringEncode],
+            "pipeStringNodeIdCodec",
           ),
         );
         return _;
