@@ -1047,6 +1047,18 @@ const verbatim: CodecOptions = {
 };
 
 /**
+ * For tsquery/tsvector, natural equality is present (comparisons are done
+ * after parsing, so minor whitespace differences don't matter), but there's no
+ * real natural order for them.
+ */
+const textsearch: CodecOptions = {
+  // Use built in `castFromPg` (::text) because we don't know the various
+  // drivers won't parse it.
+  hasNaturalEquality: true,
+  hasNaturalOrdering: false,
+};
+
+/**
  * Casts to something else before casting to text; e.g. `${expression}::numeric::text`
  */
 const castVia = (via: SQL): CodecOptions => ({
@@ -1134,6 +1146,8 @@ export const TYPES = {
   }),
   jsonpath: t()("4072", "jsonpath"),
   xml: t<string>()("142", "xml"),
+  tsvector: t<string>()("3614", "tsvector", textsearch),
+  tsquery: t<string>()("3615", "tsquery", textsearch),
   citext: s<string>()(undefined, "citext", verbatim),
   uuid: s<string>()("2950", "uuid", verbatim),
   timestamp: s<string>()(
@@ -1330,6 +1344,8 @@ export const LIST_TYPES = {
   jsonb: builtinListOfCodec("3807", TYPES.jsonb),
   jsonpath: builtinListOfCodec("4073", TYPES.jsonpath),
   xml: builtinListOfCodec("143", TYPES.xml),
+  tsvector: builtinListOfCodec("3643", TYPES.tsvector),
+  tsquery: builtinListOfCodec("3645", TYPES.tsquery),
   citext: builtinListOfCodec("20277428", TYPES.citext),
   uuid: builtinListOfCodec("2951", TYPES.uuid),
   timestamp: builtinListOfCodec("1115", TYPES.timestamp),
@@ -1439,6 +1455,14 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.xml;
     case "_xml":
       return LIST_TYPES.xml;
+    case "tsvector":
+      return TYPES.tsvector;
+    case "_tsvector":
+      return LIST_TYPES.tsvector;
+    case "tsquery":
+      return TYPES.tsquery;
+    case "_tsquery":
+      return LIST_TYPES.tsquery;
     case "json":
       return TYPES.json;
     case "_json":

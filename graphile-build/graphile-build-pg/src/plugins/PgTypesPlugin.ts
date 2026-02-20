@@ -145,6 +145,38 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           doConnection("InternetAddress");
 
           build.registerScalarType(
+            inflection.builtin("TSVector"),
+            { pgCodec: build.dataplanPg.TYPES.tsvector },
+            () =>
+              stringTypeSpec(
+                build.wrapDescription(
+                  "A PostgreSQL full-text search document (`tsvector`). See https://www.postgresql.org/docs/current/datatype-textsearch.html",
+                  "type",
+                ),
+                undefined,
+                inflection.builtin("TSVector"),
+              ),
+            "graphile-build-pg built-in",
+          );
+          doConnection("TSVector");
+
+          build.registerScalarType(
+            inflection.builtin("TSQuery"),
+            { pgCodec: build.dataplanPg.TYPES.tsvector },
+            () =>
+              stringTypeSpec(
+                build.wrapDescription(
+                  "A PostgreSQL full-text search query (`tsquery`). See https://www.postgresql.org/docs/current/datatype-textsearch.html",
+                  "type",
+                ),
+                undefined,
+                inflection.builtin("TSQuery"),
+              ),
+            "graphile-build-pg built-in",
+          );
+          doConnection("TSQuery");
+
+          build.registerScalarType(
             inflection.builtin("RegProc"),
             {},
             () =>

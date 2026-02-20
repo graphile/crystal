@@ -12,7 +12,7 @@ import type {
   PgSelectQueryBuilder,
   PgSelectSingleStep,
 } from "@dataplan/pg";
-import { sqlValueWithCodec } from "@dataplan/pg";
+import { sqlValueWithCodec, TYPES } from "@dataplan/pg";
 import type {
   GrafastFieldConfig,
   InputObjectFieldApplyResolver,
@@ -102,6 +102,27 @@ declare global {
     }
   }
 }
+
+/**
+ * We probably don't want to expose these through GraphQL unless the user
+ * specifically opts in.
+ */
+const HIDE_BY_DEFAULT: ReadonlyArray<PgCodec> = [
+  // Likely a cache column and automatically computed, should not be exposed.
+  TYPES.tsvector,
+
+  // Likely a cached digest of a user's search terms (the result of a
+  // websearch_to_tsquery or similar), and should not be exposed by default.
+  // The developer probably stores the raw search string the user entered in a
+  // different column (plain text?) which should be exposed only.
+  // It's also worth noting that a raw tsquery can be extremely expensive to
+  // execute, especially if it includes a lot of `OR` or prefix searches.
+  // Allowing users to add arbitrary tsquery values into the DB is likely
+  // suboptimal. There's also the risk of side-channel attacks (such as timing
+  // attacks) which can be used to determine information about data the user
+  // isn't actually allowed to see.
+  TYPES.tsquery,
+];
 
 function processAttribute(
   fields: GraphQLFieldConfigMap<any, any>,
@@ -394,26 +415,37 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               } else if (codec.domainOfCodec) {
                 // No need to add a behavior for domain
                 walk(codec.domainOfCodec);
-              } else if (codec.attributes) {
-                behaviors.add(`-condition:attribute:filterBy`);
-                behaviors.add(`-attribute:orderBy`);
-              } else if (codec.isBinary) {
-                // Never filter, not in condition plugin nor any other
-                behaviors.add(`-attribute:filterBy`);
-                behaviors.add(`-attribute:orderBy`);
-              } else if (codec.isEnum) {
-                // Unlikely to be useful for ordering, but filtering makes
-                // sense
-                behaviors.add(`-attribute:orderBy`);
               } else {
+                if (HIDE_BY_DEFAULT.includes(codec)) {
+                  behaviors.add("-attribute:base");
+                  behaviors.add("-attribute:select");
+                  behaviors.add("-attribute:insert");
+                  behaviors.add("-attribute:update");
+                  behaviors.add("-condition:attribute:filterBy");
+                  behaviors.add("-attribute:orderBy");
+                }
+                if (codec.attributes) {
+                  behaviors.add(`-condition:attribute:filterBy`);
+                  behaviors.add(`-attribute:orderBy`);
+                }
+                if (codec.isBinary) {
+                  // Never filter, not in condition plugin nor any other
+                  behaviors.add(`-attribute:filterBy`);
+                  behaviors.add(`-attribute:orderBy`);
+                }
+                if (codec.isEnum) {
+                  // Unlikely to be useful for ordering, but filtering makes
+                  // sense
+                  behaviors.add(`-attribute:orderBy`);
+                }
                 if (codec.hasNaturalEquality === false) {
                   behaviors.add(`-attribute:filterBy`);
                 }
                 if (codec.hasNaturalOrdering === false) {
                   behaviors.add(`-attribute:orderBy`);
                 }
-                // Done
               }
+              // Done
             }
             walk(attribute.codec);
 

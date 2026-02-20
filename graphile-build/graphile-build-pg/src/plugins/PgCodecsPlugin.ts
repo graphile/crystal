@@ -1005,6 +1005,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             varchar: "String",
             name: "String",
             xml: inflection.builtin("XML"),
+            tsvector: inflection.builtin("TSVector"),
+            tsquery: inflection.builtin("TSQuery"),
             json: inflection.builtin("JSON"),
             jsonb: inflection.builtin("JSON"),
             jsonpath: inflection.builtin("JSONPath"),

@@ -338,6 +338,20 @@ const listsCodec = recordCodec({
     bytea_array_nn: {
       codec: LIST_TYPES.bytea,
       notNull: true
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector
+    },
+    tsvector_array_nn: {
+      codec: LIST_TYPES.tsvector,
+      notNull: true
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery
+    },
+    tsquery_array_nn: {
+      codec: LIST_TYPES.tsquery,
+      notNull: true
     }
   },
   extensions: {
@@ -637,6 +651,18 @@ const typesCodec = recordCodec({
     },
     ltree_array: {
       codec: spec_types_attributes_ltree_array_codec_ltree_
+    },
+    tsvector: {
+      codec: TYPES.tsvector
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector
+    },
+    tsquery: {
+      codec: TYPES.tsquery
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery
     }
   },
   extensions: {
@@ -771,6 +797,10 @@ const registry = makeRegistry({
     compoundTypeArray: compoundTypeArrayCodec,
     byteaArray: LIST_TYPES.bytea,
     bytea: TYPES.bytea,
+    tsvectorArray: LIST_TYPES.tsvector,
+    tsvector: TYPES.tsvector,
+    tsqueryArray: LIST_TYPES.tsquery,
+    tsquery: TYPES.tsquery,
     types: typesCodec,
     int2: TYPES.int2,
     anInt: anIntCodec,

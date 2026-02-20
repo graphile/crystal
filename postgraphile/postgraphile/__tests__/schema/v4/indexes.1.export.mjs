@@ -1973,6 +1973,36 @@ const listsCodec = recordCodec({
         __proto__: null,
         isIndexed: false
       }
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsvector_array_nn: {
+      codec: LIST_TYPES.tsvector,
+      notNull: true,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsquery_array_nn: {
+      codec: LIST_TYPES.tsquery,
+      notNull: true,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
     }
   },
   extensions: {
@@ -2476,6 +2506,34 @@ const typesCodec = recordCodec({
     },
     ltree_array: {
       codec: spec_types_attributes_ltree_array_codec_ltree_,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsvector: {
+      codec: TYPES.tsvector,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsquery: {
+      codec: TYPES.tsquery,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery,
       extensions: {
         __proto__: null,
         isIndexed: false
@@ -3032,6 +3090,10 @@ const registry = makeRegistry({
     compoundTypeArray: compoundTypeArrayCodec,
     byteaArray: LIST_TYPES.bytea,
     bytea: TYPES.bytea,
+    tsvectorArray: LIST_TYPES.tsvector,
+    tsvector: TYPES.tsvector,
+    tsqueryArray: LIST_TYPES.tsquery,
+    tsquery: TYPES.tsquery,
     types: typesCodec,
     anInt: anIntCodec,
     anotherInt: anotherIntCodec,

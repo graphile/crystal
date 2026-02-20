@@ -329,7 +329,11 @@ create table b.types (
   "bytea" bytea,
   "bytea_array" bytea[],
   "ltree" ltree,
-  "ltree_array" ltree[]
+  "ltree_array" ltree[],
+  "tsvector" tsvector,
+  "tsvector_array" tsvector[],
+  "tsquery" tsquery,
+  "tsquery_array" tsquery[]
 );
 
 comment on table b.types is E'@foreignKey (smallint) references a.post\n@foreignKey (id) references a.post';
@@ -347,7 +351,11 @@ create table b.lists (
   "compound_type_array" c.compound_type[],
   "compound_type_array_nn" c.compound_type[] not null,
   "bytea_array" bytea[],
-  "bytea_array_nn" bytea[] not null
+  "bytea_array_nn" bytea[] not null,
+  "tsvector_array" tsvector[],
+  "tsvector_array_nn" tsvector[] not null,
+  "tsquery_array" tsquery[],
+  "tsquery_array_nn" tsquery[] not null
 );
 
 create function b.throw_error() returns trigger as $$

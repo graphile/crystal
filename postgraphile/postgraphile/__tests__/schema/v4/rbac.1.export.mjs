@@ -2203,6 +2203,44 @@ const listsCodec = recordCodec({
         canInsert: false,
         canUpdate: false
       }
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    tsvector_array_nn: {
+      codec: LIST_TYPES.tsvector,
+      notNull: true,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    tsquery_array_nn: {
+      codec: LIST_TYPES.tsquery,
+      notNull: true,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
     }
   },
   extensions: {
@@ -2802,6 +2840,42 @@ const typesCodec = recordCodec({
         canInsert: false,
         canUpdate: false
       }
+    },
+    tsvector: {
+      codec: TYPES.tsvector,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    tsvector_array: {
+      codec: LIST_TYPES.tsvector,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    tsquery: {
+      codec: TYPES.tsquery,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    tsquery_array: {
+      codec: LIST_TYPES.tsquery,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
     }
   },
   extensions: {
@@ -3327,6 +3401,10 @@ const registry = makeRegistry({
     compoundTypeArray: compoundTypeArrayCodec,
     byteaArray: LIST_TYPES.bytea,
     bytea: TYPES.bytea,
+    tsvectorArray: LIST_TYPES.tsvector,
+    tsvector: TYPES.tsvector,
+    tsqueryArray: LIST_TYPES.tsquery,
+    tsquery: TYPES.tsquery,
     types: typesCodec,
     anInt: anIntCodec,
     anotherInt: anotherIntCodec,
@@ -7343,28 +7421,6 @@ const registry = makeRegistry({
       description: "The first post by the person."
     }),
     person: person_resourceOptionsConfig,
-    lists: {
-      executor: executor,
-      name: "lists",
-      identifier: "main.b.lists",
-      from: listsIdentifier,
-      codec: listsCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "b",
-          name: "lists"
-        },
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      },
-      uniques: [{
-        attributes: ["id"],
-        isPrimary: true
-      }]
-    },
     badly_behaved_function: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "badly_behaved_function",
       identifier: "main.c.badly_behaved_function()",
@@ -7566,6 +7622,28 @@ const registry = makeRegistry({
       },
       hasImplicitOrder: true
     }),
+    lists: {
+      executor: executor,
+      name: "lists",
+      identifier: "main.b.lists",
+      from: listsIdentifier,
+      codec: listsCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "lists"
+        },
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
+    },
     types: types_resourceOptionsConfig,
     type_function_connection: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
       name: "type_function_connection",
