@@ -34,6 +34,7 @@ export { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.ts";
 export { PgRBACPlugin } from "./plugins/PgRBACPlugin.ts";
 export { PgRefsPlugin } from "./plugins/PgRefsPlugin.ts";
 export { PgRegistryPlugin } from "./plugins/PgRegistryPlugin.ts";
+export { PgRegistryReductionPlugin } from "./plugins/PgRegistryReductionPlugin.ts";
 export { PgRelationsPlugin } from "./plugins/PgRelationsPlugin.ts";
 export { PgRemoveExtensionResourcesPlugin } from "./plugins/PgRemoveExtensionResourcesPlugin.ts";
 export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.ts";
