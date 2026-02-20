@@ -7,6 +7,7 @@ import type {
   PgSelectQueryBuilder,
   PgSelectQueryBuilderCallback,
 } from "@dataplan/pg";
+import { sql } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.ts";
@@ -40,6 +41,32 @@ declare global {
     }
   }
 }
+
+const applyOrderByCustomField = EXPORTABLE(
+  (sql) =>
+    (
+      pgFieldSource: PgResource<any, any, any, any, any>,
+      ascDesc: "asc" | "desc",
+      pgOrderByNullsLast: boolean | null | undefined,
+      queryBuilder: PgSelectQueryBuilder,
+    ) => {
+      if (typeof pgFieldSource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${pgFieldSource.from({
+        placeholder: queryBuilder.alias,
+      })}`;
+      queryBuilder.orderBy({
+        codec: pgFieldSource.codec,
+        fragment: expression,
+        direction: ascDesc.toUpperCase() as "ASC" | "DESC",
+        ...(pgOrderByNullsLast != null
+          ? { nulls: pgOrderByNullsLast ? "LAST" : "FIRST" }
+          : null),
+      });
+    },
+  [sql],
+);
 
 export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
   name: "PgOrderCustomFieldsPlugin",
@@ -124,32 +151,26 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                     extensions: {
                       grafast: {
                         apply: EXPORTABLE(
-                          (ascDesc, pgFieldSource, pgOrderByNullsLast, sql) =>
+                          (
+                            applyOrderByCustomField,
+                            ascDesc,
+                            pgFieldSource,
+                            pgOrderByNullsLast,
+                          ) =>
                             ((queryBuilder: PgSelectQueryBuilder) => {
-                              if (typeof pgFieldSource.from !== "function") {
-                                throw new Error(
-                                  "Invalid computed attribute 'from'",
-                                );
-                              }
-                              const expression = sql`${pgFieldSource.from({
-                                placeholder: queryBuilder.alias,
-                              })}`;
-                              queryBuilder.orderBy({
-                                codec: pgFieldSource.codec,
-                                fragment: expression,
-                                direction: ascDesc.toUpperCase() as
-                                  | "ASC"
-                                  | "DESC",
-                                ...(pgOrderByNullsLast != null
-                                  ? {
-                                      nulls: pgOrderByNullsLast
-                                        ? "LAST"
-                                        : "FIRST",
-                                    }
-                                  : null),
-                              });
+                              applyOrderByCustomField(
+                                pgFieldSource,
+                                ascDesc,
+                                pgOrderByNullsLast,
+                                queryBuilder,
+                              );
                             }) as PgSelectQueryBuilderCallback,
-                          [ascDesc, pgFieldSource, pgOrderByNullsLast, sql],
+                          [
+                            applyOrderByCustomField,
+                            ascDesc,
+                            pgFieldSource,
+                            pgOrderByNullsLast,
+                          ],
                         ),
                       },
                     },
