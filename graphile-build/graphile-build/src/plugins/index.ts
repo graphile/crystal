@@ -7,6 +7,7 @@ import { CommonBehaviorsPlugin } from "./CommonBehaviorsPlugin.ts";
 import { CommonTypesPlugin } from "./CommonTypesPlugin.ts";
 import { ConnectionPlugin } from "./ConnectionPlugin.ts";
 import { CursorTypePlugin } from "./CursorTypePlugin.ts";
+import { MinifySchemaPlugin } from "./MinifySchemaPlugin.ts";
 import { MutationPayloadQueryPlugin } from "./MutationPayloadQueryPlugin.ts";
 import { MutationPlugin } from "./MutationPlugin.ts";
 import { NodeAccessorPlugin } from "./NodeAccessorPlugin.ts";
@@ -33,6 +34,7 @@ export {
   CommonTypesPlugin,
   ConnectionPlugin,
   CursorTypePlugin,
+  MinifySchemaPlugin,
   MutationPayloadQueryPlugin,
   MutationPlugin,
   NodeAccessorPlugin,
