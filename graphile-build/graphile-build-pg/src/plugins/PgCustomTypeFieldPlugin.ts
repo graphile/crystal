@@ -1044,6 +1044,25 @@ const pgFunctionArgumentsFromArgs = EXPORTABLE(
   ],
 );
 
+const scalarComputed = EXPORTABLE(
+  (pgClassExpression, pgFromExpression, pgFunctionArgumentsFromArgs) =>
+    (
+      resource: PgResource,
+      $in: Step,
+      args: readonly PgSelectArgumentSpec[],
+    ) => {
+      const { $row, selectArgs } = pgFunctionArgumentsFromArgs($in, args, true);
+      const from = pgFromExpression(
+        $row,
+        resource.from,
+        resource.parameters,
+        selectArgs,
+      );
+      return pgClassExpression($row, resource.codec, undefined)`${from}`;
+    },
+  [pgClassExpression, pgFromExpression, pgFunctionArgumentsFromArgs],
+);
+
 function modFields(
   fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
@@ -1158,48 +1177,21 @@ function modFields(
                 !resource.codec.attributes &&
                 typeof resource.from === "function"
               ? EXPORTABLE(
-                  (
-                    makeArgs,
-                    pgClassExpression,
-                    pgFromExpression,
-                    pgFunctionArgumentsFromArgs,
-                    resource,
-                  ) =>
+                  (makeArgs, resource, scalarComputed) =>
                     ($in, args, _info) => {
-                      const { $row, selectArgs } = pgFunctionArgumentsFromArgs(
-                        $in,
-                        makeArgs(args),
-                        true,
-                      );
-                      const from = pgFromExpression(
-                        $row,
-                        resource.from,
-                        resource.parameters,
-                        selectArgs,
-                      );
-                      return pgClassExpression(
-                        $row,
-                        resource.codec,
-                        undefined,
-                      )`${from}`;
+                      return scalarComputed(resource, $in, makeArgs(args));
                     },
-                  [
-                    makeArgs,
-                    pgClassExpression,
-                    pgFromExpression,
-                    pgFunctionArgumentsFromArgs,
-                    resource,
-                  ],
+                  [makeArgs, resource, scalarComputed],
                   `${resource.name}_getSelectPlanFromParentAndArgs`,
                 )
               : EXPORTABLE(
                   (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
                     ($in, args, _info) => {
-                      const { selectArgs } = pgFunctionArgumentsFromArgs(
+                      const details = pgFunctionArgumentsFromArgs(
                         $in,
                         makeArgs(args),
                       );
-                      return resource.execute(selectArgs);
+                      return resource.execute(details.selectArgs);
                     },
                   [makeArgs, pgFunctionArgumentsFromArgs, resource],
                   `${resource.name}_getSelectPlanFromParentAndArgs`,
