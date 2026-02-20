@@ -1061,6 +1061,7 @@ const scalarComputed = EXPORTABLE(
       return pgClassExpression($row, resource.codec, undefined)`${from}`;
     },
   [pgClassExpression, pgFromExpression, pgFunctionArgumentsFromArgs],
+  "scalarComputed",
 );
 
 function modFields(
