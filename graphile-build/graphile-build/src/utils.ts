@@ -238,28 +238,27 @@ export const stringTypeSpec = (
   parseLiteral: coerce
     ? EXPORTABLE(
         (GraphQLError, Kind, coerce, name) => (ast) => {
-          if (ast.kind !== Kind.STRING) {
-            // ERRORS: add name to this error
-            throw new GraphQLError(
-              `${name ?? "This scalar"} can only parse string values (kind = '${
-                ast.kind
-              }')`,
-            );
+          if (ast.kind === Kind.STRING) {
+            return coerce(ast.value);
           }
-          return coerce(ast.value);
+          throw new GraphQLError(
+            `${name ?? "This scalar"} can only parse string values (kind = '${
+              ast.kind
+            }')`,
+          );
         },
         [GraphQLError, Kind, coerce, name],
       )
     : EXPORTABLE(
         (GraphQLError, Kind, name) => (ast) => {
-          if (ast.kind !== Kind.STRING) {
-            throw new GraphQLError(
-              `${name ?? "This scalar"} can only parse string values (kind='${
-                ast.kind
-              }')`,
-            );
+          if (ast.kind === Kind.STRING) {
+            return ast.value;
           }
-          return ast.value;
+          throw new GraphQLError(
+            `${name ?? "This scalar"} can only parse string values (kind='${
+              ast.kind
+            }')`,
+          );
         },
         [GraphQLError, Kind, name],
       ),

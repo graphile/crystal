@@ -967,12 +967,12 @@ export function extendSchema(
                     ? EXPORTABLE((config) => config.parseLiteral, [config])
                     : EXPORTABLE(
                         (GraphQLError, Kind, name) => (ast: any) => {
-                          if (ast.kind !== Kind.STRING) {
-                            throw new GraphQLError(
-                              `${name} can only parse string values`,
-                            );
+                          if (ast.kind === Kind.STRING) {
+                            return ast.value;
                           }
-                          return ast.value;
+                          throw new GraphQLError(
+                            `${name} can only parse string values`,
+                          );
                         },
                         [GraphQLError, Kind, name],
                       ),
