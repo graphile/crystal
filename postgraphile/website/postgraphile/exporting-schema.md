@@ -100,6 +100,35 @@ export.
 
 :::
 
+:::tip[Consider using `postgraphile/presets/minify` for exported schemas]
+
+When exporting your schema for use in a serverless environment, every byte
+matters - for bundling, for reading, and for executing. In these environments
+it's rare that introspection is a need (no GraphiQL or build tooling
+introspecting this endpoint), so this preset strips out all of the documentation
+and deprecations from the schema, and also attempts to remove other metadata
+from the code. The result is less code to export, smaller bundle size, and
+thereby a faster serverless startup time!
+
+```ts title="graphile.config.ts"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { PgMinifySchemaPreset } from "postgraphile/presets/minify";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset, PgMinifySchemaPreset],
+  /* ... */
+};
+
+export default preset;
+```
+
+Because it removes descriptions and deprecation information, it is best suited
+to production exports where milliseconds matter (e.g. serverless) rather than
+traditional servers or developer-facing schemas. The preset is experimental, so
+expect these changes to evolve over time.
+
+:::
+
 :::tip[Use `eslint-plugin-graphile-export` when writing plugins]
 
 We **highly recommend** that plugin authors (both for internal project plugins
