@@ -48,6 +48,14 @@ const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
   }
 };
 
+function isSafeTemplateLiteralStringChunk(value: string): boolean {
+  return (
+    !value.includes("`") &&
+    !value.includes("\\") &&
+    !value.includes("${")
+  );
+}
+
 export const optimize = (inAst: t.File, runs = 1): t.File => {
   let ast = inAst;
   // Reset the full AST
@@ -72,6 +80,13 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         for (let i = 0, l = expressions.length; i < l; i++) {
           const expression = expressions[i];
           if (expression.type === "StringLiteral") {
+            if (
+              !isSafeTemplateLiteralStringChunk(expression.value) ||
+              quasis[i].value.cooked == null ||
+              quasis[i + 1].value.cooked == null
+            ) {
+              continue;
+            }
             // Inline it
             if (!changed) {
               changed = true;
