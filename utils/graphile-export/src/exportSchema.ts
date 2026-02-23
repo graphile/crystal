@@ -1256,6 +1256,18 @@ function func(
 
 const shouldOptimizeFactoryCalls = true;
 
+interface FactoryASTCacheEntry {
+  rawArgs: readonly unknown[];
+  depArgs: readonly t.Expression[];
+  result: t.Expression;
+}
+
+const factoryAstCache = new Map<string, FactoryASTCacheEntry[]>();
+
+function resetCaches() {
+  factoryAstCache.clear();
+}
+
 function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
@@ -1269,7 +1281,8 @@ function factoryAst<TTuple extends any[]>(
     locationHint,
     nameHint,
   );
-  const depArgs = fn.$exporter$args.map((arg, i) => {
+  const rawArgs = fn.$exporter$args;
+  const depArgs = rawArgs.map((arg, i) => {
     if (typeof arg === "string") {
       return t.stringLiteral(arg);
     } else if (typeof arg === "number") {
@@ -1291,6 +1304,40 @@ function factoryAst<TTuple extends any[]>(
     );
   });
 
+  const key = `${factory.toString().trim()}|${depArgs.length}`;
+  let cacheByKey = factoryAstCache.get(key);
+  if (!cacheByKey) {
+    cacheByKey = [];
+    factoryAstCache.set(key, cacheByKey);
+  }
+
+  for (const existing of cacheByKey) {
+    let matches = true;
+    for (let i = 0, l = depArgs.length; i < l; i++) {
+      // Don't mind if the raw version or the AST-ified version match, but if
+      // neither match we must abort.
+      if (
+        existing.rawArgs[i] !== rawArgs[i] &&
+        existing.depArgs[i] !== depArgs[i]
+      ) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) {
+      return existing.result;
+    }
+  }
+
+  const result = factoryASTInner(funcAST, depArgs);
+  cacheByKey.push({ rawArgs, depArgs, result });
+  return result;
+}
+
+function factoryASTInner(
+  funcAST: t.FunctionExpression | t.ArrowFunctionExpression,
+  depArgs: t.Expression[],
+) {
   // DEBT: we should be able to remove this now that we have the
   // post-processing via babel, however currently the result of doing so is
   // messy.
@@ -2082,6 +2129,7 @@ function exportFile(file: CodegenFile, { disableOptimize }: ExportOptions) {
   const optimizedAst = disableOptimize ? ast : optimize(ast);
 
   const { code } = reallyGenerate(optimizedAst, {});
+  resetCaches();
   return { code };
 }
 
