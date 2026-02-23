@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type { ExecutableStep, FieldArgs, Maybe, NodeIdHandler } from "grafast";
-import { lambda } from "grafast";
+import { lambda, markSyncAndSafe } from "grafast";
 
 import { EXPORTABLE, exportNameHint } from "../utils.ts";
 import { version } from "../version.ts";
@@ -67,13 +67,15 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
           build,
           {
             specForHandler: EXPORTABLE(
-              (specForHandlerCache) =>
+              (markSyncAndSafe, specForHandlerCache) =>
                 function (handler) {
                   const existing = specForHandlerCache.get(handler);
                   if (existing) {
                     return existing;
                   }
-                  function spec(nodeId: Maybe<string>) {
+                  const spec = markSyncAndSafe(function spec(
+                    nodeId: Maybe<string>,
+                  ) {
                     // We only want to return the specifier if it matches
                     // this handler; otherwise return null.
                     if (nodeId == null) return null;
@@ -86,13 +88,11 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                       // Ignore errors
                     }
                     return null;
-                  }
-                  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
-                  spec.isSyncAndSafe = true; // Optimization
+                  }, `specifier_${handler.typeName}_${handler.codec.name}`);
                   specForHandlerCache.set(handler, spec);
                   return spec;
                 },
-              [specForHandlerCache],
+              [markSyncAndSafe, specForHandlerCache],
             ),
             nodeFetcherByTypeName(typeName) {
               const existing = nodeFetcherByTypeNameCache.get(typeName);

@@ -1,22 +1,19 @@
 import { LIST_TYPES, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, constant, context, createObjectAndApplyChildren, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, constant, context, createObjectAndApplyChildren, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
+const rawNodeIdCodec = {
+  name: "raw",
+  encode: markSyncAndSafe(function rawEncode(value) {
+    return typeof value === "string" ? value : null;
+  }),
+  decode: markSyncAndSafe(function rawDecode(value) {
+    return typeof value === "string" ? value : null;
+  })
+};
 const nodeIdHandler_Query = {
   typeName: "Query",
-  codec: {
-    name: "raw",
-    encode: Object.assign(function rawEncode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    }),
-    decode: Object.assign(function rawDecode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    })
-  },
+  codec: rawNodeIdCodec,
   match(specifier) {
     return specifier === "query";
   },
@@ -35,32 +32,24 @@ const nodeIdHandler_Query = {
 };
 const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: Object.assign(function base64JSONEncode(value) {
+  encode: markSyncAndSafe(function base64JSONEncode(value) {
     return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  }, {
-    isSyncAndSafe: true
   }),
-  decode: Object.assign(function base64JSONDecode(value) {
+  decode: markSyncAndSafe(function base64JSONDecode(value) {
     return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }, {
-    isSyncAndSafe: true
   })
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: nodeIdHandler_Query.codec,
+  raw: rawNodeIdCodec,
   base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
-    encode: Object.assign(function pipeStringEncode(value) {
+    encode: markSyncAndSafe(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    }, {
-      isSyncAndSafe: true
     }),
-    decode: Object.assign(function pipeStringDecode(value) {
+    decode: markSyncAndSafe(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }, {
-      isSyncAndSafe: true
     })
   }
 };
@@ -4547,7 +4536,7 @@ function specForHandler(handler) {
   if (existing) {
     return existing;
   }
-  function spec(nodeId) {
+  const spec = markSyncAndSafe(function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     if (nodeId == null) return null;
@@ -4560,9 +4549,7 @@ function specForHandler(handler) {
       // Ignore errors
     }
     return null;
-  }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
-  spec.isSyncAndSafe = true; // Optimization
+  }, `specifier_${handler.typeName}_${handler.codec.name}`);
   specForHandlerCache.set(handler, spec);
   return spec;
 }
@@ -4664,6 +4651,12 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const PersonSecret_personIdPlan = $record => {
+  return $record.get("person_id");
+};
+const PersonSecret_personByPersonIdPlan = $record => resource_personPgResource.get({
+  id: $record.get("person_id")
+});
 const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
@@ -4850,6 +4843,18 @@ const resource_person_type_functionPgResource = registry.pgResources["person_typ
 const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
+const PersonComputedComplexRecord_yPlan = $record => {
+  const $plan = $record.get("y");
+  const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
+const PersonComputedComplexRecord_zPlan = $record => {
+  const $plan = $record.get("z");
+  const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
 const resource_compound_type_computed_fieldPgResource = registry.pgResources["compound_type_computed_field"];
 function toString(value) {
   return "" + value;
@@ -4861,6 +4866,12 @@ const coerce = string => {
   return string;
 };
 const resource_frmcdc_comptypePgResource = registry.pgResources["frmcdc_comptype"];
+const DatetimeParseLiteral = ast => {
+  if (ast.kind === Kind.STRING) {
+    return ast.value;
+  }
+  throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
+};
 const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, queryBuilder) => {
   if (typeof pgFieldSource.from !== "function") {
     throw new Error("Invalid computed attribute 'from'");
@@ -4876,6 +4887,20 @@ const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, que
       nulls: pgOrderByNullsLast ? "LAST" : "FIRST"
     } : null)
   });
+};
+const PeopleOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const PeopleOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
 };
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
 function LTreeParseValue(value) {
@@ -4941,7 +4966,44 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const FuncOutOutRecord_firstOutPlan = $record => {
+  return $record.get("first_out");
+};
+const FuncOutOutRecord_secondOutPlan = $record => {
+  return $record.get("second_out");
+};
+const FuncOutOutUnnamedRecord_arg1Plan = $record => {
+  return $record.get("column1");
+};
+const FuncOutOutUnnamedRecord_arg2Plan = $record => {
+  return $record.get("column2");
+};
+const FuncOutUnnamedOutOutUnnamedRecord_arg3Plan = $record => {
+  return $record.get("column3");
+};
+const FuncOutOutCompoundTypeRecord_o2Plan = $record => {
+  const $plan = $record.get("o2");
+  const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
 const resource_frmcdc_postPgResource = registry.pgResources["frmcdc_post"];
+const PersonCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const PersonSecretCondition_personIdApply = ($condition, val) => applyAttributeCondition("person_id", TYPES.int, $condition, val);
+const PersonSecretsOrderBy_PERSON_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const PersonSecretsOrderBy_PERSON_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
 const resource_mutation_outPgResource = registry.pgResources["mutation_out"];
 function pgSelectFromPayload($payload) {
@@ -5181,34 +5243,6 @@ const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
-const specFromArgs_MyTable2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_MyTable, $nodeId);
-};
-const specFromArgs_PersonSecret2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
-};
-const specFromArgs_CompoundKey2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_CompoundKey, $nodeId);
-};
-const specFromArgs_NullTestRecord2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_NullTestRecord, $nodeId);
-};
-const specFromArgs_LeftArm2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
-};
-const specFromArgs_Issue7562 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Issue756, $nodeId);
-};
-const specFromArgs_Person2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
-};
 function getClientMutationIdForCustomMutationPlan($object) {
   const $result = $object.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -5222,6 +5256,33 @@ function queryPlan() {
 function applyClientMutationIdForCustomMutation(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
+const LeftArmIdentityPayload_personByPersonIdPlan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("person_id")
+});
+function LeftArmBaseInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function LeftArmBaseInput_personIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+}
+function LeftArmBaseInput_lengthInMetresApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+}
+function LeftArmBaseInput_moodApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("mood", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
   return $insert.getMeta("clientMutationId");
@@ -5229,28 +5290,134 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
 function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
 }
+function MyTableInput_jsonDataApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("json_data", bakedInputRuntime(schema, field.type, val));
+}
+function PersonSecretInput_secretApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+}
+const CreateCompoundKeyPayload_personByPersonId1Plan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("person_id_1")
+});
+const CreateCompoundKeyPayload_personByPersonId2Plan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("person_id_2")
+});
+function CompoundKeyInput_personId2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
+}
+function CompoundKeyInput_personId1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
+}
+function CompoundKeyInput_extraApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("extra", bakedInputRuntime(schema, field.type, val));
+}
+function NullTestRecordInput_nullableTextApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
+}
+function NullTestRecordInput_nullableIntApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
+}
+function NullTestRecordInput_nonNullTextApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
+}
+function Issue756Input_tsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ts", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_aliasesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_aboutApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("about", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_emailApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("email", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_siteApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("site", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_configApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("config", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_lastLoginFromIpApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_lastLoginFromSubnetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_userMacApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_createdAtApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("created_at", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -9406,7 +9573,7 @@ export const objects = {
       },
       deleteCompoundKey: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey2(args));
+          const $delete = pgDeleteSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -9433,7 +9600,7 @@ export const objects = {
       },
       deleteIssue756: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_issue756PgResource, specFromArgs_Issue7562(args));
+          const $delete = pgDeleteSingle(resource_issue756PgResource, specFromArgs_Issue756(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -9459,7 +9626,7 @@ export const objects = {
       },
       deleteLeftArm: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
+          const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -9499,7 +9666,7 @@ export const objects = {
       },
       deleteMyTable: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_my_tablePgResource, specFromArgs_MyTable2(args));
+          const $delete = pgDeleteSingle(resource_my_tablePgResource, specFromArgs_MyTable(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -9525,7 +9692,7 @@ export const objects = {
       },
       deleteNullTestRecord: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord2(args));
+          const $delete = pgDeleteSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -9551,7 +9718,7 @@ export const objects = {
       },
       deletePerson: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
+          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -9591,7 +9758,7 @@ export const objects = {
       },
       deletePersonSecret: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret2(args));
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -10232,16 +10399,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       compoundKey: planCreatePayloadResult,
-      personByPersonId1($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_1")
-        });
-      },
-      personByPersonId2($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_2")
-        });
-      },
+      personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
+      personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
       query: queryPlan
     }
   },
@@ -10266,11 +10425,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       leftArm: planCreatePayloadResult,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -10302,11 +10457,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       personSecret: planCreatePayloadResult,
       query: queryPlan
     }
@@ -10315,22 +10466,14 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      compoundKey: planUpdateOrDeletePayloadResult,
+      compoundKey: planCreatePayloadResult,
       deletedCompoundKeyId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_CompoundKey.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      personByPersonId1($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_1")
-        });
-      },
-      personByPersonId2($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_2")
-        });
-      },
+      personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
+      personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
       query: queryPlan
     }
   },
@@ -10343,7 +10486,7 @@ export const objects = {
         const specifier = nodeIdHandler_Issue756.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      issue756: planUpdateOrDeletePayloadResult,
+      issue756: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -10356,12 +10499,8 @@ export const objects = {
         const specifier = nodeIdHandler_LeftArm.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      leftArm: planUpdateOrDeletePayloadResult,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      leftArm: planCreatePayloadResult,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -10374,7 +10513,7 @@ export const objects = {
         const specifier = nodeIdHandler_MyTable.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      myTable: planUpdateOrDeletePayloadResult,
+      myTable: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -10387,7 +10526,7 @@ export const objects = {
         const specifier = nodeIdHandler_NullTestRecord.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      nullTestRecord: planUpdateOrDeletePayloadResult,
+      nullTestRecord: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -10400,7 +10539,7 @@ export const objects = {
         const specifier = nodeIdHandler_Person.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -10413,12 +10552,8 @@ export const objects = {
         const specifier = nodeIdHandler_PersonSecret.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
-      personSecret: planUpdateOrDeletePayloadResult,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
+      personSecret: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -10442,57 +10577,28 @@ export const objects = {
   FuncOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   FuncOutComplexSetofRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   FuncOutOutCompoundTypeRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      o2($record) {
-        const $plan = $record.get("o2");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      o2: FuncOutOutCompoundTypeRecord_o2Plan
     }
   },
   FuncOutOutRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstOut($record) {
-        return $record.get("first_out");
-      },
-      secondOut($record) {
-        return $record.get("second_out");
-      }
+      firstOut: FuncOutOutRecord_firstOutPlan,
+      secondOut: FuncOutOutRecord_secondOutPlan
     }
   },
   FuncOutOutSetofRecord: {
@@ -10501,23 +10607,15 @@ export const objects = {
   FuncOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg2($record) {
-        return $record.get("column2");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg2: FuncOutOutUnnamedRecord_arg2Plan
     }
   },
   FuncOutUnnamedOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg3($record) {
-        return $record.get("column3");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg3: FuncOutUnnamedOutOutUnnamedRecord_arg3Plan
     }
   },
   FuncReturnsTableMultiColRecord: {
@@ -10608,14 +10706,8 @@ export const objects = {
         const specifier = nodeIdHandler_LeftArm.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
       },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      }
+      personByPersonId: PersonSecret_personByPersonIdPlan,
+      personId: PersonSecret_personIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -10630,11 +10722,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       leftArm: planCustomMutationPayloadResult,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -10673,18 +10761,8 @@ export const objects = {
   MutationOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   MutationOutComplexSetofPayload: {
@@ -10698,18 +10776,8 @@ export const objects = {
   MutationOutComplexSetofRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   MutationOutOutCompoundTypePayload: {
@@ -10723,12 +10791,7 @@ export const objects = {
   MutationOutOutCompoundTypeRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      o2($record) {
-        const $plan = $record.get("o2");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      o2: FuncOutOutCompoundTypeRecord_o2Plan
     }
   },
   MutationOutOutPayload: {
@@ -10742,12 +10805,8 @@ export const objects = {
   MutationOutOutRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstOut($record) {
-        return $record.get("first_out");
-      },
-      secondOut($record) {
-        return $record.get("second_out");
-      }
+      firstOut: FuncOutOutRecord_firstOutPlan,
+      secondOut: FuncOutOutRecord_secondOutPlan
     }
   },
   MutationOutOutSetofPayload: {
@@ -10772,12 +10831,8 @@ export const objects = {
   MutationOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg2($record) {
-        return $record.get("column2");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg2: FuncOutOutUnnamedRecord_arg2Plan
     }
   },
   MutationOutPayload: {
@@ -10823,12 +10878,8 @@ export const objects = {
   MutationOutUnnamedOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg3($record) {
-        return $record.get("column3");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg3: FuncOutUnnamedOutOutUnnamedRecord_arg3Plan
     }
   },
   MutationOutUnnamedPayload: {
@@ -11086,18 +11137,8 @@ export const objects = {
   PersonComputedComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   PersonComputedFirstArgInoutOutRecord: {
@@ -11124,14 +11165,8 @@ export const objects = {
         const specifier = nodeIdHandler_PersonSecret.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
       },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      },
+      personByPersonId: PersonSecret_personByPersonIdPlan,
+      personId: PersonSecret_personIdPlan,
       secret($record) {
         return $record.get("sekrit");
       }
@@ -11269,17 +11304,9 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      compoundKey: planUpdateOrDeletePayloadResult,
-      personByPersonId1($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_1")
-        });
-      },
-      personByPersonId2($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_2")
-        });
-      },
+      compoundKey: planCreatePayloadResult,
+      personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
+      personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
       query: queryPlan
     }
   },
@@ -11287,7 +11314,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      issue756: planUpdateOrDeletePayloadResult,
+      issue756: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -11295,12 +11322,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      leftArm: planUpdateOrDeletePayloadResult,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      leftArm: planCreatePayloadResult,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -11308,7 +11331,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      myTable: planUpdateOrDeletePayloadResult,
+      myTable: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -11316,7 +11339,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      nullTestRecord: planUpdateOrDeletePayloadResult,
+      nullTestRecord: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -11324,7 +11347,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -11332,12 +11355,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
-      personSecret: planUpdateOrDeletePayloadResult,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
+      personSecret: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -11381,47 +11400,17 @@ export const inputObjects = {
   CompoundKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      extra(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      },
-      personId1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      },
-      personId2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+      extra: CompoundKeyInput_extraApply,
+      personId1: CompoundKeyInput_personId1Apply,
+      personId2: CompoundKeyInput_personId2Apply
     }
   },
   CompoundKeyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      extra(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      },
-      personId1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      },
-      personId2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+      extra: CompoundKeyInput_extraApply,
+      personId1: CompoundKeyInput_personId1Apply,
+      personId2: CompoundKeyInput_personId2Apply
     }
   },
   CompoundTypeInput: {
@@ -11479,130 +11468,130 @@ export const inputObjects = {
   },
   CreateCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       compoundKey: applyCreateFields
     }
   },
   CreateEdgeCaseInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       edgeCase: applyCreateFields
     }
   },
   CreateIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       issue756: applyCreateFields
     }
   },
   CreateLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       leftArm: applyCreateFields
     }
   },
   CreateMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       myTable: applyCreateFields
     }
   },
   CreateNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       nullTestRecord: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       person: applyCreateFields
     }
   },
   CreatePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       personSecret: applyCreateFields
     }
   },
   DeleteCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteIssue756ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteMyTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNullTestRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   EdgeCaseCondition: {
@@ -11648,9 +11637,7 @@ export const inputObjects = {
   },
   Issue756Condition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PersonCondition_idApply,
       ts($condition, val) {
         return applyAttributeCondition("ts", notNullTimestampCodec, $condition, val);
       }
@@ -11659,18 +11646,8 @@ export const inputObjects = {
   Issue756Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      ts(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      ts: Issue756Input_tsApply
     }
   },
   Issue756MutationInput: {
@@ -11681,18 +11658,8 @@ export const inputObjects = {
   Issue756Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      ts(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      ts: Issue756Input_tsApply
     }
   },
   Issue756SetMutationInput: {
@@ -11723,46 +11690,22 @@ export const inputObjects = {
   LeftArmBaseInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      lengthInMetres: LeftArmBaseInput_lengthInMetresApply,
+      mood: LeftArmBaseInput_moodApply,
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   LeftArmCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PersonCondition_idApply,
       lengthInMetres($condition, val) {
         return applyAttributeCondition("length_in_metres", TYPES.float, $condition, val);
       },
       mood($condition, val) {
         return applyAttributeCondition("mood", TYPES.text, $condition, val);
       },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      }
+      personId: PersonSecretCondition_personIdApply
     }
   },
   LeftArmIdentityInput: {
@@ -11773,59 +11716,19 @@ export const inputObjects = {
   LeftArmInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      lengthInMetres: LeftArmBaseInput_lengthInMetresApply,
+      mood: LeftArmBaseInput_moodApply,
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   LeftArmPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      lengthInMetres: LeftArmBaseInput_lengthInMetresApply,
+      mood: LeftArmBaseInput_moodApply,
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   ListOfCompoundTypesMutationInput: {
@@ -11915,9 +11818,7 @@ export const inputObjects = {
   },
   MyTableCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PersonCondition_idApply,
       jsonData($condition, val) {
         return applyAttributeCondition("json_data", TYPES.jsonb, $condition, val);
       }
@@ -11926,35 +11827,15 @@ export const inputObjects = {
   MyTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonData(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      jsonData: MyTableInput_jsonDataApply
     }
   },
   MyTablePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonData(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      jsonData: MyTableInput_jsonDataApply
     }
   },
   NoArgsMutationInput: {
@@ -11964,9 +11845,7 @@ export const inputObjects = {
   },
   NullTestRecordCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PersonCondition_idApply,
       nonNullText($condition, val) {
         return applyAttributeCondition("non_null_text", TYPES.text, $condition, val);
       },
@@ -11981,59 +11860,19 @@ export const inputObjects = {
   NullTestRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      nonNullText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableInt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      nonNullText: NullTestRecordInput_nonNullTextApply,
+      nullableInt: NullTestRecordInput_nullableIntApply,
+      nullableText: NullTestRecordInput_nullableTextApply
     }
   },
   NullTestRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      nonNullText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableInt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      nonNullText: NullTestRecordInput_nonNullTextApply,
+      nullableInt: NullTestRecordInput_nullableIntApply,
+      nullableText: NullTestRecordInput_nullableTextApply
     }
   },
   PersonCondition: {
@@ -12063,9 +11902,7 @@ export const inputObjects = {
       email($condition, val) {
         return applyAttributeCondition("email", emailCodec, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PersonCondition_idApply,
       lastLoginFromIp($condition, val) {
         return applyAttributeCondition("last_login_from_ip", TYPES.inet, $condition, val);
       },
@@ -12086,150 +11923,38 @@ export const inputObjects = {
   PersonInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      about(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      },
-      aliases(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      },
-      config(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      },
-      createdAt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      },
-      email(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromIp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromSubnet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      },
-      site(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      },
-      userMac(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+      about: PersonInput_aboutApply,
+      aliases: PersonInput_aliasesApply,
+      config: PersonInput_configApply,
+      createdAt: PersonInput_createdAtApply,
+      email: PersonInput_emailApply,
+      id: LeftArmBaseInput_idApply,
+      lastLoginFromIp: PersonInput_lastLoginFromIpApply,
+      lastLoginFromSubnet: PersonInput_lastLoginFromSubnetApply,
+      name: PersonInput_nameApply,
+      site: PersonInput_siteApply,
+      userMac: PersonInput_userMacApply
     }
   },
   PersonPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      about(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      },
-      aliases(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      },
-      config(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      },
-      createdAt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      },
-      email(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromIp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromSubnet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      },
-      site(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      },
-      userMac(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+      about: PersonInput_aboutApply,
+      aliases: PersonInput_aliasesApply,
+      config: PersonInput_configApply,
+      createdAt: PersonInput_createdAtApply,
+      email: PersonInput_emailApply,
+      id: LeftArmBaseInput_idApply,
+      lastLoginFromIp: PersonInput_lastLoginFromIpApply,
+      lastLoginFromSubnet: PersonInput_lastLoginFromSubnetApply,
+      name: PersonInput_nameApply,
+      site: PersonInput_siteApply,
+      userMac: PersonInput_userMacApply
     }
   },
   PersonSecretCondition: {
     plans: {
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      },
+      personId: PersonSecretCondition_personIdApply,
       secret($condition, val) {
         return applyAttributeCondition("sekrit", TYPES.text, $condition, val);
       }
@@ -12238,35 +11963,15 @@ export const inputObjects = {
   PersonSecretInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      secret(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: LeftArmBaseInput_personIdApply,
+      secret: PersonSecretInput_secretApply
     }
   },
   PersonSecretPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      secret(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: LeftArmBaseInput_personIdApply,
+      secret: PersonSecretInput_secretApply
     }
   },
   TableMutationInput: {
@@ -12286,98 +11991,98 @@ export const inputObjects = {
   },
   UpdateCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      compoundKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      compoundKeyPatch: applyCreateFields
     }
   },
   UpdateCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      compoundKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      compoundKeyPatch: applyCreateFields
     }
   },
   UpdateIssue756ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      issue756Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      issue756Patch: applyCreateFields
     }
   },
   UpdateIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      issue756Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      issue756Patch: applyCreateFields
     }
   },
   UpdateLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateMyTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      myTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      myTablePatch: applyCreateFields
     }
   },
   UpdateMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      myTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      myTablePatch: applyCreateFields
     }
   },
   UpdateNullTestRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullTestRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      nullTestRecordPatch: applyCreateFields
     }
   },
   UpdateNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullTestRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      nullTestRecordPatch: applyCreateFields
     }
   },
   UpdatePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personSecretPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personSecretPatch: applyCreateFields
     }
   },
   UpdatePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personSecretPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personSecretPatch: applyCreateFields
     }
   },
   WrappedUrlInput: {
@@ -12457,12 +12162,7 @@ export const scalars = {
   Datetime: {
     serialize: toString,
     parseValue: toString,
-    parseLiteral(ast) {
-      if (ast.kind === Kind.STRING) {
-        return ast.value;
-      }
-      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
-    }
+    parseLiteral: DatetimeParseLiteral
   },
   Email: {
     serialize: GraphQLString.serialize,
@@ -12555,12 +12255,7 @@ export const scalars = {
   NotNullTimestamp: {
     serialize: toString,
     parseValue: toString,
-    parseLiteral(ast) {
-      if (ast.kind === Kind.STRING) {
-        return ast.value;
-      }
-      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
-    }
+    parseLiteral: DatetimeParseLiteral
   },
   NotNullUrl: {
     serialize: GraphQLString.serialize,
@@ -12870,20 +12565,8 @@ export const enums = {
   },
   Issue756SOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PeopleOrderBy_ID_ASCApply,
+      ID_DESC: PeopleOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         issue756Uniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -12918,20 +12601,8 @@ export const enums = {
   },
   LeftArmsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PeopleOrderBy_ID_ASCApply,
+      ID_DESC: PeopleOrderBy_ID_DESCApply,
       LENGTH_IN_METRES_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "length_in_metres",
@@ -12956,20 +12627,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      PERSON_ID_ASC: PersonSecretsOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: PersonSecretsOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         left_armUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -12992,20 +12651,8 @@ export const enums = {
   },
   MyTablesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PeopleOrderBy_ID_ASCApply,
+      ID_DESC: PeopleOrderBy_ID_DESCApply,
       JSON_DATA_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "json_data",
@@ -13040,20 +12687,8 @@ export const enums = {
   },
   NullTestRecordsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PeopleOrderBy_ID_ASCApply,
+      ID_DESC: PeopleOrderBy_ID_DESCApply,
       NON_NULL_TEXT_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "non_null_text",
@@ -13174,20 +12809,8 @@ export const enums = {
       FIRST_NAME_DESC(queryBuilder) {
         applyOrderByCustomField(resource_person_first_namePgResource, "desc", undefined, queryBuilder);
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PeopleOrderBy_ID_ASCApply,
+      ID_DESC: PeopleOrderBy_ID_DESCApply,
       LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "last_login_from_ip",
@@ -13270,20 +12893,8 @@ export const enums = {
   },
   PersonSecretsOrderBy: {
     values: {
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      PERSON_ID_ASC: PersonSecretsOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: PersonSecretsOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         person_secretUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

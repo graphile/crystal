@@ -285,6 +285,10 @@ class CodegenFile {
   _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
     new Map();
 
+  _factoryAstCache = new Map<string, FactoryASTCacheEntry[]>();
+
+  _convertToIdentifierViaASTCache = new Map<t.Expression, t.Identifier>();
+
   public options: ExportOptions;
 
   constructor(options: ExportOptions) {
@@ -1174,6 +1178,17 @@ function convertToIdentifierViaAST(
       depth,
       variableIdentifier,
     );
+
+  const existingVariableIdentifier =
+    file._convertToIdentifierViaASTCache.get(ast);
+  if (existingVariableIdentifier) {
+    // In case anything else referenced it, be sure to define it
+    variableIdentifier.name = existingVariableIdentifier.name;
+    return existingVariableIdentifier;
+  } else {
+    file._convertToIdentifierViaASTCache.set(ast, variableIdentifier);
+  }
+
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-export error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
@@ -1256,6 +1271,12 @@ function func(
 
 const shouldOptimizeFactoryCalls = true;
 
+interface FactoryASTCacheEntry {
+  rawArgs: readonly unknown[];
+  depArgs: readonly t.Expression[];
+  result: t.Expression;
+}
+
 function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
@@ -1269,7 +1290,8 @@ function factoryAst<TTuple extends any[]>(
     locationHint,
     nameHint,
   );
-  const depArgs = fn.$exporter$args.map((arg, i) => {
+  const rawArgs = fn.$exporter$args;
+  const depArgs = rawArgs.map((arg, i) => {
     if (typeof arg === "string") {
       return t.stringLiteral(arg);
     } else if (typeof arg === "number") {
@@ -1291,6 +1313,46 @@ function factoryAst<TTuple extends any[]>(
     );
   });
 
+  const isCacheable = typeof fn === "function";
+
+  const cacheKey = isCacheable
+    ? `${factory.toString().trim()}|${depArgs.length}`
+    : null;
+  let cacheByKey = cacheKey ? file._factoryAstCache.get(cacheKey) : null;
+  if (cacheKey) {
+    if (!cacheByKey) {
+      cacheByKey = [];
+      file._factoryAstCache.set(cacheKey, cacheByKey);
+    }
+
+    for (const existing of cacheByKey) {
+      let matches = true;
+      for (let i = 0, l = depArgs.length; i < l; i++) {
+        // Don't mind if the raw version or the AST-ified version match, but if
+        // neither match we must abort.
+        if (
+          existing.rawArgs[i] !== rawArgs[i] &&
+          existing.depArgs[i] !== depArgs[i]
+        ) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        return existing.result;
+      }
+    }
+  }
+
+  const result = factoryASTInner(funcAST, depArgs);
+  cacheByKey?.push({ rawArgs, depArgs, result });
+  return result;
+}
+
+function factoryASTInner(
+  funcAST: t.FunctionExpression | t.ArrowFunctionExpression,
+  depArgs: t.Expression[],
+) {
   // DEBT: we should be able to remove this now that we have the
   // post-processing via babel, however currently the result of doing so is
   // messy.

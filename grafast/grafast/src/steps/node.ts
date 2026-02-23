@@ -1,5 +1,6 @@
 import type { Maybe, NodeIdHandler } from "../interfaces.ts";
 import type { Step } from "../step.ts";
+import { markSyncAndSafe } from "../utils.ts";
 import { constant } from "./constant.ts";
 import { lambda } from "./lambda.ts";
 
@@ -46,7 +47,7 @@ function decodeNodeIdWithHandler(details: DecodeNodeIdDetails) {
     return null;
   }
 }
-decodeNodeIdWithHandler.isSyncAndSafe = true; // Optimization
+markSyncAndSafe(decodeNodeIdWithHandler);
 
 export function nodeIdFromNode(handler: NodeIdHandler<any>, $node: Step) {
   const specifier = handler.plan($node);
@@ -56,7 +57,9 @@ export function nodeIdFromNode(handler: NodeIdHandler<any>, $node: Step) {
 export function makeDecodeNodeIdRuntime(handlers: readonly NodeIdHandler[]) {
   const codecs = [...new Set(handlers.map((h) => h.codec))];
 
-  function decodeNodeIdWithCodecs(raw: string | null | undefined) {
+  return markSyncAndSafe(function decodeNodeIdWithCodecs(
+    raw: string | null | undefined,
+  ) {
     if (raw == null) return null;
     return codecs.reduce(
       (memo, codec) => {
@@ -71,9 +74,7 @@ export function makeDecodeNodeIdRuntime(handlers: readonly NodeIdHandler[]) {
         [codecName: string]: any | null;
       },
     );
-  }
-  decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
-  return decodeNodeIdWithCodecs;
+  });
 }
 
 export function makeDecodeNodeId(handlers: readonly NodeIdHandler[]) {

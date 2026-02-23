@@ -1,22 +1,19 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const rawNodeIdCodec = {
+  name: "raw",
+  encode: markSyncAndSafe(function rawEncode(value) {
+    return typeof value === "string" ? value : null;
+  }),
+  decode: markSyncAndSafe(function rawDecode(value) {
+    return typeof value === "string" ? value : null;
+  })
+};
 const nodeIdHandler_Query = {
   typeName: "Query",
-  codec: {
-    name: "raw",
-    encode: Object.assign(function rawEncode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    }),
-    decode: Object.assign(function rawDecode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    })
-  },
+  codec: rawNodeIdCodec,
   match(specifier) {
     return specifier === "query";
   },
@@ -35,32 +32,24 @@ const nodeIdHandler_Query = {
 };
 const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: Object.assign(function base64JSONEncode(value) {
+  encode: markSyncAndSafe(function base64JSONEncode(value) {
     return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  }, {
-    isSyncAndSafe: true
   }),
-  decode: Object.assign(function base64JSONDecode(value) {
+  decode: markSyncAndSafe(function base64JSONDecode(value) {
     return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }, {
-    isSyncAndSafe: true
   })
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: nodeIdHandler_Query.codec,
+  raw: rawNodeIdCodec,
   base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
-    encode: Object.assign(function pipeStringEncode(value) {
+    encode: markSyncAndSafe(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    }, {
-      isSyncAndSafe: true
     }),
-    decode: Object.assign(function pipeStringDecode(value) {
+    decode: markSyncAndSafe(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }, {
-      isSyncAndSafe: true
     })
   }
 };
@@ -977,7 +966,7 @@ function specForHandler(handler) {
   if (existing) {
     return existing;
   }
-  function spec(nodeId) {
+  const spec = markSyncAndSafe(function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     if (nodeId == null) return null;
@@ -990,9 +979,7 @@ function specForHandler(handler) {
       // Ignore errors
     }
     return null;
-  }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
-  spec.isSyncAndSafe = true; // Optimization
+  }, `specifier_${handler.typeName}_${handler.codec.name}`);
   specForHandlerCache.set(handler, spec);
   return spec;
 }
@@ -1067,6 +1054,21 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const LetterDescriptionCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const LetterDescriptionsOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const LetterDescriptionsOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 const argDetailsSimple_referencing_table_mutation = [{
   graphqlArgName: "t",
   pgCodec: referencingTableCodec,
@@ -1116,16 +1118,41 @@ const specFromArgs_ReferencingTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
-const specFromArgs_LetterDescription2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
-};
-const specFromArgs_ReferencingTable2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
-};
 function queryPlan() {
   return rootValue();
+}
+function applyClientMutationIdForCustomMutation(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function ReferencingTableInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function ReferencingTableInput_enum1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_1", bakedInputRuntime(schema, field.type, val));
+}
+function ReferencingTableInput_enum2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_2", bakedInputRuntime(schema, field.type, val));
+}
+function ReferencingTableInput_enum3Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_3", bakedInputRuntime(schema, field.type, val));
+}
+function ReferencingTableInput_simpleEnumApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("simple_enum", bakedInputRuntime(schema, field.type, val));
 }
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
@@ -1154,28 +1181,34 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
+const CreateLetterDescriptionPayload_letterDescriptionEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
 function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
 }
+function LetterDescriptionInput_letterApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("letter", bakedInputRuntime(schema, field.type, val));
+}
+function LetterDescriptionInput_letterViaViewApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("letter_via_view", bakedInputRuntime(schema, field.type, val));
+}
+function LetterDescriptionInput_descriptionApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("description", bakedInputRuntime(schema, field.type, val));
+}
+const CreateReferencingTablePayload_referencingTableEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -2170,7 +2203,7 @@ export const objects = {
       },
       deleteLetterDescription: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, specFromArgs_LetterDescription2(args));
+          const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, specFromArgs_LetterDescription(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2224,7 +2257,7 @@ export const objects = {
       },
       deleteReferencingTable: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_referencing_tablePgResource, specFromArgs_ReferencingTable2(args));
+          const $delete = pgDeleteSingle(resource_referencing_tablePgResource, specFromArgs_ReferencingTable(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2350,9 +2383,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       letterDescription: planCreatePayloadResult,
-      letterDescriptionEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      letterDescriptionEdge: CreateLetterDescriptionPayload_letterDescriptionEdgePlan,
       query: queryPlan
     }
   },
@@ -2362,9 +2393,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       referencingTable: planCreatePayloadResult,
-      referencingTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      referencingTableEdge: CreateReferencingTablePayload_referencingTableEdgePlan
     }
   },
   DeleteLetterDescriptionPayload: {
@@ -2376,10 +2405,8 @@ export const objects = {
         const specifier = nodeIdHandler_LetterDescription.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      letterDescription: planUpdateOrDeletePayloadResult,
-      letterDescriptionEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      letterDescription: planCreatePayloadResult,
+      letterDescriptionEdge: CreateLetterDescriptionPayload_letterDescriptionEdgePlan,
       query: queryPlan
     }
   },
@@ -2393,10 +2420,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      referencingTable: planUpdateOrDeletePayloadResult,
-      referencingTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      referencingTable: planCreatePayloadResult,
+      referencingTableEdge: CreateReferencingTablePayload_referencingTableEdgePlan
     }
   },
   LetterDescription: {
@@ -2475,10 +2500,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      letterDescription: planUpdateOrDeletePayloadResult,
-      letterDescriptionEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_letter_descriptionsPgResource, letter_descriptionsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      letterDescription: planCreatePayloadResult,
+      letterDescriptionEdge: CreateLetterDescriptionPayload_letterDescriptionEdgePlan,
       query: queryPlan
     }
   },
@@ -2487,10 +2510,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      referencingTable: planUpdateOrDeletePayloadResult,
-      referencingTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      referencingTable: planCreatePayloadResult,
+      referencingTableEdge: CreateReferencingTablePayload_referencingTableEdgePlan
     }
   }
 };
@@ -2516,44 +2537,44 @@ export const interfaces = {
 export const inputObjects = {
   CreateLetterDescriptionInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       letterDescription: applyCreateFields
     }
   },
   CreateReferencingTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       referencingTable: applyCreateFields
     }
   },
   DeleteLetterDescriptionByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLetterDescriptionByLetterInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLetterDescriptionByLetterViaViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLetterDescriptionInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReferencingTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReferencingTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   LetterDescriptionCondition: {
@@ -2561,9 +2582,7 @@ export const inputObjects = {
       description($condition, val) {
         return applyAttributeCondition("description", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: LetterDescriptionCondition_idApply,
       letter($condition, val) {
         return applyAttributeCondition("letter", spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum, $condition, val);
       },
@@ -2575,59 +2594,19 @@ export const inputObjects = {
   LetterDescriptionInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      description(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("description", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      letter(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("letter", bakedInputRuntime(schema, field.type, val));
-      },
-      letterViaView(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("letter_via_view", bakedInputRuntime(schema, field.type, val));
-      }
+      description: LetterDescriptionInput_descriptionApply,
+      id: ReferencingTableInput_idApply,
+      letter: LetterDescriptionInput_letterApply,
+      letterViaView: LetterDescriptionInput_letterViaViewApply
     }
   },
   LetterDescriptionPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      description(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("description", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      letter(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("letter", bakedInputRuntime(schema, field.type, val));
-      },
-      letterViaView(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("letter_via_view", bakedInputRuntime(schema, field.type, val));
-      }
+      description: LetterDescriptionInput_descriptionApply,
+      id: ReferencingTableInput_idApply,
+      letter: LetterDescriptionInput_letterApply,
+      letterViaView: LetterDescriptionInput_letterViaViewApply
     }
   },
   ReferencingTableCondition: {
@@ -2641,9 +2620,7 @@ export const inputObjects = {
       enum3($condition, val) {
         return applyAttributeCondition("enum_3", spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: LetterDescriptionCondition_idApply,
       simpleEnum($condition, val) {
         return applyAttributeCondition("simple_enum", spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum, $condition, val);
       }
@@ -2652,114 +2629,62 @@ export const inputObjects = {
   ReferencingTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      enum1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_1", bakedInputRuntime(schema, field.type, val));
-      },
-      enum2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_3", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      simpleEnum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("simple_enum", bakedInputRuntime(schema, field.type, val));
-      }
+      enum1: ReferencingTableInput_enum1Apply,
+      enum2: ReferencingTableInput_enum2Apply,
+      enum3: ReferencingTableInput_enum3Apply,
+      id: ReferencingTableInput_idApply,
+      simpleEnum: ReferencingTableInput_simpleEnumApply
     }
   },
   ReferencingTableMutationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   ReferencingTablePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      enum1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_1", bakedInputRuntime(schema, field.type, val));
-      },
-      enum2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_3", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      simpleEnum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("simple_enum", bakedInputRuntime(schema, field.type, val));
-      }
+      enum1: ReferencingTableInput_enum1Apply,
+      enum2: ReferencingTableInput_enum2Apply,
+      enum3: ReferencingTableInput_enum3Apply,
+      id: ReferencingTableInput_idApply,
+      simpleEnum: ReferencingTableInput_simpleEnumApply
     }
   },
   UpdateLetterDescriptionByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateLetterDescriptionByLetterInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateLetterDescriptionByLetterViaViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateLetterDescriptionInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateReferencingTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      referencingTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      referencingTablePatch: applyCreateFields
     }
   },
   UpdateReferencingTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      referencingTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      referencingTablePatch: applyCreateFields
     }
   }
 };
@@ -2822,20 +2747,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: LetterDescriptionsOrderBy_ID_ASCApply,
+      ID_DESC: LetterDescriptionsOrderBy_ID_DESCApply,
       LETTER_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "letter",
@@ -2938,20 +2851,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: LetterDescriptionsOrderBy_ID_ASCApply,
+      ID_DESC: LetterDescriptionsOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         referencing_tableUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

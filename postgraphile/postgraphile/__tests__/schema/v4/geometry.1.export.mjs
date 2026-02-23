@@ -1,22 +1,19 @@
 import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const rawNodeIdCodec = {
+  name: "raw",
+  encode: markSyncAndSafe(function rawEncode(value) {
+    return typeof value === "string" ? value : null;
+  }),
+  decode: markSyncAndSafe(function rawDecode(value) {
+    return typeof value === "string" ? value : null;
+  })
+};
 const nodeIdHandler_Query = {
   typeName: "Query",
-  codec: {
-    name: "raw",
-    encode: Object.assign(function rawEncode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    }),
-    decode: Object.assign(function rawDecode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    })
-  },
+  codec: rawNodeIdCodec,
   match(specifier) {
     return specifier === "query";
   },
@@ -35,32 +32,24 @@ const nodeIdHandler_Query = {
 };
 const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: Object.assign(function base64JSONEncode(value) {
+  encode: markSyncAndSafe(function base64JSONEncode(value) {
     return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  }, {
-    isSyncAndSafe: true
   }),
-  decode: Object.assign(function base64JSONDecode(value) {
+  decode: markSyncAndSafe(function base64JSONDecode(value) {
     return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }, {
-    isSyncAndSafe: true
   })
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: nodeIdHandler_Query.codec,
+  raw: rawNodeIdCodec,
   base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
-    encode: Object.assign(function pipeStringEncode(value) {
+    encode: markSyncAndSafe(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    }, {
-      isSyncAndSafe: true
     }),
-    decode: Object.assign(function pipeStringDecode(value) {
+    decode: markSyncAndSafe(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }, {
-      isSyncAndSafe: true
     })
   }
 };
@@ -560,7 +549,7 @@ function specForHandler() {
   if (existing) {
     return existing;
   }
-  function spec(nodeId) {
+  const spec = markSyncAndSafe(function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     if (nodeId == null) return null;
@@ -573,9 +562,7 @@ function specForHandler() {
       // Ignore errors
     }
     return null;
-  }
-  spec.displayName = `specifier_${nodeIdHandler_Geom.typeName}_${nodeIdHandler_Geom.codec.name}`;
-  spec.isSyncAndSafe = true; // Optimization
+  }, `specifier_${nodeIdHandler_Geom.typeName}_${nodeIdHandler_Geom.codec.name}`);
   specForHandlerCache.set(nodeIdHandler_Geom, spec);
   return spec;
 }
@@ -621,10 +608,9 @@ const specFromArgs_Geom = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
-const specFromArgs_Geom2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
-};
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -648,20 +634,120 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function getClientMutationIdForUpdateOrDeletePlan($mutation) {
-  const $result = $mutation.getStepForKey("result");
-  return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateGeomPayload_geomEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(geomUniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function GeomInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_pointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("point", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_pointsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("points", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_lineApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("line", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_linesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("lines", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_lsegApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("lseg", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_lsegsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("lsegs", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_boxApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("box", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_boxesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("boxes", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_openPathApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("open_path", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_openPathsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("open_paths", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_closedPathApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_closedPathsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("closed_paths", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_polygonApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("polygon", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_polygonsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("polygons", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_circleApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("circle", bakedInputRuntime(schema, field.type, val));
+}
+function GeomInput_circlesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("circles", bakedInputRuntime(schema, field.type, val));
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1268,7 +1354,7 @@ export const objects = {
       },
       deleteGeom: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_geomPgResource, specFromArgs_Geom2(args));
+          const $delete = pgDeleteSingle(resource_geomPgResource, specFromArgs_Geom(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1327,12 +1413,8 @@ export const objects = {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
       },
-      geom($object) {
-        return $object.get("result");
-      },
-      geomEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(geomUniques[0].attributes, $mutation, fieldArgs);
-      },
+      geom: planCreatePayloadResult,
+      geomEdge: CreateGeomPayload_geomEdgePlan,
       query: queryPlan
     }
   },
@@ -1345,10 +1427,8 @@ export const objects = {
         const specifier = nodeIdHandler_Geom.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      geom: planUpdateOrDeletePayloadResult,
-      geomEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(geomUniques[0].attributes, $mutation, fieldArgs);
-      },
+      geom: planCreatePayloadResult,
+      geomEdge: CreateGeomPayload_geomEdgePlan,
       query: queryPlan
     }
   },
@@ -1392,10 +1472,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      geom: planUpdateOrDeletePayloadResult,
-      geomEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(geomUniques[0].attributes, $mutation, fieldArgs);
-      },
+      geom: planCreatePayloadResult,
+      geomEdge: CreateGeomPayload_geomEdgePlan,
       query: queryPlan
     }
   }
@@ -1422,24 +1500,18 @@ export const interfaces = {
 export const inputObjects = {
   CreateGeomInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      geom(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      geom: applyCreateFields
     }
   },
   DeleteGeomByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteGeomInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   GeomCondition: {
@@ -1500,227 +1572,57 @@ export const inputObjects = {
   GeomInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      box(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("box", bakedInputRuntime(schema, field.type, val));
-      },
-      boxes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boxes", bakedInputRuntime(schema, field.type, val));
-      },
-      circle(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("circle", bakedInputRuntime(schema, field.type, val));
-      },
-      circles(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("circles", bakedInputRuntime(schema, field.type, val));
-      },
-      closedPath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
-      },
-      closedPaths(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("closed_paths", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      line(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("line", bakedInputRuntime(schema, field.type, val));
-      },
-      lines(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lines", bakedInputRuntime(schema, field.type, val));
-      },
-      lseg(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lseg", bakedInputRuntime(schema, field.type, val));
-      },
-      lsegs(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lsegs", bakedInputRuntime(schema, field.type, val));
-      },
-      openPath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("open_path", bakedInputRuntime(schema, field.type, val));
-      },
-      openPaths(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("open_paths", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      points(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("points", bakedInputRuntime(schema, field.type, val));
-      },
-      polygon(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("polygon", bakedInputRuntime(schema, field.type, val));
-      },
-      polygons(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("polygons", bakedInputRuntime(schema, field.type, val));
-      }
+      box: GeomInput_boxApply,
+      boxes: GeomInput_boxesApply,
+      circle: GeomInput_circleApply,
+      circles: GeomInput_circlesApply,
+      closedPath: GeomInput_closedPathApply,
+      closedPaths: GeomInput_closedPathsApply,
+      id: GeomInput_idApply,
+      line: GeomInput_lineApply,
+      lines: GeomInput_linesApply,
+      lseg: GeomInput_lsegApply,
+      lsegs: GeomInput_lsegsApply,
+      openPath: GeomInput_openPathApply,
+      openPaths: GeomInput_openPathsApply,
+      point: GeomInput_pointApply,
+      points: GeomInput_pointsApply,
+      polygon: GeomInput_polygonApply,
+      polygons: GeomInput_polygonsApply
     }
   },
   GeomPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      box(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("box", bakedInputRuntime(schema, field.type, val));
-      },
-      boxes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boxes", bakedInputRuntime(schema, field.type, val));
-      },
-      circle(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("circle", bakedInputRuntime(schema, field.type, val));
-      },
-      circles(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("circles", bakedInputRuntime(schema, field.type, val));
-      },
-      closedPath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
-      },
-      closedPaths(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("closed_paths", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      line(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("line", bakedInputRuntime(schema, field.type, val));
-      },
-      lines(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lines", bakedInputRuntime(schema, field.type, val));
-      },
-      lseg(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lseg", bakedInputRuntime(schema, field.type, val));
-      },
-      lsegs(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("lsegs", bakedInputRuntime(schema, field.type, val));
-      },
-      openPath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("open_path", bakedInputRuntime(schema, field.type, val));
-      },
-      openPaths(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("open_paths", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      points(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("points", bakedInputRuntime(schema, field.type, val));
-      },
-      polygon(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("polygon", bakedInputRuntime(schema, field.type, val));
-      },
-      polygons(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("polygons", bakedInputRuntime(schema, field.type, val));
-      }
+      box: GeomInput_boxApply,
+      boxes: GeomInput_boxesApply,
+      circle: GeomInput_circleApply,
+      circles: GeomInput_circlesApply,
+      closedPath: GeomInput_closedPathApply,
+      closedPaths: GeomInput_closedPathsApply,
+      id: GeomInput_idApply,
+      line: GeomInput_lineApply,
+      lines: GeomInput_linesApply,
+      lseg: GeomInput_lsegApply,
+      lsegs: GeomInput_lsegsApply,
+      openPath: GeomInput_openPathApply,
+      openPaths: GeomInput_openPathsApply,
+      point: GeomInput_pointApply,
+      points: GeomInput_pointsApply,
+      polygon: GeomInput_polygonApply,
+      polygons: GeomInput_polygonsApply
     }
   },
   UpdateGeomByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      geomPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      geomPatch: applyCreateFields
     }
   },
   UpdateGeomInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      geomPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      geomPatch: applyCreateFields
     }
   }
 };

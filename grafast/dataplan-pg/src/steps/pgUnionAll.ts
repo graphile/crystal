@@ -97,11 +97,6 @@ const NO_ROWS = Object.freeze({
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
 
-function add([a, b]: readonly [a: number, b: number]): number {
-  return a + b;
-}
-add.isSyncAndSafe = true;
-
 type PgUnionAllStepSelect<TAttributes extends string> =
   | { type: "pk" }
   | { type: "type" }

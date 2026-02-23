@@ -1,22 +1,19 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const rawNodeIdCodec = {
+  name: "raw",
+  encode: markSyncAndSafe(function rawEncode(value) {
+    return typeof value === "string" ? value : null;
+  }),
+  decode: markSyncAndSafe(function rawDecode(value) {
+    return typeof value === "string" ? value : null;
+  })
+};
 const nodeIdHandler_Query = {
   typeName: "Query",
-  codec: {
-    name: "raw",
-    encode: Object.assign(function rawEncode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    }),
-    decode: Object.assign(function rawDecode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    })
-  },
+  codec: rawNodeIdCodec,
   match(specifier) {
     return specifier === "query";
   },
@@ -35,32 +32,24 @@ const nodeIdHandler_Query = {
 };
 const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: Object.assign(function base64JSONEncode(value) {
+  encode: markSyncAndSafe(function base64JSONEncode(value) {
     return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  }, {
-    isSyncAndSafe: true
   }),
-  decode: Object.assign(function base64JSONDecode(value) {
+  decode: markSyncAndSafe(function base64JSONDecode(value) {
     return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }, {
-    isSyncAndSafe: true
   })
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: nodeIdHandler_Query.codec,
+  raw: rawNodeIdCodec,
   base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
-    encode: Object.assign(function pipeStringEncode(value) {
+    encode: markSyncAndSafe(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    }, {
-      isSyncAndSafe: true
     }),
-    decode: Object.assign(function pipeStringDecode(value) {
+    decode: markSyncAndSafe(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }, {
-      isSyncAndSafe: true
     })
   }
 };
@@ -501,7 +490,7 @@ function specForHandler() {
   if (existing) {
     return existing;
   }
-  function spec(nodeId) {
+  const spec = markSyncAndSafe(function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     if (nodeId == null) return null;
@@ -514,9 +503,7 @@ function specForHandler() {
       // Ignore errors
     }
     return null;
-  }
-  spec.displayName = `specifier_${nodeIdHandler_QiJian.typeName}_${nodeIdHandler_QiJian.codec.name}`;
-  spec.isSyncAndSafe = true; // Optimization
+  }, `specifier_${nodeIdHandler_QiJian.typeName}_${nodeIdHandler_QiJian.codec.name}`);
   specForHandlerCache.set(nodeIdHandler_QiJian, spec);
   return spec;
 }
@@ -562,6 +549,9 @@ const specFromArgs_QiJian = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -585,13 +575,26 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateQiJianPayload_qiJianEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function QiJianInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function QiJianInput_qiJianApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -979,12 +982,8 @@ export const objects = {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
       },
-      qiJian($object) {
-        return $object.get("result");
-      },
-      qiJianEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      qiJian: planCreatePayloadResult,
+      qiJianEdge: CreateQiJianPayload_qiJianEdgePlan,
       query: queryPlan
     }
   },
@@ -1022,12 +1021,8 @@ export const objects = {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
       },
-      qiJian($object) {
-        return $object.get("result");
-      },
-      qiJianEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      qiJian: planCreatePayloadResult,
+      qiJianEdge: CreateQiJianPayload_qiJianEdgePlan,
       query: queryPlan
     }
   }
@@ -1054,14 +1049,8 @@ export const interfaces = {
 export const inputObjects = {
   CreateQiJianInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      qiJian(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      qiJian: applyCreateFields
     }
   },
   QiJianCondition: {
@@ -1077,47 +1066,27 @@ export const inputObjects = {
   QiJianInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      qiJian(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
-      }
+      id: QiJianInput_idApply,
+      qiJian: QiJianInput_qiJianApply
     }
   },
   QiJianPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      qiJian(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
-      }
+      id: QiJianInput_idApply,
+      qiJian: QiJianInput_qiJianApply
     }
   },
   UpdateQiJianByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      qiJianPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      qiJianPatch: applyCreateFields
     }
   },
   UpdateQiJianInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      qiJianPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      qiJianPatch: applyCreateFields
     }
   }
 };

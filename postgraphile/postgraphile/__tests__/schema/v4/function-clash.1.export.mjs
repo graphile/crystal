@@ -1,22 +1,19 @@
 import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
+const rawNodeIdCodec = {
+  name: "raw",
+  encode: markSyncAndSafe(function rawEncode(value) {
+    return typeof value === "string" ? value : null;
+  }),
+  decode: markSyncAndSafe(function rawDecode(value) {
+    return typeof value === "string" ? value : null;
+  })
+};
 const nodeIdHandler_Query = {
   typeName: "Query",
-  codec: {
-    name: "raw",
-    encode: Object.assign(function rawEncode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    }),
-    decode: Object.assign(function rawDecode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    })
-  },
+  codec: rawNodeIdCodec,
   match(specifier) {
     return specifier === "query";
   },
@@ -35,32 +32,24 @@ const nodeIdHandler_Query = {
 };
 const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: Object.assign(function base64JSONEncode(value) {
+  encode: markSyncAndSafe(function base64JSONEncode(value) {
     return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  }, {
-    isSyncAndSafe: true
   }),
-  decode: Object.assign(function base64JSONDecode(value) {
+  decode: markSyncAndSafe(function base64JSONDecode(value) {
     return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }, {
-    isSyncAndSafe: true
   })
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: nodeIdHandler_Query.codec,
+  raw: rawNodeIdCodec,
   base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
-    encode: Object.assign(function pipeStringEncode(value) {
+    encode: markSyncAndSafe(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    }, {
-      isSyncAndSafe: true
     }),
-    decode: Object.assign(function pipeStringDecode(value) {
+    decode: markSyncAndSafe(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }, {
-      isSyncAndSafe: true
     })
   }
 };
@@ -7483,7 +7472,7 @@ function specForHandler(handler) {
   if (existing) {
     return existing;
   }
-  function spec(nodeId) {
+  const spec = markSyncAndSafe(function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     if (nodeId == null) return null;
@@ -7496,9 +7485,7 @@ function specForHandler(handler) {
       // Ignore errors
     }
     return null;
-  }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
-  spec.isSyncAndSafe = true; // Optimization
+  }, `specifier_${handler.typeName}_${handler.codec.name}`);
   specForHandlerCache.set(handler, spec);
   return spec;
 }
@@ -7749,6 +7736,16 @@ function findTypeNameMatch(specifier) {
   console.warn(`Could not find a type that matched the specifier '${inspect(specifier)}'`);
   return null;
 }
+const UniqueForeignKey_compoundKey1Plan = $record => {
+  return $record.get("compound_key_1");
+};
+const UniqueForeignKey_compoundKey2Plan = $record => {
+  return $record.get("compound_key_2");
+};
+const UniqueForeignKey_compoundKeyByCompoundKey1AndCompoundKey2Plan = $record => resource_compound_keyPgResource.get({
+  person_id_1: $record.get("compound_key_1"),
+  person_id_2: $record.get("compound_key_2")
+});
 const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
@@ -7943,6 +7940,18 @@ const resource_person_type_functionPgResource = registry.pgResources["person_typ
 const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
+const PersonComputedComplexRecord_yPlan = $record => {
+  const $plan = $record.get("y");
+  const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
+const PersonComputedComplexRecord_zPlan = $record => {
+  const $plan = $record.get("z");
+  const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
 const resource_compound_type_computed_fieldPgResource = registry.pgResources["compound_type_computed_field"];
 function toString(value) {
   return "" + value;
@@ -8020,7 +8029,31 @@ const makeArgs_post_computed_compound_type_array = (args, path = []) => argDetai
 const resource_post_computed_compound_type_arrayPgResource = registry.pgResources["post_computed_compound_type_array"];
 const resource_frmcdc_comptypePgResource = registry.pgResources["frmcdc_comptype"];
 const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function CompoundTypeInput_aApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("a", bakedInputRuntime(schema, field.type, val));
+}
+function CompoundTypeInput_bApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("b", bakedInputRuntime(schema, field.type, val));
+}
+const DatetimeParseLiteral = ast => {
+  if (ast.kind === Kind.STRING) {
+    return ast.value;
+  }
+  throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
+};
+const Type_enumArrayPlan = $record => {
+  return $record.get("enum_array");
+};
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
+const Type_byteaArrayPlan = $record => {
+  return $record.get("bytea_array");
+};
 function LTreeParseValue(value) {
   return value;
 }
@@ -8033,6 +8066,22 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const TypeCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const TypeCondition_enumArrayApply = ($condition, val) => applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
+const TypesOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const TypesOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, queryBuilder) => {
   if (typeof pgFieldSource.from !== "function") {
     throw new Error("Invalid computed attribute 'from'");
@@ -8099,6 +8148,87 @@ const parseValueLiteral = (ast, variables) => {
       // Everything else is invalid.
       return undefined;
   }
+};
+const ForeignKey_personIdPlan = $record => {
+  return $record.get("person_id");
+};
+const ForeignKey_personByPersonIdPlan = $record => resource_personPgResource.get({
+  id: $record.get("person_id")
+});
+const ForeignKeyCondition_personIdApply = ($condition, val) => applyAttributeCondition("person_id", TYPES.int, $condition, val);
+const FuncOutOutRecord_firstOutPlan = $record => {
+  return $record.get("first_out");
+};
+const FuncOutOutRecord_secondOutPlan = $record => {
+  return $record.get("second_out");
+};
+const FuncOutOutUnnamedRecord_arg1Plan = $record => {
+  return $record.get("column1");
+};
+const FuncOutOutUnnamedRecord_arg2Plan = $record => {
+  return $record.get("column2");
+};
+const FuncOutUnnamedOutOutUnnamedRecord_arg3Plan = $record => {
+  return $record.get("column3");
+};
+const FuncOutOutCompoundTypeRecord_o2Plan = $record => {
+  const $plan = $record.get("o2");
+  const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
+const TestviewCondition_col1Apply = ($condition, val) => applyAttributeCondition("col1", TYPES.int, $condition, val);
+const TestviewCondition_col2Apply = ($condition, val) => applyAttributeCondition("col2", TYPES.int, $condition, val);
+const TestviewsOrderBy_COL1_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col1",
+    direction: "ASC"
+  });
+};
+const TestviewsOrderBy_COL1_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col1",
+    direction: "DESC"
+  });
+};
+const TestviewsOrderBy_COL2_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col2",
+    direction: "ASC"
+  });
+};
+const TestviewsOrderBy_COL2_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col2",
+    direction: "DESC"
+  });
+};
+const PersonSecretsOrderBy_PERSON_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const PersonSecretsOrderBy_PERSON_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const SimilarTable1Condition_col3Apply = ($condition, val) => applyAttributeCondition("col3", TYPES.int, $condition, val);
+const SimilarTable1SOrderBy_COL3_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col3",
+    direction: "ASC"
+  });
+};
+const SimilarTable1SOrderBy_COL3_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col3",
+    direction: "DESC"
+  });
 };
 const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
 const resource_mutation_outPgResource = registry.pgResources["mutation_out"];
@@ -8636,82 +8766,6 @@ const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
-const specFromArgs_Input2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Input, $nodeId);
-};
-const specFromArgs_Patch2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Patch, $nodeId);
-};
-const specFromArgs_Reserved2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
-};
-const specFromArgs_ReservedPatchRecord2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReservedPatchRecord, $nodeId);
-};
-const specFromArgs_ReservedInputRecord2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReservedInputRecord, $nodeId);
-};
-const specFromArgs_DefaultValue2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_DefaultValue, $nodeId);
-};
-const specFromArgs_MyTable2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_MyTable, $nodeId);
-};
-const specFromArgs_PersonSecret2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
-};
-const specFromArgs_ViewTable2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ViewTable, $nodeId);
-};
-const specFromArgs_CompoundKey2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_CompoundKey, $nodeId);
-};
-const specFromArgs_SimilarTable12 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_SimilarTable1, $nodeId);
-};
-const specFromArgs_SimilarTable22 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_SimilarTable2, $nodeId);
-};
-const specFromArgs_NullTestRecord2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_NullTestRecord, $nodeId);
-};
-const specFromArgs_LeftArm2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
-};
-const specFromArgs_Issue7562 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Issue756, $nodeId);
-};
-const specFromArgs_Post2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
-};
-const specFromArgs_Person2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
-};
-const specFromArgs_List2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, $nodeId);
-};
-const specFromArgs_Type2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
-};
 function getClientMutationIdForCustomMutationPlan($object) {
   const $result = $object.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -8745,7 +8799,78 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const LeftArmIdentityPayload_leftArmEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
+const LeftArmIdentityPayload_personByPersonIdPlan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("person_id")
+});
+function LeftArmBaseInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function LeftArmBaseInput_personIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+}
+function LeftArmBaseInput_lengthInMetresApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+}
+function LeftArmBaseInput_moodApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("mood", bakedInputRuntime(schema, field.type, val));
+}
+const Issue756MutationPayload_issue756EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];
+const TableMutationPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
+const TableMutationPayload_personByAuthorIdPlan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("author_id")
+});
+function PostInput_headlineApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("headline", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_bodyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("body", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_authorIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("author_id", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_enumsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enums", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_comptypesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
+}
+const MutationOutTablePayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
+const TypeFunctionMutationPayload_typeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
+const TypeFunctionMutationPayload_postBySmallintPlan = $record => resource_postPgResource.get({
+  id: $record.get("result").get("smallint")
+});
+const TypeFunctionMutationPayload_postByIdPlan = $record => resource_postPgResource.get({
+  id: $record.get("result").get("id")
+});
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
   return $insert.getMeta("clientMutationId");
@@ -8753,28 +8878,544 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
+const CreateInputPayload_inputEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
 function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
 }
+const CreatePatchPayload_patchEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
+const CreateReservedPayload_reservedEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
+const CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
+const CreateReservedInputRecordPayload_reservedInputRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
+const CreateDefaultValuePayload_defaultValueEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
+function DefaultValueInput_nullValueApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("null_value", bakedInputRuntime(schema, field.type, val));
+}
+function NoPrimaryKeyInput_strApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("str", bakedInputRuntime(schema, field.type, val));
+}
+function TestviewInput_col1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col1", bakedInputRuntime(schema, field.type, val));
+}
+function TestviewInput_col2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col2", bakedInputRuntime(schema, field.type, val));
+}
+const CreateMyTablePayload_myTableEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_my_tablePgResource, my_tableUniques[0].attributes, $mutation, fieldArgs);
+function MyTableInput_jsonDataApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("json_data", bakedInputRuntime(schema, field.type, val));
+}
+const CreatePersonSecretPayload_personSecretEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
+function PersonSecretInput_secretApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+}
+const CreateViewTablePayload_viewTableEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
+const CreateCompoundKeyPayload_compoundKeyEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_compound_keyPgResource, compound_keyUniques[0].attributes, $mutation, fieldArgs);
+const CreateCompoundKeyPayload_personByPersonId1Plan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("person_id_1")
+});
+const CreateCompoundKeyPayload_personByPersonId2Plan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("person_id_2")
+});
+function CompoundKeyInput_personId2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
+}
+function CompoundKeyInput_personId1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
+}
+function CompoundKeyInput_extraApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("extra", bakedInputRuntime(schema, field.type, val));
+}
+const CreateSimilarTable1Payload_similarTable1EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
+function SimilarTable1Input_col3Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col3", bakedInputRuntime(schema, field.type, val));
+}
+const CreateSimilarTable2Payload_similarTable2EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
+function SimilarTable2Input_col4Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col4", bakedInputRuntime(schema, field.type, val));
+}
+function SimilarTable2Input_col5Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col5", bakedInputRuntime(schema, field.type, val));
+}
+const CreateNullTestRecordPayload_nullTestRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_null_test_recordPgResource, null_test_recordUniques[0].attributes, $mutation, fieldArgs);
+function NullTestRecordInput_nullableTextApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
+}
+function NullTestRecordInput_nullableIntApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
+}
+function NullTestRecordInput_nonNullTextApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
+}
+function Issue756Input_tsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ts", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_aliasesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_aboutApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("about", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_emailApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("email", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_siteApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("site", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_configApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("config", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_lastLoginFromIpApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_lastLoginFromSubnetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_userMacApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_createdAtApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("created_at", bakedInputRuntime(schema, field.type, val));
+}
+const CreateListPayload_listEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
+function ListInput_intArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_intArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_enumArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_enumArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_dateArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_dateArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_timestamptzArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_timestamptzArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_compoundTypeArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_compoundTypeArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_byteaArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_byteaArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_smallintApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("smallint", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_bigintApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bigint", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_numericApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("numeric", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_decimalApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("decimal", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_booleanApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("boolean", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_varcharApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("varchar", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_enumApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_domainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_domain2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain2", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_textArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("text_array", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_jsonApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("json", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_jsonbApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_jsonpathApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullableRangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_numrangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("numrange", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_daterangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("daterange", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_anIntRangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timestampApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timestamptzApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_dateApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("time", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timetzApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timetz", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_intervalApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("interval", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_intervalArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_moneyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("money", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_compoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nestedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullableCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullableNestedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_pointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("point", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullablePointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_inetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_cidrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_macaddrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regprocApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regproc", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regprocedureApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regoperApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regoper", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regoperatorApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regclassApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regclass", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regtypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regtype", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regconfigApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regdictionaryApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_textArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_int8ArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_byteaApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_ltreeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ltree", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_ltreeArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -20650,7 +21291,7 @@ export const objects = {
       },
       deleteCompoundKey: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey2(args));
+          const $delete = pgDeleteSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20677,7 +21318,7 @@ export const objects = {
       },
       deleteDefaultValue: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_default_valuePgResource, specFromArgs_DefaultValue2(args));
+          const $delete = pgDeleteSingle(resource_default_valuePgResource, specFromArgs_DefaultValue(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20703,7 +21344,7 @@ export const objects = {
       },
       deleteInput: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_inputsPgResource, specFromArgs_Input2(args));
+          const $delete = pgDeleteSingle(resource_inputsPgResource, specFromArgs_Input(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20729,7 +21370,7 @@ export const objects = {
       },
       deleteIssue756: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_issue756PgResource, specFromArgs_Issue7562(args));
+          const $delete = pgDeleteSingle(resource_issue756PgResource, specFromArgs_Issue756(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20755,7 +21396,7 @@ export const objects = {
       },
       deleteLeftArm: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
+          const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20795,7 +21436,7 @@ export const objects = {
       },
       deleteList: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_listsPgResource, specFromArgs_List2(args));
+          const $delete = pgDeleteSingle(resource_listsPgResource, specFromArgs_List(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20821,7 +21462,7 @@ export const objects = {
       },
       deleteMyTable: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_my_tablePgResource, specFromArgs_MyTable2(args));
+          const $delete = pgDeleteSingle(resource_my_tablePgResource, specFromArgs_MyTable(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20861,7 +21502,7 @@ export const objects = {
       },
       deleteNullTestRecord: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord2(args));
+          const $delete = pgDeleteSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20887,7 +21528,7 @@ export const objects = {
       },
       deletePatch: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_patchsPgResource, specFromArgs_Patch2(args));
+          const $delete = pgDeleteSingle(resource_patchsPgResource, specFromArgs_Patch(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20913,7 +21554,7 @@ export const objects = {
       },
       deletePerson: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
+          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20953,7 +21594,7 @@ export const objects = {
       },
       deletePersonSecret: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret2(args));
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -20979,7 +21620,7 @@ export const objects = {
       },
       deletePost: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_postPgResource, specFromArgs_Post2(args));
+          const $delete = pgDeleteSingle(resource_postPgResource, specFromArgs_Post(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21005,7 +21646,7 @@ export const objects = {
       },
       deleteReserved: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_reservedPgResource, specFromArgs_Reserved2(args));
+          const $delete = pgDeleteSingle(resource_reservedPgResource, specFromArgs_Reserved(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21031,7 +21672,7 @@ export const objects = {
       },
       deleteReservedInputRecord: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_reserved_inputPgResource, specFromArgs_ReservedInputRecord2(args));
+          const $delete = pgDeleteSingle(resource_reserved_inputPgResource, specFromArgs_ReservedInputRecord(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21057,7 +21698,7 @@ export const objects = {
       },
       deleteReservedPatchRecord: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_reservedPatchsPgResource, specFromArgs_ReservedPatchRecord2(args));
+          const $delete = pgDeleteSingle(resource_reservedPatchsPgResource, specFromArgs_ReservedPatchRecord(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21083,7 +21724,7 @@ export const objects = {
       },
       deleteSimilarTable1: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_similar_table_1PgResource, specFromArgs_SimilarTable12(args));
+          const $delete = pgDeleteSingle(resource_similar_table_1PgResource, specFromArgs_SimilarTable1(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21109,7 +21750,7 @@ export const objects = {
       },
       deleteSimilarTable2: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_similar_table_2PgResource, specFromArgs_SimilarTable22(args));
+          const $delete = pgDeleteSingle(resource_similar_table_2PgResource, specFromArgs_SimilarTable2(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21135,7 +21776,7 @@ export const objects = {
       },
       deleteType: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_typesPgResource, specFromArgs_Type2(args));
+          const $delete = pgDeleteSingle(resource_typesPgResource, specFromArgs_Type(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -21161,7 +21802,7 @@ export const objects = {
       },
       deleteViewTable: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_view_tablePgResource, specFromArgs_ViewTable2(args));
+          const $delete = pgDeleteSingle(resource_view_tablePgResource, specFromArgs_ViewTable(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -22473,19 +23114,9 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       compoundKey: planCreatePayloadResult,
-      compoundKeyEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_compound_keyPgResource, compound_keyUniques[0].attributes, $mutation, fieldArgs);
-      },
-      personByPersonId1($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_1")
-        });
-      },
-      personByPersonId2($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_2")
-        });
-      },
+      compoundKeyEdge: CreateCompoundKeyPayload_compoundKeyEdgePlan,
+      personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
+      personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
       query: queryPlan
     }
   },
@@ -22494,9 +23125,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       defaultValue: planCreatePayloadResult,
-      defaultValueEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
-      },
+      defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
   },
@@ -22519,11 +23148,7 @@ export const objects = {
         });
       },
       foreignKey: planCreatePayloadResult,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -22532,9 +23157,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       input: planCreatePayloadResult,
-      inputEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
   },
@@ -22543,9 +23166,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       issue756: planCreatePayloadResult,
-      issue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      issue756Edge: Issue756MutationPayload_issue756EdgePlan,
       query: queryPlan
     }
   },
@@ -22554,14 +23175,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       leftArm: planCreatePayloadResult,
-      leftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -22570,9 +23185,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       list: planCreatePayloadResult,
-      listEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
   },
@@ -22581,9 +23194,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       myTable: planCreatePayloadResult,
-      myTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_my_tablePgResource, my_tableUniques[0].attributes, $mutation, fieldArgs);
-      },
+      myTableEdge: CreateMyTablePayload_myTableEdgePlan,
       query: queryPlan
     }
   },
@@ -22600,9 +23211,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       nullTestRecord: planCreatePayloadResult,
-      nullTestRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_null_test_recordPgResource, null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-      },
+      nullTestRecordEdge: CreateNullTestRecordPayload_nullTestRecordEdgePlan,
       query: queryPlan
     }
   },
@@ -22611,9 +23220,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       patch: planCreatePayloadResult,
-      patchEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
   },
@@ -22622,9 +23229,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       person: planCreatePayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personEdge: MutationOutTablePayload_personEdgePlan,
       query: queryPlan
     }
   },
@@ -22632,15 +23237,9 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       personSecret: planCreatePayloadResult,
-      personSecretEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -22648,15 +23247,9 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
-      personByAuthorId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
+      personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
       post: planCreatePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -22666,9 +23259,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reservedInputRecord: planCreatePayloadResult,
-      reservedInputRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
   CreateReservedPatchRecordPayload: {
@@ -22677,9 +23268,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reservedPatchRecord: planCreatePayloadResult,
-      reservedPatchRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
   CreateReservedPayload: {
@@ -22688,9 +23277,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reserved: planCreatePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   CreateSimilarTable1Payload: {
@@ -22699,9 +23286,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       similarTable1: planCreatePayloadResult,
-      similarTable1Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
   CreateSimilarTable2Payload: {
@@ -22710,9 +23295,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       similarTable2: planCreatePayloadResult,
-      similarTable2Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
   CreateTestviewPayload: {
@@ -22727,21 +23310,11 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
-      postById($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("id")
-        });
-      },
-      postBySmallint($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("smallint")
-        });
-      },
+      postById: TypeFunctionMutationPayload_postByIdPlan,
+      postBySmallint: TypeFunctionMutationPayload_postBySmallintPlan,
       query: queryPlan,
       type: planCreatePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   CreateUpdatableViewPayload: {
@@ -22758,9 +23331,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       viewTable: planCreatePayloadResult,
-      viewTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
   DefaultValue: {
@@ -22792,25 +23363,15 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      compoundKey: planUpdateOrDeletePayloadResult,
-      compoundKeyEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_compound_keyPgResource, compound_keyUniques[0].attributes, $mutation, fieldArgs);
-      },
+      compoundKey: planCreatePayloadResult,
+      compoundKeyEdge: CreateCompoundKeyPayload_compoundKeyEdgePlan,
       deletedCompoundKeyId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_CompoundKey.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      personByPersonId1($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_1")
-        });
-      },
-      personByPersonId2($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_2")
-        });
-      },
+      personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
+      personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
       query: queryPlan
     }
   },
@@ -22818,10 +23379,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      defaultValue: planUpdateOrDeletePayloadResult,
-      defaultValueEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
-      },
+      defaultValue: planCreatePayloadResult,
+      defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       deletedDefaultValueId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_DefaultValue.plan($record);
@@ -22839,10 +23398,8 @@ export const objects = {
         const specifier = nodeIdHandler_Input.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      input: planUpdateOrDeletePayloadResult,
-      inputEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      input: planCreatePayloadResult,
+      inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
   },
@@ -22855,10 +23412,8 @@ export const objects = {
         const specifier = nodeIdHandler_Issue756.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      issue756: planUpdateOrDeletePayloadResult,
-      issue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      issue756: planCreatePayloadResult,
+      issue756Edge: Issue756MutationPayload_issue756EdgePlan,
       query: queryPlan
     }
   },
@@ -22871,15 +23426,9 @@ export const objects = {
         const specifier = nodeIdHandler_LeftArm.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      leftArm: planUpdateOrDeletePayloadResult,
-      leftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      leftArm: planCreatePayloadResult,
+      leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -22892,10 +23441,8 @@ export const objects = {
         const specifier = nodeIdHandler_List.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      list: planUpdateOrDeletePayloadResult,
-      listEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      list: planCreatePayloadResult,
+      listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
   },
@@ -22908,10 +23455,8 @@ export const objects = {
         const specifier = nodeIdHandler_MyTable.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      myTable: planUpdateOrDeletePayloadResult,
-      myTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_my_tablePgResource, my_tableUniques[0].attributes, $mutation, fieldArgs);
-      },
+      myTable: planCreatePayloadResult,
+      myTableEdge: CreateMyTablePayload_myTableEdgePlan,
       query: queryPlan
     }
   },
@@ -22919,7 +23464,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      noPrimaryKey: planUpdateOrDeletePayloadResult,
+      noPrimaryKey: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -22932,10 +23477,8 @@ export const objects = {
         const specifier = nodeIdHandler_NullTestRecord.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      nullTestRecord: planUpdateOrDeletePayloadResult,
-      nullTestRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_null_test_recordPgResource, null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-      },
+      nullTestRecord: planCreatePayloadResult,
+      nullTestRecordEdge: CreateNullTestRecordPayload_nullTestRecordEdgePlan,
       query: queryPlan
     }
   },
@@ -22948,10 +23491,8 @@ export const objects = {
         const specifier = nodeIdHandler_Patch.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      patch: planUpdateOrDeletePayloadResult,
-      patchEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      patch: planCreatePayloadResult,
+      patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
   },
@@ -22964,10 +23505,8 @@ export const objects = {
         const specifier = nodeIdHandler_Person.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person: planUpdateOrDeletePayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      person: planCreatePayloadResult,
+      personEdge: MutationOutTablePayload_personEdgePlan,
       query: queryPlan
     }
   },
@@ -22980,15 +23519,9 @@ export const objects = {
         const specifier = nodeIdHandler_PersonSecret.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
-      personSecret: planUpdateOrDeletePayloadResult,
-      personSecretEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
+      personSecret: planCreatePayloadResult,
+      personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -23001,15 +23534,9 @@ export const objects = {
         const specifier = nodeIdHandler_Post.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      personByAuthorId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
-      post: planUpdateOrDeletePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
+      post: planCreatePayloadResult,
+      postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -23023,10 +23550,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      reservedInputRecord: planUpdateOrDeletePayloadResult,
-      reservedInputRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedInputRecord: planCreatePayloadResult,
+      reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
   DeleteReservedPatchRecordPayload: {
@@ -23039,10 +23564,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      reservedPatchRecord: planUpdateOrDeletePayloadResult,
-      reservedPatchRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedPatchRecord: planCreatePayloadResult,
+      reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
   DeleteReservedPayload: {
@@ -23055,10 +23578,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reserved: planCreatePayloadResult,
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   DeleteSimilarTable1Payload: {
@@ -23071,10 +23592,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      similarTable1: planUpdateOrDeletePayloadResult,
-      similarTable1Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable1: planCreatePayloadResult,
+      similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
   DeleteSimilarTable2Payload: {
@@ -23087,10 +23606,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      similarTable2: planUpdateOrDeletePayloadResult,
-      similarTable2Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable2: planCreatePayloadResult,
+      similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
   DeleteTypePayload: {
@@ -23102,21 +23619,11 @@ export const objects = {
         const specifier = nodeIdHandler_Type.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      postById($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("id")
-        });
-      },
-      postBySmallint($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("smallint")
-        });
-      },
+      postById: TypeFunctionMutationPayload_postByIdPlan,
+      postBySmallint: TypeFunctionMutationPayload_postBySmallintPlan,
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      type: planCreatePayloadResult,
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   DeleteViewTablePayload: {
@@ -23129,10 +23636,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      viewTable: planUpdateOrDeletePayloadResult,
-      viewTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      viewTable: planCreatePayloadResult,
+      viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
   EdgeCase: {
@@ -23161,26 +23666,11 @@ export const objects = {
   ForeignKey: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      compoundKey1($record) {
-        return $record.get("compound_key_1");
-      },
-      compoundKey2($record) {
-        return $record.get("compound_key_2");
-      },
-      compoundKeyByCompoundKey1AndCompoundKey2($record) {
-        return resource_compound_keyPgResource.get({
-          person_id_1: $record.get("compound_key_1"),
-          person_id_2: $record.get("compound_key_2")
-        });
-      },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      }
+      compoundKey1: UniqueForeignKey_compoundKey1Plan,
+      compoundKey2: UniqueForeignKey_compoundKey2Plan,
+      compoundKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey_compoundKeyByCompoundKey1AndCompoundKey2Plan,
+      personByPersonId: ForeignKey_personByPersonIdPlan,
+      personId: ForeignKey_personIdPlan
     }
   },
   ForeignKeysConnection: {
@@ -23192,18 +23682,8 @@ export const objects = {
   FuncOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   FuncOutComplexSetofConnection: {
@@ -23215,40 +23695,21 @@ export const objects = {
   FuncOutComplexSetofRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   FuncOutOutCompoundTypeRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      o2($record) {
-        const $plan = $record.get("o2");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      o2: FuncOutOutCompoundTypeRecord_o2Plan
     }
   },
   FuncOutOutRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstOut($record) {
-        return $record.get("first_out");
-      },
-      secondOut($record) {
-        return $record.get("second_out");
-      }
+      firstOut: FuncOutOutRecord_firstOutPlan,
+      secondOut: FuncOutOutRecord_secondOutPlan
     }
   },
   FuncOutOutSetofConnection: {
@@ -23263,12 +23724,8 @@ export const objects = {
   FuncOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg2($record) {
-        return $record.get("column2");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg2: FuncOutOutUnnamedRecord_arg2Plan
     }
   },
   FuncOutSetofConnection: {
@@ -23280,12 +23737,8 @@ export const objects = {
   FuncOutUnnamedOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg3($record) {
-        return $record.get("column3");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg3: FuncOutUnnamedOutOutUnnamedRecord_arg3Plan
     }
   },
   FuncReturnsTableMultiColConnection: {
@@ -23371,9 +23824,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       issue756: planCustomMutationPayloadResult,
-      issue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      issue756Edge: Issue756MutationPayload_issue756EdgePlan,
       query: queryPlan
     }
   },
@@ -23436,14 +23887,8 @@ export const objects = {
         const specifier = nodeIdHandler_LeftArm.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
       },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      }
+      personByPersonId: ForeignKey_personByPersonIdPlan,
+      personId: ForeignKey_personIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -23458,14 +23903,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       leftArm: planCustomMutationPayloadResult,
-      leftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -23478,9 +23917,7 @@ export const objects = {
   List: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      byteaArray($record) {
-        return $record.get("bytea_array");
-      },
+      byteaArray: Type_byteaArrayPlan,
       byteaArrayNn($record) {
         return $record.get("bytea_array_nn");
       },
@@ -23502,9 +23939,7 @@ export const objects = {
       dateArrayNn($record) {
         return $record.get("date_array_nn");
       },
-      enumArray($record) {
-        return $record.get("enum_array");
-      },
+      enumArray: Type_enumArrayPlan,
       enumArrayNn($record) {
         return $record.get("enum_array_nn");
       },
@@ -23638,18 +24073,8 @@ export const objects = {
   MutationOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   MutationOutComplexSetofPayload: {
@@ -23663,18 +24088,8 @@ export const objects = {
   MutationOutComplexSetofRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   MutationOutOutCompoundTypePayload: {
@@ -23688,12 +24103,7 @@ export const objects = {
   MutationOutOutCompoundTypeRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      o2($record) {
-        const $plan = $record.get("o2");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      o2: FuncOutOutCompoundTypeRecord_o2Plan
     }
   },
   MutationOutOutPayload: {
@@ -23707,12 +24117,8 @@ export const objects = {
   MutationOutOutRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstOut($record) {
-        return $record.get("first_out");
-      },
-      secondOut($record) {
-        return $record.get("second_out");
-      }
+      firstOut: FuncOutOutRecord_firstOutPlan,
+      secondOut: FuncOutOutRecord_secondOutPlan
     }
   },
   MutationOutOutSetofPayload: {
@@ -23737,12 +24143,8 @@ export const objects = {
   MutationOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg2($record) {
-        return $record.get("column2");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg2: FuncOutOutUnnamedRecord_arg2Plan
     }
   },
   MutationOutPayload: {
@@ -23766,9 +24168,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       person: planCustomMutationPayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personEdge: MutationOutTablePayload_personEdgePlan,
       query: queryPlan
     }
   },
@@ -23791,12 +24191,8 @@ export const objects = {
   MutationOutUnnamedOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      arg1($record) {
-        return $record.get("column1");
-      },
-      arg3($record) {
-        return $record.get("column3");
-      }
+      arg1: FuncOutOutUnnamedRecord_arg1Plan,
+      arg3: FuncOutUnnamedOutOutUnnamedRecord_arg3Plan
     }
   },
   MutationOutUnnamedPayload: {
@@ -24180,18 +24576,8 @@ export const objects = {
   PersonComputedComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: PersonComputedComplexRecord_yPlan,
+      z: PersonComputedComplexRecord_zPlan
     }
   },
   PersonComputedFirstArgInoutOutRecord: {
@@ -24218,14 +24604,8 @@ export const objects = {
         const specifier = nodeIdHandler_PersonSecret.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
       },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      },
+      personByPersonId: ForeignKey_personByPersonIdPlan,
+      personId: ForeignKey_personIdPlan,
       secret($record) {
         return $record.get("sekrit");
       }
@@ -24358,15 +24738,9 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
-      personByAuthorId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
+      personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
       post: planCustomMutationPayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -24528,15 +24902,9 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
-      personByAuthorId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
+      personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
       post: planCustomMutationPayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -24563,9 +24931,7 @@ export const objects = {
       anIntRange($record) {
         return $record.get("an_int_range");
       },
-      byteaArray($record) {
-        return $record.get("bytea_array");
-      },
+      byteaArray: Type_byteaArrayPlan,
       compoundType($record) {
         const $plan = $record.get("compound_type");
         const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -24573,9 +24939,7 @@ export const objects = {
         $select.getClassStep().setTrusted();
         return $select;
       },
-      enumArray($record) {
-        return $record.get("enum_array");
-      },
+      enumArray: Type_enumArrayPlan,
       int8ArrayDomain($record) {
         return $record.get("int8_array_domain");
       },
@@ -24656,21 +25020,11 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
-      postById($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("id")
-        });
-      },
-      postBySmallint($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("smallint")
-        });
-      },
+      postById: TypeFunctionMutationPayload_postByIdPlan,
+      postBySmallint: TypeFunctionMutationPayload_postBySmallintPlan,
       query: queryPlan,
       type: planCustomMutationPayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   TypesConnection: {
@@ -24690,18 +25044,9 @@ export const objects = {
   UniqueForeignKey: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      compoundKey1($record) {
-        return $record.get("compound_key_1");
-      },
-      compoundKey2($record) {
-        return $record.get("compound_key_2");
-      },
-      compoundKeyByCompoundKey1AndCompoundKey2($record) {
-        return resource_compound_keyPgResource.get({
-          person_id_1: $record.get("compound_key_1"),
-          person_id_2: $record.get("compound_key_2")
-        });
-      }
+      compoundKey1: UniqueForeignKey_compoundKey1Plan,
+      compoundKey2: UniqueForeignKey_compoundKey2Plan,
+      compoundKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey_compoundKeyByCompoundKey1AndCompoundKey2Plan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -24731,20 +25076,10 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      compoundKey: planUpdateOrDeletePayloadResult,
-      compoundKeyEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_compound_keyPgResource, compound_keyUniques[0].attributes, $mutation, fieldArgs);
-      },
-      personByPersonId1($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_1")
-        });
-      },
-      personByPersonId2($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id_2")
-        });
-      },
+      compoundKey: planCreatePayloadResult,
+      compoundKeyEdge: CreateCompoundKeyPayload_compoundKeyEdgePlan,
+      personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
+      personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
       query: queryPlan
     }
   },
@@ -24752,10 +25087,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      defaultValue: planUpdateOrDeletePayloadResult,
-      defaultValueEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
-      },
+      defaultValue: planCreatePayloadResult,
+      defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
   },
@@ -24763,10 +25096,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      input: planUpdateOrDeletePayloadResult,
-      inputEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      input: planCreatePayloadResult,
+      inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
   },
@@ -24774,10 +25105,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      issue756: planUpdateOrDeletePayloadResult,
-      issue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      issue756: planCreatePayloadResult,
+      issue756Edge: Issue756MutationPayload_issue756EdgePlan,
       query: queryPlan
     }
   },
@@ -24785,15 +25114,9 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      leftArm: planUpdateOrDeletePayloadResult,
-      leftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
+      leftArm: planCreatePayloadResult,
+      leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
     }
   },
@@ -24801,10 +25124,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      list: planUpdateOrDeletePayloadResult,
-      listEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      list: planCreatePayloadResult,
+      listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
   },
@@ -24812,10 +25133,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      myTable: planUpdateOrDeletePayloadResult,
-      myTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_my_tablePgResource, my_tableUniques[0].attributes, $mutation, fieldArgs);
-      },
+      myTable: planCreatePayloadResult,
+      myTableEdge: CreateMyTablePayload_myTableEdgePlan,
       query: queryPlan
     }
   },
@@ -24823,7 +25142,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      noPrimaryKey: planUpdateOrDeletePayloadResult,
+      noPrimaryKey: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -24831,10 +25150,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      nullTestRecord: planUpdateOrDeletePayloadResult,
-      nullTestRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_null_test_recordPgResource, null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-      },
+      nullTestRecord: planCreatePayloadResult,
+      nullTestRecordEdge: CreateNullTestRecordPayload_nullTestRecordEdgePlan,
       query: queryPlan
     }
   },
@@ -24842,10 +25159,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      patch: planUpdateOrDeletePayloadResult,
-      patchEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      patch: planCreatePayloadResult,
+      patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
   },
@@ -24853,10 +25168,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      person: planCreatePayloadResult,
+      personEdge: MutationOutTablePayload_personEdgePlan,
       query: queryPlan
     }
   },
@@ -24864,15 +25177,9 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      personByPersonId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("person_id")
-        });
-      },
-      personSecret: planUpdateOrDeletePayloadResult,
-      personSecretEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
+      personSecret: planCreatePayloadResult,
+      personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -24880,15 +25187,9 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      personByAuthorId($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
-      post: planUpdateOrDeletePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
+      post: planCreatePayloadResult,
+      postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -24897,10 +25198,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedInputRecord: planUpdateOrDeletePayloadResult,
-      reservedInputRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedInputRecord: planCreatePayloadResult,
+      reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
   UpdateReservedPatchRecordPayload: {
@@ -24908,10 +25207,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedPatchRecord: planUpdateOrDeletePayloadResult,
-      reservedPatchRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedPatchRecord: planCreatePayloadResult,
+      reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
   UpdateReservedPayload: {
@@ -24919,10 +25216,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reserved: planCreatePayloadResult,
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   UpdateSimilarTable1Payload: {
@@ -24930,10 +25225,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable1: planUpdateOrDeletePayloadResult,
-      similarTable1Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable1: planCreatePayloadResult,
+      similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
   UpdateSimilarTable2Payload: {
@@ -24941,31 +25234,19 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable2: planUpdateOrDeletePayloadResult,
-      similarTable2Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable2: planCreatePayloadResult,
+      similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
   UpdateTypePayload: {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      postById($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("id")
-        });
-      },
-      postBySmallint($record) {
-        return resource_postPgResource.get({
-          id: $record.get("result").get("smallint")
-        });
-      },
+      postById: TypeFunctionMutationPayload_postByIdPlan,
+      postBySmallint: TypeFunctionMutationPayload_postBySmallintPlan,
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      type: planCreatePayloadResult,
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   UpdateViewTablePayload: {
@@ -24973,10 +25254,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      viewTable: planUpdateOrDeletePayloadResult,
-      viewTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      viewTable: planCreatePayloadResult,
+      viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
   ViewTable: {
@@ -25086,47 +25365,17 @@ export const inputObjects = {
   CompoundKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      extra(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      },
-      personId1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      },
-      personId2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+      extra: CompoundKeyInput_extraApply,
+      personId1: CompoundKeyInput_personId1Apply,
+      personId2: CompoundKeyInput_personId2Apply
     }
   },
   CompoundKeyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      extra(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      },
-      personId1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      },
-      personId2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+      extra: CompoundKeyInput_extraApply,
+      personId1: CompoundKeyInput_personId1Apply,
+      personId2: CompoundKeyInput_personId2Apply
     }
   },
   CompoundTypeArrayMutationInput: {
@@ -25137,18 +25386,8 @@ export const inputObjects = {
   CompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      },
+      a: CompoundTypeInput_aApply,
+      b: CompoundTypeInput_bApply,
       c(obj, val, {
         field,
         schema
@@ -25216,153 +25455,151 @@ export const inputObjects = {
   },
   CreateCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       compoundKey: applyCreateFields
     }
   },
   CreateDefaultValueInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       defaultValue: applyCreateFields
     }
   },
   CreateEdgeCaseInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       edgeCase: applyCreateFields
     }
   },
   CreateForeignKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       foreignKey: applyCreateFields
     }
   },
   CreateInputInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       input: applyCreateFields
     }
   },
   CreateIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       issue756: applyCreateFields
     }
   },
   CreateLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       leftArm: applyCreateFields
     }
   },
   CreateListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       list: applyCreateFields
     }
   },
   CreateMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       myTable: applyCreateFields
     }
   },
   CreateNoPrimaryKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       noPrimaryKey: applyCreateFields
     }
   },
   CreateNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       nullTestRecord: applyCreateFields
     }
   },
   CreatePatchInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       patch: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       person: applyCreateFields
     }
   },
   CreatePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       personSecret: applyCreateFields
     }
   },
   CreatePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       post: applyCreateFields
     }
   },
   CreateReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reserved: applyCreateFields
     }
   },
   CreateReservedInputRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reservedInputRecord: applyCreateFields
     }
   },
   CreateReservedPatchRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reservedPatchRecord: applyCreateFields
     }
   },
   CreateSimilarTable1Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       similarTable1: applyCreateFields
     }
   },
   CreateSimilarTable2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       similarTable2: applyCreateFields
     }
   },
   CreateTestviewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       testview: applyCreateFields
     }
   },
   CreateTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       type: applyCreateFields
     }
   },
   CreateUpdatableViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       updatableView: applyCreateFields
     }
   },
   CreateViewTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       viewTable: applyCreateFields
     }
   },
   DefaultValueCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       nullValue($condition, val) {
         return applyAttributeCondition("null_value", TYPES.text, $condition, val);
       }
@@ -25371,240 +25608,220 @@ export const inputObjects = {
   DefaultValueInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      nullValue(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null_value", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      nullValue: DefaultValueInput_nullValueApply
     }
   },
   DefaultValuePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      nullValue(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null_value", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      nullValue: DefaultValueInput_nullValueApply
     }
   },
   DeleteCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteDefaultValueByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteDefaultValueInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteInputByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteInputInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteIssue756ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteListByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteMyTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNoPrimaryKeyByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNullTestRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePatchByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePatchInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedInputRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedInputRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedPatchRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedPatchRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable1ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable1Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable2ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteViewTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteViewTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   EdgeCaseCondition: {
@@ -25651,9 +25868,7 @@ export const inputObjects = {
       compoundKey2($condition, val) {
         return applyAttributeCondition("compound_key_2", TYPES.int, $condition, val);
       },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      }
+      personId: ForeignKeyCondition_personIdApply
     }
   },
   ForeignKeyInput: {
@@ -25671,12 +25886,7 @@ export const inputObjects = {
       }) {
         obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
       },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   GuidFnInput: {
@@ -25686,31 +25896,19 @@ export const inputObjects = {
   },
   InputCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   InputInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   InputPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   IntSetMutationInput: {
@@ -25720,9 +25918,7 @@ export const inputObjects = {
   },
   Issue756Condition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       ts($condition, val) {
         return applyAttributeCondition("ts", notNullTimestampCodec, $condition, val);
       }
@@ -25731,18 +25927,8 @@ export const inputObjects = {
   Issue756Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      ts(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      ts: Issue756Input_tsApply
     }
   },
   Issue756MutationInput: {
@@ -25753,18 +25939,8 @@ export const inputObjects = {
   Issue756Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      ts(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      ts: Issue756Input_tsApply
     }
   },
   Issue756SetMutationInput: {
@@ -25795,46 +25971,22 @@ export const inputObjects = {
   LeftArmBaseInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      lengthInMetres: LeftArmBaseInput_lengthInMetresApply,
+      mood: LeftArmBaseInput_moodApply,
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   LeftArmCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       lengthInMetres($condition, val) {
         return applyAttributeCondition("length_in_metres", TYPES.float, $condition, val);
       },
       mood($condition, val) {
         return applyAttributeCondition("mood", TYPES.text, $condition, val);
       },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      }
+      personId: ForeignKeyCondition_personIdApply
     }
   },
   LeftArmIdentityInput: {
@@ -25845,59 +25997,19 @@ export const inputObjects = {
   LeftArmInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      lengthInMetres: LeftArmBaseInput_lengthInMetresApply,
+      mood: LeftArmBaseInput_moodApply,
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   LeftArmPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      lengthInMetres: LeftArmBaseInput_lengthInMetresApply,
+      mood: LeftArmBaseInput_moodApply,
+      personId: LeftArmBaseInput_personIdApply
     }
   },
   ListBdeMutationInput: {
@@ -25919,15 +26031,11 @@ export const inputObjects = {
       dateArrayNn($condition, val) {
         return applyAttributeCondition("date_array_nn", LIST_TYPES.date, $condition, val);
       },
-      enumArray($condition, val) {
-        return applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
-      },
+      enumArray: TypeCondition_enumArrayApply,
       enumArrayNn($condition, val) {
         return applyAttributeCondition("enum_array_nn", colorArrayCodec, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       intArray($condition, val) {
         return applyAttributeCondition("int_array", LIST_TYPES.int, $condition, val);
       },
@@ -25945,84 +26053,19 @@ export const inputObjects = {
   ListInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      intArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      },
-      intArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+      byteaArray: ListInput_byteaArrayApply,
+      byteaArrayNn: ListInput_byteaArrayNnApply,
+      compoundTypeArray: ListInput_compoundTypeArrayApply,
+      compoundTypeArrayNn: ListInput_compoundTypeArrayNnApply,
+      dateArray: ListInput_dateArrayApply,
+      dateArrayNn: ListInput_dateArrayNnApply,
+      enumArray: ListInput_enumArrayApply,
+      enumArrayNn: ListInput_enumArrayNnApply,
+      id: LeftArmBaseInput_idApply,
+      intArray: ListInput_intArrayApply,
+      intArrayNn: ListInput_intArrayNnApply,
+      timestamptzArray: ListInput_timestamptzArrayApply,
+      timestamptzArrayNn: ListInput_timestamptzArrayNnApply
     }
   },
   ListOfCompoundTypesMutationInput: {
@@ -26033,84 +26076,19 @@ export const inputObjects = {
   ListPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      intArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      },
-      intArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+      byteaArray: ListInput_byteaArrayApply,
+      byteaArrayNn: ListInput_byteaArrayNnApply,
+      compoundTypeArray: ListInput_compoundTypeArrayApply,
+      compoundTypeArrayNn: ListInput_compoundTypeArrayNnApply,
+      dateArray: ListInput_dateArrayApply,
+      dateArrayNn: ListInput_dateArrayNnApply,
+      enumArray: ListInput_enumArrayApply,
+      enumArrayNn: ListInput_enumArrayNnApply,
+      id: LeftArmBaseInput_idApply,
+      intArray: ListInput_intArrayApply,
+      intArrayNn: ListInput_intArrayNnApply,
+      timestamptzArray: ListInput_timestamptzArrayApply,
+      timestamptzArrayNn: ListInput_timestamptzArrayNnApply
     }
   },
   Mult1Input: {
@@ -26235,9 +26213,7 @@ export const inputObjects = {
   },
   MyTableCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       jsonData($condition, val) {
         return applyAttributeCondition("json_data", TYPES.jsonb, $condition, val);
       }
@@ -26246,52 +26222,22 @@ export const inputObjects = {
   MyTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonData(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      jsonData: MyTableInput_jsonDataApply
     }
   },
   MyTablePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonData(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      jsonData: MyTableInput_jsonDataApply
     }
   },
   NestedCompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      },
+      a: CompoundTypeInput_aApply,
+      b: CompoundTypeInput_bApply,
       bazBuz(obj, val, {
         field,
         schema
@@ -26314,9 +26260,7 @@ export const inputObjects = {
   },
   NoPrimaryKeyCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       str($condition, val) {
         return applyAttributeCondition("str", TYPES.text, $condition, val);
       }
@@ -26325,42 +26269,20 @@ export const inputObjects = {
   NoPrimaryKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      str(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      str: NoPrimaryKeyInput_strApply
     }
   },
   NoPrimaryKeyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      str(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      str: NoPrimaryKeyInput_strApply
     }
   },
   NullTestRecordCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       nonNullText($condition, val) {
         return applyAttributeCondition("non_null_text", TYPES.text, $condition, val);
       },
@@ -26375,88 +26297,36 @@ export const inputObjects = {
   NullTestRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      nonNullText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableInt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      nonNullText: NullTestRecordInput_nonNullTextApply,
+      nullableInt: NullTestRecordInput_nullableIntApply,
+      nullableText: NullTestRecordInput_nullableTextApply
     }
   },
   NullTestRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      nonNullText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableInt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply,
+      nonNullText: NullTestRecordInput_nonNullTextApply,
+      nullableInt: NullTestRecordInput_nullableIntApply,
+      nullableText: NullTestRecordInput_nullableTextApply
     }
   },
   PatchCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   PatchInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   PatchPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   PersonCondition: {
@@ -26486,9 +26356,7 @@ export const inputObjects = {
       email($condition, val) {
         return applyAttributeCondition("email", emailCodec, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: TypeCondition_idApply,
       lastLoginFromIp($condition, val) {
         return applyAttributeCondition("last_login_from_ip", TYPES.inet, $condition, val);
       },
@@ -26509,150 +26377,38 @@ export const inputObjects = {
   PersonInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      about(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      },
-      aliases(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      },
-      config(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      },
-      createdAt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      },
-      email(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromIp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromSubnet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      },
-      site(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      },
-      userMac(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+      about: PersonInput_aboutApply,
+      aliases: PersonInput_aliasesApply,
+      config: PersonInput_configApply,
+      createdAt: PersonInput_createdAtApply,
+      email: PersonInput_emailApply,
+      id: LeftArmBaseInput_idApply,
+      lastLoginFromIp: PersonInput_lastLoginFromIpApply,
+      lastLoginFromSubnet: PersonInput_lastLoginFromSubnetApply,
+      name: PersonInput_nameApply,
+      site: PersonInput_siteApply,
+      userMac: PersonInput_userMacApply
     }
   },
   PersonPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      about(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      },
-      aliases(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      },
-      config(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      },
-      createdAt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      },
-      email(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromIp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromSubnet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      },
-      site(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      },
-      userMac(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+      about: PersonInput_aboutApply,
+      aliases: PersonInput_aliasesApply,
+      config: PersonInput_configApply,
+      createdAt: PersonInput_createdAtApply,
+      email: PersonInput_emailApply,
+      id: LeftArmBaseInput_idApply,
+      lastLoginFromIp: PersonInput_lastLoginFromIpApply,
+      lastLoginFromSubnet: PersonInput_lastLoginFromSubnetApply,
+      name: PersonInput_nameApply,
+      site: PersonInput_siteApply,
+      userMac: PersonInput_userMacApply
     }
   },
   PersonSecretCondition: {
     plans: {
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      },
+      personId: ForeignKeyCondition_personIdApply,
       secret($condition, val) {
         return applyAttributeCondition("sekrit", TYPES.text, $condition, val);
       }
@@ -26661,35 +26417,15 @@ export const inputObjects = {
   PersonSecretInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      secret(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: LeftArmBaseInput_personIdApply,
+      secret: PersonSecretInput_secretApply
     }
   },
   PersonSecretPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      secret(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: LeftArmBaseInput_personIdApply,
+      secret: PersonSecretInput_secretApply
     }
   },
   PostCondition: {
@@ -26719,50 +26455,18 @@ export const inputObjects = {
       headline($condition, val) {
         return applyAttributeCondition("headline", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   PostInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      authorId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      },
-      body(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      },
-      comptypes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
-      },
-      enums(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enums", bakedInputRuntime(schema, field.type, val));
-      },
-      headline(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("headline", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      authorId: PostInput_authorIdApply,
+      body: PostInput_bodyApply,
+      comptypes: PostInput_comptypesApply,
+      enums: PostInput_enumsApply,
+      headline: PostInput_headlineApply,
+      id: LeftArmBaseInput_idApply
     }
   },
   PostManyInput: {
@@ -26773,42 +26477,12 @@ export const inputObjects = {
   PostPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      authorId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      },
-      body(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      },
-      comptypes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
-      },
-      enums(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enums", bakedInputRuntime(schema, field.type, val));
-      },
-      headline(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("headline", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      authorId: PostInput_authorIdApply,
+      body: PostInput_bodyApply,
+      comptypes: PostInput_comptypesApply,
+      enums: PostInput_enumsApply,
+      headline: PostInput_headlineApply,
+      id: LeftArmBaseInput_idApply
     }
   },
   PostWithSuffixInput: {
@@ -26818,89 +26492,53 @@ export const inputObjects = {
   },
   ReservedCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   ReservedInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   ReservedInputRecordCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   ReservedInputRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   ReservedInputRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   ReservedPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   ReservedPatchRecordCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   ReservedPatchRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   ReservedPatchRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      id: LeftArmBaseInput_idApply
     }
   },
   ReturnVoidMutationInput: {
@@ -26910,150 +26548,58 @@ export const inputObjects = {
   },
   SimilarTable1Condition: {
     plans: {
-      col1($condition, val) {
-        return applyAttributeCondition("col1", TYPES.int, $condition, val);
-      },
-      col2($condition, val) {
-        return applyAttributeCondition("col2", TYPES.int, $condition, val);
-      },
-      col3($condition, val) {
-        return applyAttributeCondition("col3", TYPES.int, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      col1: TestviewCondition_col1Apply,
+      col2: TestviewCondition_col2Apply,
+      col3: SimilarTable1Condition_col3Apply,
+      id: TypeCondition_idApply
     }
   },
   SimilarTable1Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      col3: SimilarTable1Input_col3Apply,
+      id: LeftArmBaseInput_idApply
     }
   },
   SimilarTable1Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      col3: SimilarTable1Input_col3Apply,
+      id: LeftArmBaseInput_idApply
     }
   },
   SimilarTable2Condition: {
     plans: {
-      col3($condition, val) {
-        return applyAttributeCondition("col3", TYPES.int, $condition, val);
-      },
+      col3: SimilarTable1Condition_col3Apply,
       col4($condition, val) {
         return applyAttributeCondition("col4", TYPES.int, $condition, val);
       },
       col5($condition, val) {
         return applyAttributeCondition("col5", TYPES.int, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: TypeCondition_idApply
     }
   },
   SimilarTable2Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      col4(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col4", bakedInputRuntime(schema, field.type, val));
-      },
-      col5(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col5", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col3: SimilarTable1Input_col3Apply,
+      col4: SimilarTable2Input_col4Apply,
+      col5: SimilarTable2Input_col5Apply,
+      id: LeftArmBaseInput_idApply
     }
   },
   SimilarTable2Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      col4(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col4", bakedInputRuntime(schema, field.type, val));
-      },
-      col5(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col5", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col3: SimilarTable1Input_col3Apply,
+      col4: SimilarTable2Input_col4Apply,
+      col5: SimilarTable2Input_col5Apply,
+      id: LeftArmBaseInput_idApply
     }
   },
   TableMutationInput: {
@@ -27068,12 +26614,8 @@ export const inputObjects = {
   },
   TestviewCondition: {
     plans: {
-      col1($condition, val) {
-        return applyAttributeCondition("col1", TYPES.int, $condition, val);
-      },
-      col2($condition, val) {
-        return applyAttributeCondition("col2", TYPES.int, $condition, val);
-      },
+      col1: TestviewCondition_col1Apply,
+      col2: TestviewCondition_col2Apply,
       testviewid($condition, val) {
         return applyAttributeCondition("testviewid", TYPES.int, $condition, val);
       }
@@ -27082,18 +26624,8 @@ export const inputObjects = {
   TestviewInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
       testviewid(obj, val, {
         field,
         schema
@@ -27137,12 +26669,8 @@ export const inputObjects = {
       enum($condition, val) {
         return applyAttributeCondition("enum", colorCodec, $condition, val);
       },
-      enumArray($condition, val) {
-        return applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      enumArray: TypeCondition_enumArrayApply,
+      id: TypeCondition_idApply,
       inet($condition, val) {
         return applyAttributeCondition("inet", TYPES.inet, $condition, val);
       },
@@ -27268,611 +26796,111 @@ export const inputObjects = {
   TypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      anIntRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      },
-      bigint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      },
-      boolean(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      },
-      bytea(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      date(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      },
-      daterange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      },
-      decimal(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      },
-      domain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domain2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      int8ArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      interval(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      },
-      intervalArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      },
-      json(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonb(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonpath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
-      },
-      ltree(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      },
-      ltreeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      money(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      },
-      nestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableNestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullablePoint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      },
-      numeric(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      },
-      numrange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      regclass(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      },
-      regconfig(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      },
-      regdictionary(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      },
-      regoper(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      },
-      regoperator(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      },
-      regproc(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      },
-      regprocedure(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      },
-      regtype(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      },
-      smallint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      },
-      textArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      },
-      textArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      time(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      },
-      timetz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      },
-      varchar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+      anIntRange: TypeInput_anIntRangeApply,
+      bigint: TypeInput_bigintApply,
+      boolean: TypeInput_booleanApply,
+      bytea: TypeInput_byteaApply,
+      byteaArray: ListInput_byteaArrayApply,
+      cidr: TypeInput_cidrApply,
+      compoundType: TypeInput_compoundTypeApply,
+      date: TypeInput_dateApply,
+      daterange: TypeInput_daterangeApply,
+      decimal: TypeInput_decimalApply,
+      domain: TypeInput_domainApply,
+      domain2: TypeInput_domain2Apply,
+      enum: TypeInput_enumApply,
+      enumArray: ListInput_enumArrayApply,
+      id: LeftArmBaseInput_idApply,
+      inet: TypeInput_inetApply,
+      int8ArrayDomain: TypeInput_int8ArrayDomainApply,
+      interval: TypeInput_intervalApply,
+      intervalArray: TypeInput_intervalArrayApply,
+      json: TypeInput_jsonApply,
+      jsonb: TypeInput_jsonbApply,
+      jsonpath: TypeInput_jsonpathApply,
+      ltree: TypeInput_ltreeApply,
+      ltreeArray: TypeInput_ltreeArrayApply,
+      macaddr: TypeInput_macaddrApply,
+      money: TypeInput_moneyApply,
+      nestedCompoundType: TypeInput_nestedCompoundTypeApply,
+      nullableCompoundType: TypeInput_nullableCompoundTypeApply,
+      nullableNestedCompoundType: TypeInput_nullableNestedCompoundTypeApply,
+      nullablePoint: TypeInput_nullablePointApply,
+      nullableRange: TypeInput_nullableRangeApply,
+      numeric: TypeInput_numericApply,
+      numrange: TypeInput_numrangeApply,
+      point: TypeInput_pointApply,
+      regclass: TypeInput_regclassApply,
+      regconfig: TypeInput_regconfigApply,
+      regdictionary: TypeInput_regdictionaryApply,
+      regoper: TypeInput_regoperApply,
+      regoperator: TypeInput_regoperatorApply,
+      regproc: TypeInput_regprocApply,
+      regprocedure: TypeInput_regprocedureApply,
+      regtype: TypeInput_regtypeApply,
+      smallint: TypeInput_smallintApply,
+      textArray: TypeInput_textArrayApply,
+      textArrayDomain: TypeInput_textArrayDomainApply,
+      time: TypeInput_timeApply,
+      timestamp: TypeInput_timestampApply,
+      timestamptz: TypeInput_timestamptzApply,
+      timetz: TypeInput_timetzApply,
+      varchar: TypeInput_varcharApply
     }
   },
   TypePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      anIntRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      },
-      bigint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      },
-      boolean(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      },
-      bytea(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      date(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      },
-      daterange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      },
-      decimal(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      },
-      domain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domain2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      int8ArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      interval(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      },
-      intervalArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      },
-      json(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonb(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonpath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
-      },
-      ltree(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      },
-      ltreeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      money(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      },
-      nestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableNestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullablePoint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      },
-      numeric(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      },
-      numrange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      regclass(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      },
-      regconfig(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      },
-      regdictionary(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      },
-      regoper(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      },
-      regoperator(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      },
-      regproc(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      },
-      regprocedure(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      },
-      regtype(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      },
-      smallint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      },
-      textArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      },
-      textArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      time(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      },
-      timetz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      },
-      varchar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+      anIntRange: TypeInput_anIntRangeApply,
+      bigint: TypeInput_bigintApply,
+      boolean: TypeInput_booleanApply,
+      bytea: TypeInput_byteaApply,
+      byteaArray: ListInput_byteaArrayApply,
+      cidr: TypeInput_cidrApply,
+      compoundType: TypeInput_compoundTypeApply,
+      date: TypeInput_dateApply,
+      daterange: TypeInput_daterangeApply,
+      decimal: TypeInput_decimalApply,
+      domain: TypeInput_domainApply,
+      domain2: TypeInput_domain2Apply,
+      enum: TypeInput_enumApply,
+      enumArray: ListInput_enumArrayApply,
+      id: LeftArmBaseInput_idApply,
+      inet: TypeInput_inetApply,
+      int8ArrayDomain: TypeInput_int8ArrayDomainApply,
+      interval: TypeInput_intervalApply,
+      intervalArray: TypeInput_intervalArrayApply,
+      json: TypeInput_jsonApply,
+      jsonb: TypeInput_jsonbApply,
+      jsonpath: TypeInput_jsonpathApply,
+      ltree: TypeInput_ltreeApply,
+      ltreeArray: TypeInput_ltreeArrayApply,
+      macaddr: TypeInput_macaddrApply,
+      money: TypeInput_moneyApply,
+      nestedCompoundType: TypeInput_nestedCompoundTypeApply,
+      nullableCompoundType: TypeInput_nullableCompoundTypeApply,
+      nullableNestedCompoundType: TypeInput_nullableNestedCompoundTypeApply,
+      nullablePoint: TypeInput_nullablePointApply,
+      nullableRange: TypeInput_nullableRangeApply,
+      numeric: TypeInput_numericApply,
+      numrange: TypeInput_numrangeApply,
+      point: TypeInput_pointApply,
+      regclass: TypeInput_regclassApply,
+      regconfig: TypeInput_regconfigApply,
+      regdictionary: TypeInput_regdictionaryApply,
+      regoper: TypeInput_regoperApply,
+      regoperator: TypeInput_regoperatorApply,
+      regproc: TypeInput_regprocApply,
+      regprocedure: TypeInput_regprocedureApply,
+      regtype: TypeInput_regtypeApply,
+      smallint: TypeInput_smallintApply,
+      textArray: TypeInput_textArrayApply,
+      textArrayDomain: TypeInput_textArrayDomainApply,
+      time: TypeInput_timeApply,
+      timestamp: TypeInput_timestampApply,
+      timestamptz: TypeInput_timestamptzApply,
+      timetz: TypeInput_timetzApply,
+      varchar: TypeInput_varcharApply
     }
   },
   TypesMutationInput: {
@@ -27927,307 +26955,271 @@ export const inputObjects = {
   },
   UpdateCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      compoundKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      compoundKeyPatch: applyCreateFields
     }
   },
   UpdateCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      compoundKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      compoundKeyPatch: applyCreateFields
     }
   },
   UpdateDefaultValueByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      defaultValuePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      defaultValuePatch: applyCreateFields
     }
   },
   UpdateDefaultValueInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      defaultValuePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      defaultValuePatch: applyCreateFields
     }
   },
   UpdateInputByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      inputPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      inputPatch: applyCreateFields
     }
   },
   UpdateInputInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      inputPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      inputPatch: applyCreateFields
     }
   },
   UpdateIssue756ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      issue756Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      issue756Patch: applyCreateFields
     }
   },
   UpdateIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      issue756Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      issue756Patch: applyCreateFields
     }
   },
   UpdateLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateListByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      listPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      listPatch: applyCreateFields
     }
   },
   UpdateListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      listPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      listPatch: applyCreateFields
     }
   },
   UpdateMyTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      myTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      myTablePatch: applyCreateFields
     }
   },
   UpdateMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      myTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      myTablePatch: applyCreateFields
     }
   },
   UpdateNoPrimaryKeyByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      noPrimaryKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      noPrimaryKeyPatch: applyCreateFields
     }
   },
   UpdateNullTestRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullTestRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      nullTestRecordPatch: applyCreateFields
     }
   },
   UpdateNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullTestRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      nullTestRecordPatch: applyCreateFields
     }
   },
   UpdatePatchByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      patchPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      patchPatch: applyCreateFields
     }
   },
   UpdatePatchInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      patchPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      patchPatch: applyCreateFields
     }
   },
   UpdatePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personSecretPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personSecretPatch: applyCreateFields
     }
   },
   UpdatePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personSecretPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personSecretPatch: applyCreateFields
     }
   },
   UpdatePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      postPatch: applyCreateFields
     }
   },
   UpdatePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      postPatch: applyCreateFields
     }
   },
   UpdateReservedByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedInputRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedInputRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedInputRecordPatch: applyCreateFields
     }
   },
   UpdateReservedInputRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedInputRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedInputRecordPatch: applyCreateFields
     }
   },
   UpdateReservedPatchRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatchRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatchRecordPatch: applyCreateFields
     }
   },
   UpdateReservedPatchRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatchRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatchRecordPatch: applyCreateFields
     }
   },
   UpdateSimilarTable1ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable1Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable1Patch: applyCreateFields
     }
   },
   UpdateSimilarTable1Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable1Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable1Patch: applyCreateFields
     }
   },
   UpdateSimilarTable2ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable2Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable2Patch: applyCreateFields
     }
   },
   UpdateSimilarTable2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable2Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable2Patch: applyCreateFields
     }
   },
   UpdateTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      typePatch: applyCreateFields
     }
   },
   UpdateTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      typePatch: applyCreateFields
     }
   },
   UpdateViewTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      viewTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      viewTablePatch: applyCreateFields
     }
   },
   UpdateViewTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      viewTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      viewTablePatch: applyCreateFields
     }
   },
   ViewTableCondition: {
     plans: {
-      col1($condition, val) {
-        return applyAttributeCondition("col1", TYPES.int, $condition, val);
-      },
-      col2($condition, val) {
-        return applyAttributeCondition("col2", TYPES.int, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      col1: TestviewCondition_col1Apply,
+      col2: TestviewCondition_col2Apply,
+      id: TypeCondition_idApply
     }
   },
   ViewTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      id: LeftArmBaseInput_idApply
     }
   },
   ViewTablePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      id: LeftArmBaseInput_idApply
     }
   },
   WrappedUrlInput: {
@@ -28317,12 +27309,7 @@ export const scalars = {
   Datetime: {
     serialize: toString,
     parseValue: toString,
-    parseLiteral(ast) {
-      if (ast.kind === Kind.STRING) {
-        return ast.value;
-      }
-      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
-    }
+    parseLiteral: DatetimeParseLiteral
   },
   Email: {
     serialize: GraphQLString.serialize,
@@ -28420,12 +27407,7 @@ export const scalars = {
   NotNullTimestamp: {
     serialize: toString,
     parseValue: toString,
-    parseLiteral(ast) {
-      if (ast.kind === Kind.STRING) {
-        return ast.value;
-      }
-      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
-    }
+    parseLiteral: DatetimeParseLiteral
   },
   NotNullUrl: {
     serialize: GraphQLString.serialize,
@@ -28669,20 +27651,8 @@ export const enums = {
   },
   DefaultValuesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       NULL_VALUE_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "null_value",
@@ -28823,20 +27793,8 @@ export const enums = {
   },
   InputsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         inputsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -28859,20 +27817,8 @@ export const enums = {
   },
   Issue756SOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         issue756Uniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -28907,20 +27853,8 @@ export const enums = {
   },
   LeftArmsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       LENGTH_IN_METRES_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "length_in_metres",
@@ -28945,20 +27879,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      PERSON_ID_ASC: PersonSecretsOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: PersonSecretsOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         left_armUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -28981,20 +27903,8 @@ export const enums = {
   },
   ListsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         listsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29017,20 +27927,8 @@ export const enums = {
   },
   MyTablesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       JSON_DATA_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "json_data",
@@ -29081,20 +27979,8 @@ export const enums = {
   },
   NoPrimaryKeysOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       STR_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "str",
@@ -29111,20 +27997,8 @@ export const enums = {
   },
   NullTestRecordsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       NON_NULL_TEXT_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "non_null_text",
@@ -29183,20 +28057,8 @@ export const enums = {
   },
   PatchesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         patchsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29281,20 +28143,8 @@ export const enums = {
       FIRST_NAME_DESC(queryBuilder) {
         applyOrderByCustomField(resource_person_first_namePgResource, "desc", undefined, queryBuilder);
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "last_login_from_ip",
@@ -29377,20 +28227,8 @@ export const enums = {
   },
   PersonSecretsOrderBy: {
     values: {
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      PERSON_ID_ASC: PersonSecretsOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: PersonSecretsOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         person_secretUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29467,20 +28305,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         postUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29503,20 +28329,8 @@ export const enums = {
   },
   ReservedInputRecordsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         reserved_inputUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29539,20 +28353,8 @@ export const enums = {
   },
   ReservedPatchRecordsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         reservedPatchsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29575,20 +28377,8 @@ export const enums = {
   },
   ReservedsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         reservedUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29611,56 +28401,14 @@ export const enums = {
   },
   SimilarTable1SOrderBy: {
     values: {
-      COL1_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "ASC"
-        });
-      },
-      COL1_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "DESC"
-        });
-      },
-      COL2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "ASC"
-        });
-      },
-      COL2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "DESC"
-        });
-      },
-      COL3_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "ASC"
-        });
-      },
-      COL3_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      COL1_ASC: TestviewsOrderBy_COL1_ASCApply,
+      COL1_DESC: TestviewsOrderBy_COL1_DESCApply,
+      COL2_ASC: TestviewsOrderBy_COL2_ASCApply,
+      COL2_DESC: TestviewsOrderBy_COL2_DESCApply,
+      COL3_ASC: SimilarTable1SOrderBy_COL3_ASCApply,
+      COL3_DESC: SimilarTable1SOrderBy_COL3_DESCApply,
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         similar_table_1Uniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29683,18 +28431,8 @@ export const enums = {
   },
   SimilarTable2SOrderBy: {
     values: {
-      COL3_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "ASC"
-        });
-      },
-      COL3_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "DESC"
-        });
-      },
+      COL3_ASC: SimilarTable1SOrderBy_COL3_ASCApply,
+      COL3_DESC: SimilarTable1SOrderBy_COL3_DESCApply,
       COL4_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "col4",
@@ -29719,20 +28457,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         similar_table_2Uniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -29755,30 +28481,10 @@ export const enums = {
   },
   TestviewsOrderBy: {
     values: {
-      COL1_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "ASC"
-        });
-      },
-      COL1_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "DESC"
-        });
-      },
-      COL2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "ASC"
-        });
-      },
-      COL2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "DESC"
-        });
-      },
+      COL1_ASC: TestviewsOrderBy_COL1_ASCApply,
+      COL1_DESC: TestviewsOrderBy_COL1_DESCApply,
+      COL2_ASC: TestviewsOrderBy_COL2_ASCApply,
+      COL2_DESC: TestviewsOrderBy_COL2_DESCApply,
       TESTVIEWID_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "testviewid",
@@ -29903,20 +28609,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       INET_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "inet",
@@ -30329,44 +29023,12 @@ export const enums = {
   },
   ViewTablesOrderBy: {
     values: {
-      COL1_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "ASC"
-        });
-      },
-      COL1_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "DESC"
-        });
-      },
-      COL2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "ASC"
-        });
-      },
-      COL2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      COL1_ASC: TestviewsOrderBy_COL1_ASCApply,
+      COL1_DESC: TestviewsOrderBy_COL1_DESCApply,
+      COL2_ASC: TestviewsOrderBy_COL2_ASCApply,
+      COL2_DESC: TestviewsOrderBy_COL2_DESCApply,
+      ID_ASC: TypesOrderBy_ID_ASCApply,
+      ID_DESC: TypesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         view_tableUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

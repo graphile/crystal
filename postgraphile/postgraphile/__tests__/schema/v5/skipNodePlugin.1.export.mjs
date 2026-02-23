@@ -7351,6 +7351,19 @@ const resource_foreign_keyPgResource = registry.pgResources["foreign_key"];
 const resource_testviewPgResource = registry.pgResources["testview"];
 const resource_b_updatable_viewPgResource = registry.pgResources["b_updatable_view"];
 const resource_c_edge_casePgResource = registry.pgResources["c_edge_case"];
+const Input_rowIdPlan = $record => {
+  return $record.get("id");
+};
+const UniqueForeignKey_compoundKey1Plan = $record => {
+  return $record.get("compound_key_1");
+};
+const UniqueForeignKey_compoundKey2Plan = $record => {
+  return $record.get("compound_key_2");
+};
+const UniqueForeignKey_cCompoundKeyByCompoundKey1AndCompoundKey2Plan = $record => resource_c_compound_keyPgResource.get({
+  person_id_1: $record.get("compound_key_1"),
+  person_id_2: $record.get("compound_key_2")
+});
 const resource_c_person_computed_outPgResource = registry.pgResources["c_person_computed_out"];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
@@ -7545,6 +7558,18 @@ const resource_c_person_type_functionPgResource = registry.pgResources["c_person
 const resource_c_person_type_function_listPgResource = registry.pgResources["c_person_type_function_list"];
 const resource_frmcdc_bWrappedUrlPgResource = registry.pgResources["frmcdc_bWrappedUrl"];
 const resource_frmcdc_cCompoundTypePgResource = registry.pgResources["frmcdc_cCompoundType"];
+const CPersonComputedComplexRecord_yPlan = $record => {
+  const $plan = $record.get("y");
+  const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
+const CPersonComputedComplexRecord_zPlan = $record => {
+  const $plan = $record.get("z");
+  const $select = pgSelectSingleFromRecord(resource_c_personPgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
 function toString(value) {
   return "" + value;
 }
@@ -7621,7 +7646,32 @@ const makeArgs_post_computed_compound_type_array = (args, path = []) => argDetai
 const resource_post_computed_compound_type_arrayPgResource = registry.pgResources["post_computed_compound_type_array"];
 const resource_frmcdc_comptypePgResource = registry.pgResources["frmcdc_comptype"];
 const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function CCompoundTypeInput_aApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("a", bakedInputRuntime(schema, field.type, val));
+}
+function CCompoundTypeInput_bApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("b", bakedInputRuntime(schema, field.type, val));
+}
+const DatetimeParseLiteral = ast => {
+  if (ast.kind === Kind.STRING) {
+    return ast.value;
+  }
+  throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
+};
+const BType_enumArrayPlan = $record => {
+  return $record.get("enum_array");
+};
 const resource_frmcdc_bNestedCompoundTypePgResource = registry.pgResources["frmcdc_bNestedCompoundType"];
+const BType_byteaArrayPlan = $record => {
+  return $record.get("bytea_array");
+};
+const JSONSerialize = value => value;
 function LTreeParseValue(value) {
   return value;
 }
@@ -7634,6 +7684,21 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const BTypeCondition_rowIdApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const BTypeOrderBy_ROW_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const BTypeOrderBy_ROW_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 const isValidHstoreObject = obj => {
   if (obj === null) {
     // Null is okay
@@ -7684,6 +7749,92 @@ const parseValueLiteral = (ast, variables) => {
       // Everything else is invalid.
       return undefined;
   }
+};
+const ForeignKey_personIdPlan = $record => {
+  return $record.get("person_id");
+};
+const ForeignKey_cPersonByPersonIdPlan = $record => resource_c_personPgResource.get({
+  id: $record.get("person_id")
+});
+const ForeignKeyCondition_personIdApply = ($condition, val) => applyAttributeCondition("person_id", TYPES.int, $condition, val);
+const ForeignKeyCondition_compoundKey1Apply = ($condition, val) => applyAttributeCondition("compound_key_1", TYPES.int, $condition, val);
+const ForeignKeyCondition_compoundKey2Apply = ($condition, val) => applyAttributeCondition("compound_key_2", TYPES.int, $condition, val);
+const ForeignKeyOrderBy_COMPOUND_KEY_2_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "compound_key_2",
+    direction: "ASC"
+  });
+};
+const ForeignKeyOrderBy_COMPOUND_KEY_2_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "compound_key_2",
+    direction: "DESC"
+  });
+};
+const CFuncOutOutRecord_firstOutPlan = $record => {
+  return $record.get("first_out");
+};
+const CFuncOutOutRecord_secondOutPlan = $record => {
+  return $record.get("second_out");
+};
+const CFuncOutOutCompoundTypeRecord_o2Plan = $record => {
+  const $plan = $record.get("o2");
+  const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
+  $select.getClassStep().setTrusted();
+  return $select;
+};
+const TestviewCondition_col1Apply = ($condition, val) => applyAttributeCondition("col1", TYPES.int, $condition, val);
+const TestviewCondition_col2Apply = ($condition, val) => applyAttributeCondition("col2", TYPES.int, $condition, val);
+const TestviewOrderBy_COL1_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col1",
+    direction: "ASC"
+  });
+};
+const TestviewOrderBy_COL1_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col1",
+    direction: "DESC"
+  });
+};
+const TestviewOrderBy_COL2_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col2",
+    direction: "ASC"
+  });
+};
+const TestviewOrderBy_COL2_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col2",
+    direction: "DESC"
+  });
+};
+const CPersonSecretOrderBy_PERSON_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const CPersonSecretOrderBy_PERSON_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const SimilarTable1Condition_col3Apply = ($condition, val) => applyAttributeCondition("col3", TYPES.int, $condition, val);
+const SimilarTable1OrderBy_COL3_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col3",
+    direction: "ASC"
+  });
+};
+const SimilarTable1OrderBy_COL3_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col3",
+    direction: "DESC"
+  });
 };
 const resource_c_edge_case_computedPgResource = registry.pgResources["c_edge_case_computed"];
 const resource_c_mutation_outPgResource = registry.pgResources["c_mutation_out"];
@@ -8178,7 +8329,66 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CLeftArmIdentityPayload_cLeftArmEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_left_armPgResource, c_left_armUniques[0].attributes, $mutation, fieldArgs);
+function CLeftArmBaseInput_rowIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function CLeftArmBaseInput_personIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+}
+function CLeftArmBaseInput_lengthInMetresApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+}
+function CLeftArmBaseInput_moodApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("mood", bakedInputRuntime(schema, field.type, val));
+}
+const CIssue756MutationPayload_cIssue756EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_issue756PgResource, c_issue756Uniques[0].attributes, $mutation, fieldArgs);
 const resource_frmcdc_bJwtTokenPgResource = registry.pgResources["frmcdc_bJwtToken"];
+const CTableMutationPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
+function PostInput_headlineApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("headline", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_bodyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("body", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_authorIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("author_id", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_enumsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enums", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_comptypesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
+}
+const CMutationOutTablePayload_cPersonEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_personPgResource, c_personUniques[0].attributes, $mutation, fieldArgs);
+const BTypeFunctionMutationPayload_bTypeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_b_typesPgResource, b_typesUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
   return $insert.getMeta("clientMutationId");
@@ -8186,28 +8396,550 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
+const CreateInputPayload_inputEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
 function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
 }
+const CreatePatchPayload_patchEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
+const CreateReservedPayload_reservedEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
+const CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
+const CreateReservedInputRecordPayload_reservedInputRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
+const CreateDefaultValuePayload_defaultValueEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
+function DefaultValueInput_nullValueApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("null_value", bakedInputRuntime(schema, field.type, val));
+}
+function ForeignKeyInput_compoundKey1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_key_1", bakedInputRuntime(schema, field.type, val));
+}
+function ForeignKeyInput_compoundKey2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
+}
+function NoPrimaryKeyInput_strApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("str", bakedInputRuntime(schema, field.type, val));
+}
+function TestviewInput_col1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col1", bakedInputRuntime(schema, field.type, val));
+}
+function TestviewInput_col2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col2", bakedInputRuntime(schema, field.type, val));
+}
+const CreateCMyTablePayload_cMyTableEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_my_tablePgResource, c_my_tableUniques[0].attributes, $mutation, fieldArgs);
+function CMyTableInput_jsonDataApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("json_data", bakedInputRuntime(schema, field.type, val));
+}
+const CreateCPersonSecretPayload_cPersonSecretEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_person_secretPgResource, c_person_secretUniques[0].attributes, $mutation, fieldArgs);
+function CPersonSecretInput_secretApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+}
+const CreateViewTablePayload_viewTableEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
+const CreateCCompoundKeyPayload_cCompoundKeyEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_compound_keyPgResource, c_compound_keyUniques[0].attributes, $mutation, fieldArgs);
+function CCompoundKeyInput_personId2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
+}
+function CCompoundKeyInput_personId1Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
+}
+function CCompoundKeyInput_extraApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("extra", bakedInputRuntime(schema, field.type, val));
+}
+const CreateSimilarTable1Payload_similarTable1EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
+function SimilarTable1Input_col3Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col3", bakedInputRuntime(schema, field.type, val));
+}
+const CreateSimilarTable2Payload_similarTable2EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
+function SimilarTable2Input_col4Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col4", bakedInputRuntime(schema, field.type, val));
+}
+function SimilarTable2Input_col5Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col5", bakedInputRuntime(schema, field.type, val));
+}
+const CreateCNullTestRecordPayload_cNullTestRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_c_null_test_recordPgResource, c_null_test_recordUniques[0].attributes, $mutation, fieldArgs);
+function CNullTestRecordInput_nullableTextApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
+}
+function CNullTestRecordInput_nullableIntApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
+}
+function CNullTestRecordInput_nonNullTextApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
+}
+function CIssue756Input_tsApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ts", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_aliasesApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_aboutApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("about", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_emailApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("email", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_siteApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("site", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_configApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("config", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_lastLoginFromIpApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_lastLoginFromSubnetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_userMacApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
+}
+function CPersonInput_createdAtApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("created_at", bakedInputRuntime(schema, field.type, val));
+}
+const CreateBListPayload_bListEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_b_listsPgResource, b_listsUniques[0].attributes, $mutation, fieldArgs);
+function BListInput_intArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int_array", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_intArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_enumArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_enumArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_dateArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date_array", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_dateArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_timestamptzArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_timestamptzArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_compoundTypeArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_compoundTypeArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_byteaArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+}
+function BListInput_byteaArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_smallintApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("smallint", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_bigintApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bigint", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_numericApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("numeric", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_decimalApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("decimal", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_booleanApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("boolean", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_varcharApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("varchar", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_enumApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_domainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_domain2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain2", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_textArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("text_array", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_jsonApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("json", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_jsonbApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_jsonpathApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_nullableRangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_numrangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("numrange", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_daterangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("daterange", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_anIntRangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_timestampApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_timestamptzApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_dateApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_timeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("time", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_timetzApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timetz", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_intervalApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("interval", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_intervalArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_moneyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("money", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_compoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_nestedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_nullableCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_nullableNestedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_pointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("point", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_nullablePointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_inetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_cidrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_macaddrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regprocApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regproc", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regprocedureApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regoperApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regoper", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regoperatorApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regclassApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regclass", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regtypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regtype", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regconfigApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_regdictionaryApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_textArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_int8ArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_byteaApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_ltreeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ltree", bakedInputRuntime(schema, field.type, val));
+}
+function BTypeInput_ltreeArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query {
@@ -19999,9 +20731,7 @@ export const objects = {
         $select.getClassStep().setTrusted();
         return $select;
       },
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     }
   },
   BCompoundTypeArrayMutationPayload: {
@@ -20042,9 +20772,7 @@ export const objects = {
   BList: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      byteaArray($record) {
-        return $record.get("bytea_array");
-      },
+      byteaArray: BType_byteaArrayPlan,
       byteaArrayNn($record) {
         return $record.get("bytea_array_nn");
       },
@@ -20066,9 +20794,7 @@ export const objects = {
       dateArrayNn($record) {
         return $record.get("date_array_nn");
       },
-      enumArray($record) {
-        return $record.get("enum_array");
-      },
+      enumArray: BType_enumArrayPlan,
       enumArrayNn($record) {
         return $record.get("enum_array_nn");
       },
@@ -20078,9 +20804,7 @@ export const objects = {
       intArrayNn($record) {
         return $record.get("int_array_nn");
       },
-      rowId($record) {
-        return $record.get("id");
-      },
+      rowId: Input_rowIdPlan,
       timestamptzArray($record) {
         return $record.get("timestamptz_array");
       },
@@ -20168,9 +20892,7 @@ export const objects = {
       anIntRange($record) {
         return $record.get("an_int_range");
       },
-      byteaArray($record) {
-        return $record.get("bytea_array");
-      },
+      byteaArray: BType_byteaArrayPlan,
       compoundType($record) {
         const $plan = $record.get("compound_type");
         const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
@@ -20178,9 +20900,7 @@ export const objects = {
         $select.getClassStep().setTrusted();
         return $select;
       },
-      enumArray($record) {
-        return $record.get("enum_array");
-      },
+      enumArray: BType_enumArrayPlan,
       int8ArrayDomain($record) {
         return $record.get("int8_array_domain");
       },
@@ -20222,9 +20942,7 @@ export const objects = {
           id: $record.get("smallint")
         });
       },
-      rowId($record) {
-        return $record.get("id");
-      },
+      rowId: Input_rowIdPlan,
       textArray($record) {
         return $record.get("text_array");
       },
@@ -20265,9 +20983,7 @@ export const objects = {
   BTypeFunctionMutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      bTypeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_typesPgResource, b_typesUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bTypeEdge: BTypeFunctionMutationPayload_bTypeEdgePlan,
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       query: queryPlan,
       result: planCustomMutationPayloadResult
@@ -20398,18 +21114,8 @@ export const objects = {
   CFuncOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_c_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: CPersonComputedComplexRecord_yPlan,
+      z: CPersonComputedComplexRecord_zPlan
     }
   },
   CFuncOutComplexSetofConnection: {
@@ -20421,40 +21127,21 @@ export const objects = {
   CFuncOutComplexSetofRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_c_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: CPersonComputedComplexRecord_yPlan,
+      z: CPersonComputedComplexRecord_zPlan
     }
   },
   CFuncOutOutCompoundTypeRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      o2($record) {
-        const $plan = $record.get("o2");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      o2: CFuncOutOutCompoundTypeRecord_o2Plan
     }
   },
   CFuncOutOutRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstOut($record) {
-        return $record.get("first_out");
-      },
-      secondOut($record) {
-        return $record.get("second_out");
-      }
+      firstOut: CFuncOutOutRecord_firstOutPlan,
+      secondOut: CFuncOutOutRecord_secondOutPlan
     }
   },
   CFuncOutOutSetofConnection: {
@@ -20510,9 +21197,7 @@ export const objects = {
   CIssue756: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -20531,9 +21216,7 @@ export const objects = {
   CIssue756MutationPayload: {
     assertStep: ObjectStep,
     plans: {
-      cIssue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_issue756PgResource, c_issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      cIssue756Edge: CIssue756MutationPayload_cIssue756EdgePlan,
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       query: queryPlan,
       result: planCustomMutationPayloadResult
@@ -20582,20 +21265,12 @@ export const objects = {
   CLeftArm: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      cPersonByPersonId($record) {
-        return resource_c_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
+      cPersonByPersonId: ForeignKey_cPersonByPersonIdPlan,
       lengthInMetres($record) {
         return $record.get("length_in_metres");
       },
-      personId($record) {
-        return $record.get("person_id");
-      },
-      rowId($record) {
-        return $record.get("id");
-      }
+      personId: ForeignKey_personIdPlan,
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -20614,9 +21289,7 @@ export const objects = {
   CLeftArmIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      cLeftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_left_armPgResource, c_left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cLeftArmEdge: CLeftArmIdentityPayload_cLeftArmEdgePlan,
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       leftArm: planCustomMutationPayloadResult,
       query: queryPlan
@@ -20657,18 +21330,8 @@ export const objects = {
   CMutationOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_c_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: CPersonComputedComplexRecord_yPlan,
+      z: CPersonComputedComplexRecord_zPlan
     }
   },
   CMutationOutComplexSetofPayload: {
@@ -20682,18 +21345,8 @@ export const objects = {
   CMutationOutComplexSetofRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_c_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: CPersonComputedComplexRecord_yPlan,
+      z: CPersonComputedComplexRecord_zPlan
     }
   },
   CMutationOutOutCompoundTypePayload: {
@@ -20707,12 +21360,7 @@ export const objects = {
   CMutationOutOutCompoundTypeRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      o2($record) {
-        const $plan = $record.get("o2");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      o2: CFuncOutOutCompoundTypeRecord_o2Plan
     }
   },
   CMutationOutOutPayload: {
@@ -20726,12 +21374,8 @@ export const objects = {
   CMutationOutOutRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstOut($record) {
-        return $record.get("first_out");
-      },
-      secondOut($record) {
-        return $record.get("second_out");
-      }
+      firstOut: CFuncOutOutRecord_firstOutPlan,
+      secondOut: CFuncOutOutRecord_secondOutPlan
     }
   },
   CMutationOutOutSetofPayload: {
@@ -20776,9 +21420,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
-      cPersonEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_personPgResource, c_personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPersonEdge: CMutationOutTablePayload_cPersonEdgePlan,
       query: queryPlan,
       result: planCustomMutationPayloadResult
     }
@@ -20835,9 +21477,7 @@ export const objects = {
       jsonData($record) {
         return $record.get("json_data");
       },
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -20873,9 +21513,7 @@ export const objects = {
       nullableText($record) {
         return $record.get("nullable_text");
       },
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -21054,9 +21692,7 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
-      rowId($record) {
-        return $record.get("id");
-      },
+      rowId: Input_rowIdPlan,
       site($record) {
         const $plan = $record.get("site");
         const $select = pgSelectSingleFromRecord(resource_frmcdc_bWrappedUrlPgResource, $plan);
@@ -21097,18 +21733,8 @@ export const objects = {
   CPersonComputedComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      y($record) {
-        const $plan = $record.get("y");
-        const $select = pgSelectSingleFromRecord(resource_frmcdc_cCompoundTypePgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      },
-      z($record) {
-        const $plan = $record.get("z");
-        const $select = pgSelectSingleFromRecord(resource_c_personPgResource, $plan);
-        $select.getClassStep().setTrusted();
-        return $select;
-      }
+      y: CPersonComputedComplexRecord_yPlan,
+      z: CPersonComputedComplexRecord_zPlan
     }
   },
   CPersonComputedFirstArgInoutOutRecord: {
@@ -21137,14 +21763,8 @@ export const objects = {
   CPersonSecret: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      cPersonByPersonId($record) {
-        return resource_c_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      },
+      cPersonByPersonId: ForeignKey_cPersonByPersonIdPlan,
+      personId: ForeignKey_personIdPlan,
       secret($record) {
         return $record.get("sekrit");
       }
@@ -21184,9 +21804,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       bList: planCreatePayloadResult,
-      bListEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_listsPgResource, b_listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bListEdge: CreateBListPayload_bListEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -21195,9 +21813,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       bType: planCreatePayloadResult,
-      bTypeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_typesPgResource, b_typesUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bTypeEdge: BTypeFunctionMutationPayload_bTypeEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -21214,9 +21830,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       cCompoundKey: planCreatePayloadResult,
-      cCompoundKeyEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_compound_keyPgResource, c_compound_keyUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cCompoundKeyEdge: CreateCCompoundKeyPayload_cCompoundKeyEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -21233,9 +21847,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       cIssue756: planCreatePayloadResult,
-      cIssue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_issue756PgResource, c_issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      cIssue756Edge: CIssue756MutationPayload_cIssue756EdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -21244,9 +21856,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       cLeftArm: planCreatePayloadResult,
-      cLeftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_left_armPgResource, c_left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cLeftArmEdge: CLeftArmIdentityPayload_cLeftArmEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -21256,9 +21866,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       cMyTable: planCreatePayloadResult,
-      cMyTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_my_tablePgResource, c_my_tableUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cMyTableEdge: CreateCMyTablePayload_cMyTableEdgePlan,
       query: queryPlan
     }
   },
@@ -21267,9 +21875,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       cNullTestRecord: planCreatePayloadResult,
-      cNullTestRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_null_test_recordPgResource, c_null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cNullTestRecordEdge: CreateCNullTestRecordPayload_cNullTestRecordEdgePlan,
       query: queryPlan
     }
   },
@@ -21278,9 +21884,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       cPerson: planCreatePayloadResult,
-      cPersonEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_personPgResource, c_personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPersonEdge: CMutationOutTablePayload_cPersonEdgePlan,
       query: queryPlan
     }
   },
@@ -21289,9 +21893,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       cPersonSecret: planCreatePayloadResult,
-      cPersonSecretEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_person_secretPgResource, c_person_secretUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPersonSecretEdge: CreateCPersonSecretPayload_cPersonSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -21300,9 +21902,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       defaultValue: planCreatePayloadResult,
-      defaultValueEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
-      },
+      defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
   },
@@ -21319,9 +21919,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       input: planCreatePayloadResult,
-      inputEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
   },
@@ -21338,9 +21936,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       patch: planCreatePayloadResult,
-      patchEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
   },
@@ -21349,9 +21945,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       post: planCreatePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: CTableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -21361,9 +21955,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reservedInputRecord: planCreatePayloadResult,
-      reservedInputRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
   CreateReservedPatchRecordPayload: {
@@ -21372,9 +21964,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reservedPatchRecord: planCreatePayloadResult,
-      reservedPatchRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
   CreateReservedPayload: {
@@ -21383,9 +21973,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reserved: planCreatePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   CreateSimilarTable1Payload: {
@@ -21394,9 +21982,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       similarTable1: planCreatePayloadResult,
-      similarTable1Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
   CreateSimilarTable2Payload: {
@@ -21405,9 +21991,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       similarTable2: planCreatePayloadResult,
-      similarTable2Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
   CreateTestviewPayload: {
@@ -21432,9 +22016,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       viewTable: planCreatePayloadResult,
-      viewTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
   CSearchTestSummariesConnection: {
@@ -21455,9 +22037,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: CTableMutationPayload_postEdgePlan,
       query: queryPlan,
       result: planCustomMutationPayloadResult
     }
@@ -21484,9 +22064,7 @@ export const objects = {
       nullValue($record) {
         return $record.get("null_value");
       },
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -21505,10 +22083,8 @@ export const objects = {
   DeleteBListPayload: {
     assertStep: ObjectStep,
     plans: {
-      bList: planUpdateOrDeletePayloadResult,
-      bListEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_listsPgResource, b_listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bList: planCreatePayloadResult,
+      bListEdge: CreateBListPayload_bListEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -21516,10 +22092,8 @@ export const objects = {
   DeleteBTypePayload: {
     assertStep: ObjectStep,
     plans: {
-      bType: planUpdateOrDeletePayloadResult,
-      bTypeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_typesPgResource, b_typesUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bType: planCreatePayloadResult,
+      bTypeEdge: BTypeFunctionMutationPayload_bTypeEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -21527,10 +22101,8 @@ export const objects = {
   DeleteCCompoundKeyPayload: {
     assertStep: ObjectStep,
     plans: {
-      cCompoundKey: planUpdateOrDeletePayloadResult,
-      cCompoundKeyEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_compound_keyPgResource, c_compound_keyUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cCompoundKey: planCreatePayloadResult,
+      cCompoundKeyEdge: CreateCCompoundKeyPayload_cCompoundKeyEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -21538,10 +22110,8 @@ export const objects = {
   DeleteCIssue756Payload: {
     assertStep: ObjectStep,
     plans: {
-      cIssue756: planUpdateOrDeletePayloadResult,
-      cIssue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_issue756PgResource, c_issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      cIssue756: planCreatePayloadResult,
+      cIssue756Edge: CIssue756MutationPayload_cIssue756EdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -21549,10 +22119,8 @@ export const objects = {
   DeleteCLeftArmPayload: {
     assertStep: ObjectStep,
     plans: {
-      cLeftArm: planUpdateOrDeletePayloadResult,
-      cLeftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_left_armPgResource, c_left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cLeftArm: planCreatePayloadResult,
+      cLeftArmEdge: CLeftArmIdentityPayload_cLeftArmEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -21561,10 +22129,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cMyTable: planUpdateOrDeletePayloadResult,
-      cMyTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_my_tablePgResource, c_my_tableUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cMyTable: planCreatePayloadResult,
+      cMyTableEdge: CreateCMyTablePayload_cMyTableEdgePlan,
       query: queryPlan
     }
   },
@@ -21572,10 +22138,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cNullTestRecord: planUpdateOrDeletePayloadResult,
-      cNullTestRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_null_test_recordPgResource, c_null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cNullTestRecord: planCreatePayloadResult,
+      cNullTestRecordEdge: CreateCNullTestRecordPayload_cNullTestRecordEdgePlan,
       query: queryPlan
     }
   },
@@ -21583,10 +22147,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cPerson: planUpdateOrDeletePayloadResult,
-      cPersonEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_personPgResource, c_personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPerson: planCreatePayloadResult,
+      cPersonEdge: CMutationOutTablePayload_cPersonEdgePlan,
       query: queryPlan
     }
   },
@@ -21594,10 +22156,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cPersonSecret: planUpdateOrDeletePayloadResult,
-      cPersonSecretEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_person_secretPgResource, c_person_secretUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPersonSecret: planCreatePayloadResult,
+      cPersonSecretEdge: CreateCPersonSecretPayload_cPersonSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -21605,10 +22165,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      defaultValue: planUpdateOrDeletePayloadResult,
-      defaultValueEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
-      },
+      defaultValue: planCreatePayloadResult,
+      defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
   },
@@ -21616,10 +22174,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      input: planUpdateOrDeletePayloadResult,
-      inputEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      input: planCreatePayloadResult,
+      inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
   },
@@ -21627,7 +22183,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      noPrimaryKey: planUpdateOrDeletePayloadResult,
+      noPrimaryKey: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -21635,10 +22191,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      patch: planUpdateOrDeletePayloadResult,
-      patchEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      patch: planCreatePayloadResult,
+      patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
   },
@@ -21646,10 +22200,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      post: planUpdateOrDeletePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      post: planCreatePayloadResult,
+      postEdge: CTableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -21658,10 +22210,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedInputRecord: planUpdateOrDeletePayloadResult,
-      reservedInputRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedInputRecord: planCreatePayloadResult,
+      reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
   DeleteReservedPatchRecordPayload: {
@@ -21669,10 +22219,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedPatchRecord: planUpdateOrDeletePayloadResult,
-      reservedPatchRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedPatchRecord: planCreatePayloadResult,
+      reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
   DeleteReservedPayload: {
@@ -21680,10 +22228,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reserved: planCreatePayloadResult,
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   DeleteSimilarTable1Payload: {
@@ -21691,10 +22237,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable1: planUpdateOrDeletePayloadResult,
-      similarTable1Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable1: planCreatePayloadResult,
+      similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
   DeleteSimilarTable2Payload: {
@@ -21702,10 +22246,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable2: planUpdateOrDeletePayloadResult,
-      similarTable2Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable2: planCreatePayloadResult,
+      similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
   DeleteUniqueForeignKeyPayload: {
@@ -21713,7 +22255,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      uniqueForeignKey: planUpdateOrDeletePayloadResult
+      uniqueForeignKey: planCreatePayloadResult
     }
   },
   DeleteViewTablePayload: {
@@ -21721,35 +22263,18 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      viewTable: planUpdateOrDeletePayloadResult,
-      viewTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      viewTable: planCreatePayloadResult,
+      viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
   ForeignKey: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      cCompoundKeyByCompoundKey1AndCompoundKey2($record) {
-        return resource_c_compound_keyPgResource.get({
-          person_id_1: $record.get("compound_key_1"),
-          person_id_2: $record.get("compound_key_2")
-        });
-      },
-      compoundKey1($record) {
-        return $record.get("compound_key_1");
-      },
-      compoundKey2($record) {
-        return $record.get("compound_key_2");
-      },
-      cPersonByPersonId($record) {
-        return resource_c_personPgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      }
+      cCompoundKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey_cCompoundKeyByCompoundKey1AndCompoundKey2Plan,
+      compoundKey1: UniqueForeignKey_compoundKey1Plan,
+      compoundKey2: UniqueForeignKey_compoundKey2Plan,
+      cPersonByPersonId: ForeignKey_cPersonByPersonIdPlan,
+      personId: ForeignKey_personIdPlan
     }
   },
   ForeignKeyConnection: {
@@ -21761,9 +22286,7 @@ export const objects = {
   Input: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -21831,9 +22354,7 @@ export const objects = {
   NoPrimaryKey: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -21852,9 +22373,7 @@ export const objects = {
   Patch: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -21945,9 +22464,7 @@ export const objects = {
       headlineTrimmedStrict($in, args, _info) {
         return scalarComputed(resource_post_headline_trimmed_strictPgResource, $in, makeArgs_post_headline_trimmed_strict(args));
       },
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -21981,9 +22498,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: CTableMutationPayload_postEdgePlan,
       query: queryPlan,
       result: planCustomMutationPayloadResult
     }
@@ -21997,9 +22512,7 @@ export const objects = {
   Reserved: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22018,9 +22531,7 @@ export const objects = {
   ReservedInputRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22039,9 +22550,7 @@ export const objects = {
   ReservedPatchRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22067,9 +22576,7 @@ export const objects = {
   SimilarTable1: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22088,9 +22595,7 @@ export const objects = {
   SimilarTable2: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22124,18 +22629,9 @@ export const objects = {
   UniqueForeignKey: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      cCompoundKeyByCompoundKey1AndCompoundKey2($record) {
-        return resource_c_compound_keyPgResource.get({
-          person_id_1: $record.get("compound_key_1"),
-          person_id_2: $record.get("compound_key_2")
-        });
-      },
-      compoundKey1($record) {
-        return $record.get("compound_key_1");
-      },
-      compoundKey2($record) {
-        return $record.get("compound_key_2");
-      }
+      cCompoundKeyByCompoundKey1AndCompoundKey2: UniqueForeignKey_cCompoundKeyByCompoundKey1AndCompoundKey2Plan,
+      compoundKey1: UniqueForeignKey_compoundKey1Plan,
+      compoundKey2: UniqueForeignKey_compoundKey2Plan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22154,10 +22650,8 @@ export const objects = {
   UpdateBListPayload: {
     assertStep: ObjectStep,
     plans: {
-      bList: planUpdateOrDeletePayloadResult,
-      bListEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_listsPgResource, b_listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bList: planCreatePayloadResult,
+      bListEdge: CreateBListPayload_bListEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -22165,10 +22659,8 @@ export const objects = {
   UpdateBTypePayload: {
     assertStep: ObjectStep,
     plans: {
-      bType: planUpdateOrDeletePayloadResult,
-      bTypeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_b_typesPgResource, b_typesUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bType: planCreatePayloadResult,
+      bTypeEdge: BTypeFunctionMutationPayload_bTypeEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -22176,10 +22668,8 @@ export const objects = {
   UpdateCCompoundKeyPayload: {
     assertStep: ObjectStep,
     plans: {
-      cCompoundKey: planUpdateOrDeletePayloadResult,
-      cCompoundKeyEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_compound_keyPgResource, c_compound_keyUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cCompoundKey: planCreatePayloadResult,
+      cCompoundKeyEdge: CreateCCompoundKeyPayload_cCompoundKeyEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -22187,10 +22677,8 @@ export const objects = {
   UpdateCIssue756Payload: {
     assertStep: ObjectStep,
     plans: {
-      cIssue756: planUpdateOrDeletePayloadResult,
-      cIssue756Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_issue756PgResource, c_issue756Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      cIssue756: planCreatePayloadResult,
+      cIssue756Edge: CIssue756MutationPayload_cIssue756EdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -22198,10 +22686,8 @@ export const objects = {
   UpdateCLeftArmPayload: {
     assertStep: ObjectStep,
     plans: {
-      cLeftArm: planUpdateOrDeletePayloadResult,
-      cLeftArmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_left_armPgResource, c_left_armUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cLeftArm: planCreatePayloadResult,
+      cLeftArmEdge: CLeftArmIdentityPayload_cLeftArmEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -22210,10 +22696,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cMyTable: planUpdateOrDeletePayloadResult,
-      cMyTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_my_tablePgResource, c_my_tableUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cMyTable: planCreatePayloadResult,
+      cMyTableEdge: CreateCMyTablePayload_cMyTableEdgePlan,
       query: queryPlan
     }
   },
@@ -22221,10 +22705,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cNullTestRecord: planUpdateOrDeletePayloadResult,
-      cNullTestRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_null_test_recordPgResource, c_null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cNullTestRecord: planCreatePayloadResult,
+      cNullTestRecordEdge: CreateCNullTestRecordPayload_cNullTestRecordEdgePlan,
       query: queryPlan
     }
   },
@@ -22232,10 +22714,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cPerson: planUpdateOrDeletePayloadResult,
-      cPersonEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_personPgResource, c_personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPerson: planCreatePayloadResult,
+      cPersonEdge: CMutationOutTablePayload_cPersonEdgePlan,
       query: queryPlan
     }
   },
@@ -22243,10 +22723,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      cPersonSecret: planUpdateOrDeletePayloadResult,
-      cPersonSecretEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_c_person_secretPgResource, c_person_secretUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cPersonSecret: planCreatePayloadResult,
+      cPersonSecretEdge: CreateCPersonSecretPayload_cPersonSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -22254,10 +22732,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      defaultValue: planUpdateOrDeletePayloadResult,
-      defaultValueEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
-      },
+      defaultValue: planCreatePayloadResult,
+      defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
   },
@@ -22265,10 +22741,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      input: planUpdateOrDeletePayloadResult,
-      inputEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_inputsPgResource, inputsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      input: planCreatePayloadResult,
+      inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
   },
@@ -22276,7 +22750,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      noPrimaryKey: planUpdateOrDeletePayloadResult,
+      noPrimaryKey: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -22284,10 +22758,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      patch: planUpdateOrDeletePayloadResult,
-      patchEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_patchsPgResource, patchsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      patch: planCreatePayloadResult,
+      patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
   },
@@ -22295,10 +22767,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      post: planUpdateOrDeletePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      post: planCreatePayloadResult,
+      postEdge: CTableMutationPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -22307,10 +22777,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedInputRecord: planUpdateOrDeletePayloadResult,
-      reservedInputRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedInputRecord: planCreatePayloadResult,
+      reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
   UpdateReservedPatchRecordPayload: {
@@ -22318,10 +22786,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedPatchRecord: planUpdateOrDeletePayloadResult,
-      reservedPatchRecordEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedPatchRecord: planCreatePayloadResult,
+      reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
   UpdateReservedPayload: {
@@ -22329,10 +22795,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reserved: planCreatePayloadResult,
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   UpdateSimilarTable1Payload: {
@@ -22340,10 +22804,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable1: planUpdateOrDeletePayloadResult,
-      similarTable1Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_1PgResource, similar_table_1Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable1: planCreatePayloadResult,
+      similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
   UpdateSimilarTable2Payload: {
@@ -22351,10 +22813,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable2: planUpdateOrDeletePayloadResult,
-      similarTable2Edge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_similar_table_2PgResource, similar_table_2Uniques[0].attributes, $mutation, fieldArgs);
-      }
+      similarTable2: planCreatePayloadResult,
+      similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
   UpdateUniqueForeignKeyPayload: {
@@ -22362,7 +22822,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      uniqueForeignKey: planUpdateOrDeletePayloadResult
+      uniqueForeignKey: planCreatePayloadResult
     }
   },
   UpdateViewTablePayload: {
@@ -22370,18 +22830,14 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      viewTable: planUpdateOrDeletePayloadResult,
-      viewTableEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_view_tablePgResource, view_tableUniques[0].attributes, $mutation, fieldArgs);
-      }
+      viewTable: planCreatePayloadResult,
+      viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
   ViewTable: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      rowId($record) {
-        return $record.get("id");
-      }
+      rowId: Input_rowIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -22471,175 +22927,43 @@ export const inputObjects = {
   },
   BListCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   BListInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      intArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      },
-      intArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+      byteaArray: BListInput_byteaArrayApply,
+      byteaArrayNn: BListInput_byteaArrayNnApply,
+      compoundTypeArray: BListInput_compoundTypeArrayApply,
+      compoundTypeArrayNn: BListInput_compoundTypeArrayNnApply,
+      dateArray: BListInput_dateArrayApply,
+      dateArrayNn: BListInput_dateArrayNnApply,
+      enumArray: BListInput_enumArrayApply,
+      enumArrayNn: BListInput_enumArrayNnApply,
+      intArray: BListInput_intArrayApply,
+      intArrayNn: BListInput_intArrayNnApply,
+      rowId: CLeftArmBaseInput_rowIdApply,
+      timestamptzArray: BListInput_timestamptzArrayApply,
+      timestamptzArrayNn: BListInput_timestamptzArrayNnApply
     }
   },
   BListPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      intArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      },
-      intArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+      byteaArray: BListInput_byteaArrayApply,
+      byteaArrayNn: BListInput_byteaArrayNnApply,
+      compoundTypeArray: BListInput_compoundTypeArrayApply,
+      compoundTypeArrayNn: BListInput_compoundTypeArrayNnApply,
+      dateArray: BListInput_dateArrayApply,
+      dateArrayNn: BListInput_dateArrayNnApply,
+      enumArray: BListInput_enumArrayApply,
+      enumArrayNn: BListInput_enumArrayNnApply,
+      intArray: BListInput_intArrayApply,
+      intArrayNn: BListInput_intArrayNnApply,
+      rowId: CLeftArmBaseInput_rowIdApply,
+      timestamptzArray: BListInput_timestamptzArrayApply,
+      timestamptzArrayNn: BListInput_timestamptzArrayNnApply
     }
   },
   BMult1Input: {
@@ -22665,18 +22989,8 @@ export const inputObjects = {
   BNestedCompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      },
+      a: CCompoundTypeInput_aApply,
+      b: CCompoundTypeInput_bApply,
       bazBuz(obj, val, {
         field,
         schema
@@ -22759,9 +23073,7 @@ export const inputObjects = {
       regtype($condition, val) {
         return applyAttributeCondition("regtype", TYPES.regtype, $condition, val);
       },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      rowId: BTypeCondition_rowIdApply,
       smallint($condition, val) {
         return applyAttributeCondition("smallint", TYPES.int2, $condition, val);
       },
@@ -22800,611 +23112,111 @@ export const inputObjects = {
   BTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      anIntRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      },
-      bigint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      },
-      boolean(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      },
-      bytea(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      date(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      },
-      daterange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      },
-      decimal(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      },
-      domain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domain2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      int8ArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      interval(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      },
-      intervalArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      },
-      json(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonb(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonpath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
-      },
-      ltree(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      },
-      ltreeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      money(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      },
-      nestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableNestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullablePoint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      },
-      numeric(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      },
-      numrange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      regclass(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      },
-      regconfig(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      },
-      regdictionary(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      },
-      regoper(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      },
-      regoperator(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      },
-      regproc(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      },
-      regprocedure(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      },
-      regtype(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      smallint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      },
-      textArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      },
-      textArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      time(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      },
-      timetz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      },
-      varchar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+      anIntRange: BTypeInput_anIntRangeApply,
+      bigint: BTypeInput_bigintApply,
+      boolean: BTypeInput_booleanApply,
+      bytea: BTypeInput_byteaApply,
+      byteaArray: BListInput_byteaArrayApply,
+      cidr: BTypeInput_cidrApply,
+      compoundType: BTypeInput_compoundTypeApply,
+      date: BTypeInput_dateApply,
+      daterange: BTypeInput_daterangeApply,
+      decimal: BTypeInput_decimalApply,
+      domain: BTypeInput_domainApply,
+      domain2: BTypeInput_domain2Apply,
+      enum: BTypeInput_enumApply,
+      enumArray: BListInput_enumArrayApply,
+      inet: BTypeInput_inetApply,
+      int8ArrayDomain: BTypeInput_int8ArrayDomainApply,
+      interval: BTypeInput_intervalApply,
+      intervalArray: BTypeInput_intervalArrayApply,
+      json: BTypeInput_jsonApply,
+      jsonb: BTypeInput_jsonbApply,
+      jsonpath: BTypeInput_jsonpathApply,
+      ltree: BTypeInput_ltreeApply,
+      ltreeArray: BTypeInput_ltreeArrayApply,
+      macaddr: BTypeInput_macaddrApply,
+      money: BTypeInput_moneyApply,
+      nestedCompoundType: BTypeInput_nestedCompoundTypeApply,
+      nullableCompoundType: BTypeInput_nullableCompoundTypeApply,
+      nullableNestedCompoundType: BTypeInput_nullableNestedCompoundTypeApply,
+      nullablePoint: BTypeInput_nullablePointApply,
+      nullableRange: BTypeInput_nullableRangeApply,
+      numeric: BTypeInput_numericApply,
+      numrange: BTypeInput_numrangeApply,
+      point: BTypeInput_pointApply,
+      regclass: BTypeInput_regclassApply,
+      regconfig: BTypeInput_regconfigApply,
+      regdictionary: BTypeInput_regdictionaryApply,
+      regoper: BTypeInput_regoperApply,
+      regoperator: BTypeInput_regoperatorApply,
+      regproc: BTypeInput_regprocApply,
+      regprocedure: BTypeInput_regprocedureApply,
+      regtype: BTypeInput_regtypeApply,
+      rowId: CLeftArmBaseInput_rowIdApply,
+      smallint: BTypeInput_smallintApply,
+      textArray: BTypeInput_textArrayApply,
+      textArrayDomain: BTypeInput_textArrayDomainApply,
+      time: BTypeInput_timeApply,
+      timestamp: BTypeInput_timestampApply,
+      timestamptz: BTypeInput_timestamptzApply,
+      timetz: BTypeInput_timetzApply,
+      varchar: BTypeInput_varcharApply
     }
   },
   BTypePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      anIntRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      },
-      bigint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      },
-      boolean(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      },
-      bytea(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      date(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      },
-      daterange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      },
-      decimal(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      },
-      domain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domain2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      int8ArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      interval(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      },
-      intervalArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      },
-      json(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonb(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonpath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
-      },
-      ltree(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      },
-      ltreeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      money(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      },
-      nestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableNestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullablePoint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      },
-      numeric(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      },
-      numrange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      regclass(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      },
-      regconfig(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      },
-      regdictionary(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      },
-      regoper(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      },
-      regoperator(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      },
-      regproc(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      },
-      regprocedure(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      },
-      regtype(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      smallint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      },
-      textArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      },
-      textArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      time(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      },
-      timetz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      },
-      varchar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+      anIntRange: BTypeInput_anIntRangeApply,
+      bigint: BTypeInput_bigintApply,
+      boolean: BTypeInput_booleanApply,
+      bytea: BTypeInput_byteaApply,
+      byteaArray: BListInput_byteaArrayApply,
+      cidr: BTypeInput_cidrApply,
+      compoundType: BTypeInput_compoundTypeApply,
+      date: BTypeInput_dateApply,
+      daterange: BTypeInput_daterangeApply,
+      decimal: BTypeInput_decimalApply,
+      domain: BTypeInput_domainApply,
+      domain2: BTypeInput_domain2Apply,
+      enum: BTypeInput_enumApply,
+      enumArray: BListInput_enumArrayApply,
+      inet: BTypeInput_inetApply,
+      int8ArrayDomain: BTypeInput_int8ArrayDomainApply,
+      interval: BTypeInput_intervalApply,
+      intervalArray: BTypeInput_intervalArrayApply,
+      json: BTypeInput_jsonApply,
+      jsonb: BTypeInput_jsonbApply,
+      jsonpath: BTypeInput_jsonpathApply,
+      ltree: BTypeInput_ltreeApply,
+      ltreeArray: BTypeInput_ltreeArrayApply,
+      macaddr: BTypeInput_macaddrApply,
+      money: BTypeInput_moneyApply,
+      nestedCompoundType: BTypeInput_nestedCompoundTypeApply,
+      nullableCompoundType: BTypeInput_nullableCompoundTypeApply,
+      nullableNestedCompoundType: BTypeInput_nullableNestedCompoundTypeApply,
+      nullablePoint: BTypeInput_nullablePointApply,
+      nullableRange: BTypeInput_nullableRangeApply,
+      numeric: BTypeInput_numericApply,
+      numrange: BTypeInput_numrangeApply,
+      point: BTypeInput_pointApply,
+      regclass: BTypeInput_regclassApply,
+      regconfig: BTypeInput_regconfigApply,
+      regdictionary: BTypeInput_regdictionaryApply,
+      regoper: BTypeInput_regoperApply,
+      regoperator: BTypeInput_regoperatorApply,
+      regproc: BTypeInput_regprocApply,
+      regprocedure: BTypeInput_regprocedureApply,
+      regtype: BTypeInput_regtypeApply,
+      rowId: CLeftArmBaseInput_rowIdApply,
+      smallint: BTypeInput_smallintApply,
+      textArray: BTypeInput_textArrayApply,
+      textArrayDomain: BTypeInput_textArrayDomainApply,
+      time: BTypeInput_timeApply,
+      timestamp: BTypeInput_timestampApply,
+      timestamptz: BTypeInput_timestamptzApply,
+      timetz: BTypeInput_timetzApply,
+      varchar: BTypeInput_varcharApply
     }
   },
   BUpdatableViewCondition: {
@@ -23479,64 +23291,24 @@ export const inputObjects = {
   CCompoundKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      extra(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      },
-      personId1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      },
-      personId2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+      extra: CCompoundKeyInput_extraApply,
+      personId1: CCompoundKeyInput_personId1Apply,
+      personId2: CCompoundKeyInput_personId2Apply
     }
   },
   CCompoundKeyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      extra(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("extra", bakedInputRuntime(schema, field.type, val));
-      },
-      personId1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-      },
-      personId2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-      }
+      extra: CCompoundKeyInput_extraApply,
+      personId1: CCompoundKeyInput_personId1Apply,
+      personId2: CCompoundKeyInput_personId2Apply
     }
   },
   CCompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      },
+      a: CCompoundTypeInput_aApply,
+      b: CCompoundTypeInput_bApply,
       c(obj, val, {
         field,
         schema
@@ -23618,9 +23390,7 @@ export const inputObjects = {
   },
   CIssue756Condition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      rowId: BTypeCondition_rowIdApply,
       ts($condition, val) {
         return applyAttributeCondition("ts", cNotNullTimestampCodec, $condition, val);
       }
@@ -23629,18 +23399,8 @@ export const inputObjects = {
   CIssue756Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      ts(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply,
+      ts: CIssue756Input_tsApply
     }
   },
   CIssue756MutationInput: {
@@ -23651,18 +23411,8 @@ export const inputObjects = {
   CIssue756Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      ts(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ts", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply,
+      ts: CIssue756Input_tsApply
     }
   },
   CIssue756SetMutationInput: {
@@ -23693,30 +23443,10 @@ export const inputObjects = {
   CLeftArmBaseInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      lengthInMetres: CLeftArmBaseInput_lengthInMetresApply,
+      mood: CLeftArmBaseInput_moodApply,
+      personId: CLeftArmBaseInput_personIdApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   CLeftArmCondition: {
@@ -23727,12 +23457,8 @@ export const inputObjects = {
       mood($condition, val) {
         return applyAttributeCondition("mood", TYPES.text, $condition, val);
       },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      personId: ForeignKeyCondition_personIdApply,
+      rowId: BTypeCondition_rowIdApply
     }
   },
   CLeftArmIdentityInput: {
@@ -23743,59 +23469,19 @@ export const inputObjects = {
   CLeftArmInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      lengthInMetres: CLeftArmBaseInput_lengthInMetresApply,
+      mood: CLeftArmBaseInput_moodApply,
+      personId: CLeftArmBaseInput_personIdApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   CLeftArmPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-      },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      lengthInMetres: CLeftArmBaseInput_lengthInMetresApply,
+      mood: CLeftArmBaseInput_moodApply,
+      personId: CLeftArmBaseInput_personIdApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   CListOfCompoundTypesMutationInput: {
@@ -23885,43 +23571,21 @@ export const inputObjects = {
   },
   CMyTableCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   CMyTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      jsonData(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      jsonData: CMyTableInput_jsonDataApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   CMyTablePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      jsonData(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      jsonData: CMyTableInput_jsonDataApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   CNoArgsMutationInput: {
@@ -23940,67 +23604,25 @@ export const inputObjects = {
       nullableText($condition, val) {
         return applyAttributeCondition("nullable_text", TYPES.text, $condition, val);
       },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   CNullTestRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      nonNullText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableInt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      nonNullText: CNullTestRecordInput_nonNullTextApply,
+      nullableInt: CNullTestRecordInput_nullableIntApply,
+      nullableText: CNullTestRecordInput_nullableTextApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   CNullTestRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      nonNullText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableInt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableText(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      nonNullText: CNullTestRecordInput_nonNullTextApply,
+      nullableInt: CNullTestRecordInput_nullableIntApply,
+      nullableText: CNullTestRecordInput_nullableTextApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ComptypeInput: {
@@ -24040,9 +23662,7 @@ export const inputObjects = {
       name($condition, val) {
         return applyAttributeCondition("person_full_name", TYPES.varchar, $condition, val);
       },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      rowId: BTypeCondition_rowIdApply,
       userMac($condition, val) {
         return applyAttributeCondition("user_mac", TYPES.macaddr, $condition, val);
       }
@@ -24051,150 +23671,38 @@ export const inputObjects = {
   CPersonInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      about(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      },
-      aliases(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      },
-      config(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      },
-      createdAt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      },
-      email(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromIp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromSubnet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      site(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      },
-      userMac(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+      about: CPersonInput_aboutApply,
+      aliases: CPersonInput_aliasesApply,
+      config: CPersonInput_configApply,
+      createdAt: CPersonInput_createdAtApply,
+      email: CPersonInput_emailApply,
+      lastLoginFromIp: CPersonInput_lastLoginFromIpApply,
+      lastLoginFromSubnet: CPersonInput_lastLoginFromSubnetApply,
+      name: CPersonInput_nameApply,
+      rowId: CLeftArmBaseInput_rowIdApply,
+      site: CPersonInput_siteApply,
+      userMac: CPersonInput_userMacApply
     }
   },
   CPersonPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      about(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("about", bakedInputRuntime(schema, field.type, val));
-      },
-      aliases(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-      },
-      config(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("config", bakedInputRuntime(schema, field.type, val));
-      },
-      createdAt(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-      },
-      email(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("email", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromIp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-      },
-      lastLoginFromSubnet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      site(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("site", bakedInputRuntime(schema, field.type, val));
-      },
-      userMac(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-      }
+      about: CPersonInput_aboutApply,
+      aliases: CPersonInput_aliasesApply,
+      config: CPersonInput_configApply,
+      createdAt: CPersonInput_createdAtApply,
+      email: CPersonInput_emailApply,
+      lastLoginFromIp: CPersonInput_lastLoginFromIpApply,
+      lastLoginFromSubnet: CPersonInput_lastLoginFromSubnetApply,
+      name: CPersonInput_nameApply,
+      rowId: CLeftArmBaseInput_rowIdApply,
+      site: CPersonInput_siteApply,
+      userMac: CPersonInput_userMacApply
     }
   },
   CPersonSecretCondition: {
     plans: {
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      },
+      personId: ForeignKeyCondition_personIdApply,
       secret($condition, val) {
         return applyAttributeCondition("sekrit", TYPES.text, $condition, val);
       }
@@ -24203,184 +23711,164 @@ export const inputObjects = {
   CPersonSecretInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      secret(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: CLeftArmBaseInput_personIdApply,
+      secret: CPersonSecretInput_secretApply
     }
   },
   CPersonSecretPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      },
-      secret(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-      }
+      personId: CLeftArmBaseInput_personIdApply,
+      secret: CPersonSecretInput_secretApply
     }
   },
   CreateBListInput: {
     plans: {
       bList: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateBTypeInput: {
     plans: {
       bType: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateBUpdatableViewInput: {
     plans: {
       bUpdatableView: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateCCompoundKeyInput: {
     plans: {
       cCompoundKey: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateCEdgeCaseInput: {
     plans: {
       cEdgeCase: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateCIssue756Input: {
     plans: {
       cIssue756: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateCLeftArmInput: {
     plans: {
       cLeftArm: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCreate
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateCMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       cMyTable: applyCreateFields
     }
   },
   CreateCNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       cNullTestRecord: applyCreateFields
     }
   },
   CreateCPersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       cPerson: applyCreateFields
     }
   },
   CreateCPersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       cPersonSecret: applyCreateFields
     }
   },
   CreateDefaultValueInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       defaultValue: applyCreateFields
     }
   },
   CreateForeignKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       foreignKey: applyCreateFields
     }
   },
   CreateInputInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       input: applyCreateFields
     }
   },
   CreateNoPrimaryKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       noPrimaryKey: applyCreateFields
     }
   },
   CreatePatchInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       patch: applyCreateFields
     }
   },
   CreatePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       post: applyCreateFields
     }
   },
   CreateReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reserved: applyCreateFields
     }
   },
   CreateReservedInputRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reservedInputRecord: applyCreateFields
     }
   },
   CreateReservedPatchRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reservedPatchRecord: applyCreateFields
     }
   },
   CreateSimilarTable1Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       similarTable1: applyCreateFields
     }
   },
   CreateSimilarTable2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       similarTable2: applyCreateFields
     }
   },
   CreateTestviewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       testview: applyCreateFields
     }
   },
   CreateUniqueForeignKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       uniqueForeignKey: applyCreateFields
     }
   },
   CreateViewTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       viewTable: applyCreateFields
     }
   },
@@ -24404,223 +23892,168 @@ export const inputObjects = {
       nullValue($condition, val) {
         return applyAttributeCondition("null_value", TYPES.text, $condition, val);
       },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   DefaultValueInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      nullValue(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null_value", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      nullValue: DefaultValueInput_nullValueApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   DefaultValuePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      nullValue(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null_value", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      nullValue: DefaultValueInput_nullValueApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   DeleteBListByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteBTypeByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCIssue756ByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCLeftArmByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCMyTableByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCNullTestRecordByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCPersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCPersonByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCPersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteDefaultValueByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteInputByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNoPrimaryKeyByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePatchByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePostByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedInputRecordByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedPatchRecordByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable1ByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable2ByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteUniqueForeignKeyByCompoundKey1AndCompoundKey2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteViewTableByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   ForeignKeyCondition: {
     plans: {
-      compoundKey1($condition, val) {
-        return applyAttributeCondition("compound_key_1", TYPES.int, $condition, val);
-      },
-      compoundKey2($condition, val) {
-        return applyAttributeCondition("compound_key_2", TYPES.int, $condition, val);
-      },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      }
+      compoundKey1: ForeignKeyCondition_compoundKey1Apply,
+      compoundKey2: ForeignKeyCondition_compoundKey2Apply,
+      personId: ForeignKeyCondition_personIdApply
     }
   },
   ForeignKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      compoundKey1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_1", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundKey2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
-      },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-      }
+      compoundKey1: ForeignKeyInput_compoundKey1Apply,
+      compoundKey2: ForeignKeyInput_compoundKey2Apply,
+      personId: CLeftArmBaseInput_personIdApply
     }
   },
   InputCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   InputInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   InputPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   MutationCompoundTypeArrayInput: {
@@ -24652,9 +24085,7 @@ export const inputObjects = {
   },
   NoPrimaryKeyCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      rowId: BTypeCondition_rowIdApply,
       str($condition, val) {
         return applyAttributeCondition("str", TYPES.text, $condition, val);
       }
@@ -24663,64 +24094,32 @@ export const inputObjects = {
   NoPrimaryKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      str(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply,
+      str: NoPrimaryKeyInput_strApply
     }
   },
   NoPrimaryKeyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      str(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("str", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply,
+      str: NoPrimaryKeyInput_strApply
     }
   },
   PatchCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   PatchInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   PatchPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   PostCondition: {
@@ -24734,50 +24133,18 @@ export const inputObjects = {
       headline($condition, val) {
         return applyAttributeCondition("headline", TYPES.text, $condition, val);
       },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   PostInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      authorId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      },
-      body(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      },
-      comptypes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
-      },
-      enums(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enums", bakedInputRuntime(schema, field.type, val));
-      },
-      headline(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("headline", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      authorId: PostInput_authorIdApply,
+      body: PostInput_bodyApply,
+      comptypes: PostInput_comptypesApply,
+      enums: PostInput_enumsApply,
+      headline: PostInput_headlineApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   PostManyInput: {
@@ -24788,42 +24155,12 @@ export const inputObjects = {
   PostPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      authorId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      },
-      body(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      },
-      comptypes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("comptypes", bakedInputRuntime(schema, field.type, val));
-      },
-      enums(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enums", bakedInputRuntime(schema, field.type, val));
-      },
-      headline(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("headline", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      authorId: PostInput_authorIdApply,
+      body: PostInput_bodyApply,
+      comptypes: PostInput_comptypesApply,
+      enums: PostInput_enumsApply,
+      headline: PostInput_headlineApply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   PostWithSuffixInput: {
@@ -24833,89 +24170,53 @@ export const inputObjects = {
   },
   ReservedCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   ReservedInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ReservedInputRecordCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   ReservedInputRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ReservedInputRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ReservedPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ReservedPatchRecordCondition: {
     plans: {
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   ReservedPatchRecordInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ReservedPatchRecordPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ReturnVoidMutationInput: {
@@ -24925,160 +24226,64 @@ export const inputObjects = {
   },
   SimilarTable1Condition: {
     plans: {
-      col1($condition, val) {
-        return applyAttributeCondition("col1", TYPES.int, $condition, val);
-      },
-      col2($condition, val) {
-        return applyAttributeCondition("col2", TYPES.int, $condition, val);
-      },
-      col3($condition, val) {
-        return applyAttributeCondition("col3", TYPES.int, $condition, val);
-      },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      col1: TestviewCondition_col1Apply,
+      col2: TestviewCondition_col2Apply,
+      col3: SimilarTable1Condition_col3Apply,
+      rowId: BTypeCondition_rowIdApply
     }
   },
   SimilarTable1Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      col3: SimilarTable1Input_col3Apply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   SimilarTable1Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      col3: SimilarTable1Input_col3Apply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   SimilarTable2Condition: {
     plans: {
-      col3($condition, val) {
-        return applyAttributeCondition("col3", TYPES.int, $condition, val);
-      },
+      col3: SimilarTable1Condition_col3Apply,
       col4($condition, val) {
         return applyAttributeCondition("col4", TYPES.int, $condition, val);
       },
       col5($condition, val) {
         return applyAttributeCondition("col5", TYPES.int, $condition, val);
       },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      rowId: BTypeCondition_rowIdApply
     }
   },
   SimilarTable2Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      col4(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col4", bakedInputRuntime(schema, field.type, val));
-      },
-      col5(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col5", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col3: SimilarTable1Input_col3Apply,
+      col4: SimilarTable2Input_col4Apply,
+      col5: SimilarTable2Input_col5Apply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   SimilarTable2Patch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col3(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col3", bakedInputRuntime(schema, field.type, val));
-      },
-      col4(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col4", bakedInputRuntime(schema, field.type, val));
-      },
-      col5(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col5", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col3: SimilarTable1Input_col3Apply,
+      col4: SimilarTable2Input_col4Apply,
+      col5: SimilarTable2Input_col5Apply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   TestviewCondition: {
     plans: {
-      col1($condition, val) {
-        return applyAttributeCondition("col1", TYPES.int, $condition, val);
-      },
-      col2($condition, val) {
-        return applyAttributeCondition("col2", TYPES.int, $condition, val);
-      },
+      col1: TestviewCondition_col1Apply,
+      col2: TestviewCondition_col2Apply,
       testviewid($condition, val) {
         return applyAttributeCondition("testviewid", TYPES.int, $condition, val);
       }
@@ -25087,18 +24292,8 @@ export const inputObjects = {
   TestviewInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
       testviewid(obj, val, {
         field,
         schema
@@ -25109,243 +24304,183 @@ export const inputObjects = {
   },
   UniqueForeignKeyCondition: {
     plans: {
-      compoundKey1($condition, val) {
-        return applyAttributeCondition("compound_key_1", TYPES.int, $condition, val);
-      },
-      compoundKey2($condition, val) {
-        return applyAttributeCondition("compound_key_2", TYPES.int, $condition, val);
-      }
+      compoundKey1: ForeignKeyCondition_compoundKey1Apply,
+      compoundKey2: ForeignKeyCondition_compoundKey2Apply
     }
   },
   UniqueForeignKeyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      compoundKey1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_1", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundKey2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
-      }
+      compoundKey1: ForeignKeyInput_compoundKey1Apply,
+      compoundKey2: ForeignKeyInput_compoundKey2Apply
     }
   },
   UniqueForeignKeyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      compoundKey1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_1", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundKey2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_key_2", bakedInputRuntime(schema, field.type, val));
-      }
+      compoundKey1: ForeignKeyInput_compoundKey1Apply,
+      compoundKey2: ForeignKeyInput_compoundKey2Apply
     }
   },
   UpdateBListByRowIdInput: {
     plans: {
-      bListPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      bListPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateBTypeByRowIdInput: {
     plans: {
-      bTypePatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      bTypePatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateCCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      cCompoundKeyPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      cCompoundKeyPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateCIssue756ByRowIdInput: {
     plans: {
-      cIssue756Patch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      cIssue756Patch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateCLeftArmByPersonIdInput: {
     plans: {
-      cLeftArmPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      cLeftArmPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateCLeftArmByRowIdInput: {
     plans: {
-      cLeftArmPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      cLeftArmPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateCMyTableByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cMyTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      cMyTablePatch: applyCreateFields
     }
   },
   UpdateCNullTestRecordByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cNullTestRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      cNullTestRecordPatch: applyCreateFields
     }
   },
   UpdateCPersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cPersonPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      cPersonPatch: applyCreateFields
     }
   },
   UpdateCPersonByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cPersonPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      cPersonPatch: applyCreateFields
     }
   },
   UpdateCPersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cPersonSecretPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      cPersonSecretPatch: applyCreateFields
     }
   },
   UpdateDefaultValueByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      defaultValuePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      defaultValuePatch: applyCreateFields
     }
   },
   UpdateInputByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      inputPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      inputPatch: applyCreateFields
     }
   },
   UpdateNoPrimaryKeyByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      noPrimaryKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      noPrimaryKeyPatch: applyCreateFields
     }
   },
   UpdatePatchByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      patchPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      patchPatch: applyCreateFields
     }
   },
   UpdatePostByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      postPatch: applyCreateFields
     }
   },
   UpdateReservedByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedInputRecordByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedInputRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedInputRecordPatch: applyCreateFields
     }
   },
   UpdateReservedPatchRecordByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatchRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatchRecordPatch: applyCreateFields
     }
   },
   UpdateSimilarTable1ByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable1Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable1Patch: applyCreateFields
     }
   },
   UpdateSimilarTable2ByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable2Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable2Patch: applyCreateFields
     }
   },
   UpdateUniqueForeignKeyByCompoundKey1AndCompoundKey2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      uniqueForeignKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      uniqueForeignKeyPatch: applyCreateFields
     }
   },
   UpdateViewTableByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      viewTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      viewTablePatch: applyCreateFields
     }
   },
   ViewTableCondition: {
     plans: {
-      col1($condition, val) {
-        return applyAttributeCondition("col1", TYPES.int, $condition, val);
-      },
-      col2($condition, val) {
-        return applyAttributeCondition("col2", TYPES.int, $condition, val);
-      },
-      rowId($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      col1: TestviewCondition_col1Apply,
+      col2: TestviewCondition_col2Apply,
+      rowId: BTypeCondition_rowIdApply
     }
   },
   ViewTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   },
   ViewTablePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col1(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
-      },
-      col2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col2", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      col1: TestviewInput_col1Apply,
+      col2: TestviewInput_col2Apply,
+      rowId: CLeftArmBaseInput_rowIdApply
     }
   }
 };
@@ -25429,12 +24564,7 @@ export const scalars = {
   CNotNullTimestamp: {
     serialize: toString,
     parseValue: toString,
-    parseLiteral(ast) {
-      if (ast.kind === Kind.STRING) {
-        return ast.value;
-      }
-      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
-    }
+    parseLiteral: DatetimeParseLiteral
   },
   Cursor: {
     serialize: toString,
@@ -25459,12 +24589,7 @@ export const scalars = {
   Datetime: {
     serialize: toString,
     parseValue: toString,
-    parseLiteral(ast) {
-      if (ast.kind === Kind.STRING) {
-        return ast.value;
-      }
-      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
-    }
+    parseLiteral: DatetimeParseLiteral
   },
   InternetAddress: {
     serialize: toString,
@@ -25477,12 +24602,8 @@ export const scalars = {
     }
   },
   JSON: {
-    serialize(value) {
-      return value;
-    },
-    parseValue(value) {
-      return value;
-    },
+    serialize: JSONSerialize,
+    parseValue: JSONSerialize,
     parseLiteral: (() => {
       const parseLiteralToObject = (ast, variables) => {
         switch (ast.kind) {
@@ -25527,9 +24648,7 @@ export const scalars = {
     }
   },
   KeyValueHash: {
-    serialize(value) {
-      return value;
-    },
+    serialize: JSONSerialize,
     parseValue(obj) {
       if (isValidHstoreObject(obj)) {
         return obj;
@@ -25771,20 +24890,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   BTypeOrderBy: {
@@ -25963,20 +25070,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply,
       SMALLINT_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "smallint",
@@ -26223,20 +25318,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply,
       TS_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "ts",
@@ -26277,20 +25360,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      PERSON_ID_ASC: CPersonSecretOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: CPersonSecretOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         c_left_armUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -26309,20 +25380,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   CMyTableOrderBy: {
@@ -26345,20 +25404,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   CNullTestRecordOrderBy: {
@@ -26417,20 +25464,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   CPersonOrderBy: {
@@ -26527,20 +25562,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply,
       USER_MAC_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "user_mac",
@@ -26557,20 +25580,8 @@ export const enums = {
   },
   CPersonSecretOrderBy: {
     values: {
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      PERSON_ID_ASC: CPersonSecretOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: CPersonSecretOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         c_person_secretUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -26635,20 +25646,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   ForeignKeyOrderBy: {
@@ -26665,18 +25664,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      COMPOUND_KEY_2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "compound_key_2",
-          direction: "ASC"
-        });
-      },
-      COMPOUND_KEY_2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "compound_key_2",
-          direction: "DESC"
-        });
-      },
+      COMPOUND_KEY_2_ASC: ForeignKeyOrderBy_COMPOUND_KEY_2_ASCApply,
+      COMPOUND_KEY_2_DESC: ForeignKeyOrderBy_COMPOUND_KEY_2_DESCApply,
       PERSON_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "person_id",
@@ -26711,20 +25700,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   NonUpdatableViewOrderBy: {
@@ -26745,20 +25722,8 @@ export const enums = {
   },
   NoPrimaryKeyOrderBy: {
     values: {
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply,
       STR_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "str",
@@ -26793,20 +25758,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   PostOrderBy: {
@@ -26865,20 +25818,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   ReservedInputRecordOrderBy: {
@@ -26901,20 +25842,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   ReservedOrderBy: {
@@ -26937,20 +25866,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   ReservedPatchRecordOrderBy: {
@@ -26973,60 +25890,18 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   SimilarTable1OrderBy: {
     values: {
-      COL1_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "ASC"
-        });
-      },
-      COL1_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "DESC"
-        });
-      },
-      COL2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "ASC"
-        });
-      },
-      COL2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "DESC"
-        });
-      },
-      COL3_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "ASC"
-        });
-      },
-      COL3_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "DESC"
-        });
-      },
+      COL1_ASC: TestviewOrderBy_COL1_ASCApply,
+      COL1_DESC: TestviewOrderBy_COL1_DESCApply,
+      COL2_ASC: TestviewOrderBy_COL2_ASCApply,
+      COL2_DESC: TestviewOrderBy_COL2_DESCApply,
+      COL3_ASC: SimilarTable1OrderBy_COL3_ASCApply,
+      COL3_DESC: SimilarTable1OrderBy_COL3_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         similar_table_1Uniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -27045,36 +25920,14 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   SimilarTable2OrderBy: {
     values: {
-      COL3_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "ASC"
-        });
-      },
-      COL3_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col3",
-          direction: "DESC"
-        });
-      },
+      COL3_ASC: SimilarTable1OrderBy_COL3_ASCApply,
+      COL3_DESC: SimilarTable1OrderBy_COL3_DESCApply,
       COL4_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "col4",
@@ -27117,48 +25970,16 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   },
   TestviewOrderBy: {
     values: {
-      COL1_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "ASC"
-        });
-      },
-      COL1_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "DESC"
-        });
-      },
-      COL2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "ASC"
-        });
-      },
-      COL2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "DESC"
-        });
-      },
+      COL1_ASC: TestviewOrderBy_COL1_ASCApply,
+      COL1_DESC: TestviewOrderBy_COL1_DESCApply,
+      COL2_ASC: TestviewOrderBy_COL2_ASCApply,
+      COL2_DESC: TestviewOrderBy_COL2_DESCApply,
       TESTVIEWID_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "testviewid",
@@ -27189,46 +26010,16 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      COMPOUND_KEY_2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "compound_key_2",
-          direction: "ASC"
-        });
-      },
-      COMPOUND_KEY_2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "compound_key_2",
-          direction: "DESC"
-        });
-      }
+      COMPOUND_KEY_2_ASC: ForeignKeyOrderBy_COMPOUND_KEY_2_ASCApply,
+      COMPOUND_KEY_2_DESC: ForeignKeyOrderBy_COMPOUND_KEY_2_DESCApply
     }
   },
   ViewTableOrderBy: {
     values: {
-      COL1_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "ASC"
-        });
-      },
-      COL1_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col1",
-          direction: "DESC"
-        });
-      },
-      COL2_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "ASC"
-        });
-      },
-      COL2_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col2",
-          direction: "DESC"
-        });
-      },
+      COL1_ASC: TestviewOrderBy_COL1_ASCApply,
+      COL1_DESC: TestviewOrderBy_COL1_DESCApply,
+      COL2_ASC: TestviewOrderBy_COL2_ASCApply,
+      COL2_DESC: TestviewOrderBy_COL2_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         view_tableUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -27247,20 +26038,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ROW_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ROW_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      }
+      ROW_ID_ASC: BTypeOrderBy_ROW_ID_ASCApply,
+      ROW_ID_DESC: BTypeOrderBy_ROW_ID_DESCApply
     }
   }
 };

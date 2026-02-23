@@ -1,22 +1,19 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, each, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, each, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const rawNodeIdCodec = {
+  name: "raw",
+  encode: markSyncAndSafe(function rawEncode(value) {
+    return typeof value === "string" ? value : null;
+  }),
+  decode: markSyncAndSafe(function rawDecode(value) {
+    return typeof value === "string" ? value : null;
+  })
+};
 const nodeIdHandler_Query = {
   typeName: "Query",
-  codec: {
-    name: "raw",
-    encode: Object.assign(function rawEncode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    }),
-    decode: Object.assign(function rawDecode(value) {
-      return typeof value === "string" ? value : null;
-    }, {
-      isSyncAndSafe: true
-    })
-  },
+  codec: rawNodeIdCodec,
   match(specifier) {
     return specifier === "query";
   },
@@ -35,32 +32,24 @@ const nodeIdHandler_Query = {
 };
 const base64JSONNodeIdCodec = {
   name: "base64JSON",
-  encode: Object.assign(function base64JSONEncode(value) {
+  encode: markSyncAndSafe(function base64JSONEncode(value) {
     return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  }, {
-    isSyncAndSafe: true
   }),
-  decode: Object.assign(function base64JSONDecode(value) {
+  decode: markSyncAndSafe(function base64JSONDecode(value) {
     return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }, {
-    isSyncAndSafe: true
   })
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: nodeIdHandler_Query.codec,
+  raw: rawNodeIdCodec,
   base64JSON: base64JSONNodeIdCodec,
   pipeString: {
     name: "pipeString",
-    encode: Object.assign(function pipeStringEncode(value) {
+    encode: markSyncAndSafe(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    }, {
-      isSyncAndSafe: true
     }),
-    decode: Object.assign(function pipeStringDecode(value) {
+    decode: markSyncAndSafe(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }, {
-      isSyncAndSafe: true
     })
   }
 };
@@ -638,7 +627,7 @@ function specForHandler() {
   if (existing) {
     return existing;
   }
-  function spec(nodeId) {
+  const spec = markSyncAndSafe(function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
     if (nodeId == null) return null;
@@ -651,9 +640,7 @@ function specForHandler() {
       // Ignore errors
     }
     return null;
-  }
-  spec.displayName = `specifier_${nodeIdHandler_T.typeName}_${nodeIdHandler_T.codec.name}`;
-  spec.isSyncAndSafe = true; // Optimization
+  }, `specifier_${nodeIdHandler_T.typeName}_${nodeIdHandler_T.codec.name}`);
   specForHandlerCache.set(nodeIdHandler_T, spec);
   return spec;
 }
@@ -700,10 +687,9 @@ const specFromArgs_T = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
-const specFromArgs_T2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_T, $nodeId);
-};
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -727,20 +713,30 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function getClientMutationIdForUpdateOrDeletePlan($mutation) {
-  const $result = $mutation.getStepForKey("result");
-  return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateTPayload_tEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function TInput_kApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("k", bakedInputRuntime(schema, field.type, val));
+}
+function TInput_vApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("v", bakedInputRuntime(schema, field.type, val));
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1171,7 +1167,7 @@ export const objects = {
       },
       deleteT: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_tPgResource, specFromArgs_T2(args));
+          const $delete = pgDeleteSingle(resource_tPgResource, specFromArgs_T(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1231,12 +1227,8 @@ export const objects = {
         return $insert.getMeta("clientMutationId");
       },
       query: queryPlan,
-      t($object) {
-        return $object.get("result");
-      },
-      tEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
-      }
+      t: planCreatePayloadResult,
+      tEdge: CreateTPayload_tEdgePlan
     }
   },
   DeleteTPayload: {
@@ -1249,10 +1241,8 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      t: planUpdateOrDeletePayloadResult,
-      tEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
-      }
+      t: planCreatePayloadResult,
+      tEdge: CreateTPayload_tEdgePlan
     }
   },
   T: {
@@ -1292,10 +1282,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      t: planUpdateOrDeletePayloadResult,
-      tEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
-      }
+      t: planCreatePayloadResult,
+      tEdge: CreateTPayload_tEdgePlan
     }
   },
   WorkHour: {
@@ -1338,24 +1326,18 @@ export const interfaces = {
 export const inputObjects = {
   CreateTInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      t(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      t: applyCreateFields
     }
   },
   DeleteTByKInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteTInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   TCondition: {
@@ -1371,47 +1353,27 @@ export const inputObjects = {
   TInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      k(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("k", bakedInputRuntime(schema, field.type, val));
-      },
-      v(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("v", bakedInputRuntime(schema, field.type, val));
-      }
+      k: TInput_kApply,
+      v: TInput_vApply
     }
   },
   TPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      k(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("k", bakedInputRuntime(schema, field.type, val));
-      },
-      v(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("v", bakedInputRuntime(schema, field.type, val));
-      }
+      k: TInput_kApply,
+      v: TInput_vApply
     }
   },
   UpdateTByKInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      tPatch: applyCreateFields
     }
   },
   UpdateTInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      tPatch: applyCreateFields
     }
   },
   WorkHourInput: {
