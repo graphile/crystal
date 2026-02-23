@@ -236,8 +236,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         exitPath.scope.crawl();
 
         // If a local top-level function is only ever called directly, and all
-        // calls pass the same leading identifier arguments, inline those
-        // identifiers into the function body and remove the redundant
+        // calls pass the same identifier arguments in some positions, inline
+        // those identifiers into the function body and remove the redundant
         // parameters/arguments.
         exitPath.traverse({
           VariableDeclarator: optimizeCommonLeadingCallArgs,
@@ -403,46 +403,23 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             return;
           }
 
-          let prefixLength = 0;
-          const maxPrefix = Math.min(
+          const indexesToEliminate: number[] = [];
+          const maxIndex = Math.min(
             params.length,
             ...callPaths.map((callPath) => callPath.node.arguments.length),
           );
-          for (let i = 0; i < maxPrefix; i++) {
+          for (let i = 0; i < maxIndex; i++) {
             const param = functionPath.node.params[i];
             if (!t.isIdentifier(param)) {
-              break;
+              continue;
             }
             const firstArg = callPaths[0].node.arguments[i];
             if (!t.isIdentifier(firstArg)) {
-              break;
+              continue;
             }
             const firstArgBinding = callPaths[0].scope.getBinding(firstArg.name);
             if (!firstArgBinding || firstArgBinding.scope !== exitPath.scope) {
-              break;
-            }
-            if (firstArg.name === param.name) {
-              let allMatch = true;
-              for (let j = 1; j < callPaths.length; j++) {
-                const arg = callPaths[j].node.arguments[i];
-                if (!t.isIdentifier(arg) || arg.name !== firstArg.name) {
-                  allMatch = false;
-                  break;
-                }
-                const argBinding = callPaths[j].scope.getBinding(arg.name);
-                if (!argBinding || argBinding.scope !== exitPath.scope) {
-                  allMatch = false;
-                  break;
-                }
-              }
-              if (!allMatch) {
-                break;
-              }
-              prefixLength++;
               continue;
-            }
-            if (functionPath.scope.hasOwnBinding(firstArg.name)) {
-              break;
             }
             let allMatch = true;
             for (let j = 1; j < callPaths.length; j++) {
@@ -458,16 +435,23 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
               }
             }
             if (!allMatch) {
-              break;
+              continue;
             }
-            prefixLength++;
+            if (firstArg.name === param.name) {
+              indexesToEliminate.push(i);
+              continue;
+            }
+            if (functionPath.scope.hasOwnBinding(firstArg.name)) {
+              continue;
+            }
+            indexesToEliminate.push(i);
           }
 
-          if (prefixLength === 0) {
+          if (indexesToEliminate.length === 0) {
             return;
           }
 
-          for (let i = 0; i < prefixLength; i++) {
+          for (const i of indexesToEliminate) {
             const param = functionPath.node.params[i];
             const firstArg = callPaths[0].node.arguments[i];
             if (!t.isIdentifier(param) || !t.isIdentifier(firstArg)) {
@@ -478,7 +462,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             }
           }
 
-          for (let i = prefixLength - 1; i >= 0; i--) {
+          for (let k = indexesToEliminate.length - 1; k >= 0; k--) {
+            const i = indexesToEliminate[k];
             functionPath.node.params.splice(i, 1);
             for (const callPath of callPaths) {
               callPath.node.arguments.splice(i, 1);
