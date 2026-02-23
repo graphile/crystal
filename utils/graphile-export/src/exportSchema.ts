@@ -1313,33 +1313,39 @@ function factoryAst<TTuple extends any[]>(
     );
   });
 
-  const key = `${factory.toString().trim()}|${depArgs.length}`;
-  let cacheByKey = file._factoryAstCache.get(key);
-  if (!cacheByKey) {
-    cacheByKey = [];
-    file._factoryAstCache.set(key, cacheByKey);
-  }
+  const isCacheable = typeof fn === "function";
 
-  for (const existing of cacheByKey) {
-    let matches = true;
-    for (let i = 0, l = depArgs.length; i < l; i++) {
-      // Don't mind if the raw version or the AST-ified version match, but if
-      // neither match we must abort.
-      if (
-        existing.rawArgs[i] !== rawArgs[i] &&
-        existing.depArgs[i] !== depArgs[i]
-      ) {
-        matches = false;
-        break;
-      }
+  const cacheKey = isCacheable
+    ? `${factory.toString().trim()}|${depArgs.length}`
+    : null;
+  let cacheByKey = cacheKey ? file._factoryAstCache.get(cacheKey) : null;
+  if (cacheKey) {
+    if (!cacheByKey) {
+      cacheByKey = [];
+      file._factoryAstCache.set(cacheKey, cacheByKey);
     }
-    if (matches) {
-      return existing.result;
+
+    for (const existing of cacheByKey) {
+      let matches = true;
+      for (let i = 0, l = depArgs.length; i < l; i++) {
+        // Don't mind if the raw version or the AST-ified version match, but if
+        // neither match we must abort.
+        if (
+          existing.rawArgs[i] !== rawArgs[i] &&
+          existing.depArgs[i] !== depArgs[i]
+        ) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        return existing.result;
+      }
     }
   }
 
   const result = factoryASTInner(funcAST, depArgs);
-  cacheByKey.push({ rawArgs, depArgs, result });
+  cacheByKey?.push({ rawArgs, depArgs, result });
   return result;
 }
 
