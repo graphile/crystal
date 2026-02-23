@@ -1182,6 +1182,8 @@ function convertToIdentifierViaAST(
   const existingVariableIdentifier =
     file._convertToIdentifierViaASTCache.get(ast);
   if (existingVariableIdentifier) {
+    // In case anything else referenced it, be sure to define it
+    variableIdentifier.name = existingVariableIdentifier.name;
     return existingVariableIdentifier;
   } else {
     file._convertToIdentifierViaASTCache.set(ast, variableIdentifier);
