@@ -438,13 +438,16 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
               continue;
             }
             if (firstArg.name === param.name) {
+              // Safe to eliminate directly
               indexesToEliminate.push(i);
+            } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
+              // Cannot safely rename inner references, abort
+              // TODO: handle renaming of conflicting variables to enable referencing global value.
               continue;
+            } else {
+              // Safe to eliminate, but will need to rename inner references
+              indexesToEliminate.push(i);
             }
-            if (functionPath.scope.hasOwnBinding(firstArg.name)) {
-              continue;
-            }
-            indexesToEliminate.push(i);
           }
 
           if (indexesToEliminate.length === 0) {
@@ -455,9 +458,11 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             const param = functionPath.node.params[i];
             const firstArg = callPaths[0].node.arguments[i];
             if (!t.isIdentifier(param) || !t.isIdentifier(firstArg)) {
-              return;
+              // Satisfy TypeScript
+              throw new Error("GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable");
             }
             if (param.name !== firstArg.name) {
+              // The rename of the inner references mentioned above
               functionPath.scope.rename(param.name, firstArg.name);
             }
           }
