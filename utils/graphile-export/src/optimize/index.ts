@@ -441,7 +441,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
               // Safe to eliminate directly
               indexesToEliminate.push(i);
             } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
-              // Cannot safely rename inner references, abort
+              // Cannot safely rename inner references for this index, skip it
               // TODO: handle renaming of conflicting variables to enable referencing global value.
               continue;
             } else {
