@@ -158,7 +158,16 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (EdgeStep, connection, constant, first, pgMutationPayloadEdge, pkAttributes, resource) => (
+                  (
+                    EdgeStep,
+                    connection,
+                    constant,
+                    first,
+                    pgMutationPayloadEdge,
+                    pkAttributes,
+                    resource,
+                  ) =>
+                    (
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep;
                       }>,
@@ -174,7 +183,15 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                         $mutation,
                         fieldArgs,
                       ),
-                  [EdgeStep, connection, constant, first, pgMutationPayloadEdge, pkAttributes, resource],
+                  [
+                    EdgeStep,
+                    connection,
+                    constant,
+                    first,
+                    pgMutationPayloadEdge,
+                    pkAttributes,
+                    resource,
+                  ],
                 ),
                 ...(deprecationReason ? { deprecationReason } : null),
               }),

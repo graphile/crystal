@@ -351,7 +351,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             const init = path.get("init");
             if (
               !init ||
-              (!init.isFunctionExpression() && !init.isArrowFunctionExpression())
+              (!init.isFunctionExpression() &&
+                !init.isArrowFunctionExpression())
             ) {
               return;
             }
@@ -361,7 +362,9 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             >;
           }
 
-          const scope = path.isFunctionDeclaration() ? path.scope.parent : path.scope;
+          const scope = path.isFunctionDeclaration()
+            ? path.scope.parent
+            : path.scope;
           if (scope !== exitPath.scope) {
             return;
           }
@@ -417,7 +420,9 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             if (!t.isIdentifier(firstArg)) {
               continue;
             }
-            const firstArgBinding = callPaths[0].scope.getBinding(firstArg.name);
+            const firstArgBinding = callPaths[0].scope.getBinding(
+              firstArg.name,
+            );
             if (!firstArgBinding || firstArgBinding.scope !== exitPath.scope) {
               continue;
             }
@@ -459,7 +464,9 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             const firstArg = callPaths[0].node.arguments[i];
             if (!t.isIdentifier(param) || !t.isIdentifier(firstArg)) {
               // Satisfy TypeScript
-              throw new Error("GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable");
+              throw new Error(
+                "GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable",
+              );
             }
             if (param.name !== firstArg.name) {
               // The rename of the inner references mentioned above
