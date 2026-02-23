@@ -563,6 +563,9 @@ const specFromArgs_Citation = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -586,7 +589,8 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateCitationPayload_citationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(citationUniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
@@ -964,12 +968,8 @@ export const objects = {
   CreateCitationPayload: {
     assertStep: assertStep,
     plans: {
-      citation($object) {
-        return $object.get("result");
-      },
-      citationEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(citationUniques[0].attributes, $mutation, fieldArgs);
-      },
+      citation: planCreatePayloadResult,
+      citationEdge: CreateCitationPayload_citationEdgePlan,
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
@@ -980,12 +980,8 @@ export const objects = {
   DeleteCitationPayload: {
     assertStep: ObjectStep,
     plans: {
-      citation($object) {
-        return $object.get("result");
-      },
-      citationEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(citationUniques[0].attributes, $mutation, fieldArgs);
-      },
+      citation: planCreatePayloadResult,
+      citationEdge: CreateCitationPayload_citationEdgePlan,
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
@@ -1028,9 +1024,7 @@ export const inputObjects = {
   },
   CreateCitationInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteCitationByIdInput: {
@@ -1040,7 +1034,7 @@ export const inputObjects = {
   },
   DeleteCitationInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   }
 };

@@ -692,6 +692,7 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const BarCondition_colApply = ($condition, val) => applyAttributeCondition("col", TYPES.text, $condition, val);
 const handlers = [nodeIdHandler_Foo];
 const decodeNodeId2 = makeDecodeNodeIdRuntime(handlers);
 const getIdentifiers = nodeId => {
@@ -707,6 +708,18 @@ const getIdentifiers = nodeId => {
   return null;
 };
 const localAttributeCodecs = [TYPES.int];
+const BarsOrderBy_COL_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col",
+    direction: "ASC"
+  });
+};
+const BarsOrderBy_COL_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "col",
+    direction: "DESC"
+  });
+};
 function applyInputToInsert(_, $object) {
   return $object;
 }
@@ -718,14 +731,6 @@ function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
 const specFromArgs_Foo = args => {
-  const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Foo, $nodeId);
-};
-const specFromArgs_Bar2 = args => {
-  const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Bar, $nodeId);
-};
-const specFromArgs_Foo2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
   return specFromNodeId(nodeIdHandler_Foo, $nodeId);
 };
@@ -759,6 +764,7 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CreateBarPayload_barEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_barPgResource, barUniques[0].attributes, $mutation, fieldArgs);
 function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
@@ -766,6 +772,12 @@ function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function BarInput_colApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col", bakedInputRuntime(schema, field.type, val));
 }
 const handlers2 = [nodeIdHandler_Foo];
 const decodeNodeId3 = makeDecodeNodeIdRuntime(handlers2);
@@ -781,20 +793,10 @@ const getIdentifiers2 = nodeId => {
   }
   return null;
 };
+const CreateFooPayload_fooEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_fooPgResource, fooUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1408,7 +1410,7 @@ export const objects = {
       },
       deleteBar: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_barPgResource, specFromArgs_Bar2(args));
+          const $delete = pgDeleteSingle(spec_resource_barPgResource, specFromArgs_Bar(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1420,7 +1422,7 @@ export const objects = {
       },
       deleteFoo: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_fooPgResource, specFromArgs_Foo2(args));
+          const $delete = pgDeleteSingle(spec_resource_fooPgResource, specFromArgs_Foo(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1487,9 +1489,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       bar: planCreatePayloadResult,
-      barEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_barPgResource, barUniques[0].attributes, $mutation, fieldArgs);
-      },
+      barEdge: CreateBarPayload_barEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -1499,9 +1499,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       foo: planCreatePayloadResult,
-      fooEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_fooPgResource, fooUniques[0].attributes, $mutation, fieldArgs);
-      },
+      fooEdge: CreateFooPayload_fooEdgePlan,
       query: queryPlan
     }
   },
@@ -1509,9 +1507,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       bar: planUpdateOrDeletePayloadResult,
-      barEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_barPgResource, barUniques[0].attributes, $mutation, fieldArgs);
-      },
+      barEdge: CreateBarPayload_barEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBarId($object) {
         const $record = $object.getStepForKey("result");
@@ -1531,9 +1527,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       foo: planUpdateOrDeletePayloadResult,
-      fooEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_fooPgResource, fooUniques[0].attributes, $mutation, fieldArgs);
-      },
+      fooEdge: CreateFooPayload_fooEdgePlan,
       query: queryPlan
     }
   },
@@ -1567,10 +1561,8 @@ export const objects = {
   UpdateBarPayload: {
     assertStep: ObjectStep,
     plans: {
-      bar: planUpdateOrDeletePayloadResult,
-      barEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_barPgResource, barUniques[0].attributes, $mutation, fieldArgs);
-      },
+      bar: planCreatePayloadResult,
+      barEdge: CreateBarPayload_barEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -1580,9 +1572,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       foo: planUpdateOrDeletePayloadResult,
-      fooEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_fooPgResource, fooUniques[0].attributes, $mutation, fieldArgs);
-      },
+      fooEdge: CreateFooPayload_fooEdgePlan,
       query: queryPlan
     }
   }
@@ -1609,9 +1599,7 @@ export const interfaces = {
 export const inputObjects = {
   BarCondition: {
     plans: {
-      col($condition, val) {
-        return applyAttributeCondition("col", TYPES.text, $condition, val);
-      },
+      col: BarCondition_colApply,
       fooByRowId(condition, nodeId) {
         if (nodeId === undefined) {
           return;
@@ -1663,12 +1651,7 @@ export const inputObjects = {
   BarInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col", bakedInputRuntime(schema, field.type, val));
-      },
+      col: BarInput_colApply,
       fooByRowId(record, nodeId) {
         if (nodeId === undefined) {
           return;
@@ -1695,12 +1678,7 @@ export const inputObjects = {
   BarPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col", bakedInputRuntime(schema, field.type, val));
-      }
+      col: BarInput_colApply
     }
   },
   CreateBarInput: {
@@ -1727,20 +1705,13 @@ export const inputObjects = {
   },
   FooCondition: {
     plans: {
-      col($condition, val) {
-        return applyAttributeCondition("col", TYPES.text, $condition, val);
-      }
+      col: BarCondition_colApply
     }
   },
   FooInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col", bakedInputRuntime(schema, field.type, val));
-      },
+      col: BarInput_colApply,
       rowId(obj, val, {
         field,
         schema
@@ -1752,18 +1723,13 @@ export const inputObjects = {
   FooPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      col(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col", bakedInputRuntime(schema, field.type, val));
-      }
+      col: BarInput_colApply
     }
   },
   UpdateBarInput: {
     plans: {
-      barPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      barPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateFooInput: {
@@ -1788,18 +1754,8 @@ export const scalars = {
 export const enums = {
   BarsOrderBy: {
     values: {
-      COL_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col",
-          direction: "ASC"
-        });
-      },
-      COL_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col",
-          direction: "DESC"
-        });
-      },
+      COL_ASC: BarsOrderBy_COL_ASCApply,
+      COL_DESC: BarsOrderBy_COL_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         barUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -1822,18 +1778,8 @@ export const enums = {
   },
   FoosOrderBy: {
     values: {
-      COL_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col",
-          direction: "ASC"
-        });
-      },
-      COL_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "col",
-          direction: "DESC"
-        });
-      },
+      COL_ASC: BarsOrderBy_COL_ASCApply,
+      COL_DESC: BarsOrderBy_COL_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         fooUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

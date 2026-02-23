@@ -1942,7 +1942,13 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const List_enumArrayPlan = $record => {
+  return $record.get("enum_array");
+};
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
+const List_byteaArrayPlan = $record => {
+  return $record.get("bytea_array");
+};
 function toString(value) {
   return "" + value;
 }
@@ -1956,6 +1962,21 @@ const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcd
 function LTreeParseValue(value) {
   return value;
 }
+const LTreeParseLiteral = (node, variables) => {
+  return LTreeParseValue(valueFromASTUntyped(node, variables));
+};
+function CompoundTypeInput_aApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("a", bakedInputRuntime(schema, field.type, val));
+}
+function CompoundTypeInput_bApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("b", bakedInputRuntime(schema, field.type, val));
+}
 const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
 function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
   $condition.where({
@@ -1966,6 +1987,22 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const ListCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const ListCondition_enumArrayApply = ($condition, val) => applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
+const ListsOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const ListsOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 const argDetailsSimple_mult_1 = [{
   graphqlArgName: "arg0",
   pgCodec: TYPES.int,
@@ -2153,14 +2190,6 @@ const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
-const specFromArgs_List2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, $nodeId);
-};
-const specFromArgs_Type2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
-};
 function getClientMutationIdForCustomMutationPlan($object) {
   const $result = $object.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -2196,6 +2225,7 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const TypeFunctionMutationPayload_typeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
   return $insert.getMeta("clientMutationId");
@@ -2203,28 +2233,375 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
 function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
 }
+const CreateListPayload_listEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
+function ListInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_intArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_intArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_enumArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_enumArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_dateArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_dateArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_timestamptzArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_timestamptzArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_compoundTypeArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_compoundTypeArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_byteaArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
+}
+function ListInput_byteaArrayNnApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_smallintApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("smallint", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_bigintApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bigint", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_numericApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("numeric", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_decimalApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("decimal", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_booleanApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("boolean", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_varcharApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("varchar", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_enumApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("enum", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_domainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_domain2Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain2", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_textArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("text_array", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_jsonApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("json", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_jsonbApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_jsonpathApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullableRangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_numrangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("numrange", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_daterangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("daterange", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_anIntRangeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timestampApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timestamptzApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_dateApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("date", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("time", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_timetzApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("timetz", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_intervalApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("interval", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_intervalArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_moneyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("money", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_compoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nestedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullableCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullableNestedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_pointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("point", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_nullablePointApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_inetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_cidrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_macaddrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regprocApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regproc", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regprocedureApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regoperApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regoper", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regoperatorApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regclassApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regclass", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regtypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regtype", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regconfigApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regdictionaryApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_textArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_int8ArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_byteaApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bytea", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_ltreeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ltree", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_ltreeArrayApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -4518,7 +4895,7 @@ export const objects = {
       },
       deleteList: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_listsPgResource, specFromArgs_List2(args));
+          const $delete = pgDeleteSingle(resource_listsPgResource, specFromArgs_List(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4544,7 +4921,7 @@ export const objects = {
       },
       deleteType: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_typesPgResource, specFromArgs_Type2(args));
+          const $delete = pgDeleteSingle(resource_typesPgResource, specFromArgs_Type(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4810,9 +5187,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       list: planCreatePayloadResult,
-      listEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
   },
@@ -4822,9 +5197,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       type: planCreatePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   CreateUpdatableViewPayload: {
@@ -4845,9 +5218,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       list: planUpdateOrDeletePayloadResult,
-      listEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
   },
@@ -4862,9 +5233,7 @@ export const objects = {
       },
       query: queryPlan,
       type: planUpdateOrDeletePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   GuidFnPayload: {
@@ -4881,9 +5250,7 @@ export const objects = {
   List: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      byteaArray($record) {
-        return $record.get("bytea_array");
-      },
+      byteaArray: List_byteaArrayPlan,
       byteaArrayNn($record) {
         return $record.get("bytea_array_nn");
       },
@@ -4905,9 +5272,7 @@ export const objects = {
       dateArrayNn($record) {
         return $record.get("date_array_nn");
       },
-      enumArray($record) {
-        return $record.get("enum_array");
-      },
+      enumArray: List_enumArrayPlan,
       enumArrayNn($record) {
         return $record.get("enum_array_nn");
       },
@@ -5008,9 +5373,7 @@ export const objects = {
       anIntRange($record) {
         return $record.get("an_int_range");
       },
-      byteaArray($record) {
-        return $record.get("bytea_array");
-      },
+      byteaArray: List_byteaArrayPlan,
       compoundType($record) {
         const $plan = $record.get("compound_type");
         const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
@@ -5018,9 +5381,7 @@ export const objects = {
         $select.getClassStep().setTrusted();
         return $select;
       },
-      enumArray($record) {
-        return $record.get("enum_array");
-      },
+      enumArray: List_enumArrayPlan,
       int8ArrayDomain($record) {
         return $record.get("int8_array_domain");
       },
@@ -5093,9 +5454,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCustomMutationPlan,
       query: queryPlan,
       type: planCustomMutationPayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
   TypesConnection: {
@@ -5124,10 +5483,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      list: planUpdateOrDeletePayloadResult,
-      listEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_listsPgResource, listsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      list: planCreatePayloadResult,
+      listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
   },
@@ -5137,9 +5494,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       type: planUpdateOrDeletePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   }
 };
@@ -5191,18 +5546,8 @@ export const inputObjects = {
   CompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      },
+      a: CompoundTypeInput_aApply,
+      b: CompoundTypeInput_bApply,
       c(obj, val, {
         field,
         schema
@@ -5265,7 +5610,7 @@ export const inputObjects = {
   },
   CreateUpdatableViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       updatableView: applyCreateFields
     }
   },
@@ -5313,15 +5658,11 @@ export const inputObjects = {
       dateArrayNn($condition, val) {
         return applyAttributeCondition("date_array_nn", LIST_TYPES.date, $condition, val);
       },
-      enumArray($condition, val) {
-        return applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
-      },
+      enumArray: ListCondition_enumArrayApply,
       enumArrayNn($condition, val) {
         return applyAttributeCondition("enum_array_nn", colorArrayCodec, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: ListCondition_idApply,
       intArray($condition, val) {
         return applyAttributeCondition("int_array", LIST_TYPES.int, $condition, val);
       },
@@ -5339,167 +5680,37 @@ export const inputObjects = {
   ListInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      intArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      },
-      intArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+      byteaArray: ListInput_byteaArrayApply,
+      byteaArrayNn: ListInput_byteaArrayNnApply,
+      compoundTypeArray: ListInput_compoundTypeArrayApply,
+      compoundTypeArrayNn: ListInput_compoundTypeArrayNnApply,
+      dateArray: ListInput_dateArrayApply,
+      dateArrayNn: ListInput_dateArrayNnApply,
+      enumArray: ListInput_enumArrayApply,
+      enumArrayNn: ListInput_enumArrayNnApply,
+      id: ListInput_idApply,
+      intArray: ListInput_intArrayApply,
+      intArrayNn: ListInput_intArrayNnApply,
+      timestamptzArray: ListInput_timestamptzArrayApply,
+      timestamptzArrayNn: ListInput_timestamptzArrayNnApply
     }
   },
   ListPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundTypeArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array", bakedInputRuntime(schema, field.type, val));
-      },
-      dateArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      intArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array", bakedInputRuntime(schema, field.type, val));
-      },
-      intArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int_array_nn", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptzArrayNn(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz_array_nn", bakedInputRuntime(schema, field.type, val));
-      }
+      byteaArray: ListInput_byteaArrayApply,
+      byteaArrayNn: ListInput_byteaArrayNnApply,
+      compoundTypeArray: ListInput_compoundTypeArrayApply,
+      compoundTypeArrayNn: ListInput_compoundTypeArrayNnApply,
+      dateArray: ListInput_dateArrayApply,
+      dateArrayNn: ListInput_dateArrayNnApply,
+      enumArray: ListInput_enumArrayApply,
+      enumArrayNn: ListInput_enumArrayNnApply,
+      id: ListInput_idApply,
+      intArray: ListInput_intArrayApply,
+      intArrayNn: ListInput_intArrayNnApply,
+      timestamptzArray: ListInput_timestamptzArrayApply,
+      timestamptzArrayNn: ListInput_timestamptzArrayNnApply
     }
   },
   Mult1Input: {
@@ -5525,18 +5736,8 @@ export const inputObjects = {
   NestedCompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
-      },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
-      },
+      a: CompoundTypeInput_aApply,
+      b: CompoundTypeInput_bApply,
       bazBuz(obj, val, {
         field,
         schema
@@ -5580,12 +5781,8 @@ export const inputObjects = {
       enum($condition, val) {
         return applyAttributeCondition("enum", colorCodec, $condition, val);
       },
-      enumArray($condition, val) {
-        return applyAttributeCondition("enum_array", colorArrayCodec, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      enumArray: ListCondition_enumArrayApply,
+      id: ListCondition_idApply,
       inet($condition, val) {
         return applyAttributeCondition("inet", TYPES.inet, $condition, val);
       },
@@ -5711,611 +5908,111 @@ export const inputObjects = {
   TypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      anIntRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      },
-      bigint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      },
-      boolean(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      },
-      bytea(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      date(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      },
-      daterange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      },
-      decimal(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      },
-      domain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domain2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      int8ArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      interval(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      },
-      intervalArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      },
-      json(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonb(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonpath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
-      },
-      ltree(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      },
-      ltreeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      money(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      },
-      nestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableNestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullablePoint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      },
-      numeric(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      },
-      numrange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      regclass(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      },
-      regconfig(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      },
-      regdictionary(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      },
-      regoper(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      },
-      regoperator(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      },
-      regproc(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      },
-      regprocedure(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      },
-      regtype(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      },
-      smallint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      },
-      textArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      },
-      textArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      time(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      },
-      timetz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      },
-      varchar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+      anIntRange: TypeInput_anIntRangeApply,
+      bigint: TypeInput_bigintApply,
+      boolean: TypeInput_booleanApply,
+      bytea: TypeInput_byteaApply,
+      byteaArray: ListInput_byteaArrayApply,
+      cidr: TypeInput_cidrApply,
+      compoundType: TypeInput_compoundTypeApply,
+      date: TypeInput_dateApply,
+      daterange: TypeInput_daterangeApply,
+      decimal: TypeInput_decimalApply,
+      domain: TypeInput_domainApply,
+      domain2: TypeInput_domain2Apply,
+      enum: TypeInput_enumApply,
+      enumArray: ListInput_enumArrayApply,
+      id: ListInput_idApply,
+      inet: TypeInput_inetApply,
+      int8ArrayDomain: TypeInput_int8ArrayDomainApply,
+      interval: TypeInput_intervalApply,
+      intervalArray: TypeInput_intervalArrayApply,
+      json: TypeInput_jsonApply,
+      jsonb: TypeInput_jsonbApply,
+      jsonpath: TypeInput_jsonpathApply,
+      ltree: TypeInput_ltreeApply,
+      ltreeArray: TypeInput_ltreeArrayApply,
+      macaddr: TypeInput_macaddrApply,
+      money: TypeInput_moneyApply,
+      nestedCompoundType: TypeInput_nestedCompoundTypeApply,
+      nullableCompoundType: TypeInput_nullableCompoundTypeApply,
+      nullableNestedCompoundType: TypeInput_nullableNestedCompoundTypeApply,
+      nullablePoint: TypeInput_nullablePointApply,
+      nullableRange: TypeInput_nullableRangeApply,
+      numeric: TypeInput_numericApply,
+      numrange: TypeInput_numrangeApply,
+      point: TypeInput_pointApply,
+      regclass: TypeInput_regclassApply,
+      regconfig: TypeInput_regconfigApply,
+      regdictionary: TypeInput_regdictionaryApply,
+      regoper: TypeInput_regoperApply,
+      regoperator: TypeInput_regoperatorApply,
+      regproc: TypeInput_regprocApply,
+      regprocedure: TypeInput_regprocedureApply,
+      regtype: TypeInput_regtypeApply,
+      smallint: TypeInput_smallintApply,
+      textArray: TypeInput_textArrayApply,
+      textArrayDomain: TypeInput_textArrayDomainApply,
+      time: TypeInput_timeApply,
+      timestamp: TypeInput_timestampApply,
+      timestamptz: TypeInput_timestamptzApply,
+      timetz: TypeInput_timetzApply,
+      varchar: TypeInput_varcharApply
     }
   },
   TypePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      anIntRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("an_int_range", bakedInputRuntime(schema, field.type, val));
-      },
-      bigint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint", bakedInputRuntime(schema, field.type, val));
-      },
-      boolean(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("boolean", bakedInputRuntime(schema, field.type, val));
-      },
-      bytea(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea", bakedInputRuntime(schema, field.type, val));
-      },
-      byteaArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bytea_array", bakedInputRuntime(schema, field.type, val));
-      },
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      compoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      date(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("date", bakedInputRuntime(schema, field.type, val));
-      },
-      daterange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("daterange", bakedInputRuntime(schema, field.type, val));
-      },
-      decimal(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("decimal", bakedInputRuntime(schema, field.type, val));
-      },
-      domain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domain2(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain2", bakedInputRuntime(schema, field.type, val));
-      },
-      enum(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum", bakedInputRuntime(schema, field.type, val));
-      },
-      enumArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("enum_array", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      int8ArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("int8_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      interval(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval", bakedInputRuntime(schema, field.type, val));
-      },
-      intervalArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("interval_array", bakedInputRuntime(schema, field.type, val));
-      },
-      json(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("json", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonb(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
-      },
-      jsonpath(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
-      },
-      ltree(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree", bakedInputRuntime(schema, field.type, val));
-      },
-      ltreeArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("ltree_array", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      money(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("money", bakedInputRuntime(schema, field.type, val));
-      },
-      nestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableNestedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_nested_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      nullablePoint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullablePoint", bakedInputRuntime(schema, field.type, val));
-      },
-      nullableRange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("nullable_range", bakedInputRuntime(schema, field.type, val));
-      },
-      numeric(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numeric", bakedInputRuntime(schema, field.type, val));
-      },
-      numrange(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("numrange", bakedInputRuntime(schema, field.type, val));
-      },
-      point(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("point", bakedInputRuntime(schema, field.type, val));
-      },
-      regclass(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regclass", bakedInputRuntime(schema, field.type, val));
-      },
-      regconfig(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regconfig", bakedInputRuntime(schema, field.type, val));
-      },
-      regdictionary(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regdictionary", bakedInputRuntime(schema, field.type, val));
-      },
-      regoper(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoper", bakedInputRuntime(schema, field.type, val));
-      },
-      regoperator(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regoperator", bakedInputRuntime(schema, field.type, val));
-      },
-      regproc(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regproc", bakedInputRuntime(schema, field.type, val));
-      },
-      regprocedure(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regprocedure", bakedInputRuntime(schema, field.type, val));
-      },
-      regtype(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regtype", bakedInputRuntime(schema, field.type, val));
-      },
-      smallint(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("smallint", bakedInputRuntime(schema, field.type, val));
-      },
-      textArray(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array", bakedInputRuntime(schema, field.type, val));
-      },
-      textArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("text_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      time(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("time", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamp(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-      },
-      timestamptz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timestamptz", bakedInputRuntime(schema, field.type, val));
-      },
-      timetz(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("timetz", bakedInputRuntime(schema, field.type, val));
-      },
-      varchar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("varchar", bakedInputRuntime(schema, field.type, val));
-      }
+      anIntRange: TypeInput_anIntRangeApply,
+      bigint: TypeInput_bigintApply,
+      boolean: TypeInput_booleanApply,
+      bytea: TypeInput_byteaApply,
+      byteaArray: ListInput_byteaArrayApply,
+      cidr: TypeInput_cidrApply,
+      compoundType: TypeInput_compoundTypeApply,
+      date: TypeInput_dateApply,
+      daterange: TypeInput_daterangeApply,
+      decimal: TypeInput_decimalApply,
+      domain: TypeInput_domainApply,
+      domain2: TypeInput_domain2Apply,
+      enum: TypeInput_enumApply,
+      enumArray: ListInput_enumArrayApply,
+      id: ListInput_idApply,
+      inet: TypeInput_inetApply,
+      int8ArrayDomain: TypeInput_int8ArrayDomainApply,
+      interval: TypeInput_intervalApply,
+      intervalArray: TypeInput_intervalArrayApply,
+      json: TypeInput_jsonApply,
+      jsonb: TypeInput_jsonbApply,
+      jsonpath: TypeInput_jsonpathApply,
+      ltree: TypeInput_ltreeApply,
+      ltreeArray: TypeInput_ltreeArrayApply,
+      macaddr: TypeInput_macaddrApply,
+      money: TypeInput_moneyApply,
+      nestedCompoundType: TypeInput_nestedCompoundTypeApply,
+      nullableCompoundType: TypeInput_nullableCompoundTypeApply,
+      nullableNestedCompoundType: TypeInput_nullableNestedCompoundTypeApply,
+      nullablePoint: TypeInput_nullablePointApply,
+      nullableRange: TypeInput_nullableRangeApply,
+      numeric: TypeInput_numericApply,
+      numrange: TypeInput_numrangeApply,
+      point: TypeInput_pointApply,
+      regclass: TypeInput_regclassApply,
+      regconfig: TypeInput_regconfigApply,
+      regdictionary: TypeInput_regdictionaryApply,
+      regoper: TypeInput_regoperApply,
+      regoperator: TypeInput_regoperatorApply,
+      regproc: TypeInput_regprocApply,
+      regprocedure: TypeInput_regprocedureApply,
+      regtype: TypeInput_regtypeApply,
+      smallint: TypeInput_smallintApply,
+      textArray: TypeInput_textArrayApply,
+      textArrayDomain: TypeInput_textArrayDomainApply,
+      time: TypeInput_timeApply,
+      timestamp: TypeInput_timestampApply,
+      timestamptz: TypeInput_timestamptzApply,
+      timetz: TypeInput_timetzApply,
+      varchar: TypeInput_varcharApply
     }
   },
   UpdatableViewCondition: {
@@ -6371,8 +6068,8 @@ export const inputObjects = {
   },
   UpdateListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      listPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      listPatch: applyCreateFields
     }
   },
   UpdateTypeByIdInput: {
@@ -6530,9 +6227,7 @@ export const scalars = {
       return jsonwebtoken.sign(token, "secret", options);
     },
     parseValue: LTreeParseValue,
-    parseLiteral(node, variables) {
-      return LTreeParseValue(valueFromASTUntyped(node, variables));
-    },
+    parseLiteral: LTreeParseLiteral,
     plan($in) {
       const $record = $in;
       return $record.record();
@@ -6543,9 +6238,7 @@ export const scalars = {
       return x;
     },
     parseValue: LTreeParseValue,
-    parseLiteral(node, variables) {
-      return LTreeParseValue(valueFromASTUntyped(node, variables));
-    }
+    parseLiteral: LTreeParseLiteral
   },
   RegClass: {
     serialize: toString,
@@ -6686,20 +6379,8 @@ export const enums = {
   },
   ListsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: ListsOrderBy_ID_ASCApply,
+      ID_DESC: ListsOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         listsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -6830,20 +6511,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: ListsOrderBy_ID_ASCApply,
+      ID_DESC: ListsOrderBy_ID_DESCApply,
       INET_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "inet",

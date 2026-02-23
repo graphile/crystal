@@ -571,10 +571,9 @@ const specFromArgs_Network = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
-const specFromArgs_Network2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
-};
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -598,20 +597,42 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function getClientMutationIdForUpdateOrDeletePlan($mutation) {
-  const $result = $mutation.getStepForKey("result");
-  return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateNetworkPayload_networkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function NetworkInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function NetworkInput_inetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+}
+function NetworkInput_cidrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+}
+function NetworkInput_macaddrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1049,7 +1070,7 @@ export const objects = {
       },
       deleteNetwork: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network2(args));
+          const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1108,12 +1129,8 @@ export const objects = {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
       },
-      network($object) {
-        return $object.get("result");
-      },
-      networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
-      },
+      network: planCreatePayloadResult,
+      networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
   },
@@ -1127,9 +1144,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       network: planUpdateOrDeletePayloadResult,
-      networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
-      },
+      networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
   },
@@ -1161,10 +1176,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      network: planUpdateOrDeletePayloadResult,
-      networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
-      },
+      network: planCreatePayloadResult,
+      networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
   }
@@ -1191,14 +1204,8 @@ export const interfaces = {
 export const inputObjects = {
   CreateNetworkInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      network(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      network: applyCreateFields
     }
   },
   DeleteNetworkByIdInput: {
@@ -1230,59 +1237,19 @@ export const inputObjects = {
   NetworkInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      }
+      cidr: NetworkInput_cidrApply,
+      id: NetworkInput_idApply,
+      inet: NetworkInput_inetApply,
+      macaddr: NetworkInput_macaddrApply
     }
   },
   NetworkPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      }
+      cidr: NetworkInput_cidrApply,
+      id: NetworkInput_idApply,
+      inet: NetworkInput_inetApply,
+      macaddr: NetworkInput_macaddrApply
     }
   },
   UpdateNetworkByIdInput: {
@@ -1293,8 +1260,8 @@ export const inputObjects = {
   },
   UpdateNetworkInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      networkPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      networkPatch: applyCreateFields
     }
   }
 };

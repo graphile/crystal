@@ -700,10 +700,9 @@ const specFromArgs_T = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
-const specFromArgs_T2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_T, $nodeId);
-};
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -727,20 +726,30 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function getClientMutationIdForUpdateOrDeletePlan($mutation) {
-  const $result = $mutation.getStepForKey("result");
-  return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateTPayload_tEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function TInput_kApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("k", bakedInputRuntime(schema, field.type, val));
+}
+function TInput_vApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("v", bakedInputRuntime(schema, field.type, val));
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1171,7 +1180,7 @@ export const objects = {
       },
       deleteT: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_tPgResource, specFromArgs_T2(args));
+          const $delete = pgDeleteSingle(resource_tPgResource, specFromArgs_T(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1231,12 +1240,8 @@ export const objects = {
         return $insert.getMeta("clientMutationId");
       },
       query: queryPlan,
-      t($object) {
-        return $object.get("result");
-      },
-      tEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
-      }
+      t: planCreatePayloadResult,
+      tEdge: CreateTPayload_tEdgePlan
     }
   },
   DeleteTPayload: {
@@ -1250,9 +1255,7 @@ export const objects = {
       },
       query: queryPlan,
       t: planUpdateOrDeletePayloadResult,
-      tEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
-      }
+      tEdge: CreateTPayload_tEdgePlan
     }
   },
   T: {
@@ -1292,10 +1295,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      t: planUpdateOrDeletePayloadResult,
-      tEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(tUniques[0].attributes, $mutation, fieldArgs);
-      }
+      t: planCreatePayloadResult,
+      tEdge: CreateTPayload_tEdgePlan
     }
   },
   WorkHour: {
@@ -1338,14 +1339,8 @@ export const interfaces = {
 export const inputObjects = {
   CreateTInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      t(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      t: applyCreateFields
     }
   },
   DeleteTByKInput: {
@@ -1371,35 +1366,15 @@ export const inputObjects = {
   TInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      k(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("k", bakedInputRuntime(schema, field.type, val));
-      },
-      v(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("v", bakedInputRuntime(schema, field.type, val));
-      }
+      k: TInput_kApply,
+      v: TInput_vApply
     }
   },
   TPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      k(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("k", bakedInputRuntime(schema, field.type, val));
-      },
-      v(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("v", bakedInputRuntime(schema, field.type, val));
-      }
+      k: TInput_kApply,
+      v: TInput_vApply
     }
   },
   UpdateTByKInput: {
@@ -1410,8 +1385,8 @@ export const inputObjects = {
   },
   UpdateTInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      tPatch: applyCreateFields
     }
   },
   WorkHourInput: {

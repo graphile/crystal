@@ -917,6 +917,34 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const AlwaysAsIdentityCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const AlwaysAsIdentityCondition_tApply = ($condition, val) => applyAttributeCondition("t", TYPES.text, $condition, val);
+const AlwaysAsIdentitiesOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const AlwaysAsIdentitiesOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const AlwaysAsIdentitiesOrderBy_T_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "t",
+    direction: "ASC"
+  });
+};
+const AlwaysAsIdentitiesOrderBy_T_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "t",
+    direction: "DESC"
+  });
+};
 function applyInputToInsert(_, $object) {
   return $object;
 }
@@ -936,22 +964,6 @@ const specFromArgs_Network = args => {
   return specFromNodeId(nodeIdHandler_Network, $nodeId);
 };
 const specFromArgs_Type = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
-};
-const specFromArgs_AlwaysAsIdentity2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_AlwaysAsIdentity, $nodeId);
-};
-const specFromArgs_ByDefaultAsIdentity2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ByDefaultAsIdentity, $nodeId);
-};
-const specFromArgs_Network2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
-};
-const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
@@ -985,6 +997,7 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CreateAlwaysAsIdentityPayload_alwaysAsIdentityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
 function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
@@ -993,20 +1006,72 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
+function AlwaysAsIdentityInput_tApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("t", bakedInputRuntime(schema, field.type, val));
+}
+const CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
+function ByDefaultAsIdentityInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+const CreateNetworkPayload_networkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
+function NetworkInput_inetApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+}
+function NetworkInput_cidrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+}
+function NetworkInput_macaddrApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+}
+function NetworkInput_macaddr8Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("macaddr8", bakedInputRuntime(schema, field.type, val));
+}
+const CreateTypePayload_typeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
+function TypeInput_regroleApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regrole", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_regnamespaceApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("regnamespace", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_bigintDomainArrayDomainApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("bigint_domain_array_domain", bakedInputRuntime(schema, field.type, val));
+}
+function TypeInput_domainConstrainedCompoundTypeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("domain_constrained_compound_type", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -2565,7 +2630,7 @@ export const objects = {
       },
       deleteAlwaysAsIdentity: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_always_as_identityPgResource, specFromArgs_AlwaysAsIdentity2(args));
+          const $delete = pgDeleteSingle(resource_always_as_identityPgResource, specFromArgs_AlwaysAsIdentity(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2591,7 +2656,7 @@ export const objects = {
       },
       deleteByDefaultAsIdentity: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_by_default_as_identityPgResource, specFromArgs_ByDefaultAsIdentity2(args));
+          const $delete = pgDeleteSingle(resource_by_default_as_identityPgResource, specFromArgs_ByDefaultAsIdentity(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2617,7 +2682,7 @@ export const objects = {
       },
       deleteNetwork: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network2(args));
+          const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2643,7 +2708,7 @@ export const objects = {
       },
       deleteType: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_typesPgResource, specFromArgs_Type2(args));
+          const $delete = pgDeleteSingle(resource_typesPgResource, specFromArgs_Type(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2821,9 +2886,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       alwaysAsIdentity: planCreatePayloadResult,
-      alwaysAsIdentityEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
-      },
+      alwaysAsIdentityEdge: CreateAlwaysAsIdentityPayload_alwaysAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -2832,9 +2895,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       byDefaultAsIdentity: planCreatePayloadResult,
-      byDefaultAsIdentityEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
-      },
+      byDefaultAsIdentityEdge: CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -2844,9 +2905,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       network: planCreatePayloadResult,
-      networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
-      },
+      networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
   },
@@ -2856,18 +2915,14 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       type: planCreatePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: CreateTypePayload_typeEdgePlan
     }
   },
   DeleteAlwaysAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
       alwaysAsIdentity: planUpdateOrDeletePayloadResult,
-      alwaysAsIdentityEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
-      },
+      alwaysAsIdentityEdge: CreateAlwaysAsIdentityPayload_alwaysAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedAlwaysAsIdentityId($object) {
         const $record = $object.getStepForKey("result");
@@ -2881,9 +2936,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       byDefaultAsIdentity: planUpdateOrDeletePayloadResult,
-      byDefaultAsIdentityEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
-      },
+      byDefaultAsIdentityEdge: CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedByDefaultAsIdentityId($object) {
         const $record = $object.getStepForKey("result");
@@ -2903,9 +2956,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       network: planUpdateOrDeletePayloadResult,
-      networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
-      },
+      networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
   },
@@ -2920,9 +2971,7 @@ export const objects = {
       },
       query: queryPlan,
       type: planUpdateOrDeletePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: CreateTypePayload_typeEdgePlan
     }
   },
   DomainConstrainedCompoundType: {
@@ -2992,10 +3041,8 @@ export const objects = {
   UpdateAlwaysAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      alwaysAsIdentity: planUpdateOrDeletePayloadResult,
-      alwaysAsIdentityEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
-      },
+      alwaysAsIdentity: planCreatePayloadResult,
+      alwaysAsIdentityEdge: CreateAlwaysAsIdentityPayload_alwaysAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -3004,9 +3051,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       byDefaultAsIdentity: planUpdateOrDeletePayloadResult,
-      byDefaultAsIdentityEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
-      },
+      byDefaultAsIdentityEdge: CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -3016,9 +3061,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       network: planUpdateOrDeletePayloadResult,
-      networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
-      },
+      networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
   },
@@ -3028,9 +3071,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       type: planUpdateOrDeletePayloadResult,
-      typeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-      }
+      typeEdge: CreateTypePayload_typeEdgePlan
     }
   }
 };
@@ -3056,78 +3097,40 @@ export const interfaces = {
 export const inputObjects = {
   AlwaysAsIdentityCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
-      t($condition, val) {
-        return applyAttributeCondition("t", TYPES.text, $condition, val);
-      }
+      id: AlwaysAsIdentityCondition_idApply,
+      t: AlwaysAsIdentityCondition_tApply
     }
   },
   AlwaysAsIdentityInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      t(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("t", bakedInputRuntime(schema, field.type, val));
-      }
+      t: AlwaysAsIdentityInput_tApply
     }
   },
   AlwaysAsIdentityPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      t(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("t", bakedInputRuntime(schema, field.type, val));
-      }
+      t: AlwaysAsIdentityInput_tApply
     }
   },
   ByDefaultAsIdentityCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
-      t($condition, val) {
-        return applyAttributeCondition("t", TYPES.text, $condition, val);
-      }
+      id: AlwaysAsIdentityCondition_idApply,
+      t: AlwaysAsIdentityCondition_tApply
     }
   },
   ByDefaultAsIdentityInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      t(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("t", bakedInputRuntime(schema, field.type, val));
-      }
+      id: ByDefaultAsIdentityInput_idApply,
+      t: AlwaysAsIdentityInput_tApply
     }
   },
   ByDefaultAsIdentityPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      t(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("t", bakedInputRuntime(schema, field.type, val));
-      }
+      id: ByDefaultAsIdentityInput_idApply,
+      t: AlwaysAsIdentityInput_tApply
     }
   },
   CreateAlwaysAsIdentityInput: {
@@ -3252,9 +3255,7 @@ export const inputObjects = {
       cidr($condition, val) {
         return applyAttributeCondition("cidr", TYPES.cidr, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: AlwaysAsIdentityCondition_idApply,
       inet($condition, val) {
         return applyAttributeCondition("inet", TYPES.inet, $condition, val);
       },
@@ -3269,71 +3270,21 @@ export const inputObjects = {
   NetworkInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr8(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr8", bakedInputRuntime(schema, field.type, val));
-      }
+      cidr: NetworkInput_cidrApply,
+      id: ByDefaultAsIdentityInput_idApply,
+      inet: NetworkInput_inetApply,
+      macaddr: NetworkInput_macaddrApply,
+      macaddr8: NetworkInput_macaddr8Apply
     }
   },
   NetworkPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      cidr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      inet(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("inet", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-      },
-      macaddr8(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("macaddr8", bakedInputRuntime(schema, field.type, val));
-      }
+      cidr: NetworkInput_cidrApply,
+      id: ByDefaultAsIdentityInput_idApply,
+      inet: NetworkInput_inetApply,
+      macaddr: NetworkInput_macaddrApply,
+      macaddr8: NetworkInput_macaddr8Apply
     }
   },
   TypeCondition: {
@@ -3344,9 +3295,7 @@ export const inputObjects = {
       domainConstrainedCompoundType($condition, val) {
         return applyAttributeCondition("domain_constrained_compound_type", domainConstrainedCompoundTypeCodec, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: AlwaysAsIdentityCondition_idApply,
       regnamespace($condition, val) {
         return applyAttributeCondition("regnamespace", TYPES.regnamespace, $condition, val);
       },
@@ -3358,71 +3307,21 @@ export const inputObjects = {
   TypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      bigintDomainArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint_domain_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domainConstrainedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain_constrained_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      regnamespace(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regnamespace", bakedInputRuntime(schema, field.type, val));
-      },
-      regrole(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regrole", bakedInputRuntime(schema, field.type, val));
-      }
+      bigintDomainArrayDomain: TypeInput_bigintDomainArrayDomainApply,
+      domainConstrainedCompoundType: TypeInput_domainConstrainedCompoundTypeApply,
+      id: ByDefaultAsIdentityInput_idApply,
+      regnamespace: TypeInput_regnamespaceApply,
+      regrole: TypeInput_regroleApply
     }
   },
   TypePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      bigintDomainArrayDomain(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("bigint_domain_array_domain", bakedInputRuntime(schema, field.type, val));
-      },
-      domainConstrainedCompoundType(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("domain_constrained_compound_type", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      regnamespace(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regnamespace", bakedInputRuntime(schema, field.type, val));
-      },
-      regrole(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("regrole", bakedInputRuntime(schema, field.type, val));
-      }
+      bigintDomainArrayDomain: TypeInput_bigintDomainArrayDomainApply,
+      domainConstrainedCompoundType: TypeInput_domainConstrainedCompoundTypeApply,
+      id: ByDefaultAsIdentityInput_idApply,
+      regnamespace: TypeInput_regnamespaceApply,
+      regrole: TypeInput_regroleApply
     }
   },
   UpdateAlwaysAsIdentityByIdInput: {
@@ -3433,8 +3332,8 @@ export const inputObjects = {
   },
   UpdateAlwaysAsIdentityInput: {
     plans: {
-      alwaysAsIdentityPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      alwaysAsIdentityPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateByDefaultAsIdentityByIdInput: {
@@ -3571,20 +3470,8 @@ export const scalars = {
 export const enums = {
   AlwaysAsIdentitiesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: AlwaysAsIdentitiesOrderBy_ID_ASCApply,
+      ID_DESC: AlwaysAsIdentitiesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         always_as_identityUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -3603,36 +3490,14 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      T_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "t",
-          direction: "ASC"
-        });
-      },
-      T_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "t",
-          direction: "DESC"
-        });
-      }
+      T_ASC: AlwaysAsIdentitiesOrderBy_T_ASCApply,
+      T_DESC: AlwaysAsIdentitiesOrderBy_T_DESCApply
     }
   },
   ByDefaultAsIdentitiesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: AlwaysAsIdentitiesOrderBy_ID_ASCApply,
+      ID_DESC: AlwaysAsIdentitiesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         by_default_as_identityUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -3651,18 +3516,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      T_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "t",
-          direction: "ASC"
-        });
-      },
-      T_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "t",
-          direction: "DESC"
-        });
-      }
+      T_ASC: AlwaysAsIdentitiesOrderBy_T_ASCApply,
+      T_DESC: AlwaysAsIdentitiesOrderBy_T_DESCApply
     }
   },
   Color: {
@@ -3712,20 +3567,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: AlwaysAsIdentitiesOrderBy_ID_ASCApply,
+      ID_DESC: AlwaysAsIdentitiesOrderBy_ID_DESCApply,
       INET_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "inet",
@@ -3796,20 +3639,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: AlwaysAsIdentitiesOrderBy_ID_ASCApply,
+      ID_DESC: AlwaysAsIdentitiesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         typesUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

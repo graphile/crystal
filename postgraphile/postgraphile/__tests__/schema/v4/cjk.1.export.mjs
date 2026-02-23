@@ -562,6 +562,9 @@ const specFromArgs_QiJian = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -585,13 +588,26 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateQiJianPayload_qiJianEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function QiJianInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function QiJianInput_qiJianApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -979,12 +995,8 @@ export const objects = {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
       },
-      qiJian($object) {
-        return $object.get("result");
-      },
-      qiJianEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      qiJian: planCreatePayloadResult,
+      qiJianEdge: CreateQiJianPayload_qiJianEdgePlan,
       query: queryPlan
     }
   },
@@ -1022,12 +1034,8 @@ export const objects = {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
       },
-      qiJian($object) {
-        return $object.get("result");
-      },
-      qiJianEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      qiJian: planCreatePayloadResult,
+      qiJianEdge: CreateQiJianPayload_qiJianEdgePlan,
       query: queryPlan
     }
   }
@@ -1054,14 +1062,8 @@ export const interfaces = {
 export const inputObjects = {
   CreateQiJianInput: {
     plans: {
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      },
-      qiJian(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      }
+      clientMutationId: applyClientMutationIdForCreate,
+      qiJian: applyCreateFields
     }
   },
   QiJianCondition: {
@@ -1077,35 +1079,15 @@ export const inputObjects = {
   QiJianInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      qiJian(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
-      }
+      id: QiJianInput_idApply,
+      qiJian: QiJianInput_qiJianApply
     }
   },
   QiJianPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      qiJian(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
-      }
+      id: QiJianInput_idApply,
+      qiJian: QiJianInput_qiJianApply
     }
   },
   UpdateQiJianByIdInput: {
@@ -1116,8 +1098,8 @@ export const inputObjects = {
   },
   UpdateQiJianInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      qiJianPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      qiJianPatch: applyCreateFields
     }
   }
 };

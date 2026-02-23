@@ -1351,6 +1351,21 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const TvEpisodeCondition_codeApply = ($condition, val) => applyAttributeCondition("code", TYPES.int, $condition, val);
+const TvEpisodesOrderBy_CODE_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "code",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const TvEpisodesOrderBy_CODE_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "code",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -1407,6 +1422,21 @@ const scalarComputed = ($in, args) => {
   const from = pgFromExpression($row, resource_person_full_namePgResource.from, resource_person_full_namePgResource.parameters, selectArgs);
   return pgClassExpression($row, resource_person_full_namePgResource.codec, undefined)`${from}`;
 };
+const PostCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const PostsOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const PostsOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 const resource_getflamblePgResource = registry.pgResources["getflamble"];
 function pgSelectFromPayload($payload) {
   const $result = $payload.getStepForKey("result");
@@ -1460,30 +1490,6 @@ const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
-const specFromArgs_Film2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Film, $nodeId);
-};
-const specFromArgs_Studio2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
-};
-const specFromArgs_Post2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
-};
-const specFromArgs_TvEpisode2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvEpisode, $nodeId);
-};
-const specFromArgs_TvShow2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvShow, $nodeId);
-};
-const specFromArgs_Person2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
-};
 function getClientMutationIdForCustomMutationPlan($object) {
   const $result = $object.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -1503,9 +1509,6 @@ function getClientMutationIdForCreatePlan($mutation) {
 }
 function planCreatePayloadResult($object) {
   return $object.get("result");
-}
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
 }
 function applyCreateFields(qb, arg) {
   if (arg != null) {
@@ -1532,20 +1535,96 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CreateFilmPayload_filmEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
+function FilmInput_codeApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("code", bakedInputRuntime(schema, field.type, val));
+}
+function FilmInput_titleApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("title", bakedInputRuntime(schema, field.type, val));
+}
+const CreateStudioPayload_studioEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
+function StudioInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function StudioInput_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("name", bakedInputRuntime(schema, field.type, val));
+}
+const CreatePostPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
+const CreatePostPayload_authorPlan = $record => resource_personPgResource.get({
+  id: $record.get("result").get("author_id")
+});
+function PostInput_bodyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("body", bakedInputRuntime(schema, field.type, val));
+}
+function PostInput_authorIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("author_id", bakedInputRuntime(schema, field.type, val));
+}
+const CreateTvEpisodePayload_tvEpisodeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
+const CreateTvEpisodePayload_tvShowByShowIdPlan = $record => resource_tv_showsPgResource.get({
+  code: $record.get("result").get("show_id")
+});
+function TvEpisodeInput_showIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("show_id", bakedInputRuntime(schema, field.type, val));
+}
+const CreateTvShowPayload_tvShowEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
+const CreateTvShowPayload_studioByStudioIdPlan = $record => resource_studiosPgResource.get({
+  id: $record.get("result").get("studio_id")
+});
+function TvShowInput_studioIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("studio_id", bakedInputRuntime(schema, field.type, val));
+}
+const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
+function PersonInput_firstNameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("first_name", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_lastNameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("last_name", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_colNoOrderApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col_no_order", bakedInputRuntime(schema, field.type, val));
+}
+function PersonInput_colNoFilterApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("col_no_filter", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -4006,7 +4085,7 @@ export const objects = {
       },
       deleteFilm: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_filmsPgResource, specFromArgs_Film2(args));
+          const $delete = pgDeleteSingle(resource_filmsPgResource, specFromArgs_Film(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4032,7 +4111,7 @@ export const objects = {
       },
       deletePerson: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
+          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4058,7 +4137,7 @@ export const objects = {
       },
       deletePost: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_postPgResource, specFromArgs_Post2(args));
+          const $delete = pgDeleteSingle(resource_postPgResource, specFromArgs_Post(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4084,7 +4163,7 @@ export const objects = {
       },
       deleteStudio: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_studiosPgResource, specFromArgs_Studio2(args));
+          const $delete = pgDeleteSingle(resource_studiosPgResource, specFromArgs_Studio(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4110,7 +4189,7 @@ export const objects = {
       },
       deleteTvEpisode: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_tv_episodesPgResource, specFromArgs_TvEpisode2(args));
+          const $delete = pgDeleteSingle(resource_tv_episodesPgResource, specFromArgs_TvEpisode(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4136,7 +4215,7 @@ export const objects = {
       },
       deleteTvShow: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_tv_showsPgResource, specFromArgs_TvShow2(args));
+          const $delete = pgDeleteSingle(resource_tv_showsPgResource, specFromArgs_TvShow(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4347,9 +4426,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       film: planCreatePayloadResult,
-      filmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      filmEdge: CreateFilmPayload_filmEdgePlan,
       query: queryPlan
     }
   },
@@ -4358,25 +4435,17 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       person: planCreatePayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
   },
   CreatePostPayload: {
     assertStep: assertStep,
     plans: {
-      author($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
+      author: CreatePostPayload_authorPlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       post: planCreatePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: CreatePostPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -4394,9 +4463,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       studio: planCreatePayloadResult,
-      studioEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
-      }
+      studioEdge: CreateStudioPayload_studioEdgePlan
     }
   },
   CreateTvEpisodePayload: {
@@ -4405,14 +4472,8 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       tvEpisode: planCreatePayloadResult,
-      tvEpisodeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
-      },
-      tvShowByShowId($record) {
-        return resource_tv_showsPgResource.get({
-          code: $record.get("result").get("show_id")
-        });
-      }
+      tvEpisodeEdge: CreateTvEpisodePayload_tvEpisodeEdgePlan,
+      tvShowByShowId: CreateTvEpisodePayload_tvShowByShowIdPlan
     }
   },
   CreateTvShowPayload: {
@@ -4420,15 +4481,9 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
-      studioByStudioId($record) {
-        return resource_studiosPgResource.get({
-          id: $record.get("result").get("studio_id")
-        });
-      },
+      studioByStudioId: CreateTvShowPayload_studioByStudioIdPlan,
       tvShow: planCreatePayloadResult,
-      tvShowEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      tvShowEdge: CreateTvShowPayload_tvShowEdgePlan
     }
   },
   DeleteFilmPayload: {
@@ -4441,9 +4496,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       film: planUpdateOrDeletePayloadResult,
-      filmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      filmEdge: CreateFilmPayload_filmEdgePlan,
       query: queryPlan
     }
   },
@@ -4457,20 +4510,14 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       person: planUpdateOrDeletePayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
   },
   DeletePostPayload: {
     assertStep: ObjectStep,
     plans: {
-      author($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
+      author: CreatePostPayload_authorPlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedPostId($object) {
         const $record = $object.getStepForKey("result");
@@ -4478,9 +4525,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       post: planUpdateOrDeletePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: CreatePostPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -4495,9 +4540,7 @@ export const objects = {
       },
       query: queryPlan,
       studio: planUpdateOrDeletePayloadResult,
-      studioEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
-      }
+      studioEdge: CreateStudioPayload_studioEdgePlan
     }
   },
   DeleteTvEpisodePayload: {
@@ -4511,14 +4554,8 @@ export const objects = {
       },
       query: queryPlan,
       tvEpisode: planUpdateOrDeletePayloadResult,
-      tvEpisodeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
-      },
-      tvShowByShowId($record) {
-        return resource_tv_showsPgResource.get({
-          code: $record.get("result").get("show_id")
-        });
-      }
+      tvEpisodeEdge: CreateTvEpisodePayload_tvEpisodeEdgePlan,
+      tvShowByShowId: CreateTvEpisodePayload_tvShowByShowIdPlan
     }
   },
   DeleteTvShowPayload: {
@@ -4531,15 +4568,9 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      studioByStudioId($record) {
-        return resource_studiosPgResource.get({
-          id: $record.get("result").get("studio_id")
-        });
-      },
+      studioByStudioId: CreateTvShowPayload_studioByStudioIdPlan,
       tvShow: planUpdateOrDeletePayloadResult,
-      tvShowEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      tvShowEdge: CreateTvShowPayload_tvShowEdgePlan
     }
   },
   Film: {
@@ -4816,10 +4847,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      film: planUpdateOrDeletePayloadResult,
-      filmEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
-      },
+      film: planCreatePayloadResult,
+      filmEdge: CreateFilmPayload_filmEdgePlan,
       query: queryPlan
     }
   },
@@ -4828,25 +4857,17 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       person: planUpdateOrDeletePayloadResult,
-      personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-      },
+      personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
   },
   UpdatePostPayload: {
     assertStep: ObjectStep,
     plans: {
-      author($record) {
-        return resource_personPgResource.get({
-          id: $record.get("result").get("author_id")
-        });
-      },
+      author: CreatePostPayload_authorPlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       post: planUpdateOrDeletePayloadResult,
-      postEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
-      },
+      postEdge: CreatePostPayload_postEdgePlan,
       query: queryPlan
     }
   },
@@ -4856,9 +4877,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       studio: planUpdateOrDeletePayloadResult,
-      studioEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
-      }
+      studioEdge: CreateStudioPayload_studioEdgePlan
     }
   },
   UpdateTvEpisodePayload: {
@@ -4867,14 +4886,8 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       tvEpisode: planUpdateOrDeletePayloadResult,
-      tvEpisodeEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
-      },
-      tvShowByShowId($record) {
-        return resource_tv_showsPgResource.get({
-          code: $record.get("result").get("show_id")
-        });
-      }
+      tvEpisodeEdge: CreateTvEpisodePayload_tvEpisodeEdgePlan,
+      tvShowByShowId: CreateTvEpisodePayload_tvShowByShowIdPlan
     }
   },
   UpdateTvShowPayload: {
@@ -4882,15 +4895,9 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      studioByStudioId($record) {
-        return resource_studiosPgResource.get({
-          id: $record.get("result").get("studio_id")
-        });
-      },
+      studioByStudioId: CreateTvShowPayload_studioByStudioIdPlan,
       tvShow: planUpdateOrDeletePayloadResult,
-      tvShowEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
-      }
+      tvShowEdge: CreateTvShowPayload_tvShowEdgePlan
     }
   }
 };
@@ -4934,7 +4941,7 @@ export const inputObjects = {
   },
   CreateRenamedTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       renamedTable: applyCreateFields
     }
   },
@@ -5018,9 +5025,7 @@ export const inputObjects = {
   },
   FilmCondition: {
     plans: {
-      code($condition, val) {
-        return applyAttributeCondition("code", TYPES.int, $condition, val);
-      },
+      code: TvEpisodeCondition_codeApply,
       title($condition, val) {
         return applyAttributeCondition("title", TYPES.varchar, $condition, val);
       }
@@ -5029,35 +5034,15 @@ export const inputObjects = {
   FilmInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      code(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("code", bakedInputRuntime(schema, field.type, val));
-      },
-      title(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("title", bakedInputRuntime(schema, field.type, val));
-      }
+      code: FilmInput_codeApply,
+      title: FilmInput_titleApply
     }
   },
   FilmPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      code(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("code", bakedInputRuntime(schema, field.type, val));
-      },
-      title(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("title", bakedInputRuntime(schema, field.type, val));
-      }
+      code: FilmInput_codeApply,
+      title: FilmInput_titleApply
     }
   },
   GetflambleInput: {
@@ -5087,9 +5072,7 @@ export const inputObjects = {
       firstName($condition, val) {
         return applyAttributeCondition("first_name", TYPES.varchar, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PostCondition_idApply,
       lastName($condition, val) {
         return applyAttributeCondition("last_name", TYPES.varchar, $condition, val);
       }
@@ -5098,42 +5081,17 @@ export const inputObjects = {
   PersonInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      colNoFilter(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col_no_filter", bakedInputRuntime(schema, field.type, val));
-      },
-      colNoOrder(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col_no_order", bakedInputRuntime(schema, field.type, val));
-      },
+      colNoFilter: PersonInput_colNoFilterApply,
+      colNoOrder: PersonInput_colNoOrderApply,
       colNoUpdate(obj, val, {
         field,
         schema
       }) {
         obj.set("col_no_update", bakedInputRuntime(schema, field.type, val));
       },
-      firstName(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("first_name", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lastName(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_name", bakedInputRuntime(schema, field.type, val));
-      }
+      firstName: PersonInput_firstNameApply,
+      id: StudioInput_idApply,
+      lastName: PersonInput_lastNameApply
     }
   },
   PersonPatch: {
@@ -5145,36 +5103,11 @@ export const inputObjects = {
       }) {
         obj.set("col_no_create", bakedInputRuntime(schema, field.type, val));
       },
-      colNoFilter(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col_no_filter", bakedInputRuntime(schema, field.type, val));
-      },
-      colNoOrder(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col_no_order", bakedInputRuntime(schema, field.type, val));
-      },
-      firstName(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("first_name", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      lastName(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("last_name", bakedInputRuntime(schema, field.type, val));
-      }
+      colNoFilter: PersonInput_colNoFilterApply,
+      colNoOrder: PersonInput_colNoOrderApply,
+      firstName: PersonInput_firstNameApply,
+      id: StudioInput_idApply,
+      lastName: PersonInput_lastNameApply
     }
   },
   PostCondition: {
@@ -5185,55 +5118,23 @@ export const inputObjects = {
       body($condition, val) {
         return applyAttributeCondition("body", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: PostCondition_idApply
     }
   },
   PostInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      authorId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      },
-      body(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      authorId: PostInput_authorIdApply,
+      body: PostInput_bodyApply,
+      id: StudioInput_idApply
     }
   },
   PostPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      authorId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("author_id", bakedInputRuntime(schema, field.type, val));
-      },
-      body(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("body", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      authorId: PostInput_authorIdApply,
+      body: PostInput_bodyApply,
+      id: StudioInput_idApply
     }
   },
   RenamedTableCondition: {
@@ -5256,9 +5157,7 @@ export const inputObjects = {
   },
   StudioCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PostCondition_idApply,
       name($condition, val) {
         return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
@@ -5267,42 +5166,20 @@ export const inputObjects = {
   StudioInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      id: StudioInput_idApply,
+      name: StudioInput_nameApply
     }
   },
   StudioPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      id: StudioInput_idApply,
+      name: StudioInput_nameApply
     }
   },
   TvEpisodeCondition: {
     plans: {
-      code($condition, val) {
-        return applyAttributeCondition("code", TYPES.int, $condition, val);
-      },
+      code: TvEpisodeCondition_codeApply,
       showId($condition, val) {
         return applyAttributeCondition("show_id", TYPES.int, $condition, val);
       }
@@ -5311,42 +5188,20 @@ export const inputObjects = {
   TvEpisodeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      code(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("code", bakedInputRuntime(schema, field.type, val));
-      },
-      showId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("show_id", bakedInputRuntime(schema, field.type, val));
-      }
+      code: FilmInput_codeApply,
+      showId: TvEpisodeInput_showIdApply
     }
   },
   TvEpisodePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      code(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("code", bakedInputRuntime(schema, field.type, val));
-      },
-      showId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("show_id", bakedInputRuntime(schema, field.type, val));
-      }
+      code: FilmInput_codeApply,
+      showId: TvEpisodeInput_showIdApply
     }
   },
   TvShowCondition: {
     plans: {
-      code($condition, val) {
-        return applyAttributeCondition("code", TYPES.int, $condition, val);
-      },
+      code: TvEpisodeCondition_codeApply,
       studioId($condition, val) {
         return applyAttributeCondition("studio_id", TYPES.int, $condition, val);
       }
@@ -5355,35 +5210,15 @@ export const inputObjects = {
   TvShowInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      code(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("code", bakedInputRuntime(schema, field.type, val));
-      },
-      studioId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("studio_id", bakedInputRuntime(schema, field.type, val));
-      }
+      code: FilmInput_codeApply,
+      studioId: TvShowInput_studioIdApply
     }
   },
   TvShowPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      code(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("code", bakedInputRuntime(schema, field.type, val));
-      },
-      studioId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("studio_id", bakedInputRuntime(schema, field.type, val));
-      }
+      code: FilmInput_codeApply,
+      studioId: TvShowInput_studioIdApply
     }
   },
   UpdateFilmByCodeInput: {
@@ -5394,8 +5229,8 @@ export const inputObjects = {
   },
   UpdateFilmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      filmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      filmPatch: applyCreateFields
     }
   },
   UpdatePersonByIdInput: {
@@ -5474,20 +5309,8 @@ export const scalars = {
 export const enums = {
   FilmsOrderBy: {
     values: {
-      CODE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "code",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      CODE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "code",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      CODE_ASC: TvEpisodesOrderBy_CODE_ASCApply,
+      CODE_DESC: TvEpisodesOrderBy_CODE_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         filmsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -5582,20 +5405,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PostsOrderBy_ID_ASCApply,
+      ID_DESC: PostsOrderBy_ID_DESCApply,
       LAST_NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "last_name",
@@ -5654,20 +5465,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PostsOrderBy_ID_ASCApply,
+      ID_DESC: PostsOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         postUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -5706,20 +5505,8 @@ export const enums = {
   },
   StudiosOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PostsOrderBy_ID_ASCApply,
+      ID_DESC: PostsOrderBy_ID_DESCApply,
       NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name",
@@ -5754,20 +5541,8 @@ export const enums = {
   },
   TvEpisodesOrderBy: {
     values: {
-      CODE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "code",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      CODE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "code",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      CODE_ASC: TvEpisodesOrderBy_CODE_ASCApply,
+      CODE_DESC: TvEpisodesOrderBy_CODE_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         tv_episodesUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -5802,20 +5577,8 @@ export const enums = {
   },
   TvShowsOrderBy: {
     values: {
-      CODE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "code",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      CODE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "code",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      CODE_ASC: TvEpisodesOrderBy_CODE_ASCApply,
+      CODE_DESC: TvEpisodesOrderBy_CODE_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         tv_showsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

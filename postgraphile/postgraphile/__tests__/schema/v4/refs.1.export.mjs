@@ -1050,6 +1050,12 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const BookAuthor_bookIdPlan = $record => {
+  return $record.get("book_id");
+};
+const BookAuthor_bookByBookIdPlan = $record => resource_booksPgResource.get({
+  id: $record.get("book_id")
+});
 const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
 function toString(value) {
   return "" + value;
@@ -1063,6 +1069,55 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const BookAuthorCondition_bookIdApply = ($condition, val) => applyAttributeCondition("book_id", TYPES.int, $condition, val);
+const BookAuthorsOrderBy_BOOK_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "book_id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const BookAuthorsOrderBy_BOOK_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "book_id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const BookEditor_personIdPlan = $record => {
+  return $record.get("person_id");
+};
+const BookEditor_personByPersonIdPlan = $record => resource_peoplePgResource.get({
+  id: $record.get("person_id")
+});
+const PenNameCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const PenNameCondition_personIdApply = ($condition, val) => applyAttributeCondition("person_id", TYPES.int, $condition, val);
+const PenNamesOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const PenNamesOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const PenNamesOrderBy_PERSON_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "ASC"
+  });
+};
+const PenNamesOrderBy_PERSON_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "person_id",
+    direction: "DESC"
+  });
+};
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -2202,14 +2257,8 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
   BookAuthor: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      bookByBookId($record) {
-        return resource_booksPgResource.get({
-          id: $record.get("book_id")
-        });
-      },
-      bookId($record) {
-        return $record.get("book_id");
-      },
+      bookByBookId: BookAuthor_bookByBookIdPlan,
+      bookId: BookAuthor_bookIdPlan,
       nodeId($parent) {
         const specifier = nodeIdHandler_BookAuthor.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookAuthor.codec.name].encode);
@@ -2240,26 +2289,14 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
   BookEditor: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      bookByBookId($record) {
-        return resource_booksPgResource.get({
-          id: $record.get("book_id")
-        });
-      },
-      bookId($record) {
-        return $record.get("book_id");
-      },
+      bookByBookId: BookAuthor_bookByBookIdPlan,
+      bookId: BookAuthor_bookIdPlan,
       nodeId($parent) {
         const specifier = nodeIdHandler_BookEditor.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookEditor.codec.name].encode);
       },
-      personByPersonId($record) {
-        return resource_peoplePgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      }
+      personByPersonId: BookEditor_personByPersonIdPlan,
+      personId: BookEditor_personIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -2308,14 +2345,8 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       penName($record) {
         return $record.get("pen_name");
       },
-      personByPersonId($record) {
-        return resource_peoplePgResource.get({
-          id: $record.get("person_id")
-        });
-      },
-      personId($record) {
-        return $record.get("person_id");
-      }
+      personByPersonId: BookEditor_personByPersonIdPlan,
+      personId: BookEditor_personIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -2437,9 +2468,7 @@ export const interfaces = {
 export const inputObjects = {
   BookAuthorCondition: {
     plans: {
-      bookId($condition, val) {
-        return applyAttributeCondition("book_id", TYPES.int, $condition, val);
-      },
+      bookId: BookAuthorCondition_bookIdApply,
       penNameId($condition, val) {
         return applyAttributeCondition("pen_name_id", TYPES.int, $condition, val);
       }
@@ -2447,9 +2476,7 @@ export const inputObjects = {
   },
   BookCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PenNameCondition_idApply,
       isbn($condition, val) {
         return applyAttributeCondition("isbn", TYPES.text, $condition, val);
       },
@@ -2460,32 +2487,22 @@ export const inputObjects = {
   },
   BookEditorCondition: {
     plans: {
-      bookId($condition, val) {
-        return applyAttributeCondition("book_id", TYPES.int, $condition, val);
-      },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      }
+      bookId: BookAuthorCondition_bookIdApply,
+      personId: PenNameCondition_personIdApply
     }
   },
   PenNameCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PenNameCondition_idApply,
       penName($condition, val) {
         return applyAttributeCondition("pen_name", TYPES.text, $condition, val);
       },
-      personId($condition, val) {
-        return applyAttributeCondition("person_id", TYPES.int, $condition, val);
-      }
+      personId: PenNameCondition_personIdApply
     }
   },
   PersonCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: PenNameCondition_idApply,
       name($condition, val) {
         return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
@@ -2493,9 +2510,7 @@ export const inputObjects = {
   },
   PostCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: PenNameCondition_idApply
     }
   }
 };
@@ -2514,20 +2529,8 @@ export const scalars = {
 export const enums = {
   BookAuthorsOrderBy: {
     values: {
-      BOOK_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "book_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      BOOK_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "book_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      BOOK_ID_ASC: BookAuthorsOrderBy_BOOK_ID_ASCApply,
+      BOOK_ID_DESC: BookAuthorsOrderBy_BOOK_ID_DESCApply,
       PEN_NAME_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "pen_name_id",
@@ -2562,32 +2565,10 @@ export const enums = {
   },
   BookEditorsOrderBy: {
     values: {
-      BOOK_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "book_id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      BOOK_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "book_id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-      },
+      BOOK_ID_ASC: BookAuthorsOrderBy_BOOK_ID_ASCApply,
+      BOOK_ID_DESC: BookAuthorsOrderBy_BOOK_ID_DESCApply,
+      PERSON_ID_ASC: PenNamesOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: PenNamesOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         book_editorsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -2610,20 +2591,8 @@ export const enums = {
   },
   BooksOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PenNamesOrderBy_ID_ASCApply,
+      ID_DESC: PenNamesOrderBy_ID_DESCApply,
       ISBN_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "isbn",
@@ -2672,20 +2641,8 @@ export const enums = {
   },
   PenNamesOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PenNamesOrderBy_ID_ASCApply,
+      ID_DESC: PenNamesOrderBy_ID_DESCApply,
       PEN_NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "pen_name",
@@ -2698,18 +2655,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      PERSON_ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "ASC"
-        });
-      },
-      PERSON_ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "person_id",
-          direction: "DESC"
-        });
-      },
+      PERSON_ID_ASC: PenNamesOrderBy_PERSON_ID_ASCApply,
+      PERSON_ID_DESC: PenNamesOrderBy_PERSON_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         pen_namesUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -2732,20 +2679,8 @@ export const enums = {
   },
   PeopleOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PenNamesOrderBy_ID_ASCApply,
+      ID_DESC: PenNamesOrderBy_ID_DESCApply,
       NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name",
@@ -2780,20 +2715,8 @@ export const enums = {
   },
   PostsOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: PenNamesOrderBy_ID_ASCApply,
+      ID_DESC: PenNamesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         postsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

@@ -1341,6 +1341,20 @@ const nodeIdCodecs = {
 };
 const building_buildingPgResource = registry.pgResources["building"];
 const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
+function RelationalTopic_buildingByConstructorPlan($record) {
+  const $buildings = building_buildingPgResource.find();
+  let previousAlias = $buildings.alias;
+  const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
+  $buildings.join({
+    type: "inner",
+    from: relational_items_relational_itemsPgResource.from,
+    alias: relational_itemsAlias,
+    conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${relational_itemsAlias}.${sql.identifier("constructor")}`]
+  });
+  previousAlias = relational_itemsAlias;
+  $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
+  return $buildings.single();
+}
 const spec_resource___proto__PgResource = registry.pgResources["__proto__"];
 const nodeIdHandler__Proto__ = makeTableNodeIdHandler({
   typeName: "_Proto__",
@@ -1545,6 +1559,40 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const MachineCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const MachineCondition_constructorApply = ($condition, val) => applyAttributeCondition("constructor", TYPES.text, $condition, val);
+const MachinesOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const MachinesOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const MachinesOrderBy_CONSTRUCTOR_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "constructor",
+    direction: "ASC"
+  });
+};
+const MachinesOrderBy_CONSTRUCTOR_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "constructor",
+    direction: "DESC"
+  });
+};
+const RelationalItemsOrderBy_TYPE_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "type",
+    direction: "DESC"
+  });
+};
 const detailsByAttributeName = {
   __proto__: null,
   constructor: {
@@ -1808,6 +1856,79 @@ const scalarComputed = ($in, args) => {
   const from = pgFromExpression($row, resource_null_yieldPgResource.from, resource_null_yieldPgResource.parameters, selectArgs);
   return pgClassExpression($row, resource_null_yieldPgResource.codec, undefined)`${from}`;
 };
+function RelationalTopicCondition_typeApply($condition, val) {
+  const queryBuilder = $condition.dangerouslyGetParent();
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  const expression = sql`${alias}.${sql.identifier("type")}`;
+  const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+  $condition.where(condition);
+}
+function RelationalTopicCondition_constructorApply($condition, val) {
+  const queryBuilder = $condition.dangerouslyGetParent();
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  const expression = sql`${alias}.${sql.identifier("constructor")}`;
+  const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+  $condition.where(condition);
+}
+const RelationalTopicsOrderBy_TYPE_ASCApply = queryBuilder => {
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  queryBuilder.orderBy({
+    fragment: sql`${alias}.${sql.identifier("type")}`,
+    codec: itemTypeCodec,
+    direction: "ASC"
+  });
+};
+const RelationalTopicsOrderBy_CONSTRUCTOR_ASCApply = queryBuilder => {
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  queryBuilder.orderBy({
+    fragment: sql`${alias}.${sql.identifier("constructor")}`,
+    codec: TYPES.text,
+    direction: "ASC"
+  });
+};
+const _ProtoCondition_nameApply = ($condition, val) => applyAttributeCondition("name", TYPES.text, $condition, val);
+const _ProtoCondition_brandApply = ($condition, val) => applyAttributeCondition("brand", TYPES.text, $condition, val);
+const _ProtoSOrderBy_NAME_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "name",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const _ProtoSOrderBy_NAME_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "name",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const _ProtoSOrderBy_BRAND_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "brand",
+    direction: "ASC"
+  });
+};
+const _ProtoSOrderBy_BRAND_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "brand",
+    direction: "DESC"
+  });
+};
+const ConstructorCondition_exportApply = ($condition, val) => applyAttributeCondition("export", TYPES.text, $condition, val);
+const ConstructorsOrderBy_EXPORT_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "export",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const ConstructorsOrderBy_EXPORT_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "export",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
 function applyInputToInsert(_, $object) {
   return $object;
 }
@@ -1882,36 +2003,12 @@ const specFromArgs_Reserved = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
 };
-const specFromArgs__Proto__2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler__Proto__, $nodeId);
-};
-const specFromArgs_Building3 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, $nodeId);
-};
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs_Building4 = args => {
   return uniqueAttributes5.reduce((memo, [attributeName, fieldName]) => {
     memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
-};
-const specFromArgs_Constructor2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Constructor, $nodeId);
-};
-const specFromArgs_Crop2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Crop, $nodeId);
-};
-const specFromArgs_Machine2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Machine, $nodeId);
-};
-const specFromArgs_Material3 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Material, $nodeId);
 };
 const uniqueAttributes6 = [["valueOf", "valueOf"]];
 const specFromArgs_Material4 = args => {
@@ -1920,10 +2017,6 @@ const specFromArgs_Material4 = args => {
     return memo;
   }, Object.create(null));
 };
-const specFromArgs_Null3 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Null, $nodeId);
-};
 const uniqueAttributes7 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs_Null4 = args => {
   return uniqueAttributes7.reduce((memo, [attributeName, fieldName]) => {
@@ -1931,24 +2024,12 @@ const specFromArgs_Null4 = args => {
     return memo;
   }, Object.create(null));
 };
-const specFromArgs_Project3 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Project, $nodeId);
-};
 const uniqueAttributes8 = [["__proto__", "_proto__"]];
 const specFromArgs_Project4 = args => {
   return uniqueAttributes8.reduce((memo, [attributeName, fieldName]) => {
     memo[attributeName] = args.getRaw(["input", fieldName]);
     return memo;
   }, Object.create(null));
-};
-const specFromArgs_Yield2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Yield, $nodeId);
-};
-const specFromArgs_Reserved2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
 };
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
@@ -1980,6 +2061,7 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CreateProtoPayload__protoEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
 function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
@@ -1988,39 +2070,125 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-const specFromRecord4 = $record => {
-  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
+function _Proto__Input_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function _Proto__Input_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("name", bakedInputRuntime(schema, field.type, val));
+}
+function _Proto__Input_brandApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("brand", bakedInputRuntime(schema, field.type, val));
+}
+const CreateBuildingPayload_buildingEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
+function BuildingInput_constructorApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("constructor", bakedInputRuntime(schema, field.type, val));
+}
+const CreateConstructorPayload_constructorEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
+function ConstructorInput_exportApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("export", bakedInputRuntime(schema, field.type, val));
+}
+const CreateCropPayload_cropEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
+function CropInput_yieldApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("yield", bakedInputRuntime(schema, field.type, val));
+}
+function CropInput_amountApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("amount", bakedInputRuntime(schema, field.type, val));
+}
+const CreateMachinePayload_machineEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
+function CreateMachinePayload_buildingByConstructorPlan($in) {
+  const $record = $in.get("result");
+  return building_buildingPgResource.get(specFromRecord3($record));
+}
+function MachineInput_inputApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("input", bakedInputRuntime(schema, field.type, val));
+}
+const CreateMaterialPayload_materialEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
+function MaterialInput_classApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("class", bakedInputRuntime(schema, field.type, val));
+}
+function MaterialInput_valueOfApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("valueOf", bakedInputRuntime(schema, field.type, val));
+}
+const CreateNullPayload_nullEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
+function NullInput_hasOwnPropertyApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("hasOwnProperty", bakedInputRuntime(schema, field.type, val));
+}
+function NullInput_breakApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("break", bakedInputRuntime(schema, field.type, val));
+}
+const CreateProjectPayload_projectEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
+function ProjectInput__proto__Apply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("__proto__", bakedInputRuntime(schema, field.type, val));
+}
+const CreateYieldPayload_yieldEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
+function YieldInput_cropApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("crop", bakedInputRuntime(schema, field.type, val));
+}
+const CreateReservedPayload_reservedEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
+function ReservedInput_nullApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("null", bakedInputRuntime(schema, field.type, val));
+}
+function ReservedInput_caseApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("case", bakedInputRuntime(schema, field.type, val));
+}
+function ReservedInput_doApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("do", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
 }
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
-}
-const specFromRecord5 = $record => {
-  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-const specFromRecord6 = $record => {
-  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
 export const typeDefs = /* GraphQL */`type RelationalTopic implements Node & RelationalItem {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -7046,7 +7214,7 @@ export const objects = {
       },
       deleteBuilding: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(building_buildingPgResource, specFromArgs_Building3(args));
+          const $delete = pgDeleteSingle(building_buildingPgResource, specFromArgs_Building(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7084,7 +7252,7 @@ export const objects = {
       },
       deleteConstructor: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_constructorPgResource, specFromArgs_Constructor2(args));
+          const $delete = pgDeleteSingle(spec_resource_constructorPgResource, specFromArgs_Constructor(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7138,7 +7306,7 @@ export const objects = {
       },
       deleteCrop: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_cropPgResource, specFromArgs_Crop2(args));
+          const $delete = pgDeleteSingle(spec_resource_cropPgResource, specFromArgs_Crop(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7178,7 +7346,7 @@ export const objects = {
       },
       deleteMachine: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_machinePgResource, specFromArgs_Machine2(args));
+          const $delete = pgDeleteSingle(spec_resource_machinePgResource, specFromArgs_Machine(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7204,7 +7372,7 @@ export const objects = {
       },
       deleteMaterial: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_materialPgResource, specFromArgs_Material3(args));
+          const $delete = pgDeleteSingle(spec_resource_materialPgResource, specFromArgs_Material(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7256,7 +7424,7 @@ export const objects = {
       },
       deleteNull: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_nullPgResource, specFromArgs_Null3(args));
+          const $delete = pgDeleteSingle(spec_resource_nullPgResource, specFromArgs_Null(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7308,7 +7476,7 @@ export const objects = {
       },
       deleteProject: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_projectPgResource, specFromArgs_Project3(args));
+          const $delete = pgDeleteSingle(spec_resource_projectPgResource, specFromArgs_Project(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7346,7 +7514,7 @@ export const objects = {
       },
       deleteProto__: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource___proto__PgResource, specFromArgs__Proto__2(args));
+          const $delete = pgDeleteSingle(spec_resource___proto__PgResource, specFromArgs__Proto__(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7386,7 +7554,7 @@ export const objects = {
       },
       deleteReserved: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, specFromArgs_Reserved2(args));
+          const $delete = pgDeleteSingle(spec_resource_reservedPgResource, specFromArgs_Reserved(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -7454,7 +7622,7 @@ export const objects = {
       },
       deleteYield: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(spec_resource_yieldPgResource, specFromArgs_Yield2(args));
+          const $delete = pgDeleteSingle(spec_resource_yieldPgResource, specFromArgs_Yield(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -8062,9 +8230,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       building: planCreatePayloadResult,
-      buildingEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
-      },
+      buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -8074,9 +8240,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       constructor: planCreatePayloadResult,
-      constructorEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
-      },
+      constructorEdge: CreateConstructorPayload_constructorEdgePlan,
       query: queryPlan
     }
   },
@@ -8085,24 +8249,17 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       crop: planCreatePayloadResult,
-      cropEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cropEdge: CreateCropPayload_cropEdgePlan,
       query: queryPlan
     }
   },
   CreateMachinePayload: {
     assertStep: assertStep,
     plans: {
-      buildingByConstructor($in) {
-        const $record = $in.get("result");
-        return building_buildingPgResource.get(specFromRecord4($record));
-      },
+      buildingByConstructor: CreateMachinePayload_buildingByConstructorPlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       machine: planCreatePayloadResult,
-      machineEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
-      },
+      machineEdge: CreateMachinePayload_machineEdgePlan,
       query: queryPlan
     }
   },
@@ -8111,9 +8268,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       material: planCreatePayloadResult,
-      materialEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
-      },
+      materialEdge: CreateMaterialPayload_materialEdgePlan,
       query: queryPlan
     }
   },
@@ -8122,9 +8277,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       null: planCreatePayloadResult,
-      nullEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
-      },
+      nullEdge: CreateNullPayload_nullEdgePlan,
       query: queryPlan
     }
   },
@@ -8133,9 +8286,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       project: planCreatePayloadResult,
-      projectEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
-      },
+      projectEdge: CreateProjectPayload_projectEdgePlan,
       query: queryPlan
     }
   },
@@ -8143,9 +8294,7 @@ export const objects = {
     assertStep: assertStep,
     plans: {
       _proto__: planCreatePayloadResult,
-      _protoEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      _protoEdge: CreateProtoPayload__protoEdgePlan,
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan
     }
@@ -8156,9 +8305,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       reserved: planCreatePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   CreateYieldPayload: {
@@ -8167,9 +8314,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       yield: planCreatePayloadResult,
-      yieldEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
-      }
+      yieldEdge: CreateYieldPayload_yieldEdgePlan
     }
   },
   Crop: {
@@ -8198,9 +8343,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       building: planUpdateOrDeletePayloadResult,
-      buildingEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
-      },
+      buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBuildingId($object) {
         const $record = $object.getStepForKey("result");
@@ -8215,9 +8358,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       constructor: planUpdateOrDeletePayloadResult,
-      constructorEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
-      },
+      constructorEdge: CreateConstructorPayload_constructorEdgePlan,
       deletedConstructorId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Constructor.plan($record);
@@ -8231,9 +8372,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       crop: planUpdateOrDeletePayloadResult,
-      cropEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cropEdge: CreateCropPayload_cropEdgePlan,
       deletedCropId($object) {
         const $record = $object.getStepForKey("result");
         const specifier = nodeIdHandler_Crop.plan($record);
@@ -8245,10 +8384,7 @@ export const objects = {
   DeleteMachinePayload: {
     assertStep: ObjectStep,
     plans: {
-      buildingByConstructor($in) {
-        const $record = $in.get("result");
-        return building_buildingPgResource.get(specFromRecord6($record));
-      },
+      buildingByConstructor: CreateMachinePayload_buildingByConstructorPlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedMachineId($object) {
         const $record = $object.getStepForKey("result");
@@ -8256,9 +8392,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       machine: planUpdateOrDeletePayloadResult,
-      machineEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
-      },
+      machineEdge: CreateMachinePayload_machineEdgePlan,
       query: queryPlan
     }
   },
@@ -8272,9 +8406,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       material: planUpdateOrDeletePayloadResult,
-      materialEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
-      },
+      materialEdge: CreateMaterialPayload_materialEdgePlan,
       query: queryPlan
     }
   },
@@ -8288,9 +8420,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       null: planUpdateOrDeletePayloadResult,
-      nullEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
-      },
+      nullEdge: CreateNullPayload_nullEdgePlan,
       query: queryPlan
     }
   },
@@ -8304,9 +8434,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       project: planUpdateOrDeletePayloadResult,
-      projectEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
-      },
+      projectEdge: CreateProjectPayload_projectEdgePlan,
       query: queryPlan
     }
   },
@@ -8314,9 +8442,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       _proto__: planUpdateOrDeletePayloadResult,
-      _protoEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      _protoEdge: CreateProtoPayload__protoEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedProtoId($object) {
         const $record = $object.getStepForKey("result");
@@ -8337,9 +8463,7 @@ export const objects = {
       },
       query: queryPlan,
       reserved: planUpdateOrDeletePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   DeleteYieldPayload: {
@@ -8353,9 +8477,7 @@ export const objects = {
       },
       query: queryPlan,
       yield: planUpdateOrDeletePayloadResult,
-      yieldEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
-      }
+      yieldEdge: CreateYieldPayload_yieldEdgePlan
     }
   },
   Machine: {
@@ -8464,20 +8586,7 @@ export const objects = {
   RelationalStatus: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      buildingByConstructor($record) {
-        const $buildings = building_buildingPgResource.find();
-        let previousAlias = $buildings.alias;
-        const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $buildings.join({
-          type: "inner",
-          from: relational_items_relational_itemsPgResource.from,
-          alias: relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${relational_itemsAlias}.${sql.identifier("constructor")}`]
-        });
-        previousAlias = relational_itemsAlias;
-        $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
-        return $buildings.single();
-      },
+      buildingByConstructor: RelationalTopic_buildingByConstructorPlan,
       nodeId($parent) {
         const specifier = nodeIdHandler_RelationalStatus.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_RelationalStatus.codec.name].encode);
@@ -8500,20 +8609,7 @@ export const objects = {
   RelationalTopic: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      buildingByConstructor($record) {
-        const $buildings = building_buildingPgResource.find();
-        let previousAlias = $buildings.alias;
-        const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-        $buildings.join({
-          type: "inner",
-          from: relational_items_relational_itemsPgResource.from,
-          alias: relational_itemsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("constructor")} = ${relational_itemsAlias}.${sql.identifier("constructor")}`]
-        });
-        previousAlias = relational_itemsAlias;
-        $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
-        return $buildings.single();
-      },
+      buildingByConstructor: RelationalTopic_buildingByConstructorPlan,
       nodeId($parent) {
         const specifier = nodeIdHandler_RelationalTopic.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_RelationalTopic.codec.name].encode);
@@ -8559,9 +8655,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       building: planUpdateOrDeletePayloadResult,
-      buildingEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(building_buildingPgResource, buildingUniques[0].attributes, $mutation, fieldArgs);
-      },
+      buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -8571,9 +8665,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       constructor: planUpdateOrDeletePayloadResult,
-      constructorEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_constructorPgResource, constructorUniques[0].attributes, $mutation, fieldArgs);
-      },
+      constructorEdge: CreateConstructorPayload_constructorEdgePlan,
       query: queryPlan
     }
   },
@@ -8582,24 +8674,17 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       crop: planUpdateOrDeletePayloadResult,
-      cropEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_cropPgResource, cropUniques[0].attributes, $mutation, fieldArgs);
-      },
+      cropEdge: CreateCropPayload_cropEdgePlan,
       query: queryPlan
     }
   },
   UpdateMachinePayload: {
     assertStep: ObjectStep,
     plans: {
-      buildingByConstructor($in) {
-        const $record = $in.get("result");
-        return building_buildingPgResource.get(specFromRecord5($record));
-      },
+      buildingByConstructor: CreateMachinePayload_buildingByConstructorPlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       machine: planUpdateOrDeletePayloadResult,
-      machineEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_machinePgResource, machineUniques[0].attributes, $mutation, fieldArgs);
-      },
+      machineEdge: CreateMachinePayload_machineEdgePlan,
       query: queryPlan
     }
   },
@@ -8608,9 +8693,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       material: planUpdateOrDeletePayloadResult,
-      materialEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_materialPgResource, materialUniques[0].attributes, $mutation, fieldArgs);
-      },
+      materialEdge: CreateMaterialPayload_materialEdgePlan,
       query: queryPlan
     }
   },
@@ -8619,9 +8702,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       null: planUpdateOrDeletePayloadResult,
-      nullEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_nullPgResource, nullUniques[0].attributes, $mutation, fieldArgs);
-      },
+      nullEdge: CreateNullPayload_nullEdgePlan,
       query: queryPlan
     }
   },
@@ -8630,19 +8711,15 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       project: planUpdateOrDeletePayloadResult,
-      projectEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_projectPgResource, projectUniques[0].attributes, $mutation, fieldArgs);
-      },
+      projectEdge: CreateProjectPayload_projectEdgePlan,
       query: queryPlan
     }
   },
   UpdateProtoPayload: {
     assertStep: ObjectStep,
     plans: {
-      _proto__: planUpdateOrDeletePayloadResult,
-      _protoEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource___proto__PgResource, __proto__Uniques[0].attributes, $mutation, fieldArgs);
-      },
+      _proto__: planCreatePayloadResult,
+      _protoEdge: CreateProtoPayload__protoEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -8653,9 +8730,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       reserved: planUpdateOrDeletePayloadResult,
-      reservedEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
-      }
+      reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
   UpdateYieldPayload: {
@@ -8664,9 +8739,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       yield: planUpdateOrDeletePayloadResult,
-      yieldEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
-      }
+      yieldEdge: CreateYieldPayload_yieldEdgePlan
     }
   },
   Yield: {
@@ -8775,178 +8848,70 @@ export const inputObjects = {
   _Proto__Input: {
     baked: createObjectAndApplyChildren,
     plans: {
-      brand(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("brand", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      brand: _Proto__Input_brandApply,
+      id: _Proto__Input_idApply,
+      name: _Proto__Input_nameApply
     }
   },
   _ProtoCondition: {
     plans: {
-      brand($condition, val) {
-        return applyAttributeCondition("brand", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
-      name($condition, val) {
-        return applyAttributeCondition("name", TYPES.text, $condition, val);
-      }
+      brand: _ProtoCondition_brandApply,
+      id: MachineCondition_idApply,
+      name: _ProtoCondition_nameApply
     }
   },
   _ProtoPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      brand(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("brand", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      brand: _Proto__Input_brandApply,
+      id: _Proto__Input_idApply,
+      name: _Proto__Input_nameApply
     }
   },
   BuildingCondition: {
     plans: {
-      constructor($condition, val) {
-        return applyAttributeCondition("constructor", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
-      name($condition, val) {
-        return applyAttributeCondition("name", TYPES.text, $condition, val);
-      }
+      constructor: MachineCondition_constructorApply,
+      id: MachineCondition_idApply,
+      name: _ProtoCondition_nameApply
     }
   },
   BuildingInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      constructor(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      constructor: BuildingInput_constructorApply,
+      id: _Proto__Input_idApply,
+      name: _Proto__Input_nameApply
     }
   },
   BuildingPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      constructor(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      constructor: BuildingInput_constructorApply,
+      id: _Proto__Input_idApply,
+      name: _Proto__Input_nameApply
     }
   },
   ConstructorCondition: {
     plans: {
-      export($condition, val) {
-        return applyAttributeCondition("export", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
-      name($condition, val) {
-        return applyAttributeCondition("name", TYPES.text, $condition, val);
-      }
+      export: ConstructorCondition_exportApply,
+      id: MachineCondition_idApply,
+      name: _ProtoCondition_nameApply
     }
   },
   ConstructorInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      export(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("export", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      export: ConstructorInput_exportApply,
+      id: _Proto__Input_idApply,
+      name: _Proto__Input_nameApply
     }
   },
   ConstructorPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      export(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("export", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      export: ConstructorInput_exportApply,
+      id: _Proto__Input_idApply,
+      name: _Proto__Input_nameApply
     }
   },
   CreateBuildingInput: {
@@ -9014,9 +8979,7 @@ export const inputObjects = {
       amount($condition, val) {
         return applyAttributeCondition("amount", TYPES.int, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: MachineCondition_idApply,
       yield($condition, val) {
         return applyAttributeCondition("yield", TYPES.text, $condition, val);
       }
@@ -9025,47 +8988,17 @@ export const inputObjects = {
   CropInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      amount(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("amount", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      yield(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("yield", bakedInputRuntime(schema, field.type, val));
-      }
+      amount: CropInput_amountApply,
+      id: _Proto__Input_idApply,
+      yield: CropInput_yieldApply
     }
   },
   CropPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      amount(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("amount", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      yield(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("yield", bakedInputRuntime(schema, field.type, val));
-      }
+      amount: CropInput_amountApply,
+      id: _Proto__Input_idApply,
+      yield: CropInput_yieldApply
     }
   },
   DeleteBuildingByConstructorInput: {
@@ -9240,12 +9173,8 @@ export const inputObjects = {
   },
   MachineCondition: {
     plans: {
-      constructor($condition, val) {
-        return applyAttributeCondition("constructor", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      constructor: MachineCondition_constructorApply,
+      id: MachineCondition_idApply,
       input($condition, val) {
         return applyAttributeCondition("input", TYPES.text, $condition, val);
       }
@@ -9254,47 +9183,17 @@ export const inputObjects = {
   MachineInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      constructor(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      input(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("input", bakedInputRuntime(schema, field.type, val));
-      }
+      constructor: BuildingInput_constructorApply,
+      id: _Proto__Input_idApply,
+      input: MachineInput_inputApply
     }
   },
   MachinePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      constructor(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("constructor", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      input(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("input", bakedInputRuntime(schema, field.type, val));
-      }
+      constructor: BuildingInput_constructorApply,
+      id: _Proto__Input_idApply,
+      input: MachineInput_inputApply
     }
   },
   MaterialCondition: {
@@ -9302,9 +9201,7 @@ export const inputObjects = {
       class($condition, val) {
         return applyAttributeCondition("class", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: MachineCondition_idApply,
       valueOf($condition, val) {
         return applyAttributeCondition("valueOf", TYPES.text, $condition, val);
       }
@@ -9313,47 +9210,17 @@ export const inputObjects = {
   MaterialInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      class(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("class", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      valueOf(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("valueOf", bakedInputRuntime(schema, field.type, val));
-      }
+      class: MaterialInput_classApply,
+      id: _Proto__Input_idApply,
+      valueOf: MaterialInput_valueOfApply
     }
   },
   MaterialPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      class(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("class", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      valueOf(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("valueOf", bakedInputRuntime(schema, field.type, val));
-      }
+      class: MaterialInput_classApply,
+      id: _Proto__Input_idApply,
+      valueOf: MaterialInput_valueOfApply
     }
   },
   NullCondition: {
@@ -9364,55 +9231,23 @@ export const inputObjects = {
       hasOwnProperty($condition, val) {
         return applyAttributeCondition("hasOwnProperty", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      id: MachineCondition_idApply
     }
   },
   NullInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      break(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("break", bakedInputRuntime(schema, field.type, val));
-      },
-      hasOwnProperty(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("hasOwnProperty", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      break: NullInput_breakApply,
+      hasOwnProperty: NullInput_hasOwnPropertyApply,
+      id: _Proto__Input_idApply
     }
   },
   NullPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      break(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("break", bakedInputRuntime(schema, field.type, val));
-      },
-      hasOwnProperty(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("hasOwnProperty", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      break: NullInput_breakApply,
+      hasOwnProperty: NullInput_hasOwnPropertyApply,
+      id: _Proto__Input_idApply
     }
   },
   ProjectCondition: {
@@ -9420,68 +9255,30 @@ export const inputObjects = {
       _proto__($condition, val) {
         return applyAttributeCondition("__proto__", TYPES.text, $condition, val);
       },
-      brand($condition, val) {
-        return applyAttributeCondition("brand", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      brand: _ProtoCondition_brandApply,
+      id: MachineCondition_idApply
     }
   },
   ProjectInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      _proto__(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("__proto__", bakedInputRuntime(schema, field.type, val));
-      },
-      brand(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("brand", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      _proto__: ProjectInput__proto__Apply,
+      brand: _Proto__Input_brandApply,
+      id: _Proto__Input_idApply
     }
   },
   ProjectPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      _proto__(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("__proto__", bakedInputRuntime(schema, field.type, val));
-      },
-      brand(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("brand", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      _proto__: ProjectInput__proto__Apply,
+      brand: _Proto__Input_brandApply,
+      id: _Proto__Input_idApply
     }
   },
   RelationalItemCondition: {
     plans: {
-      constructor($condition, val) {
-        return applyAttributeCondition("constructor", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      constructor: MachineCondition_constructorApply,
+      id: MachineCondition_idApply,
       type($condition, val) {
         return applyAttributeCondition("type", itemTypeCodec, $condition, val);
       }
@@ -9489,53 +9286,25 @@ export const inputObjects = {
   },
   RelationalStatusCondition: {
     plans: {
-      constructor($condition, val) {
-        const queryBuilder = $condition.dangerouslyGetParent();
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        const expression = sql`${alias}.${sql.identifier("constructor")}`;
-        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        $condition.where(condition);
-      },
+      constructor: RelationalTopicCondition_constructorApply,
       description($condition, val) {
         return applyAttributeCondition("description", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: MachineCondition_idApply,
       note($condition, val) {
         return applyAttributeCondition("note", TYPES.text, $condition, val);
       },
-      type($condition, val) {
-        const queryBuilder = $condition.dangerouslyGetParent();
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        const expression = sql`${alias}.${sql.identifier("type")}`;
-        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-        $condition.where(condition);
-      }
+      type: RelationalTopicCondition_typeApply
     }
   },
   RelationalTopicCondition: {
     plans: {
-      constructor($condition, val) {
-        const queryBuilder = $condition.dangerouslyGetParent();
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        const expression = sql`${alias}.${sql.identifier("constructor")}`;
-        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        $condition.where(condition);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      constructor: RelationalTopicCondition_constructorApply,
+      id: MachineCondition_idApply,
       title($condition, val) {
         return applyAttributeCondition("title", TYPES.text, $condition, val);
       },
-      type($condition, val) {
-        const queryBuilder = $condition.dangerouslyGetParent();
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        const expression = sql`${alias}.${sql.identifier("type")}`;
-        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-        $condition.where(condition);
-      }
+      type: RelationalTopicCondition_typeApply
     }
   },
   ReservedCondition: {
@@ -9546,9 +9315,7 @@ export const inputObjects = {
       do($condition, val) {
         return applyAttributeCondition("do", TYPES.text, $condition, val);
       },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: MachineCondition_idApply,
       null($condition, val) {
         return applyAttributeCondition("null", TYPES.text, $condition, val);
       }
@@ -9557,59 +9324,19 @@ export const inputObjects = {
   ReservedInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      case(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("case", bakedInputRuntime(schema, field.type, val));
-      },
-      do(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("do", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      null(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null", bakedInputRuntime(schema, field.type, val));
-      }
+      case: ReservedInput_caseApply,
+      do: ReservedInput_doApply,
+      id: _Proto__Input_idApply,
+      null: ReservedInput_nullApply
     }
   },
   ReservedPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      case(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("case", bakedInputRuntime(schema, field.type, val));
-      },
-      do(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("do", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      null(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("null", bakedInputRuntime(schema, field.type, val));
-      }
+      case: ReservedInput_caseApply,
+      do: ReservedInput_doApply,
+      id: _Proto__Input_idApply,
+      null: ReservedInput_nullApply
     }
   },
   UpdateBuildingByConstructorInput: {
@@ -9764,8 +9491,8 @@ export const inputObjects = {
   },
   UpdateProtoInput: {
     plans: {
-      _protoPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      _protoPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateReservedByCaseInput: {
@@ -9821,58 +9548,24 @@ export const inputObjects = {
       crop($condition, val) {
         return applyAttributeCondition("crop", TYPES.text, $condition, val);
       },
-      export($condition, val) {
-        return applyAttributeCondition("export", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      export: ConstructorCondition_exportApply,
+      id: MachineCondition_idApply
     }
   },
   YieldInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      crop(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("crop", bakedInputRuntime(schema, field.type, val));
-      },
-      export(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("export", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      crop: YieldInput_cropApply,
+      export: ConstructorInput_exportApply,
+      id: _Proto__Input_idApply
     }
   },
   YieldPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      crop(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("crop", bakedInputRuntime(schema, field.type, val));
-      },
-      export(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("export", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      crop: YieldInput_cropApply,
+      export: ConstructorInput_exportApply,
+      id: _Proto__Input_idApply
     }
   }
 };
@@ -9891,46 +9584,12 @@ export const scalars = {
 export const enums = {
   _ProtoSOrderBy: {
     values: {
-      BRAND_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "brand",
-          direction: "ASC"
-        });
-      },
-      BRAND_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "brand",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      NAME_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "name",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      NAME_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "name",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      BRAND_ASC: _ProtoSOrderBy_BRAND_ASCApply,
+      BRAND_DESC: _ProtoSOrderBy_BRAND_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
+      NAME_ASC: _ProtoSOrderBy_NAME_ASCApply,
+      NAME_DESC: _ProtoSOrderBy_NAME_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         __proto__Uniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -9967,20 +9626,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name",
@@ -10015,48 +9662,12 @@ export const enums = {
   },
   ConstructorsOrderBy: {
     values: {
-      EXPORT_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "export",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      EXPORT_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "export",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      NAME_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "name",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      NAME_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "name",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      EXPORT_ASC: ConstructorsOrderBy_EXPORT_ASCApply,
+      EXPORT_DESC: ConstructorsOrderBy_EXPORT_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
+      NAME_ASC: _ProtoSOrderBy_NAME_ASCApply,
+      NAME_DESC: _ProtoSOrderBy_NAME_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         constructorUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10091,20 +9702,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         cropUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10141,32 +9740,10 @@ export const enums = {
   },
   MachinesOrderBy: {
     values: {
-      CONSTRUCTOR_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "constructor",
-          direction: "ASC"
-        });
-      },
-      CONSTRUCTOR_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "constructor",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      CONSTRUCTOR_ASC: MachinesOrderBy_CONSTRUCTOR_ASCApply,
+      CONSTRUCTOR_DESC: MachinesOrderBy_CONSTRUCTOR_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       INPUT_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "input",
@@ -10215,20 +9792,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         materialUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10293,20 +9858,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         nullUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10343,32 +9896,10 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      BRAND_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "brand",
-          direction: "ASC"
-        });
-      },
-      BRAND_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "brand",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      BRAND_ASC: _ProtoSOrderBy_BRAND_ASCApply,
+      BRAND_DESC: _ProtoSOrderBy_BRAND_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         projectUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10391,32 +9922,10 @@ export const enums = {
   },
   RelationalItemsOrderBy: {
     values: {
-      CONSTRUCTOR_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "constructor",
-          direction: "ASC"
-        });
-      },
-      CONSTRUCTOR_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "constructor",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      CONSTRUCTOR_ASC: MachinesOrderBy_CONSTRUCTOR_ASCApply,
+      CONSTRUCTOR_DESC: MachinesOrderBy_CONSTRUCTOR_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         relational_itemsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10441,30 +9950,13 @@ export const enums = {
           direction: "ASC"
         });
       },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      }
+      TYPE_DESC: RelationalItemsOrderBy_TYPE_DESCApply
     }
   },
   RelationalStatusesOrderBy: {
     values: {
-      CONSTRUCTOR_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("constructor")}`,
-          codec: TYPES.text,
-          direction: "ASC"
-        });
-      },
-      CONSTRUCTOR_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "constructor",
-          direction: "DESC"
-        });
-      },
+      CONSTRUCTOR_ASC: RelationalTopicsOrderBy_CONSTRUCTOR_ASCApply,
+      CONSTRUCTOR_DESC: MachinesOrderBy_CONSTRUCTOR_DESCApply,
       DESCRIPTION_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "description",
@@ -10477,20 +9969,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       NOTE_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "note",
@@ -10521,52 +10001,16 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      }
+      TYPE_ASC: RelationalTopicsOrderBy_TYPE_ASCApply,
+      TYPE_DESC: RelationalItemsOrderBy_TYPE_DESCApply
     }
   },
   RelationalTopicsOrderBy: {
     values: {
-      CONSTRUCTOR_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("constructor")}`,
-          codec: TYPES.text,
-          direction: "ASC"
-        });
-      },
-      CONSTRUCTOR_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "constructor",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      CONSTRUCTOR_ASC: RelationalTopicsOrderBy_CONSTRUCTOR_ASCApply,
+      CONSTRUCTOR_DESC: MachinesOrderBy_CONSTRUCTOR_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         pkCols.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -10597,20 +10041,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      }
+      TYPE_ASC: RelationalTopicsOrderBy_TYPE_ASCApply,
+      TYPE_DESC: RelationalItemsOrderBy_TYPE_DESCApply
     }
   },
   ReservedsOrderBy: {
@@ -10643,20 +10075,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       NULL_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "null",
@@ -10705,34 +10125,10 @@ export const enums = {
           direction: "DESC"
         });
       },
-      EXPORT_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "export",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      EXPORT_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "export",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      EXPORT_ASC: ConstructorsOrderBy_EXPORT_ASCApply,
+      EXPORT_DESC: ConstructorsOrderBy_EXPORT_DESCApply,
+      ID_ASC: MachinesOrderBy_ID_ASCApply,
+      ID_DESC: MachinesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         yieldUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({

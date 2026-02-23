@@ -725,6 +725,34 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const UserFileCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const UserFileCondition_filenameApply = ($condition, val) => applyAttributeCondition("filename", TYPES.text, $condition, val);
+const UserFilesOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const UserFilesOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const UserFilesOrderBy_FILENAME_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "filename",
+    direction: "ASC"
+  });
+};
+const UserFilesOrderBy_FILENAME_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "filename",
+    direction: "DESC"
+  });
+};
 function applyInputToInsert(_, $object) {
   return $object;
 }
@@ -740,18 +768,6 @@ const specFromArgs_User = args => {
   return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
 const specFromArgs_UserFile = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
-};
-const specFromArgs_File2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_File, $nodeId);
-};
-const specFromArgs_User2 = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, $nodeId);
-};
-const specFromArgs_UserFile2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
 };
@@ -785,6 +801,7 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CreateFilePayload_fileEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
 function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
@@ -793,20 +810,38 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
+function FileInput_idApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("id", bakedInputRuntime(schema, field.type, val));
+}
+function FileInput_filenameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("filename", bakedInputRuntime(schema, field.type, val));
+}
+const CreateUserPayload_userEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
+function UserInput_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("name", bakedInputRuntime(schema, field.type, val));
+}
+const CreateUserFilePayload_userFileEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
+const CreateUserFilePayload_userByUserIdPlan = $record => resource_userPgResource.get({
+  id: $record.get("result").get("user_id")
+});
+function UserFileInput_userIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("user_id", bakedInputRuntime(schema, field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyPatchFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1905,7 +1940,7 @@ export const objects = {
       },
       deleteFile: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_filePgResource, specFromArgs_File2(args));
+          const $delete = pgDeleteSingle(resource_filePgResource, specFromArgs_File(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1931,7 +1966,7 @@ export const objects = {
       },
       deleteUser: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_userPgResource, specFromArgs_User2(args));
+          const $delete = pgDeleteSingle(resource_userPgResource, specFromArgs_User(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1957,7 +1992,7 @@ export const objects = {
       },
       deleteUserFile: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_user_filePgResource, specFromArgs_UserFile2(args));
+          const $delete = pgDeleteSingle(resource_user_filePgResource, specFromArgs_UserFile(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -2066,9 +2101,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       file: planCreatePayloadResult,
-      fileEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
-      },
+      fileEdge: CreateFilePayload_fileEdgePlan,
       query: queryPlan
     }
   },
@@ -2077,15 +2110,9 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
-      userByUserId($record) {
-        return resource_userPgResource.get({
-          id: $record.get("result").get("user_id")
-        });
-      },
+      userByUserId: CreateUserFilePayload_userByUserIdPlan,
       userFile: planCreatePayloadResult,
-      userFileEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
-      }
+      userFileEdge: CreateUserFilePayload_userFileEdgePlan
     }
   },
   CreateUserPayload: {
@@ -2094,9 +2121,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       query: queryPlan,
       user: planCreatePayloadResult,
-      userEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
-      }
+      userEdge: CreateUserPayload_userEdgePlan
     }
   },
   DeleteFilePayload: {
@@ -2109,9 +2134,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       file: planUpdateOrDeletePayloadResult,
-      fileEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
-      },
+      fileEdge: CreateFilePayload_fileEdgePlan,
       query: queryPlan
     }
   },
@@ -2125,15 +2148,9 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      userByUserId($record) {
-        return resource_userPgResource.get({
-          id: $record.get("result").get("user_id")
-        });
-      },
+      userByUserId: CreateUserFilePayload_userByUserIdPlan,
       userFile: planUpdateOrDeletePayloadResult,
-      userFileEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
-      }
+      userFileEdge: CreateUserFilePayload_userFileEdgePlan
     }
   },
   DeleteUserPayload: {
@@ -2147,9 +2164,7 @@ export const objects = {
       },
       query: queryPlan,
       user: planUpdateOrDeletePayloadResult,
-      userEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
-      }
+      userEdge: CreateUserPayload_userEdgePlan
     }
   },
   File: {
@@ -2178,10 +2193,8 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      file: planUpdateOrDeletePayloadResult,
-      fileEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_filePgResource, fileUniques[0].attributes, $mutation, fieldArgs);
-      },
+      file: planCreatePayloadResult,
+      fileEdge: CreateFilePayload_fileEdgePlan,
       query: queryPlan
     }
   },
@@ -2190,15 +2203,9 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      userByUserId($record) {
-        return resource_userPgResource.get({
-          id: $record.get("result").get("user_id")
-        });
-      },
+      userByUserId: CreateUserFilePayload_userByUserIdPlan,
       userFile: planUpdateOrDeletePayloadResult,
-      userFileEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
-      }
+      userFileEdge: CreateUserFilePayload_userFileEdgePlan
     }
   },
   UpdateUserPayload: {
@@ -2207,9 +2214,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       user: planUpdateOrDeletePayloadResult,
-      userEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
-      }
+      userEdge: CreateUserPayload_userEdgePlan
     }
   },
   User: {
@@ -2352,46 +2357,22 @@ export const inputObjects = {
   },
   FileCondition: {
     plans: {
-      filename($condition, val) {
-        return applyAttributeCondition("filename", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      }
+      filename: UserFileCondition_filenameApply,
+      id: UserFileCondition_idApply
     }
   },
   FileInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      filename(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("filename", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      filename: FileInput_filenameApply,
+      id: FileInput_idApply
     }
   },
   FilePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      filename(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("filename", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      }
+      filename: FileInput_filenameApply,
+      id: FileInput_idApply
     }
   },
   UpdateFileByIdInput: {
@@ -2402,8 +2383,8 @@ export const inputObjects = {
   },
   UpdateFileInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      filePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      filePatch: applyCreateFields
     }
   },
   UpdateUserByIdInput: {
@@ -2432,9 +2413,7 @@ export const inputObjects = {
   },
   UserCondition: {
     plans: {
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      id: UserFileCondition_idApply,
       name($condition, val) {
         return applyAttributeCondition("name", TYPES.text, $condition, val);
       }
@@ -2442,12 +2421,8 @@ export const inputObjects = {
   },
   UserFileCondition: {
     plans: {
-      filename($condition, val) {
-        return applyAttributeCondition("filename", TYPES.text, $condition, val);
-      },
-      id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
-      },
+      filename: UserFileCondition_filenameApply,
+      id: UserFileCondition_idApply,
       userId($condition, val) {
         return applyAttributeCondition("user_id", TYPES.int, $condition, val);
       }
@@ -2456,81 +2431,31 @@ export const inputObjects = {
   UserFileInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      filename(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("filename", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      userId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_id", bakedInputRuntime(schema, field.type, val));
-      }
+      filename: FileInput_filenameApply,
+      id: FileInput_idApply,
+      userId: UserFileInput_userIdApply
     }
   },
   UserFilePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      filename(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("filename", bakedInputRuntime(schema, field.type, val));
-      },
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      userId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("user_id", bakedInputRuntime(schema, field.type, val));
-      }
+      filename: FileInput_filenameApply,
+      id: FileInput_idApply,
+      userId: UserFileInput_userIdApply
     }
   },
   UserInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      id: FileInput_idApply,
+      name: UserInput_nameApply
     }
   },
   UserPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
-      },
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("name", bakedInputRuntime(schema, field.type, val));
-      }
+      id: FileInput_idApply,
+      name: UserInput_nameApply
     }
   }
 };
@@ -2549,32 +2474,10 @@ export const scalars = {
 export const enums = {
   FilesOrderBy: {
     values: {
-      FILENAME_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "filename",
-          direction: "ASC"
-        });
-      },
-      FILENAME_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "filename",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      FILENAME_ASC: UserFilesOrderBy_FILENAME_ASCApply,
+      FILENAME_DESC: UserFilesOrderBy_FILENAME_DESCApply,
+      ID_ASC: UserFilesOrderBy_ID_ASCApply,
+      ID_DESC: UserFilesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         fileUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -2597,32 +2500,10 @@ export const enums = {
   },
   UserFilesOrderBy: {
     values: {
-      FILENAME_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "filename",
-          direction: "ASC"
-        });
-      },
-      FILENAME_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "filename",
-          direction: "DESC"
-        });
-      },
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      FILENAME_ASC: UserFilesOrderBy_FILENAME_ASCApply,
+      FILENAME_DESC: UserFilesOrderBy_FILENAME_DESCApply,
+      ID_ASC: UserFilesOrderBy_ID_ASCApply,
+      ID_DESC: UserFilesOrderBy_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         user_fileUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -2657,20 +2538,8 @@ export const enums = {
   },
   UsersOrderBy: {
     values: {
-      ID_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "ASC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      ID_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "id",
-          direction: "DESC"
-        });
-        queryBuilder.setOrderIsUnique();
-      },
+      ID_ASC: UserFilesOrderBy_ID_ASCApply,
+      ID_DESC: UserFilesOrderBy_ID_DESCApply,
       NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name",

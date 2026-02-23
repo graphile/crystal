@@ -562,10 +562,9 @@ const specFromArgs_Accessory = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
-const specFromArgs_Accessory2 = args => {
-  const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Accessory, $nodeId);
-};
+function planCreatePayloadResult($object) {
+  return $object.get("result");
+}
 function queryPlan() {
   return rootValue();
 }
@@ -589,20 +588,30 @@ const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-function getClientMutationIdForUpdateOrDeletePlan($mutation) {
-  const $result = $mutation.getStepForKey("result");
-  return $result.getMeta("clientMutationId");
-}
-function planUpdateOrDeletePayloadResult($object) {
-  return $object.get("result");
-}
-function applyClientMutationIdForUpdateOrDelete(qb, val) {
+const CreateAccessoryPayload_accessoryEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
+function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function applyPatchFields(qb, arg) {
+function applyCreateFields(qb, arg) {
   if (arg != null) {
     return qb.setBuilder();
   }
+}
+function AccessoryInput_nameApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("Name", bakedInputRuntime(schema, field.type, val));
+}
+function AccessoryInput_rowIdApply(obj, val, {
+  field,
+  schema
+}) {
+  obj.set("Id", bakedInputRuntime(schema, field.type, val));
+}
+function getClientMutationIdForUpdateOrDeletePlan($mutation) {
+  const $result = $mutation.getStepForKey("result");
+  return $result.getMeta("clientMutationId");
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1022,7 +1031,7 @@ export const objects = {
       },
       deleteAccessory: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_AccessoryPgResource, specFromArgs_Accessory2(args));
+          const $delete = pgDeleteSingle(resource_AccessoryPgResource, specFromArgs_Accessory(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -1107,12 +1116,8 @@ export const objects = {
   CreateAccessoryPayload: {
     assertStep: assertStep,
     plans: {
-      accessory($object) {
-        return $object.get("result");
-      },
-      accessoryEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
-      },
+      accessory: planCreatePayloadResult,
+      accessoryEdge: CreateAccessoryPayload_accessoryEdgePlan,
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
@@ -1124,9 +1129,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       accessory: planUpdateOrDeletePayloadResult,
-      accessoryEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
-      },
+      accessoryEdge: CreateAccessoryPayload_accessoryEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedAccessoryId($object) {
         const $record = $object.getStepForKey("result");
@@ -1139,10 +1142,8 @@ export const objects = {
   UpdateAccessoryPayload: {
     assertStep: ObjectStep,
     plans: {
-      accessory: planUpdateOrDeletePayloadResult,
-      accessoryEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
-      },
+      accessory: planCreatePayloadResult,
+      accessoryEdge: CreateAccessoryPayload_accessoryEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
     }
@@ -1181,47 +1182,21 @@ export const inputObjects = {
   AccessoryInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("Name", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("Id", bakedInputRuntime(schema, field.type, val));
-      }
+      name: AccessoryInput_nameApply,
+      rowId: AccessoryInput_rowIdApply
     }
   },
   AccessoryPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      name(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("Name", bakedInputRuntime(schema, field.type, val));
-      },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("Id", bakedInputRuntime(schema, field.type, val));
-      }
+      name: AccessoryInput_nameApply,
+      rowId: AccessoryInput_rowIdApply
     }
   },
   CreateAccessoryInput: {
     plans: {
-      accessory(qb, arg) {
-        if (arg != null) {
-          return qb.setBuilder();
-        }
-      },
-      clientMutationId(qb, val) {
-        qb.setMeta("clientMutationId", val);
-      }
+      accessory: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteAccessoryByRowIdInput: {
@@ -1242,8 +1217,8 @@ export const inputObjects = {
   },
   UpdateAccessoryInput: {
     plans: {
-      accessoryPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      accessoryPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   }
 };
