@@ -3,35 +3,16 @@ import type {
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfigArgumentMap,
   GraphQLInputType,
-  GraphQLNamedType,
-  GraphQLOutputType,
-  GraphQLType,
-} from "graphql";
-import {
-  GraphQLDirective,
-  GraphQLEnumType,
-  GraphQLInputObjectType,
   GraphQLInterfaceType,
-  GraphQLList,
-  GraphQLNonNull,
+  GraphQLNamedType,
   GraphQLObjectType,
-  GraphQLScalarType,
+  GraphQLOutputType,
   GraphQLSchema,
-  GraphQLUnionType,
-  isEnumType,
-  isInputObjectType,
-  isInterfaceType,
-  isIntrospectionType,
-  isListType,
-  isNonNullType,
-  isObjectType,
-  isScalarType,
-  isSpecifiedDirective,
-  isSpecifiedScalarType,
-  isUnionType,
+  GraphQLType,
 } from "graphql";
 
 interface TransformOptions {
+  graphql: typeof import("graphql");
   trimDeprecated?: boolean;
   trimDescriptions?: boolean;
 }
@@ -60,7 +41,7 @@ function transformSchema(
   schema: GraphQLSchema,
   options: TransformOptions,
 ): GraphQLSchema {
-  const { trimDeprecated = false, trimDescriptions = false } = options;
+  const { graphql, trimDeprecated = false, trimDescriptions = false } = options;
   const schemaConfig = schema.toConfig();
 
   const typeMap = new Map<string, GraphQLNamedType>();
@@ -74,10 +55,10 @@ function transformSchema(
   }
 
   const remapType = (t: GraphQLType): GraphQLType => {
-    if (isNonNullType(t)) {
-      return new GraphQLNonNull(remapType(t.ofType));
-    } else if (isListType(t)) {
-      return new GraphQLList(remapType(t.ofType));
+    if (graphql.isNonNullType(t)) {
+      return new graphql.GraphQLNonNull(remapType(t.ofType));
+    } else if (graphql.isListType(t)) {
+      return new graphql.GraphQLList(remapType(t.ofType));
     } else {
       return typeMap.get(t.name) ?? t;
     }
@@ -185,18 +166,20 @@ function transformSchema(
 
   function transformType(type: GraphQLNamedType) {
     switch (true) {
-      case isScalarType(type): {
-        return new GraphQLScalarType(maybeTrimDescription(type.toConfig()));
+      case graphql.isScalarType(type): {
+        return new graphql.GraphQLScalarType(
+          maybeTrimDescription(type.toConfig()),
+        );
       }
 
-      case isEnumType(type): {
+      case graphql.isEnumType(type): {
         const config = type.toConfig();
         const values: GraphQLEnumValueConfigMap = Object.fromEntries(
           Object.entries(config.values)
             .filter(([, v]) => !trimDeprecated || !v.deprecationReason)
             .map(([k, v]) => [k, maybeTrimDescription(v)]),
         );
-        return new GraphQLEnumType(
+        return new graphql.GraphQLEnumType(
           maybeTrimDescription({
             ...config,
             values,
@@ -204,9 +187,9 @@ function transformSchema(
         );
       }
 
-      case isUnionType(type): {
+      case graphql.isUnionType(type): {
         const config = type.toConfig();
-        return new GraphQLUnionType(
+        return new graphql.GraphQLUnionType(
           maybeTrimDescription(
             maybeTrimDescription({
               ...config,
@@ -216,23 +199,23 @@ function transformSchema(
         );
       }
 
-      case isInterfaceType(type): {
+      case graphql.isInterfaceType(type): {
         const config = type.toConfig();
-        return new GraphQLInterfaceType(
+        return new graphql.GraphQLInterfaceType(
           maybeTrimDescription(replaceFields(replaceInterfaces(config))),
         );
       }
 
-      case isInputObjectType(type): {
+      case graphql.isInputObjectType(type): {
         const config = type.toConfig();
-        return new GraphQLInputObjectType(
+        return new graphql.GraphQLInputObjectType(
           maybeTrimDescription(replaceInputFields(config)),
         );
       }
 
-      case isObjectType(type): {
+      case graphql.isObjectType(type): {
         const config = type.toConfig();
-        return new GraphQLObjectType(
+        return new graphql.GraphQLObjectType(
           maybeTrimDescription(replaceFields(replaceInterfaces(config))),
         );
       }
@@ -244,8 +227,8 @@ function transformSchema(
 
   for (const t of schemaConfig.types) {
     if (typeMap.has(t.name)) continue;
-    if (isIntrospectionType(t)) continue;
-    if (isSpecifiedScalarType(t)) {
+    if (graphql.isIntrospectionType(t)) continue;
+    if (graphql.isSpecifiedScalarType(t)) {
       typeMap.set(t.name, t);
     } else {
       const type = transformType(t);
@@ -254,12 +237,14 @@ function transformSchema(
   }
 
   const directives = schemaConfig.directives.map((d) =>
-    isSpecifiedDirective(d)
+    graphql.isSpecifiedDirective(d)
       ? d
-      : new GraphQLDirective(maybeTrimDescription(replaceArgs(d.toConfig()))),
+      : new graphql.GraphQLDirective(
+          maybeTrimDescription(replaceArgs(d.toConfig())),
+        ),
   );
 
-  return new GraphQLSchema(
+  return new graphql.GraphQLSchema(
     maybeTrimDescription({
       ...schemaConfig,
       types: Array.from(typeMap.values()),
@@ -293,6 +278,7 @@ export const MinifySchemaPlugin: GraphileConfig.Plugin = {
     hooks: {
       finalize(schema, build) {
         return transformSchema(schema, {
+          graphql: build.graphql,
           trimDeprecated: true,
           trimDescriptions: true,
         });

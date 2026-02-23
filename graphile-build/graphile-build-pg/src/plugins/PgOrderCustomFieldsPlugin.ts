@@ -107,7 +107,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { inflection, sql, options } = build;
+        const { inflection, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;
