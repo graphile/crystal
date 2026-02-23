@@ -384,7 +384,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           }
 
           const params = functionPath.node.params;
-          if (params.length === 0 || !params.every(isSimpleParam)) {
+          if (params.length === 0) {
             return;
           }
 
