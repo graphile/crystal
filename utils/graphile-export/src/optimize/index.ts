@@ -240,8 +240,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         // those identifiers into the function body and remove the redundant
         // parameters/arguments.
         exitPath.traverse({
-          VariableDeclarator: optimizeCommonLeadingCallArgs,
-          FunctionDeclaration: optimizeCommonLeadingCallArgs,
+          VariableDeclarator: eliminateRedundantArguments,
+          FunctionDeclaration: eliminateRedundantArguments,
         });
 
         // Replace all things that are only referenced once.
@@ -327,7 +327,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           path.remove();
         }
 
-        function optimizeCommonLeadingCallArgs(
+        function eliminateRedundantArguments(
           path:
             | NodePath<t.VariableDeclarator>
             | NodePath<t.FunctionDeclaration>,
