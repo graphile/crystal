@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-const PersistedPlugin: GraphileConfig.Plugin = {
+export const PersistedPlugin: GraphileConfig.Plugin = {
   name: "PersistedPlugin",
   description: "Enables persisted operations in Grafserv",
   version,

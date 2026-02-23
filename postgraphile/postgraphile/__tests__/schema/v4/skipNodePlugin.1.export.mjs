@@ -7646,6 +7646,22 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
+const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, queryBuilder) => {
+  if (typeof pgFieldSource.from !== "function") {
+    throw new Error("Invalid computed attribute 'from'");
+  }
+  const expression = sql`${pgFieldSource.from({
+    placeholder: queryBuilder.alias
+  })}`;
+  queryBuilder.orderBy({
+    codec: pgFieldSource.codec,
+    fragment: expression,
+    direction: ascDesc.toUpperCase(),
+    ...(pgOrderByNullsLast != null ? {
+      nulls: pgOrderByNullsLast ? "LAST" : "FIRST"
+    } : null)
+  });
+};
 const isValidHstoreObject = obj => {
   if (obj === null) {
     // Null is okay
@@ -25579,7 +25595,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"BigFloat" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`BigFloat can only parse string values (kind='${ast.kind}')`);
     }
   },
   BigInt: {
@@ -25589,7 +25605,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`BigInt can only parse string values (kind='${ast.kind}')`);
     }
   },
   Cursor: {
@@ -25599,7 +25615,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   },
   Date: {
@@ -25609,7 +25625,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Date" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Date can only parse string values (kind='${ast.kind}')`);
     }
   },
   Datetime: {
@@ -25619,7 +25635,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
     }
   },
   Email: {
@@ -25639,7 +25655,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`InternetAddress can only parse string values (kind='${ast.kind}')`);
     }
   },
   JSON: {
@@ -25664,7 +25680,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"JSONPath" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`JSONPath can only parse string values (kind='${ast.kind}')`);
     }
   },
   KeyValueHash: {
@@ -25675,7 +25691,7 @@ export const scalars = {
       if (isValidHstoreObject(obj)) {
         return obj;
       }
-      throw new GraphQLError(`This is not a valid ${"KeyValueHash"} object, it must be a key/value hash where keys and values are both strings (or null).`);
+      throw new GraphQLError(`This is not a valid KeyValueHash object, it must be a key/value hash where keys and values are both strings (or null).`);
     },
     parseLiteral(ast, variables) {
       switch (ast.kind) {
@@ -25722,7 +25738,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Datetime can only parse string values (kind='${ast.kind}')`);
     }
   },
   NotNullUrl: {
@@ -25737,7 +25753,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegClass" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegClass can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegConfig: {
@@ -25747,7 +25763,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegConfig" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegConfig can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegDictionary: {
@@ -25757,7 +25773,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegDictionary" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegDictionary can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegOper: {
@@ -25767,7 +25783,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegOper" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegOper can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegOperator: {
@@ -25777,7 +25793,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegOperator" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegOperator can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegProc: {
@@ -25787,7 +25803,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegProc" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegProc can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegProcedure: {
@@ -25797,7 +25813,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegProcedure" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegProcedure can only parse string values (kind='${ast.kind}')`);
     }
   },
   RegType: {
@@ -25807,7 +25823,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"RegType" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`RegType can only parse string values (kind='${ast.kind}')`);
     }
   },
   Time: {
@@ -25817,7 +25833,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return ast.value;
       }
-      throw new GraphQLError(`${"Time" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      throw new GraphQLError(`Time can only parse string values (kind='${ast.kind}')`);
     }
   },
   UUID: {
@@ -25829,7 +25845,7 @@ export const scalars = {
       if (ast.kind === Kind.STRING) {
         return coerce(ast.value);
       }
-      throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      throw new GraphQLError(`UUID can only parse string values (kind = '${ast.kind}')`);
     }
   }
 };
@@ -26016,30 +26032,10 @@ export const enums = {
   EdgeCasesOrderBy: {
     values: {
       COMPUTED_ASC(queryBuilder) {
-        if (typeof resource_edge_case_computedPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_edge_case_computedPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_edge_case_computedPgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_edge_case_computedPgResource, "asc", undefined, queryBuilder);
       },
       COMPUTED_DESC(queryBuilder) {
-        if (typeof resource_edge_case_computedPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_edge_case_computedPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_edge_case_computedPgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_edge_case_computedPgResource, "desc", undefined, queryBuilder);
       },
       NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -26550,30 +26546,10 @@ export const enums = {
         });
       },
       COMPUTED_OUT_ASC(queryBuilder) {
-        if (typeof resource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_person_computed_outPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_person_computed_outPgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_person_computed_outPgResource, "asc", undefined, queryBuilder);
       },
       COMPUTED_OUT_DESC(queryBuilder) {
-        if (typeof resource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_person_computed_outPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_person_computed_outPgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_person_computed_outPgResource, "desc", undefined, queryBuilder);
       },
       CONFIG_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -26614,30 +26590,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       FIRST_NAME_ASC(queryBuilder) {
-        if (typeof resource_person_first_namePgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_person_first_namePgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_person_first_namePgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_person_first_namePgResource, "asc", undefined, queryBuilder);
       },
       FIRST_NAME_DESC(queryBuilder) {
-        if (typeof resource_person_first_namePgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_person_first_namePgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_person_first_namePgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_person_first_namePgResource, "desc", undefined, queryBuilder);
       },
       ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -26808,30 +26764,10 @@ export const enums = {
         });
       },
       COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-        if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_post_computed_with_optional_argPgResource.codec,
-          fragment: expression,
-          direction: "asc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_post_computed_with_optional_argPgResource, "asc", undefined, queryBuilder);
       },
       COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-        if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-          placeholder: queryBuilder.alias
-        })}`;
-        queryBuilder.orderBy({
-          codec: resource_post_computed_with_optional_argPgResource.codec,
-          fragment: expression,
-          direction: "desc".toUpperCase()
-        });
+        applyOrderByCustomField(resource_post_computed_with_optional_argPgResource, "desc", undefined, queryBuilder);
       },
       HEADLINE_ASC(queryBuilder) {
         queryBuilder.orderBy({

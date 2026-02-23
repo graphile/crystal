@@ -37,11 +37,75 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
+const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
+  if (t.isExpression(functionBody)) {
+    return functionBody;
+  } else if (functionBody.body.length === 1) {
+    const statement = functionBody.body[0];
+    if (statement.type === "ReturnStatement") {
+      return statement.argument;
+    }
+  }
+};
+
 export const optimize = (inAst: t.File, runs = 1): t.File => {
   let ast = inAst;
   // Reset the full AST
   ast = parse(generate(ast).code, { sourceType: "module" });
+
   traverse(ast, {
+    LogicalExpression: {
+      enter(path) {
+        if (
+          (path.node.operator === "??" || path.node.operator === "||") &&
+          expressionIsAlwaysTruthy(path.node.left)
+        ) {
+          path.replaceWith(path.node.left);
+        }
+      },
+    },
+    TemplateLiteral: {
+      enter(path) {
+        let changed = false;
+        let quasis = path.node.quasis;
+        let expressions = path.node.expressions;
+        for (let i = 0, l = expressions.length; i < l; i++) {
+          const expression = expressions[i];
+          if (expression.type === "StringLiteral") {
+            // Inline it
+            if (!changed) {
+              changed = true;
+              quasis = [...path.node.quasis];
+              expressions = [...path.node.expressions];
+            }
+            quasis[i] = {
+              ...quasis[i],
+              value: {
+                raw:
+                  quasis[i].value.raw +
+                  expression.value +
+                  quasis[i + 1].value.raw,
+                cooked:
+                  quasis[i].value.cooked +
+                  expression.value +
+                  quasis[i + 1].value.cooked,
+              },
+            };
+            quasis.splice(i + 1, 1);
+            expressions.splice(i, 1);
+            i--;
+            l--;
+          }
+        }
+        if (changed) {
+          path.replaceWith({
+            ...path.node,
+            quasis,
+            expressions,
+          });
+        }
+      },
+    },
     SpreadElement: {
       enter(path) {
         if (
@@ -84,18 +148,12 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         ) {
           return;
         }
-        const getExpression = (
-          functionBody: t.BlockStatement | t.Expression,
-        ) => {
-          if (t.isExpression(functionBody)) {
-            return functionBody;
-          } else if (functionBody.body.length === 1) {
-            const statement = functionBody.body[0];
-            if (statement.type === "ReturnStatement") {
-              return statement.argument;
-            }
-          }
-        };
+
+        const args = node.arguments;
+        const params = node.callee.params;
+        if (params.length !== args.length) {
+          return;
+        }
 
         const expression = getExpression(node.callee.body);
 
@@ -103,17 +161,11 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           return;
         }
 
-        const args = node.arguments;
         if (!args.every(isSimpleArg)) {
           return;
         }
 
-        const params = node.callee.params;
         if (!params.every(isSimpleParam)) {
-          return;
-        }
-
-        if (params.length !== args.length) {
           return;
         }
 
@@ -277,7 +329,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       }
 
       // Don't strip a block if there's any variable declarations in it.
-      if (body.some((stmt) => stmt.type === "VariableDeclaration")) {
+      if (body.some(t.isVariableDeclaration)) {
         return;
       }
 
@@ -386,6 +438,8 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
       return true;
     case "BooleanLiteral":
       return !test.value;
+    case "StringLiteral":
+      return !test.value;
     case "BinaryExpression": {
       switch (test.operator) {
         case "!=": {
@@ -411,6 +465,10 @@ function expressionIsAlwaysTruthy(test: t.Expression) {
   switch (test.type) {
     case "BooleanLiteral":
       return test.value;
+    case "StringLiteral":
+      return !!test.value;
+    case "NumericLiteral":
+      return !!test.value;
     default:
       return false;
   }
