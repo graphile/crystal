@@ -4476,7 +4476,7 @@ export const objects = {
   DeleteBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building: planUpdateOrDeletePayloadResult,
+      building: planCreatePayloadResult,
       buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBuildingId($object) {
@@ -4498,7 +4498,7 @@ export const objects = {
         const specifier = nodeIdHandler_Offer.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      offer: planUpdateOrDeletePayloadResult,
+      offer: planCreatePayloadResult,
       offerEdge: CreateOfferPayload_offerEdgePlan,
       postByPostId: CreateOfferPayload_postByPostIdPlan,
       query: queryPlan
@@ -4513,7 +4513,7 @@ export const objects = {
         const specifier = nodeIdHandler_Post.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      post: planUpdateOrDeletePayloadResult,
+      post: planCreatePayloadResult,
       postEdge: CreatePostPayload_postEdgePlan,
       query: queryPlan
     }
@@ -4527,7 +4527,7 @@ export const objects = {
         const specifier = nodeIdHandler_Property.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      property: planUpdateOrDeletePayloadResult,
+      property: planCreatePayloadResult,
       propertyEdge: CreatePropertyPayload_propertyEdgePlan,
       query: queryPlan,
       streetByStreetId: CreatePropertyPayload_streetByStreetIdPlan
@@ -4543,7 +4543,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      street: planUpdateOrDeletePayloadResult,
+      street: planCreatePayloadResult,
       streetEdge: CreateStreetPayload_streetEdgePlan
     }
   },
@@ -4559,7 +4559,7 @@ export const objects = {
       propertyByPropId: CreateStreetPropertyPayload_propertyByPropIdPlan,
       query: queryPlan,
       streetByStrId: CreateStreetPropertyPayload_streetByStrIdPlan,
-      streetProperty: planUpdateOrDeletePayloadResult,
+      streetProperty: planCreatePayloadResult,
       streetPropertyEdge: CreateStreetPropertyPayload_streetPropertyEdgePlan
     }
   },
@@ -4850,7 +4850,7 @@ export const objects = {
   UpdateBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building: planUpdateOrDeletePayloadResult,
+      building: planCreatePayloadResult,
       buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       namedAfterStreet: CreateBuildingPayload_namedAfterStreetPlan,
@@ -4862,7 +4862,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      offer: planUpdateOrDeletePayloadResult,
+      offer: planCreatePayloadResult,
       offerEdge: CreateOfferPayload_offerEdgePlan,
       postByPostId: CreateOfferPayload_postByPostIdPlan,
       query: queryPlan
@@ -4881,7 +4881,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      property: planUpdateOrDeletePayloadResult,
+      property: planCreatePayloadResult,
       propertyEdge: CreatePropertyPayload_propertyEdgePlan,
       query: queryPlan,
       streetByStreetId: CreatePropertyPayload_streetByStreetIdPlan
@@ -4892,7 +4892,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      street: planUpdateOrDeletePayloadResult,
+      street: planCreatePayloadResult,
       streetEdge: CreateStreetPayload_streetEdgePlan
     }
   },
@@ -4903,7 +4903,7 @@ export const objects = {
       propertyByPropId: CreateStreetPropertyPayload_propertyByPropIdPlan,
       query: queryPlan,
       streetByStrId: CreateStreetPropertyPayload_streetByStrIdPlan,
-      streetProperty: planUpdateOrDeletePayloadResult,
+      streetProperty: planCreatePayloadResult,
       streetPropertyEdge: CreateStreetPropertyPayload_streetPropertyEdgePlan
     }
   }
@@ -4997,67 +4997,67 @@ export const inputObjects = {
   },
   DeleteBuildingByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteBuildingInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteOfferByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteOfferInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePropertyByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePropertyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteStreetByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteStreetByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteStreetInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteStreetPropertyByStrIdAndPropIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteStreetPropertyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   HouseCondition: {
@@ -5196,32 +5196,32 @@ export const inputObjects = {
   },
   UpdateBuildingByIdInput: {
     plans: {
-      buildingPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      buildingPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateBuildingInput: {
     plans: {
-      buildingPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      buildingPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateOfferByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      offerPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      offerPatch: applyCreateFields
     }
   },
   UpdateOfferInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      offerPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      offerPatch: applyCreateFields
     }
   },
   UpdatePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      postPatch: applyCreateFields
     }
   },
   UpdatePostInput: {
@@ -5232,44 +5232,44 @@ export const inputObjects = {
   },
   UpdatePropertyByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      propertyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      propertyPatch: applyCreateFields
     }
   },
   UpdatePropertyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      propertyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      propertyPatch: applyCreateFields
     }
   },
   UpdateStreetByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      streetPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      streetPatch: applyCreateFields
     }
   },
   UpdateStreetByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      streetPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      streetPatch: applyCreateFields
     }
   },
   UpdateStreetInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      streetPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      streetPatch: applyCreateFields
     }
   },
   UpdateStreetPropertyByStrIdAndPropIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      streetPropertyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      streetPropertyPatch: applyCreateFields
     }
   },
   UpdateStreetPropertyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      streetPropertyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      streetPropertyPatch: applyCreateFields
     }
   }
 };

@@ -8329,7 +8329,7 @@ export const objects = {
   DeleteBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building: planUpdateOrDeletePayloadResult,
+      building: planCreatePayloadResult,
       buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBuildingId($object) {
@@ -8344,7 +8344,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      constructor: planUpdateOrDeletePayloadResult,
+      constructor: planCreatePayloadResult,
       constructorEdge: CreateConstructorPayload_constructorEdgePlan,
       deletedConstructorId($object) {
         const $record = $object.getStepForKey("result");
@@ -8358,7 +8358,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      crop: planUpdateOrDeletePayloadResult,
+      crop: planCreatePayloadResult,
       cropEdge: CreateCropPayload_cropEdgePlan,
       deletedCropId($object) {
         const $record = $object.getStepForKey("result");
@@ -8378,7 +8378,7 @@ export const objects = {
         const specifier = nodeIdHandler_Machine.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      machine: planUpdateOrDeletePayloadResult,
+      machine: planCreatePayloadResult,
       machineEdge: CreateMachinePayload_machineEdgePlan,
       query: queryPlan
     }
@@ -8392,7 +8392,7 @@ export const objects = {
         const specifier = nodeIdHandler_Material.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      material: planUpdateOrDeletePayloadResult,
+      material: planCreatePayloadResult,
       materialEdge: CreateMaterialPayload_materialEdgePlan,
       query: queryPlan
     }
@@ -8406,7 +8406,7 @@ export const objects = {
         const specifier = nodeIdHandler_Null.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      null: planUpdateOrDeletePayloadResult,
+      null: planCreatePayloadResult,
       nullEdge: CreateNullPayload_nullEdgePlan,
       query: queryPlan
     }
@@ -8420,7 +8420,7 @@ export const objects = {
         const specifier = nodeIdHandler_Project.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      project: planUpdateOrDeletePayloadResult,
+      project: planCreatePayloadResult,
       projectEdge: CreateProjectPayload_projectEdgePlan,
       query: queryPlan
     }
@@ -8428,7 +8428,7 @@ export const objects = {
   DeleteProtoPayload: {
     assertStep: ObjectStep,
     plans: {
-      _proto__: planUpdateOrDeletePayloadResult,
+      _proto__: planCreatePayloadResult,
       _protoEdge: CreateProtoPayload__protoEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedProtoId($object) {
@@ -8449,7 +8449,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
+      reserved: planCreatePayloadResult,
       reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
@@ -8463,7 +8463,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      yield: planUpdateOrDeletePayloadResult,
+      yield: planCreatePayloadResult,
       yieldEdge: CreateYieldPayload_yieldEdgePlan
     }
   },
@@ -8641,7 +8641,7 @@ export const objects = {
   UpdateBuildingPayload: {
     assertStep: ObjectStep,
     plans: {
-      building: planUpdateOrDeletePayloadResult,
+      building: planCreatePayloadResult,
       buildingEdge: CreateBuildingPayload_buildingEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -8651,7 +8651,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      constructor: planUpdateOrDeletePayloadResult,
+      constructor: planCreatePayloadResult,
       constructorEdge: CreateConstructorPayload_constructorEdgePlan,
       query: queryPlan
     }
@@ -8660,7 +8660,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      crop: planUpdateOrDeletePayloadResult,
+      crop: planCreatePayloadResult,
       cropEdge: CreateCropPayload_cropEdgePlan,
       query: queryPlan
     }
@@ -8670,7 +8670,7 @@ export const objects = {
     plans: {
       buildingByConstructor: CreateMachinePayload_buildingByConstructorPlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      machine: planUpdateOrDeletePayloadResult,
+      machine: planCreatePayloadResult,
       machineEdge: CreateMachinePayload_machineEdgePlan,
       query: queryPlan
     }
@@ -8679,7 +8679,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      material: planUpdateOrDeletePayloadResult,
+      material: planCreatePayloadResult,
       materialEdge: CreateMaterialPayload_materialEdgePlan,
       query: queryPlan
     }
@@ -8688,7 +8688,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      null: planUpdateOrDeletePayloadResult,
+      null: planCreatePayloadResult,
       nullEdge: CreateNullPayload_nullEdgePlan,
       query: queryPlan
     }
@@ -8697,7 +8697,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      project: planUpdateOrDeletePayloadResult,
+      project: planCreatePayloadResult,
       projectEdge: CreateProjectPayload_projectEdgePlan,
       query: queryPlan
     }
@@ -8716,7 +8716,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
+      reserved: planCreatePayloadResult,
       reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
@@ -8725,7 +8725,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      yield: planUpdateOrDeletePayloadResult,
+      yield: planCreatePayloadResult,
       yieldEdge: CreateYieldPayload_yieldEdgePlan
     }
   },
@@ -8990,172 +8990,172 @@ export const inputObjects = {
   },
   DeleteBuildingByConstructorInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteBuildingByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteBuildingInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteConstructorByExportInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteConstructorByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteConstructorByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteConstructorInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteCropByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteCropByYieldInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteCropInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMachineByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMachineInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMaterialByClassInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMaterialByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMaterialByValueOfInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMaterialInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNullByBreakInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNullByHasOwnPropertyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNullByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNullInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProjectByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProjectByProtoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProjectInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProtoByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProtoByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProtoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteReservedByCaseInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteReservedByDoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteReservedByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteReservedByNullInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteYieldByExportInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteYieldByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteYieldInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   MachineCondition: {
@@ -9328,152 +9328,152 @@ export const inputObjects = {
   },
   UpdateBuildingByConstructorInput: {
     plans: {
-      buildingPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      buildingPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateBuildingByIdInput: {
     plans: {
-      buildingPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      buildingPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateBuildingInput: {
     plans: {
-      buildingPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      buildingPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateConstructorByExportInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      constructorPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      constructorPatch: applyCreateFields
     }
   },
   UpdateConstructorByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      constructorPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      constructorPatch: applyCreateFields
     }
   },
   UpdateConstructorByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      constructorPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      constructorPatch: applyCreateFields
     }
   },
   UpdateConstructorInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      constructorPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      constructorPatch: applyCreateFields
     }
   },
   UpdateCropByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cropPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      cropPatch: applyCreateFields
     }
   },
   UpdateCropByYieldInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cropPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      cropPatch: applyCreateFields
     }
   },
   UpdateCropInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      cropPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      cropPatch: applyCreateFields
     }
   },
   UpdateMachineByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      machinePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      machinePatch: applyCreateFields
     }
   },
   UpdateMachineInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      machinePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      machinePatch: applyCreateFields
     }
   },
   UpdateMaterialByClassInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      materialPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      materialPatch: applyCreateFields
     }
   },
   UpdateMaterialByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      materialPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      materialPatch: applyCreateFields
     }
   },
   UpdateMaterialByValueOfInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      materialPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      materialPatch: applyCreateFields
     }
   },
   UpdateMaterialInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      materialPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      materialPatch: applyCreateFields
     }
   },
   UpdateNullByBreakInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      nullPatch: applyCreateFields
     }
   },
   UpdateNullByHasOwnPropertyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      nullPatch: applyCreateFields
     }
   },
   UpdateNullByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      nullPatch: applyCreateFields
     }
   },
   UpdateNullInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      nullPatch: applyCreateFields
     }
   },
   UpdateProjectByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      projectPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      projectPatch: applyCreateFields
     }
   },
   UpdateProjectByProtoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      projectPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      projectPatch: applyCreateFields
     }
   },
   UpdateProjectInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      projectPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      projectPatch: applyCreateFields
     }
   },
   UpdateProtoByIdInput: {
     plans: {
-      _protoPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      _protoPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateProtoByNameInput: {
     plans: {
-      _protoPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      _protoPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateProtoInput: {
@@ -9484,50 +9484,50 @@ export const inputObjects = {
   },
   UpdateReservedByCaseInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedByDoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedByNullInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateYieldByExportInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      yieldPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      yieldPatch: applyCreateFields
     }
   },
   UpdateYieldByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      yieldPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      yieldPatch: applyCreateFields
     }
   },
   UpdateYieldInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      yieldPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      yieldPatch: applyCreateFields
     }
   },
   YieldCondition: {

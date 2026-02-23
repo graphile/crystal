@@ -10164,7 +10164,7 @@ export const objects = {
         const specifier = nodeIdHandler_LeftArm.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      leftArm: planUpdateOrDeletePayloadResult,
+      leftArm: planCreatePayloadResult,
       leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
@@ -10179,7 +10179,7 @@ export const objects = {
         const specifier = nodeIdHandler_Person.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -10194,7 +10194,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
-      personSecret: planUpdateOrDeletePayloadResult,
+      personSecret: planCreatePayloadResult,
       personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
@@ -10382,7 +10382,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -10413,13 +10413,13 @@ export const interfaces = {
 export const inputObjects = {
   CreateLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       leftArm: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       person: applyCreateFields
     }
   },
@@ -10431,42 +10431,42 @@ export const inputObjects = {
   },
   DeleteLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   LeftArmBaseInput: {
@@ -10627,14 +10627,14 @@ export const inputObjects = {
   },
   UpdateLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmInput: {
@@ -10645,20 +10645,20 @@ export const inputObjects = {
   },
   UpdatePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   WrappedUrlInput: {

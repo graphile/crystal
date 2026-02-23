@@ -1241,7 +1241,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      t: planUpdateOrDeletePayloadResult,
+      t: planCreatePayloadResult,
       tEdge: CreateTPayload_tEdgePlan
     }
   },
@@ -1332,12 +1332,12 @@ export const inputObjects = {
   },
   DeleteTByKInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteTInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   TCondition: {
@@ -1366,8 +1366,8 @@ export const inputObjects = {
   },
   UpdateTByKInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      tPatch: applyCreateFields
     }
   },
   UpdateTInput: {

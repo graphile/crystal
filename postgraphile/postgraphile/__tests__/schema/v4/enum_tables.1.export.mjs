@@ -2405,7 +2405,7 @@ export const objects = {
         const specifier = nodeIdHandler_LetterDescription.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      letterDescription: planUpdateOrDeletePayloadResult,
+      letterDescription: planCreatePayloadResult,
       letterDescriptionEdge: CreateLetterDescriptionPayload_letterDescriptionEdgePlan,
       query: queryPlan
     }
@@ -2420,7 +2420,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      referencingTable: planUpdateOrDeletePayloadResult,
+      referencingTable: planCreatePayloadResult,
       referencingTableEdge: CreateReferencingTablePayload_referencingTableEdgePlan
     }
   },
@@ -2510,7 +2510,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      referencingTable: planUpdateOrDeletePayloadResult,
+      referencingTable: planCreatePayloadResult,
       referencingTableEdge: CreateReferencingTablePayload_referencingTableEdgePlan
     }
   }
@@ -2543,38 +2543,38 @@ export const inputObjects = {
   },
   CreateReferencingTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       referencingTable: applyCreateFields
     }
   },
   DeleteLetterDescriptionByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLetterDescriptionByLetterInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLetterDescriptionByLetterViaViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLetterDescriptionInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReferencingTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReferencingTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   LetterDescriptionCondition: {
@@ -2653,20 +2653,20 @@ export const inputObjects = {
   },
   UpdateLetterDescriptionByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateLetterDescriptionByLetterInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateLetterDescriptionByLetterViaViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      letterDescriptionPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      letterDescriptionPatch: applyCreateFields
     }
   },
   UpdateLetterDescriptionInput: {
@@ -2677,14 +2677,14 @@ export const inputObjects = {
   },
   UpdateReferencingTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      referencingTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      referencingTablePatch: applyCreateFields
     }
   },
   UpdateReferencingTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      referencingTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      referencingTablePatch: applyCreateFields
     }
   }
 };

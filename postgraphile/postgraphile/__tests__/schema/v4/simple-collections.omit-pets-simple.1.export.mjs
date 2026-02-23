@@ -1746,7 +1746,7 @@ export const objects = {
         const specifier = nodeIdHandler_Person.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -1761,7 +1761,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       personByOwnerId: CreatePetPayload_personByOwnerIdPlan,
-      pet: planUpdateOrDeletePayloadResult,
+      pet: planCreatePayloadResult,
       petEdge: CreatePetPayload_petEdgePlan,
       query: queryPlan
     }
@@ -1859,7 +1859,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByOwnerId: CreatePetPayload_personByOwnerIdPlan,
-      pet: planUpdateOrDeletePayloadResult,
+      pet: planCreatePayloadResult,
       petEdge: CreatePetPayload_petEdgePlan,
       query: queryPlan
     }
@@ -1899,22 +1899,22 @@ export const inputObjects = {
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePetByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePetInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   PersonCondition: {
@@ -1964,8 +1964,8 @@ export const inputObjects = {
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonInput: {
@@ -1976,14 +1976,14 @@ export const inputObjects = {
   },
   UpdatePetByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      petPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      petPatch: applyCreateFields
     }
   },
   UpdatePetInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      petPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      petPatch: applyCreateFields
     }
   }
 };

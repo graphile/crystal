@@ -21175,7 +21175,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      compoundKey: planUpdateOrDeletePayloadResult,
+      compoundKey: planCreatePayloadResult,
       compoundKeyEdge: CreateCompoundKeyPayload_compoundKeyEdgePlan,
       personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
       personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
@@ -21186,7 +21186,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      defaultValue: planUpdateOrDeletePayloadResult,
+      defaultValue: planCreatePayloadResult,
       defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
@@ -21195,7 +21195,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      input: planUpdateOrDeletePayloadResult,
+      input: planCreatePayloadResult,
       inputEdge: CreateInputPayload_inputEdgePlan,
       query: queryPlan
     }
@@ -21204,7 +21204,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      issue756: planUpdateOrDeletePayloadResult,
+      issue756: planCreatePayloadResult,
       issue756Edge: Issue756MutationPayload_issue756EdgePlan,
       query: queryPlan
     }
@@ -21213,7 +21213,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      leftArm: planUpdateOrDeletePayloadResult,
+      leftArm: planCreatePayloadResult,
       leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
@@ -21223,7 +21223,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      list: planUpdateOrDeletePayloadResult,
+      list: planCreatePayloadResult,
       listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
@@ -21232,7 +21232,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      myTable: planUpdateOrDeletePayloadResult,
+      myTable: planCreatePayloadResult,
       myTableEdge: CreateMyTablePayload_myTableEdgePlan,
       query: queryPlan
     }
@@ -21241,7 +21241,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      noPrimaryKey: planUpdateOrDeletePayloadResult,
+      noPrimaryKey: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -21249,7 +21249,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      nullTestRecord: planUpdateOrDeletePayloadResult,
+      nullTestRecord: planCreatePayloadResult,
       nullTestRecordEdge: CreateNullTestRecordPayload_nullTestRecordEdgePlan,
       query: queryPlan
     }
@@ -21258,7 +21258,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      patch: planUpdateOrDeletePayloadResult,
+      patch: planCreatePayloadResult,
       patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
@@ -21267,7 +21267,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: MutationOutTablePayload_personEdgePlan,
       query: queryPlan
     }
@@ -21277,7 +21277,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
-      personSecret: planUpdateOrDeletePayloadResult,
+      personSecret: planCreatePayloadResult,
       personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
@@ -21287,7 +21287,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
-      post: planUpdateOrDeletePayloadResult,
+      post: planCreatePayloadResult,
       postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
@@ -21297,7 +21297,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedInputRecord: planUpdateOrDeletePayloadResult,
+      reservedInputRecord: planCreatePayloadResult,
       reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
@@ -21306,7 +21306,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedPatchRecord: planUpdateOrDeletePayloadResult,
+      reservedPatchRecord: planCreatePayloadResult,
       reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
@@ -21315,7 +21315,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
+      reserved: planCreatePayloadResult,
       reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
@@ -21324,7 +21324,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable1: planUpdateOrDeletePayloadResult,
+      similarTable1: planCreatePayloadResult,
       similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
@@ -21333,7 +21333,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable2: planUpdateOrDeletePayloadResult,
+      similarTable2: planCreatePayloadResult,
       similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
@@ -21344,7 +21344,7 @@ export const objects = {
       postById: TypeFunctionMutationPayload_postByIdPlan,
       postBySmallint: TypeFunctionMutationPayload_postBySmallintPlan,
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
+      type: planCreatePayloadResult,
       typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
@@ -21353,7 +21353,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      viewTable: planUpdateOrDeletePayloadResult,
+      viewTable: planCreatePayloadResult,
       viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
@@ -22713,7 +22713,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      compoundKey: planUpdateOrDeletePayloadResult,
+      compoundKey: planCreatePayloadResult,
       compoundKeyEdge: CreateCompoundKeyPayload_compoundKeyEdgePlan,
       personByPersonId1: CreateCompoundKeyPayload_personByPersonId1Plan,
       personByPersonId2: CreateCompoundKeyPayload_personByPersonId2Plan,
@@ -22724,7 +22724,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      defaultValue: planUpdateOrDeletePayloadResult,
+      defaultValue: planCreatePayloadResult,
       defaultValueEdge: CreateDefaultValuePayload_defaultValueEdgePlan,
       query: queryPlan
     }
@@ -22742,7 +22742,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      issue756: planUpdateOrDeletePayloadResult,
+      issue756: planCreatePayloadResult,
       issue756Edge: Issue756MutationPayload_issue756EdgePlan,
       query: queryPlan
     }
@@ -22751,7 +22751,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      leftArm: planUpdateOrDeletePayloadResult,
+      leftArm: planCreatePayloadResult,
       leftArmEdge: LeftArmIdentityPayload_leftArmEdgePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       query: queryPlan
@@ -22761,7 +22761,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      list: planUpdateOrDeletePayloadResult,
+      list: planCreatePayloadResult,
       listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
@@ -22770,7 +22770,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      myTable: planUpdateOrDeletePayloadResult,
+      myTable: planCreatePayloadResult,
       myTableEdge: CreateMyTablePayload_myTableEdgePlan,
       query: queryPlan
     }
@@ -22779,7 +22779,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      noPrimaryKey: planUpdateOrDeletePayloadResult,
+      noPrimaryKey: planCreatePayloadResult,
       query: queryPlan
     }
   },
@@ -22787,7 +22787,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      nullTestRecord: planUpdateOrDeletePayloadResult,
+      nullTestRecord: planCreatePayloadResult,
       nullTestRecordEdge: CreateNullTestRecordPayload_nullTestRecordEdgePlan,
       query: queryPlan
     }
@@ -22796,7 +22796,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      patch: planUpdateOrDeletePayloadResult,
+      patch: planCreatePayloadResult,
       patchEdge: CreatePatchPayload_patchEdgePlan,
       query: queryPlan
     }
@@ -22805,7 +22805,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: MutationOutTablePayload_personEdgePlan,
       query: queryPlan
     }
@@ -22815,7 +22815,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
-      personSecret: planUpdateOrDeletePayloadResult,
+      personSecret: planCreatePayloadResult,
       personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
@@ -22825,7 +22825,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByAuthorId: TableMutationPayload_personByAuthorIdPlan,
-      post: planUpdateOrDeletePayloadResult,
+      post: planCreatePayloadResult,
       postEdge: TableMutationPayload_postEdgePlan,
       query: queryPlan
     }
@@ -22835,7 +22835,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedInputRecord: planUpdateOrDeletePayloadResult,
+      reservedInputRecord: planCreatePayloadResult,
       reservedInputRecordEdge: CreateReservedInputRecordPayload_reservedInputRecordEdgePlan
     }
   },
@@ -22844,7 +22844,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reservedPatchRecord: planUpdateOrDeletePayloadResult,
+      reservedPatchRecord: planCreatePayloadResult,
       reservedPatchRecordEdge: CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan
     }
   },
@@ -22853,7 +22853,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      reserved: planUpdateOrDeletePayloadResult,
+      reserved: planCreatePayloadResult,
       reservedEdge: CreateReservedPayload_reservedEdgePlan
     }
   },
@@ -22862,7 +22862,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable1: planUpdateOrDeletePayloadResult,
+      similarTable1: planCreatePayloadResult,
       similarTable1Edge: CreateSimilarTable1Payload_similarTable1EdgePlan
     }
   },
@@ -22871,7 +22871,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      similarTable2: planUpdateOrDeletePayloadResult,
+      similarTable2: planCreatePayloadResult,
       similarTable2Edge: CreateSimilarTable2Payload_similarTable2EdgePlan
     }
   },
@@ -22882,7 +22882,7 @@ export const objects = {
       postById: TypeFunctionMutationPayload_postByIdPlan,
       postBySmallint: TypeFunctionMutationPayload_postBySmallintPlan,
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
+      type: planCreatePayloadResult,
       typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
@@ -22891,7 +22891,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      viewTable: planUpdateOrDeletePayloadResult,
+      viewTable: planCreatePayloadResult,
       viewTableEdge: CreateViewTablePayload_viewTableEdgePlan
     }
   },
@@ -23067,25 +23067,25 @@ export const inputObjects = {
   },
   CreateCompoundKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       compoundKey: applyCreateFields
     }
   },
   CreateDefaultValueInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       defaultValue: applyCreateFields
     }
   },
   CreateEdgeCaseInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       edgeCase: applyCreateFields
     }
   },
   CreateForeignKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       foreignKey: applyCreateFields
     }
   },
@@ -23097,115 +23097,115 @@ export const inputObjects = {
   },
   CreateIssue756Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       issue756: applyCreateFields
     }
   },
   CreateLeftArmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       leftArm: applyCreateFields
     }
   },
   CreateListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       list: applyCreateFields
     }
   },
   CreateMyTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       myTable: applyCreateFields
     }
   },
   CreateNoPrimaryKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       noPrimaryKey: applyCreateFields
     }
   },
   CreateNullTestRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       nullTestRecord: applyCreateFields
     }
   },
   CreatePatchInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       patch: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       person: applyCreateFields
     }
   },
   CreatePersonSecretInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       personSecret: applyCreateFields
     }
   },
   CreatePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       post: applyCreateFields
     }
   },
   CreateReservedInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reserved: applyCreateFields
     }
   },
   CreateReservedInputRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reservedInputRecord: applyCreateFields
     }
   },
   CreateReservedPatchRecordInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       reservedPatchRecord: applyCreateFields
     }
   },
   CreateSimilarTable1Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       similarTable1: applyCreateFields
     }
   },
   CreateSimilarTable2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       similarTable2: applyCreateFields
     }
   },
   CreateTestviewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       testview: applyCreateFields
     }
   },
   CreateTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       type: applyCreateFields
     }
   },
   CreateUpdatableViewInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       updatableView: applyCreateFields
     }
   },
   CreateViewTableInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       viewTable: applyCreateFields
     }
   },
@@ -23233,112 +23233,112 @@ export const inputObjects = {
   },
   DeleteCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteDefaultValueByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteInputByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteIssue756ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteListByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteMyTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNoPrimaryKeyByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteNullTestRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePatchByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedInputRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteReservedPatchRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable1ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteSimilarTable2ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteViewTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   EdgeCaseCondition: {
@@ -24472,14 +24472,14 @@ export const inputObjects = {
   },
   UpdateCompoundKeyByPersonId1AndPersonId2Input: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      compoundKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      compoundKeyPatch: applyCreateFields
     }
   },
   UpdateDefaultValueByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      defaultValuePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      defaultValuePatch: applyCreateFields
     }
   },
   UpdateInputByIdInput: {
@@ -24490,116 +24490,116 @@ export const inputObjects = {
   },
   UpdateIssue756ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      issue756Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      issue756Patch: applyCreateFields
     }
   },
   UpdateLeftArmByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateLeftArmByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      leftArmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      leftArmPatch: applyCreateFields
     }
   },
   UpdateListByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      listPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      listPatch: applyCreateFields
     }
   },
   UpdateMyTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      myTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      myTablePatch: applyCreateFields
     }
   },
   UpdateNoPrimaryKeyByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      noPrimaryKeyPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      noPrimaryKeyPatch: applyCreateFields
     }
   },
   UpdateNullTestRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      nullTestRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      nullTestRecordPatch: applyCreateFields
     }
   },
   UpdatePatchByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      patchPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      patchPatch: applyCreateFields
     }
   },
   UpdatePersonByEmailInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonSecretByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personSecretPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personSecretPatch: applyCreateFields
     }
   },
   UpdatePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      postPatch: applyCreateFields
     }
   },
   UpdateReservedByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatch: applyCreateFields
     }
   },
   UpdateReservedInputRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedInputRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedInputRecordPatch: applyCreateFields
     }
   },
   UpdateReservedPatchRecordByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      reservedPatchRecordPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      reservedPatchRecordPatch: applyCreateFields
     }
   },
   UpdateSimilarTable1ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable1Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable1Patch: applyCreateFields
     }
   },
   UpdateSimilarTable2ByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      similarTable2Patch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      similarTable2Patch: applyCreateFields
     }
   },
   UpdateTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      typePatch: applyCreateFields
     }
   },
   UpdateViewTableByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      viewTablePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      viewTablePatch: applyCreateFields
     }
   },
   ViewTableCondition: {

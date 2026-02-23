@@ -2899,7 +2899,7 @@ export const objects = {
   DeleteAlwaysAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      alwaysAsIdentity: planUpdateOrDeletePayloadResult,
+      alwaysAsIdentity: planCreatePayloadResult,
       alwaysAsIdentityEdge: CreateAlwaysAsIdentityPayload_alwaysAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedAlwaysAsIdentityId($object) {
@@ -2913,7 +2913,7 @@ export const objects = {
   DeleteByDefaultAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      byDefaultAsIdentity: planUpdateOrDeletePayloadResult,
+      byDefaultAsIdentity: planCreatePayloadResult,
       byDefaultAsIdentityEdge: CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedByDefaultAsIdentityId($object) {
@@ -2933,7 +2933,7 @@ export const objects = {
         const specifier = nodeIdHandler_Network.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      network: planUpdateOrDeletePayloadResult,
+      network: planCreatePayloadResult,
       networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
@@ -2948,7 +2948,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
+      type: planCreatePayloadResult,
       typeEdge: CreateTypePayload_typeEdgePlan
     }
   },
@@ -3028,7 +3028,7 @@ export const objects = {
   UpdateByDefaultAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
-      byDefaultAsIdentity: planUpdateOrDeletePayloadResult,
+      byDefaultAsIdentity: planCreatePayloadResult,
       byDefaultAsIdentityEdge: CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -3038,7 +3038,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      network: planUpdateOrDeletePayloadResult,
+      network: planCreatePayloadResult,
       networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
@@ -3048,7 +3048,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
+      type: planCreatePayloadResult,
       typeEdge: CreateTypePayload_typeEdgePlan
     }
   }
@@ -3137,42 +3137,42 @@ export const inputObjects = {
   },
   DeleteAlwaysAsIdentityByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteAlwaysAsIdentityInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteByDefaultAsIdentityByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteByDefaultAsIdentityInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNetworkByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNetworkInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DomainConstrainedCompoundTypeInput: {
@@ -3304,8 +3304,8 @@ export const inputObjects = {
   },
   UpdateAlwaysAsIdentityByIdInput: {
     plans: {
-      alwaysAsIdentityPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      alwaysAsIdentityPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateAlwaysAsIdentityInput: {
@@ -3316,38 +3316,38 @@ export const inputObjects = {
   },
   UpdateByDefaultAsIdentityByIdInput: {
     plans: {
-      byDefaultAsIdentityPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      byDefaultAsIdentityPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateByDefaultAsIdentityInput: {
     plans: {
-      byDefaultAsIdentityPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      byDefaultAsIdentityPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateNetworkByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      networkPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      networkPatch: applyCreateFields
     }
   },
   UpdateNetworkInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      networkPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      networkPatch: applyCreateFields
     }
   },
   UpdateTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      typePatch: applyCreateFields
     }
   },
   UpdateTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      typePatch: applyCreateFields
     }
   }
 };

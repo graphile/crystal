@@ -2120,7 +2120,7 @@ export const objects = {
         const specifier = nodeIdHandler_File.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      file: planUpdateOrDeletePayloadResult,
+      file: planCreatePayloadResult,
       fileEdge: CreateFilePayload_fileEdgePlan,
       query: queryPlan
     }
@@ -2136,7 +2136,7 @@ export const objects = {
       },
       query: queryPlan,
       userByUserId: CreateUserFilePayload_userByUserIdPlan,
-      userFile: planUpdateOrDeletePayloadResult,
+      userFile: planCreatePayloadResult,
       userFileEdge: CreateUserFilePayload_userFileEdgePlan
     }
   },
@@ -2150,7 +2150,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      user: planUpdateOrDeletePayloadResult,
+      user: planCreatePayloadResult,
       userEdge: CreateUserPayload_userEdgePlan
     }
   },
@@ -2191,7 +2191,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       userByUserId: CreateUserFilePayload_userByUserIdPlan,
-      userFile: planUpdateOrDeletePayloadResult,
+      userFile: planCreatePayloadResult,
       userFileEdge: CreateUserFilePayload_userFileEdgePlan
     }
   },
@@ -2200,7 +2200,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      user: planUpdateOrDeletePayloadResult,
+      user: planCreatePayloadResult,
       userEdge: CreateUserPayload_userEdgePlan
     }
   },
@@ -2314,32 +2314,32 @@ export const inputObjects = {
   },
   DeleteFileByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteFileInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteUserByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteUserFileByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteUserFileInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteUserInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   FileCondition: {
@@ -2364,8 +2364,8 @@ export const inputObjects = {
   },
   UpdateFileByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      filePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      filePatch: applyCreateFields
     }
   },
   UpdateFileInput: {
@@ -2376,26 +2376,26 @@ export const inputObjects = {
   },
   UpdateUserByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      userPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      userPatch: applyCreateFields
     }
   },
   UpdateUserFileByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      userFilePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      userFilePatch: applyCreateFields
     }
   },
   UpdateUserFileInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      userFilePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      userFilePatch: applyCreateFields
     }
   },
   UpdateUserInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      userPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      userPatch: applyCreateFields
     }
   },
   UserCondition: {

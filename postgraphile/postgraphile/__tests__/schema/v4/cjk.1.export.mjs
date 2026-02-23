@@ -1079,8 +1079,8 @@ export const inputObjects = {
   },
   UpdateQiJianByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      qiJianPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      qiJianPatch: applyCreateFields
     }
   },
   UpdateQiJianInput: {

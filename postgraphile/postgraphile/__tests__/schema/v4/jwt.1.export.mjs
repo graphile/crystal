@@ -5204,7 +5204,7 @@ export const objects = {
         const specifier = nodeIdHandler_List.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      list: planUpdateOrDeletePayloadResult,
+      list: planCreatePayloadResult,
       listEdge: CreateListPayload_listEdgePlan,
       query: queryPlan
     }
@@ -5219,7 +5219,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
+      type: planCreatePayloadResult,
       typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   },
@@ -5480,7 +5480,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      type: planUpdateOrDeletePayloadResult,
+      type: planCreatePayloadResult,
       typeEdge: TypeFunctionMutationPayload_typeEdgePlan
     }
   }
@@ -5585,13 +5585,13 @@ export const inputObjects = {
   },
   CreateListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       list: applyCreateFields
     }
   },
   CreateTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       type: applyCreateFields
     }
   },
@@ -5603,22 +5603,22 @@ export const inputObjects = {
   },
   DeleteListByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteListInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   GuidFnInput: {
@@ -6049,8 +6049,8 @@ export const inputObjects = {
   },
   UpdateListByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      listPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      listPatch: applyCreateFields
     }
   },
   UpdateListInput: {
@@ -6061,14 +6061,14 @@ export const inputObjects = {
   },
   UpdateTypeByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      typePatch: applyCreateFields
     }
   },
   UpdateTypeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      typePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      typePatch: applyCreateFields
     }
   }
 };

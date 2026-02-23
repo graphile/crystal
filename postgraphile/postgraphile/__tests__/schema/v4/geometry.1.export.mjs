@@ -1427,7 +1427,7 @@ export const objects = {
         const specifier = nodeIdHandler_Geom.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      geom: planUpdateOrDeletePayloadResult,
+      geom: planCreatePayloadResult,
       geomEdge: CreateGeomPayload_geomEdgePlan,
       query: queryPlan
     }
@@ -1506,12 +1506,12 @@ export const inputObjects = {
   },
   DeleteGeomByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteGeomInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   GeomCondition: {
@@ -1615,8 +1615,8 @@ export const inputObjects = {
   },
   UpdateGeomByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      geomPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      geomPatch: applyCreateFields
     }
   },
   UpdateGeomInput: {

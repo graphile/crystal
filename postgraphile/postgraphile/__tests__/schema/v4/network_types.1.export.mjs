@@ -1130,7 +1130,7 @@ export const objects = {
         const specifier = nodeIdHandler_Network.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      network: planUpdateOrDeletePayloadResult,
+      network: planCreatePayloadResult,
       networkEdge: CreateNetworkPayload_networkEdgePlan,
       query: queryPlan
     }
@@ -1197,12 +1197,12 @@ export const inputObjects = {
   },
   DeleteNetworkByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteNetworkInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   NetworkCondition: {
@@ -1241,8 +1241,8 @@ export const inputObjects = {
   },
   UpdateNetworkByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      networkPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      networkPatch: applyCreateFields
     }
   },
   UpdateNetworkInput: {

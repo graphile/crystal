@@ -5146,7 +5146,7 @@ export const objects = {
         const specifier = nodeIdHandler_Location.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      location: planUpdateOrDeletePayloadResult,
+      location: planCreatePayloadResult,
       locationEdge: CreateLocationPayload_locationEdgePlan,
       query: queryPlan
     }
@@ -5161,7 +5161,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       locationByEntityId: CreateLocationTagPayload_locationByEntityIdPlan,
-      locationTag: planUpdateOrDeletePayloadResult,
+      locationTag: planCreatePayloadResult,
       locationTagEdge: CreateLocationTagPayload_locationTagEdgePlan,
       query: queryPlan
     }
@@ -5175,7 +5175,7 @@ export const objects = {
         const specifier = nodeIdHandler_Measurement.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      measurement: planUpdateOrDeletePayloadResult,
+      measurement: planCreatePayloadResult,
       measurementEdge: CreateMeasurementPayload_measurementEdgePlan,
       query: queryPlan,
       userByUserId: CreateMeasurementPayload_userByUserIdPlan
@@ -5190,7 +5190,7 @@ export const objects = {
         const specifier = nodeIdHandler_Photo.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      photo: planUpdateOrDeletePayloadResult,
+      photo: planCreatePayloadResult,
       photoEdge: CreatePhotoPayload_photoEdgePlan,
       query: queryPlan
     }
@@ -5205,7 +5205,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       photoByEntityId: CreatePhotoTagPayload_photoByEntityIdPlan,
-      photoTag: planUpdateOrDeletePayloadResult,
+      photoTag: planCreatePayloadResult,
       photoTagEdge: CreatePhotoTagPayload_photoTagEdgePlan,
       query: queryPlan
     }
@@ -5219,7 +5219,7 @@ export const objects = {
         const specifier = nodeIdHandler_Profile.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      profile: planUpdateOrDeletePayloadResult,
+      profile: planCreatePayloadResult,
       profileEdge: CreateProfilePayload_profileEdgePlan,
       query: queryPlan
     }
@@ -5234,7 +5234,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       profileByEntityId: CreateProfileTagPayload_profileByEntityIdPlan,
-      profileTag: planUpdateOrDeletePayloadResult,
+      profileTag: planCreatePayloadResult,
       profileTagEdge: CreateProfileTagPayload_profileTagEdgePlan,
       query: queryPlan
     }
@@ -5249,7 +5249,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      user: planUpdateOrDeletePayloadResult,
+      user: planCreatePayloadResult,
       userEdge: CreateUserPayload_userEdgePlan
     }
   },
@@ -5501,7 +5501,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       locationByEntityId: CreateLocationTagPayload_locationByEntityIdPlan,
-      locationTag: planUpdateOrDeletePayloadResult,
+      locationTag: planCreatePayloadResult,
       locationTagEdge: CreateLocationTagPayload_locationTagEdgePlan,
       query: queryPlan
     }
@@ -5510,7 +5510,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      measurement: planUpdateOrDeletePayloadResult,
+      measurement: planCreatePayloadResult,
       measurementEdge: CreateMeasurementPayload_measurementEdgePlan,
       query: queryPlan,
       userByUserId: CreateMeasurementPayload_userByUserIdPlan
@@ -5520,7 +5520,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      photo: planUpdateOrDeletePayloadResult,
+      photo: planCreatePayloadResult,
       photoEdge: CreatePhotoPayload_photoEdgePlan,
       query: queryPlan
     }
@@ -5530,7 +5530,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       photoByEntityId: CreatePhotoTagPayload_photoByEntityIdPlan,
-      photoTag: planUpdateOrDeletePayloadResult,
+      photoTag: planCreatePayloadResult,
       photoTagEdge: CreatePhotoTagPayload_photoTagEdgePlan,
       query: queryPlan
     }
@@ -5539,7 +5539,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      profile: planUpdateOrDeletePayloadResult,
+      profile: planCreatePayloadResult,
       profileEdge: CreateProfilePayload_profileEdgePlan,
       query: queryPlan
     }
@@ -5549,7 +5549,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       profileByEntityId: CreateProfileTagPayload_profileByEntityIdPlan,
-      profileTag: planUpdateOrDeletePayloadResult,
+      profileTag: planCreatePayloadResult,
       profileTagEdge: CreateProfileTagPayload_profileTagEdgePlan,
       query: queryPlan
     }
@@ -5559,7 +5559,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      user: planUpdateOrDeletePayloadResult,
+      user: planCreatePayloadResult,
       userEdge: CreateUserPayload_userEdgePlan
     }
   },
@@ -5673,82 +5673,82 @@ export const inputObjects = {
   },
   DeleteLocationByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteLocationInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteLocationTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteLocationTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMeasurementByTimestampAndKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteMeasurementInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePhotoByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePhotoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePhotoTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePhotoTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProfileByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProfileInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProfileTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteProfileTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteUserByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteUserInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   LocationCondition: {
@@ -5907,8 +5907,8 @@ export const inputObjects = {
   },
   UpdateLocationByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      locationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      locationPatch: applyCreateFields
     }
   },
   UpdateLocationInput: {
@@ -5919,86 +5919,86 @@ export const inputObjects = {
   },
   UpdateLocationTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      locationTagPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      locationTagPatch: applyCreateFields
     }
   },
   UpdateLocationTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      locationTagPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      locationTagPatch: applyCreateFields
     }
   },
   UpdateMeasurementByTimestampAndKeyInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      measurementPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      measurementPatch: applyCreateFields
     }
   },
   UpdateMeasurementInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      measurementPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      measurementPatch: applyCreateFields
     }
   },
   UpdatePhotoByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      photoPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      photoPatch: applyCreateFields
     }
   },
   UpdatePhotoInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      photoPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      photoPatch: applyCreateFields
     }
   },
   UpdatePhotoTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      photoTagPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      photoTagPatch: applyCreateFields
     }
   },
   UpdatePhotoTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      photoTagPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      photoTagPatch: applyCreateFields
     }
   },
   UpdateProfileByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      profilePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      profilePatch: applyCreateFields
     }
   },
   UpdateProfileInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      profilePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      profilePatch: applyCreateFields
     }
   },
   UpdateProfileTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      profileTagPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      profileTagPatch: applyCreateFields
     }
   },
   UpdateProfileTagInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      profileTagPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      profileTagPatch: applyCreateFields
     }
   },
   UpdateUserByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      userPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      userPatch: applyCreateFields
     }
   },
   UpdateUserInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      userPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      userPatch: applyCreateFields
     }
   },
   UserCondition: {

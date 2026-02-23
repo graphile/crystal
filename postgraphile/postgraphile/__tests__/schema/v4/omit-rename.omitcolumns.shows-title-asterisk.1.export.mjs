@@ -4482,7 +4482,7 @@ export const objects = {
         const specifier = nodeIdHandler_Film.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      film: planUpdateOrDeletePayloadResult,
+      film: planCreatePayloadResult,
       filmEdge: CreateFilmPayload_filmEdgePlan,
       query: queryPlan
     }
@@ -4496,7 +4496,7 @@ export const objects = {
         const specifier = nodeIdHandler_Person.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -4511,7 +4511,7 @@ export const objects = {
         const specifier = nodeIdHandler_Post.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      post: planUpdateOrDeletePayloadResult,
+      post: planCreatePayloadResult,
       postEdge: CreatePostPayload_postEdgePlan,
       query: queryPlan
     }
@@ -4526,7 +4526,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      studio: planUpdateOrDeletePayloadResult,
+      studio: planCreatePayloadResult,
       studioEdge: CreateStudioPayload_studioEdgePlan
     }
   },
@@ -4540,7 +4540,7 @@ export const objects = {
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
       query: queryPlan,
-      tvEpisode: planUpdateOrDeletePayloadResult,
+      tvEpisode: planCreatePayloadResult,
       tvEpisodeEdge: CreateTvEpisodePayload_tvEpisodeEdgePlan,
       tvShowByShowId: CreateTvEpisodePayload_tvShowByShowIdPlan
     }
@@ -4556,7 +4556,7 @@ export const objects = {
       },
       query: queryPlan,
       studioByStudioId: CreateTvShowPayload_studioByStudioIdPlan,
-      tvShow: planUpdateOrDeletePayloadResult,
+      tvShow: planCreatePayloadResult,
       tvShowEdge: CreateTvShowPayload_tvShowEdgePlan
     }
   },
@@ -4843,7 +4843,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -4853,7 +4853,7 @@ export const objects = {
     plans: {
       author: CreatePostPayload_authorPlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      post: planUpdateOrDeletePayloadResult,
+      post: planCreatePayloadResult,
       postEdge: CreatePostPayload_postEdgePlan,
       query: queryPlan
     }
@@ -4863,7 +4863,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      studio: planUpdateOrDeletePayloadResult,
+      studio: planCreatePayloadResult,
       studioEdge: CreateStudioPayload_studioEdgePlan
     }
   },
@@ -4872,7 +4872,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      tvEpisode: planUpdateOrDeletePayloadResult,
+      tvEpisode: planCreatePayloadResult,
       tvEpisodeEdge: CreateTvEpisodePayload_tvEpisodeEdgePlan,
       tvShowByShowId: CreateTvEpisodePayload_tvShowByShowIdPlan
     }
@@ -4883,7 +4883,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
       studioByStudioId: CreateTvShowPayload_studioByStudioIdPlan,
-      tvShow: planUpdateOrDeletePayloadResult,
+      tvShow: planCreatePayloadResult,
       tvShowEdge: CreateTvShowPayload_tvShowEdgePlan
     }
   }
@@ -4910,19 +4910,19 @@ export const interfaces = {
 export const inputObjects = {
   CreateFilmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       film: applyCreateFields
     }
   },
   CreatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       person: applyCreateFields
     }
   },
   CreatePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       post: applyCreateFields
     }
   },
@@ -4934,80 +4934,80 @@ export const inputObjects = {
   },
   CreateStudioInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       studio: applyCreateFields
     }
   },
   CreateTvEpisodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       tvEpisode: applyCreateFields
     }
   },
   CreateTvShowInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForCreate,
+      clientMutationId: applyClientMutationIdForCustomMutation,
       tvShow: applyCreateFields
     }
   },
   DeleteFilmByCodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteFilmInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeletePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteStudioByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteStudioInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTvEpisodeByCodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTvEpisodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTvShowByCodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteTvShowInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   FilmCondition: {
@@ -5210,8 +5210,8 @@ export const inputObjects = {
   },
   UpdateFilmByCodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      filmPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      filmPatch: applyCreateFields
     }
   },
   UpdateFilmInput: {
@@ -5222,62 +5222,62 @@ export const inputObjects = {
   },
   UpdatePersonByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      personPatch: applyCreateFields
     }
   },
   UpdatePostByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      postPatch: applyCreateFields
     }
   },
   UpdatePostInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      postPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      postPatch: applyCreateFields
     }
   },
   UpdateStudioByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      studioPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      studioPatch: applyCreateFields
     }
   },
   UpdateStudioInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      studioPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      studioPatch: applyCreateFields
     }
   },
   UpdateTvEpisodeByCodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tvEpisodePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      tvEpisodePatch: applyCreateFields
     }
   },
   UpdateTvEpisodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tvEpisodePatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      tvEpisodePatch: applyCreateFields
     }
   },
   UpdateTvShowByCodeInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tvShowPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      tvShowPatch: applyCreateFields
     }
   },
   UpdateTvShowInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      tvShowPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCustomMutation,
+      tvShowPatch: applyCreateFields
     }
   }
 };

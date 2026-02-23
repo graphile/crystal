@@ -1016,7 +1016,7 @@ export const inputObjects = {
   },
   DeleteCitationByIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteCitationInput: {

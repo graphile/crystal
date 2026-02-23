@@ -1115,7 +1115,7 @@ export const objects = {
   DeleteAccessoryPayload: {
     assertStep: ObjectStep,
     plans: {
-      accessory: planUpdateOrDeletePayloadResult,
+      accessory: planCreatePayloadResult,
       accessoryEdge: CreateAccessoryPayload_accessoryEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedAccessoryId($object) {
@@ -1188,18 +1188,18 @@ export const inputObjects = {
   },
   DeleteAccessoryByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteAccessoryInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateAccessoryByRowIdInput: {
     plans: {
-      accessoryPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      accessoryPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateAccessoryInput: {

@@ -16998,7 +16998,7 @@ export const objects = {
   DeleteAwsApplicationFirstPartyVulnerabilityPayload: {
     assertStep: ObjectStep,
     plans: {
-      awsApplicationFirstPartyVulnerability: planUpdateOrDeletePayloadResult,
+      awsApplicationFirstPartyVulnerability: planCreatePayloadResult,
       awsApplicationFirstPartyVulnerabilityEdge: CreateAwsApplicationFirstPartyVulnerabilityPayload_awsApplicationFirstPartyVulnerabilityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -17007,7 +17007,7 @@ export const objects = {
   DeleteAwsApplicationPayload: {
     assertStep: ObjectStep,
     plans: {
-      awsApplication: planUpdateOrDeletePayloadResult,
+      awsApplication: planCreatePayloadResult,
       awsApplicationEdge: CreateAwsApplicationPayload_awsApplicationEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -17016,7 +17016,7 @@ export const objects = {
   DeleteAwsApplicationThirdPartyVulnerabilityPayload: {
     assertStep: ObjectStep,
     plans: {
-      awsApplicationThirdPartyVulnerability: planUpdateOrDeletePayloadResult,
+      awsApplicationThirdPartyVulnerability: planCreatePayloadResult,
       awsApplicationThirdPartyVulnerabilityEdge: CreateAwsApplicationThirdPartyVulnerabilityPayload_awsApplicationThirdPartyVulnerabilityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -17026,7 +17026,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      firstPartyVulnerability: planUpdateOrDeletePayloadResult,
+      firstPartyVulnerability: planCreatePayloadResult,
       firstPartyVulnerabilityEdge: CreateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityEdgePlan,
       query: queryPlan
     }
@@ -17035,7 +17035,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      gcpApplicationFirstPartyVulnerability: planUpdateOrDeletePayloadResult,
+      gcpApplicationFirstPartyVulnerability: planCreatePayloadResult,
       gcpApplicationFirstPartyVulnerabilityEdge: CreateGcpApplicationFirstPartyVulnerabilityPayload_gcpApplicationFirstPartyVulnerabilityEdgePlan,
       query: queryPlan
     }
@@ -17044,7 +17044,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      gcpApplication: planUpdateOrDeletePayloadResult,
+      gcpApplication: planCreatePayloadResult,
       gcpApplicationEdge: CreateGcpApplicationPayload_gcpApplicationEdgePlan,
       query: queryPlan
     }
@@ -17053,7 +17053,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      gcpApplicationThirdPartyVulnerability: planUpdateOrDeletePayloadResult,
+      gcpApplicationThirdPartyVulnerability: planCreatePayloadResult,
       gcpApplicationThirdPartyVulnerabilityEdge: CreateGcpApplicationThirdPartyVulnerabilityPayload_gcpApplicationThirdPartyVulnerabilityEdgePlan,
       query: queryPlan
     }
@@ -17062,7 +17062,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      logEntry: planUpdateOrDeletePayloadResult,
+      logEntry: planCreatePayloadResult,
       logEntryEdge: CreateLogEntryPayload_logEntryEdgePlan,
       query: queryPlan
     }
@@ -17071,7 +17071,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      organization: planUpdateOrDeletePayloadResult,
+      organization: planCreatePayloadResult,
       organizationEdge: CreateOrganizationPayload_organizationEdgePlan,
       query: queryPlan
     }
@@ -17080,7 +17080,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -17089,7 +17089,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      priority: planUpdateOrDeletePayloadResult,
+      priority: planCreatePayloadResult,
       priorityEdge: CreatePriorityPayload_priorityEdgePlan,
       query: queryPlan
     }
@@ -17099,7 +17099,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      relationalItemRelationCompositePk: planUpdateOrDeletePayloadResult,
+      relationalItemRelationCompositePk: planCreatePayloadResult,
       relationalItemRelationCompositePkEdge: CreateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkEdgePlan
     }
   },
@@ -17108,7 +17108,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      relationalItemRelation: planUpdateOrDeletePayloadResult,
+      relationalItemRelation: planCreatePayloadResult,
       relationalItemRelationEdge: CreateRelationalItemRelationPayload_relationalItemRelationEdgePlan
     }
   },
@@ -17117,7 +17117,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      singleTableItemRelationCompositePk: planUpdateOrDeletePayloadResult,
+      singleTableItemRelationCompositePk: planCreatePayloadResult,
       singleTableItemRelationCompositePkEdge: CreateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkEdgePlan
     }
   },
@@ -17126,7 +17126,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      singleTableItemRelation: planUpdateOrDeletePayloadResult,
+      singleTableItemRelation: planCreatePayloadResult,
       singleTableItemRelationEdge: CreateSingleTableItemRelationPayload_singleTableItemRelationEdgePlan
     }
   },
@@ -17135,7 +17135,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      thirdPartyVulnerability: planUpdateOrDeletePayloadResult,
+      thirdPartyVulnerability: planCreatePayloadResult,
       thirdPartyVulnerabilityEdge: CreateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityEdgePlan
     }
   },
@@ -19523,7 +19523,7 @@ export const objects = {
   UpdateAwsApplicationPayload: {
     assertStep: ObjectStep,
     plans: {
-      awsApplication: planUpdateOrDeletePayloadResult,
+      awsApplication: planCreatePayloadResult,
       awsApplicationEdge: CreateAwsApplicationPayload_awsApplicationEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -19532,7 +19532,7 @@ export const objects = {
   UpdateAwsApplicationThirdPartyVulnerabilityPayload: {
     assertStep: ObjectStep,
     plans: {
-      awsApplicationThirdPartyVulnerability: planUpdateOrDeletePayloadResult,
+      awsApplicationThirdPartyVulnerability: planCreatePayloadResult,
       awsApplicationThirdPartyVulnerabilityEdge: CreateAwsApplicationThirdPartyVulnerabilityPayload_awsApplicationThirdPartyVulnerabilityEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan
@@ -19542,7 +19542,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      firstPartyVulnerability: planUpdateOrDeletePayloadResult,
+      firstPartyVulnerability: planCreatePayloadResult,
       firstPartyVulnerabilityEdge: CreateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityEdgePlan,
       query: queryPlan
     }
@@ -19551,7 +19551,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      gcpApplicationFirstPartyVulnerability: planUpdateOrDeletePayloadResult,
+      gcpApplicationFirstPartyVulnerability: planCreatePayloadResult,
       gcpApplicationFirstPartyVulnerabilityEdge: CreateGcpApplicationFirstPartyVulnerabilityPayload_gcpApplicationFirstPartyVulnerabilityEdgePlan,
       query: queryPlan
     }
@@ -19560,7 +19560,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      gcpApplication: planUpdateOrDeletePayloadResult,
+      gcpApplication: planCreatePayloadResult,
       gcpApplicationEdge: CreateGcpApplicationPayload_gcpApplicationEdgePlan,
       query: queryPlan
     }
@@ -19569,7 +19569,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      gcpApplicationThirdPartyVulnerability: planUpdateOrDeletePayloadResult,
+      gcpApplicationThirdPartyVulnerability: planCreatePayloadResult,
       gcpApplicationThirdPartyVulnerabilityEdge: CreateGcpApplicationThirdPartyVulnerabilityPayload_gcpApplicationThirdPartyVulnerabilityEdgePlan,
       query: queryPlan
     }
@@ -19578,7 +19578,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      logEntry: planUpdateOrDeletePayloadResult,
+      logEntry: planCreatePayloadResult,
       logEntryEdge: CreateLogEntryPayload_logEntryEdgePlan,
       query: queryPlan
     }
@@ -19587,7 +19587,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      organization: planUpdateOrDeletePayloadResult,
+      organization: planCreatePayloadResult,
       organizationEdge: CreateOrganizationPayload_organizationEdgePlan,
       query: queryPlan
     }
@@ -19596,7 +19596,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      person: planUpdateOrDeletePayloadResult,
+      person: planCreatePayloadResult,
       personEdge: CreatePersonPayload_personEdgePlan,
       query: queryPlan
     }
@@ -19605,7 +19605,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      priority: planUpdateOrDeletePayloadResult,
+      priority: planCreatePayloadResult,
       priorityEdge: CreatePriorityPayload_priorityEdgePlan,
       query: queryPlan
     }
@@ -19615,7 +19615,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      relationalItemRelationCompositePk: planUpdateOrDeletePayloadResult,
+      relationalItemRelationCompositePk: planCreatePayloadResult,
       relationalItemRelationCompositePkEdge: CreateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkEdgePlan
     }
   },
@@ -19624,7 +19624,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      relationalItemRelation: planUpdateOrDeletePayloadResult,
+      relationalItemRelation: planCreatePayloadResult,
       relationalItemRelationEdge: CreateRelationalItemRelationPayload_relationalItemRelationEdgePlan
     }
   },
@@ -19633,7 +19633,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      singleTableItemRelationCompositePk: planUpdateOrDeletePayloadResult,
+      singleTableItemRelationCompositePk: planCreatePayloadResult,
       singleTableItemRelationCompositePkEdge: CreateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkEdgePlan
     }
   },
@@ -19642,7 +19642,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      singleTableItemRelation: planUpdateOrDeletePayloadResult,
+      singleTableItemRelation: planCreatePayloadResult,
       singleTableItemRelationEdge: CreateSingleTableItemRelationPayload_singleTableItemRelationEdgePlan
     }
   },
@@ -19651,7 +19651,7 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan,
-      thirdPartyVulnerability: planUpdateOrDeletePayloadResult,
+      thirdPartyVulnerability: planCreatePayloadResult,
       thirdPartyVulnerabilityEdge: CreateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityEdgePlan
     }
   },
@@ -20348,102 +20348,102 @@ export const inputObjects = {
   },
   DeleteAwsApplicationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteAwsApplicationFirstPartyVulnerabilityByAwsApplicationIdAndFirstPartyVulnerabilityIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteAwsApplicationThirdPartyVulnerabilityByAwsApplicationIdAndThirdPartyVulnerabilityIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteFirstPartyVulnerabilityByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteGcpApplicationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteGcpApplicationFirstPartyVulnerabilityByGcpApplicationIdAndFirstPartyVulnerabilityIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteGcpApplicationThirdPartyVulnerabilityByGcpApplicationIdAndThirdPartyVulnerabilityIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteLogEntryByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteOrganizationByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteOrganizationByOrganizationIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePersonByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePersonByUsernameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeletePriorityByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteRelationalItemRelationByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteRelationalItemRelationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteSingleTableItemRelationByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteSingleTableItemRelationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteThirdPartyVulnerabilityByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   FirstPartyVulnerabilityCondition: {
@@ -21163,8 +21163,8 @@ export const inputObjects = {
   },
   UpdateAwsApplicationByRowIdInput: {
     plans: {
-      awsApplicationPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      awsApplicationPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateAwsApplicationFirstPartyVulnerabilityByAwsApplicationIdAndFirstPartyVulnerabilityIdInput: {
@@ -21175,110 +21175,110 @@ export const inputObjects = {
   },
   UpdateAwsApplicationThirdPartyVulnerabilityByAwsApplicationIdAndThirdPartyVulnerabilityIdInput: {
     plans: {
-      awsApplicationThirdPartyVulnerabilityPatch: applyPatchFields,
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      awsApplicationThirdPartyVulnerabilityPatch: applyCreateFields,
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   UpdateFirstPartyVulnerabilityByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      firstPartyVulnerabilityPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      firstPartyVulnerabilityPatch: applyCreateFields
     }
   },
   UpdateGcpApplicationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      gcpApplicationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      gcpApplicationPatch: applyCreateFields
     }
   },
   UpdateGcpApplicationFirstPartyVulnerabilityByGcpApplicationIdAndFirstPartyVulnerabilityIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      gcpApplicationFirstPartyVulnerabilityPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      gcpApplicationFirstPartyVulnerabilityPatch: applyCreateFields
     }
   },
   UpdateGcpApplicationThirdPartyVulnerabilityByGcpApplicationIdAndThirdPartyVulnerabilityIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      gcpApplicationThirdPartyVulnerabilityPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      gcpApplicationThirdPartyVulnerabilityPatch: applyCreateFields
     }
   },
   UpdateLogEntryByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      logEntryPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      logEntryPatch: applyCreateFields
     }
   },
   UpdateOrganizationByNameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      organizationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      organizationPatch: applyCreateFields
     }
   },
   UpdateOrganizationByOrganizationIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      organizationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      organizationPatch: applyCreateFields
     }
   },
   UpdatePersonByPersonIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      personPatch: applyCreateFields
     }
   },
   UpdatePersonByUsernameInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      personPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      personPatch: applyCreateFields
     }
   },
   UpdatePriorityByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      priorityPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      priorityPatch: applyCreateFields
     }
   },
   UpdateRelationalItemRelationByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      relationalItemRelationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      relationalItemRelationPatch: applyCreateFields
     }
   },
   UpdateRelationalItemRelationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      relationalItemRelationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      relationalItemRelationPatch: applyCreateFields
     }
   },
   UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      relationalItemRelationCompositePkPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      relationalItemRelationCompositePkPatch: applyCreateFields
     }
   },
   UpdateSingleTableItemRelationByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      singleTableItemRelationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      singleTableItemRelationPatch: applyCreateFields
     }
   },
   UpdateSingleTableItemRelationByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      singleTableItemRelationPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      singleTableItemRelationPatch: applyCreateFields
     }
   },
   UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      singleTableItemRelationCompositePkPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      singleTableItemRelationCompositePkPatch: applyCreateFields
     }
   },
   UpdateThirdPartyVulnerabilityByRowIdInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      thirdPartyVulnerabilityPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      thirdPartyVulnerabilityPatch: applyCreateFields
     }
   },
   VulnerabilityCondition: {

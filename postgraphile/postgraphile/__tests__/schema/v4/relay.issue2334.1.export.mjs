@@ -1493,7 +1493,7 @@ export const objects = {
   DeleteBarPayload: {
     assertStep: ObjectStep,
     plans: {
-      bar: planUpdateOrDeletePayloadResult,
+      bar: planCreatePayloadResult,
       barEdge: CreateBarPayload_barEdgePlan,
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedBarId($object) {
@@ -1513,7 +1513,7 @@ export const objects = {
         const specifier = nodeIdHandler_Foo.plan($record);
         return lambda(specifier, base64JSONNodeIdCodec.encode);
       },
-      foo: planUpdateOrDeletePayloadResult,
+      foo: planCreatePayloadResult,
       fooEdge: CreateFooPayload_fooEdgePlan,
       query: queryPlan
     }
@@ -1558,7 +1558,7 @@ export const objects = {
     assertStep: ObjectStep,
     plans: {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      foo: planUpdateOrDeletePayloadResult,
+      foo: planCreatePayloadResult,
       fooEdge: CreateFooPayload_fooEdgePlan,
       query: queryPlan
     }
@@ -1682,12 +1682,12 @@ export const inputObjects = {
   },
   DeleteBarInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   DeleteFooInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete
+      clientMutationId: applyClientMutationIdForCreate
     }
   },
   FooCondition: {
@@ -1721,8 +1721,8 @@ export const inputObjects = {
   },
   UpdateFooInput: {
     plans: {
-      clientMutationId: applyClientMutationIdForUpdateOrDelete,
-      fooPatch: applyPatchFields
+      clientMutationId: applyClientMutationIdForCreate,
+      fooPatch: applyCreateFields
     }
   }
 };
