@@ -766,7 +766,7 @@ function planCreatePayloadResult($object) {
 function queryPlan() {
   return rootValue();
 }
-const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+const getPgSelectSingleFromMutationResult = (pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
   if ($result instanceof PgDeleteSingleStep) {
@@ -776,11 +776,11 @@ const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) 
       memo[attributeName] = $result.get(attributeName);
       return memo;
     }, Object.create(null));
-    return resource.find(spec);
+    return resource_peoplePgResource.find(spec);
   }
 };
-const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
-  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(pkAttributes, $mutation);
   if (!$select) return constant(null);
   fieldArgs.apply($select, "orderBy");
   const $connection = connection($select);
@@ -1639,7 +1639,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForCreatePlan,
       person: planCreatePayloadResult,
       personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(peopleUniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }
@@ -1668,7 +1668,7 @@ export const objects = {
       },
       person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(peopleUniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }
@@ -1768,7 +1768,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       person: planUpdateOrDeletePayloadResult,
       personEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(peopleUniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }

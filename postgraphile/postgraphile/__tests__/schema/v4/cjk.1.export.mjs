@@ -496,8 +496,8 @@ const nodeIdHandler_QiJian = makeTableNodeIdHandler({
   pk: _Uniques[0].attributes
 });
 const specForHandlerCache = new Map();
-function specForHandler(handler) {
-  const existing = specForHandlerCache.get(handler);
+function specForHandler() {
+  const existing = specForHandlerCache.get(nodeIdHandler_QiJian);
   if (existing) {
     return existing;
   }
@@ -506,8 +506,8 @@ function specForHandler(handler) {
     // this handler; otherwise return null.
     if (nodeId == null) return null;
     try {
-      const specifier = handler.codec.decode(nodeId);
-      if (handler.match(specifier)) {
+      const specifier = nodeIdHandler_QiJian.codec.decode(nodeId);
+      if (nodeIdHandler_QiJian.match(specifier)) {
         return specifier;
       }
     } catch {
@@ -515,13 +515,13 @@ function specForHandler(handler) {
     }
     return null;
   }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
+  spec.displayName = `specifier_${nodeIdHandler_QiJian.typeName}_${nodeIdHandler_QiJian.codec.name}`;
   spec.isSyncAndSafe = true; // Optimization
-  specForHandlerCache.set(handler, spec);
+  specForHandlerCache.set(nodeIdHandler_QiJian, spec);
   return spec;
 }
 const nodeFetcher_QiJian = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_QiJian));
+  const $decoded = lambda($nodeId, specForHandler());
   return nodeIdHandler_QiJian.get(nodeIdHandler_QiJian.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
@@ -565,7 +565,7 @@ function applyInputToUpdateOrDelete(_, $object) {
 function queryPlan() {
   return rootValue();
 }
-const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+const getPgSelectSingleFromMutationResult = (pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
   if ($result instanceof PgDeleteSingleStep) {
@@ -575,11 +575,11 @@ const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) 
       memo[attributeName] = $result.get(attributeName);
       return memo;
     }, Object.create(null));
-    return resource.find(spec);
+    return resource_PgResource.find(spec);
   }
 };
-const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
-  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(pkAttributes, $mutation);
   if (!$select) return constant(null);
   fieldArgs.apply($select, "orderBy");
   const $connection = connection($select);
@@ -983,7 +983,7 @@ export const objects = {
         return $object.get("result");
       },
       qiJianEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_PgResource, _Uniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }
@@ -1026,7 +1026,7 @@ export const objects = {
         return $object.get("result");
       },
       qiJianEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_PgResource, _Uniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(_Uniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }
