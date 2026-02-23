@@ -285,6 +285,10 @@ class CodegenFile {
   _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
     new Map();
 
+  _factoryAstCache = new Map<string, FactoryASTCacheEntry[]>();
+
+  _convertToIdentifierViaASTCache = new Map<t.Expression, t.Identifier>();
+
   public options: ExportOptions;
 
   constructor(options: ExportOptions) {
@@ -1174,6 +1178,15 @@ function convertToIdentifierViaAST(
       depth,
       variableIdentifier,
     );
+
+  const existingVariableIdentifier =
+    file._convertToIdentifierViaASTCache.get(ast);
+  if (existingVariableIdentifier) {
+    return existingVariableIdentifier;
+  } else {
+    file._convertToIdentifierViaASTCache.set(ast, variableIdentifier);
+  }
+
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-export error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
@@ -1262,12 +1275,6 @@ interface FactoryASTCacheEntry {
   result: t.Expression;
 }
 
-const factoryAstCache = new Map<string, FactoryASTCacheEntry[]>();
-
-function resetCaches() {
-  factoryAstCache.clear();
-}
-
 function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
@@ -1305,10 +1312,10 @@ function factoryAst<TTuple extends any[]>(
   });
 
   const key = `${factory.toString().trim()}|${depArgs.length}`;
-  let cacheByKey = factoryAstCache.get(key);
+  let cacheByKey = file._factoryAstCache.get(key);
   if (!cacheByKey) {
     cacheByKey = [];
-    factoryAstCache.set(key, cacheByKey);
+    file._factoryAstCache.set(key, cacheByKey);
   }
 
   for (const existing of cacheByKey) {
@@ -2129,7 +2136,6 @@ function exportFile(file: CodegenFile, { disableOptimize }: ExportOptions) {
   const optimizedAst = disableOptimize ? ast : optimize(ast);
 
   const { code } = reallyGenerate(optimizedAst, {});
-  resetCaches();
   return { code };
 }
 
