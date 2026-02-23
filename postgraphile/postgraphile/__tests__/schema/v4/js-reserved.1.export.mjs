@@ -1800,13 +1800,13 @@ const pgFunctionArgumentsFromArgs = (() => {
   }
   return pgFunctionArgumentsFromArgs;
 })();
-const scalarComputed = (resource, $in, args) => {
+const scalarComputed = ($in, args) => {
   const {
     $row,
     selectArgs
   } = pgFunctionArgumentsFromArgs($in, args, true);
-  const from = pgFromExpression($row, resource.from, resource.parameters, selectArgs);
-  return pgClassExpression($row, resource.codec, undefined)`${from}`;
+  const from = pgFromExpression($row, resource_null_yieldPgResource.from, resource_null_yieldPgResource.parameters, selectArgs);
+  return pgClassExpression($row, resource_null_yieldPgResource.codec, undefined)`${from}`;
 };
 function applyInputToInsert(_, $object) {
   return $object;
@@ -8413,7 +8413,7 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Null.codec.name].encode);
       },
       yield($in, args, _info) {
-        return scalarComputed(resource_null_yieldPgResource, $in, makeArgs_null_yield(args));
+        return scalarComputed($in, makeArgs_null_yield(args));
       }
     },
     planType($specifier) {

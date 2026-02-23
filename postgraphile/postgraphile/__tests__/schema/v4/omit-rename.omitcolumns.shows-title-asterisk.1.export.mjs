@@ -1399,13 +1399,13 @@ const pgFunctionArgumentsFromArgs = (() => {
   }
   return pgFunctionArgumentsFromArgs;
 })();
-const scalarComputed = (resource, $in, args) => {
+const scalarComputed = ($in, args) => {
   const {
     $row,
     selectArgs
   } = pgFunctionArgumentsFromArgs($in, args, true);
-  const from = pgFromExpression($row, resource.from, resource.parameters, selectArgs);
-  return pgClassExpression($row, resource.codec, undefined)`${from}`;
+  const from = pgFromExpression($row, resource_person_full_namePgResource.from, resource_person_full_namePgResource.parameters, selectArgs);
+  return pgClassExpression($row, resource_person_full_namePgResource.codec, undefined)`${from}`;
 };
 const resource_getflamblePgResource = registry.pgResources["getflamble"];
 function pgSelectFromPayload($payload) {
@@ -4620,7 +4620,7 @@ export const objects = {
         return $record.get("last_name");
       },
       name($in, args, _info) {
-        return scalarComputed(resource_person_full_namePgResource, $in, makeArgs_person_full_name(args));
+        return scalarComputed($in, makeArgs_person_full_name(args));
       },
       nodeId($parent) {
         const specifier = nodeIdHandler_Person.plan($parent);

@@ -496,8 +496,8 @@ const nodeIdHandler_Accessory = makeTableNodeIdHandler({
   pk: AccessoryUniques[0].attributes
 });
 const specForHandlerCache = new Map();
-function specForHandler(handler) {
-  const existing = specForHandlerCache.get(handler);
+function specForHandler() {
+  const existing = specForHandlerCache.get(nodeIdHandler_Accessory);
   if (existing) {
     return existing;
   }
@@ -506,8 +506,8 @@ function specForHandler(handler) {
     // this handler; otherwise return null.
     if (nodeId == null) return null;
     try {
-      const specifier = handler.codec.decode(nodeId);
-      if (handler.match(specifier)) {
+      const specifier = nodeIdHandler_Accessory.codec.decode(nodeId);
+      if (nodeIdHandler_Accessory.match(specifier)) {
         return specifier;
       }
     } catch {
@@ -515,13 +515,13 @@ function specForHandler(handler) {
     }
     return null;
   }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
+  spec.displayName = `specifier_${nodeIdHandler_Accessory.typeName}_${nodeIdHandler_Accessory.codec.name}`;
   spec.isSyncAndSafe = true; // Optimization
-  specForHandlerCache.set(handler, spec);
+  specForHandlerCache.set(nodeIdHandler_Accessory, spec);
   return spec;
 }
 const nodeFetcher_Accessory = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Accessory));
+  const $decoded = lambda($nodeId, specForHandler());
   return nodeIdHandler_Accessory.get(nodeIdHandler_Accessory.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
@@ -569,7 +569,7 @@ const specFromArgs_Accessory2 = args => {
 function queryPlan() {
   return rootValue();
 }
-const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+const getPgSelectSingleFromMutationResult = (pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
   if ($result instanceof PgDeleteSingleStep) {
@@ -579,11 +579,11 @@ const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) 
       memo[attributeName] = $result.get(attributeName);
       return memo;
     }, Object.create(null));
-    return resource.find(spec);
+    return resource_AccessoryPgResource.find(spec);
   }
 };
-const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
-  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(pkAttributes, $mutation);
   if (!$select) return constant(null);
   fieldArgs.apply($select, "orderBy");
   const $connection = connection($select);
@@ -1111,7 +1111,7 @@ export const objects = {
         return $object.get("result");
       },
       accessoryEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_AccessoryPgResource, AccessoryUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -1125,7 +1125,7 @@ export const objects = {
     plans: {
       accessory: planUpdateOrDeletePayloadResult,
       accessoryEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_AccessoryPgResource, AccessoryUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       deletedAccessoryId($object) {
@@ -1141,7 +1141,7 @@ export const objects = {
     plans: {
       accessory: planUpdateOrDeletePayloadResult,
       accessoryEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_AccessoryPgResource, AccessoryUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(AccessoryUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       query: queryPlan

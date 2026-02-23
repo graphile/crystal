@@ -505,8 +505,8 @@ const nodeIdHandler_Network = makeTableNodeIdHandler({
   pk: networkUniques[0].attributes
 });
 const specForHandlerCache = new Map();
-function specForHandler(handler) {
-  const existing = specForHandlerCache.get(handler);
+function specForHandler() {
+  const existing = specForHandlerCache.get(nodeIdHandler_Network);
   if (existing) {
     return existing;
   }
@@ -515,8 +515,8 @@ function specForHandler(handler) {
     // this handler; otherwise return null.
     if (nodeId == null) return null;
     try {
-      const specifier = handler.codec.decode(nodeId);
-      if (handler.match(specifier)) {
+      const specifier = nodeIdHandler_Network.codec.decode(nodeId);
+      if (nodeIdHandler_Network.match(specifier)) {
         return specifier;
       }
     } catch {
@@ -524,13 +524,13 @@ function specForHandler(handler) {
     }
     return null;
   }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
+  spec.displayName = `specifier_${nodeIdHandler_Network.typeName}_${nodeIdHandler_Network.codec.name}`;
   spec.isSyncAndSafe = true; // Optimization
-  specForHandlerCache.set(handler, spec);
+  specForHandlerCache.set(nodeIdHandler_Network, spec);
   return spec;
 }
 const nodeFetcher_Network = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Network));
+  const $decoded = lambda($nodeId, specForHandler());
   return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
@@ -578,7 +578,7 @@ const specFromArgs_Network2 = args => {
 function queryPlan() {
   return rootValue();
 }
-const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+const getPgSelectSingleFromMutationResult = (pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
   if ($result instanceof PgDeleteSingleStep) {
@@ -588,11 +588,11 @@ const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) 
       memo[attributeName] = $result.get(attributeName);
       return memo;
     }, Object.create(null));
-    return resource.find(spec);
+    return resource_networkPgResource.find(spec);
   }
 };
-const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
-  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+const pgMutationPayloadEdge = (pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(pkAttributes, $mutation);
   if (!$select) return constant(null);
   fieldArgs.apply($select, "orderBy");
   const $connection = connection($select);
@@ -1118,7 +1118,7 @@ export const objects = {
         return $object.get("result");
       },
       networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }
@@ -1134,7 +1134,7 @@ export const objects = {
       },
       network: planUpdateOrDeletePayloadResult,
       networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }
@@ -1169,7 +1169,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       network: planUpdateOrDeletePayloadResult,
       networkEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
+        return pgMutationPayloadEdge(networkUniques[0].attributes, $mutation, fieldArgs);
       },
       query: queryPlan
     }

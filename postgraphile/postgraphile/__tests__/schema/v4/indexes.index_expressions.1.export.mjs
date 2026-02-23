@@ -501,8 +501,8 @@ const nodeIdHandler_Employee = makeTableNodeIdHandler({
   pk: employeeUniques[0].attributes
 });
 const specForHandlerCache = new Map();
-function specForHandler(handler) {
-  const existing = specForHandlerCache.get(handler);
+function specForHandler() {
+  const existing = specForHandlerCache.get(nodeIdHandler_Employee);
   if (existing) {
     return existing;
   }
@@ -511,8 +511,8 @@ function specForHandler(handler) {
     // this handler; otherwise return null.
     if (nodeId == null) return null;
     try {
-      const specifier = handler.codec.decode(nodeId);
-      if (handler.match(specifier)) {
+      const specifier = nodeIdHandler_Employee.codec.decode(nodeId);
+      if (nodeIdHandler_Employee.match(specifier)) {
         return specifier;
       }
     } catch {
@@ -520,13 +520,13 @@ function specForHandler(handler) {
     }
     return null;
   }
-  spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
+  spec.displayName = `specifier_${nodeIdHandler_Employee.typeName}_${nodeIdHandler_Employee.codec.name}`;
   spec.isSyncAndSafe = true; // Optimization
-  specForHandlerCache.set(handler, spec);
+  specForHandlerCache.set(nodeIdHandler_Employee, spec);
   return spec;
 }
 const nodeFetcher_Employee = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Employee));
+  const $decoded = lambda($nodeId, specForHandler());
   return nodeIdHandler_Employee.get(nodeIdHandler_Employee.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
