@@ -670,16 +670,16 @@ const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutP
 function toString(value) {
   return "" + value;
 }
-function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+function applyAttributeCondition(attributeCodec, $condition, val) {
   $condition.where({
     type: "attribute",
-    attribute: attributeName,
+    attribute: "col",
     callback(expression) {
       return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
     }
   });
 }
-const BarCondition_colApply = ($condition, val) => applyAttributeCondition("col", TYPES.text, $condition, val);
+const BarCondition_colApply = ($condition, val) => applyAttributeCondition(TYPES.text, $condition, val);
 const decodeNodeId_foo = makeDecodeNodeIdRuntime([nodeIdHandler_Foo]);
 const getIdentifiersFromSpecifier1 = specifier => {
   if (specifier == null) return null;
@@ -692,7 +692,7 @@ const getIdentifiersFromSpecifier1 = specifier => {
 };
 const getIdentifiers_foo = nodeId => getIdentifiersFromSpecifier1(decodeNodeId_foo(nodeId));
 const localAttributeCodecs_bar_fooByMyId = [TYPES.int];
-const pgConditionApplyNodeId = (attributeCount, localAttributes, typeName, condition, nodeId) => {
+const pgConditionApplyNodeId = (localAttributes, condition, nodeId) => {
   if (nodeId === undefined) {
     return;
   } else if (nodeId === null) {
@@ -707,13 +707,13 @@ const pgConditionApplyNodeId = (attributeCount, localAttributes, typeName, condi
     }
     return;
   } else if (typeof nodeId !== "string") {
-    throw new Error(`Invalid node identifier for '${typeName}'; expected string`);
+    throw new Error(`Invalid node identifier for 'Foo'; expected string`);
   } else {
     const identifiers = getIdentifiers_foo(nodeId);
     if (identifiers == null) {
-      throw new Error(`Invalid node identifier for '${typeName}'`);
+      throw new Error(`Invalid node identifier for 'Foo'`);
     }
-    for (let i = 0; i < attributeCount; i++) {
+    for (let i = 0; i < 1; i++) {
       const localName = localAttributes[i];
       const value = identifiers[i];
       if (value == null) {
@@ -806,7 +806,7 @@ function applyCreateFields(qb, arg) {
 function BarInput_colApply(obj, val, info) {
   obj.set("col", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const pgRowTypeApplyNodeId = (attributeCount, localAttributes, typeName, record, nodeId) => {
+const pgRowTypeApplyNodeId = (localAttributes, record, nodeId) => {
   if (nodeId === undefined) {
     return;
   } else if (nodeId === null) {
@@ -815,13 +815,13 @@ const pgRowTypeApplyNodeId = (attributeCount, localAttributes, typeName, record,
     }
     return;
   } else if (typeof nodeId !== "string") {
-    throw new Error(`Invalid node identifier for '${typeName}'; expected string`);
+    throw new Error(`Invalid node identifier for 'Foo'; expected string`);
   } else {
     const identifiers = getIdentifiers_foo(nodeId);
     if (identifiers == null) {
-      throw new Error(`Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`);
+      throw new Error(`Invalid node identifier for 'Foo': ${JSON.stringify(nodeId)}`);
     }
-    for (let i = 0; i < attributeCount; i++) {
+    for (let i = 0; i < 1; i++) {
       const localName = localAttributes[i];
       record.set(localName, identifiers[i]);
     }
@@ -1635,7 +1635,7 @@ export const inputObjects = {
     plans: {
       col: BarCondition_colApply,
       fooByRowId(condition, nodeId) {
-        return pgConditionApplyNodeId(1, registryConfig.pgRelations.bar.fooByMyId.localAttributes, "Foo", condition, nodeId);
+        return pgConditionApplyNodeId(registryConfig.pgRelations.bar.fooByMyId.localAttributes, condition, nodeId);
       }
     }
   },
@@ -1644,7 +1644,7 @@ export const inputObjects = {
     plans: {
       col: BarInput_colApply,
       fooByRowId(record, nodeId) {
-        return pgRowTypeApplyNodeId(1, registryConfig.pgRelations.bar.fooByMyId.localAttributes, "Foo", record, nodeId);
+        return pgRowTypeApplyNodeId(registryConfig.pgRelations.bar.fooByMyId.localAttributes, record, nodeId);
       }
     }
   },

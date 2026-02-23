@@ -8053,7 +8053,7 @@ const TypesOrderBy_ID_DESCApply = queryBuilder => {
   });
   queryBuilder.setOrderIsUnique();
 };
-const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, queryBuilder) => {
+const applyOrderByCustomField = (pgFieldSource, ascDesc, queryBuilder) => {
   if (typeof pgFieldSource.from !== "function") {
     throw new Error("Invalid computed attribute 'from'");
   }
@@ -8063,10 +8063,7 @@ const applyOrderByCustomField = (pgFieldSource, ascDesc, pgOrderByNullsLast, que
   queryBuilder.orderBy({
     codec: pgFieldSource.codec,
     fragment: expression,
-    direction: ascDesc.toUpperCase(),
-    ...(pgOrderByNullsLast != null ? {
-      nulls: pgOrderByNullsLast ? "LAST" : "FIRST"
-    } : null)
+    direction: ascDesc.toUpperCase()
   });
 };
 const isValidHstoreObject = obj => {
@@ -27317,10 +27314,10 @@ export const enums = {
   EdgeCasesOrderBy: {
     values: {
       COMPUTED_ASC(queryBuilder) {
-        applyOrderByCustomField(resource_edge_case_computedPgResource, "asc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_edge_case_computedPgResource, "asc", queryBuilder);
       },
       COMPUTED_DESC(queryBuilder) {
-        applyOrderByCustomField(resource_edge_case_computedPgResource, "desc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_edge_case_computedPgResource, "desc", queryBuilder);
       },
       NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -27723,10 +27720,10 @@ export const enums = {
         });
       },
       COMPUTED_OUT_ASC(queryBuilder) {
-        applyOrderByCustomField(resource_person_computed_outPgResource, "asc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_person_computed_outPgResource, "asc", queryBuilder);
       },
       COMPUTED_OUT_DESC(queryBuilder) {
-        applyOrderByCustomField(resource_person_computed_outPgResource, "desc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_person_computed_outPgResource, "desc", queryBuilder);
       },
       CONFIG_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -27767,10 +27764,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       FIRST_NAME_ASC(queryBuilder) {
-        applyOrderByCustomField(resource_person_first_namePgResource, "asc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_person_first_namePgResource, "asc", queryBuilder);
       },
       FIRST_NAME_DESC(queryBuilder) {
-        applyOrderByCustomField(resource_person_first_namePgResource, "desc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_person_first_namePgResource, "desc", queryBuilder);
       },
       ID_ASC: TypesOrderBy_ID_ASCApply,
       ID_DESC: TypesOrderBy_ID_DESCApply,
@@ -27917,10 +27914,10 @@ export const enums = {
         });
       },
       COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-        applyOrderByCustomField(resource_post_computed_with_optional_argPgResource, "asc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_post_computed_with_optional_argPgResource, "asc", queryBuilder);
       },
       COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-        applyOrderByCustomField(resource_post_computed_with_optional_argPgResource, "desc", undefined, queryBuilder);
+        applyOrderByCustomField(resource_post_computed_with_optional_argPgResource, "desc", queryBuilder);
       },
       HEADLINE_ASC(queryBuilder) {
         queryBuilder.orderBy({
