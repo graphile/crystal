@@ -7,7 +7,6 @@ import type {
 } from "@dataplan/pg";
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, ObjectStep } from "grafast";
-import { connection, constant, EdgeStep, first } from "grafast";
 import type { GraphQLEnumType, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -52,6 +51,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
         const {
           extend,
           getTypeByName,
+          grafast: { EdgeStep, connection, constant, first },
           graphql: { GraphQLList, GraphQLNonNull },
           inflection,
         } = build;
@@ -158,20 +158,23 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (pgMutationPayloadEdge, pkAttributes, resource) =>
-                    (
+                  (EdgeStep, connection, constant, first, pgMutationPayloadEdge, pkAttributes, resource) => (
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep;
                       }>,
                       fieldArgs: FieldArgs,
                     ) =>
                       pgMutationPayloadEdge(
+                        EdgeStep,
+                        connection,
+                        constant,
+                        first,
                         resource,
                         pkAttributes,
                         $mutation,
                         fieldArgs,
                       ),
-                  [pgMutationPayloadEdge, pkAttributes, resource],
+                  [EdgeStep, connection, constant, first, pgMutationPayloadEdge, pkAttributes, resource],
                 ),
                 ...(deprecationReason ? { deprecationReason } : null),
               }),
@@ -214,14 +217,12 @@ const getPgSelectSingleFromMutationResult = EXPORTABLE(
 
 // ENHANCE: review this plan, it feels overly complex and somewhat hacky.
 const pgMutationPayloadEdge = EXPORTABLE(
-  (
-    EdgeStep,
-    connection,
-    constant,
-    first,
-    getPgSelectSingleFromMutationResult,
-  ) =>
+  (getPgSelectSingleFromMutationResult) =>
     (
+      EdgeStep: typeof import("grafast").EdgeStep,
+      connection: typeof import("grafast").connection,
+      constant: typeof import("grafast").constant,
+      first: typeof import("grafast").first,
       resource: Exclude<
         ReturnType<GraphileBuild.Build["pgTableResource"]>,
         null | undefined
@@ -242,6 +243,6 @@ const pgMutationPayloadEdge = EXPORTABLE(
       const $connection = connection($select);
       return new EdgeStep($connection, first($connection));
     },
-  [EdgeStep, connection, constant, first, getPgSelectSingleFromMutationResult],
+  [getPgSelectSingleFromMutationResult],
   "pgMutationPayloadEdge",
 );
