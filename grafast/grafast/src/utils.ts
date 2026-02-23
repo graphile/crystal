@@ -1535,3 +1535,17 @@ export const GraphQLSpecifiedErrorBehaviors = Object.freeze([
   "NULL",
   "HALT",
 ] as const);
+
+const IS_SYNC_AND_SAFE = Object.freeze({
+  isSyncAndSafe: true,
+});
+
+export function markSyncAndSafe<
+  T extends ((...args: any) => any) & { displayName?: string },
+>(fn: T, displayName?: string): T {
+  Object.assign(fn, IS_SYNC_AND_SAFE);
+  if (displayName) {
+    fn.displayName = displayName;
+  }
+  return fn;
+}

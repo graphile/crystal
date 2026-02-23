@@ -5,7 +5,13 @@ import type {
   ExecutionDetails,
   Maybe,
 } from "grafast";
-import { applyTransforms, lambda, SafeError, Step } from "grafast";
+import {
+  applyTransforms,
+  lambda,
+  markSyncAndSafe,
+  SafeError,
+  Step,
+} from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type {
@@ -292,7 +298,7 @@ function parseCursor(cursor: Maybe<string>) {
     );
   }
 }
-parseCursor.isSyncAndSafe = true; // Optimization
+markSyncAndSafe(parseCursor);
 
 export function getUnary<T>(
   values: ExecutionDetails["values"],

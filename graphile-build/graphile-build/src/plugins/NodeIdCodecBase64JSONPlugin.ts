@@ -19,31 +19,28 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdCodec) {
           return _;
         }
-        const { EXPORTABLE } = build;
+        const {
+          EXPORTABLE,
+          grafast: { markSyncAndSafe },
+        } = build;
         const base64JSONEncode = EXPORTABLE(
-          () =>
-            Object.assign(
-              function base64JSONEncode(value: any): string | null {
-                return Buffer.from(JSON.stringify(value), "utf8").toString(
-                  "base64",
-                );
-              },
-              { isSyncAndSafe: true },
-            ),
-          [],
+          (markSyncAndSafe) =>
+            markSyncAndSafe(function base64JSONEncode(
+              value: any,
+            ): string | null {
+              return Buffer.from(JSON.stringify(value), "utf8").toString(
+                "base64",
+              );
+            }),
+          [markSyncAndSafe],
           "base64JSONEncode",
         );
         const base64JSONDecode = EXPORTABLE(
-          () =>
-            Object.assign(
-              function base64JSONDecode(value: string): any {
-                return JSON.parse(
-                  Buffer.from(value, "base64").toString("utf8"),
-                );
-              },
-              { isSyncAndSafe: true },
-            ),
-          [],
+          (markSyncAndSafe) =>
+            markSyncAndSafe(function base64JSONDecode(value: string): any {
+              return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+            }),
+          [markSyncAndSafe],
           "base64JSONDecode",
         );
 
