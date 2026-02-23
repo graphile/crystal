@@ -49,11 +49,7 @@ const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
 };
 
 function isSafeTemplateLiteralStringChunk(value: string): boolean {
-  return (
-    !value.includes("`") &&
-    !value.includes("\\") &&
-    !value.includes("${")
-  );
+  return !value.includes("`") && !value.includes("\\") && !value.includes("${");
 }
 
 export const optimize = (inAst: t.File, runs = 1): t.File => {
