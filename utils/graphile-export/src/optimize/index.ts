@@ -37,6 +37,33 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
+function isScalarConstantArg(
+  arg: t.Node,
+): arg is
+  | t.BooleanLiteral
+  | t.NullLiteral
+  | t.StringLiteral
+  | t.NumericLiteral
+  | t.BigIntLiteral
+  | (t.Identifier & { name: "undefined" }) {
+  return (
+    t.isBooleanLiteral(arg) ||
+    t.isNullLiteral(arg) ||
+    t.isStringLiteral(arg) ||
+    t.isNumericLiteral(arg) ||
+    t.isBigIntLiteral(arg) ||
+    (t.isIdentifier(arg) && arg.name === "undefined")
+  );
+}
+
+function isHoistableScalarConstantArg(
+  arg: t.Node,
+): arg is t.StringLiteral | t.NumericLiteral | t.BigIntLiteral {
+  return (
+    t.isStringLiteral(arg) || t.isNumericLiteral(arg) || t.isBigIntLiteral(arg)
+  );
+}
+
 const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
   if (t.isExpression(functionBody)) {
     return functionBody;
@@ -247,8 +274,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         exitPath.scope.crawl();
 
         // If a local top-level function is only ever called directly, and all
-        // calls pass the same identifier arguments in some positions, inline
-        // those identifiers into the function body and remove the redundant
+        // calls pass the same arguments in some positions, inline those values
+        // into the function body and remove the redundant
         // parameters/arguments.
         exitPath.traverse({
           VariableDeclarator: eliminateRedundantArguments,
@@ -418,6 +445,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           }
 
           const indexesToEliminate: number[] = [];
+          const indexesToRename = new Set<number>();
+          const indexesToSubstitute = new Set<number>();
           const maxIndex = Math.min(
             params.length,
             ...callPaths.map((callPath) => callPath.node.arguments.length),
@@ -428,24 +457,10 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
               continue;
             }
             const firstArg = callPaths[0].node.arguments[i];
-            if (!t.isIdentifier(firstArg)) {
-              continue;
-            }
-            const firstArgBinding = callPaths[0].scope.getBinding(
-              firstArg.name,
-            );
-            if (!firstArgBinding || firstArgBinding.scope !== exitPath.scope) {
-              continue;
-            }
             let allMatch = true;
             for (let j = 1; j < callPaths.length; j++) {
               const arg = callPaths[j].node.arguments[i];
-              if (!t.isIdentifier(arg) || arg.name !== firstArg.name) {
-                allMatch = false;
-                break;
-              }
-              const argBinding = callPaths[j].scope.getBinding(arg.name);
-              if (!argBinding || argBinding.scope !== exitPath.scope) {
+              if (!t.isNodesEquivalent(arg ?? null, firstArg ?? null)) {
                 allMatch = false;
                 break;
               }
@@ -453,35 +468,104 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             if (!allMatch) {
               continue;
             }
-            if (firstArg.name === param.name) {
-              // Safe to eliminate directly
-              indexesToEliminate.push(i);
-            } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
-              // Cannot safely rename inner references for this index, skip it
-              // TODO: handle renaming of conflicting variables to enable referencing global value.
+
+            if (t.isIdentifier(firstArg) && firstArg.name !== "undefined") {
+              const firstArgBinding = callPaths[0].scope.getBinding(
+                firstArg.name,
+              );
+              if (
+                !firstArgBinding ||
+                firstArgBinding.scope !== exitPath.scope
+              ) {
+                continue;
+              }
+              if (firstArg.name === param.name) {
+                // Safe to eliminate directly
+                indexesToEliminate.push(i);
+              } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
+                // Cannot safely rename inner references for this index, skip it
+                // TODO: handle renaming of conflicting variables to enable referencing global value.
+                continue;
+              } else {
+                // Safe to eliminate, but will need to rename inner references
+                indexesToEliminate.push(i);
+                indexesToRename.add(i);
+              }
               continue;
-            } else {
-              // Safe to eliminate, but will need to rename inner references
-              indexesToEliminate.push(i);
             }
+
+            if (!isScalarConstantArg(firstArg)) {
+              continue;
+            }
+            indexesToEliminate.push(i);
+            indexesToSubstitute.add(i);
           }
 
           if (indexesToEliminate.length === 0) {
             return;
           }
 
+          const hoistedDeclarators: t.VariableDeclarator[] = [];
           for (const i of indexesToEliminate) {
             const param = functionPath.node.params[i];
             const firstArg = callPaths[0].node.arguments[i];
-            if (!t.isIdentifier(param) || !t.isIdentifier(firstArg)) {
+            if (!t.isIdentifier(param) || !firstArg) {
               // Satisfy TypeScript
               throw new Error(
                 "GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable",
               );
             }
-            if (param.name !== firstArg.name) {
+            if (indexesToRename.has(i)) {
+              if (!t.isIdentifier(firstArg)) {
+                throw new Error(
+                  "GraphileExportInternalError<9bc420a8-9e3f-435f-bf5f-f6ec1d8795dd>: This path should be unreachable",
+                );
+              }
               // The rename of the inner references mentioned above
               functionPath.scope.rename(param.name, firstArg.name);
+            } else if (indexesToSubstitute.has(i)) {
+              const binding = functionPath.scope.bindings[param.name];
+              if (binding) {
+                const referencePaths = [...binding.referencePaths];
+                if (
+                  isHoistableScalarConstantArg(firstArg) &&
+                  referencePaths.length > 1
+                ) {
+                  const localId = functionPath.scope.generateUidIdentifier(
+                    param.name,
+                  );
+                  hoistedDeclarators.push(
+                    t.variableDeclarator(localId, t.cloneNode(firstArg)),
+                  );
+                  for (const referencePath of referencePaths) {
+                    referencePath.replaceWith(t.cloneNode(localId));
+                  }
+                } else {
+                  for (const referencePath of referencePaths) {
+                    referencePath.replaceWith(t.cloneNode(firstArg));
+                  }
+                }
+                functionPath.scope.removeBinding(param.name);
+              }
+            }
+          }
+
+          if (hoistedDeclarators.length > 0) {
+            if (t.isArrowFunctionExpression(functionPath.node)) {
+              if (!t.isBlockStatement(functionPath.node.body)) {
+                functionPath.node.body = t.blockStatement([
+                  t.variableDeclaration("const", hoistedDeclarators),
+                  t.returnStatement(functionPath.node.body),
+                ]);
+              } else {
+                functionPath.node.body.body.unshift(
+                  t.variableDeclaration("const", hoistedDeclarators),
+                );
+              }
+            } else {
+              functionPath.node.body.body.unshift(
+                t.variableDeclaration("const", hoistedDeclarators),
+              );
             }
           }
 
