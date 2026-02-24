@@ -5985,11 +5985,11 @@ export const scalars = {
         }
         return memo;
       }, Object.create(null));
-      const options = Object.assign(Object.create(null), undefined, token.aud || undefined ? null : {
+      const options = Object.assign(Object.create(null), undefined, token.aud ? null : {
         audience: "postgraphile"
-      }, token.iss || undefined ? null : {
+      }, token.iss ? null : {
         issuer: "postgraphile"
-      }, token.exp || undefined ? null : {
+      }, token.exp ? null : {
         expiresIn: "1 day"
       });
       return jsonwebtoken.sign(token, "secret", options);
