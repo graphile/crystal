@@ -1,4 +1,5 @@
 import assert from "node:assert";
+import { inspect } from "node:util";
 
 import generate from "@babel/generator";
 import { parse } from "@babel/parser";
@@ -58,14 +59,6 @@ function isScalarConstantArg(
   );
 }
 
-function isHoistableScalarConstantArg(
-  arg: t.Node,
-): arg is t.StringLiteral | t.NumericLiteral | t.BigIntLiteral {
-  return (
-    t.isStringLiteral(arg) || t.isNumericLiteral(arg) || t.isBigIntLiteral(arg)
-  );
-}
-
 const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
   if (t.isExpression(functionBody)) {
     return functionBody;
@@ -80,6 +73,11 @@ const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
 function isSafeTemplateLiteralStringChunk(value: string): boolean {
   return !value.includes("`") && !value.includes("\\") && !value.includes("${");
 }
+
+type ParamSubstitute = { _: "substitute"; argIdx: number; value: t.Expression };
+type ParamEliminate = { _: "eliminate"; argIdx: number };
+type ParamRename = { _: "rename"; argIdx: number; to: t.Identifier };
+type ParamAction = ParamEliminate | ParamSubstitute | ParamRename;
 
 export const optimize = (inAst: t.File, runs = 1): t.File => {
   let ast = inAst;
@@ -446,9 +444,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             return;
           }
 
-          const indexesToEliminate: number[] = [];
-          const indexesToRename = new Set<number>();
-          const indexesToSubstitute = new Set<number>();
+          const indexActions: Array<ParamAction> = [];
           const leastArgumentCount = Math.min(
             params.length,
             ...callPaths.map((callPath) => callPath.node.arguments.length),
@@ -467,12 +463,12 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             );
             // If all the argIdx arguments aren't equivalent, skip to the next argIdx
             if (!allArgsAreEquivalent) {
+              // Irrelevant; skip to next index
               continue;
             } else if (isScalarConstantArg(firstArg)) {
               // Includes identifier `undefined`
-
-              indexesToEliminate.push(argIdx);
-              indexesToSubstitute.add(argIdx);
+              const value = firstArg;
+              indexActions.push({ _: "substitute", argIdx, value });
             } else if (t.isIdentifier(firstArg)) {
               const globalName = firstArg.name;
               assert.ok(
@@ -488,94 +484,77 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
               if (param.name === globalName) {
                 // Parameter name matches globalName; simply eliminate
-                indexesToEliminate.push(argIdx);
+                indexActions.push({ _: "eliminate", argIdx });
               } else if (functionPath.scope.hasOwnBinding(globalName)) {
                 // Cannot safely rename inner references for this index, skip it
                 // TODO: handle renaming of conflicting variables to enable referencing global value.
-                continue;
               } else {
                 // Safe to eliminate, but will need to rename inner references
-                indexesToEliminate.push(argIdx);
-                indexesToRename.add(argIdx);
+                indexActions.push({ _: "rename", argIdx, to: firstArg });
               }
             } else {
               // Too complex for us currently
+              continue;
             }
           }
 
-          if (indexesToEliminate.length === 0) {
+          if (indexActions.length === 0) {
             return;
           }
 
-          const hoistedDeclarators: t.VariableDeclarator[] = [];
-          for (const i of indexesToEliminate) {
-            const param = functionPath.node.params[i];
-            const firstArg = callPaths[0].node.arguments[i];
-            if (!t.isIdentifier(param) || !firstArg) {
+          let lastIdx = -1;
+
+          // Perform rewriting of the function as necessary
+          for (const action of indexActions) {
+            const { argIdx } = action;
+
+            // Guaranteed by above code
+            assert.ok(argIdx > lastIdx, "arg indexes must increase");
+            lastIdx = argIdx;
+
+            const param = functionPath.node.params[argIdx];
+            if (!t.isIdentifier(param)) {
               // Satisfy TypeScript
               throw new Error(
                 "GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable",
               );
             }
-            if (indexesToRename.has(i)) {
-              if (!t.isIdentifier(firstArg)) {
-                throw new Error(
-                  "GraphileExportInternalError<9bc420a8-9e3f-435f-bf5f-f6ec1d8795dd>: This path should be unreachable",
-                );
+            switch (action._) {
+              case "rename": {
+                functionPath.scope.rename(param.name, action.to.name);
+                break;
               }
-              // The rename of the inner references mentioned above
-              functionPath.scope.rename(param.name, firstArg.name);
-            } else if (indexesToSubstitute.has(i)) {
-              const binding = functionPath.scope.bindings[param.name];
-              if (binding) {
-                const referencePaths = [...binding.referencePaths];
-                if (
-                  isHoistableScalarConstantArg(firstArg) &&
-                  referencePaths.length > 1
-                ) {
-                  const localId = functionPath.scope.generateUidIdentifier(
-                    param.name,
-                  );
-                  hoistedDeclarators.push(
-                    t.variableDeclarator(localId, t.cloneNode(firstArg)),
-                  );
-                  for (const referencePath of referencePaths) {
-                    referencePath.replaceWith(t.cloneNode(localId));
-                  }
-                } else {
-                  for (const referencePath of referencePaths) {
-                    referencePath.replaceWith(t.cloneNode(firstArg));
-                  }
+              case "substitute": {
+                const binding = functionPath.scope.bindings[param.name];
+                if (!binding) {
+                  throw new Error(`No binding for ${param.name}?!`);
                 }
-                functionPath.scope.removeBinding(param.name);
+                if (binding.referencePaths.length > 0) {
+                  const referencePaths = [...binding.referencePaths];
+                  for (const referencePath of referencePaths) {
+                    referencePath.replaceWith(t.cloneNode(action.value));
+                  }
+                  functionPath.scope.removeBinding(param.name);
+                }
+                break;
+              }
+              case "eliminate": {
+                // Eliminate only, no further action necessary
+                break;
+              }
+              default: {
+                const never: never = action;
+                throw new Error(`Not understood: ${inspect(never)}`);
               }
             }
           }
 
-          if (hoistedDeclarators.length > 0) {
-            if (t.isArrowFunctionExpression(functionPath.node)) {
-              if (!t.isBlockStatement(functionPath.node.body)) {
-                functionPath.node.body = t.blockStatement([
-                  t.variableDeclaration("const", hoistedDeclarators),
-                  t.returnStatement(functionPath.node.body),
-                ]);
-              } else {
-                functionPath.node.body.body.unshift(
-                  t.variableDeclaration("const", hoistedDeclarators),
-                );
-              }
-            } else {
-              functionPath.node.body.body.unshift(
-                t.variableDeclaration("const", hoistedDeclarators),
-              );
-            }
-          }
-
-          for (let k = indexesToEliminate.length - 1; k >= 0; k--) {
-            const i = indexesToEliminate[k];
-            functionPath.node.params.splice(i, 1);
+          // Finally eliminate the arguments
+          for (let k = indexActions.length - 1; k >= 0; k--) {
+            const { argIdx } = indexActions[k];
+            functionPath.node.params.splice(argIdx, 1);
             for (const callPath of callPaths) {
-              callPath.node.arguments.splice(i, 1);
+              callPath.node.arguments.splice(argIdx, 1);
             }
           }
         }
