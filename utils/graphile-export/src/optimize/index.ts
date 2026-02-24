@@ -447,29 +447,29 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           const indexesToEliminate: number[] = [];
           const indexesToRename = new Set<number>();
           const indexesToSubstitute = new Set<number>();
-          const maxIndex = Math.min(
+          const leastArgumentCount = Math.min(
             params.length,
             ...callPaths.map((callPath) => callPath.node.arguments.length),
           );
-          for (let i = 0; i < maxIndex; i++) {
-            const param = functionPath.node.params[i];
+          for (let argIdx = 0; argIdx < leastArgumentCount; argIdx++) {
+            const param = functionPath.node.params[argIdx];
             if (!t.isIdentifier(param)) {
-              continue;
-            }
-            const firstArg = callPaths[0].node.arguments[i];
-            let allMatch = true;
-            for (let j = 1; j < callPaths.length; j++) {
-              const arg = callPaths[j].node.arguments[i];
-              if (!t.isNodesEquivalent(arg ?? null, firstArg ?? null)) {
-                allMatch = false;
-                break;
-              }
-            }
-            if (!allMatch) {
+              // We don't support destructuring/rest/etc currently
               continue;
             }
 
-            if (t.isIdentifier(firstArg) && firstArg.name !== "undefined") {
+            const [firstCallPath, ...remainingCallPaths] = callPaths;
+            const firstArg = firstCallPath.node.arguments[argIdx];
+            const allArgsAreEquivalent = remainingCallPaths.every((callPath) =>
+              t.isNodesEquivalent(callPath.node.arguments[argIdx], firstArg),
+            );
+            // If all the argIdx arguments aren't equivalent, skip to the next argIdx
+            if (!allArgsAreEquivalent) {
+              continue;
+            } else if (
+              t.isIdentifier(firstArg) &&
+              firstArg.name !== "undefined"
+            ) {
               const firstArgBinding = callPaths[0].scope.getBinding(
                 firstArg.name,
               );
@@ -481,24 +481,23 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
               }
               if (firstArg.name === param.name) {
                 // Safe to eliminate directly
-                indexesToEliminate.push(i);
+                indexesToEliminate.push(argIdx);
               } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
                 // Cannot safely rename inner references for this index, skip it
                 // TODO: handle renaming of conflicting variables to enable referencing global value.
                 continue;
               } else {
                 // Safe to eliminate, but will need to rename inner references
-                indexesToEliminate.push(i);
-                indexesToRename.add(i);
+                indexesToEliminate.push(argIdx);
+                indexesToRename.add(argIdx);
               }
               continue;
-            }
-
-            if (!isScalarConstantArg(firstArg)) {
+            } else if (!isScalarConstantArg(firstArg)) {
               continue;
+            } else {
+              indexesToEliminate.push(argIdx);
+              indexesToSubstitute.add(argIdx);
             }
-            indexesToEliminate.push(i);
-            indexesToSubstitute.add(i);
           }
 
           if (indexesToEliminate.length === 0) {
