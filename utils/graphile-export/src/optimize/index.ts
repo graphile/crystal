@@ -126,10 +126,10 @@ function resolveBinaryOperator(
   }
 }
 
-export const optimize = (inAst: t.File, runs = 1): t.File => {
-  let ast = inAst;
-  // Reset the full AST
-  ast = parse(generate(ast).code, { sourceType: "module" });
+export const optimize = (inAst: t.File): t.File => {
+  // Reset the full AST, since it will have been mangled and we want the latest
+  // bindings to be synchronized.
+  const ast = parse(generate(inAst).code, { sourceType: "module" });
 
   // convert `plan: function plan() {...}` to `plan() { ... }`
   // convert `fn(...["a", "b"])` to `fn("a", "b")`
@@ -749,10 +749,6 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
   });
-
-  if (runs < 2) {
-    return optimize(ast, runs + 1);
-  }
 
   return ast;
 };

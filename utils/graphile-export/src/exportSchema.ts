@@ -2160,12 +2160,18 @@ export async function exportSchemaAsString(
   return exportFile(file, options);
 }
 
-function exportFile(file: CodegenFile, { disableOptimize }: ExportOptions) {
-  const ast = file.toAST();
+function exportFile(
+  file: CodegenFile,
+  { disableOptimize, optimizeLoops = 2 }: ExportOptions,
+) {
+  let ast = file.toAST();
+  if (!disableOptimize) {
+    for (let i = 0; i < optimizeLoops; i++) {
+      ast = optimize(ast);
+    }
+  }
 
-  const optimizedAst = disableOptimize ? ast : optimize(ast);
-
-  const { code } = reallyGenerate(optimizedAst, {});
+  const { code } = reallyGenerate(ast, {});
   return { code };
 }
 

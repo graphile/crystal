@@ -1,5 +1,6 @@
 export interface ExportOptions {
   mode?: "graphql-js" | "typeDefs";
+
   /**
    * Pass modules to factor into the export; when we see any of the root-level
    * exports from these modules we'll automatically reference them.
@@ -20,19 +21,29 @@ export interface ExportOptions {
   modules?: {
     [moduleName: string]: any;
   };
+
   /**
    * Set 'true' if we should use prettier to format the exported code.
    */
   prettier?: boolean;
 
+  /** @deprecated Use `optimizeRuns: 0` instead */
+  disableOptimize?: boolean;
+
   /**
-   * Set 'true' if you're facing memory exhaustion issues on large schemas and
-   * wish to skip optimizing the export.
+   * Set `0` if you're facing memory exhaustion issues when exporting large
+   * schemas and wish to skip optimizing the export.
    *
    * Optimizing the export can make the export smaller and more readable,
    * involving fewer IIFEs and similar constructs used throughout EXPORTABLE
    * expressions. It may also have a (positive, hopefully) impact on
    * performance. In general it's recommended to leave optimize enabled.
+   *
+   * Changing this to `1` will only do a single optimization pass, leaving some
+   * optimizations on the table. Setting it larger than 2 should generally
+   * result in diminishing returns.
+   *
+   * @default {2}
    */
-  disableOptimize?: boolean;
+  optimizeLoops?: number;
 }
