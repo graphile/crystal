@@ -53,7 +53,7 @@ const nodeIdCodecs = {
     })
   }
 };
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_person_full_name = () => EMPTY_ARRAY;
 const executor = new PgExecutor({
   name: "main",
