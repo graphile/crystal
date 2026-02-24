@@ -250,7 +250,9 @@ export const optimize = (inAst: t.File): t.File => {
           const name = declaration.id;
           if (name.type === "Identifier") {
             const fn = declaration.init;
-            if (fn && fn.type === "FunctionExpression") {
+            if (!fn) {
+              // noop
+            } else if (fn.type === "FunctionExpression") {
               const functionDecl = t.functionDeclaration(
                 name,
                 fn.params,
@@ -259,6 +261,10 @@ export const optimize = (inAst: t.File): t.File => {
                 fn.async,
               );
               path.replaceWith(functionDecl);
+            } else if (fn.type === "ClassExpression") {
+              path.replaceWith(
+                t.classDeclaration(name, fn.superClass, fn.body, fn.decorators),
+              );
             }
           }
         }
