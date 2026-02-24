@@ -126,6 +126,21 @@ function resolveBinaryOperator(
   }
 }
 
+/** Returns true if the result will always be interpreted as a boolean */
+function isBooleanContext(path: NodePath<t.LogicalExpression>): boolean {
+  const parentNode = path.parentPath.node;
+  if (
+    (t.isConditionalExpression(parentNode) || t.isIfStatement(parentNode)) &&
+    parentNode.test === path.node
+  ) {
+    return true;
+  }
+  if (t.isUnaryExpression(parentNode) && parentNode.operator === "!") {
+    return true;
+  }
+  return false;
+}
+
 export const optimize = (inAst: t.File): t.File => {
   // Reset the full AST, since it will have been mangled and we want the latest
   // bindings to be synchronized.
@@ -144,6 +159,11 @@ export const optimize = (inAst: t.File): t.File => {
               path.replaceWith(left);
             } else if (expressionIsNullOrUndefined(left)) {
               path.replaceWith(right);
+            } else if (
+              expressionIsNullOrUndefined(right) &&
+              isBooleanContext(path)
+            ) {
+              path.replaceWith(left);
             }
             break;
           }
@@ -152,6 +172,11 @@ export const optimize = (inAst: t.File): t.File => {
               path.replaceWith(left);
             } else if (expressionIsAlwaysFalsy(left)) {
               path.replaceWith(right);
+            } else if (
+              expressionIsAlwaysFalsy(right) &&
+              isBooleanContext(path)
+            ) {
+              path.replaceWith(left);
             }
             break;
           }
@@ -160,6 +185,11 @@ export const optimize = (inAst: t.File): t.File => {
               path.replaceWith(left);
             } else if (expressionIsAlwaysTruthy(left)) {
               path.replaceWith(right);
+            } else if (
+              expressionIsAlwaysTruthy(right) &&
+              isBooleanContext(path)
+            ) {
+              path.replaceWith(left);
             }
             break;
           }
