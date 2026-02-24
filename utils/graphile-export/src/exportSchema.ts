@@ -974,6 +974,8 @@ function _convertToAST(
   depth: number,
   reference: t.Expression,
 ): t.Expression {
+  const wk = importWellKnownOrFactory(file, thing, locationHint, nameHint);
+  if (wk) return wk;
   if (isForbidden(thing)) {
     throw new Error(
       `The value at ${locationHint} is forbidden from being exported; please be more specific in your EXPORTABLE factories!`,
@@ -1189,16 +1191,14 @@ function convertToIdentifierViaAST(
   const variableIdentifier = file.makeVariable(nameHint || "value");
   file._values.set(thing, variableIdentifier);
 
-  const ast =
-    importWellKnownOrFactory(file, thing, locationHint, nameHint) ??
-    _convertToAST(
-      file,
-      thing,
-      locationHint,
-      nameHint,
-      depth,
-      variableIdentifier,
-    );
+  const ast = _convertToAST(
+    file,
+    thing,
+    locationHint,
+    nameHint,
+    depth,
+    variableIdentifier,
+  );
 
   const existingVariableIdentifier =
     file._convertToIdentifierViaASTCache.get(ast);
