@@ -48,6 +48,9 @@ export function EXPORTABLE_OBJECT_CLONE<T extends object>(
   obj: T,
   name?: string,
 ): T {
+  if ((obj as any).$exporter$factory) {
+    return obj;
+  }
   if (Object.getPrototypeOf(obj) === Object.prototype) {
     const keys = Object.keys(obj);
     const values = Object.values(obj);
@@ -76,6 +79,9 @@ export function EXPORTABLE_ARRAY_CLONE<T extends readonly any[]>(
   arr: T,
   name?: string,
 ): T {
+  if ((arr as any).$exporter$factory) {
+    return arr;
+  }
   const fn = te.eval<any>`return (${te.join(
     arr.map((_, i) => te.identifier(`val${i}`)),
     ", ",
