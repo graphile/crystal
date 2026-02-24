@@ -1124,35 +1124,20 @@ function queryPlan() {
 function applyClientMutationIdForCustomMutation(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
-function ReferencingTableInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function ReferencingTableInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function ReferencingTableInput_enum1Apply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("enum_1", bakedInputRuntime(schema, field.type, val));
+function ReferencingTableInput_enum1Apply(obj, val, info) {
+  obj.set("enum_1", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function ReferencingTableInput_enum2Apply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("enum_2", bakedInputRuntime(schema, field.type, val));
+function ReferencingTableInput_enum2Apply(obj, val, info) {
+  obj.set("enum_2", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function ReferencingTableInput_enum3Apply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("enum_3", bakedInputRuntime(schema, field.type, val));
+function ReferencingTableInput_enum3Apply(obj, val, info) {
+  obj.set("enum_3", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function ReferencingTableInput_simpleEnumApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("simple_enum", bakedInputRuntime(schema, field.type, val));
+function ReferencingTableInput_simpleEnumApply(obj, val, info) {
+  obj.set("simple_enum", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
@@ -1187,23 +1172,14 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function LetterDescriptionInput_letterApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("letter", bakedInputRuntime(schema, field.type, val));
+function LetterDescriptionInput_letterApply(obj, val, info) {
+  obj.set("letter", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LetterDescriptionInput_letterViaViewApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("letter_via_view", bakedInputRuntime(schema, field.type, val));
+function LetterDescriptionInput_letterViaViewApply(obj, val, info) {
+  obj.set("letter_via_view", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LetterDescriptionInput_descriptionApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("description", bakedInputRuntime(schema, field.type, val));
+function LetterDescriptionInput_descriptionApply(obj, val, info) {
+  obj.set("description", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateReferencingTablePayload_referencingTableEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_referencing_tablePgResource, referencing_tableUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {

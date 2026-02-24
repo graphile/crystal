@@ -993,68 +993,38 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function AlwaysAsIdentityInput_tApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("t", bakedInputRuntime(schema, field.type, val));
+function AlwaysAsIdentityInput_tApply(obj, val, info) {
+  obj.set("t", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateByDefaultAsIdentityPayload_byDefaultAsIdentityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
-function ByDefaultAsIdentityInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function ByDefaultAsIdentityInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateNetworkPayload_networkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
-function NetworkInput_inetApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_inetApply(obj, val, info) {
+  obj.set("inet", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NetworkInput_cidrApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_cidrApply(obj, val, info) {
+  obj.set("cidr", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NetworkInput_macaddrApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_macaddrApply(obj, val, info) {
+  obj.set("macaddr", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NetworkInput_macaddr8Apply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("macaddr8", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_macaddr8Apply(obj, val, info) {
+  obj.set("macaddr8", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateTypePayload_typeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
-function TypeInput_regroleApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("regrole", bakedInputRuntime(schema, field.type, val));
+function TypeInput_regroleApply(obj, val, info) {
+  obj.set("regrole", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function TypeInput_regnamespaceApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("regnamespace", bakedInputRuntime(schema, field.type, val));
+function TypeInput_regnamespaceApply(obj, val, info) {
+  obj.set("regnamespace", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function TypeInput_bigintDomainArrayDomainApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("bigint_domain_array_domain", bakedInputRuntime(schema, field.type, val));
+function TypeInput_bigintDomainArrayDomainApply(obj, val, info) {
+  obj.set("bigint_domain_array_domain", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function TypeInput_domainConstrainedCompoundTypeApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("domain_constrained_compound_type", bakedInputRuntime(schema, field.type, val));
+function TypeInput_domainConstrainedCompoundTypeApply(obj, val, info) {
+  obj.set("domain_constrained_compound_type", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
@@ -3178,53 +3148,29 @@ export const inputObjects = {
   DomainConstrainedCompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      a(obj, val, info) {
+        obj.set("a", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      b(obj, val, info) {
+        obj.set("b", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      c(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("c", bakedInputRuntime(schema, field.type, val));
+      c(obj, val, info) {
+        obj.set("c", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      d(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("d", bakedInputRuntime(schema, field.type, val));
+      d(obj, val, info) {
+        obj.set("d", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      e(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("e", bakedInputRuntime(schema, field.type, val));
+      e(obj, val, info) {
+        obj.set("e", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      f(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("f", bakedInputRuntime(schema, field.type, val));
+      f(obj, val, info) {
+        obj.set("f", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      fooBar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
+      fooBar(obj, val, info) {
+        obj.set("foo_bar", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      g(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("g", bakedInputRuntime(schema, field.type, val));
+      g(obj, val, info) {
+        obj.set("g", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },

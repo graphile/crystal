@@ -760,11 +760,8 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function BarInput_colApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("col", bakedInputRuntime(schema, field.type, val));
+function BarInput_colApply(obj, val, info) {
+  obj.set("col", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const handlers2 = [nodeIdHandler_Foo];
 const decodeNodeId3 = makeDecodeNodeIdRuntime(handlers2);
@@ -1699,11 +1696,8 @@ export const inputObjects = {
     baked: createObjectAndApplyChildren,
     plans: {
       col: BarInput_colApply,
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      rowId(obj, val, info) {
+        obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },

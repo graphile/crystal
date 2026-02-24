@@ -1407,11 +1407,8 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function PostInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function PostInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -1437,34 +1434,22 @@ const CreateOfferPayload_offerEdgePlan = ($mutation, fieldArgs) => pgMutationPay
 const CreateOfferPayload_postByPostIdPlan = $record => resource_postsPgResource.get({
   id: $record.get("result").get("post_id")
 });
-function OfferInput_postIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("post_id", bakedInputRuntime(schema, field.type, val));
+function OfferInput_postIdApply(obj, val, info) {
+  obj.set("post_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateStreetPayload_streetEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_streetsPgResource, streetsUniques[0].attributes, $mutation, fieldArgs);
-function StreetInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function StreetInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePropertyPayload_propertyEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_propertiesPgResource, propertiesUniques[0].attributes, $mutation, fieldArgs);
 const CreatePropertyPayload_streetByStreetIdPlan = $record => resource_streetsPgResource.get({
   id: $record.get("result").get("street_id")
 });
-function PropertyInput_streetIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("street_id", bakedInputRuntime(schema, field.type, val));
+function PropertyInput_streetIdApply(obj, val, info) {
+  obj.set("street_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PropertyInput_nameOrNumberApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name_or_number", bakedInputRuntime(schema, field.type, val));
+function PropertyInput_nameOrNumberApply(obj, val, info) {
+  obj.set("name_or_number", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateStreetPropertyPayload_streetPropertyEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_street_propertyPgResource, street_propertyUniques[0].attributes, $mutation, fieldArgs);
 const CreateStreetPropertyPayload_propertyByPropIdPlan = $record => resource_propertiesPgResource.get({
@@ -1473,23 +1458,14 @@ const CreateStreetPropertyPayload_propertyByPropIdPlan = $record => resource_pro
 const CreateStreetPropertyPayload_streetByStrIdPlan = $record => resource_streetsPgResource.get({
   id: $record.get("result").get("str_id")
 });
-function StreetPropertyInput_strIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("str_id", bakedInputRuntime(schema, field.type, val));
+function StreetPropertyInput_strIdApply(obj, val, info) {
+  obj.set("str_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function StreetPropertyInput_propIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("prop_id", bakedInputRuntime(schema, field.type, val));
+function StreetPropertyInput_propIdApply(obj, val, info) {
+  obj.set("prop_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function StreetPropertyInput_currentOwnerApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("current_owner", bakedInputRuntime(schema, field.type, val));
+function StreetPropertyInput_currentOwnerApply(obj, val, info) {
+  obj.set("current_owner", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateBuildingPayload_buildingEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
 const CreateBuildingPayload_propertyByPropertyIdPlan = $record => resource_propertiesPgResource.get({
@@ -1498,23 +1474,14 @@ const CreateBuildingPayload_propertyByPropertyIdPlan = $record => resource_prope
 const CreateBuildingPayload_namedAfterStreetPlan = $record => resource_streetsPgResource.get({
   name: $record.get("result").get("name")
 });
-function BuildingInput_propertyIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("property_id", bakedInputRuntime(schema, field.type, val));
+function BuildingInput_propertyIdApply(obj, val, info) {
+  obj.set("property_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function BuildingInput_floorsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("floors", bakedInputRuntime(schema, field.type, val));
+function BuildingInput_floorsApply(obj, val, info) {
+  obj.set("floors", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function BuildingInput_isPrimaryApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("is_primary", bakedInputRuntime(schema, field.type, val));
+function BuildingInput_isPrimaryApply(obj, val, info) {
+  obj.set("is_primary", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

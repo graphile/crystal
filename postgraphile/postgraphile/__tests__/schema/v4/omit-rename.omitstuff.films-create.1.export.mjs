@@ -1533,90 +1533,54 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   return new EdgeStep($connection, first($connection));
 };
 const CreateStudioPayload_studioEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
-function StudioInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function StudioInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function StudioInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function StudioInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePostPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
 const CreatePostPayload_authorPlan = $record => resource_personPgResource.get({
   id: $record.get("result").get("author_id")
 });
-function PostInput_bodyApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("body", bakedInputRuntime(schema, field.type, val));
+function PostInput_bodyApply(obj, val, info) {
+  obj.set("body", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PostInput_authorIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("author_id", bakedInputRuntime(schema, field.type, val));
+function PostInput_authorIdApply(obj, val, info) {
+  obj.set("author_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateTvEpisodePayload_tvEpisodeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
 const CreateTvEpisodePayload_tvShowByShowIdPlan = $record => resource_tv_showsPgResource.get({
   code: $record.get("result").get("show_id")
 });
-function TvEpisodeInput_codeApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("code", bakedInputRuntime(schema, field.type, val));
+function TvEpisodeInput_codeApply(obj, val, info) {
+  obj.set("code", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function TvEpisodeInput_titleApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("title", bakedInputRuntime(schema, field.type, val));
+function TvEpisodeInput_titleApply(obj, val, info) {
+  obj.set("title", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function TvEpisodeInput_showIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("show_id", bakedInputRuntime(schema, field.type, val));
+function TvEpisodeInput_showIdApply(obj, val, info) {
+  obj.set("show_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateTvShowPayload_tvShowEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
 const CreateTvShowPayload_studioByStudioIdPlan = $record => resource_studiosPgResource.get({
   id: $record.get("result").get("studio_id")
 });
-function TvShowInput_studioIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("studio_id", bakedInputRuntime(schema, field.type, val));
+function TvShowInput_studioIdApply(obj, val, info) {
+  obj.set("studio_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-function PersonInput_firstNameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("first_name", bakedInputRuntime(schema, field.type, val));
+function PersonInput_firstNameApply(obj, val, info) {
+  obj.set("first_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_lastNameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("last_name", bakedInputRuntime(schema, field.type, val));
+function PersonInput_lastNameApply(obj, val, info) {
+  obj.set("last_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_colNoOrderApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("col_no_order", bakedInputRuntime(schema, field.type, val));
+function PersonInput_colNoOrderApply(obj, val, info) {
+  obj.set("col_no_order", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_colNoFilterApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("col_no_filter", bakedInputRuntime(schema, field.type, val));
+function PersonInput_colNoFilterApply(obj, val, info) {
+  obj.set("col_no_filter", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
@@ -5011,11 +4975,8 @@ export const inputObjects = {
     plans: {
       colNoFilter: PersonInput_colNoFilterApply,
       colNoOrder: PersonInput_colNoOrderApply,
-      colNoUpdate(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col_no_update", bakedInputRuntime(schema, field.type, val));
+      colNoUpdate(obj, val, info) {
+        obj.set("col_no_update", bakedInputRuntime(info.schema, info.field.type, val));
       },
       firstName: PersonInput_firstNameApply,
       id: StudioInput_idApply,
@@ -5025,11 +4986,8 @@ export const inputObjects = {
   PersonPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      colNoCreate(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col_no_create", bakedInputRuntime(schema, field.type, val));
+      colNoCreate(obj, val, info) {
+        obj.set("col_no_create", bakedInputRuntime(info.schema, info.field.type, val));
       },
       colNoFilter: PersonInput_colNoFilterApply,
       colNoOrder: PersonInput_colNoOrderApply,
@@ -5075,11 +5033,8 @@ export const inputObjects = {
   RenamedTableInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      colA(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("col1", bakedInputRuntime(schema, field.type, val));
+      colA(obj, val, info) {
+        obj.set("col1", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },

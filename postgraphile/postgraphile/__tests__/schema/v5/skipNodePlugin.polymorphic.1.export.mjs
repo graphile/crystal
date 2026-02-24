@@ -5662,134 +5662,77 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function AwsApplicationFirstPartyVulnerabilityInput_awsApplicationIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("aws_application_id", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationFirstPartyVulnerabilityInput_awsApplicationIdApply(obj, val, info) {
+  obj.set("aws_application_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function AwsApplicationFirstPartyVulnerabilityInput_firstPartyVulnerabilityIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("first_party_vulnerability_id", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationFirstPartyVulnerabilityInput_firstPartyVulnerabilityIdApply(obj, val, info) {
+  obj.set("first_party_vulnerability_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateAwsApplicationThirdPartyVulnerabilityPayload_awsApplicationThirdPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_aws_application_third_party_vulnerabilitiesPgResource, aws_application_third_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
-function AwsApplicationThirdPartyVulnerabilityInput_thirdPartyVulnerabilityIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("third_party_vulnerability_id", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationThirdPartyVulnerabilityInput_thirdPartyVulnerabilityIdApply(obj, val, info) {
+  obj.set("third_party_vulnerability_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateGcpApplicationFirstPartyVulnerabilityPayload_gcpApplicationFirstPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_gcp_application_first_party_vulnerabilitiesPgResource, gcp_application_first_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
-function GcpApplicationFirstPartyVulnerabilityInput_gcpApplicationIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("gcp_application_id", bakedInputRuntime(schema, field.type, val));
+function GcpApplicationFirstPartyVulnerabilityInput_gcpApplicationIdApply(obj, val, info) {
+  obj.set("gcp_application_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateGcpApplicationThirdPartyVulnerabilityPayload_gcpApplicationThirdPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_gcp_application_third_party_vulnerabilitiesPgResource, gcp_application_third_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
 const CreateOrganizationPayload_organizationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_organizationsPgResource, organizationsUniques[0].attributes, $mutation, fieldArgs);
-function OrganizationInput_organizationIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
+function OrganizationInput_organizationIdApply(obj, val, info) {
+  obj.set("organization_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function OrganizationInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function OrganizationInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
-function PersonInput_personIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+function PersonInput_personIdApply(obj, val, info) {
+  obj.set("person_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_usernameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("username", bakedInputRuntime(schema, field.type, val));
+function PersonInput_usernameApply(obj, val, info) {
+  obj.set("username", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePriorityPayload_priorityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_prioritiesPgResource, prioritiesUniques[0].attributes, $mutation, fieldArgs);
-function PriorityInput_rowIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function PriorityInput_rowIdApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PriorityInput_titleApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("title", bakedInputRuntime(schema, field.type, val));
+function PriorityInput_titleApply(obj, val, info) {
+  obj.set("title", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_relational_item_relation_composite_pksPgResource, relational_item_relation_composite_pksUniques[0].attributes, $mutation, fieldArgs);
-function RelationalItemRelationCompositePkInput_parentIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
+function RelationalItemRelationCompositePkInput_parentIdApply(obj, val, info) {
+  obj.set("parent_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function RelationalItemRelationCompositePkInput_childIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("child_id", bakedInputRuntime(schema, field.type, val));
+function RelationalItemRelationCompositePkInput_childIdApply(obj, val, info) {
+  obj.set("child_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_single_table_item_relation_composite_pksPgResource, single_table_item_relation_composite_pksUniques[0].attributes, $mutation, fieldArgs);
 const CreateRelationalItemRelationPayload_relationalItemRelationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_relational_item_relationsPgResource, relational_item_relationsUniques[0].attributes, $mutation, fieldArgs);
 const CreateSingleTableItemRelationPayload_singleTableItemRelationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_single_table_item_relationsPgResource, single_table_item_relationsUniques[0].attributes, $mutation, fieldArgs);
 const CreateLogEntryPayload_logEntryEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_log_entriesPgResource, log_entriesUniques[0].attributes, $mutation, fieldArgs);
-function LogEntryInput_textApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("text", bakedInputRuntime(schema, field.type, val));
+function LogEntryInput_textApply(obj, val, info) {
+  obj.set("text", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(paths_0_resource_first_party_vulnerabilitiesPgResource, first_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
-function FirstPartyVulnerabilityInput_cvssScoreApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("cvss_score", bakedInputRuntime(schema, field.type, val));
+function FirstPartyVulnerabilityInput_cvssScoreApply(obj, val, info) {
+  obj.set("cvss_score", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function FirstPartyVulnerabilityInput_teamNameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("team_name", bakedInputRuntime(schema, field.type, val));
+function FirstPartyVulnerabilityInput_teamNameApply(obj, val, info) {
+  obj.set("team_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(paths_1_resource_third_party_vulnerabilitiesPgResource, third_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
-function ThirdPartyVulnerabilityInput_vendorNameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("vendor_name", bakedInputRuntime(schema, field.type, val));
+function ThirdPartyVulnerabilityInput_vendorNameApply(obj, val, info) {
+  obj.set("vendor_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateAwsApplicationPayload_awsApplicationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_aws_applicationsPgResource, aws_applicationsUniques[0].attributes, $mutation, fieldArgs);
-function AwsApplicationInput_lastDeployedApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("last_deployed", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationInput_lastDeployedApply(obj, val, info) {
+  obj.set("last_deployed", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function AwsApplicationInput_awsIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("aws_id", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationInput_awsIdApply(obj, val, info) {
+  obj.set("aws_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateGcpApplicationPayload_gcpApplicationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_gcp_applicationsPgResource, gcp_applicationsUniques[0].attributes, $mutation, fieldArgs);
-function GcpApplicationInput_gcpIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("gcp_id", bakedInputRuntime(schema, field.type, val));
+function GcpApplicationInput_gcpIdApply(obj, val, info) {
+  obj.set("gcp_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

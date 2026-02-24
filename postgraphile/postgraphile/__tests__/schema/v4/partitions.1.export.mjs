@@ -1618,70 +1618,43 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function LocationInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function LocationInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePhotoPayload_photoEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_photosPgResource, photosUniques[0].attributes, $mutation, fieldArgs);
 const CreateProfilePayload_profileEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_profilesPgResource, profilesUniques[0].attributes, $mutation, fieldArgs);
 const CreateUserPayload_userEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_usersPgResource, usersUniques[0].attributes, $mutation, fieldArgs);
-function UserInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function UserInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateMeasurementPayload_measurementEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_measurementsPgResource, measurementsUniques[0].attributes, $mutation, fieldArgs);
 const CreateMeasurementPayload_userByUserIdPlan = $record => resource_usersPgResource.get({
   id: $record.get("result").get("user_id")
 });
-function MeasurementInput_timestampApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+function MeasurementInput_timestampApply(obj, val, info) {
+  obj.set("timestamp", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function MeasurementInput_keyApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("key", bakedInputRuntime(schema, field.type, val));
+function MeasurementInput_keyApply(obj, val, info) {
+  obj.set("key", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function MeasurementInput_valueApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("value", bakedInputRuntime(schema, field.type, val));
+function MeasurementInput_valueApply(obj, val, info) {
+  obj.set("value", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function MeasurementInput_userIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("user_id", bakedInputRuntime(schema, field.type, val));
+function MeasurementInput_userIdApply(obj, val, info) {
+  obj.set("user_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateLocationTagPayload_locationTagEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
 const CreateLocationTagPayload_locationByEntityIdPlan = $record => resource_locationsPgResource.get({
   id: $record.get("result").get("entity_id")
 });
-function LocationTagInput_entityKindApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("entity_kind", bakedInputRuntime(schema, field.type, val));
+function LocationTagInput_entityKindApply(obj, val, info) {
+  obj.set("entity_kind", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LocationTagInput_entityIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("entity_id", bakedInputRuntime(schema, field.type, val));
+function LocationTagInput_entityIdApply(obj, val, info) {
+  obj.set("entity_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LocationTagInput_tagApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("tag", bakedInputRuntime(schema, field.type, val));
+function LocationTagInput_tagApply(obj, val, info) {
+  obj.set("tag", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePhotoTagPayload_photoTagEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
 const CreatePhotoTagPayload_photoByEntityIdPlan = $record => resource_photosPgResource.get({

@@ -10046,53 +10046,29 @@ export const inputObjects = {
   CompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      a(obj, val, info) {
+        obj.set("a", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      b(obj, val, info) {
+        obj.set("b", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      c(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("c", bakedInputRuntime(schema, field.type, val));
+      c(obj, val, info) {
+        obj.set("c", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      d(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("d", bakedInputRuntime(schema, field.type, val));
+      d(obj, val, info) {
+        obj.set("d", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      e(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("e", bakedInputRuntime(schema, field.type, val));
+      e(obj, val, info) {
+        obj.set("e", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      f(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("f", bakedInputRuntime(schema, field.type, val));
+      f(obj, val, info) {
+        obj.set("f", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      fooBar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
+      fooBar(obj, val, info) {
+        obj.set("foo_bar", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      g(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("g", bakedInputRuntime(schema, field.type, val));
+      g(obj, val, info) {
+        obj.set("g", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },
@@ -10155,29 +10131,17 @@ export const inputObjects = {
   LeftArmBaseInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      id(obj, val, info) {
+        obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      lengthInMetres(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+      lengthInMetres(obj, val, info) {
+        obj.set("length_in_metres", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      mood(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("mood", bakedInputRuntime(schema, field.type, val));
+      mood(obj, val, info) {
+        obj.set("mood", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      personId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      personId(obj, val, info) {
+        obj.set("person_id", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },
@@ -10381,11 +10345,8 @@ export const inputObjects = {
   WrappedUrlInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      url(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("url", bakedInputRuntime(schema, field.type, val));
+      url(obj, val, info) {
+        obj.set("url", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   }

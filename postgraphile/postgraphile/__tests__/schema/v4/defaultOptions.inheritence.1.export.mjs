@@ -797,34 +797,22 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function FileInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function FileInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function FileInput_filenameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("filename", bakedInputRuntime(schema, field.type, val));
+function FileInput_filenameApply(obj, val, info) {
+  obj.set("filename", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateUserPayload_userEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_userPgResource, userUniques[0].attributes, $mutation, fieldArgs);
-function UserInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function UserInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateUserFilePayload_userFileEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_user_filePgResource, user_fileUniques[0].attributes, $mutation, fieldArgs);
 const CreateUserFilePayload_userByUserIdPlan = $record => resource_userPgResource.get({
   id: $record.get("result").get("user_id")
 });
-function UserFileInput_userIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("user_id", bakedInputRuntime(schema, field.type, val));
+function UserFileInput_userIdApply(obj, val, info) {
+  obj.set("user_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

@@ -584,17 +584,11 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function QiJianInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function QiJianInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function QiJianInput_qiJianApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("\u671F\u95F4", bakedInputRuntime(schema, field.type, val));
+function QiJianInput_qiJianApply(obj, val, info) {
+  obj.set("\u671F\u95F4", bakedInputRuntime(info.schema, info.field.type, val));
 }
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

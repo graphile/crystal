@@ -802,26 +802,17 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function PersonInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function PersonInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function PersonInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePetPayload_personByOwnerIdPlan = $record => resource_peoplePgResource.get({
   id: $record.get("result").get("owner_id")
 });
-function PetInput_ownerIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("owner_id", bakedInputRuntime(schema, field.type, val));
+function PetInput_ownerIdApply(obj, val, info) {
+  obj.set("owner_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

@@ -5362,29 +5362,17 @@ const LeftArmIdentityPayload_leftArmEdgePlan = ($mutation, fieldArgs) => pgMutat
 const LeftArmIdentityPayload_personByPersonIdPlan = $record => resource_personPgResource.get({
   id: $record.get("result").get("person_id")
 });
-function LeftArmBaseInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function LeftArmBaseInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LeftArmBaseInput_personIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+function LeftArmBaseInput_personIdApply(obj, val, info) {
+  obj.set("person_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LeftArmBaseInput_lengthInMetresApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+function LeftArmBaseInput_lengthInMetresApply(obj, val, info) {
+  obj.set("length_in_metres", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function LeftArmBaseInput_moodApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("mood", bakedInputRuntime(schema, field.type, val));
+function LeftArmBaseInput_moodApply(obj, val, info) {
+  obj.set("mood", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const Issue756MutationPayload_issue756EdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
 const MutationOutTablePayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
@@ -5401,21 +5389,15 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function MyTableInput_jsonDataApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("json_data", bakedInputRuntime(schema, field.type, val));
+function MyTableInput_jsonDataApply(obj, val, info) {
+  obj.set("json_data", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePersonSecretPayload_personSecretEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
 const CreatePersonSecretPayload_personBySecretPlan = $record => resource_personPgResource.get({
   about: $record.get("result").get("sekrit")
 });
-function PersonSecretInput_secretApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+function PersonSecretInput_secretApply(obj, val, info) {
+  obj.set("sekrit", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateCompoundKeyPayload_compoundKeyEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_compound_keyPgResource, compound_keyUniques[0].attributes, $mutation, fieldArgs);
 const CreateCompoundKeyPayload_personByPersonId1Plan = $record => resource_personPgResource.get({
@@ -5424,108 +5406,57 @@ const CreateCompoundKeyPayload_personByPersonId1Plan = $record => resource_perso
 const CreateCompoundKeyPayload_personByPersonId2Plan = $record => resource_personPgResource.get({
   id: $record.get("result").get("person_id_2")
 });
-function CompoundKeyInput_personId2Apply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
+function CompoundKeyInput_personId2Apply(obj, val, info) {
+  obj.set("person_id_2", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function CompoundKeyInput_personId1Apply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
+function CompoundKeyInput_personId1Apply(obj, val, info) {
+  obj.set("person_id_1", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function CompoundKeyInput_extraApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("extra", bakedInputRuntime(schema, field.type, val));
+function CompoundKeyInput_extraApply(obj, val, info) {
+  obj.set("extra", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateNullTestRecordPayload_nullTestRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_null_test_recordPgResource, null_test_recordUniques[0].attributes, $mutation, fieldArgs);
-function NullTestRecordInput_nullableTextApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
+function NullTestRecordInput_nullableTextApply(obj, val, info) {
+  obj.set("nullable_text", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NullTestRecordInput_nullableIntApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
+function NullTestRecordInput_nullableIntApply(obj, val, info) {
+  obj.set("nullable_int", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NullTestRecordInput_nonNullTextApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
+function NullTestRecordInput_nonNullTextApply(obj, val, info) {
+  obj.set("non_null_text", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function Issue756Input_tsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("ts", bakedInputRuntime(schema, field.type, val));
+function Issue756Input_tsApply(obj, val, info) {
+  obj.set("ts", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+function PersonInput_nameApply(obj, val, info) {
+  obj.set("person_full_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_aliasesApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+function PersonInput_aliasesApply(obj, val, info) {
+  obj.set("aliases", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_aboutApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("about", bakedInputRuntime(schema, field.type, val));
+function PersonInput_aboutApply(obj, val, info) {
+  obj.set("about", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_emailApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("email", bakedInputRuntime(schema, field.type, val));
+function PersonInput_emailApply(obj, val, info) {
+  obj.set("email", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_siteApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("site", bakedInputRuntime(schema, field.type, val));
+function PersonInput_siteApply(obj, val, info) {
+  obj.set("site", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_configApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("config", bakedInputRuntime(schema, field.type, val));
+function PersonInput_configApply(obj, val, info) {
+  obj.set("config", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_lastLoginFromIpApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
+function PersonInput_lastLoginFromIpApply(obj, val, info) {
+  obj.set("last_login_from_ip", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_lastLoginFromSubnetApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
+function PersonInput_lastLoginFromSubnetApply(obj, val, info) {
+  obj.set("last_login_from_subnet", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_userMacApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
+function PersonInput_userMacApply(obj, val, info) {
+  obj.set("user_mac", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_createdAtApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("created_at", bakedInputRuntime(schema, field.type, val));
+function PersonInput_createdAtApply(obj, val, info) {
+  obj.set("created_at", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
@@ -12754,53 +12685,29 @@ export const inputObjects = {
   CompoundTypeInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      a(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      a(obj, val, info) {
+        obj.set("a", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      b(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      b(obj, val, info) {
+        obj.set("b", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      c(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("c", bakedInputRuntime(schema, field.type, val));
+      c(obj, val, info) {
+        obj.set("c", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      d(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("d", bakedInputRuntime(schema, field.type, val));
+      d(obj, val, info) {
+        obj.set("d", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      e(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("e", bakedInputRuntime(schema, field.type, val));
+      e(obj, val, info) {
+        obj.set("e", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      f(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("f", bakedInputRuntime(schema, field.type, val));
+      f(obj, val, info) {
+        obj.set("f", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      fooBar(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
+      fooBar(obj, val, info) {
+        obj.set("foo_bar", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      g(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("g", bakedInputRuntime(schema, field.type, val));
+      g(obj, val, info) {
+        obj.set("g", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },
@@ -12953,23 +12860,14 @@ export const inputObjects = {
   EdgeCaseInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      notNullHasDefault(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("not_null_has_default", bakedInputRuntime(schema, field.type, val));
+      notNullHasDefault(obj, val, info) {
+        obj.set("not_null_has_default", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      rowId(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("row_id", bakedInputRuntime(schema, field.type, val));
+      rowId(obj, val, info) {
+        obj.set("row_id", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      wontCastEasy(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("wont_cast_easy", bakedInputRuntime(schema, field.type, val));
+      wontCastEasy(obj, val, info) {
+        obj.set("wont_cast_easy", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   },
@@ -13437,11 +13335,8 @@ export const inputObjects = {
   WrappedUrlInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      url(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("url", bakedInputRuntime(schema, field.type, val));
+      url(obj, val, info) {
+        obj.set("url", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   }
