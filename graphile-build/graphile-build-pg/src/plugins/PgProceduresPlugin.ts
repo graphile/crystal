@@ -509,7 +509,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               return null;
             }
 
-            const options: PgFunctionResourceOptions = {
+            const functionResourceOptions: PgFunctionResourceOptions = {
               name,
               identifier,
               from: fromCallback,
@@ -526,8 +526,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               serviceName,
               pgProc,
               baseResourceOptions: resourceConfig,
-              functionResourceOptions: options,
+              functionResourceOptions,
             });
+            const options = EXPORTABLE_OBJECT_CLONE(
+              functionResourceOptions,
+              `${pgProc.proname}ResourceOptions`,
+            );
 
             const finalResourceOptions = EXPORTABLE(
               (PgResource, options, resourceConfig) =>
@@ -549,28 +553,29 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           } else {
             // Need to mark this exportable to avoid out-of-order access to
             // variables in the export
-            const options: PgResourceOptions = EXPORTABLE_OBJECT_CLONE(
-              {
-                executor,
-                name,
-                identifier,
-                from: fromCallback,
-                parameters,
-                codec: returnCodec,
-                hasImplicitOrder,
-                extensions,
-                ...(!returnsSetof ? { isUnique: true } : null),
-                ...(isMutation ? { isMutation } : null),
-                ...(description ? { description } : null),
-              },
-              `${name}_resourceOptionsConfig`,
-            );
+            const resourceOptions: PgResourceOptions = {
+              executor,
+              name,
+              identifier,
+              from: fromCallback,
+              parameters,
+              codec: returnCodec,
+              hasImplicitOrder,
+              extensions,
+              ...(!returnsSetof ? { isUnique: true } : null),
+              ...(isMutation ? { isMutation } : null),
+              ...(description ? { description } : null),
+            };
 
             await info.process("pgProcedures_PgResourceOptions", {
               serviceName,
               pgProc,
-              resourceOptions: options,
+              resourceOptions,
             });
+            const options: PgResourceOptions = EXPORTABLE_OBJECT_CLONE(
+              resourceOptions,
+              `${name}_resourceOptionsConfig`,
+            );
 
             return EXPORTABLE(
               (options, pgResourceOptions) => pgResourceOptions(options),
