@@ -763,22 +763,8 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
       return !test.value;
     case "StringLiteral":
       return !test.value;
-    case "BinaryExpression": {
-      switch (test.operator) {
-        case "!=": {
-          if (
-            expressionIsNullOrUndefined(test.left) &&
-            expressionIsNullOrUndefined(test.right)
-          ) {
-            return true;
-          }
-          return false;
-        }
-        default: {
-          return false;
-        }
-      }
-    }
+    case "NumericLiteral":
+      return !test.value;
     default:
       return false;
   }
