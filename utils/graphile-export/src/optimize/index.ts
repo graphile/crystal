@@ -354,7 +354,7 @@ export const optimize = (inAst: t.File): t.File => {
             const binding = calleePath.scope.bindings[param.name];
 
             // Replace all references to this identifier with the value
-            binding.referencePaths.forEach((referencePath) => {
+            binding?.referencePaths.forEach((referencePath) => {
               referencePath.replaceWith(t.cloneNode(arg));
             });
 
@@ -626,10 +626,7 @@ export const optimize = (inAst: t.File): t.File => {
               }
               case "substitute": {
                 const binding = functionPath.scope.bindings[paramName];
-                if (!binding) {
-                  throw new Error(`No binding for ${paramName}?!`);
-                }
-                if (binding.referencePaths.length > 0) {
+                if (binding?.referencePaths.length > 0) {
                   const referencePaths = [...binding.referencePaths];
                   for (const referencePath of referencePaths) {
                     referencePath.replaceWith(t.cloneNode(action.value));
