@@ -1,3 +1,5 @@
+import assert from "node:assert";
+
 import generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";
@@ -466,23 +468,28 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             // If all the argIdx arguments aren't equivalent, skip to the next argIdx
             if (!allArgsAreEquivalent) {
               continue;
-            } else if (
-              t.isIdentifier(firstArg) &&
-              firstArg.name !== "undefined"
-            ) {
-              const firstArgBinding = callPaths[0].scope.getBinding(
-                firstArg.name,
+            } else if (isScalarConstantArg(firstArg)) {
+              // Includes identifier `undefined`
+
+              indexesToEliminate.push(argIdx);
+              indexesToSubstitute.add(argIdx);
+            } else if (t.isIdentifier(firstArg)) {
+              const globalName = firstArg.name;
+              assert.ok(
+                globalName !== "undefined",
+                "`undefined` should be handled by isScalarConstantArg",
               );
-              if (
-                !firstArgBinding ||
-                firstArgBinding.scope !== exitPath.scope
-              ) {
+
+              // If this isn't a global identifier, skip to next argument
+              const firstArgBinding = callPaths[0].scope.getBinding(globalName);
+              if (firstArgBinding?.scope !== exitPath.scope) {
                 continue;
               }
-              if (firstArg.name === param.name) {
-                // Safe to eliminate directly
+
+              if (param.name === globalName) {
+                // Parameter name matches globalName; simply eliminate
                 indexesToEliminate.push(argIdx);
-              } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
+              } else if (functionPath.scope.hasOwnBinding(globalName)) {
                 // Cannot safely rename inner references for this index, skip it
                 // TODO: handle renaming of conflicting variables to enable referencing global value.
                 continue;
@@ -491,12 +498,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
                 indexesToEliminate.push(argIdx);
                 indexesToRename.add(argIdx);
               }
-              continue;
-            } else if (!isScalarConstantArg(firstArg)) {
-              continue;
             } else {
-              indexesToEliminate.push(argIdx);
-              indexesToSubstitute.add(argIdx);
+              // Too complex for us currently
             }
           }
 
