@@ -52,6 +52,7 @@ import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.ts";
 import {
+  exportNameHint,
   parseDatabaseIdentifier,
   parseSmartTagsOptsString,
   tagToString,
@@ -954,9 +955,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   });
                 }
                 const handlers = details.map((d) => d.handler);
+                exportNameHint(handlers, `handlers_${codec.name}`);
                 return {
                   getSpec: makeGetRelationalSpec(details, tablePkAttributes),
-                  getIdentifiers: makeGetIdentifiers(handlers),
+                  getIdentifiers: makeGetIdentifiers(handlers, codec.name),
                 };
               } else if (codec.polymorphism?.mode === "single") {
                 // Lots of type names, but they all relate to the same table
@@ -969,9 +971,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   }
                   handlers.push(handler);
                 }
+                exportNameHint(handlers, `handlers_${codec.name}`);
                 return {
                   getSpec: makeGetSingleSpec(handlers, tablePkAttributes),
-                  getIdentifiers: makeGetIdentifiers(handlers),
+                  getIdentifiers: makeGetIdentifiers(handlers, codec.name),
                 };
               } else if (codec.polymorphism) {
                 throw new Error(
@@ -984,6 +987,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 if (!handler || !specForHandler) {
                   return null;
                 }
+                const handlers = [handler];
+                exportNameHint(handlers, `handlers_${codec.name}`);
                 return {
                   getSpec: EXPORTABLE(
                     (handler, lambda, specForHandler) =>
@@ -1000,7 +1005,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       },
                     [handler, lambda, specForHandler],
                   ),
-                  getIdentifiers: makeGetIdentifiers([handler]),
+                  getIdentifiers: makeGetIdentifiers(handlers, codec.name),
                 };
               }
             },
@@ -1498,9 +1503,13 @@ return function (access, inhibitOnNull) {
                                 },
                               [access, inhibitOnNull, pk],
                             ),
-                        getIdentifiers(value) {
-                          return value.slice(1);
-                        },
+                        getIdentifiers: EXPORTABLE(
+                          () => (value) => {
+                            return value.slice(1);
+                          },
+                          [],
+                          "getIdentifiers",
+                        ),
                         get: EXPORTABLE(
                           (resource) => (spec: any) => resource.get(spec),
                           [resource],
@@ -1771,14 +1780,12 @@ return function (access, inhibitOnNull) {
   },
 };
 
-function makeGetIdentifiers(handlers: ReadonlyArray<NodeIdHandler>) {
-  const decodeNodeId = EXPORTABLE(
-    (handlers, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime(handlers),
-    [handlers, makeDecodeNodeIdRuntime],
-  );
-  return EXPORTABLE(
-    (decodeNodeId, handlers) => (nodeId: string | null | undefined) => {
-      const specifier = decodeNodeId(nodeId);
+const getIdentifiersFromSpecifier = EXPORTABLE(
+  () =>
+    (
+      handlers: readonly NodeIdHandler[],
+      specifier: { [codecName: string]: any } | null,
+    ) => {
       if (specifier == null) return null;
       for (const handler of handlers) {
         const value = specifier?.[handler.codec.name];
@@ -1789,8 +1796,60 @@ function makeGetIdentifiers(handlers: ReadonlyArray<NodeIdHandler>) {
       }
       return null;
     },
-    [decodeNodeId, handlers],
-  );
+  [],
+  "getIdentifiersFromSpecifier",
+);
+
+const getIdentifiersFromSpecifier1 = EXPORTABLE(
+  () =>
+    (
+      handler: NodeIdHandler,
+      specifier: { [codecName: string]: any } | null,
+    ) => {
+      if (specifier == null) return null;
+      const value = specifier?.[handler.codec.name];
+      const match = value != null ? handler.match(value) : false;
+      if (match) {
+        return handler.getIdentifiers(value);
+      }
+      return null;
+    },
+  [],
+  "getIdentifiersFromSpecifier1",
+);
+
+function makeGetIdentifiers(
+  handlers: ReadonlyArray<NodeIdHandler>,
+  name: string,
+) {
+  if (handlers.length === 1) {
+    const [handler] = handlers;
+    const decodeNodeId = EXPORTABLE(
+      (handler, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime([handler]),
+      [handler, makeDecodeNodeIdRuntime],
+      `decodeNodeId_${name}`,
+    );
+    return EXPORTABLE(
+      (decodeNodeId, getIdentifiersFromSpecifier1, handler) =>
+        (nodeId: string | null | undefined) =>
+          getIdentifiersFromSpecifier1(handler, decodeNodeId(nodeId)),
+      [decodeNodeId, getIdentifiersFromSpecifier1, handler],
+      `getIdentifiers_${name}`,
+    );
+  } else {
+    const decodeNodeId = EXPORTABLE(
+      (handlers, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime(handlers),
+      [handlers, makeDecodeNodeIdRuntime],
+      `decodeNodeId_${name}`,
+    );
+    return EXPORTABLE(
+      (decodeNodeId, getIdentifiersFromSpecifier, handlers) =>
+        (nodeId: string | null | undefined) =>
+          getIdentifiersFromSpecifier(handlers, decodeNodeId(nodeId)),
+      [decodeNodeId, getIdentifiersFromSpecifier, handlers],
+      `getIdentifiers_${name}`,
+    );
+  }
 }
 
 function makeGetRelationalSpec(

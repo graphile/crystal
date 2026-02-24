@@ -46,6 +46,12 @@ function tidyExtensions(obj: {
   delete extensions.enumTableEnumDetails;
   delete extensions.singleOutputParameterName;
   delete extensions.variant;
+  delete extensions.oid;
+  delete extensions.canSelect;
+  delete extensions.canInsert;
+  delete extensions.canUpdate;
+  delete extensions.canDelete;
+  delete extensions.canExecute;
 
   if (extensions.tags) {
     tidyTags(extensions.tags);

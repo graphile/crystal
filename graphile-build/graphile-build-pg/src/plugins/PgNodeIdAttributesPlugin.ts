@@ -2,15 +2,17 @@ import "./PgTablesPlugin.ts";
 import "graphile-config";
 
 import type {
+  PgCodec,
   PgCodecRelation,
   PgCodecWithAttributes,
   PgCondition,
   PgRegistry,
 } from "@dataplan/pg";
 import { sqlValueWithCodec } from "@dataplan/pg";
-import type { Setter } from "grafast";
+import type { Maybe, Setter } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
+import { exportNameHint } from "../utils.ts";
 import { version } from "../version.ts";
 
 declare global {
@@ -43,6 +45,102 @@ declare global {
     }
   }
 }
+
+const pgConditionApplyNodeId = EXPORTABLE(
+  () =>
+    (
+      attributeCount: number,
+      getIdentifiers: (nodeId: Maybe<string>) => null | readonly any[],
+      localAttributeCodecs: PgCodec[],
+      localAttributes: readonly string[],
+      sql: GraphileBuild.Build["sql"],
+      sqlValueWithCodec: GraphileBuild.Build["dataplanPg"]["sqlValueWithCodec"],
+      typeName: string,
+      condition: PgCondition,
+      nodeId: unknown,
+    ) => {
+      if (nodeId === undefined) {
+        return;
+      } else if (nodeId === null) {
+        for (const localName of localAttributes) {
+          condition.where({
+            type: "attribute",
+            attribute: localName,
+            callback: (expression) => sql`${expression} is null`,
+          });
+        }
+        return;
+      } else if (typeof nodeId !== "string") {
+        throw new Error(
+          `Invalid node identifier for '${typeName}'; expected string`,
+        );
+      } else {
+        const identifiers = getIdentifiers(nodeId);
+        if (identifiers == null) {
+          throw new Error(`Invalid node identifier for '${typeName}'`);
+        }
+        for (let i = 0; i < attributeCount; i++) {
+          const localName = localAttributes[i];
+          const value = identifiers[i];
+          if (value == null) {
+            condition.where({
+              type: "attribute",
+              attribute: localName,
+              callback: (expression) => sql`${expression} is null`,
+            });
+          } else {
+            const codec = localAttributeCodecs[i];
+            const sqlRemoteValue = sqlValueWithCodec(value, codec);
+            condition.where({
+              type: "attribute",
+              attribute: localName,
+              callback: (expression) => sql`${expression} = ${sqlRemoteValue}`,
+            });
+          }
+        }
+      }
+    },
+  [],
+  "pgConditionApplyNodeId",
+);
+
+const pgRowTypeApplyNodeId = EXPORTABLE(
+  () =>
+    (
+      attributeCount: number,
+      getIdentifiers: (nodeId: Maybe<string>) => null | readonly any[],
+      localAttributes: readonly string[],
+      typeName: string,
+      record: Setter,
+      nodeId: unknown,
+    ) => {
+      if (nodeId === undefined) {
+        return;
+      } else if (nodeId === null) {
+        for (const localName of localAttributes) {
+          record.set(localName, null);
+        }
+        return;
+      } else if (typeof nodeId !== "string") {
+        throw new Error(
+          `Invalid node identifier for '${typeName}'; expected string`,
+        );
+      } else {
+        const identifiers = getIdentifiers(nodeId);
+        if (identifiers == null) {
+          throw new Error(
+            `Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`,
+          );
+        }
+        for (let i = 0; i < attributeCount; i++) {
+          const localName = localAttributes[i];
+          record.set(localName, identifiers[i]);
+        }
+      }
+    },
+  [],
+  "pgRowTypeApplyNodeId",
+);
 
 export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
   name: "PgNodeIdAttributesPlugin",
@@ -185,6 +283,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               const localAttributeCodecs = localAttributes.map(
                 (name) => pgCodec.attributes[name].codec,
               );
+              exportNameHint(
+                localAttributeCodecs,
+                `localAttributeCodecs_${pgCodec.name}_${relationName}`,
+              );
               return extend(
                 memo,
                 {
@@ -215,6 +317,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                               getIdentifiers,
                               localAttributeCodecs,
                               localAttributes,
+                              pgConditionApplyNodeId,
                               sql,
                               sqlValueWithCodec,
                               typeName,
@@ -223,60 +326,24 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 condition: PgCondition,
                                 nodeId: unknown,
                               ) {
-                                if (nodeId === undefined) {
-                                  return;
-                                } else if (nodeId === null) {
-                                  for (const localName of localAttributes) {
-                                    condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} is null`,
-                                    });
-                                  }
-                                  return;
-                                } else if (typeof nodeId !== "string") {
-                                  throw new Error(
-                                    `Invalid node identifier for '${typeName}'; expected string`,
-                                  );
-                                } else {
-                                  const identifiers = getIdentifiers(nodeId);
-                                  if (identifiers == null) {
-                                    throw new Error(
-                                      `Invalid node identifier for '${typeName}'`,
-                                    );
-                                  }
-                                  for (let i = 0; i < attributeCount; i++) {
-                                    const localName = localAttributes[i];
-                                    const value = identifiers[i];
-                                    if (value == null) {
-                                      condition.where({
-                                        type: "attribute",
-                                        attribute: localName,
-                                        callback: (expression) =>
-                                          sql`${expression} is null`,
-                                      });
-                                    } else {
-                                      const codec = localAttributeCodecs[i];
-                                      const sqlRemoteValue = sqlValueWithCodec(
-                                        value,
-                                        codec,
-                                      );
-                                      condition.where({
-                                        type: "attribute",
-                                        attribute: localName,
-                                        callback: (expression) =>
-                                          sql`${expression} = ${sqlRemoteValue}`,
-                                      });
-                                    }
-                                  }
-                                }
+                                return pgConditionApplyNodeId(
+                                  attributeCount,
+                                  getIdentifiers,
+                                  localAttributeCodecs,
+                                  localAttributes,
+                                  sql,
+                                  sqlValueWithCodec,
+                                  typeName,
+                                  condition,
+                                  nodeId,
+                                );
                               },
                             [
                               attributeCount,
                               getIdentifiers,
                               localAttributeCodecs,
                               localAttributes,
+                              pgConditionApplyNodeId,
                               sql,
                               sqlValueWithCodec,
                               typeName,
@@ -287,37 +354,24 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                               attributeCount,
                               getIdentifiers,
                               localAttributes,
+                              pgRowTypeApplyNodeId,
                               typeName,
                             ) =>
                               function plan(record: Setter, nodeId: unknown) {
-                                if (nodeId === undefined) {
-                                  return;
-                                } else if (nodeId === null) {
-                                  for (const localName of localAttributes) {
-                                    record.set(localName, null);
-                                  }
-                                  return;
-                                } else if (typeof nodeId !== "string") {
-                                  throw new Error(
-                                    `Invalid node identifier for '${typeName}'; expected string`,
-                                  );
-                                } else {
-                                  const identifiers = getIdentifiers(nodeId);
-                                  if (identifiers == null) {
-                                    throw new Error(
-                                      `Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`,
-                                    );
-                                  }
-                                  for (let i = 0; i < attributeCount; i++) {
-                                    const localName = localAttributes[i];
-                                    record.set(localName, identifiers[i]);
-                                  }
-                                }
+                                return pgRowTypeApplyNodeId(
+                                  attributeCount,
+                                  getIdentifiers,
+                                  localAttributes,
+                                  typeName,
+                                  record,
+                                  nodeId,
+                                );
                               },
                             [
                               attributeCount,
                               getIdentifiers,
                               localAttributes,
+                              pgRowTypeApplyNodeId,
                               typeName,
                             ],
                           ),

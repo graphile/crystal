@@ -30,6 +30,7 @@ import {
 } from "./plugins/index.ts";
 import {
   EXPORTABLE,
+  EXPORTABLE_ARRAY_CLONE,
   EXPORTABLE_OBJECT_CLONE,
   exportNameHint,
 } from "./utils.ts";
@@ -42,6 +43,7 @@ declare global {
       grafast: typeof grafast;
       graphileBuild: {
         EXPORTABLE: typeof EXPORTABLE;
+        EXPORTABLE_ARRAY_CLONE: typeof EXPORTABLE_ARRAY_CLONE;
         EXPORTABLE_OBJECT_CLONE: typeof EXPORTABLE_OBJECT_CLONE;
         exportNameHint: typeof exportNameHint;
       };
@@ -60,6 +62,7 @@ export const GraphileBuildLibPreset: GraphileConfig.Preset = {
     grafast,
     graphileBuild: {
       EXPORTABLE,
+      EXPORTABLE_ARRAY_CLONE,
       EXPORTABLE_OBJECT_CLONE,
       exportNameHint,
     },

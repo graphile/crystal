@@ -1383,37 +1383,68 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
-const handlers = [nodeIdHandler_Person];
-const decodeNodeId2 = makeDecodeNodeIdRuntime(handlers);
-const getIdentifiers = nodeId => {
-  const specifier = decodeNodeId2(nodeId);
+const decodeNodeId_person = makeDecodeNodeIdRuntime([nodeIdHandler_Person]);
+const getIdentifiersFromSpecifier1 = (handler, specifier) => {
   if (specifier == null) return null;
-  for (const handler of handlers) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
+  const value = specifier?.[handler.codec.name];
+  const match = value != null ? handler.match(value) : false;
+  if (match) {
+    return handler.getIdentifiers(value);
   }
   return null;
 };
-const localAttributeCodecs = [TYPES.int];
+const getIdentifiers_person = nodeId => getIdentifiersFromSpecifier1(nodeIdHandler_Person, decodeNodeId_person(nodeId));
+const localAttributeCodecs_post_author = [TYPES.int];
+const pgConditionApplyNodeId = (attributeCount, getIdentifiers, localAttributeCodecs, localAttributes, typeName, condition, nodeId) => {
+  if (nodeId === undefined) {
+    return;
+  } else if (nodeId === null) {
+    for (const localName of localAttributes) {
+      condition.where({
+        type: "attribute",
+        attribute: localName,
+        callback(expression) {
+          return sql`${expression} is null`;
+        }
+      });
+    }
+    return;
+  } else if (typeof nodeId !== "string") {
+    throw new Error(`Invalid node identifier for '${typeName}'; expected string`);
+  } else {
+    const identifiers = getIdentifiers(nodeId);
+    if (identifiers == null) {
+      throw new Error(`Invalid node identifier for '${typeName}'`);
+    }
+    for (let i = 0; i < attributeCount; i++) {
+      const localName = localAttributes[i];
+      const value = identifiers[i];
+      if (value == null) {
+        condition.where({
+          type: "attribute",
+          attribute: localName,
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        const codec = localAttributeCodecs[i];
+        const sqlRemoteValue = sqlValueWithCodec(value, codec);
+        condition.where({
+          type: "attribute",
+          attribute: localName,
+          callback(expression) {
+            return sql`${expression} = ${sqlRemoteValue}`;
+          }
+        });
+      }
+    }
+  }
+};
 const TvEpisodeCondition_titleApply = ($condition, val) => applyAttributeCondition("title", TYPES.varchar, $condition, val);
-const handlers2 = [nodeIdHandler_TvShow];
-const decodeNodeId3 = makeDecodeNodeIdRuntime(handlers2);
-const getIdentifiers2 = nodeId => {
-  const specifier = decodeNodeId3(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers2) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
-const localAttributeCodecs2 = [TYPES.int];
+const decodeNodeId_tvShows = makeDecodeNodeIdRuntime([nodeIdHandler_TvShow]);
+const getIdentifiers_tvShows = nodeId => getIdentifiersFromSpecifier1(nodeIdHandler_TvShow, decodeNodeId_tvShows(nodeId));
+const localAttributeCodecs_tvEpisodes_tvShowsByMyShowId = [TYPES.int];
 const TvEpisodesOrderBy_TITLE_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "title",
@@ -1426,21 +1457,9 @@ const TvEpisodesOrderBy_TITLE_DESCApply = queryBuilder => {
     direction: "DESC"
   });
 };
-const handlers3 = [nodeIdHandler_Studio];
-const decodeNodeId4 = makeDecodeNodeIdRuntime(handlers3);
-const getIdentifiers3 = nodeId => {
-  const specifier = decodeNodeId4(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers3) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
-const localAttributeCodecs3 = [TYPES.int];
+const decodeNodeId_studios = makeDecodeNodeIdRuntime([nodeIdHandler_Studio]);
+const getIdentifiers_studios = nodeId => getIdentifiersFromSpecifier1(nodeIdHandler_Studio, decodeNodeId_studios(nodeId));
+const localAttributeCodecs_tvShows_studiosByMyStudioId = [TYPES.int];
 const resource_getflamblePgResource = registry.pgResources["getflamble"];
 function pgSelectFromPayload($payload) {
   const $result = $payload.getStepForKey("result");
@@ -1557,50 +1576,38 @@ const CreatePostPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPaylo
 function PostInput_bodyApply(obj, val, info) {
   obj.set("body", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const handlers4 = [nodeIdHandler_Person];
-const decodeNodeId5 = makeDecodeNodeIdRuntime(handlers4);
-const getIdentifiers4 = nodeId => {
-  const specifier = decodeNodeId5(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers4) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
+const pgRowTypeApplyNodeId = (attributeCount, getIdentifiers, localAttributes, typeName, record, nodeId) => {
+  if (nodeId === undefined) {
+    return;
+  } else if (nodeId === null) {
+    for (const localName of localAttributes) {
+      record.set(localName, null);
+    }
+    return;
+  } else if (typeof nodeId !== "string") {
+    throw new Error(`Invalid node identifier for '${typeName}'; expected string`);
+  } else {
+    const identifiers = getIdentifiers(nodeId);
+    if (identifiers == null) {
+      throw new Error(`Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`);
+    }
+    for (let i = 0; i < attributeCount; i++) {
+      const localName = localAttributes[i];
+      record.set(localName, identifiers[i]);
     }
   }
-  return null;
 };
+function PostInput_authorApply(record, nodeId) {
+  return pgRowTypeApplyNodeId(1, getIdentifiers_person, registryConfig.pgRelations.post.author.localAttributes, "Person", record, nodeId);
+}
 const CreateTvEpisodePayload_tvEpisodeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
-const handlers5 = [nodeIdHandler_TvShow];
-const decodeNodeId6 = makeDecodeNodeIdRuntime(handlers5);
-const getIdentifiers5 = nodeId => {
-  const specifier = decodeNodeId6(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers5) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
+function TvEpisodeInput_tvShowByShowIdApply(record, nodeId) {
+  return pgRowTypeApplyNodeId(1, getIdentifiers_tvShows, registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes, "TvShow", record, nodeId);
+}
 const CreateTvShowPayload_tvShowEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
-const handlers6 = [nodeIdHandler_Studio];
-const decodeNodeId7 = makeDecodeNodeIdRuntime(handlers6);
-const getIdentifiers6 = nodeId => {
-  const specifier = decodeNodeId7(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers6) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
+function TvShowInput_studioByStudioIdApply(record, nodeId) {
+  return pgRowTypeApplyNodeId(1, getIdentifiers_studios, registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes, "Studio", record, nodeId);
+}
 const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(codecResource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
 function PersonInput_firstNameApply(obj, val, info) {
   obj.set("first_name", bakedInputRuntime(info.schema, info.field.type, val));
@@ -1618,48 +1625,6 @@ function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
 }
-const handlers7 = [nodeIdHandler_Person];
-const decodeNodeId8 = makeDecodeNodeIdRuntime(handlers7);
-const getIdentifiers7 = nodeId => {
-  const specifier = decodeNodeId8(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers7) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
-const handlers8 = [nodeIdHandler_TvShow];
-const decodeNodeId9 = makeDecodeNodeIdRuntime(handlers8);
-const getIdentifiers8 = nodeId => {
-  const specifier = decodeNodeId9(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers8) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
-const handlers9 = [nodeIdHandler_Studio];
-const decodeNodeId10 = makeDecodeNodeIdRuntime(handlers9);
-const getIdentifiers9 = nodeId => {
-  const specifier = decodeNodeId10(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers9) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -4545,50 +4510,7 @@ export const inputObjects = {
   PostCondition: {
     plans: {
       author(condition, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.post.author.localAttributes) {
-            condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Person'; expected string`);
-        } else {
-          const identifiers = getIdentifiers(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Person'`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
-            const value = identifiers[i];
-            if (value == null) {
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} is null`;
-                }
-              });
-            } else {
-              const codec = localAttributeCodecs[i];
-              const sqlRemoteValue = sqlValueWithCodec(value, codec);
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} = ${sqlRemoteValue}`;
-                }
-              });
-            }
-          }
-        }
+        return pgConditionApplyNodeId(1, getIdentifiers_person, localAttributeCodecs_post_author, registryConfig.pgRelations.post.author.localAttributes, "Person", condition, nodeId);
       },
       body($condition, val) {
         return applyAttributeCondition("body", TYPES.text, $condition, val);
@@ -4598,27 +4520,7 @@ export const inputObjects = {
   PostInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      author(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.post.author.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Person'; expected string`);
-        } else {
-          const identifiers = getIdentifiers4(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Person': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
-      },
+      author: PostInput_authorApply,
       body: PostInput_bodyApply,
       rowId: StudioInput_rowIdApply
     }
@@ -4626,27 +4528,7 @@ export const inputObjects = {
   PostPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      author(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.post.author.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Person'; expected string`);
-        } else {
-          const identifiers = getIdentifiers7(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Person': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
-      },
+      author: PostInput_authorApply,
       body: PostInput_bodyApply
     }
   },
@@ -4689,50 +4571,7 @@ export const inputObjects = {
     plans: {
       title: TvEpisodeCondition_titleApply,
       tvShowByShowId(condition, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes) {
-            condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'TvShow'; expected string`);
-        } else {
-          const identifiers = getIdentifiers2(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'TvShow'`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
-            const value = identifiers[i];
-            if (value == null) {
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} is null`;
-                }
-              });
-            } else {
-              const codec = localAttributeCodecs2[i];
-              const sqlRemoteValue = sqlValueWithCodec(value, codec);
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} = ${sqlRemoteValue}`;
-                }
-              });
-            }
-          }
-        }
+        return pgConditionApplyNodeId(1, getIdentifiers_tvShows, localAttributeCodecs_tvEpisodes_tvShowsByMyShowId, registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes, "TvShow", condition, nodeId);
       }
     }
   },
@@ -4741,103 +4580,20 @@ export const inputObjects = {
     plans: {
       code: FilmInput_codeApply,
       title: FilmInput_titleApply,
-      tvShowByShowId(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'TvShow'; expected string`);
-        } else {
-          const identifiers = getIdentifiers5(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'TvShow': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
-      }
+      tvShowByShowId: TvEpisodeInput_tvShowByShowIdApply
     }
   },
   TvEpisodePatch: {
     baked: createObjectAndApplyChildren,
     plans: {
       title: FilmInput_titleApply,
-      tvShowByShowId(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'TvShow'; expected string`);
-        } else {
-          const identifiers = getIdentifiers8(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'TvShow': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
-      }
+      tvShowByShowId: TvEpisodeInput_tvShowByShowIdApply
     }
   },
   TvShowCondition: {
     plans: {
       studioByStudioId(condition, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes) {
-            condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Studio'; expected string`);
-        } else {
-          const identifiers = getIdentifiers3(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Studio'`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
-            const value = identifiers[i];
-            if (value == null) {
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} is null`;
-                }
-              });
-            } else {
-              const codec = localAttributeCodecs3[i];
-              const sqlRemoteValue = sqlValueWithCodec(value, codec);
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} = ${sqlRemoteValue}`;
-                }
-              });
-            }
-          }
-        }
+        return pgConditionApplyNodeId(1, getIdentifiers_studios, localAttributeCodecs_tvShows_studiosByMyStudioId, registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes, "Studio", condition, nodeId);
       },
       title: TvEpisodeCondition_titleApply
     }
@@ -4846,54 +4602,14 @@ export const inputObjects = {
     baked: createObjectAndApplyChildren,
     plans: {
       code: FilmInput_codeApply,
-      studioByStudioId(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Studio'; expected string`);
-        } else {
-          const identifiers = getIdentifiers6(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Studio': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
-      },
+      studioByStudioId: TvShowInput_studioByStudioIdApply,
       title: FilmInput_titleApply
     }
   },
   TvShowPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      studioByStudioId(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Studio'; expected string`);
-        } else {
-          const identifiers = getIdentifiers9(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Studio': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
-      },
+      studioByStudioId: TvShowInput_studioByStudioIdApply,
       title: FilmInput_titleApply
     }
   },

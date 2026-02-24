@@ -1,6 +1,6 @@
-export function EXPORTABLE<T, TScope extends any[]>(
+export function EXPORTABLE<T, TScope extends readonly any[]>(
   factory: (...args: TScope) => T,
-  args: [...TScope],
+  args: readonly [...TScope],
   nameHint?: string,
 ): T {
   const forbiddenIndex = args.findIndex(isForbidden);

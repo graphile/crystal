@@ -680,21 +680,64 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
   });
 }
 const BarCondition_colApply = ($condition, val) => applyAttributeCondition("col", TYPES.text, $condition, val);
-const handlers = [nodeIdHandler_Foo];
-const decodeNodeId2 = makeDecodeNodeIdRuntime(handlers);
-const getIdentifiers = nodeId => {
-  const specifier = decodeNodeId2(nodeId);
+const decodeNodeId_foo = makeDecodeNodeIdRuntime([nodeIdHandler_Foo]);
+const getIdentifiersFromSpecifier1 = specifier => {
   if (specifier == null) return null;
-  for (const handler of handlers) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
+  const value = specifier?.[nodeIdHandler_Foo.codec.name];
+  const match = value != null ? nodeIdHandler_Foo.match(value) : false;
+  if (match) {
+    return nodeIdHandler_Foo.getIdentifiers(value);
   }
   return null;
 };
-const localAttributeCodecs = [TYPES.int];
+const getIdentifiers_foo = nodeId => getIdentifiersFromSpecifier1(decodeNodeId_foo(nodeId));
+const localAttributeCodecs_bar_fooByMyId = [TYPES.int];
+const pgConditionApplyNodeId = (attributeCount, localAttributes, typeName, condition, nodeId) => {
+  if (nodeId === undefined) {
+    return;
+  } else if (nodeId === null) {
+    for (const localName of localAttributes) {
+      condition.where({
+        type: "attribute",
+        attribute: localName,
+        callback(expression) {
+          return sql`${expression} is null`;
+        }
+      });
+    }
+    return;
+  } else if (typeof nodeId !== "string") {
+    throw new Error(`Invalid node identifier for '${typeName}'; expected string`);
+  } else {
+    const identifiers = getIdentifiers_foo(nodeId);
+    if (identifiers == null) {
+      throw new Error(`Invalid node identifier for '${typeName}'`);
+    }
+    for (let i = 0; i < attributeCount; i++) {
+      const localName = localAttributes[i];
+      const value = identifiers[i];
+      if (value == null) {
+        condition.where({
+          type: "attribute",
+          attribute: localName,
+          callback(expression) {
+            return sql`${expression} is null`;
+          }
+        });
+      } else {
+        const codec = localAttributeCodecs_bar_fooByMyId[i];
+        const sqlRemoteValue = sqlValueWithCodec(value, codec);
+        condition.where({
+          type: "attribute",
+          attribute: localName,
+          callback(expression) {
+            return sql`${expression} = ${sqlRemoteValue}`;
+          }
+        });
+      }
+    }
+  }
+};
 const BarsOrderBy_COL_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "col",
@@ -763,19 +806,26 @@ function applyCreateFields(qb, arg) {
 function BarInput_colApply(obj, val, info) {
   obj.set("col", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const handlers2 = [nodeIdHandler_Foo];
-const decodeNodeId3 = makeDecodeNodeIdRuntime(handlers2);
-const getIdentifiers2 = nodeId => {
-  const specifier = decodeNodeId3(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers2) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
+const pgRowTypeApplyNodeId = (attributeCount, localAttributes, typeName, record, nodeId) => {
+  if (nodeId === undefined) {
+    return;
+  } else if (nodeId === null) {
+    for (const localName of localAttributes) {
+      record.set(localName, null);
+    }
+    return;
+  } else if (typeof nodeId !== "string") {
+    throw new Error(`Invalid node identifier for '${typeName}'; expected string`);
+  } else {
+    const identifiers = getIdentifiers_foo(nodeId);
+    if (identifiers == null) {
+      throw new Error(`Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`);
+    }
+    for (let i = 0; i < attributeCount; i++) {
+      const localName = localAttributes[i];
+      record.set(localName, identifiers[i]);
     }
   }
-  return null;
 };
 const CreateFooPayload_fooEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_fooPgResource, fooUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
@@ -1585,50 +1635,7 @@ export const inputObjects = {
     plans: {
       col: BarCondition_colApply,
       fooByRowId(condition, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.bar.fooByMyId.localAttributes) {
-            condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Foo'; expected string`);
-        } else {
-          const identifiers = getIdentifiers(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Foo'`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.bar.fooByMyId.localAttributes[i];
-            const value = identifiers[i];
-            if (value == null) {
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} is null`;
-                }
-              });
-            } else {
-              const codec = localAttributeCodecs[i];
-              const sqlRemoteValue = sqlValueWithCodec(value, codec);
-              condition.where({
-                type: "attribute",
-                attribute: localName,
-                callback(expression) {
-                  return sql`${expression} = ${sqlRemoteValue}`;
-                }
-              });
-            }
-          }
-        }
+        return pgConditionApplyNodeId(1, registryConfig.pgRelations.bar.fooByMyId.localAttributes, "Foo", condition, nodeId);
       }
     }
   },
@@ -1637,25 +1644,7 @@ export const inputObjects = {
     plans: {
       col: BarInput_colApply,
       fooByRowId(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.bar.fooByMyId.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for 'Foo'; expected string`);
-        } else {
-          const identifiers = getIdentifiers2(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for 'Foo': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.bar.fooByMyId.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
+        return pgRowTypeApplyNodeId(1, registryConfig.pgRelations.bar.fooByMyId.localAttributes, "Foo", record, nodeId);
       }
     }
   },

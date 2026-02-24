@@ -271,9 +271,9 @@ helper, so after running the autofix you might end up with "undefined variable
 definition into your code:
 
 ```ts
-export function EXPORTABLE<T, TScope extends any[]>(
+export function EXPORTABLE<T, TScope extends readonly any[]>(
   factory: (...args: TScope) => T,
-  args: [...TScope],
+  args: readonly [...TScope],
   nameHint?: string,
 ): T {
   const fn: T = factory(...args);

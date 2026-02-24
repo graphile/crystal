@@ -14,6 +14,9 @@ const base64JSONNodeIdCodec = {
 const nodeIdHandler_SingleTableTopic_getSpec = $list => ({
   id: inhibitOnNull(access($list, [1]))
 });
+const getIdentifiers = value => {
+  return value.slice(1);
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -4001,9 +4004,7 @@ const nodeIdHandler_SingleTableTopic = {
     return list([constant("SingleTableTopic", false), $record.get("id")]);
   },
   getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
+  getIdentifiers: getIdentifiers,
   get: nodeIdHandler_SingleTableTopic_get,
   match(obj) {
     return obj[0] === "SingleTableTopic";
@@ -4384,9 +4385,7 @@ const nodeIdHandlerByTypeName = {
       return list([constant("SingleTablePost", false), $record.get("id")]);
     },
     getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
+    getIdentifiers: getIdentifiers,
     get: nodeIdHandler_SingleTableTopic_get,
     match(obj) {
       return obj[0] === "SingleTablePost";
@@ -4399,9 +4398,7 @@ const nodeIdHandlerByTypeName = {
       return list([constant("SingleTableDivider", false), $record.get("id")]);
     },
     getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
+    getIdentifiers: getIdentifiers,
     get: nodeIdHandler_SingleTableTopic_get,
     match(obj) {
       return obj[0] === "SingleTableDivider";
@@ -4414,9 +4411,7 @@ const nodeIdHandlerByTypeName = {
       return list([constant("SingleTableChecklist", false), $record.get("id")]);
     },
     getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
+    getIdentifiers: getIdentifiers,
     get: nodeIdHandler_SingleTableTopic_get,
     match(obj) {
       return obj[0] === "SingleTableChecklist";
@@ -4429,9 +4424,7 @@ const nodeIdHandlerByTypeName = {
       return list([constant("SingleTableChecklistItem", false), $record.get("id")]);
     },
     getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
+    getIdentifiers: getIdentifiers,
     get: nodeIdHandler_SingleTableTopic_get,
     match(obj) {
       return obj[0] === "SingleTableChecklistItem";
@@ -4444,9 +4437,7 @@ const nodeIdHandlerByTypeName = {
       return list([constant("MovieCollection", false), $record.get("id")]);
     },
     getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
+    getIdentifiers: getIdentifiers,
     get: nodeIdHandlerByTypeName_MovieCollection_get,
     match(obj) {
       return obj[0] === "MovieCollection";
@@ -4459,9 +4450,7 @@ const nodeIdHandlerByTypeName = {
       return list([constant("SeriesCollection", false), $record.get("id")]);
     },
     getSpec: nodeIdHandler_SingleTableTopic_getSpec,
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
+    getIdentifiers: getIdentifiers,
     get: nodeIdHandlerByTypeName_MovieCollection_get,
     match(obj) {
       return obj[0] === "SeriesCollection";
