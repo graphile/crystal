@@ -74,10 +74,11 @@ function isSafeTemplateLiteralStringChunk(value: string): boolean {
   return !value.includes("`") && !value.includes("\\") && !value.includes("${");
 }
 
-type ParamSubstitute = { _: "substitute"; argIdx: number; value: t.Expression };
-type ParamEliminate = { _: "eliminate"; argIdx: number };
-type ParamRename = { _: "rename"; argIdx: number; to: t.Identifier };
-type ParamAction = ParamEliminate | ParamSubstitute | ParamRename;
+type ParamAction = { argIdx: number; name: string } & (
+  | { _: "eliminate" }
+  | { _: "substitute"; value: t.Expression }
+  | { _: "rename"; to: string }
+);
 
 export const optimize = (inAst: t.File, runs = 1): t.File => {
   let ast = inAst;
@@ -455,6 +456,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
               // We don't support destructuring/rest/etc currently
               continue;
             }
+            const { name } = param;
 
             const [firstCallPath, ...remainingCallPaths] = callPaths;
             const firstArg = firstCallPath.node.arguments[argIdx];
@@ -468,7 +470,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             } else if (isScalarConstantArg(firstArg)) {
               // Includes identifier `undefined`
               const value = firstArg;
-              indexActions.push({ _: "substitute", argIdx, value });
+              indexActions.push({ _: "substitute", argIdx, name, value });
             } else if (t.isIdentifier(firstArg)) {
               const globalName = firstArg.name;
               assert.ok(
@@ -484,13 +486,14 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
               if (param.name === globalName) {
                 // Parameter name matches globalName; simply eliminate
-                indexActions.push({ _: "eliminate", argIdx });
+                indexActions.push({ _: "eliminate", argIdx, name });
               } else if (functionPath.scope.hasOwnBinding(globalName)) {
                 // Cannot safely rename inner references for this index, skip it
                 // TODO: handle renaming of conflicting variables to enable referencing global value.
               } else {
                 // Safe to eliminate, but will need to rename inner references
-                indexActions.push({ _: "rename", argIdx, to: firstArg });
+                const to = firstArg.name;
+                indexActions.push({ _: "rename", argIdx, name, to });
               }
             } else {
               // Too complex for us currently
@@ -506,35 +509,28 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
           // Perform rewriting of the function as necessary
           for (const action of indexActions) {
-            const { argIdx } = action;
+            const { argIdx, name: paramName } = action;
 
             // Guaranteed by above code
             assert.ok(argIdx > lastIdx, "arg indexes must increase");
             lastIdx = argIdx;
 
-            const param = functionPath.node.params[argIdx];
-            if (!t.isIdentifier(param)) {
-              // Satisfy TypeScript
-              throw new Error(
-                "GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable",
-              );
-            }
             switch (action._) {
               case "rename": {
-                functionPath.scope.rename(param.name, action.to.name);
+                functionPath.scope.rename(paramName, action.to);
                 break;
               }
               case "substitute": {
-                const binding = functionPath.scope.bindings[param.name];
+                const binding = functionPath.scope.bindings[paramName];
                 if (!binding) {
-                  throw new Error(`No binding for ${param.name}?!`);
+                  throw new Error(`No binding for ${paramName}?!`);
                 }
                 if (binding.referencePaths.length > 0) {
                   const referencePaths = [...binding.referencePaths];
                   for (const referencePath of referencePaths) {
                     referencePath.replaceWith(t.cloneNode(action.value));
                   }
-                  functionPath.scope.removeBinding(param.name);
+                  functionPath.scope.removeBinding(paramName);
                 }
                 break;
               }
