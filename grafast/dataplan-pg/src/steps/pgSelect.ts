@@ -2564,7 +2564,7 @@ export function generatePgParameterAnalysis(
     }
   }
   return {
-    /** DO NOT GENERATE THIS OBJECT YOURSELF! Use generateParameterAnalysis(parameters) */
+    /** DO NOT GENERATE THIS OBJECT YOURSELF! Use generatePgParameterAnalysis(parameters) */
     [$$generationCheck]: parameters,
     parameterByName,
     indexAfterWhichAllArgsAreNamed,
@@ -2583,7 +2583,7 @@ export function pgFromExpressionRuntime(
 ) {
   if (!parameterAnalysis[$$generationCheck]) {
     throw new Error(
-      `You must not generate the parameter analysis yourself; use generateParameterAnalysis(parameters)`,
+      `You must not generate the parameter analysis yourself; use generatePgParameterAnalysis(parameters)`,
     );
   }
   if (parameterAnalysis[$$generationCheck] !== parameters) {

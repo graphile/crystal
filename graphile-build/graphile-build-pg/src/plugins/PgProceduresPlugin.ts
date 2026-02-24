@@ -19,6 +19,7 @@ import {
 } from "@dataplan/pg";
 import {
   EXPORTABLE,
+  EXPORTABLE_ARRAY_CLONE,
   EXPORTABLE_OBJECT_CLONE,
   gatherConfig,
 } from "graphile-build";
@@ -315,7 +316,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          const parameters: PgResourceParameter[] = [];
+          const rawParameters: PgResourceParameter[] = [];
 
           // const processedFirstInputArg = false;
 
@@ -394,7 +395,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 }
               }
               */
-              parameters.push({
+              rawParameters.push({
                 name: argName,
                 codec: argCodec,
                 ...(required ? { required } : null),
@@ -447,6 +448,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               extensions.singleOutputParameterName = outOrInoutArg;
             }
           }
+
+          const parameters = EXPORTABLE_ARRAY_CLONE(
+            rawParameters,
+            `${pgProc.proname}Parameters`,
+          );
 
           if (
             !returnCodec.isAnonymous &&

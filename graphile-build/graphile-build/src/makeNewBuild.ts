@@ -132,6 +132,7 @@ export default function makeNewBuild(
     // Legacy support for things from lib
     EXPORTABLE: lib.graphileBuild.EXPORTABLE,
     exportNameHint: lib.graphileBuild.exportNameHint,
+    EXPORTABLE_ARRAY_CLONE: lib.graphileBuild.EXPORTABLE_ARRAY_CLONE,
     EXPORTABLE_OBJECT_CLONE: lib.graphileBuild.EXPORTABLE_OBJECT_CLONE,
     grafast: lib.grafast,
     graphql: lib.graphql,

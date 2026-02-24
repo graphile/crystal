@@ -10,9 +10,9 @@ import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";
 import te from "tamedevil";
 
-export function EXPORTABLE<T, TScope extends any[]>(
+export function EXPORTABLE<T, TScope extends readonly any[]>(
   factory: (...args: TScope) => T,
-  args: [...TScope],
+  args: readonly [...TScope],
   nameHint?: string,
 ): T {
   const forbiddenIndex = args.findIndex(isForbidden);
@@ -70,6 +70,23 @@ export function EXPORTABLE_OBJECT_CLONE<T extends object>(
       "EXPORTABLE_OBJECT_CLONE can currently only be used with POJOs.",
     );
   }
+}
+
+export function EXPORTABLE_ARRAY_CLONE<T extends readonly any[]>(
+  arr: T,
+  name?: string,
+): T {
+  const fn = te.eval<any>`return (${te.join(
+    arr.map((_, i) => te.identifier(`val${i}`)),
+    ", ",
+  )}) => [${te.indent(
+    te.join(
+      arr.map((_, i) => te.identifier(`val${i}`)),
+      ",\n",
+    ),
+  )}];`;
+  // eslint-disable-next-line graphile-export/exhaustive-deps
+  return EXPORTABLE(fn, arr, name);
 }
 
 export function exportNameHint(obj: any, nameHint: string): void {

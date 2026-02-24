@@ -377,7 +377,11 @@ declare global {
         args: [...TScope],
         nameHint?: string,
       ): T;
-      EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T): T;
+      EXPORTABLE_ARRAY_CLONE<T extends readonly any[]>(
+        arr: T,
+        name?: string,
+      ): T;
+      EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T, name?: string): T;
       exportNameHint(obj: any, nameHint: string): void;
 
       /**
