@@ -717,12 +717,18 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
             exportNameHint(makeArgs, `makeArgs_${resource.name}`);
 
+            const parameterAnalysis = EXPORTABLE(
+              (generatePgParameterAnalysis, parameters) =>
+                generatePgParameterAnalysis(parameters),
+              [generatePgParameterAnalysis, parameters],
+              `${resource.name}ParameterAnalysis`,
+            );
             return {
               argDetails,
               makeArgs,
               makeArgsRuntime,
               makeFieldArgs,
-              parameterAnalysis: generatePgParameterAnalysis(parameters),
+              parameterAnalysis,
             };
           };
 
