@@ -3607,8 +3607,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "left_arm",
         codec: leftArmCodec,
-        required: true,
-        extensions: {}
+        required: true
       }],
       returnsSetof: false,
       extensions: {},
