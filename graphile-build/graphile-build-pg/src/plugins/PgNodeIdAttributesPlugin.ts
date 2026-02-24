@@ -350,7 +350,14 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                             ],
                           )
                         : EXPORTABLE(
-                            (attributeCount, getIdentifiers, localAttributes, pgRowTypeApplyNodeId, typeName) => function plan(record: Setter, nodeId: unknown) {
+                            (
+                              attributeCount,
+                              getIdentifiers,
+                              localAttributes,
+                              pgRowTypeApplyNodeId,
+                              typeName,
+                            ) =>
+                              function plan(record: Setter, nodeId: unknown) {
                                 return pgRowTypeApplyNodeId(
                                   attributeCount,
                                   getIdentifiers,
@@ -360,7 +367,13 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   nodeId,
                                 );
                               },
-                            [attributeCount, getIdentifiers, localAttributes, pgRowTypeApplyNodeId, typeName],
+                            [
+                              attributeCount,
+                              getIdentifiers,
+                              localAttributes,
+                              pgRowTypeApplyNodeId,
+                              typeName,
+                            ],
                           ),
                     },
                   ),
