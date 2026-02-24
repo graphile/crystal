@@ -722,17 +722,11 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function TInput_kApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("k", bakedInputRuntime(schema, field.type, val));
+function TInput_kApply(obj, val, info) {
+  obj.set("k", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function TInput_vApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("v", bakedInputRuntime(schema, field.type, val));
+function TInput_vApply(obj, val, info) {
+  obj.set("v", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
@@ -1379,29 +1373,17 @@ export const inputObjects = {
   WorkHourInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      fromHours(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("from_hours", bakedInputRuntime(schema, field.type, val));
+      fromHours(obj, val, info) {
+        obj.set("from_hours", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      fromMinutes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("from_minutes", bakedInputRuntime(schema, field.type, val));
+      fromMinutes(obj, val, info) {
+        obj.set("from_minutes", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      toHours(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("to_hours", bakedInputRuntime(schema, field.type, val));
+      toHours(obj, val, info) {
+        obj.set("to_hours", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      toMinutes(obj, val, {
-        field,
-        schema
-      }) {
-        obj.set("to_minutes", bakedInputRuntime(schema, field.type, val));
+      toMinutes(obj, val, info) {
+        obj.set("to_minutes", bakedInputRuntime(info.schema, info.field.type, val));
       }
     }
   }

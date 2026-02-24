@@ -643,107 +643,56 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function GeomInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function GeomInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_pointApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("point", bakedInputRuntime(schema, field.type, val));
+function GeomInput_pointApply(obj, val, info) {
+  obj.set("point", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_pointsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("points", bakedInputRuntime(schema, field.type, val));
+function GeomInput_pointsApply(obj, val, info) {
+  obj.set("points", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_lineApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("line", bakedInputRuntime(schema, field.type, val));
+function GeomInput_lineApply(obj, val, info) {
+  obj.set("line", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_linesApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("lines", bakedInputRuntime(schema, field.type, val));
+function GeomInput_linesApply(obj, val, info) {
+  obj.set("lines", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_lsegApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("lseg", bakedInputRuntime(schema, field.type, val));
+function GeomInput_lsegApply(obj, val, info) {
+  obj.set("lseg", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_lsegsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("lsegs", bakedInputRuntime(schema, field.type, val));
+function GeomInput_lsegsApply(obj, val, info) {
+  obj.set("lsegs", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_boxApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("box", bakedInputRuntime(schema, field.type, val));
+function GeomInput_boxApply(obj, val, info) {
+  obj.set("box", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_boxesApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("boxes", bakedInputRuntime(schema, field.type, val));
+function GeomInput_boxesApply(obj, val, info) {
+  obj.set("boxes", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_openPathApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("open_path", bakedInputRuntime(schema, field.type, val));
+function GeomInput_openPathApply(obj, val, info) {
+  obj.set("open_path", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_openPathsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("open_paths", bakedInputRuntime(schema, field.type, val));
+function GeomInput_openPathsApply(obj, val, info) {
+  obj.set("open_paths", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_closedPathApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
+function GeomInput_closedPathApply(obj, val, info) {
+  obj.set("closed_path", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_closedPathsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("closed_paths", bakedInputRuntime(schema, field.type, val));
+function GeomInput_closedPathsApply(obj, val, info) {
+  obj.set("closed_paths", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_polygonApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("polygon", bakedInputRuntime(schema, field.type, val));
+function GeomInput_polygonApply(obj, val, info) {
+  obj.set("polygon", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_polygonsApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("polygons", bakedInputRuntime(schema, field.type, val));
+function GeomInput_polygonsApply(obj, val, info) {
+  obj.set("polygons", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_circleApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("circle", bakedInputRuntime(schema, field.type, val));
+function GeomInput_circleApply(obj, val, info) {
+  obj.set("circle", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function GeomInput_circlesApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("circles", bakedInputRuntime(schema, field.type, val));
+function GeomInput_circlesApply(obj, val, info) {
+  obj.set("circles", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

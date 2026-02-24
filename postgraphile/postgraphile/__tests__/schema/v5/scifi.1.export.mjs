@@ -584,17 +584,11 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function AccessoryInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("Name", bakedInputRuntime(schema, field.type, val));
+function AccessoryInput_nameApply(obj, val, info) {
+  obj.set("Name", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function AccessoryInput_rowIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("Id", bakedInputRuntime(schema, field.type, val));
+function AccessoryInput_rowIdApply(obj, val, info) {
+  obj.set("Id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

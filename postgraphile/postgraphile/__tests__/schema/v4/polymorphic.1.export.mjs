@@ -6162,30 +6162,18 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function OrganizationInput_organizationIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
+function OrganizationInput_organizationIdApply(obj, val, info) {
+  obj.set("organization_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function OrganizationInput_nameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("name", bakedInputRuntime(schema, field.type, val));
+function OrganizationInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_peoplePgResource, peopleUniques[0].attributes, $mutation, fieldArgs);
-function PersonInput_personIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+function PersonInput_personIdApply(obj, val, info) {
+  obj.set("person_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function PersonInput_usernameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("username", bakedInputRuntime(schema, field.type, val));
+function PersonInput_usernameApply(obj, val, info) {
+  obj.set("username", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_relational_item_relation_composite_pksPgResource, relational_item_relation_composite_pksUniques[0].attributes, $mutation, fieldArgs);
 const CreateRelationalItemRelationCompositePkPayload_relationalItemByChildIdPlan = $record => otherSource_relational_itemsPgResource.get({
@@ -6194,17 +6182,11 @@ const CreateRelationalItemRelationCompositePkPayload_relationalItemByChildIdPlan
 const CreateRelationalItemRelationCompositePkPayload_relationalItemByParentIdPlan = $record => otherSource_relational_itemsPgResource.get({
   id: $record.get("result").get("parent_id")
 });
-function RelationalItemRelationCompositePkInput_parentIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
+function RelationalItemRelationCompositePkInput_parentIdApply(obj, val, info) {
+  obj.set("parent_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function RelationalItemRelationCompositePkInput_childIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("child_id", bakedInputRuntime(schema, field.type, val));
+function RelationalItemRelationCompositePkInput_childIdApply(obj, val, info) {
+  obj.set("child_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_single_table_item_relation_composite_pksPgResource, single_table_item_relation_composite_pksUniques[0].attributes, $mutation, fieldArgs);
 const CreateSingleTableItemRelationCompositePkPayload_singleTableItemByChildIdPlan = $record => resource_single_table_itemsPgResource.get({
@@ -6214,11 +6196,8 @@ const CreateSingleTableItemRelationCompositePkPayload_singleTableItemByParentIdP
   id: $record.get("result").get("parent_id")
 });
 const CreateRelationalItemRelationPayload_relationalItemRelationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_relational_item_relationsPgResource, relational_item_relationsUniques[0].attributes, $mutation, fieldArgs);
-function RelationalItemRelationInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function RelationalItemRelationInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateSingleTableItemRelationPayload_singleTableItemRelationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(otherSource_single_table_item_relationsPgResource, single_table_item_relationsUniques[0].attributes, $mutation, fieldArgs);
 const CreateLogEntryPayload_logEntryEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_log_entriesPgResource, log_entriesUniques[0].attributes, $mutation, fieldArgs);
@@ -6228,51 +6207,30 @@ const CreateLogEntryPayload_organizationByOrganizationIdPlan = $record => spec_r
 const CreateLogEntryPayload_personByPersonIdPlan = $record => otherSource_peoplePgResource.get({
   person_id: $record.get("result").get("person_id")
 });
-function LogEntryInput_textApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("text", bakedInputRuntime(schema, field.type, val));
+function LogEntryInput_textApply(obj, val, info) {
+  obj.set("text", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_first_party_vulnerabilitiesPgResource, first_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
-function FirstPartyVulnerabilityInput_cvssScoreApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("cvss_score", bakedInputRuntime(schema, field.type, val));
+function FirstPartyVulnerabilityInput_cvssScoreApply(obj, val, info) {
+  obj.set("cvss_score", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function FirstPartyVulnerabilityInput_teamNameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("team_name", bakedInputRuntime(schema, field.type, val));
+function FirstPartyVulnerabilityInput_teamNameApply(obj, val, info) {
+  obj.set("team_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_third_party_vulnerabilitiesPgResource, third_party_vulnerabilitiesUniques[0].attributes, $mutation, fieldArgs);
-function ThirdPartyVulnerabilityInput_vendorNameApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("vendor_name", bakedInputRuntime(schema, field.type, val));
+function ThirdPartyVulnerabilityInput_vendorNameApply(obj, val, info) {
+  obj.set("vendor_name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateAwsApplicationPayload_awsApplicationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_aws_applicationsPgResource, aws_applicationsUniques[0].attributes, $mutation, fieldArgs);
-function AwsApplicationInput_lastDeployedApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("last_deployed", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationInput_lastDeployedApply(obj, val, info) {
+  obj.set("last_deployed", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function AwsApplicationInput_awsIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("aws_id", bakedInputRuntime(schema, field.type, val));
+function AwsApplicationInput_awsIdApply(obj, val, info) {
+  obj.set("aws_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateGcpApplicationPayload_gcpApplicationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_gcp_applicationsPgResource, gcp_applicationsUniques[0].attributes, $mutation, fieldArgs);
-function GcpApplicationInput_gcpIdApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("gcp_id", bakedInputRuntime(schema, field.type, val));
+function GcpApplicationInput_gcpIdApply(obj, val, info) {
+  obj.set("gcp_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");

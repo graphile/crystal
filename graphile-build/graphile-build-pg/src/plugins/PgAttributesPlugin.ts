@@ -727,14 +727,10 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               } else {
                 apply = EXPORTABLE(
                   (attributeName, bakedInputRuntime) =>
-                    function plan(
-                      obj: Setter,
-                      val: unknown,
-                      { field, schema },
-                    ) {
+                    function plan(obj: Setter, val: unknown, info) {
                       obj.set(
                         attributeName,
-                        bakedInputRuntime(schema, field.type, val),
+                        bakedInputRuntime(info.schema, info.field.type, val),
                       );
                     },
                   [attributeName, bakedInputRuntime],

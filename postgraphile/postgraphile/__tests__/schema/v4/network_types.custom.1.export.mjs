@@ -593,29 +593,17 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
-function NetworkInput_idApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("id", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NetworkInput_inetApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("inet", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_inetApply(obj, val, info) {
+  obj.set("inet", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NetworkInput_cidrApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_cidrApply(obj, val, info) {
+  obj.set("cidr", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function NetworkInput_macaddrApply(obj, val, {
-  field,
-  schema
-}) {
-  obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+function NetworkInput_macaddrApply(obj, val, info) {
+  obj.set("macaddr", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
