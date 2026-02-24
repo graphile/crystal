@@ -40,15 +40,15 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
-function isScalarConstantArg(
-  arg: t.Node,
-): arg is
+type ScalarConstant =
   | t.BooleanLiteral
   | t.NullLiteral
   | t.StringLiteral
   | t.NumericLiteral
   | t.BigIntLiteral
-  | (t.Identifier & { name: "undefined" }) {
+  | (t.Identifier & { name: "undefined" });
+
+function isScalarConstant(arg: t.Node): arg is ScalarConstant {
   return (
     t.isBooleanLiteral(arg) ||
     t.isNullLiteral(arg) ||
@@ -57,6 +57,24 @@ function isScalarConstantArg(
     t.isBigIntLiteral(arg) ||
     (t.isIdentifier(arg) && arg.name === "undefined")
   );
+}
+
+function getScalarConstantValue(arg: ScalarConstant) {
+  switch (arg.type) {
+    case "NullLiteral": {
+      return null;
+    }
+    case "Identifier": {
+      assert.equal(arg.name, "undefined");
+      return undefined;
+    }
+    case "BigIntLiteral": {
+      return BigInt(arg.value);
+    }
+    default: {
+      return arg.value;
+    }
+  }
 }
 
 const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
@@ -80,6 +98,34 @@ type ParamAction = { argIdx: number; name: string } & (
   | { _: "rename"; to: string }
 );
 
+function resolveBinaryOperator(
+  operator: t.BinaryExpression["operator"],
+  leftVal: any,
+  rightVal: any,
+) {
+  switch (operator) {
+    case "===":
+      return t.booleanLiteral(leftVal === rightVal);
+    case "!==":
+      return t.booleanLiteral(leftVal !== rightVal);
+    case "==":
+      return t.booleanLiteral(leftVal == rightVal);
+    case "!=":
+      return t.booleanLiteral(leftVal != rightVal);
+    case ">":
+      return t.booleanLiteral(leftVal > rightVal);
+    case "<":
+      return t.booleanLiteral(leftVal < rightVal);
+    case ">=":
+      return t.booleanLiteral(leftVal >= rightVal);
+    case "<=":
+      return t.booleanLiteral(leftVal <= rightVal);
+    default: {
+      return undefined;
+    }
+  }
+}
+
 export const optimize = (inAst: t.File, runs = 1): t.File => {
   let ast = inAst;
   // Reset the full AST
@@ -87,17 +133,55 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
   traverse(ast, {
     LogicalExpression: {
-      enter(path) {
-        if (
-          (path.node.operator === "??" || path.node.operator === "||") &&
-          expressionIsAlwaysTruthy(path.node.left)
-        ) {
-          path.replaceWith(path.node.left);
+      exit(path) {
+        const { operator, left, right } = path.node;
+        switch (operator) {
+          case "??": {
+            if (expressionIsAlwaysTruthy(left)) {
+              path.replaceWith(left);
+            } else if (expressionIsNullOrUndefined(left)) {
+              path.replaceWith(right);
+            }
+            break;
+          }
+          case "||": {
+            if (expressionIsAlwaysTruthy(left)) {
+              path.replaceWith(left);
+            } else if (expressionIsAlwaysFalsy(left)) {
+              path.replaceWith(right);
+            }
+            break;
+          }
+          case "&&": {
+            if (expressionIsAlwaysFalsy(left)) {
+              path.replaceWith(left);
+            } else if (expressionIsAlwaysTruthy(left)) {
+              path.replaceWith(right);
+            }
+            break;
+          }
+        }
+      },
+    },
+    BinaryExpression: {
+      exit(path) {
+        const { left, right, operator } = path.node;
+        if (isScalarConstant(left) && isScalarConstant(right)) {
+          const leftVal = getScalarConstantValue(left);
+          const rightVal = getScalarConstantValue(right);
+          const replacement = resolveBinaryOperator(
+            operator,
+            leftVal,
+            rightVal,
+          );
+          if (replacement) {
+            path.replaceWith(replacement);
+          }
         }
       },
     },
     TemplateLiteral: {
-      enter(path) {
+      exit(path) {
         let changed = false;
         let quasis = path.node.quasis;
         let expressions = path.node.expressions;
@@ -146,7 +230,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     SpreadElement: {
-      enter(path) {
+      exit(path) {
         if (
           path.node.argument.type === "NullLiteral" &&
           path.parentPath.isObjectExpression()
@@ -156,7 +240,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     VariableDeclaration: {
-      enter(path) {
+      exit(path) {
         const node = path.node;
         if (node.declarations.length === 1) {
           const declaration = node.declarations[0];
@@ -467,7 +551,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             if (!allArgsAreEquivalent) {
               // Not relevant to us; skip to the next argIdx
               continue;
-            } else if (isScalarConstantArg(firstArg)) {
+            } else if (isScalarConstant(firstArg)) {
               // Includes identifier `undefined`
               const value = firstArg;
               actions.push({ _: "substitute", argIdx, name, value });
@@ -563,8 +647,12 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         return;
       }
 
-      // Don't strip a block if there's any variable declarations in it.
-      if (body.some(t.isVariableDeclaration)) {
+      // Don't strip a block if there's any variable declarations in it, unless
+      // the parent block only contains this block
+      if (
+        path.parentPath.node.body.length > 1 &&
+        body.some(t.isVariableDeclaration)
+      ) {
         return;
       }
 
@@ -698,6 +786,8 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
 
 function expressionIsAlwaysTruthy(test: t.Expression) {
   switch (test.type) {
+    case "NullLiteral":
+      return false;
     case "BooleanLiteral":
       return test.value;
     case "StringLiteral":
