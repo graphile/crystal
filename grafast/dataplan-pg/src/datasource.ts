@@ -1163,18 +1163,12 @@ export function makeRegistry<
   for (const [resourceName, rawConfig] of Object.entries(
     config.pgResources,
   ) as [keyof TResourceOptions, PgResourceOptions<any, any, any, any>][]) {
-    const resourceConfig = {
-      ...rawConfig,
-      executor: addExecutor(rawConfig.executor),
-      codec: addCodec(rawConfig.codec),
-      parameters: rawConfig.parameters
-        ? (rawConfig.parameters as readonly PgResourceParameter[]).map((p) => ({
-            ...p,
-            codec: addCodec(p.codec),
-          }))
-        : rawConfig.parameters,
-    };
-    const resource = new PgResource(registry, resourceConfig) as any;
+    addExecutor(rawConfig.executor);
+    addCodec(rawConfig.codec);
+    rawConfig.parameters?.forEach((p: PgResourceParameter) =>
+      addCodec(p.codec),
+    );
+    const resource = new PgResource(registry, rawConfig) as any;
 
     // This is the magic that breaks the circular reference: rather than
     // building PgResource via a factory we tell the system to just retrieve it
