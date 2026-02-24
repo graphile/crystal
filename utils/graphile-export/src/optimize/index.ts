@@ -445,7 +445,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             return;
           }
 
-          const indexActions: Array<ParamAction> = [];
+          const actions: Array<ParamAction> = [];
           const leastArgumentCount = Math.min(
             params.length,
             ...callPaths.map((callPath) => callPath.node.arguments.length),
@@ -458,19 +458,19 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             }
             const { name } = param;
 
-            const [firstCallPath, ...remainingCallPaths] = callPaths;
-            const firstArg = firstCallPath.node.arguments[argIdx];
+            const [firstPath, ...remainingCallPaths] = callPaths;
+            const firstArg = firstPath.node.arguments[argIdx];
             const allArgsAreEquivalent = remainingCallPaths.every((callPath) =>
               t.isNodesEquivalent(callPath.node.arguments[argIdx], firstArg),
             );
-            // If all the argIdx arguments aren't equivalent, skip to the next argIdx
+
             if (!allArgsAreEquivalent) {
-              // Irrelevant; skip to next index
+              // Not relevant to us; skip to the next argIdx
               continue;
             } else if (isScalarConstantArg(firstArg)) {
               // Includes identifier `undefined`
               const value = firstArg;
-              indexActions.push({ _: "substitute", argIdx, name, value });
+              actions.push({ _: "substitute", argIdx, name, value });
             } else if (t.isIdentifier(firstArg)) {
               const globalName = firstArg.name;
               assert.ok(
@@ -478,22 +478,19 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
                 "`undefined` should be handled by isScalarConstantArg",
               );
 
-              // If this isn't a global identifier, skip to next argument
-              const firstArgBinding = callPaths[0].scope.getBinding(globalName);
+              const firstArgBinding = firstPath.scope.getBinding(globalName);
               if (firstArgBinding?.scope !== exitPath.scope) {
+                // Not a global identifier, skip to next argument
                 continue;
-              }
-
-              if (param.name === globalName) {
-                // Parameter name matches globalName; simply eliminate
-                indexActions.push({ _: "eliminate", argIdx, name });
+              } else if (param.name === globalName) {
+                // Simply eliminate so we can reference globalName directly
+                actions.push({ _: "eliminate", argIdx, name });
               } else if (functionPath.scope.hasOwnBinding(globalName)) {
                 // Cannot safely rename inner references for this index, skip it
                 // TODO: handle renaming of conflicting variables to enable referencing global value.
               } else {
-                // Safe to eliminate, but will need to rename inner references
-                const to = firstArg.name;
-                indexActions.push({ _: "rename", argIdx, name, to });
+                // Rename inner references to match the globalName
+                actions.push({ _: "rename", argIdx, name, to: globalName });
               }
             } else {
               // Too complex for us currently
@@ -501,14 +498,15 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             }
           }
 
-          if (indexActions.length === 0) {
+          if (actions.length === 0) {
+            // Nothing to do.
             return;
           }
 
           let lastIdx = -1;
 
           // Perform rewriting of the function as necessary
-          for (const action of indexActions) {
+          for (const action of actions) {
             const { argIdx, name: paramName } = action;
 
             // Guaranteed by above code
@@ -546,8 +544,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           }
 
           // Finally eliminate the arguments
-          for (let k = indexActions.length - 1; k >= 0; k--) {
-            const { argIdx } = indexActions[k];
+          for (let k = actions.length - 1; k >= 0; k--) {
+            const { argIdx } = actions[k];
             functionPath.node.params.splice(argIdx, 1);
             for (const callPath of callPaths) {
               callPath.node.arguments.splice(argIdx, 1);
