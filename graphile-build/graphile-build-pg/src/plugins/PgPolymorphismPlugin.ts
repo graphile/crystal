@@ -1800,22 +1800,56 @@ const getIdentifiersFromSpecifier = EXPORTABLE(
   "getIdentifiersFromSpecifier",
 );
 
+const getIdentifiersFromSpecifier1 = EXPORTABLE(
+  () =>
+    (
+      handler: NodeIdHandler,
+      specifier: { [codecName: string]: any } | null,
+    ) => {
+      if (specifier == null) return null;
+      const value = specifier?.[handler.codec.name];
+      const match = value != null ? handler.match(value) : false;
+      if (match) {
+        return handler.getIdentifiers(value);
+      }
+      return null;
+    },
+  [],
+  "getIdentifiersFromSpecifier1",
+);
+
 function makeGetIdentifiers(
   handlers: ReadonlyArray<NodeIdHandler>,
   name: string,
 ) {
-  const decodeNodeId = EXPORTABLE(
-    (handlers, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime(handlers),
-    [handlers, makeDecodeNodeIdRuntime],
-    `decodeNodeId_${name}`,
-  );
-  return EXPORTABLE(
-    (decodeNodeId, getIdentifiersFromSpecifier, handlers) =>
-      (nodeId: string | null | undefined) =>
-        getIdentifiersFromSpecifier(handlers, decodeNodeId(nodeId)),
-    [decodeNodeId, getIdentifiersFromSpecifier, handlers],
-    `getIdentifiers_${name}`,
-  );
+  if (handlers.length === 1) {
+    const [handler] = handlers;
+    const decodeNodeId = EXPORTABLE(
+      (handler, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime([handler]),
+      [handler, makeDecodeNodeIdRuntime],
+      `decodeNodeId_${name}`,
+    );
+    return EXPORTABLE(
+      (decodeNodeId, getIdentifiersFromSpecifier1, handler) =>
+        (nodeId: string | null | undefined) =>
+          getIdentifiersFromSpecifier1(handler, decodeNodeId(nodeId)),
+      [decodeNodeId, getIdentifiersFromSpecifier1, handler],
+      `getIdentifiers_${name}`,
+    );
+  } else {
+    const decodeNodeId = EXPORTABLE(
+      (handlers, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime(handlers),
+      [handlers, makeDecodeNodeIdRuntime],
+      `decodeNodeId_${name}`,
+    );
+    return EXPORTABLE(
+      (decodeNodeId, getIdentifiersFromSpecifier, handlers) =>
+        (nodeId: string | null | undefined) =>
+          getIdentifiersFromSpecifier(handlers, decodeNodeId(nodeId)),
+      [decodeNodeId, getIdentifiersFromSpecifier, handlers],
+      `getIdentifiers_${name}`,
+    );
+  }
 }
 
 function makeGetRelationalSpec(
