@@ -11,6 +11,7 @@ import { sqlValueWithCodec } from "@dataplan/pg";
 import type { Setter } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
+import { exportNameHint } from "../utils.ts";
 import { version } from "../version.ts";
 
 declare global {
@@ -184,6 +185,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               const attributeCount = localAttributes.length;
               const localAttributeCodecs = localAttributes.map(
                 (name) => pgCodec.attributes[name].codec,
+              );
+              exportNameHint(
+                localAttributeCodecs,
+                `localAttributeCodecs_${pgCodec.name}_${relationName}`,
               );
               return extend(
                 memo,
