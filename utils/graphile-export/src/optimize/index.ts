@@ -664,25 +664,40 @@ export const optimize = (inAst: t.File): t.File => {
       exit(path) {
         const body = path.node.body;
 
-        // Only strip if it's a statement within another block statement or the
-        // program. We don't want to trim block wrappers around for/if/while/etc
-        if (
-          !path.parentPath.isBlockStatement() &&
-          !path.parentPath.isProgram()
-        ) {
-          return;
+        // If it only has two statements, the first being `const foo = ...` and the latter being `return foo` then rewrite to just `return ...`
+        if (body.length === 2) {
+          const [line1, line2] = body;
+          if (t.isReturnStatement(line2) && t.isIdentifier(line2.argument)) {
+            const identifierName = line2.argument.name;
+            if (
+              t.isVariableDeclaration(line1) &&
+              line1.declarations.length === 1
+            ) {
+              const { id, init } = line1.declarations[0];
+              if (t.isIdentifier(id) && id.name === identifierName) {
+                const ret = t.returnStatement(init);
+                if (path.parentPath.isBlock()) {
+                  path.replaceWith(ret);
+                  return;
+                } else {
+                  path.replaceWith(t.blockStatement([ret]));
+                  return;
+                }
+              }
+            }
+          }
         }
 
-        // Don't strip a block if there's any variable declarations in it, unless
-        // the parent block only contains this block
-        if (
-          path.parentPath.node.body.length > 1 &&
-          body.some(t.isVariableDeclaration)
-        ) {
-          return;
+        // Strip it if it's inside another block and it either doesn't declare
+        // any variables or is the only statement
+        if (path.parentPath.isBlockStatement() || path.parentPath.isProgram()) {
+          if (
+            path.parentPath.node.body.length === 1 ||
+            !body.some(t.isVariableDeclaration)
+          ) {
+            path.replaceWithMultiple(body);
+          }
         }
-
-        path.replaceWithMultiple(body);
       },
     },
     IfStatement: {
