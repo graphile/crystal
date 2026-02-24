@@ -43,7 +43,7 @@ export interface ExportOptions {
    * optimizations on the table. Setting it larger than 2 should generally
    * result in diminishing returns.
    *
-   * @default {2}
+   * @defaultValue `2`
    */
   optimizeLoops?: number;
 }
