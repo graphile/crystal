@@ -131,6 +131,9 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
   // Reset the full AST
   ast = parse(generate(ast).code, { sourceType: "module" });
 
+  // convert `plan: function plan() {...}` to `plan() { ... }`
+  // convert `fn(...["a", "b"])` to `fn("a", "b")`
+  // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
   traverse(ast, {
     LogicalExpression: {
       exit(path) {
@@ -262,7 +265,20 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     CallExpression: {
-      enter(path) {
+      exit(path) {
+        const argsPath = path.get("arguments");
+        if (argsPath.length === 1) {
+          const argPath = argsPath[0];
+          if (t.isSpreadElement(argPath.node)) {
+            const spreadPath = argPath as NodePath<t.SpreadElement>;
+            if (t.isArrayExpression(spreadPath.node.argument)) {
+              argPath.replaceWithMultiple(
+                spreadPath.node.argument.elements.filter(isNotNullish),
+              );
+            }
+          }
+        }
+
         const node = path.node;
 
         if (
@@ -638,72 +654,77 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         }
       },
     },
-    BlockStatement(path) {
-      const body = path.node.body;
+    BlockStatement: {
+      exit(path) {
+        const body = path.node.body;
 
-      // Only strip if it's a statement within another block statement or the
-      // program. We don't want to trim block wrappers around for/if/while/etc
-      if (!path.parentPath.isBlockStatement() && !path.parentPath.isProgram()) {
-        return;
-      }
-
-      // Don't strip a block if there's any variable declarations in it, unless
-      // the parent block only contains this block
-      if (
-        path.parentPath.node.body.length > 1 &&
-        body.some(t.isVariableDeclaration)
-      ) {
-        return;
-      }
-
-      path.replaceWithMultiple(body);
-    },
-  });
-
-  ast = parse(generate(ast).code, { sourceType: "module" });
-
-  // convert `plan: function plan() {...}` to `plan() { ... }`
-  // convert `fn(...["a", "b"])` to `fn("a", "b")`
-  // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
-  traverse(ast, {
-    IfStatement(path) {
-      const test = path.node.test;
-      if (expressionIsAlwaysFalsy(test)) {
-        if (path.node.alternate) {
-          path.replaceWith(path.node.alternate);
-        } else {
-          path.remove();
-        }
-      } else if (expressionIsAlwaysTruthy(test)) {
-        path.replaceWith(path.node.consequent);
-      }
-    },
-    ConditionalExpression(path) {
-      const test = path.node.test;
-      if (expressionIsAlwaysFalsy(test)) {
-        path.replaceWith(path.node.alternate);
-      } else if (expressionIsAlwaysTruthy(test)) {
-        path.replaceWith(path.node.consequent);
-      }
-    },
-    ObjectProperty(path) {
-      if (!t.isIdentifier(path.node.key)) {
-        return;
-      }
-      const func = path.node.value;
-      if (!t.isFunctionExpression(func) && !t.isArrowFunctionExpression(func)) {
-        return;
-      }
-      if (t.isArrowFunctionExpression(func)) {
-        // Check if it contains `this`; if so, do not rewrite
-        const hasThis = !!path
-          .get("value")
-          .find((path) => t.isThisExpression(path.node));
-        if (hasThis) {
+        // Only strip if it's a statement within another block statement or the
+        // program. We don't want to trim block wrappers around for/if/while/etc
+        if (
+          !path.parentPath.isBlockStatement() &&
+          !path.parentPath.isProgram()
+        ) {
           return;
         }
-      }
-      /*
+
+        // Don't strip a block if there's any variable declarations in it, unless
+        // the parent block only contains this block
+        if (
+          path.parentPath.node.body.length > 1 &&
+          body.some(t.isVariableDeclaration)
+        ) {
+          return;
+        }
+
+        path.replaceWithMultiple(body);
+      },
+    },
+    IfStatement: {
+      exit(path) {
+        const test = path.node.test;
+        if (expressionIsAlwaysFalsy(test)) {
+          if (path.node.alternate) {
+            path.replaceWith(path.node.alternate);
+          } else {
+            path.remove();
+          }
+        } else if (expressionIsAlwaysTruthy(test)) {
+          path.replaceWith(path.node.consequent);
+        }
+      },
+    },
+    ConditionalExpression: {
+      exit(path) {
+        const test = path.node.test;
+        if (expressionIsAlwaysFalsy(test)) {
+          path.replaceWith(path.node.alternate);
+        } else if (expressionIsAlwaysTruthy(test)) {
+          path.replaceWith(path.node.consequent);
+        }
+      },
+    },
+    ObjectProperty: {
+      exit(path) {
+        if (!t.isIdentifier(path.node.key)) {
+          return;
+        }
+        const func = path.node.value;
+        if (
+          !t.isFunctionExpression(func) &&
+          !t.isArrowFunctionExpression(func)
+        ) {
+          return;
+        }
+        if (t.isArrowFunctionExpression(func)) {
+          // Check if it contains `this`; if so, do not rewrite
+          const hasThis = !!path
+            .get("value")
+            .find((path) => t.isThisExpression(path.node));
+          if (hasThis) {
+            return;
+          }
+        }
+        /*
       if (!func.id) {
         return;
       }
@@ -711,34 +732,21 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         return;
       }
       */
-      const body = t.isBlock(func.body)
-        ? func.body
-        : t.blockStatement([t.returnStatement(func.body)]);
-      path.replaceWith(
-        t.objectMethod(
-          "method",
-          path.node.key,
-          func.params,
-          body,
-          false,
-          func.generator,
-          func.async,
-        ),
-      );
-    },
-    CallExpression(path) {
-      const argsPath = path.get("arguments");
-      if (argsPath.length === 1) {
-        const argPath = argsPath[0];
-        if (t.isSpreadElement(argPath.node)) {
-          const spreadPath = argPath as NodePath<t.SpreadElement>;
-          if (t.isArrayExpression(spreadPath.node.argument)) {
-            argPath.replaceWithMultiple(
-              spreadPath.node.argument.elements.filter(isNotNullish),
-            );
-          }
-        }
-      }
+        const body = t.isBlock(func.body)
+          ? func.body
+          : t.blockStatement([t.returnStatement(func.body)]);
+        path.replaceWith(
+          t.objectMethod(
+            "method",
+            path.node.key,
+            func.params,
+            body,
+            false,
+            func.generator,
+            func.async,
+          ),
+        );
+      },
     },
   });
 
