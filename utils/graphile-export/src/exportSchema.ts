@@ -1014,6 +1014,21 @@ function _convertToAST(
       return val;
     }
   };
+  const handleFreezeOrSeal = (expr: t.Expression) => {
+    if (Object.isFrozen(thing)) {
+      return t.callExpression(
+        t.memberExpression(t.identifier("Object"), t.identifier("freeze")),
+        [expr],
+      );
+    } else if (Object.isSealed(thing)) {
+      return t.callExpression(
+        t.memberExpression(t.identifier("Object"), t.identifier("seal")),
+        [expr],
+      );
+    } else {
+      return expr;
+    }
+  };
   if (depth > 100) {
     throw new Error(
       `_convertToAST: potentially infinite recursion at ${locationHint}. TODO: allow exporting recursive structures.`,
@@ -1026,11 +1041,13 @@ function _convertToAST(
       }`,
     );
   } else if (Array.isArray(thing)) {
-    return t.arrayExpression(
-      thing.map((entry, i) => {
-        const tKey = identifierOrLiteral(i);
-        return handleSubvalue(entry, tKey, i);
-      }),
+    return handleFreezeOrSeal(
+      t.arrayExpression(
+        thing.map((entry, i) => {
+          const tKey = identifierOrLiteral(i);
+          return handleSubvalue(entry, tKey, i);
+        }),
+      ),
     );
   } else if (typeof thing === "function") {
     return func(file, thing as AnyFunction, locationHint, nameHint);
@@ -1067,22 +1084,26 @@ function _convertToAST(
     if (prototype === null) {
       if (hasUnsafeKeys) {
         // Object.fromEntries([[k, v], [k, v], ...])
-        return t.callExpression(
-          t.memberExpression(
-            t.identifier("Object"),
-            t.identifier("fromEntries"),
-          ),
-          [
-            t.arrayExpression(
-              propertyPairs.map(([key, val]) => t.arrayExpression([key, val])),
+        return handleFreezeOrSeal(
+          t.callExpression(
+            t.memberExpression(
+              t.identifier("Object"),
+              t.identifier("fromEntries"),
             ),
-          ],
+            [
+              t.arrayExpression(
+                propertyPairs.map(([key, val]) =>
+                  t.arrayExpression([key, val]),
+                ),
+              ),
+            ],
+          ),
         );
       } else {
         const obj = objectNullPrototype(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
         );
-        return obj;
+        return handleFreezeOrSeal(obj);
       }
     } else {
       if (hasUnsafeKeys) {
@@ -1093,7 +1114,7 @@ function _convertToAST(
         const obj = t.objectExpression(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
         );
-        return obj;
+        return handleFreezeOrSeal(obj);
       }
     }
   } else {
