@@ -675,13 +675,17 @@ export const optimize = (inAst: t.File): t.File => {
             ) {
               const { id, init } = line1.declarations[0];
               if (t.isIdentifier(id) && id.name === identifierName) {
-                const ret = t.returnStatement(init);
-                if (path.parentPath.isBlock()) {
-                  path.replaceWith(ret);
-                  return;
-                } else {
-                  path.replaceWith(t.blockStatement([ret]));
-                  return;
+                // One last check: is this same variable referenced inside the function?
+                const binding = path.scope.bindings[identifierName];
+                if (binding == null || binding.referencePaths.length === 0) {
+                  const ret = t.returnStatement(init);
+                  if (path.parentPath.isBlock()) {
+                    path.replaceWith(ret);
+                    return;
+                  } else {
+                    path.replaceWith(t.blockStatement([ret]));
+                    return;
+                  }
                 }
               }
             }
