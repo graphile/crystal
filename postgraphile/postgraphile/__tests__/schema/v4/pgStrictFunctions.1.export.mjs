@@ -7066,7 +7066,7 @@ const resource_postPgResource = registry.pgResources["post"];
 const resource_personPgResource = registry.pgResources["person"];
 const resource_listsPgResource = registry.pgResources["lists"];
 const resource_typesPgResource = registry.pgResources["types"];
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_person_computed_out = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_func_outPgResource = registry.pgResources["func_out"];

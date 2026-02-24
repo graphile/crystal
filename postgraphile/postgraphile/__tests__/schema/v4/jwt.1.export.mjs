@@ -1795,7 +1795,7 @@ const argDetailsSimple_compound_type_array_query = [{
 }];
 const makeArgs_compound_type_array_query = (args, path = []) => argDetailsSimple_compound_type_array_query.map(details => makeArg(path, args, details));
 const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_type_function_connection = () => EMPTY_ARRAY;
 const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
 const type_function_connection_getSelectPlanFromParentAndArgs = ($root, args, _info) => {

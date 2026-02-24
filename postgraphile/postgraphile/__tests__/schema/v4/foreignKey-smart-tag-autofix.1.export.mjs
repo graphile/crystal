@@ -4295,7 +4295,7 @@ const resource_null_test_recordPgResource = registry.pgResources["null_test_reco
 const resource_left_armPgResource = registry.pgResources["left_arm"];
 const resource_issue756PgResource = registry.pgResources["issue756"];
 const resource_personPgResource = registry.pgResources["person"];
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_person_computed_out = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_func_outPgResource = registry.pgResources["func_out"];

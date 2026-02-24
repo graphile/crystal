@@ -1094,7 +1094,7 @@ const resource_postPgResource = registry.pgResources["post"];
 const resource_tv_episodesPgResource = registry.pgResources["tv_episodes"];
 const resource_tv_showsPgResource = registry.pgResources["tv_shows"];
 const resource_personPgResource = registry.pgResources["person"];
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_renamed_function = () => EMPTY_ARRAY;
 const resource_renamed_functionPgResource = registry.pgResources["renamed_function"];
 const argDetailsSimple_returnPostsMatching = [{

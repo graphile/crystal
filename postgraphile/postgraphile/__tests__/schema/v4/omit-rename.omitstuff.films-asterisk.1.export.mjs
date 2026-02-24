@@ -1112,7 +1112,7 @@ const resource_studiosPgResource = registry.pgResources["studios"];
 const resource_postPgResource = registry.pgResources["post"];
 const resource_tv_episodesPgResource = registry.pgResources["tv_episodes"];
 const resource_personPgResource = registry.pgResources["person"];
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_person_full_name = () => EMPTY_ARRAY;
 const resource_renamed_functionPgResource = registry.pgResources["renamed_function"];
 const makeTableNodeIdHandler = ({

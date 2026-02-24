@@ -2,7 +2,7 @@ import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgUnion
 import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, lambda, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_first_party_vulnerabilities_cvss_score_int = () => EMPTY_ARRAY;
 const executor = new PgExecutor({
   name: "main",

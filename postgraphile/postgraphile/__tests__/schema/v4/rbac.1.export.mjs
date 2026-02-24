@@ -8021,7 +8021,7 @@ const resource_person_secretPgResource = registry.pgResources["person_secret"];
 const resource_left_armPgResource = registry.pgResources["left_arm"];
 const resource_postPgResource = registry.pgResources["post"];
 const resource_personPgResource = registry.pgResources["person"];
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_current_user_id = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
