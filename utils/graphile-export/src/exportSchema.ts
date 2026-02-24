@@ -1353,7 +1353,7 @@ function factoryAst<TTuple extends any[]>(
         // neither match we must abort.
         if (
           existing.rawArgs[i] !== rawArgs[i] &&
-          existing.depArgs[i] !== depArgs[i]
+          !t.isNodesEquivalent(existing.depArgs[i], depArgs[i])
         ) {
           matches = false;
           break;
@@ -1372,8 +1372,9 @@ function factoryAst<TTuple extends any[]>(
 
 function factoryASTInner(
   funcAST: t.FunctionExpression | t.ArrowFunctionExpression,
-  depArgs: t.Expression[],
+  inDepArgs: t.Expression[],
 ) {
+  const depArgs = [...inDepArgs];
   // DEBT: we should be able to remove this now that we have the
   // post-processing via babel, however currently the result of doing so is
   // messy.
