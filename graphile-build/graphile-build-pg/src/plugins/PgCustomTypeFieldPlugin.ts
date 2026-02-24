@@ -97,6 +97,7 @@ declare global {
       pgGetArgDetailsFromParameters(
         resource: PgResource<any, any, any, any, any>,
         parameters?: readonly PgResourceParameter[],
+        offset?: number,
       ): {
         makeFieldArgs(): {
           [graphqlArgName: string]: {
@@ -208,6 +209,22 @@ declare global {
       pgFunctionsPreferNodeId?: boolean;
     }
   }
+}
+
+const memoSlice1Cache = new WeakMap<ReadonlyArray<any>, ReadonlyArray<any>>();
+/**
+ * Memoized slice, to help export be more efficient
+ */
+function memoSlice<T>(arg: ReadonlyArray<T>, offset: number): ReadonlyArray<T> {
+  if (offset === 0) return arg;
+  if (offset !== 1) {
+    throw new Error(`offset must be 0 or 1`);
+  }
+  const existing = memoSlice1Cache.get(arg);
+  if (existing) return existing;
+  const sliced = EXPORTABLE((arg) => arg.slice(1), [arg]);
+  memoSlice1Cache.set(arg, sliced);
+  return sliced;
 }
 
 function shouldUseCustomConnection(
@@ -528,8 +545,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           } = build;
           build.pgGetArgDetailsFromParameters = (
             resource,
-            parameters = resource.parameters,
+            inParameters = resource.parameters,
+            offset = 0,
           ) => {
+            const parameters = memoSlice(inParameters, offset);
             const finalBuild = build as GraphileBuild.Build;
             const argDetails = parameters.map((param, index) => {
               const argName = finalBuild.inflection.argument({
@@ -1133,15 +1152,12 @@ function modFields(
     (memo, resource) =>
       build.recoverable(memo, () => {
         // "Computed attributes" skip a parameter
-        const remainingParameters = (
-          isRootMutation || isRootQuery
-            ? resource.parameters
-            : resource.parameters.slice(1)
-        ) as PgResourceParameter[];
+        const offset = isRootMutation || isRootQuery ? 0 : 1;
 
         const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
           resource,
-          remainingParameters,
+          resource.parameters,
+          offset,
         );
 
         const getSelectPlanFromParentAndArgs: FieldPlanResolver<
