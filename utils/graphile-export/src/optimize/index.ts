@@ -145,18 +145,15 @@ function isBooleanContext(path: NodePath<t.LogicalExpression>): boolean {
   return false;
 }
 
-function getRootScope(path: NodePath) {
-  let scope = path.scope;
-  while (scope.parent) {
-    scope = scope.parent;
-  }
-  return scope;
-}
-
+/**
+ * If a local top-level function is only ever called directly, and all
+ * calls pass the same arguments in some positions, inline those values into
+ * the function body and remove the redundant parameters/arguments.
+ */
 function eliminateRedundantArguments(
+  rootScope: Scope,
   path: NodePath<t.VariableDeclarator> | NodePath<t.FunctionDeclaration>,
 ) {
-  const rootScope = getRootScope(path);
   let bindingName: string | null = null;
   let functionPath:
     | NodePath<t.FunctionDeclaration>
@@ -795,21 +792,6 @@ export const optimize = (inAst: t.File): t.File => {
       },
     },
 
-    // If a local top-level function is only ever called directly, and all
-    // calls pass the same arguments in some positions, inline those values
-    // into the function body and remove the redundant
-    // parameters/arguments.
-    VariableDeclarator: {
-      exit(path) {
-        eliminateRedundantArguments(path);
-      },
-    },
-    FunctionDeclaration: {
-      exit(path) {
-        eliminateRedundantArguments(path);
-      },
-    },
-
     Program: {
       exit(exitPath) {
         // Make sure our scope information is up to date!
@@ -822,9 +804,11 @@ export const optimize = (inAst: t.File): t.File => {
         for (const statementPath of exitPath.get("body")) {
           if (statementPath.isVariableDeclaration()) {
             for (const declaratorPath of statementPath.get("declarations")) {
+              eliminateRedundantArguments(rootScope, declaratorPath);
               inlineIfReferencedOnceOnly(rootScope, declaratorPath);
             }
           } else if (statementPath.isFunctionDeclaration()) {
+            eliminateRedundantArguments(rootScope, statementPath);
             inlineIfReferencedOnceOnly(rootScope, statementPath);
           }
         }
