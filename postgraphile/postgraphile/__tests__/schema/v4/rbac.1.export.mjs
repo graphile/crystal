@@ -4206,8 +4206,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4231,8 +4230,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: true,
@@ -4255,8 +4253,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4281,8 +4278,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: true,
@@ -4306,8 +4302,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "in_arg",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: TYPES.void,
       hasImplicitOrder: false,
@@ -4330,8 +4325,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "in_arg",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: TYPES.void,
       hasImplicitOrder: false,
@@ -4358,8 +4352,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        codec: TYPES.json,
-        required: true
+        codec: TYPES.json
       }],
       codec: TYPES.json,
       hasImplicitOrder: false,
@@ -4382,8 +4375,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        codec: TYPES.json,
-        required: true
+        codec: TYPES.json
       }],
       codec: TYPES.json,
       hasImplicitOrder: false,
@@ -4407,8 +4399,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        codec: TYPES.jsonb,
-        required: true
+        codec: TYPES.jsonb
       }],
       codec: TYPES.jsonb,
       hasImplicitOrder: false,
@@ -4431,8 +4422,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "json",
-        codec: TYPES.jsonb,
-        required: true
+        codec: TYPES.jsonb
       }],
       codec: TYPES.jsonb,
       hasImplicitOrder: false,
@@ -4457,7 +4447,6 @@ const registry = makeRegistry({
       parameters: [{
         name: "_the_json",
         codec: TYPES.jsonb,
-        required: true,
         notNull: true
       }],
       codec: TYPES.jsonb,
@@ -4483,6 +4472,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "_the_json",
         codec: TYPES.jsonb,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.jsonb,
@@ -4508,12 +4498,10 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -4543,12 +4531,10 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -4574,11 +4560,11 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -4605,11 +4591,11 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -4634,12 +4620,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4664,12 +4648,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4693,11 +4675,11 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.int
+        codec: TYPES.int,
+        optional: true
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4722,11 +4704,11 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.int
+        codec: TYPES.int,
+        optional: true
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4750,11 +4732,11 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.int
+        codec: TYPES.int,
+        optional: true
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4778,12 +4760,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4807,12 +4787,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4837,12 +4815,10 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -4868,12 +4844,10 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -4898,12 +4872,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "ino",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -4986,12 +4958,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "ino",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -5102,15 +5072,16 @@ const registry = makeRegistry({
       parameters: [{
         name: "",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -5135,15 +5106,16 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -5168,15 +5140,16 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -5201,15 +5174,16 @@ const registry = makeRegistry({
       parameters: [{
         name: "",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -5234,15 +5208,16 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -5286,16 +5261,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "x",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "y",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "z",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: true,
@@ -5318,16 +5290,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "x",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "y",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "z",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: true,
@@ -5370,8 +5339,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
       hasImplicitOrder: true,
@@ -5394,16 +5362,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "b",
-        codec: LIST_TYPES.text,
-        required: true
+        codec: LIST_TYPES.text
       }, {
         name: "d",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }, {
         name: "e",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: LIST_TYPES.uuid,
       hasImplicitOrder: false,
@@ -5427,14 +5392,15 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "a",
-        codec: TYPES.int
+        codec: TYPES.int,
+        optional: true
       }, {
         name: "b",
-        codec: TYPES.int
+        codec: TYPES.int,
+        optional: true
       }],
       codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
       hasImplicitOrder: true,
@@ -5456,8 +5422,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "g",
-        codec: guidCodec,
-        required: true
+        codec: guidCodec
       }],
       codec: guidCodec,
       hasImplicitOrder: false,
@@ -5748,8 +5713,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "edge_case",
-        codec: edgeCaseCodec,
-        required: true
+        codec: edgeCaseCodec
       }],
       codec: TYPES.text,
       hasImplicitOrder: false,
@@ -5910,32 +5874,26 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.bigint,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.boolean,
-        required: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.varchar,
-        required: true,
         notNull: true
       }, {
         name: "d",
         codec: LIST_TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "e",
         codec: TYPES.json,
-        required: true,
         notNull: true
       }, {
         name: "f",
         codec: floatrangeCodec,
-        required: true,
         notNull: true
       }],
       codec: TYPES.boolean,
@@ -5961,32 +5919,26 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         codec: TYPES.bigint,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.boolean,
-        required: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.varchar,
-        required: true,
         notNull: true
       }, {
         name: "d",
         codec: LIST_TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "e",
         codec: TYPES.json,
-        required: true,
         notNull: true
       }, {
         name: "f",
         codec: floatrangeCodec,
-        required: true,
         notNull: true
       }],
       codec: TYPES.boolean,
@@ -6028,16 +5980,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.numeric,
-        required: true
+        codec: TYPES.numeric
       }, {
         name: "c",
-        codec: TYPES.bigint,
-        required: true
+        codec: TYPES.bigint
       }],
       returnsSetof: false,
       extensions: {
@@ -6059,16 +6008,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.numeric,
-        required: true
+        codec: TYPES.numeric
       }, {
         name: "c",
-        codec: TYPES.bigint,
-        required: true
+        codec: TYPES.bigint
       }],
       returnsSetof: false,
       extensions: {
@@ -6128,7 +6074,6 @@ const registry = makeRegistry({
       parameters: [{
         name: "left_arm",
         codec: leftArmCodec,
-        required: true,
         extensions: {
           variant: "base"
         }
@@ -6176,16 +6121,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.numeric,
-        required: true
+        codec: TYPES.numeric
       }, {
         name: "c",
-        codec: TYPES.bigint,
-        required: true
+        codec: TYPES.bigint
       }],
       returnsSetof: false,
       extensions: {
@@ -6207,8 +6149,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }],
       codec: LIST_TYPES.interval,
       hasImplicitOrder: false,
@@ -6231,8 +6172,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }],
       codec: TYPES.interval,
       hasImplicitOrder: true,
@@ -6254,8 +6194,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }],
       codec: LIST_TYPES.text,
       hasImplicitOrder: false,
@@ -6278,8 +6217,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "compound_type",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -6303,11 +6241,11 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         codec: postCodec,
-        required: true,
         notNull: true
       }, {
         name: "i",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -6337,12 +6275,10 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         codec: postCodec,
-        required: true,
         notNull: true
       }, {
         name: "i",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -6371,14 +6307,15 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }, {
         name: "length",
-        codec: TYPES.int
+        codec: TYPES.int,
+        optional: true
       }, {
         name: "omission",
-        codec: TYPES.text
+        codec: TYPES.text,
+        optional: true
       }],
       codec: TYPES.text,
       hasImplicitOrder: false,
@@ -6401,16 +6338,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }, {
         name: "length",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "omission",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: TYPES.text,
       hasImplicitOrder: false,
@@ -6434,15 +6368,16 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         codec: postCodec,
-        required: true,
         notNull: true
       }, {
         name: "length",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "omission",
         codec: TYPES.text,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.text,
@@ -6466,8 +6401,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i1",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
       hasImplicitOrder: false,
@@ -6490,8 +6424,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "i1",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
       hasImplicitOrder: false,
@@ -6515,16 +6448,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "left_arm_id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "post_id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "txt",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
       hasImplicitOrder: false,
@@ -6565,8 +6495,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6587,8 +6516,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6608,8 +6536,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: true,
       extensions: {
@@ -6631,8 +6558,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "records",
-        codec: compoundTypeArrayCodec,
-        required: true
+        codec: compoundTypeArrayCodec
       }],
       returnsSetof: true,
       extensions: {
@@ -6654,8 +6580,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -6676,8 +6601,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -6697,12 +6621,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }, {
         name: "suffix",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       returnsSetof: false,
       extensions: {
@@ -6726,8 +6648,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6749,8 +6670,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6771,8 +6691,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6794,8 +6713,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6816,12 +6734,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "post",
-        codec: postCodec,
-        required: true
+        codec: postCodec
       }, {
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -6842,8 +6758,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "posts",
-        codec: postArrayCodec,
-        required: true
+        codec: postArrayCodec
       }],
       returnsSetof: true,
       extensions: {
@@ -6866,8 +6781,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       codec: TYPES.text,
       hasImplicitOrder: false,
@@ -6897,8 +6811,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       codec: TYPES.text,
       hasImplicitOrder: false,
@@ -6926,8 +6839,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       codec: registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
       hasImplicitOrder: false,
@@ -6950,12 +6862,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }, {
         name: "ino",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: TYPES.text,
       hasImplicitOrder: false,
@@ -6979,12 +6889,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }, {
         name: "ino",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
       hasImplicitOrder: false,
@@ -7007,12 +6915,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }, {
         name: "email",
-        codec: emailCodec,
-        required: true
+        codec: emailCodec
       }],
       codec: TYPES.boolean,
       hasImplicitOrder: false,
@@ -7038,8 +6944,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       codec: registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
       hasImplicitOrder: false,
@@ -7063,20 +6968,20 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         codec: personCodec,
-        required: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -7101,20 +7006,20 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         codec: personCodec,
-        required: true,
         notNull: true
       }, {
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -7139,20 +7044,20 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         codec: personCodec,
-        required: true,
         notNull: true
       }, {
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "c",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -7177,20 +7082,20 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         codec: personCodec,
-        required: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "b",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -7215,20 +7120,20 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         codec: personCodec,
-        required: true,
         notNull: true
       }, {
         name: "a",
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }, {
         name: "",
         codec: TYPES.int,
+        optional: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -7252,12 +7157,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
       hasImplicitOrder: false,
@@ -7280,12 +7183,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
       hasImplicitOrder: true,
@@ -7307,12 +7208,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
       hasImplicitOrder: false,
@@ -7336,12 +7235,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
       hasImplicitOrder: true,
@@ -7364,16 +7261,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }, {
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
       hasImplicitOrder: false,
@@ -7395,8 +7289,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -7571,8 +7464,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -7593,8 +7485,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "person",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       returnsSetof: true,
       extensions: {
@@ -7679,8 +7570,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -7700,8 +7590,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -7722,8 +7611,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       returnsSetof: true,
       extensions: {
@@ -7744,12 +7632,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }, {
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -7806,8 +7692,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        codec: personCodec,
-        required: true
+        codec: personCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -8292,8 +8177,7 @@ const pgFieldSource_person_first_namePgResource = registry.pgResources["person_f
 const argDetailsSimple_left_arm_identity = [{
   graphqlArgName: "leftArm",
   pgCodec: leftArmCodec,
-  postgresArgName: "left_arm",
-  required: true
+  postgresArgName: "left_arm"
 }];
 function makeArg(path, args, details) {
   const {

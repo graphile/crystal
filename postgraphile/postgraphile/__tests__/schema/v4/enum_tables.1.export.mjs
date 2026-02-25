@@ -795,8 +795,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "t",
-        codec: referencingTableCodec,
-        required: true
+        codec: referencingTableCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -1072,8 +1071,7 @@ const LetterDescriptionsOrderBy_ID_DESCApply = queryBuilder => {
 const argDetailsSimple_referencing_table_mutation = [{
   graphqlArgName: "t",
   pgCodec: referencingTableCodec,
-  postgresArgName: "t",
-  required: true
+  postgresArgName: "t"
 }];
 function makeArg(path, args, details) {
   const {

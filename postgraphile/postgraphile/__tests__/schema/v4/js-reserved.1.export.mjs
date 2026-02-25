@@ -937,20 +937,16 @@ const registryConfig = {
     },
     parameters: [{
       name: "yield",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "__proto__",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "constructor",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "hasOwnProperty",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }],
     codec: TYPES.int,
     hasImplicitOrder: false,
@@ -971,20 +967,16 @@ const registryConfig = {
     },
     parameters: [{
       name: "yield",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "__proto__",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "constructor",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "hasOwnProperty",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }],
     codec: TYPES.int,
     hasImplicitOrder: false,
@@ -1005,20 +997,16 @@ const registryConfig = {
     },
     parameters: [{
       name: "yield",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "__proto__",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "constructor",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "hasOwnProperty",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }],
     codec: TYPES.int,
     hasImplicitOrder: false,
@@ -1039,24 +1027,19 @@ const registryConfig = {
     },
     parameters: [{
       name: "n",
-      codec: nullCodec,
-      required: true
+      codec: nullCodec
     }, {
       name: "yield",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "__proto__",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "constructor",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }, {
       name: "valueOf",
-      codec: TYPES.int,
-      required: true
+      codec: TYPES.int
     }],
     codec: TYPES.int,
     hasImplicitOrder: false,
@@ -1610,23 +1593,19 @@ const detailsByAttributeName4 = Object.fromEntries([["__proto__", {
 const argDetailsSimple_await = [{
   graphqlArgName: "yield",
   pgCodec: TYPES.int,
-  postgresArgName: "yield",
-  required: true
+  postgresArgName: "yield"
 }, {
   graphqlArgName: "_proto__",
   pgCodec: TYPES.int,
-  postgresArgName: "__proto__",
-  required: true
+  postgresArgName: "__proto__"
 }, {
   graphqlArgName: "constructor",
   pgCodec: TYPES.int,
-  postgresArgName: "constructor",
-  required: true
+  postgresArgName: "constructor"
 }, {
   graphqlArgName: "hasOwnProperty",
   pgCodec: TYPES.int,
-  postgresArgName: "hasOwnProperty",
-  required: true
+  postgresArgName: "hasOwnProperty"
 }];
 function makeArg(path, args, details) {
   const {
@@ -1650,46 +1629,38 @@ const resource_awaitPgResource = registry.pgResources["await"];
 const argDetailsSimple_case = [{
   graphqlArgName: "yield",
   pgCodec: TYPES.int,
-  postgresArgName: "yield",
-  required: true
+  postgresArgName: "yield"
 }, {
   graphqlArgName: "_proto__",
   pgCodec: TYPES.int,
-  postgresArgName: "__proto__",
-  required: true
+  postgresArgName: "__proto__"
 }, {
   graphqlArgName: "constructor",
   pgCodec: TYPES.int,
-  postgresArgName: "constructor",
-  required: true
+  postgresArgName: "constructor"
 }, {
   graphqlArgName: "hasOwnProperty",
   pgCodec: TYPES.int,
-  postgresArgName: "hasOwnProperty",
-  required: true
+  postgresArgName: "hasOwnProperty"
 }];
 const makeArgs_case = (args, path = []) => argDetailsSimple_case.map(details => makeArg(path, args, details));
 const resource_casePgResource = registry.pgResources["case"];
 const argDetailsSimple_valueOf = [{
   graphqlArgName: "yield",
   pgCodec: TYPES.int,
-  postgresArgName: "yield",
-  required: true
+  postgresArgName: "yield"
 }, {
   graphqlArgName: "_proto__",
   pgCodec: TYPES.int,
-  postgresArgName: "__proto__",
-  required: true
+  postgresArgName: "__proto__"
 }, {
   graphqlArgName: "constructor",
   pgCodec: TYPES.int,
-  postgresArgName: "constructor",
-  required: true
+  postgresArgName: "constructor"
 }, {
   graphqlArgName: "hasOwnProperty",
   pgCodec: TYPES.int,
-  postgresArgName: "hasOwnProperty",
-  required: true
+  postgresArgName: "hasOwnProperty"
 }];
 const makeArgs_valueOf = (args, path = []) => argDetailsSimple_valueOf.map(details => makeArg(path, args, details));
 const resource_valueOfPgResource = registry.pgResources["valueOf"];
@@ -1767,23 +1738,19 @@ const nodeFetcher_Reserved = $nodeId => {
 const argDetailsSimple_null_yield = [{
   graphqlArgName: "yield",
   pgCodec: TYPES.int,
-  postgresArgName: "yield",
-  required: true
+  postgresArgName: "yield"
 }, {
   graphqlArgName: "_proto__",
   pgCodec: TYPES.int,
-  postgresArgName: "__proto__",
-  required: true
+  postgresArgName: "__proto__"
 }, {
   graphqlArgName: "constructor",
   pgCodec: TYPES.int,
-  postgresArgName: "constructor",
-  required: true
+  postgresArgName: "constructor"
 }, {
   graphqlArgName: "valueOf",
   pgCodec: TYPES.int,
-  postgresArgName: "valueOf",
-  required: true
+  postgresArgName: "valueOf"
 }];
 const makeArgs_null_yield = (args, path = []) => argDetailsSimple_null_yield.map(details => makeArg(path, args, details));
 const resource_null_yieldPgResource = registry.pgResources["null_yield"];
