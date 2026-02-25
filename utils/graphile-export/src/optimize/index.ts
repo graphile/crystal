@@ -144,6 +144,194 @@ function isBooleanContext(path: NodePath<t.LogicalExpression>): boolean {
   return false;
 }
 
+function getRootScope(path: NodePath) {
+  let scope = path.scope;
+  while (scope.parent) {
+    scope = scope.parent;
+  }
+  return scope;
+}
+
+function eliminateRedundantArguments(
+  path: NodePath<t.VariableDeclarator> | NodePath<t.FunctionDeclaration>,
+) {
+  const rootScope = getRootScope(path);
+  let bindingName: string | null = null;
+  let functionPath:
+    | NodePath<t.FunctionDeclaration>
+    | NodePath<t.FunctionExpression | t.ArrowFunctionExpression>
+    | null = null;
+
+  if (path.isFunctionDeclaration()) {
+    if (!path.node.id) {
+      return;
+    }
+    bindingName = path.node.id.name;
+    functionPath = path;
+  } else {
+    if (!t.isIdentifier(path.node.id)) {
+      return;
+    }
+    const init = path.get("init");
+    if (
+      !init ||
+      (!init.isFunctionExpression() && !init.isArrowFunctionExpression())
+    ) {
+      return;
+    }
+    bindingName = path.node.id.name;
+    functionPath = init as NodePath<
+      t.FunctionExpression | t.ArrowFunctionExpression
+    >;
+  }
+
+  const scope = path.isFunctionDeclaration() ? path.scope.parent : path.scope;
+  if (scope !== rootScope) {
+    return;
+  }
+  if (!bindingName) {
+    return;
+  }
+
+  const statementPath = path.getStatementParent();
+  if (
+    !statementPath ||
+    t.isExportNamedDeclaration(statementPath.node) ||
+    t.isExportDefaultDeclaration(statementPath.node)
+  ) {
+    return;
+  }
+
+  const binding = scope.bindings[bindingName];
+  if (!binding || binding.referencePaths.length === 0) {
+    return;
+  }
+
+  const params = functionPath.node.params;
+  if (params.length === 0) {
+    return;
+  }
+
+  const callPaths: NodePath<t.CallExpression>[] = [];
+  for (const refPath of binding.referencePaths) {
+    const parentPath = refPath.parentPath;
+    if (
+      !parentPath?.isCallExpression() ||
+      parentPath.node.callee !== refPath.node
+    ) {
+      return;
+    }
+    callPaths.push(parentPath);
+  }
+  if (callPaths.length === 0) {
+    return;
+  }
+
+  const actions: Array<ParamAction> = [];
+  const leastArgumentCount = Math.min(
+    params.length,
+    ...callPaths.map((callPath) => callPath.node.arguments.length),
+  );
+  for (let argIdx = 0; argIdx < leastArgumentCount; argIdx++) {
+    const param = functionPath.node.params[argIdx];
+    if (!t.isIdentifier(param)) {
+      // We don't support destructuring/rest/etc currently
+      continue;
+    }
+    const { name } = param;
+
+    const [firstPath, ...remainingCallPaths] = callPaths;
+    const firstArg = firstPath.node.arguments[argIdx];
+    const allArgsAreEquivalent = remainingCallPaths.every((callPath) =>
+      t.isNodesEquivalent(callPath.node.arguments[argIdx], firstArg),
+    );
+
+    if (!allArgsAreEquivalent) {
+      // Not relevant to us; skip to the next argIdx
+      continue;
+    } else if (isScalarConstant(firstArg)) {
+      // Includes identifier `undefined`
+      const value = firstArg;
+      actions.push({ _: "substitute", argIdx, name, value });
+    } else if (t.isIdentifier(firstArg)) {
+      const globalName = firstArg.name;
+      assert.ok(
+        globalName !== "undefined",
+        "`undefined` should be handled by isScalarConstantArg",
+      );
+
+      const firstArgBinding = firstPath.scope.getBinding(globalName);
+      if (firstArgBinding?.scope !== rootScope) {
+        // Not a global identifier, skip to next argument
+        continue;
+      } else if (param.name === globalName) {
+        // Simply eliminate so we can reference globalName directly
+        actions.push({ _: "eliminate", argIdx, name });
+      } else if (functionPath.scope.hasOwnBinding(globalName)) {
+        // Cannot safely rename inner references for this index, skip it
+        // TODO: handle renaming of conflicting variables to enable referencing global value.
+      } else {
+        // Rename inner references to match the globalName
+        actions.push({ _: "rename", argIdx, name, to: globalName });
+      }
+    } else {
+      // Too complex for us currently
+      continue;
+    }
+  }
+
+  if (actions.length === 0) {
+    // Nothing to do.
+    return;
+  }
+
+  let lastIdx = -1;
+
+  // Perform rewriting of the function as necessary
+  for (const action of actions) {
+    const { argIdx, name: paramName } = action;
+
+    // Guaranteed by above code
+    assert.ok(argIdx > lastIdx, "arg indexes must increase");
+    lastIdx = argIdx;
+
+    switch (action._) {
+      case "rename": {
+        functionPath.scope.rename(paramName, action.to);
+        break;
+      }
+      case "substitute": {
+        const binding = functionPath.scope.bindings[paramName];
+        if (binding?.referencePaths.length > 0) {
+          const referencePaths = [...binding.referencePaths];
+          for (const referencePath of referencePaths) {
+            referencePath.replaceWith(t.cloneNode(action.value));
+          }
+          functionPath.scope.removeBinding(paramName);
+        }
+        break;
+      }
+      case "eliminate": {
+        // Eliminate only, no further action necessary
+        break;
+      }
+      default: {
+        const never: never = action;
+        throw new Error(`Not understood: ${inspect(never)}`);
+      }
+    }
+  }
+
+  // Finally eliminate the arguments
+  for (let k = actions.length - 1; k >= 0; k--) {
+    const { argIdx } = actions[k];
+    functionPath.node.params.splice(argIdx, 1);
+    for (const callPath of callPaths) {
+      callPath.node.arguments.splice(argIdx, 1);
+    }
+  }
+}
+
 export const optimize = (inAst: t.File): t.File => {
   // Reset the full AST, since it will have been mangled and we want the latest
   // bindings to be synchronized.
@@ -529,19 +717,22 @@ export const optimize = (inAst: t.File): t.File => {
         }
       },
     },
+
+    // If a local top-level function is only ever called directly, and all
+    // calls pass the same arguments in some positions, inline those values
+    // into the function body and remove the redundant
+    // parameters/arguments.
+    VariableDeclarator: {
+      exit: eliminateRedundantArguments,
+    },
+    FunctionDeclaration: {
+      exit: eliminateRedundantArguments,
+    },
+
     Program: {
       exit(exitPath) {
         // Make sure our scope information is up to date!
         exitPath.scope.crawl();
-
-        // If a local top-level function is only ever called directly, and all
-        // calls pass the same arguments in some positions, inline those values
-        // into the function body and remove the redundant
-        // parameters/arguments.
-        exitPath.traverse({
-          VariableDeclarator: eliminateRedundantArguments,
-          FunctionDeclaration: eliminateRedundantArguments,
-        });
 
         // Replace all things that are only referenced once.
         // This nested traversal approach inspired by https://github.com/babel/babel/issues/15544#issuecomment-1540542863
@@ -624,190 +815,6 @@ export const optimize = (inAst: t.File): t.File => {
           targetPath.stop();
           scope.removeBinding(bindingName);
           path.remove();
-        }
-
-        function eliminateRedundantArguments(
-          path:
-            | NodePath<t.VariableDeclarator>
-            | NodePath<t.FunctionDeclaration>,
-        ) {
-          let bindingName: string | null = null;
-          let functionPath:
-            | NodePath<t.FunctionDeclaration>
-            | NodePath<t.FunctionExpression | t.ArrowFunctionExpression>
-            | null = null;
-
-          if (path.isFunctionDeclaration()) {
-            if (!path.node.id) {
-              return;
-            }
-            bindingName = path.node.id.name;
-            functionPath = path;
-          } else {
-            if (!t.isIdentifier(path.node.id)) {
-              return;
-            }
-            const init = path.get("init");
-            if (
-              !init ||
-              (!init.isFunctionExpression() &&
-                !init.isArrowFunctionExpression())
-            ) {
-              return;
-            }
-            bindingName = path.node.id.name;
-            functionPath = init as NodePath<
-              t.FunctionExpression | t.ArrowFunctionExpression
-            >;
-          }
-
-          const scope = path.isFunctionDeclaration()
-            ? path.scope.parent
-            : path.scope;
-          if (scope !== exitPath.scope) {
-            return;
-          }
-          if (!bindingName) {
-            return;
-          }
-
-          const statementPath = path.getStatementParent();
-          if (
-            !statementPath ||
-            t.isExportNamedDeclaration(statementPath.node) ||
-            t.isExportDefaultDeclaration(statementPath.node)
-          ) {
-            return;
-          }
-
-          const binding = scope.bindings[bindingName];
-          if (!binding || binding.referencePaths.length === 0) {
-            return;
-          }
-
-          const params = functionPath.node.params;
-          if (params.length === 0) {
-            return;
-          }
-
-          const callPaths: NodePath<t.CallExpression>[] = [];
-          for (const refPath of binding.referencePaths) {
-            const parentPath = refPath.parentPath;
-            if (
-              !parentPath?.isCallExpression() ||
-              parentPath.node.callee !== refPath.node
-            ) {
-              return;
-            }
-            callPaths.push(parentPath);
-          }
-          if (callPaths.length === 0) {
-            return;
-          }
-
-          const actions: Array<ParamAction> = [];
-          const leastArgumentCount = Math.min(
-            params.length,
-            ...callPaths.map((callPath) => callPath.node.arguments.length),
-          );
-          for (let argIdx = 0; argIdx < leastArgumentCount; argIdx++) {
-            const param = functionPath.node.params[argIdx];
-            if (!t.isIdentifier(param)) {
-              // We don't support destructuring/rest/etc currently
-              continue;
-            }
-            const { name } = param;
-
-            const [firstPath, ...remainingCallPaths] = callPaths;
-            const firstArg = firstPath.node.arguments[argIdx];
-            const allArgsAreEquivalent = remainingCallPaths.every((callPath) =>
-              t.isNodesEquivalent(callPath.node.arguments[argIdx], firstArg),
-            );
-
-            if (!allArgsAreEquivalent) {
-              // Not relevant to us; skip to the next argIdx
-              continue;
-            } else if (isScalarConstant(firstArg)) {
-              // Includes identifier `undefined`
-              const value = firstArg;
-              actions.push({ _: "substitute", argIdx, name, value });
-            } else if (t.isIdentifier(firstArg)) {
-              const globalName = firstArg.name;
-              assert.ok(
-                globalName !== "undefined",
-                "`undefined` should be handled by isScalarConstantArg",
-              );
-
-              const firstArgBinding = firstPath.scope.getBinding(globalName);
-              if (firstArgBinding?.scope !== exitPath.scope) {
-                // Not a global identifier, skip to next argument
-                continue;
-              } else if (param.name === globalName) {
-                // Simply eliminate so we can reference globalName directly
-                actions.push({ _: "eliminate", argIdx, name });
-              } else if (functionPath.scope.hasOwnBinding(globalName)) {
-                // Cannot safely rename inner references for this index, skip it
-                // TODO: handle renaming of conflicting variables to enable referencing global value.
-              } else {
-                // Rename inner references to match the globalName
-                actions.push({ _: "rename", argIdx, name, to: globalName });
-              }
-            } else {
-              // Too complex for us currently
-              continue;
-            }
-          }
-
-          if (actions.length === 0) {
-            // Nothing to do.
-            return;
-          }
-
-          let lastIdx = -1;
-
-          // Perform rewriting of the function as necessary
-          for (const action of actions) {
-            const { argIdx, name: paramName } = action;
-
-            // Guaranteed by above code
-            assert.ok(argIdx > lastIdx, "arg indexes must increase");
-            lastIdx = argIdx;
-
-            switch (action._) {
-              case "rename": {
-                functionPath.scope.rename(paramName, action.to);
-                break;
-              }
-              case "substitute": {
-                const binding = functionPath.scope.bindings[paramName];
-                if (binding?.referencePaths.length > 0) {
-                  const referencePaths = [...binding.referencePaths];
-                  for (const referencePath of referencePaths) {
-                    referencePath.replaceWith(t.cloneNode(action.value));
-                  }
-                  functionPath.scope.removeBinding(paramName);
-                }
-                break;
-              }
-              case "eliminate": {
-                // Eliminate only, no further action necessary
-                break;
-              }
-              default: {
-                const never: never = action;
-                throw new Error(`Not understood: ${inspect(never)}`);
-              }
-            }
-          }
-
-          // Finally eliminate the arguments
-          for (let k = actions.length - 1; k >= 0; k--) {
-            const { argIdx } = actions[k];
-            functionPath.node.params.splice(argIdx, 1);
-            for (const callPath of callPaths) {
-              callPath.node.arguments.splice(argIdx, 1);
-            }
-          }
         }
       },
     },
