@@ -59,7 +59,7 @@ import type {
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { exportNameHint, tagToString } from "../utils.ts";
+import { exportNameHint, forbidRequired, tagToString } from "../utils.ts";
 import { version } from "../version.ts";
 
 const EMPTY_ARRAY = Object.freeze([]);
@@ -120,7 +120,7 @@ declare global {
           postgresArgName?: string | null;
           pgCodec: PgCodec;
           inputType: GraphQLInputType;
-          required?: boolean;
+          optional?: boolean;
         }>;
         parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
       };
@@ -636,17 +636,17 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 : baseInputType;
 
               const inputType =
-                param.notNull && param.required
+                param.notNull && !param.optional
                   ? new GraphQLNonNull(listType)
                   : listType;
-              return {
+              return forbidRequired({
                 graphqlArgName: argName,
                 pgCodec: param.codec,
                 inputType,
                 ...(param.name ? { postgresArgName: param.name } : null),
-                ...(param.required ? { required: true } : null),
+                ...(param.optional ? { optional: true } : null),
                 ...(fetcher ? { fetcher } : null),
-              };
+              });
             });
 
             // Not used for isMutation; that's handled elsewhere.
@@ -672,16 +672,17 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     ({
                       graphqlArgName,
                       pgCodec,
-                      required,
+                      optional,
                       postgresArgName,
                       fetcher,
-                    }) => ({
-                      graphqlArgName,
-                      pgCodec,
-                      ...(postgresArgName ? { postgresArgName } : null),
-                      ...(required ? { required } : null),
-                      ...(fetcher ? { fetcher } : null),
-                    }),
+                    }) =>
+                      forbidRequired({
+                        graphqlArgName,
+                        pgCodec,
+                        ...(postgresArgName ? { postgresArgName } : null),
+                        ...(optional ? { optional } : null),
+                        ...(fetcher ? { fetcher } : null),
+                      }),
                   );
             exportNameHint(
               argDetailsSimple,

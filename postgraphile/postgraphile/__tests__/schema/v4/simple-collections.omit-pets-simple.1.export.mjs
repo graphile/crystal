@@ -503,8 +503,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "p",
-        codec: peopleCodec,
-        required: true
+        codec: peopleCodec
       }],
       returnsSetof: true,
       extensions: {

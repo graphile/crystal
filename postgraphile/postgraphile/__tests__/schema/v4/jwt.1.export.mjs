@@ -1199,12 +1199,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -1227,12 +1225,10 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: null,
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -1256,12 +1252,10 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -1286,12 +1280,10 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }, {
         name: null,
         codec: TYPES.int,
-        required: true,
         notNull: true
       }],
       codec: TYPES.int,
@@ -1315,8 +1307,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "g",
-        codec: guidCodec,
-        required: true
+        codec: guidCodec
       }],
       codec: guidCodec,
       hasImplicitOrder: false,
@@ -1339,16 +1330,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "b",
-        codec: LIST_TYPES.text,
-        required: true
+        codec: LIST_TYPES.text
       }, {
         name: "d",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }, {
         name: "e",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       codec: LIST_TYPES.uuid,
       hasImplicitOrder: false,
@@ -1407,16 +1395,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.numeric,
-        required: true
+        codec: TYPES.numeric
       }, {
         name: "c",
-        codec: TYPES.bigint,
-        required: true
+        codec: TYPES.bigint
       }],
       returnsSetof: false,
       extensions: {
@@ -1436,16 +1421,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.numeric,
-        required: true
+        codec: TYPES.numeric
       }, {
         name: "c",
-        codec: TYPES.bigint,
-        required: true
+        codec: TYPES.bigint
       }],
       returnsSetof: false,
       extensions: {
@@ -1486,16 +1468,13 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }, {
         name: "b",
-        codec: TYPES.numeric,
-        required: true
+        codec: TYPES.numeric
       }, {
         name: "c",
-        codec: TYPES.bigint,
-        required: true
+        codec: TYPES.bigint
       }],
       returnsSetof: false,
       extensions: {
@@ -1518,8 +1497,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -1542,8 +1520,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -1565,8 +1542,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: true,
       extensions: {
@@ -1590,8 +1566,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -1615,8 +1590,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "object",
-        codec: compoundTypeCodec,
-        required: true
+        codec: compoundTypeCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -1687,8 +1661,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -1707,8 +1680,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -1765,8 +1737,7 @@ const resource_typesPgResource = registry.pgResources["types"];
 const argDetailsSimple_compound_type_query = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
-  postgresArgName: "object",
-  required: true
+  postgresArgName: "object"
 }];
 function makeArg(path, args, details) {
   const {
@@ -1790,8 +1761,7 @@ const resource_compound_type_queryPgResource = registry.pgResources["compound_ty
 const argDetailsSimple_compound_type_array_query = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
-  postgresArgName: "object",
-  required: true
+  postgresArgName: "object"
 }];
 const makeArgs_compound_type_array_query = (args, path = []) => argDetailsSimple_compound_type_array_query.map(details => makeArg(path, args, details));
 const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
@@ -1820,8 +1790,7 @@ function applyAfterArg(_, $connection, val) {
 const argDetailsSimple_type_function = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
-  postgresArgName: "id",
-  required: true
+  postgresArgName: "id"
 }];
 const makeArgs_type_function = (args, path = []) => argDetailsSimple_type_function.map(details => makeArg(path, args, details));
 const resource_type_functionPgResource = registry.pgResources["type_function"];
@@ -1986,12 +1955,10 @@ const ListsOrderBy_ID_DESCApply = queryBuilder => {
 };
 const argDetailsSimple_mult_1 = [{
   graphqlArgName: "arg0",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }, {
   graphqlArgName: "arg1",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }];
 const makeArgs_mult_1 = (args, path = []) => argDetailsSimple_mult_1.map(details => makeArg(path, args, details));
 const resource_mult_1PgResource = registry.pgResources["mult_1"];
@@ -2011,60 +1978,50 @@ function applyInputArgViaPgSelect(_, $payload, arg) {
 }
 const argDetailsSimple_mult_2 = [{
   graphqlArgName: "arg0",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }, {
   graphqlArgName: "arg1",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }];
 const makeArgs_mult_2 = (args, path = []) => argDetailsSimple_mult_2.map(details => makeArg(path, args, details));
 const resource_mult_2PgResource = registry.pgResources["mult_2"];
 const argDetailsSimple_mult_3 = [{
   graphqlArgName: "arg0",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }, {
   graphqlArgName: "arg1",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }];
 const makeArgs_mult_3 = (args, path = []) => argDetailsSimple_mult_3.map(details => makeArg(path, args, details));
 const resource_mult_3PgResource = registry.pgResources["mult_3"];
 const argDetailsSimple_mult_4 = [{
   graphqlArgName: "arg0",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }, {
   graphqlArgName: "arg1",
-  pgCodec: TYPES.int,
-  required: true
+  pgCodec: TYPES.int
 }];
 const makeArgs_mult_4 = (args, path = []) => argDetailsSimple_mult_4.map(details => makeArg(path, args, details));
 const resource_mult_4PgResource = registry.pgResources["mult_4"];
 const argDetailsSimple_guid_fn = [{
   graphqlArgName: "g",
   pgCodec: guidCodec,
-  postgresArgName: "g",
-  required: true
+  postgresArgName: "g"
 }];
 const makeArgs_guid_fn = (args, path = []) => argDetailsSimple_guid_fn.map(details => makeArg(path, args, details));
 const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
 const argDetailsSimple_list_bde_mutation = [{
   graphqlArgName: "b",
   pgCodec: LIST_TYPES.text,
-  postgresArgName: "b",
-  required: true
+  postgresArgName: "b"
 }, {
   graphqlArgName: "d",
   pgCodec: TYPES.text,
-  postgresArgName: "d",
-  required: true
+  postgresArgName: "d"
 }, {
   graphqlArgName: "e",
   pgCodec: TYPES.text,
-  postgresArgName: "e",
-  required: true
+  postgresArgName: "e"
 }];
 const makeArgs_list_bde_mutation = (args, path = []) => argDetailsSimple_list_bde_mutation.map(details => makeArg(path, args, details));
 const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
@@ -2072,78 +2029,66 @@ const resource_authenticate_failPgResource = registry.pgResources["authenticate_
 const argDetailsSimple_authenticate = [{
   graphqlArgName: "a",
   pgCodec: TYPES.int,
-  postgresArgName: "a",
-  required: true
+  postgresArgName: "a"
 }, {
   graphqlArgName: "b",
   pgCodec: TYPES.numeric,
-  postgresArgName: "b",
-  required: true
+  postgresArgName: "b"
 }, {
   graphqlArgName: "c",
   pgCodec: TYPES.bigint,
-  postgresArgName: "c",
-  required: true
+  postgresArgName: "c"
 }];
 const makeArgs_authenticate = (args, path = []) => argDetailsSimple_authenticate.map(details => makeArg(path, args, details));
 const resource_authenticatePgResource = registry.pgResources["authenticate"];
 const argDetailsSimple_authenticate_many = [{
   graphqlArgName: "a",
   pgCodec: TYPES.int,
-  postgresArgName: "a",
-  required: true
+  postgresArgName: "a"
 }, {
   graphqlArgName: "b",
   pgCodec: TYPES.numeric,
-  postgresArgName: "b",
-  required: true
+  postgresArgName: "b"
 }, {
   graphqlArgName: "c",
   pgCodec: TYPES.bigint,
-  postgresArgName: "c",
-  required: true
+  postgresArgName: "c"
 }];
 const makeArgs_authenticate_many = (args, path = []) => argDetailsSimple_authenticate_many.map(details => makeArg(path, args, details));
 const resource_authenticate_manyPgResource = registry.pgResources["authenticate_many"];
 const argDetailsSimple_authenticate_payload = [{
   graphqlArgName: "a",
   pgCodec: TYPES.int,
-  postgresArgName: "a",
-  required: true
+  postgresArgName: "a"
 }, {
   graphqlArgName: "b",
   pgCodec: TYPES.numeric,
-  postgresArgName: "b",
-  required: true
+  postgresArgName: "b"
 }, {
   graphqlArgName: "c",
   pgCodec: TYPES.bigint,
-  postgresArgName: "c",
-  required: true
+  postgresArgName: "c"
 }];
 const makeArgs_authenticate_payload = (args, path = []) => argDetailsSimple_authenticate_payload.map(details => makeArg(path, args, details));
 const resource_authenticate_payloadPgResource = registry.pgResources["authenticate_payload"];
 const argDetailsSimple_compound_type_mutation = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
-  postgresArgName: "object",
-  required: true
+  postgresArgName: "object"
 }];
 const makeArgs_compound_type_mutation = (args, path = []) => argDetailsSimple_compound_type_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_mutationPgResource = registry.pgResources["compound_type_mutation"];
 const argDetailsSimple_compound_type_set_mutation = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
-  postgresArgName: "object",
-  required: true
+  postgresArgName: "object"
 }];
 const makeArgs_compound_type_set_mutation = (args, path = []) => argDetailsSimple_compound_type_set_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
 const argDetailsSimple_compound_type_array_mutation = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
-  postgresArgName: "object",
-  required: true
+  postgresArgName: "object"
 }];
 const makeArgs_compound_type_array_mutation = (args, path = []) => argDetailsSimple_compound_type_array_mutation.map(details => makeArg(path, args, details));
 const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
@@ -2151,8 +2096,7 @@ const resource_type_function_connection_mutationPgResource = registry.pgResource
 const argDetailsSimple_type_function_mutation = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
-  postgresArgName: "id",
-  required: true
+  postgresArgName: "id"
 }];
 const makeArgs_type_function_mutation = (args, path = []) => argDetailsSimple_type_function_mutation.map(details => makeArg(path, args, details));
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];

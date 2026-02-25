@@ -2342,20 +2342,20 @@ export function pgFromExpression(
   const $placeholderable = $target.getPgRoot();
   let parameters: readonly PgResourceParameter[];
   if (!inParameters) {
-    const params = [];
+    const params: PgResourceParameter[] = [];
     for (const spec of specs) {
       if (spec.step) {
         if (spec.pgCodec) {
           params.push({
             name: spec.name ?? null,
             codec: spec.pgCodec,
-            required: false,
+            optional: true,
           });
         } else {
           params.push({
             name: spec.name ?? null,
             codec: spec.step.pgCodec,
-            required: false,
+            optional: true,
           });
         }
       } else {
@@ -2509,7 +2509,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
             a.name === b.name &&
             a.codec === b.codec &&
             a.notNull === b.notNull &&
-            a.required === b.required &&
+            a.optional === b.optional &&
             a.extensions === b.extensions,
         )
       ) {
@@ -2638,7 +2638,7 @@ export function pgFromExpressionRuntime(
       if (
         dep === undefined &&
         (namedOnly ||
-          (!parameter.required &&
+          (parameter.optional &&
             digestIndex >= indexAfterWhichAllArgsAreNamed - 1))
       ) {
         namedOnly = true;

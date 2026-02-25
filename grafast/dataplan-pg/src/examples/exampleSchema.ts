@@ -310,7 +310,7 @@ export function makeExampleSchema(
         parameters: [
           {
             name: "featured",
-            required: false,
+            optional: true,
             codec: TYPES.boolean,
           },
         ],
@@ -350,12 +350,11 @@ export function makeExampleSchema(
         parameters: [
           {
             name: "forums",
-            required: true,
             codec: forumCodec,
           },
           {
             name: "featured",
-            required: false,
+            optional: true,
             codec: TYPES.boolean,
           },
         ],
@@ -411,7 +410,6 @@ export function makeExampleSchema(
             {
               name: "u",
               codec: userResourceOptions.codec,
-              required: true,
               notNull: true,
             },
           ],
@@ -440,7 +438,6 @@ export function makeExampleSchema(
           parameters: [
             {
               name: "forum",
-              required: true,
               codec: forumCodec,
             },
           ],
@@ -479,7 +476,6 @@ export function makeExampleSchema(
             {
               codec: forumCodec,
               name: null,
-              required: true,
             },
           ],
           returnsArray: true,
@@ -1047,7 +1043,6 @@ export function makeExampleSchema(
           parameters: [
             {
               name: "query",
-              required: true,
               codec: TYPES.text,
             },
           ],

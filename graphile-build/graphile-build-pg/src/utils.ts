@@ -463,3 +463,49 @@ export function exportNameHint(obj: any, nameHint: string): void {
     }
   }
 }
+
+const traces = new Set<string | undefined>();
+
+const GRAPHILE_FULL_TRACE = process.env.GRAPHILE_FULL_TRACE;
+
+function tidyTrace(trace: string | undefined) {
+  if (!trace) return trace;
+  if (GRAPHILE_FULL_TRACE) return trace;
+  // Match graphile-build-pg utils
+  return (
+    "    " +
+    trace
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(2, 6)
+      .join("\n    ")
+  );
+}
+
+/**
+ * @deprecated Remove this once V5 is launched.
+ */
+export function forbidRequired<T>(t: T): T {
+  Object.defineProperty(t, "required", {
+    enumerable: false,
+    configurable: false,
+    get() {
+      try {
+        throw new Error("Determining stack for legacy 'required' call");
+      } catch (e) {
+        const trace = tidyTrace((e as Error).stack);
+        if (!traces.has(trace)) {
+          traces.add(trace);
+          console.warn(
+            // Postgres' behavior: by default, parameters are required; to make them optional a default value must be specified
+            "[WARNING] The 'required' property was removed and replaced with its inverse 'optional' in PostGraphile v5 RC9 to better match Postgres' behavior; invert the logic at this callsite: `(param.required)` becomes `(!param.optional)`. We're backfilling this for you right now, but it won't work for schema exports and we'll be removing this once V5 is released.\n" +
+              trace,
+          );
+        }
+      }
+      return !this.optional;
+    },
+  });
+  return t;
+}

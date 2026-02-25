@@ -953,8 +953,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "a",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -980,7 +979,6 @@ const registry = makeRegistry({
       parameters: [{
         name: "n",
         codec: personCodec,
-        required: true,
         extensions: {
           variant: "nodeId"
         }
@@ -1009,8 +1007,7 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "search",
-        codec: TYPES.text,
-        required: true
+        codec: TYPES.text
       }],
       returnsSetof: true,
       extensions: {
@@ -1177,7 +1174,6 @@ const argDetailsSimple_person_full_name = [{
   graphqlArgName: "n",
   pgCodec: personCodec,
   postgresArgName: "n",
-  required: true,
   fetcher($nodeId) {
     return resource_personPgResource.get(getSpec($nodeId));
   }
@@ -1204,8 +1200,7 @@ const resource_person_full_namePgResource = registry.pgResources["person_full_na
 const argDetailsSimple_returnPostsMatching = [{
   graphqlArgName: "search",
   pgCodec: TYPES.text,
-  postgresArgName: "search",
-  required: true
+  postgresArgName: "search"
 }];
 const makeArgs_returnPostsMatching = (args, path = []) => argDetailsSimple_returnPostsMatching.map(details => makeArg(path, args, details));
 const resource_returnPostsMatchingPgResource = registry.pgResources["returnPostsMatching"];
@@ -1438,8 +1433,7 @@ function applyInputArgViaPgSelect(_, $payload, arg) {
 const argDetailsSimple_login = [{
   graphqlArgName: "a",
   pgCodec: TYPES.int,
-  postgresArgName: "a",
-  required: true
+  postgresArgName: "a"
 }];
 const makeArgs_login = (args, path = []) => argDetailsSimple_login.map(details => makeArg(path, args, details));
 const resource_loginPgResource = registry.pgResources["login"];

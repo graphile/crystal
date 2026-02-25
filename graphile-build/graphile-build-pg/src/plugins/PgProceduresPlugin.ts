@@ -25,7 +25,7 @@ import {
 } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 
-import { exportNameHint } from "../utils.ts";
+import { exportNameHint, forbidRequired } from "../utils.ts";
 import { version } from "../version.ts";
 
 declare global {
@@ -383,25 +383,27 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 );
                 return null;
               }
-              const required = inputIndex < numberOfRequiredArguments;
-              const notNull = isStrict || (isStrictish && required);
+              const optional = inputIndex >= numberOfRequiredArguments;
+              const notNull = isStrict || (isStrictish && !optional);
               /*
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
                 if (argCodec.attributes && !isMutation) {
                   // Computed attribute!
-                  required = true;
+                  optional = false;
                   notNull = true;
                 }
               }
               */
-              rawParameters.push({
-                name: argName,
-                codec: argCodec,
-                ...(required ? { required } : null),
-                ...(notNull ? { notNull } : null),
-                ...(variant ? { extensions: { variant } } : null),
-              });
+              rawParameters.push(
+                forbidRequired({
+                  name: argName,
+                  codec: argCodec,
+                  ...(optional ? { optional } : null),
+                  ...(notNull ? { notNull } : null),
+                  ...(variant ? { extensions: { variant } } : null),
+                }),
+              );
             }
           }
 

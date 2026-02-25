@@ -525,7 +525,6 @@ const registry = makeRegistry({
       parameters: [{
         name: "wh",
         codec: workHourArrayCodec,
-        required: true,
         notNull: true
       }],
       codec: TYPES.boolean,
@@ -563,8 +562,7 @@ const resource_tPgResource = registry.pgResources["t"];
 const argDetailsSimple_check_work_hours = [{
   graphqlArgName: "wh",
   pgCodec: workHourArrayCodec,
-  postgresArgName: "wh",
-  required: true
+  postgresArgName: "wh"
 }];
 function makeArg(path, args, details) {
   const {

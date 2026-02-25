@@ -41,7 +41,7 @@ export function isSimpleScalarComputedColumnLike(resource: PgResource) {
   const parameters: readonly PgResourceParameter[] | undefined =
     resource.parameters;
   if (!parameters || parameters.length < 1) return false;
-  if (parameters.some((p, i) => i > 0 && p.required)) return false;
+  if (parameters.some((p, i) => i > 0 && !p.optional)) return false;
   if (!parameters[0].codec.attributes) return false;
   if (!resource.isUnique) return false;
   return true;

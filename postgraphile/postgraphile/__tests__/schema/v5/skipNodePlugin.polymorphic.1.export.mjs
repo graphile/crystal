@@ -3119,8 +3119,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "r",
-        codec: firstPartyVulnerabilitiesCodec,
-        required: true
+        codec: firstPartyVulnerabilitiesCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -3142,8 +3141,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "r",
-        codec: thirdPartyVulnerabilitiesCodec,
-        required: true
+        codec: thirdPartyVulnerabilitiesCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -3166,8 +3164,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -3224,8 +3221,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "sti",
-        codec: singleTableItemsCodec,
-        required: true
+        codec: singleTableItemsCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -3248,7 +3244,6 @@ const registryConfig = {
       parameters: [{
         name: "nodeId",
         codec: relationalItemsCodec,
-        required: true,
         extensions: {
           variant: "nodeId"
         }
@@ -3277,8 +3272,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "ri",
-        codec: relationalItemsCodec,
-        required: true
+        codec: relationalItemsCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -3317,8 +3311,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -3358,8 +3351,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "id",
-        codec: TYPES.int,
-        required: true
+        codec: TYPES.int
       }],
       returnsSetof: false,
       extensions: {
@@ -3378,8 +3370,7 @@ const registryConfig = {
       },
       parameters: [{
         name: "t",
-        codec: relationalTopicsCodec,
-        required: true
+        codec: relationalTopicsCodec
       }],
       returnsSetof: false,
       extensions: {
@@ -5499,8 +5490,7 @@ const JSONSerialize = value => value;
 const argDetailsSimple_relational_topic_by_id_fn = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
-  postgresArgName: "id",
-  required: true
+  postgresArgName: "id"
 }];
 function makeArg(path, args, details) {
   const {
@@ -5529,8 +5519,7 @@ const all_single_tables_getSelectPlanFromParentAndArgs = ($root, args, _info) =>
 const argDetailsSimple_get_single_table_topic_by_id = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
-  postgresArgName: "id",
-  required: true
+  postgresArgName: "id"
 }];
 const makeArgs_get_single_table_topic_by_id = (args, path = []) => argDetailsSimple_get_single_table_topic_by_id.map(details => makeArg(path, args, details));
 const resource_get_single_table_topic_by_idPgResource = registry.pgResources["get_single_table_topic_by_id"];
@@ -5542,8 +5531,7 @@ const all_relational_items_fn_getSelectPlanFromParentAndArgs = ($root, args, _in
 const argDetailsSimple_relational_item_by_id_fn = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
-  postgresArgName: "id",
-  required: true
+  postgresArgName: "id"
 }];
 const makeArgs_relational_item_by_id_fn = (args, path = []) => argDetailsSimple_relational_item_by_id_fn.map(details => makeArg(path, args, details));
 const resource_relational_item_by_id_fnPgResource = registry.pgResources["relational_item_by_id_fn"];
