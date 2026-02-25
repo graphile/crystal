@@ -10,6 +10,7 @@ external libraries.
 
 Generally speaking there are two methods of achieving this, used in unison:
 
+
 1. All non-pure functions and their non-trivial scope dependencies must be made
    exportable by wrapping in an `EXPORTABLE()` call, or be made importable via
    the special `$$export` property
@@ -262,7 +263,7 @@ export const preset: GraphileConfig.Preset = {
 
 ## Troubleshooting
 
-### undefined variable `EXPORTABLE`
+### `undefined variable EXPORTABLE`
 
 Our ESLint plugin isn't smart enough to actually `import` the `EXPORTABLE`
 helper, so after running the autofix you might end up with "undefined variable
