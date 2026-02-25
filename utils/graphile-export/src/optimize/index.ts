@@ -305,7 +305,6 @@ function eliminateRedundantArguments(
           for (const referencePath of referencePaths) {
             referencePath.replaceWith(t.cloneNode(action.value));
           }
-          functionPath.scope.removeBinding(paramName);
         }
         break;
       }
@@ -323,7 +322,9 @@ function eliminateRedundantArguments(
   // Finally eliminate the arguments
   for (let k = actions.length - 1; k >= 0; k--) {
     const { argIdx } = actions[k];
+    const param = functionPath.node.params[argIdx];
     functionPath.node.params.splice(argIdx, 1);
+    functionPath.scope.removeBinding((param as t.Identifier).name);
     for (const callPath of callPaths) {
       callPath.node.arguments.splice(argIdx, 1);
     }
