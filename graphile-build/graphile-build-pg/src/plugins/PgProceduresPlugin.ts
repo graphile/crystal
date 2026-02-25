@@ -25,7 +25,7 @@ import {
 } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 
-import { exportNameHint } from "../utils.ts";
+import { exportNameHint, forbidRequired } from "../utils.ts";
 import { version } from "../version.ts";
 
 declare global {
@@ -395,13 +395,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 }
               }
               */
-              rawParameters.push({
-                name: argName,
-                codec: argCodec,
-                ...(optional ? { optional } : null),
-                ...(notNull ? { notNull } : null),
-                ...(variant ? { extensions: { variant } } : null),
-              });
+              rawParameters.push(
+                forbidRequired({
+                  name: argName,
+                  codec: argCodec,
+                  ...(optional ? { optional } : null),
+                  ...(notNull ? { notNull } : null),
+                  ...(variant ? { extensions: { variant } } : null),
+                }),
+              );
             }
           }
 

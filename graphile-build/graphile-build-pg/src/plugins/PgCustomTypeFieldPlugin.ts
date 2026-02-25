@@ -59,7 +59,7 @@ import type {
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
-import { exportNameHint, tagToString } from "../utils.ts";
+import { exportNameHint, forbidRequired, tagToString } from "../utils.ts";
 import { version } from "../version.ts";
 
 const EMPTY_ARRAY = Object.freeze([]);
@@ -675,13 +675,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       optional,
                       postgresArgName,
                       fetcher,
-                    }) => ({
-                      graphqlArgName,
-                      pgCodec,
-                      ...(postgresArgName ? { postgresArgName } : null),
-                      ...(optional ? { optional } : null),
-                      ...(fetcher ? { fetcher } : null),
-                    }),
+                    }) =>
+                      forbidRequired({
+                        graphqlArgName,
+                        pgCodec,
+                        ...(postgresArgName ? { postgresArgName } : null),
+                        ...(optional ? { optional } : null),
+                        ...(fetcher ? { fetcher } : null),
+                      }),
                   );
             exportNameHint(
               argDetailsSimple,

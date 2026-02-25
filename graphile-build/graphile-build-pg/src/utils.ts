@@ -463,3 +463,19 @@ export function exportNameHint(obj: any, nameHint: string): void {
     }
   }
 }
+
+/**
+ * @deprecated Remove this once V5 is launched.
+ */
+export function forbidRequired<T>(t: T): T {
+  Object.defineProperty(t, "required", {
+    enumerable: false,
+    configurable: false,
+    get() {
+      throw new Error(
+        `The 'required' property was removed and replaced with its inverse 'optional' in PostGraphile v5 RC9 to better match Postgres' behavior (by default, parameters are required; to make them optional a default value must be specified)`,
+      );
+    },
+  });
+  return t;
+}
