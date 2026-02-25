@@ -464,6 +464,8 @@ export function exportNameHint(obj: any, nameHint: string): void {
   }
 }
 
+const traces = new Set<string | undefined>();
+
 /**
  * @deprecated Remove this once V5 is launched.
  */
@@ -472,9 +474,20 @@ export function forbidRequired<T>(t: T): T {
     enumerable: false,
     configurable: false,
     get() {
-      throw new Error(
-        `The 'required' property was removed and replaced with its inverse 'optional' in PostGraphile v5 RC9 to better match Postgres' behavior (by default, parameters are required; to make them optional a default value must be specified)`,
-      );
+      try {
+        throw new Error("Determining stack for legacy 'required' call");
+      } catch (e) {
+        const trace = (e as Error).stack;
+        if (!traces.has(trace)) {
+          traces.add(trace);
+          console.warn(
+            // Postgres' behavior: by default, parameters are required; to make them optional a default value must be specified
+            "[WARNING] The 'required' property was removed and replaced with its inverse 'optional' in PostGraphile v5 RC9 to better match Postgres' behavior; invert the logic at this callsite: `(param.required)` becomes `(!param.optional)`. We're backfilling this for you right now, but it won't work for schema exports and we'll be removing this once V5 is released.\n" +
+              trace,
+          );
+        }
+      }
+      return !this.optional;
     },
   });
   return t;
