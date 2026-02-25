@@ -2201,16 +2201,25 @@ async function loadESLint() {
   try {
     return await import("eslint");
   } catch (e) {
-    return null;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require("eslint");
+    } catch (e2) {
+      console.warn(
+        `graphile-export could not find 'eslint' so disabling additional checks.
+  First attempt:
+    ${String(e).replace(/\n/g, "\n    ")}
+  Second attempt:
+    ${String(e2).replace(/\n/g, "\n    ")}`,
+      );
+      return null;
+    }
   }
 }
 
 async function lint(code: string, rawFilePath: string | URL) {
   const eslintModule = await loadESLint();
   if (eslintModule == null) {
-    console.warn(
-      `graphile-export could not find 'eslint' so disabling additional checks`,
-    );
     return;
   }
   const filePath =
