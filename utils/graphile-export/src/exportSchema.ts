@@ -2224,7 +2224,7 @@ async function lint(code: string, rawFilePath: string | URL) {
   }
   const filePath =
     typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
-  const { ESLint } = eslintModule;
+  const ESLint = eslintModule.ESLint || eslintModule.default?.ESLint;
   const eslint = new ESLint({
     overrideConfigFile: true, // Don't use external config
     allowInlineConfig: false, // Ignore `/* eslint-disable ... */` comments
