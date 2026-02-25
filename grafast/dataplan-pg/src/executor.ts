@@ -497,7 +497,8 @@ ${duration}
             const batchSize = batch.length;
             for (let batchIndex = 0; batchIndex < batchSize; batchIndex++) {
               const { queryValues, resultIndex } = batch[batchIndex];
-              const identifiersJSON = JSON.stringify(queryValues); // PERF: Canonical? Manual for perf?
+              const queryValuesObj = { ...queryValues };
+              const identifiersJSON = JSON.stringify(queryValuesObj); // PERF: Canonical? Manual for perf?
               const existingResult = scopedCache.get(identifiersJSON);
               if (existingResult) {
                 if (debugVerbose.enabled) {
