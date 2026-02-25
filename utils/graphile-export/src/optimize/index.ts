@@ -440,6 +440,95 @@ export const optimize = (inAst: t.File): t.File => {
         return;
       },
     },
+    ObjectProperty: {
+      exit(path) {
+        if (!t.isIdentifier(path.node.key)) {
+          return;
+        }
+        const func = path.node.value;
+        if (
+          !t.isFunctionExpression(func) &&
+          !t.isArrowFunctionExpression(func)
+        ) {
+          return;
+        }
+        if (t.isArrowFunctionExpression(func)) {
+          // Check if it contains `this`; if so, do not rewrite
+          const hasThis = !!path
+            .get("value")
+            .find((path) => t.isThisExpression(path.node));
+          if (hasThis) {
+            return;
+          }
+        }
+        /*
+      if (!func.id) {
+        return;
+      }
+      if (func.id.name !== path.node.key.name) {
+        return;
+      }
+      */
+        const body = t.isBlock(func.body)
+          ? func.body
+          : t.blockStatement([t.returnStatement(func.body)]);
+        path.replaceWith(
+          t.objectMethod(
+            "method",
+            path.node.key,
+            func.params,
+            body,
+            false,
+            func.generator,
+            func.async,
+          ),
+        );
+      },
+    },
+    BlockStatement: {
+      exit(path) {
+        const body = path.node.body;
+
+        // If it only has two statements, the first being `const foo = ...` and the latter being `return foo` then rewrite to just `return ...`
+        if (body.length === 2) {
+          const [line1, line2] = body;
+          if (t.isReturnStatement(line2) && t.isIdentifier(line2.argument)) {
+            const identifierName = line2.argument.name;
+            if (
+              t.isVariableDeclaration(line1) &&
+              line1.declarations.length === 1
+            ) {
+              const { id, init } = line1.declarations[0];
+              if (t.isIdentifier(id) && id.name === identifierName) {
+                // One last check: is this same variable referenced inside the function?
+                const binding = path.scope.bindings[identifierName];
+                if (binding == null || binding.referencePaths.length === 0) {
+                  const ret = t.returnStatement(init);
+                  if (path.parentPath.isBlock()) {
+                    path.replaceWith(ret);
+                    return;
+                  } else {
+                    path.replaceWith(t.blockStatement([ret]));
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Strip it if it's inside another block and it either doesn't declare
+        // any variables or is the only statement
+        if (path.parentPath.isBlock()) {
+          if (
+            path.parentPath.node.body.length === 1 ||
+            !body.some(t.isVariableDeclaration)
+          ) {
+            path.replaceWithMultiple(body);
+          }
+        }
+      },
+    },
     Program: {
       exit(exitPath) {
         // Make sure our scope information is up to date!
@@ -720,95 +809,6 @@ export const optimize = (inAst: t.File): t.File => {
             }
           }
         }
-      },
-    },
-    BlockStatement: {
-      exit(path) {
-        const body = path.node.body;
-
-        // If it only has two statements, the first being `const foo = ...` and the latter being `return foo` then rewrite to just `return ...`
-        if (body.length === 2) {
-          const [line1, line2] = body;
-          if (t.isReturnStatement(line2) && t.isIdentifier(line2.argument)) {
-            const identifierName = line2.argument.name;
-            if (
-              t.isVariableDeclaration(line1) &&
-              line1.declarations.length === 1
-            ) {
-              const { id, init } = line1.declarations[0];
-              if (t.isIdentifier(id) && id.name === identifierName) {
-                // One last check: is this same variable referenced inside the function?
-                const binding = path.scope.bindings[identifierName];
-                if (binding == null || binding.referencePaths.length === 0) {
-                  const ret = t.returnStatement(init);
-                  if (path.parentPath.isBlock()) {
-                    path.replaceWith(ret);
-                    return;
-                  } else {
-                    path.replaceWith(t.blockStatement([ret]));
-                    return;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // Strip it if it's inside another block and it either doesn't declare
-        // any variables or is the only statement
-        if (path.parentPath.isBlock()) {
-          if (
-            path.parentPath.node.body.length === 1 ||
-            !body.some(t.isVariableDeclaration)
-          ) {
-            path.replaceWithMultiple(body);
-          }
-        }
-      },
-    },
-    ObjectProperty: {
-      exit(path) {
-        if (!t.isIdentifier(path.node.key)) {
-          return;
-        }
-        const func = path.node.value;
-        if (
-          !t.isFunctionExpression(func) &&
-          !t.isArrowFunctionExpression(func)
-        ) {
-          return;
-        }
-        if (t.isArrowFunctionExpression(func)) {
-          // Check if it contains `this`; if so, do not rewrite
-          const hasThis = !!path
-            .get("value")
-            .find((path) => t.isThisExpression(path.node));
-          if (hasThis) {
-            return;
-          }
-        }
-        /*
-      if (!func.id) {
-        return;
-      }
-      if (func.id.name !== path.node.key.name) {
-        return;
-      }
-      */
-        const body = t.isBlock(func.body)
-          ? func.body
-          : t.blockStatement([t.returnStatement(func.body)]);
-        path.replaceWith(
-          t.objectMethod(
-            "method",
-            path.node.key,
-            func.params,
-            body,
-            false,
-            func.generator,
-            func.async,
-          ),
-        );
       },
     },
   });
