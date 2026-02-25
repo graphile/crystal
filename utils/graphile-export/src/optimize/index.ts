@@ -216,6 +216,30 @@ export const optimize = (inAst: t.File): t.File => {
         }
       },
     },
+    IfStatement: {
+      exit(path) {
+        const test = path.node.test;
+        if (expressionIsAlwaysFalsy(test)) {
+          if (path.node.alternate) {
+            path.replaceWith(path.node.alternate);
+          } else {
+            path.remove();
+          }
+        } else if (expressionIsAlwaysTruthy(test)) {
+          path.replaceWith(path.node.consequent);
+        }
+      },
+    },
+    ConditionalExpression: {
+      exit(path) {
+        const test = path.node.test;
+        if (expressionIsAlwaysFalsy(test)) {
+          path.replaceWith(path.node.alternate);
+        } else if (expressionIsAlwaysTruthy(test)) {
+          path.replaceWith(path.node.consequent);
+        }
+      },
+    },
     TemplateLiteral: {
       exit(path) {
         let changed = false;
@@ -739,30 +763,6 @@ export const optimize = (inAst: t.File): t.File => {
           ) {
             path.replaceWithMultiple(body);
           }
-        }
-      },
-    },
-    IfStatement: {
-      exit(path) {
-        const test = path.node.test;
-        if (expressionIsAlwaysFalsy(test)) {
-          if (path.node.alternate) {
-            path.replaceWith(path.node.alternate);
-          } else {
-            path.remove();
-          }
-        } else if (expressionIsAlwaysTruthy(test)) {
-          path.replaceWith(path.node.consequent);
-        }
-      },
-    },
-    ConditionalExpression: {
-      exit(path) {
-        const test = path.node.test;
-        if (expressionIsAlwaysFalsy(test)) {
-          path.replaceWith(path.node.alternate);
-        } else if (expressionIsAlwaysTruthy(test)) {
-          path.replaceWith(path.node.consequent);
         }
       },
     },
