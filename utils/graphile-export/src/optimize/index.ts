@@ -126,7 +126,10 @@ function resolveBinaryOperator(
   }
 }
 
-/** Returns true if the result will always be interpreted as a boolean */
+/**
+ * Returns true if the expression at `path` will always be interpreted as a
+ * boolean because of it's context.
+ */
 function isBooleanContext(path: NodePath<t.LogicalExpression>): boolean {
   const parentNode = path.parentPath.node;
   if (
@@ -228,12 +231,16 @@ export const optimize = (inAst: t.File): t.File => {
             ) {
               continue;
             }
+
             // Inline it
+
             if (!changed) {
               changed = true;
+              // Make a mutable copy before we start editing!
               quasis = [...path.node.quasis];
               expressions = [...path.node.expressions];
             }
+
             quasis[i] = {
               ...quasis[i],
               value: {
