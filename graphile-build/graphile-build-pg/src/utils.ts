@@ -472,17 +472,15 @@ function tidyTrace(trace: string | undefined) {
   if (!trace) return trace;
   if (GRAPHILE_FULL_TRACE) return trace;
   // Match graphile-build-pg utils
-  const matches = trace.match(/\n\s*at[^\n]*\([^\n]+/);
-  if (matches) {
-    // Match the actual code
-    const matches2 = trace
-      .substring((matches.index ?? 0) + matches[0].length)
-      .match(/\n\s*at[^\n]*\([^\n]+/);
-    if (matches2) {
-      return "    " + matches2[0].trim();
-    }
-  }
-  return trace;
+  return (
+    "    " +
+    trace
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(2, 6)
+      .join("\n    ")
+  );
 }
 
 /**
