@@ -264,11 +264,26 @@ export const optimize = (inAst: t.File): t.File => {
     },
     SpreadElement: {
       exit(path) {
+        // `...null` becomes nothing
         if (
           path.node.argument.type === "NullLiteral" &&
           path.parentPath.isObjectExpression()
         ) {
           path.remove();
+        }
+
+        // `fn(a, b, ...[c, d, e])` becomes `fn(a, b, c, d, e)`
+        // `[a, b, ...[c, d, e]]` becomes `[a, b, c, d, e]`
+        if (t.isArrayExpression(path.node.argument)) {
+          const parentNode = path.parentPath.node;
+          if (
+            t.isCallExpression(parentNode) ||
+            t.isArrayExpression(parentNode)
+          ) {
+            path.replaceWithMultiple(
+              path.node.argument.elements.filter(isNotNullish),
+            );
+          }
         }
       },
     },
@@ -302,19 +317,6 @@ export const optimize = (inAst: t.File): t.File => {
     },
     CallExpression: {
       exit(path) {
-        const argsPath = path.get("arguments");
-        if (argsPath.length === 1) {
-          const argPath = argsPath[0];
-          if (t.isSpreadElement(argPath.node)) {
-            const spreadPath = argPath as NodePath<t.SpreadElement>;
-            if (t.isArrayExpression(spreadPath.node.argument)) {
-              argPath.replaceWithMultiple(
-                spreadPath.node.argument.elements.filter(isNotNullish),
-              );
-            }
-          }
-        }
-
         const node = path.node;
 
         if (
