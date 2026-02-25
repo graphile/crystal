@@ -156,7 +156,7 @@
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.4",
     "h3": "^1.15.5",
-    "hono": "^4.11.10",
+    "hono": "^4.12.2",
     "jest": "^30.2.0",
     "jest-serializer-graphql-schema": "workspace:^",
     "koa": "^3.0.3",
