@@ -466,6 +466,25 @@ export function exportNameHint(obj: any, nameHint: string): void {
 
 const traces = new Set<string | undefined>();
 
+const GRAPHILE_FULL_TRACE = process.env.GRAPHILE_FULL_TRACE;
+
+function tidyTrace(trace: string | undefined) {
+  if (!trace) return trace;
+  if (GRAPHILE_FULL_TRACE) return trace;
+  // Match graphile-build-pg utils
+  const matches = trace.match(/\n\s*at[^\n]*\([^\n]+/);
+  if (matches) {
+    // Match the actual code
+    const matches2 = trace
+      .substring((matches.index ?? 0) + matches[0].length)
+      .match(/\n\s*at[^\n]*\([^\n]+/);
+    if (matches2) {
+      return "    " + matches2[0].trim();
+    }
+  }
+  return trace;
+}
+
 /**
  * @deprecated Remove this once V5 is launched.
  */
@@ -477,7 +496,7 @@ export function forbidRequired<T>(t: T): T {
       try {
         throw new Error("Determining stack for legacy 'required' call");
       } catch (e) {
-        const trace = (e as Error).stack;
+        const trace = tidyTrace((e as Error).stack);
         if (!traces.has(trace)) {
           traces.add(trace);
           console.warn(
