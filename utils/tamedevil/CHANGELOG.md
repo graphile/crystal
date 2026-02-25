@@ -1,5 +1,19 @@
 # tamedevil
 
+## 0.1.0-rc.5
+
+### Patch Changes
+
+- [#2957](https://github.com/graphile/crystal/pull/2957)
+  [`81ade71`](https://github.com/graphile/crystal/commit/81ade71eb278d1d9a6283e7bef48328964e5e56c)
+  Thanks [@benjie](https://github.com/benjie)! - Mark isSafeObjectPropertyName
+  as an export.
+
+- [#2965](https://github.com/graphile/crystal/pull/2965)
+  [`d15e1c2`](https://github.com/graphile/crystal/commit/d15e1c2dc9ffad906d08d3ec2963034494d43d98)
+  Thanks [@benjie](https://github.com/benjie)! - Make EXPORTABLE's scope a
+  readonly array for greater compatibility.
+
 ## 0.1.0-rc.4
 
 ### Patch Changes

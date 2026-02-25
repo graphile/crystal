@@ -1,5 +1,19 @@
 # @grafserv/persisted
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- [#2959](https://github.com/graphile/crystal/pull/2959)
+  [`848c466`](https://github.com/graphile/crystal/commit/848c4666ed89766ca81d0f9416e7827930fd6abe)
+  Thanks [@benjie](https://github.com/benjie)! - Export as named for better Node
+  ESM interop
+
+- Updated dependencies
+  [[`b793077`](https://github.com/graphile/crystal/commit/b793077f81c0bb56e5cb75853c06db6f934223ff),
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a)]:
+  - grafast@1.0.0-rc.8
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

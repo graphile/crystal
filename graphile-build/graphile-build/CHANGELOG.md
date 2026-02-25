@@ -1,5 +1,63 @@
 # graphile-build
 
+## 5.0.0-rc.5
+
+### Patch Changes
+
+- [#2957](https://github.com/graphile/crystal/pull/2957)
+  [`5615d3f`](https://github.com/graphile/crystal/commit/5615d3f37ecd78aff6503069e09481b72ff95618)
+  Thanks [@benjie](https://github.com/benjie)! - Significantly reduce the size
+  of a PostGraphile exported schema (around 20% reduction on test fixtures) by:
+  - marking optional things as optional
+  - excluding many optional things from being specified in configuration objects
+    (including `tags` objects if no tags are present)
+  - using `LIST_TYPES` for PostgreSQL builtin list types
+  - extracting inline function definitions to be global functions where
+    appropriate, and simplifying functions where not
+
+  Breaking changes to types (but more accurate reflection of reality):
+  - `extensions` is now marked as optional in many places.
+  - `extensions.tags` is now marked optional in many places.
+  - `PgCodecAttribute.notNull` is now marked as optional.
+  - `PgResourceParameter.requires` is now marked as optional.
+  - `PgCodecRelation.isUnique` is now marked as optional.
+  - `pgGetArgDetailsFromParameters().argDetails.postgresArgName` is now optional
+    (may return `undefined` in addition to `null`) and `.required` is now
+    optional (returns `boolean | undefined`)
+
+- [#2959](https://github.com/graphile/crystal/pull/2959)
+  [`8384026`](https://github.com/graphile/crystal/commit/83840262d8a6bc734840037d87cf9d7cd5292585)
+  Thanks [@benjie](https://github.com/benjie)! - Add experimental schema
+  minification support, useful for people exporting to Lambda or similar.
+
+- [#2960](https://github.com/graphile/crystal/pull/2960)
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a)
+  Thanks [@benjie](https://github.com/benjie)! - Use new Grafast
+  `markSyncAndSafe` helper when defining sync and safe functions.
+
+- [#2965](https://github.com/graphile/crystal/pull/2965)
+  [`d15e1c2`](https://github.com/graphile/crystal/commit/d15e1c2dc9ffad906d08d3ec2963034494d43d98)
+  Thanks [@benjie](https://github.com/benjie)! - Make EXPORTABLE's scope a
+  readonly array for greater compatibility.
+
+- [#2965](https://github.com/graphile/crystal/pull/2965)
+  [`c0b8af9`](https://github.com/graphile/crystal/commit/c0b8af9162059607109028e53e7fa65304f09449)
+  Thanks [@benjie](https://github.com/benjie)! - Add new EXPORTABLE_CLONE_ARRAY
+  helper for exporting arrays after construction
+
+- [#2959](https://github.com/graphile/crystal/pull/2959)
+  [`c9fd9f3`](https://github.com/graphile/crystal/commit/c9fd9f3132ffbce7f7562e7c86b64eb41762fd92)
+  Thanks [@benjie](https://github.com/benjie)! - Use shared logic to decrease
+  export size.
+
+- Updated dependencies
+  [[`b793077`](https://github.com/graphile/crystal/commit/b793077f81c0bb56e5cb75853c06db6f934223ff),
+  [`81ade71`](https://github.com/graphile/crystal/commit/81ade71eb278d1d9a6283e7bef48328964e5e56c),
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a),
+  [`d15e1c2`](https://github.com/graphile/crystal/commit/d15e1c2dc9ffad906d08d3ec2963034494d43d98)]:
+  - grafast@1.0.0-rc.8
+  - tamedevil@0.1.0-rc.5
+
 ## 5.0.0-rc.4
 
 ### Patch Changes

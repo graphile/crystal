@@ -1,5 +1,59 @@
 # graphile-export
 
+## 1.0.0-rc.5
+
+### Patch Changes
+
+- [#2963](https://github.com/graphile/crystal/pull/2963)
+  [`9c417ca`](https://github.com/graphile/crystal/commit/9c417cab6685f9592285016dcdbcacca523d6446)
+  Thanks [@benjaie](https://github.com/benjaie)! - Graphile Export now optimizes
+  the code further by detecting the parameters of functions that are always
+  called with the same values and eliminating them. Further optimizations have
+  also been applied: Graphile Export now requires fewer passes to achieve the
+  same results and more optimizations to the exported code are now applied.
+
+- [#2966](https://github.com/graphile/crystal/pull/2966)
+  [`82ef520`](https://github.com/graphile/crystal/commit/82ef5205ad07533606c656f91f08aa4b265aef7a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix omission in Graphile Export
+  where exporting a frozen/sealed object or array would not result in a
+  frozen/sealed object being restored.
+
+- [#2960](https://github.com/graphile/crystal/pull/2960)
+  [`5e9082b`](https://github.com/graphile/crystal/commit/5e9082b540c9984c0f70a625ce6e7025567dec5c)
+  Thanks [@benjie](https://github.com/benjie)! - Implement deduplication of
+  equivalent `EXPORTABLE(...)` expressions (shrink export size).
+
+- [#2959](https://github.com/graphile/crystal/pull/2959)
+  [`53d5daf`](https://github.com/graphile/crystal/commit/53d5dafa96d4b84e6a35c8d124404496119b2219)
+  Thanks [@benjie](https://github.com/benjie)! - Improve compatibility with Node
+  ESM
+
+- [#2965](https://github.com/graphile/crystal/pull/2965)
+  [`d15e1c2`](https://github.com/graphile/crystal/commit/d15e1c2dc9ffad906d08d3ec2963034494d43d98)
+  Thanks [@benjie](https://github.com/benjie)! - Make EXPORTABLE's scope a
+  readonly array for greater compatibility.
+
+- [#2959](https://github.com/graphile/crystal/pull/2959)
+  [`3fca6a7`](https://github.com/graphile/crystal/commit/3fca6a7857cede1939bda75fd00ae9114370f08b)
+  Thanks [@benjie](https://github.com/benjie)! - Improve optimization pass to
+  eliminate more redundant logic.
+
+- [#2967](https://github.com/graphile/crystal/pull/2967)
+  [`dbdc8d8`](https://github.com/graphile/crystal/commit/dbdc8d8138164028ec2953ff81531e9238ecf05c)
+  Thanks [@benjie](https://github.com/benjie)! - Further optimize the `optimize`
+  step in Graphile Export
+
+- [#2962](https://github.com/graphile/crystal/pull/2962)
+  [`b73416b`](https://github.com/graphile/crystal/commit/b73416b09c947fc0ce57ea9d4f26d15679dbc112)
+  Thanks [@benjaie](https://github.com/benjaie)! - Improve export optimization
+  to remove redundant repeated identifier arguments from local helper function
+  calls, resulting in smaller and more straight-forward exports and easier
+  optimizations for third-party plugins where `import`s are discouraged.
+- Updated dependencies
+  [[`b793077`](https://github.com/graphile/crystal/commit/b793077f81c0bb56e5cb75853c06db6f934223ff),
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a)]:
+  - grafast@1.0.0-rc.8
+
 ## 1.0.0-rc.4
 
 ### Patch Changes

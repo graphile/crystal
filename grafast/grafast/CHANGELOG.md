@@ -1,5 +1,19 @@
 # grafast
 
+## 1.0.0-rc.8
+
+### Patch Changes
+
+- [#2956](https://github.com/graphile/crystal/pull/2956)
+  [`b793077`](https://github.com/graphile/crystal/commit/b793077f81c0bb56e5cb75853c06db6f934223ff)
+  Thanks [@benjie](https://github.com/benjie)! - Internal refactor: replace
+  usage of isExecutableStep/assertExecutableStep with isStep/assertStep.
+
+- [#2960](https://github.com/graphile/crystal/pull/2960)
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a)
+  Thanks [@benjie](https://github.com/benjie)! - Use new Grafast
+  `markSyncAndSafe` helper when defining sync and safe functions.
+
 ## 1.0.0-rc.7
 
 ### Patch Changes

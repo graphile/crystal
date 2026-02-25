@@ -1,5 +1,62 @@
 # @dataplan/pg
 
+## 1.0.0-rc.6
+
+### Minor Changes
+
+- [#2954](https://github.com/graphile/crystal/pull/2954)
+  [`eb9695b`](https://github.com/graphile/crystal/commit/eb9695ba9bd04f28473cf78bc4e3a2b862c58c9e)
+  Thanks [@dargmuesli](https://github.com/dargmuesli)! - Add tsvector and
+  tsquery support
+
+### Patch Changes
+
+- [#2957](https://github.com/graphile/crystal/pull/2957)
+  [`5615d3f`](https://github.com/graphile/crystal/commit/5615d3f37ecd78aff6503069e09481b72ff95618)
+  Thanks [@benjie](https://github.com/benjie)! - Significantly reduce the size
+  of a PostGraphile exported schema (around 20% reduction on test fixtures) by:
+  - marking optional things as optional
+  - excluding many optional things from being specified in configuration objects
+    (including `tags` objects if no tags are present)
+  - using `LIST_TYPES` for PostgreSQL builtin list types
+  - extracting inline function definitions to be global functions where
+    appropriate, and simplifying functions where not
+
+  Breaking changes to types (but more accurate reflection of reality):
+  - `extensions` is now marked as optional in many places.
+  - `extensions.tags` is now marked optional in many places.
+  - `PgCodecAttribute.notNull` is now marked as optional.
+  - `PgResourceParameter.requires` is now marked as optional.
+  - `PgCodecRelation.isUnique` is now marked as optional.
+  - `pgGetArgDetailsFromParameters().argDetails.postgresArgName` is now optional
+    (may return `undefined` in addition to `null`) and `.required` is now
+    optional (returns `boolean | undefined`)
+
+- [#2960](https://github.com/graphile/crystal/pull/2960)
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a)
+  Thanks [@benjie](https://github.com/benjie)! - Use new Grafast
+  `markSyncAndSafe` helper when defining sync and safe functions.
+
+- [#2965](https://github.com/graphile/crystal/pull/2965)
+  [`d15e1c2`](https://github.com/graphile/crystal/commit/d15e1c2dc9ffad906d08d3ec2963034494d43d98)
+  Thanks [@benjie](https://github.com/benjie)! - Make EXPORTABLE's scope a
+  readonly array for greater compatibility.
+
+- [#2965](https://github.com/graphile/crystal/pull/2965)
+  [`5821e39`](https://github.com/graphile/crystal/commit/5821e397f02166ac6c27de1e24089eee0b995968)
+  Thanks [@benjie](https://github.com/benjie)! - Further reduce the size of
+  schema exports by optimizing plan functions
+
+- [#2957](https://github.com/graphile/crystal/pull/2957)
+  [`60c8690`](https://github.com/graphile/crystal/commit/60c8690d20f70aab8af0380aa3a83a5cc03b4c2b)
+  Thanks [@benjie](https://github.com/benjie)! - Add native support for Postgres
+  builtin list types via `LIST_TYPES` export.
+
+- Updated dependencies
+  [[`b793077`](https://github.com/graphile/crystal/commit/b793077f81c0bb56e5cb75853c06db6f934223ff),
+  [`57dfa70`](https://github.com/graphile/crystal/commit/57dfa70b70b026c4d84d58a6fd64731f22f7b11a)]:
+  - grafast@1.0.0-rc.8
+
 ## 1.0.0-rc.5
 
 ### Patch Changes
