@@ -3,6 +3,7 @@ import { inspect } from "node:util";
 
 import generate from "@babel/generator";
 import { parse } from "@babel/parser";
+import type { Scope } from "@babel/traverse";
 import traverse, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
 
@@ -330,6 +331,82 @@ function eliminateRedundantArguments(
       callPath.node.arguments.splice(argIdx, 1);
     }
   }
+}
+
+function inlineIfReferencedOnceOnly(
+  rootScope: Scope,
+  path: NodePath<t.VariableDeclarator> | NodePath<t.FunctionDeclaration>,
+) {
+  if (!t.isIdentifier(path.node.id)) {
+    return;
+  }
+  const bindingName = path.node.id.name;
+  const scope = t.isFunctionDeclaration(path.node)
+    ? path.scope.parent
+    : path.scope;
+  // Only optimize at top level
+  if (scope !== rootScope) {
+    return;
+  }
+  const binding = scope.bindings[bindingName];
+  if (!binding) {
+    return;
+  }
+  const expr = t.isFunctionDeclaration(path.node)
+    ? // Convert function to expression
+      t.functionExpression(
+        path.node.id,
+        path.node.params,
+        path.node.body,
+        path.node.generator,
+        path.node.async,
+      )
+    : path.node.init;
+  if (!expr) {
+    return;
+  }
+
+  // Skip if it's an export
+  const statementPath = path.getStatementParent();
+  if (
+    !statementPath ||
+    t.isExportNamedDeclaration(statementPath.node) ||
+    t.isExportDefaultDeclaration(statementPath.node)
+  ) {
+    return;
+  }
+
+  // Only replace if it's only referenced once (we don't want duplicates)
+  if (binding.referencePaths.length !== 1) {
+    return;
+  }
+  const targetPath = binding.referencePaths[0];
+  const parent = targetPath.parent;
+
+  // Don't turn this into an IIFE
+  if (
+    parent &&
+    t.isCallExpression(parent) &&
+    parent.callee === targetPath.node &&
+    (!t.isArrowFunctionExpression(expr) || t.isBlock(expr.body))
+  ) {
+    return;
+  }
+
+  // It's allowed if:
+  // 1. it's a simple value (scalar), OR
+  // 2. it's not being inserted into a function body
+  const targetFunctionParent = targetPath.getFunctionParent();
+  const sourceFunctionParent = path.getFunctionParent();
+  if (targetFunctionParent !== sourceFunctionParent) {
+    return;
+  }
+
+  targetPath.replaceWith(expr);
+  // This stopping is important to avoid 'Container is falsy' errors.
+  targetPath.stop();
+  scope.removeBinding(bindingName);
+  path.remove();
 }
 
 export const optimize = (inAst: t.File): t.File => {
@@ -723,99 +800,36 @@ export const optimize = (inAst: t.File): t.File => {
     // into the function body and remove the redundant
     // parameters/arguments.
     VariableDeclarator: {
-      exit: eliminateRedundantArguments,
+      exit(path) {
+        eliminateRedundantArguments(path);
+      },
     },
     FunctionDeclaration: {
-      exit: eliminateRedundantArguments,
+      exit(path) {
+        eliminateRedundantArguments(path);
+      },
     },
 
     Program: {
       exit(exitPath) {
         // Make sure our scope information is up to date!
-        exitPath.scope.crawl();
+        const rootScope = exitPath.scope;
+        rootScope.crawl();
 
         // Replace all things that are only referenced once.
         // This nested traversal approach inspired by https://github.com/babel/babel/issues/15544#issuecomment-1540542863
         exitPath.traverse({
-          VariableDeclarator: visitSubpath,
-          FunctionDeclaration: visitSubpath,
+          VariableDeclarator: {
+            exit(path) {
+              inlineIfReferencedOnceOnly(rootScope, path);
+            },
+          },
+          FunctionDeclaration: {
+            exit(path) {
+              inlineIfReferencedOnceOnly(rootScope, path);
+            },
+          },
         });
-        function visitSubpath(
-          path:
-            | NodePath<t.VariableDeclarator>
-            | NodePath<t.FunctionDeclaration>,
-        ) {
-          if (!t.isIdentifier(path.node.id)) {
-            return;
-          }
-          const bindingName = path.node.id.name;
-          const scope = t.isFunctionDeclaration(path.node)
-            ? path.scope.parent
-            : path.scope;
-          // Only optimize at top level
-          if (scope !== exitPath.scope) {
-            return;
-          }
-          const binding = scope.bindings[bindingName];
-          if (!binding) {
-            return;
-          }
-          const expr = t.isFunctionDeclaration(path.node)
-            ? // Convert function to expression
-              t.functionExpression(
-                path.node.id,
-                path.node.params,
-                path.node.body,
-                path.node.generator,
-                path.node.async,
-              )
-            : path.node.init;
-          if (!expr) {
-            return;
-          }
-
-          // Skip if it's an export
-          const statementPath = path.getStatementParent();
-          if (
-            !statementPath ||
-            t.isExportNamedDeclaration(statementPath.node) ||
-            t.isExportDefaultDeclaration(statementPath.node)
-          ) {
-            return;
-          }
-
-          // Only replace if it's only referenced once (we don't want duplicates)
-          if (binding.referencePaths.length !== 1) {
-            return;
-          }
-          const targetPath = binding.referencePaths[0];
-          const parent = targetPath.parent;
-
-          // Don't turn this into an IIFE
-          if (
-            parent &&
-            t.isCallExpression(parent) &&
-            parent.callee === targetPath.node &&
-            (!t.isArrowFunctionExpression(expr) || t.isBlock(expr.body))
-          ) {
-            return;
-          }
-
-          // It's allowed if:
-          // 1. it's a simple value (scalar), OR
-          // 2. it's not being inserted into a function body
-          const targetFunctionParent = targetPath.getFunctionParent();
-          const sourceFunctionParent = path.getFunctionParent();
-          if (targetFunctionParent !== sourceFunctionParent) {
-            return;
-          }
-
-          targetPath.replaceWith(expr);
-          // This stopping is important to avoid 'Container is falsy' errors.
-          targetPath.stop();
-          scope.removeBinding(bindingName);
-          path.remove();
-        }
       },
     },
   });
