@@ -732,7 +732,7 @@ export const optimize = (inAst: t.File): t.File => {
 
         // Strip it if it's inside another block and it either doesn't declare
         // any variables or is the only statement
-        if (path.parentPath.isBlockStatement() || path.parentPath.isProgram()) {
+        if (path.parentPath.isBlock()) {
           if (
             path.parentPath.node.body.length === 1 ||
             !body.some(t.isVariableDeclaration)
