@@ -974,6 +974,8 @@ function _convertToAST(
   depth: number,
   reference: t.Expression,
 ): t.Expression {
+  const wk = importWellKnownOrFactory(file, thing, locationHint, nameHint);
+  if (wk) return wk;
   if (isForbidden(thing)) {
     throw new Error(
       `The value at ${locationHint} is forbidden from being exported; please be more specific in your EXPORTABLE factories!`,
@@ -1189,16 +1191,14 @@ function convertToIdentifierViaAST(
   const variableIdentifier = file.makeVariable(nameHint || "value");
   file._values.set(thing, variableIdentifier);
 
-  const ast =
-    importWellKnownOrFactory(file, thing, locationHint, nameHint) ??
-    _convertToAST(
-      file,
-      thing,
-      locationHint,
-      nameHint,
-      depth,
-      variableIdentifier,
-    );
+  const ast = _convertToAST(
+    file,
+    thing,
+    locationHint,
+    nameHint,
+    depth,
+    variableIdentifier,
+  );
 
   const existingVariableIdentifier =
     file._convertToIdentifierViaASTCache.get(ast);
@@ -1353,7 +1353,7 @@ function factoryAst<TTuple extends any[]>(
         // neither match we must abort.
         if (
           existing.rawArgs[i] !== rawArgs[i] &&
-          existing.depArgs[i] !== depArgs[i]
+          !t.isNodesEquivalent(existing.depArgs[i], depArgs[i])
         ) {
           matches = false;
           break;
@@ -1372,8 +1372,9 @@ function factoryAst<TTuple extends any[]>(
 
 function factoryASTInner(
   funcAST: t.FunctionExpression | t.ArrowFunctionExpression,
-  depArgs: t.Expression[],
+  inDepArgs: t.Expression[],
 ) {
+  const depArgs = [...inDepArgs];
   // DEBT: we should be able to remove this now that we have the
   // post-processing via babel, however currently the result of doing so is
   // messy.
@@ -2159,12 +2160,18 @@ export async function exportSchemaAsString(
   return exportFile(file, options);
 }
 
-function exportFile(file: CodegenFile, { disableOptimize }: ExportOptions) {
-  const ast = file.toAST();
+function exportFile(
+  file: CodegenFile,
+  { disableOptimize, optimizeLoops = 2 }: ExportOptions,
+) {
+  let ast = file.toAST();
+  if (!disableOptimize) {
+    for (let i = 0; i < optimizeLoops; i++) {
+      ast = optimize(ast);
+    }
+  }
 
-  const optimizedAst = disableOptimize ? ast : optimize(ast);
-
-  const { code } = reallyGenerate(optimizedAst, {});
+  const { code } = reallyGenerate(ast, {});
   return { code };
 }
 

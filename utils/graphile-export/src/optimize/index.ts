@@ -1,3 +1,6 @@
+import assert from "node:assert";
+import { inspect } from "node:util";
+
 import generate from "@babel/generator";
 import { parse } from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";
@@ -37,6 +40,43 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
+type ScalarConstant =
+  | t.BooleanLiteral
+  | t.NullLiteral
+  | t.StringLiteral
+  | t.NumericLiteral
+  | t.BigIntLiteral
+  | (t.Identifier & { name: "undefined" });
+
+function isScalarConstant(arg: t.Node): arg is ScalarConstant {
+  return (
+    t.isBooleanLiteral(arg) ||
+    t.isNullLiteral(arg) ||
+    t.isStringLiteral(arg) ||
+    t.isNumericLiteral(arg) ||
+    t.isBigIntLiteral(arg) ||
+    (t.isIdentifier(arg) && arg.name === "undefined")
+  );
+}
+
+function getScalarConstantValue(arg: ScalarConstant) {
+  switch (arg.type) {
+    case "NullLiteral": {
+      return null;
+    }
+    case "Identifier": {
+      assert.equal(arg.name, "undefined");
+      return undefined;
+    }
+    case "BigIntLiteral": {
+      return BigInt(arg.value);
+    }
+    default: {
+      return arg.value;
+    }
+  }
+}
+
 const getExpression = (functionBody: t.BlockStatement | t.Expression) => {
   if (t.isExpression(functionBody)) {
     return functionBody;
@@ -52,24 +92,132 @@ function isSafeTemplateLiteralStringChunk(value: string): boolean {
   return !value.includes("`") && !value.includes("\\") && !value.includes("${");
 }
 
-export const optimize = (inAst: t.File, runs = 1): t.File => {
-  let ast = inAst;
-  // Reset the full AST
-  ast = parse(generate(ast).code, { sourceType: "module" });
+type ParamAction = { argIdx: number; name: string } & (
+  | { _: "eliminate" }
+  | { _: "substitute"; value: t.Expression }
+  | { _: "rename"; to: string }
+);
 
+function resolveBinaryOperator(
+  operator: t.BinaryExpression["operator"],
+  leftVal: any,
+  rightVal: any,
+) {
+  switch (operator) {
+    case "===":
+      return t.booleanLiteral(leftVal === rightVal);
+    case "!==":
+      return t.booleanLiteral(leftVal !== rightVal);
+    case "==":
+      return t.booleanLiteral(leftVal == rightVal);
+    case "!=":
+      return t.booleanLiteral(leftVal != rightVal);
+    case ">":
+      return t.booleanLiteral(leftVal > rightVal);
+    case "<":
+      return t.booleanLiteral(leftVal < rightVal);
+    case ">=":
+      return t.booleanLiteral(leftVal >= rightVal);
+    case "<=":
+      return t.booleanLiteral(leftVal <= rightVal);
+    default: {
+      return undefined;
+    }
+  }
+}
+
+/**
+ * Returns true if the expression at `path` will always be interpreted as a
+ * boolean because of it's context.
+ */
+function isBooleanContext(path: NodePath<t.LogicalExpression>): boolean {
+  const parentNode = path.parentPath.node;
+  if (
+    (t.isConditionalExpression(parentNode) || t.isIfStatement(parentNode)) &&
+    parentNode.test === path.node
+  ) {
+    return true;
+  }
+  if (t.isUnaryExpression(parentNode) && parentNode.operator === "!") {
+    return true;
+  }
+  return false;
+}
+
+export const optimize = (inAst: t.File): t.File => {
+  // Reset the full AST, since it will have been mangled and we want the latest
+  // bindings to be synchronized.
+  const ast = parse(generate(inAst).code, { sourceType: "module" });
+
+  // convert `plan: function plan() {...}` to `plan() { ... }`
+  // convert `fn(...["a", "b"])` to `fn("a", "b")`
+  // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
   traverse(ast, {
     LogicalExpression: {
-      enter(path) {
-        if (
-          (path.node.operator === "??" || path.node.operator === "||") &&
-          expressionIsAlwaysTruthy(path.node.left)
-        ) {
-          path.replaceWith(path.node.left);
+      exit(path) {
+        const { operator, left, right } = path.node;
+        switch (operator) {
+          case "??": {
+            if (expressionIsAlwaysTruthy(left)) {
+              path.replaceWith(left);
+            } else if (expressionIsNullOrUndefined(left)) {
+              path.replaceWith(right);
+            } else if (
+              expressionIsNullOrUndefined(right) &&
+              isBooleanContext(path)
+            ) {
+              path.replaceWith(left);
+            }
+            break;
+          }
+          case "||": {
+            if (expressionIsAlwaysTruthy(left)) {
+              path.replaceWith(left);
+            } else if (expressionIsAlwaysFalsy(left)) {
+              path.replaceWith(right);
+            } else if (
+              expressionIsAlwaysFalsy(right) &&
+              isBooleanContext(path)
+            ) {
+              path.replaceWith(left);
+            }
+            break;
+          }
+          case "&&": {
+            if (expressionIsAlwaysFalsy(left)) {
+              path.replaceWith(left);
+            } else if (expressionIsAlwaysTruthy(left)) {
+              path.replaceWith(right);
+            } else if (
+              expressionIsAlwaysTruthy(right) &&
+              isBooleanContext(path)
+            ) {
+              path.replaceWith(left);
+            }
+            break;
+          }
+        }
+      },
+    },
+    BinaryExpression: {
+      exit(path) {
+        const { left, right, operator } = path.node;
+        if (isScalarConstant(left) && isScalarConstant(right)) {
+          const leftVal = getScalarConstantValue(left);
+          const rightVal = getScalarConstantValue(right);
+          const replacement = resolveBinaryOperator(
+            operator,
+            leftVal,
+            rightVal,
+          );
+          if (replacement) {
+            path.replaceWith(replacement);
+          }
         }
       },
     },
     TemplateLiteral: {
-      enter(path) {
+      exit(path) {
         let changed = false;
         let quasis = path.node.quasis;
         let expressions = path.node.expressions;
@@ -83,12 +231,16 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             ) {
               continue;
             }
+
             // Inline it
+
             if (!changed) {
               changed = true;
+              // Make a mutable copy before we start editing!
               quasis = [...path.node.quasis];
               expressions = [...path.node.expressions];
             }
+
             quasis[i] = {
               ...quasis[i],
               value: {
@@ -118,24 +270,43 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     SpreadElement: {
-      enter(path) {
+      exit(path) {
+        // `...null` becomes nothing
         if (
           path.node.argument.type === "NullLiteral" &&
           path.parentPath.isObjectExpression()
         ) {
           path.remove();
+          return;
+        }
+
+        // `fn(a, b, ...[c, d, e])` becomes `fn(a, b, c, d, e)`
+        // `[a, b, ...[c, d, e]]` becomes `[a, b, c, d, e]`
+        if (t.isArrayExpression(path.node.argument)) {
+          const parentNode = path.parentPath.node;
+          if (
+            t.isCallExpression(parentNode) ||
+            t.isArrayExpression(parentNode)
+          ) {
+            path.replaceWithMultiple(
+              path.node.argument.elements.filter(isNotNullish),
+            );
+            return;
+          }
         }
       },
     },
     VariableDeclaration: {
-      enter(path) {
+      exit(path) {
         const node = path.node;
         if (node.declarations.length === 1) {
           const declaration = node.declarations[0];
           const name = declaration.id;
           if (name.type === "Identifier") {
             const fn = declaration.init;
-            if (fn && fn.type === "FunctionExpression") {
+            if (!fn) {
+              // noop
+            } else if (fn.type === "FunctionExpression") {
               const functionDecl = t.functionDeclaration(
                 name,
                 fn.params,
@@ -144,13 +315,17 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
                 fn.async,
               );
               path.replaceWith(functionDecl);
+            } else if (fn.type === "ClassExpression") {
+              path.replaceWith(
+                t.classDeclaration(name, fn.superClass, fn.body, fn.decorators),
+              );
             }
           }
         }
       },
     },
     CallExpression: {
-      enter(path) {
+      exit(path) {
         const node = path.node;
 
         if (
@@ -220,7 +395,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             const binding = calleePath.scope.bindings[param.name];
 
             // Replace all references to this identifier with the value
-            binding.referencePaths.forEach((referencePath) => {
+            binding?.referencePaths.forEach((referencePath) => {
               referencePath.replaceWith(t.cloneNode(arg));
             });
 
@@ -247,8 +422,8 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         exitPath.scope.crawl();
 
         // If a local top-level function is only ever called directly, and all
-        // calls pass the same identifier arguments in some positions, inline
-        // those identifiers into the function body and remove the redundant
+        // calls pass the same arguments in some positions, inline those values
+        // into the function body and remove the redundant
         // parameters/arguments.
         exitPath.traverse({
           VariableDeclarator: eliminateRedundantArguments,
@@ -417,146 +592,202 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             return;
           }
 
-          const indexesToEliminate: number[] = [];
-          const maxIndex = Math.min(
+          const actions: Array<ParamAction> = [];
+          const leastArgumentCount = Math.min(
             params.length,
             ...callPaths.map((callPath) => callPath.node.arguments.length),
           );
-          for (let i = 0; i < maxIndex; i++) {
-            const param = functionPath.node.params[i];
+          for (let argIdx = 0; argIdx < leastArgumentCount; argIdx++) {
+            const param = functionPath.node.params[argIdx];
             if (!t.isIdentifier(param)) {
+              // We don't support destructuring/rest/etc currently
               continue;
             }
-            const firstArg = callPaths[0].node.arguments[i];
-            if (!t.isIdentifier(firstArg)) {
-              continue;
-            }
-            const firstArgBinding = callPaths[0].scope.getBinding(
-              firstArg.name,
+            const { name } = param;
+
+            const [firstPath, ...remainingCallPaths] = callPaths;
+            const firstArg = firstPath.node.arguments[argIdx];
+            const allArgsAreEquivalent = remainingCallPaths.every((callPath) =>
+              t.isNodesEquivalent(callPath.node.arguments[argIdx], firstArg),
             );
-            if (!firstArgBinding || firstArgBinding.scope !== exitPath.scope) {
+
+            if (!allArgsAreEquivalent) {
+              // Not relevant to us; skip to the next argIdx
               continue;
-            }
-            let allMatch = true;
-            for (let j = 1; j < callPaths.length; j++) {
-              const arg = callPaths[j].node.arguments[i];
-              if (!t.isIdentifier(arg) || arg.name !== firstArg.name) {
-                allMatch = false;
-                break;
+            } else if (isScalarConstant(firstArg)) {
+              // Includes identifier `undefined`
+              const value = firstArg;
+              actions.push({ _: "substitute", argIdx, name, value });
+            } else if (t.isIdentifier(firstArg)) {
+              const globalName = firstArg.name;
+              assert.ok(
+                globalName !== "undefined",
+                "`undefined` should be handled by isScalarConstantArg",
+              );
+
+              const firstArgBinding = firstPath.scope.getBinding(globalName);
+              if (firstArgBinding?.scope !== exitPath.scope) {
+                // Not a global identifier, skip to next argument
+                continue;
+              } else if (param.name === globalName) {
+                // Simply eliminate so we can reference globalName directly
+                actions.push({ _: "eliminate", argIdx, name });
+              } else if (functionPath.scope.hasOwnBinding(globalName)) {
+                // Cannot safely rename inner references for this index, skip it
+                // TODO: handle renaming of conflicting variables to enable referencing global value.
+              } else {
+                // Rename inner references to match the globalName
+                actions.push({ _: "rename", argIdx, name, to: globalName });
               }
-              const argBinding = callPaths[j].scope.getBinding(arg.name);
-              if (!argBinding || argBinding.scope !== exitPath.scope) {
-                allMatch = false;
-                break;
-              }
-            }
-            if (!allMatch) {
-              continue;
-            }
-            if (firstArg.name === param.name) {
-              // Safe to eliminate directly
-              indexesToEliminate.push(i);
-            } else if (functionPath.scope.hasOwnBinding(firstArg.name)) {
-              // Cannot safely rename inner references for this index, skip it
-              // TODO: handle renaming of conflicting variables to enable referencing global value.
-              continue;
             } else {
-              // Safe to eliminate, but will need to rename inner references
-              indexesToEliminate.push(i);
+              // Too complex for us currently
+              continue;
             }
           }
 
-          if (indexesToEliminate.length === 0) {
+          if (actions.length === 0) {
+            // Nothing to do.
             return;
           }
 
-          for (const i of indexesToEliminate) {
-            const param = functionPath.node.params[i];
-            const firstArg = callPaths[0].node.arguments[i];
-            if (!t.isIdentifier(param) || !t.isIdentifier(firstArg)) {
-              // Satisfy TypeScript
-              throw new Error(
-                "GraphileExportInternalError<dc06a26c-543d-4bcf-8d21-24a2b51a385c>: This path should be unreachable",
-              );
-            }
-            if (param.name !== firstArg.name) {
-              // The rename of the inner references mentioned above
-              functionPath.scope.rename(param.name, firstArg.name);
+          let lastIdx = -1;
+
+          // Perform rewriting of the function as necessary
+          for (const action of actions) {
+            const { argIdx, name: paramName } = action;
+
+            // Guaranteed by above code
+            assert.ok(argIdx > lastIdx, "arg indexes must increase");
+            lastIdx = argIdx;
+
+            switch (action._) {
+              case "rename": {
+                functionPath.scope.rename(paramName, action.to);
+                break;
+              }
+              case "substitute": {
+                const binding = functionPath.scope.bindings[paramName];
+                if (binding?.referencePaths.length > 0) {
+                  const referencePaths = [...binding.referencePaths];
+                  for (const referencePath of referencePaths) {
+                    referencePath.replaceWith(t.cloneNode(action.value));
+                  }
+                  functionPath.scope.removeBinding(paramName);
+                }
+                break;
+              }
+              case "eliminate": {
+                // Eliminate only, no further action necessary
+                break;
+              }
+              default: {
+                const never: never = action;
+                throw new Error(`Not understood: ${inspect(never)}`);
+              }
             }
           }
 
-          for (let k = indexesToEliminate.length - 1; k >= 0; k--) {
-            const i = indexesToEliminate[k];
-            functionPath.node.params.splice(i, 1);
+          // Finally eliminate the arguments
+          for (let k = actions.length - 1; k >= 0; k--) {
+            const { argIdx } = actions[k];
+            functionPath.node.params.splice(argIdx, 1);
             for (const callPath of callPaths) {
-              callPath.node.arguments.splice(i, 1);
+              callPath.node.arguments.splice(argIdx, 1);
             }
           }
         }
       },
     },
-    BlockStatement(path) {
-      const body = path.node.body;
+    BlockStatement: {
+      exit(path) {
+        const body = path.node.body;
 
-      // Only strip if it's a statement within another block statement or the
-      // program. We don't want to trim block wrappers around for/if/while/etc
-      if (!path.parentPath.isBlockStatement() && !path.parentPath.isProgram()) {
-        return;
-      }
-
-      // Don't strip a block if there's any variable declarations in it.
-      if (body.some(t.isVariableDeclaration)) {
-        return;
-      }
-
-      path.replaceWithMultiple(body);
-    },
-  });
-
-  ast = parse(generate(ast).code, { sourceType: "module" });
-
-  // convert `plan: function plan() {...}` to `plan() { ... }`
-  // convert `fn(...["a", "b"])` to `fn("a", "b")`
-  // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
-  traverse(ast, {
-    IfStatement(path) {
-      const test = path.node.test;
-      if (expressionIsAlwaysFalsy(test)) {
-        if (path.node.alternate) {
-          path.replaceWith(path.node.alternate);
-        } else {
-          path.remove();
+        // If it only has two statements, the first being `const foo = ...` and the latter being `return foo` then rewrite to just `return ...`
+        if (body.length === 2) {
+          const [line1, line2] = body;
+          if (t.isReturnStatement(line2) && t.isIdentifier(line2.argument)) {
+            const identifierName = line2.argument.name;
+            if (
+              t.isVariableDeclaration(line1) &&
+              line1.declarations.length === 1
+            ) {
+              const { id, init } = line1.declarations[0];
+              if (t.isIdentifier(id) && id.name === identifierName) {
+                // One last check: is this same variable referenced inside the function?
+                const binding = path.scope.bindings[identifierName];
+                if (binding == null || binding.referencePaths.length === 0) {
+                  const ret = t.returnStatement(init);
+                  if (path.parentPath.isBlock()) {
+                    path.replaceWith(ret);
+                    return;
+                  } else {
+                    path.replaceWith(t.blockStatement([ret]));
+                    return;
+                  }
+                }
+              }
+            }
+          }
         }
-      } else if (expressionIsAlwaysTruthy(test)) {
-        path.replaceWith(path.node.consequent);
-      }
+
+        // Strip it if it's inside another block and it either doesn't declare
+        // any variables or is the only statement
+        if (path.parentPath.isBlock()) {
+          if (
+            path.parentPath.node.body.length === 1 ||
+            !body.some(t.isVariableDeclaration)
+          ) {
+            path.replaceWithMultiple(body);
+          }
+        }
+      },
     },
-    ConditionalExpression(path) {
-      const test = path.node.test;
-      if (expressionIsAlwaysFalsy(test)) {
-        path.replaceWith(path.node.alternate);
-      } else if (expressionIsAlwaysTruthy(test)) {
-        path.replaceWith(path.node.consequent);
-      }
+    IfStatement: {
+      exit(path) {
+        const test = path.node.test;
+        if (expressionIsAlwaysFalsy(test)) {
+          if (path.node.alternate) {
+            path.replaceWith(path.node.alternate);
+          } else {
+            path.remove();
+          }
+        } else if (expressionIsAlwaysTruthy(test)) {
+          path.replaceWith(path.node.consequent);
+        }
+      },
     },
-    ObjectProperty(path) {
-      if (!t.isIdentifier(path.node.key)) {
-        return;
-      }
-      const func = path.node.value;
-      if (!t.isFunctionExpression(func) && !t.isArrowFunctionExpression(func)) {
-        return;
-      }
-      if (t.isArrowFunctionExpression(func)) {
-        // Check if it contains `this`; if so, do not rewrite
-        const hasThis = !!path
-          .get("value")
-          .find((path) => t.isThisExpression(path.node));
-        if (hasThis) {
+    ConditionalExpression: {
+      exit(path) {
+        const test = path.node.test;
+        if (expressionIsAlwaysFalsy(test)) {
+          path.replaceWith(path.node.alternate);
+        } else if (expressionIsAlwaysTruthy(test)) {
+          path.replaceWith(path.node.consequent);
+        }
+      },
+    },
+    ObjectProperty: {
+      exit(path) {
+        if (!t.isIdentifier(path.node.key)) {
           return;
         }
-      }
-      /*
+        const func = path.node.value;
+        if (
+          !t.isFunctionExpression(func) &&
+          !t.isArrowFunctionExpression(func)
+        ) {
+          return;
+        }
+        if (t.isArrowFunctionExpression(func)) {
+          // Check if it contains `this`; if so, do not rewrite
+          const hasThis = !!path
+            .get("value")
+            .find((path) => t.isThisExpression(path.node));
+          if (hasThis) {
+            return;
+          }
+        }
+        /*
       if (!func.id) {
         return;
       }
@@ -564,40 +795,23 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         return;
       }
       */
-      const body = t.isBlock(func.body)
-        ? func.body
-        : t.blockStatement([t.returnStatement(func.body)]);
-      path.replaceWith(
-        t.objectMethod(
-          "method",
-          path.node.key,
-          func.params,
-          body,
-          false,
-          func.generator,
-          func.async,
-        ),
-      );
-    },
-    CallExpression(path) {
-      const argsPath = path.get("arguments");
-      if (argsPath.length === 1) {
-        const argPath = argsPath[0];
-        if (t.isSpreadElement(argPath.node)) {
-          const spreadPath = argPath as NodePath<t.SpreadElement>;
-          if (t.isArrayExpression(spreadPath.node.argument)) {
-            argPath.replaceWithMultiple(
-              spreadPath.node.argument.elements.filter(isNotNullish),
-            );
-          }
-        }
-      }
+        const body = t.isBlock(func.body)
+          ? func.body
+          : t.blockStatement([t.returnStatement(func.body)]);
+        path.replaceWith(
+          t.objectMethod(
+            "method",
+            path.node.key,
+            func.params,
+            body,
+            false,
+            func.generator,
+            func.async,
+          ),
+        );
+      },
     },
   });
-
-  if (runs < 2) {
-    return optimize(ast, runs + 1);
-  }
 
   return ast;
 };
@@ -616,22 +830,8 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
       return !test.value;
     case "StringLiteral":
       return !test.value;
-    case "BinaryExpression": {
-      switch (test.operator) {
-        case "!=": {
-          if (
-            expressionIsNullOrUndefined(test.left) &&
-            expressionIsNullOrUndefined(test.right)
-          ) {
-            return true;
-          }
-          return false;
-        }
-        default: {
-          return false;
-        }
-      }
-    }
+    case "NumericLiteral":
+      return !test.value;
     default:
       return false;
   }
@@ -639,6 +839,8 @@ function expressionIsAlwaysFalsy(test: t.Expression) {
 
 function expressionIsAlwaysTruthy(test: t.Expression) {
   switch (test.type) {
+    case "NullLiteral":
+      return false;
     case "BooleanLiteral":
       return test.value;
     case "StringLiteral":

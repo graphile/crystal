@@ -1395,7 +1395,7 @@ const getIdentifiersFromSpecifier1 = (handler, specifier) => {
 };
 const getIdentifiers_person = nodeId => getIdentifiersFromSpecifier1(nodeIdHandler_Person, decodeNodeId_person(nodeId));
 const localAttributeCodecs_post_author = [TYPES.int];
-const pgConditionApplyNodeId = (attributeCount, getIdentifiers, localAttributeCodecs, localAttributes, typeName, condition, nodeId) => {
+const pgConditionApplyNodeId = (getIdentifiers, localAttributeCodecs, localAttributes, typeName, condition, nodeId) => {
   if (nodeId === undefined) {
     return;
   } else if (nodeId === null) {
@@ -1416,7 +1416,7 @@ const pgConditionApplyNodeId = (attributeCount, getIdentifiers, localAttributeCo
     if (identifiers == null) {
       throw new Error(`Invalid node identifier for '${typeName}'`);
     }
-    for (let i = 0; i < attributeCount; i++) {
+    for (let i = 0; i < 1; i++) {
       const localName = localAttributes[i];
       const value = identifiers[i];
       if (value == null) {
@@ -1576,7 +1576,7 @@ const CreatePostPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPaylo
 function PostInput_bodyApply(obj, val, info) {
   obj.set("body", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const pgRowTypeApplyNodeId = (attributeCount, getIdentifiers, localAttributes, typeName, record, nodeId) => {
+const pgRowTypeApplyNodeId = (getIdentifiers, localAttributes, typeName, record, nodeId) => {
   if (nodeId === undefined) {
     return;
   } else if (nodeId === null) {
@@ -1591,22 +1591,22 @@ const pgRowTypeApplyNodeId = (attributeCount, getIdentifiers, localAttributes, t
     if (identifiers == null) {
       throw new Error(`Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`);
     }
-    for (let i = 0; i < attributeCount; i++) {
+    for (let i = 0; i < 1; i++) {
       const localName = localAttributes[i];
       record.set(localName, identifiers[i]);
     }
   }
 };
 function PostInput_authorApply(record, nodeId) {
-  return pgRowTypeApplyNodeId(1, getIdentifiers_person, registryConfig.pgRelations.post.author.localAttributes, "Person", record, nodeId);
+  return pgRowTypeApplyNodeId(getIdentifiers_person, registryConfig.pgRelations.post.author.localAttributes, "Person", record, nodeId);
 }
 const CreateTvEpisodePayload_tvEpisodeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
 function TvEpisodeInput_tvShowByShowIdApply(record, nodeId) {
-  return pgRowTypeApplyNodeId(1, getIdentifiers_tvShows, registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes, "TvShow", record, nodeId);
+  return pgRowTypeApplyNodeId(getIdentifiers_tvShows, registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes, "TvShow", record, nodeId);
 }
 const CreateTvShowPayload_tvShowEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_tv_showsPgResource, tv_showsUniques[0].attributes, $mutation, fieldArgs);
 function TvShowInput_studioByStudioIdApply(record, nodeId) {
-  return pgRowTypeApplyNodeId(1, getIdentifiers_studios, registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes, "Studio", record, nodeId);
+  return pgRowTypeApplyNodeId(getIdentifiers_studios, registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes, "Studio", record, nodeId);
 }
 const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(codecResource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
 function PersonInput_firstNameApply(obj, val, info) {
@@ -4510,7 +4510,7 @@ export const inputObjects = {
   PostCondition: {
     plans: {
       author(condition, nodeId) {
-        return pgConditionApplyNodeId(1, getIdentifiers_person, localAttributeCodecs_post_author, registryConfig.pgRelations.post.author.localAttributes, "Person", condition, nodeId);
+        return pgConditionApplyNodeId(getIdentifiers_person, localAttributeCodecs_post_author, registryConfig.pgRelations.post.author.localAttributes, "Person", condition, nodeId);
       },
       body($condition, val) {
         return applyAttributeCondition("body", TYPES.text, $condition, val);
@@ -4571,7 +4571,7 @@ export const inputObjects = {
     plans: {
       title: TvEpisodeCondition_titleApply,
       tvShowByShowId(condition, nodeId) {
-        return pgConditionApplyNodeId(1, getIdentifiers_tvShows, localAttributeCodecs_tvEpisodes_tvShowsByMyShowId, registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes, "TvShow", condition, nodeId);
+        return pgConditionApplyNodeId(getIdentifiers_tvShows, localAttributeCodecs_tvEpisodes_tvShowsByMyShowId, registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes, "TvShow", condition, nodeId);
       }
     }
   },
@@ -4593,7 +4593,7 @@ export const inputObjects = {
   TvShowCondition: {
     plans: {
       studioByStudioId(condition, nodeId) {
-        return pgConditionApplyNodeId(1, getIdentifiers_studios, localAttributeCodecs_tvShows_studiosByMyStudioId, registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes, "Studio", condition, nodeId);
+        return pgConditionApplyNodeId(getIdentifiers_studios, localAttributeCodecs_tvShows_studiosByMyStudioId, registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes, "Studio", condition, nodeId);
       },
       title: TvEpisodeCondition_titleApply
     }

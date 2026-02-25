@@ -534,10 +534,10 @@ function findTypeNameMatch(specifier) {
 function toString(value) {
   return "" + value;
 }
-function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+function applyAttributeCondition(attributeCodec, $condition, val) {
   $condition.where({
     type: "attribute",
-    attribute: attributeName,
+    attribute: "id",
     callback(expression) {
       return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
     }
@@ -1005,7 +1005,7 @@ export const inputObjects = {
   CitationCondition: {
     plans: {
       id($condition, val) {
-        return applyAttributeCondition("id", TYPES.int, $condition, val);
+        return applyAttributeCondition(TYPES.int, $condition, val);
       }
     }
   },
