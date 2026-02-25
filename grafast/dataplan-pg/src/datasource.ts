@@ -117,9 +117,13 @@ export interface PgResourceParameter<
    */
   codec: TCodec;
   /**
-   * If true, then this parameter must be supplied, otherwise it's optional.
+   * If true, then this parameter may be omitted, otherwise it must be supplied.
+   *
+   * NOTE: by default in Postgres all parameters are required unless they have
+   * defaults, therefore `optional: true` is the "odd one out", rather than
+   * using `required: false`.
    */
-  required?: boolean;
+  optional?: boolean;
   /**
    * If true and the parameter is supplied, then the parameter must not be
    * null.

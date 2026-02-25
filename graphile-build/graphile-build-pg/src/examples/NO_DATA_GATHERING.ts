@@ -243,7 +243,7 @@ async function main() {
         parameters: [
           {
             name: "featured",
-            required: false,
+            optional: true,
             codec: TYPES.boolean,
           },
         ],
@@ -267,13 +267,12 @@ async function main() {
           {
             name: "forum",
             codec: forumsCodec,
-            required: true,
             notNull: true,
           },
           {
             name: "featured",
             codec: TYPES.boolean,
-            required: false,
+            optional: true,
             notNull: false,
           },
         ],
@@ -296,7 +295,6 @@ async function main() {
           {
             name: "forum",
             codec: forumsCodec,
-            required: true,
             notNull: true,
           },
         ],
@@ -319,7 +317,6 @@ async function main() {
           {
             name: "forum",
             codec: forumsCodec,
-            required: true,
             notNull: true,
           },
         ],
