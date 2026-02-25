@@ -277,6 +277,7 @@ export const optimize = (inAst: t.File): t.File => {
           path.parentPath.isObjectExpression()
         ) {
           path.remove();
+          return;
         }
 
         // `fn(a, b, ...[c, d, e])` becomes `fn(a, b, c, d, e)`
@@ -290,6 +291,7 @@ export const optimize = (inAst: t.File): t.File => {
             path.replaceWithMultiple(
               path.node.argument.elements.filter(isNotNullish),
             );
+            return;
           }
         }
       },
