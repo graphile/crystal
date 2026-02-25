@@ -818,18 +818,16 @@ export const optimize = (inAst: t.File): t.File => {
 
         // Replace all things that are only referenced once.
         // This nested traversal approach inspired by https://github.com/babel/babel/issues/15544#issuecomment-1540542863
-        exitPath.traverse({
-          VariableDeclarator: {
-            exit(path) {
-              inlineIfReferencedOnceOnly(rootScope, path);
-            },
-          },
-          FunctionDeclaration: {
-            exit(path) {
-              inlineIfReferencedOnceOnly(rootScope, path);
-            },
-          },
-        });
+        // But since we don't need to visit the whole AST, we just find the paths we need
+        for (const statementPath of exitPath.get("body")) {
+          if (statementPath.isVariableDeclaration()) {
+            for (const declaratorPath of statementPath.get("declarations")) {
+              inlineIfReferencedOnceOnly(rootScope, declaratorPath);
+            }
+          } else if (statementPath.isFunctionDeclaration()) {
+            inlineIfReferencedOnceOnly(rootScope, statementPath);
+          }
+        }
       },
     },
   });
