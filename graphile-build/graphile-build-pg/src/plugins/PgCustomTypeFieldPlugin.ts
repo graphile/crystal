@@ -639,14 +639,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 param.notNull && !param.optional
                   ? new GraphQLNonNull(listType)
                   : listType;
-              return {
+              return forbidRequired({
                 graphqlArgName: argName,
                 pgCodec: param.codec,
                 inputType,
                 ...(param.name ? { postgresArgName: param.name } : null),
                 ...(param.optional ? { optional: true } : null),
                 ...(fetcher ? { fetcher } : null),
-              };
+              });
             });
 
             // Not used for isMutation; that's handled elsewhere.
