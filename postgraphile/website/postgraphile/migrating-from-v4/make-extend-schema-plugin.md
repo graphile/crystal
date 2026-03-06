@@ -174,6 +174,10 @@ A more performant (and simpler) solution to this would have been to do it in JS:
 
 :::
 
+Please refer to the
+[@dataplan/pg](https://grafast.org/grafast/step-library/dataplan-pg/)
+documentation for additional details.
+
 ## `@pgSubscription`
 
 In V4, `@pgSubscription` (from `@graphile/pg-pubsub`) let you embed a topic
@@ -279,10 +283,6 @@ Then use that step when constructing your `$topic`.
 
 For more subscription guidance, see [Realtime](../realtime) and
 [Subscriptions](../subscriptions).
-
-Please refer to the
-[@dataplan/pg](https://grafast.org/grafast/step-library/dataplan-pg/)
-documentation for additional details.
 
 ## `selectGraphQLResultFromTable`
 
