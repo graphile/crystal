@@ -62,9 +62,16 @@ In V5, the signature has changed a little.
 The first change is trivial: we've combined the first two arguments into a
 "match" object which also optionally accepts the `serviceName`.
 
-The second change, however, is much more significant — order generation now
-uses enum value configs with `extensions.grafast.apply(...)` callbacks rather
-than V4's `value.specs` shape.
+The `ordersGenerator` has changed a bit more though:
+
+- `orderByAscDesc`'s callback now accepts `queryBuilder` directly rather than
+  extracting it from an object
+- `queryBuilder.getTableAlias()` is now just `queryBuilder.alias`
+- `sqlValueWithCodec(value, codec)` should be used over `sql.value(value)` as it
+  will take care of casting the value according to the rules of `codec`
+- The return type of `orderByAscDesc`'s callback is now an object containing the
+  `fragment` alongside the `codec` that tells the system what type of data the
+  fragment represents (int/bigint/text/etc).
 
 The (simplified) new signatures are:
 

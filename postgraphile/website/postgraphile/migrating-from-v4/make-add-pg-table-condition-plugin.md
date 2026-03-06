@@ -26,9 +26,13 @@ In V5, the signature has changed a little.
 The first change is trivial: we've combined the first two arguments into a
 "match" object which also optionally accepts the `serviceName`.
 
-The second change, however, is much more significant — condition generation now
-operates through Grafast input field `apply`, which receives concrete runtime
-values. This differs from V4's lookahead-driven callback shape.
+The second change may be more involved depending on your previous code; the
+`conditionGenerator` signature has changed and rather than using the
+`queryBuilder` there's a `condition` to write to. You can still use
+`sql.value(value)` for embedding values as before, but it's recommended that
+instead you use `sqlValueWitCodec(value, codec)` as this will take care of
+casting the value via the relevant codec so it's the correct shape when it
+reaches the database. This matters more with more complex types.
 
 The (simplified) new signature is:
 
@@ -37,9 +41,7 @@ The (simplified) new signature is:
 function addPgTableCondition(
   match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
-  conditionFieldSpecGenerator: (
-    build: GraphileBuild.Build,
-  ) => GrafastInputFieldConfig,
+  fieldSpecGenerator: (build: GraphileBuild.Build) => GrafastInputFieldConfig,
 
   // OPTIONAL:
   conditionGenerator?: (
@@ -57,7 +59,7 @@ function addPgTableCondition(
 
 Note that the `conditionGenerator` is now optional because you can choose to
 instead include an `apply` (or `extensions.grafast.apply`) entry in the result
-of `conditionFieldSpecGenerator`.
+of `fieldSpecGenerator`.
 
 Here's an example:
 
@@ -85,8 +87,7 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
 );
 ```
 
-In V5 this callback path runs with runtime values, so use
-`sqlValueWithCodec(...)` to feed values safely into SQL expressions.
+V5:
 
 ```ts
 import { addPgTableCondition } from "postgraphile/utils";
