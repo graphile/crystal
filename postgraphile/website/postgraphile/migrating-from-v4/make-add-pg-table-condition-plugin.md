@@ -27,9 +27,8 @@ The first change is trivial: we've combined the first two arguments into a
 "match" object which also optionally accepts the `serviceName`.
 
 The second change, however, is much more significant — condition generation now
-operates based on the Gra*fast* plan system (which operates based on "steps"
-which represent all possible values) rather than V4's lookahead engine (which
-deals in concrete runtime values).
+operates through Grafast input field `apply`, which receives concrete runtime
+values. This differs from V4's lookahead-driven callback shape.
 
 The (simplified) new signature is:
 
@@ -38,25 +37,27 @@ The (simplified) new signature is:
 function addPgTableCondition(
   match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
-  fieldSpecGenerator: (build: GraphileBuild.Build) => GraphileInputFieldConfig,
+  conditionFieldSpecGenerator: (
+    build: GraphileBuild.Build,
+  ) => GrafastInputFieldConfig,
 
   // OPTIONAL:
   conditionGenerator?: (
-    value: FieldArgs,
+    value: unknown,
     helpers: {
-      $condition: PgConditionStep<PgSelectStep>;
       sql: typeof sql;
       sqlTableAlias: SQL;
-      build: GraphileBuild.Build;
+      sqlValueWithCodec: typeof sqlValueWithCodec;
+      build: ReturnType<typeof pruneBuild>;
+      condition: PgCondition;
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin;
 ```
 
 Note that the `conditionGenerator` is now optional because you can choose to
-instead include an `applyPlan` entry in the result of `fieldSpecGenerator` -
-these input field and argument plans are now inherent to the schema rather than
-floating in some unknowable space as they did in V4.
+instead include an `apply` (or `extensions.grafast.apply`) entry in the result
+of `conditionFieldSpecGenerator`.
 
 Here's an example:
 
@@ -84,14 +85,8 @@ const PetsCountPlugin = makeAddPgTableConditionPlugin(
 );
 ```
 
-Whereas in V5 the condition callback is called on every single GraphQL request,
-in V5 it is only called each time a new operation is planned — operations that
-reuse the plan do not call the condition callback again. `value.get()` gives us
-a step (`$val`) that represents all potential values for that input; we then
-feed this into the SQL statement via a placeholder (since it is not a concrete
-value) that will be substituted with the concrete runtime value each time a
-request executes. We also need to declare the type of the data so that it can
-be cast correctly for the database.
+In V5 this callback path runs with runtime values, so use
+`sqlValueWithCodec(...)` to feed values safely into SQL expressions.
 
 ```ts
 import { addPgTableCondition } from "postgraphile/utils";
@@ -105,10 +100,9 @@ const PetsCountPlugin = addPgTableCondition(
     type: build.graphql.GraphQLInt,
   }),
   (value, helpers) => {
-    const { sqlTableAlias, sql, $condition } = helpers;
-    const $val = value.get();
-    return sql.fragment`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${$condition.placeholder(
-      $val,
+    const { sqlTableAlias, sql, sqlValueWithCodec } = helpers;
+    return sql.fragment`(select count(*) from graphile_utils.pets where pets.user_id = ${sqlTableAlias}.id) >= ${sqlValueWithCodec(
+      value,
       TYPES.int,
     )}`;
   },

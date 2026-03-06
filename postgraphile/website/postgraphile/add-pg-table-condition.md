@@ -189,7 +189,17 @@ The signature of the `addPgTableCondition` function is:
 function addPgTableCondition(
   match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
-  fieldSpecGenerator: (build: GraphileBuild.Build) => GraphileInputFieldConfig,
+  fieldSpecGenerator: (build: GraphileBuild.Build) => GrafastInputFieldConfig,
+  conditionGenerator?: (
+    value: unknown,
+    helpers: {
+      sql: typeof sql;
+      sqlTableAlias: SQL;
+      sqlValueWithCodec: typeof sqlValueWithCodec;
+      build: ReturnType<typeof pruneBuild>;
+      condition: PgCondition;
+    },
+  ) => SQL | null | undefined,
 ): GraphileConfig.Plugin;
 ```
 
@@ -199,13 +209,13 @@ The table to match is the table named `tableName` in the schema named
 A new condition is added, named `conditionFieldName`, whose GraphQL
 representation is specified by the result of `fieldSpecGenerator`.
 
-Also inside `fieldSpecGenerator` should be an `applyPlan`, which indicates how
-this condition should work. It is passed two arguments, the `condition` (which
-is a `PgConditionStep` wrapping the `PgSelectStep` that we’re applying
-conditions to) and the `value` (which is a `FieldArgs` instance representing
-the value of the field). The `applyPlan` should use
-`condition.where((sql) => ...)` to apply a condition to the fetch.
+Also inside `fieldSpecGenerator` should be an `apply`, which indicates how
+this condition should work. It is passed two arguments: `condition` (a runtime
+`PgCondition` modifier for the current select) and `value` (the concrete runtime
+input value). The `apply` should typically use
+`condition.where((sql) => ...)` to apply a condition to the fetch, and use
+`sqlValueWithCodec(...)` for interpolated values.
 
 When the field named in `conditionFieldName` is used in a query, the
-`applyPlan` is called during planning, which results in an additional `WHERE`
-clause on the generated SQL (combined using `AND`).
+`apply` is called at runtime, resulting in an additional `WHERE` clause on the
+generated SQL (combined using `AND`).
