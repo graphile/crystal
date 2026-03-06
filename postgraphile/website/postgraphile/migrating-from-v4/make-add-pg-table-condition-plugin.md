@@ -30,7 +30,7 @@ The second change may be more involved depending on your previous code; the
 `conditionGenerator` signature has changed and rather than using the
 `queryBuilder` there's a `condition` to write to. You can still use
 `sql.value(value)` for embedding values as before, but it's recommended that
-instead you use `sqlValueWitCodec(value, codec)` as this will take care of
+instead you use `sqlValueWithCodec(value, codec)` as this will take care of
 casting the value via the relevant codec so it's the correct shape when it
 reaches the database. This matters more with more complex types.
 
