@@ -136,6 +136,9 @@ export async function build() {
     `${packagePath}/release/package.json`,
   );
 
+  // Force yarn to treat this as it's own project, so `yarn pack` doesn't complain
+  await $`touch release/yarn.lock`;
+
   // TODO: force GRAPHILE_ENV="production" and eliminate all related dead branches
 }
 

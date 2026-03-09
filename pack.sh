@@ -15,7 +15,7 @@ pack_pkg() {
   # sub-shell means no need to `cd -`
   (
     cd "${repoDir}/release" || return 1
-    rm package.tgz
+    rm -f package.tgz
     yarn pack -o package.tgz
     mv package.tgz "${repoRoot}/builds/${outputBasename}.tgz"
   )
