@@ -28,10 +28,11 @@
   },
   "scripts": {
     "codegen": "cd __tests__/dcc && node --experimental-strip-types ../../../../node_modules/.bin/graphql-codegen",
-    "test": "yarn codegen && yarn test:mocha && yarn test:bundle",
-    "test:bundle": "node --experimental-strip-types scripts/testbundle.mts",
-    "test:mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
-    "build": "zx scripts/build-npm.mjs",
+    "test": "yarn codegen && yarn test-mocha && yarn test-bundle",
+    "test-bundle": "node --experimental-strip-types scripts/testbundle.mts",
+    "test-mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
+    "build-release": "node ../../scripts/build-core.mts",
+    "prepack": "tsc -b",
     "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
   },
@@ -84,8 +85,7 @@
   },
   "files": [
     "fwd",
-    "dist",
-    "browser"
+    "dist"
   ],
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.0",
