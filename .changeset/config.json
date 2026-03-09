@@ -1,5 +1,8 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@2.2.0/schema.json",
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "onlyUpdatePeerDependentsWhenOutOfRange": true
+  },
   "changelog": [
     "@changesets/changelog-github",
     {
