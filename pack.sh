@@ -11,6 +11,14 @@ pack_pkg() {
   local repoRoot="$(pwd)"
   local packageDir="$1"
   local outputBasename="$2"
+  if [ "$packageDir" == "" ]; then
+    echo "INVALID pack_pkg CALL! $1 $2"
+    exit 1
+  fi
+  if [ "$outputBasename" == "" ]; then
+    echo "INVALID pack_pkg CALL! $1 $2"
+    exit 1
+  fi
 
   # sub-shell means no need to `cd -`
   (
@@ -24,7 +32,7 @@ pack_pkg() {
 pack_pkg utils/lru graphile__lru
 pack_pkg utils/tamedevil tamedevil
 pack_pkg utils/graphile-config graphile-config
-pack_pkg grafast/grafast
+pack_pkg grafast/grafast grafast
 pack_pkg grafast/ruru-types ruru-types
 pack_pkg grafast/ruru-components ruru-components
 pack_pkg grafast/ruru ruru
