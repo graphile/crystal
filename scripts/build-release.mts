@@ -72,31 +72,6 @@ async function transformPackageJson(packageJson: any, targetFilePath: string) {
   await fsp.writeFile(targetFilePath, JSON.stringify(newJson, null, 2));
 }
 
-export async function esmHack(codePath: string) {
-  const pkg = require(codePath);
-  const code = await fsp.readFile(codePath, "utf8");
-
-  await fsp.writeFile(
-    codePath,
-    `\
-// Convince Node to allow ESM named imports
-${Object.keys(pkg)
-  .map(
-    (varName) =>
-      `${
-        varName.match(/^[_a-zA-Z$][_a-zA-Z$0-9]*$/)
-          ? `exports.${varName}`
-          : `exports[${JSON.stringify(varName)}]`
-      } = null /* placeholder */;`,
-  )
-  .join("\n")}
-
-// Bundled module
-${code}
-`,
-  );
-}
-
 export async function build() {
   const packagePath = process.cwd();
   const packageJson = JSON.parse(
