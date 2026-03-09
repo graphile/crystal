@@ -29,17 +29,32 @@ async function transformPackageJson(packageJson: any, targetFilePath: string) {
         const version = deps[moduleName];
         if (typeof version === "string" && version.startsWith("workspace:")) {
           const range = version.substring(10);
-          if (range.length !== 1) {
-            throw new Error(`Don't understand '${version}'`);
+          if (range.length > 1) {
+            if (key !== "peerDependencies") {
+              throw new Error(
+                `${key} should typically not use explicit version range, otherwise changes may not be reflected accurately ${newJson.name}[${key}][${moduleName}] = ${version}`,
+              );
+            }
+            deps[moduleName] = `${range}`;
+          } else {
+            if (key === "peerDependencies") {
+              if (newJson.dependencies?.[moduleName]) {
+                // This is okay; we're peer-depending _and_ regular depending.
+              } else {
+                throw new Error(
+                  `${key} should use explicit version range, otherwise lots of unnecessary bumping may occur from changesets. ${newJson.name}[${key}][${moduleName}] = ${version}`,
+                );
+              }
+            }
+            // Find the package's version
+            const packageJson = JSON.parse(
+              await fsp.readFile(
+                `${__dirname}/../node_modules/${moduleName}/package.json`,
+                "utf8",
+              ),
+            );
+            deps[moduleName] = `${range}${packageJson.version}`;
           }
-          // Find the package's version
-          const packageJson = JSON.parse(
-            await fsp.readFile(
-              `${__dirname}/../node_modules/${moduleName}/package.json`,
-              "utf8",
-            ),
-          );
-          deps[moduleName] = `${range}${packageJson.version}`;
           console.log(
             `packageJson.${key}[${JSON.stringify(moduleName)}] went from ${version} to ${deps[moduleName]}`,
           );
