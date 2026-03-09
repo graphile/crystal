@@ -5,6 +5,7 @@ rm -rf builds/
 mkdir builds/
 
 yarn clean
+yarn workspaces foreach --parallel --topological-dev --all run prepack
 
 pack_pkg() {
   local repoRoot="$(pwd)"
@@ -13,7 +14,7 @@ pack_pkg() {
 
   # sub-shell means no need to `cd -`
   (
-    cd "${packageDir}"
+    cd "${packageDir}/release"
     rm -f package.tgz
     yarn pack -o package.tgz
     mv package.tgz "${repoRoot}/builds/${outputBasename}.tgz"
