@@ -24,5 +24,9 @@ jobs:
       - name: Install Dependencies
         run: yarn
 
-      - name: Create Release Pull Request
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
         uses: changesets/action@v1
+        with:
+          version: yarn changeset-version
+          publish: yarn changeset-publish

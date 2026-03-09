@@ -5,7 +5,7 @@ rm -rf builds/
 mkdir builds/
 
 yarn clean
-yarn workspaces foreach --parallel --topological-dev --all run prepack
+yarn workspaces-prepack
 
 pack_pkg() {
   local repoRoot="$(pwd)"
