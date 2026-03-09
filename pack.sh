@@ -5,7 +5,6 @@ rm -rf builds/
 mkdir builds/
 
 yarn clean
-yarn build
 
 pack_pkg() {
   local repoRoot="$(pwd)"
@@ -14,7 +13,7 @@ pack_pkg() {
 
   # sub-shell means no need to `cd -`
   (
-    cd "${packageDir}/release" || return 1
+    cd "${packageDir}"
     rm -f package.tgz
     yarn pack -o package.tgz
     mv package.tgz "${repoRoot}/builds/${outputBasename}.tgz"
