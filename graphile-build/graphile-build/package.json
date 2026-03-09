@@ -55,8 +55,8 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "grafast": "workspace:^",
-    "graphile-config": "workspace:^",
+    "grafast": "workspace:^1.0.0-rc.8",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0"
   },
   "files": [

@@ -74,7 +74,7 @@
   "peerDependencies": {
     "@dataplan/json": "workspace:^",
     "grafast": "workspace:^",
-    "graphile-config": "workspace:^",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "pg": "^8.7.1",
     "pg-sql2": "workspace:^"

@@ -40,9 +40,9 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "graphile-build": "workspace:^",
-    "graphile-config": "workspace:^",
-    "postgraphile": "workspace:^"
+    "graphile-build": "workspace:^5.0.0-rc.5",
+    "graphile-config": "workspace:^1.0.0-rc.5",
+    "postgraphile": "workspace:^5.0.0-rc.9"
   },
   "peerDependenciesMeta": {
     "graphile-build": {

@@ -34,7 +34,7 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "grafast": "workspace:^"
+    "grafast": "workspace:^1.0.0-rc.8"
   },
   "files": [
     "dist"

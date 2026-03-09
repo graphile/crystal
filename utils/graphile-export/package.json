@@ -55,7 +55,7 @@
   },
   "peerDependencies": {
     "eslint": "^8.48.0 || ^9.26.0",
-    "grafast": "workspace:^",
+    "grafast": "workspace:^1.0.0-rc.8",
     "pg-sql2": "workspace:^5.0.0-rc.4"
   },
   "peerDependenciesMeta": {

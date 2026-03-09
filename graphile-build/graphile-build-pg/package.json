@@ -75,14 +75,14 @@
     "tslib": "^2.8.1"
   },
   "peerDependencies": {
-    "@dataplan/pg": "workspace:^",
-    "grafast": "workspace:^",
-    "graphile-build": "workspace:^",
-    "graphile-config": "workspace:^",
+    "@dataplan/pg": "workspace:^1.0.0-rc.7",
+    "grafast": "workspace:^1.0.0-rc.8",
+    "graphile-build": "workspace:^5.0.0-rc.5",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "pg": "^8.7.1",
-    "pg-sql2": "workspace:^",
-    "tamedevil": "workspace:^"
+    "pg-sql2": "workspace:^5.0.0-rc.4",
+    "tamedevil": "workspace:^0.1.0-rc.5"
   },
   "peerDependenciesMeta": {
     "pg": {

@@ -114,7 +114,7 @@
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
     "@whatwg-node/server": "^0.9.64",
-    "grafast": "workspace:^",
+    "grafast": "workspace:^1.0.0-rc.8",
     "graphile-config": "workspace:^",
     "graphql": "^16.9.0",
     "h3": "^1.13.0",

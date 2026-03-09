@@ -63,7 +63,7 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "graphile-config": "workspace:^",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
