@@ -34,7 +34,6 @@
     "node": ">=22"
   },
   "files": [
-    "fwd",
     "dist"
   ],
   "publishConfig": {
