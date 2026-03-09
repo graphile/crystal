@@ -126,6 +126,9 @@ export async function build() {
       await $`cp ${f} ${`release/${f}`}`;
     }
   }
+  if (existsSync(`${packagePath}/.npmignore`)) {
+    await $`cp .npmignore release/.npmignore`;
+  }
   if (existsSync(`${packagePath}/src/.npmignore`)) {
     await $`cp src/.npmignore release/dist/.npmignore`;
   }
