@@ -15,6 +15,12 @@ async function transformPackageJson(packageJson: any, targetFilePath: string) {
   delete newJson.scripts;
   delete newJson.devDependencies;
   delete newJson.publishConfig.directory;
+  if (!newJson.name.startsWith("@")) {
+    delete newJson.publishConfig.access;
+  }
+  if (Object.keys(newJson.publishConfig).length === 0) {
+    delete newJson.publishConfig;
+  }
 
   for (const key in newJson) {
     if (
