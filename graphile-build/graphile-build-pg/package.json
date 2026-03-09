@@ -94,8 +94,7 @@
   },
   "files": [
     "dist",
-    "fwd",
-    "index.js"
+    "fwd"
   ],
   "devDependencies": {
     "@envelop/core": "^5.3.0",

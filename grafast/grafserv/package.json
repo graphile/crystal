@@ -170,8 +170,7 @@
   },
   "files": [
     "dist",
-    "fwd",
-    "index.js"
+    "fwd"
   ],
   "publishConfig": {
     "directory": "release",

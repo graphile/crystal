@@ -76,8 +76,7 @@
     "typescript": "^5.9.3"
   },
   "files": [
-    "dist",
-    "index.js"
+    "dist"
   ],
   "publishConfig": {
     "directory": "release",

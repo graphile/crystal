@@ -60,8 +60,7 @@
     "graphql": "^16.9.0"
   },
   "files": [
-    "dist",
-    "index.js"
+    "dist"
   ],
   "devDependencies": {
     "@types/debug": "^4.1.12",
