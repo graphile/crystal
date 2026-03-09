@@ -34,7 +34,6 @@
     "test-bundle": "node --experimental-strip-types scripts/testbundle.mts",
     "test-mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
     "build": "tsc -b",
-    "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
   },
   "repository": {
