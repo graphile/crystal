@@ -2807,7 +2807,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
   peerDependencies:
-    grafast: "workspace:^"
+    grafast: "workspace:^1.0.0-rc.8"
   languageName: unknown
   linkType: soft
 
@@ -2854,7 +2854,7 @@ __metadata:
   peerDependencies:
     "@dataplan/json": "workspace:^"
     grafast: "workspace:^"
-    graphile-config: "workspace:^"
+    graphile-config: "workspace:^1.0.0-rc.5"
     graphql: ^16.9.0
     pg: ^8.7.1
     pg-sql2: "workspace:^"
@@ -3993,9 +3993,9 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
   peerDependencies:
-    grafast: "workspace:^"
-    grafserv: "workspace:^"
-    graphile-config: "workspace:^"
+    grafast: "workspace:^1.0.0-rc.8"
+    grafserv: "workspace:^1.0.0-rc.6"
+    graphile-config: "workspace:^1.0.0-rc.5"
     graphql: ^16.9.0
   peerDependenciesMeta:
     graphile-config:
@@ -14682,7 +14682,7 @@ __metadata:
   peerDependencies:
     "@envelop/core": ^5.0.0
     "@whatwg-node/server": ^0.9.64
-    grafast: "workspace:^"
+    grafast: "workspace:^1.0.0-rc.8"
     graphile-config: "workspace:^"
     graphql: ^16.9.0
     h3: ^1.13.0
@@ -14744,14 +14744,14 @@ __metadata:
     typescript: "npm:^5.9.3"
     ws: "npm:^8.18.3"
   peerDependencies:
-    "@dataplan/pg": "workspace:^"
-    grafast: "workspace:^"
-    graphile-build: "workspace:^"
-    graphile-config: "workspace:^"
+    "@dataplan/pg": "workspace:^1.0.0-rc.7"
+    grafast: "workspace:^1.0.0-rc.8"
+    graphile-build: "workspace:^5.0.0-rc.5"
+    graphile-config: "workspace:^1.0.0-rc.5"
     graphql: ^16.9.0
     pg: ^8.7.1
-    pg-sql2: "workspace:^"
-    tamedevil: "workspace:^"
+    pg-sql2: "workspace:^5.0.0-rc.4"
+    tamedevil: "workspace:^0.1.0-rc.5"
   peerDependenciesMeta:
     pg:
       optional: true
@@ -14783,8 +14783,8 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
   peerDependencies:
-    grafast: "workspace:^"
-    graphile-config: "workspace:^"
+    grafast: "workspace:^1.0.0-rc.8"
+    graphile-config: "workspace:^1.0.0-rc.5"
     graphql: ^16.9.0
   languageName: unknown
   linkType: soft
@@ -14832,7 +14832,7 @@ __metadata:
     typescript: "npm:^5.9.3"
   peerDependencies:
     eslint: ^8.48.0 || ^9.26.0
-    grafast: "workspace:^"
+    grafast: "workspace:^1.0.0-rc.8"
     pg-sql2: "workspace:^5.0.0-rc.4"
   peerDependenciesMeta:
     eslint:
@@ -14858,19 +14858,19 @@ __metadata:
     jest-serializer-graphql-schema: "workspace:^"
     json5: "npm:^2.2.3"
     nodemon: "npm:^3.1.11"
-    postgraphile: "workspace:^"
+    pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
   peerDependencies:
-    "@dataplan/pg": "workspace:^"
-    grafast: "workspace:^"
-    graphile-build: "workspace:^"
-    graphile-build-pg: "workspace:^"
-    graphile-config: "workspace:^"
+    "@dataplan/pg": "workspace:^1.0.0-rc.7"
+    grafast: "workspace:^1.0.0-rc.8"
+    graphile-build: "workspace:^5.0.0-rc.5"
+    graphile-build-pg: "workspace:^5.0.0-rc.7"
+    graphile-config: "workspace:^1.0.0-rc.5"
     graphql: ^16.9.0
-    tamedevil: "workspace:^"
+    tamedevil: "workspace:^0.1.0-rc.5"
   peerDependenciesMeta:
     graphile-build-pg:
       optional: true
@@ -14892,9 +14892,9 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
   peerDependencies:
-    graphile-build: "workspace:^"
-    graphile-config: "workspace:^"
-    postgraphile: "workspace:^"
+    graphile-build: "workspace:^5.0.0-rc.5"
+    graphile-config: "workspace:^1.0.0-rc.5"
+    postgraphile: "workspace:^5.0.0-rc.9"
   peerDependenciesMeta:
     graphile-build:
       optional: true
@@ -23279,7 +23279,7 @@ __metadata:
     webpack-cli: "npm:^6.0.1"
     yargs: "npm:^17.7.2"
   peerDependencies:
-    graphile-config: "workspace:^"
+    graphile-config: "workspace:^1.0.0-rc.5"
     graphql: ^16.9.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
