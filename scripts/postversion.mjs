@@ -55,6 +55,10 @@ releasedPackages.sort();
 await $`yarn`;
 await $`git add yarn.lock`;
 
+// 3b. Rebuild Ruru HTML
+await $`yarn workspace ruru run make-ruru-html`;
+await $`git add grafast/website/static/myruru/index.html`;
+
 // 4. Commit changes (including `.changeset/pre.json`) with helpful commit message
 await $`git add ${toCommit}`;
 const commitMessage = `\
