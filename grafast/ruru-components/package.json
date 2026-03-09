@@ -16,8 +16,8 @@
     }
   },
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
-    "prepack": "tsc -b"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",

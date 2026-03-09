@@ -4,8 +4,8 @@
   "description": "Simplifies the graphile-build/graphile-build-pg inflection to trim the `ByFooIdAndBarId` from relations, etc",
   "main": "dist/index.js",
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
-    "prepack": "tsc -b",
+    "prepack": "node ../../scripts/build-release.mts",
+    "build": "tsc -b",
     "test": "node test.js"
   },
   "repository": {

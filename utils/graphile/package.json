@@ -6,9 +6,9 @@
   "bin": "dist/cli-run.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
+    "prepack": "node ../../scripts/build-release.mts",
     "test": "true",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",

@@ -37,9 +37,9 @@
     }
   },
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
+    "prepack": "node ../../scripts/build-release.mts",
     "test": "jest",
-    "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
+    "build": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {
     "type": "git",

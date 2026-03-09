@@ -12,8 +12,8 @@
     }
   },
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
-    "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {
     "type": "git",

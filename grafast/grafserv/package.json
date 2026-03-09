@@ -76,8 +76,8 @@
     }
   },
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
-    "prepack": "tsc -b",
+    "prepack": "node ../../scripts/build-release.mts",
+    "build": "tsc -b",
     "test": "jest",
     "posttest": "yarn playwright install chromium && node --experimental-strip-types scripts/smoke-examples.mts"
   },

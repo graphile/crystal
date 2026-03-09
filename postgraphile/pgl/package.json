@@ -207,8 +207,8 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
-    "prepack": "tsc -b tsconfig.build.json"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build": "tsc -b tsconfig.build.json"
   },
   "repository": {
     "type": "git",

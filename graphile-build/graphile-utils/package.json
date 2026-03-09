@@ -12,9 +12,9 @@
     }
   },
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
+    "prepack": "node ../../scripts/build-release.mts",
     "test": "jest",
-    "prepack": "tsc -b tsconfig.build.json"
+    "build": "tsc -b tsconfig.build.json"
   },
   "repository": {
     "type": "git",

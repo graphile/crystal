@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build-release": "node ../../scripts/build-release.mts",
-    "prepack": "tsc -b",
+    "prepack": "node ../../scripts/build-release.mts",
+    "build": "tsc -b",
     "watch": "tsc -b --watch"
   },
   "repository": {
