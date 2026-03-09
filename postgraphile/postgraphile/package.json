@@ -225,6 +225,7 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
+    "graphile": "node ../../utils/graphile/dist/cli-run.js",
     "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
@@ -312,7 +313,6 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemon": "^3.1.1",
-    "graphile": "workspace:^",
     "graphile-export": "workspace:^",
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",

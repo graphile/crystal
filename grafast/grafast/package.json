@@ -29,6 +29,7 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
+    "graphile": "node ../../utils/graphile/dist/cli-run.js",
     "codegen": "cd __tests__/dcc && node --experimental-strip-types ../../../../node_modules/.bin/graphql-codegen",
     "test": "yarn codegen && yarn test-mocha && yarn test-bundle",
     "test-bundle": "node --experimental-strip-types scripts/testbundle.mts",
@@ -98,7 +99,6 @@
     "@types/node": "^22.19.1",
     "@types/nodemon": "^3.1.1",
     "chai": "^5.3.3",
-    "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "jest": "^30.2.0",
     "lodash": "^4.17.23",

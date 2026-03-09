@@ -78,6 +78,7 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
+    "graphile": "node ../../utils/graphile/dist/cli-run.js",
     "build": "tsc -b",
     "test": "jest",
     "posttest": "yarn playwright install chromium && node --experimental-strip-types scripts/smoke-examples.mts"
@@ -154,7 +155,6 @@
     "express": "^4.21.2",
     "fastify": "^4.29.1 || ^5.0.0",
     "grafast": "workspace:^",
-    "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.4",
     "h3": "^1.15.5",
