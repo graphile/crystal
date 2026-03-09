@@ -12,7 +12,7 @@
     "watch": "BUILD_MODE=development yarn build && tsc -b --watch",
     "clean": "( jest --clearCache || true ) && ( rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo} postgraphile/postgraphile/.tests_tmp/ grafast/ruru/static grafast/ruru/src/bundleCode.ts grafast/ruru/src/bundleMeta.ts || true )",
     "tsc:watch:clean": "( rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo} || true ) && tsc -b --watch",
-    "workspaces-build-release": "yarn workspaces foreach --topological --all run build-release",
+    "workspaces-build-release": "yarn workspaces foreach --topological-dev --all run build-release",
     "changeset-version": "yarn changeset version && node scripts/postversion.mjs",
     "w": "yarn workspace",
     "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
