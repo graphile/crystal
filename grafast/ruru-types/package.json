@@ -13,6 +13,7 @@
   },
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "build": "tsc -b"
   },
   "repository": {

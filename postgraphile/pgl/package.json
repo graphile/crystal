@@ -208,6 +208,7 @@
   "bin": "./dist/cli-run.js",
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "build": "tsc -b tsconfig.build.json"
   },
   "repository": {

@@ -4,6 +4,7 @@
   "description": "A GraphQL code generator plugin for Grafast schemas",
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "build": "tsc -b"
   },
   "exports": {

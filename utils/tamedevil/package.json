@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "pretest": "node dist/index.js",
     "test": "jest",
     "posttest": "yarn test:docs",

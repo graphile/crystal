@@ -7,7 +7,7 @@
     "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --all --topological-dev run pretest",
     "test": "NODE_ENV=test yarn workspaces foreach --all --topological-dev run test",
     "posttest": "NODE_ENV=test yarn workspaces foreach --all --topological-dev run posttest && node scripts/benjies-depcheck.mjs",
-    "build": "yarn && yarn workspace ruru-components build && yarn workspace ruru build && tsc -b && yarn workspaces foreach --parallel --topological-dev --all --exclude '.' --exclude 'ruru' --exclude 'ruru-components' run build",
+    "build": "yarn && yarn workspace ruru-components build-package && yarn workspace ruru build-package && tsc -b && yarn workspaces foreach --parallel --topological-dev --all --exclude '.' --exclude 'ruru' --exclude 'ruru-components' run build-package",
     "watch": "BUILD_MODE=development yarn build && tsc -b --watch",
     "clean": "( jest --clearCache || true ) && ( rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo} postgraphile/postgraphile/.tests_tmp/ grafast/ruru/static grafast/ruru/src/bundleCode.ts grafast/ruru/src/bundleMeta.ts || true )",
     "tsc:watch:clean": "( rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo} || true ) && tsc -b --watch",
