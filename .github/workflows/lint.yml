@@ -28,9 +28,6 @@ jobs:
       - name: "Build"
         run: yarn build
 
-      - name: "Prepack"
-        run: yarn workspaces foreach --parallel --topological --all run prepack
-
       - name: "Lint Code"
         run: yarn eslint .
 
@@ -73,7 +70,7 @@ jobs:
       - run: yarn --immutable
 
       - name: "Build Code"
-        run: yarn build && yarn prepack:all
+        run: yarn build
 
       - name: "Run depcheck script"
         run: node scripts/benjies-depcheck.mjs

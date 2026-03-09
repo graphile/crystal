@@ -152,6 +152,6 @@ Make sure you first follow the instructions in the
 then run the test with the following commands:
 
 ```bash
-yarn prepack
+yarn build
 yarn test
 ```

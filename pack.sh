@@ -5,7 +5,7 @@ rm -rf builds/
 mkdir builds/
 
 yarn clean
-yarn workspaces-build-release
+yarn build
 
 pack_pkg() {
   local repoDir="$1"

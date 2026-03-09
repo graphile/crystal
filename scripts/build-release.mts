@@ -116,7 +116,7 @@ export async function build() {
   }
 
   await $`rm -Rf tsconfig*.tsbuildinfo dist release`;
-  await $`yarn prepack`;
+  await $`yarn build`;
   await mkdir("release");
   for (const f of packageJson.files) {
     const stats = await stat(f);
