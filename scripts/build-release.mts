@@ -132,7 +132,7 @@ export async function build() {
   if (existsSync(`${packagePath}/src/.npmignore`)) {
     await $`cp src/.npmignore release/dist/.npmignore`;
   }
-  await $`cp LICENSE.md README.md release/`;
+  await $`cp LICENSE.md README.md CHANGELOG.md release/`;
 
   await transformPackageJson(
     packageJson,
