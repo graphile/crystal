@@ -1,4 +1,4 @@
-/* global $, cd */
+/* global $ */
 
 import "zx/globals";
 
