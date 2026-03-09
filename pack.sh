@@ -8,13 +8,13 @@ yarn clean
 yarn build
 
 pack_pkg() {
-  local repoDir="$1"
-  local outputBasename="$2"
   local repoRoot="$(pwd)"
+  local packageDir="$1"
+  local outputBasename="$2"
 
   # sub-shell means no need to `cd -`
   (
-    cd "${repoDir}/release" || return 1
+    cd "${packageDir}/release" || return 1
     rm -f package.tgz
     yarn pack -o package.tgz
     mv package.tgz "${repoRoot}/builds/${outputBasename}.tgz"
