@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'yarn'
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
