@@ -20,6 +20,7 @@
     }
   },
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "test": "mocha '__tests__/**/*.test.ts'",
     "prepack": "tsc -b"
   },
@@ -62,5 +63,9 @@
     "mocha": "^11.7.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

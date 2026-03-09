@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "prepack": "tsc -b"
   },
   "repository": {
@@ -45,5 +46,9 @@
     "jest": "^30.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

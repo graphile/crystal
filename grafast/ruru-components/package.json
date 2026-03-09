@@ -16,6 +16,7 @@
     }
   },
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "prepack": "tsc -b"
   },
   "repository": {
@@ -78,5 +79,9 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

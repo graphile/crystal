@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "prepack": "tsc -b",
     "test": "true"
   },
@@ -70,5 +71,9 @@
   "files": [
     "dist",
     "index.js"
-  ]
+  ],
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
+  }
 }

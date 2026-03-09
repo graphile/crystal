@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "test": "jest",
     "prepack": "tsc -b tsconfig.build.json"
   },
@@ -77,5 +78,9 @@
   "files": [
     "dist",
     "index.js"
-  ]
+  ],
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
+  }
 }

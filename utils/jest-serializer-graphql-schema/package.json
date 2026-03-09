@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "test": "jest",
     "prepack": "tsc -b",
     "watch": "tsc -b --watch"
@@ -41,5 +42,9 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
+  }
 }

@@ -37,6 +37,7 @@
     }
   },
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "test": "jest",
     "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
@@ -120,5 +121,9 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "ws": "^8.18.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

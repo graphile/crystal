@@ -223,6 +223,7 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
@@ -317,5 +318,9 @@
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

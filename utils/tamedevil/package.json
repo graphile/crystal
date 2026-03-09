@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "pretest": "node dist/index.js",
     "test": "jest",
     "posttest": "yarn test:docs",
@@ -52,5 +53,9 @@
   ],
   "engines": {
     "node": ">=22"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

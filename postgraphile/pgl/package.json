@@ -207,6 +207,7 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
@@ -275,5 +276,9 @@
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build-release": "node ../../scripts/build-release.mts",
     "test": "node --experimental-strip-types --test",
     "prepack": "tsc -b"
   },
@@ -46,5 +47,9 @@
   ],
   "engines": {
     "node": ">=22"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }
