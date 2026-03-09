@@ -80,6 +80,22 @@ not do this unless you are certain!
 
 :::
 
+## When to use something else
+
+Before reaching for `lambda`, consider whether a better tool exists:
+
+- **I/O or async work** &rarr; use [`loadOne()`](./loadOne.md) or
+  [`loadMany()`](./loadMany.md) which support batching
+- **Non-trivial transforms that appear in multiple fields** &rarr; create a
+  [custom step class](../step-classes.mdx) with `deduplicate()` support
+- **Side effects** &rarr; use [`sideEffect()`](/grafast/standard-steps/sideEffect)
+
+`lambda` is best reserved for trivial, synchronous, pure transforms such as
+string concatenation or simple arithmetic.
+
+See [Plan resolver best practices](../plan-resolvers/best-practices.md) for
+more guidance.
+
 ## Warning: no batching!
 
 **`lambda` is an escape hatch** that breaks you out of Gra*fast*'s batching;
