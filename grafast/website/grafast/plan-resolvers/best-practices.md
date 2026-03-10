@@ -227,6 +227,7 @@ Many step functions accept a callback. **Always define these callbacks at
 file/module scope** (or import them from another file) rather than inline.
 Gra*fast* deduplicates steps by comparing the callback reference &mdash; inline
 arrow functions create a new reference on every call, defeating deduplication.
+Named functions also produce more readable debug output and `explain` plans.
 
 This applies to the following functions, in order of importance:
 
