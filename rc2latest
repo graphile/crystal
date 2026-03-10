@@ -16,11 +16,13 @@ rc2latest grafserv
 rc2latest graphile
 rc2latest graphile-config
 rc2latest graphile-export
+rc2latest graphql-codegen-grafast
 rc2latest jest-serializer-graphql-schema
 rc2latest jest-serializer-simple
 rc2latest pg-introspection
 rc2latest pgl
 rc2latest ruru
 rc2latest ruru-components
+rc2latest ruru-types
 rc2latest tamedevil
 
