@@ -11,6 +11,23 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+
+    permissions:
+      # To create a release, and also maybe to push branches:
+      contents: write
+
+      # To create/maintain the Changesets pull request
+      pull-requests: write
+
+      # PRs are backed by issues; this probably helps with stuff like reading labels/etc
+      issues: read
+
+      # To enable trusted publishing
+      id-token: write
+
+      ## To publish packages to GitHub Packages
+      #packages: write
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v5
