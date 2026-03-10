@@ -1,9 +1,11 @@
 {
   "name": "graphql-codegen-grafast",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "A GraphQL code generator plugin for Grafast schemas",
   "scripts": {
-    "prepack": "tsc -b"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b"
   },
   "exports": {
     ".": {
@@ -33,10 +35,10 @@
     "node": ">=22"
   },
   "files": [
-    "fwd",
     "dist"
   ],
   "publishConfig": {
+    "directory": "release",
     "access": "public"
   },
   "dependencies": {

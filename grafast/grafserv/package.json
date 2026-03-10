@@ -1,6 +1,6 @@
 {
   "name": "grafserv",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "A highly optimized server for GraphQL, powered by Grafast",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -76,7 +76,10 @@
     }
   },
   "scripts": {
-    "prepack": "tsc -b",
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "graphile": "node ../../utils/graphile/dist/cli-run.js",
+    "build": "tsc -b",
     "test": "jest",
     "posttest": "yarn playwright install chromium && node --experimental-strip-types scripts/smoke-examples.mts"
   },
@@ -113,7 +116,7 @@
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
     "@whatwg-node/server": "^0.9.64",
-    "grafast": "workspace:^",
+    "grafast": "workspace:^1.0.0-rc.8",
     "graphile-config": "workspace:^",
     "graphql": "^16.9.0",
     "h3": "^1.13.0",
@@ -152,7 +155,6 @@
     "express": "^4.21.2",
     "fastify": "^4.29.1 || ^5.0.0",
     "grafast": "workspace:^",
-    "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.4",
     "h3": "^1.15.5",
@@ -169,7 +171,10 @@
   },
   "files": [
     "dist",
-    "fwd",
-    "index.js"
-  ]
+    "fwd"
+  ],
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "ruru-components",
-  "version": "2.0.0-rc.6",
+  "version": "2.0.0-rc.7",
   "description": "Grafast-flavoured GraphiQL distribution; the underlying React components",
   "main": "./dist/index.js",
   "type": "module",
@@ -16,7 +16,9 @@
     }
   },
   "scripts": {
-    "prepack": "tsc -b"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -64,7 +66,6 @@
   },
   "files": [
     "dist",
-    "index.js",
     "ruru.css"
   ],
   "devDependencies": {
@@ -78,5 +79,9 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }
