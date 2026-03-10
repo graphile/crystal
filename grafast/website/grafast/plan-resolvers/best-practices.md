@@ -68,11 +68,13 @@ explicit and may become more significant again in future optimizations.
 
 ## Choose the right step type
 
-[`lambda()`](../standard-steps/lambda.md) is an escape hatch &mdash; it
-processes values **one at a time** rather than in batches. This is fine for
-trivial synchronous transforms (string concatenation, simple math), but for
-anything more complex you should use a batch step such as `loadOne()`,
-`loadMany()`, or a custom class.
+For most data-fetching work, use [`loadOne()`](../standard-steps/loadOne.md) or
+[`loadMany()`](../standard-steps/loadMany.md) &mdash; they batch automatically
+and support deduplication. For trivial synchronous transforms (string
+concatenation, simple math),
+[`lambda()`](../standard-steps/lambda.md) is fine. For anything that needs full
+control over execution, deduplication, or optimization, build a custom step
+class.
 
 ### Comparison
 
@@ -97,19 +99,19 @@ however any step can be marked as having side effects via:
 ```ts
 $step.hasSideEffects = true;
 
+### When to use loadOne/loadMany
+
+Use [`loadOne()`](../standard-steps/loadOne.md) to load a single record for each input, or [`loadMany()`](../standard-steps/loadMany.md) to load a collection of records for each input, when:
+
+- you have async work (except mutations),
+- you have I/O work (except mutations), or
+- the code would benefit from batching.
+
 ### When `lambda` is appropriate
 
 - Concatenating strings: `lambda([$first, $last], ([f, l]) => \`${f} ${l}\`, true)`
 - Simple math: `lambda($n, (n) => n + 1, true)`
 - Trivial data mapping that doesn't benefit from batching
-
-### When to use loadOne/loadMany
-
-Use [`loadOne()`](../standard-steps/loadOne.md) to loading a single record for each input, or [`loadMany()`](../standard-steps/loadMany.md) to load a collection of records for each input, when:
-
-- you have async work (except mutations),
-- you have I/O work (except mutations), or
-- the code would benefit from batching.
 
 ### When to create a custom step
 
@@ -363,5 +365,5 @@ details on when and how to use these.
 |---|---|
 | [Extract arguments deeply](#extract-arguments-deeply) | Fewer intermediate steps, better optimization |
 | [Use `loadOne`/`loadMany` for I/O; reserve `lambda` for trivial sync transforms](#choose-the-right-step-type) | Batching, deduplication, optimization |
-| [File-scoped callbacks](#define-lambda-callbacks-at-file-scope) | Enables deduplication |
+| [File-scoped callbacks](#define-callbacks-at-file-scope) | Enables deduplication |
 | [No plan resolver `try`/`catch`](#dont-use-trycatch-in-plan-resolvers) | Plan resolvers are declarative; use `maskError` or flow control steps |
