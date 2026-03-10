@@ -66,7 +66,7 @@ current optimizations (such as the "eliminate eval" pass) reduce the impact of
 shallow extraction, deep extraction remains a good habit — it makes your intent
 explicit and may become more significant again in future optimizations.
 
-## Prefer custom steps over `lambda`
+## Choose the right step type
 
 [`lambda()`](../standard-steps/lambda.md) is an escape hatch &mdash; it
 processes values **one at a time** rather than in batches. This is fine for
@@ -74,7 +74,7 @@ trivial synchronous transforms (string concatenation, simple math), but for
 anything more complex you should use a batch step such as `loadOne()`,
 `loadMany()`, or a custom class.
 
-### Why custom steps are better
+### Comparison
 
 | | `lambda` | `loadOne` | Custom step |
 |---|---|---|
@@ -362,6 +362,6 @@ details on when and how to use these.
 | Recommendation | Why |
 |---|---|
 | [Extract arguments deeply](#extract-arguments-deeply) | Fewer intermediate steps, better optimization |
-| [Avoid `lambda`, except for inexpensive synchronous work](#prefer-custom-steps-over-lambda) | Batching, deduplication, optimization |
+| [Use `loadOne`/`loadMany` for I/O; reserve `lambda` for trivial sync transforms](#choose-the-right-step-type) | Batching, deduplication, optimization |
 | [File-scoped callbacks](#define-lambda-callbacks-at-file-scope) | Enables deduplication |
 | [No plan resolver `try`/`catch`](#dont-use-trycatch-in-plan-resolvers) | Plan resolvers are declarative; use `maskError` or flow control steps |
