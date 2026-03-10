@@ -51,11 +51,11 @@ export const version = ${JSON.stringify(packageJson.version)};
 
 releasedPackages.sort();
 
-// 3. run yarn (on CI, force mutation)
+// 3. Run yarn (on CI, force mutation)
 await $`yarn install --mode=update-lockfile --no-immutable`;
 await $`git add yarn.lock`;
 
-// 4. run `postversion` scripts
+// 4. Run `postversion` scripts
 await $`yarn workspaces foreach --topological-dev --all run postversion`;
 
 // 5. Commit changes (including `.changeset/pre.json`) with helpful commit message
