@@ -5,8 +5,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "test": "jest",
-    "prepack": "tsc -b",
+    "build": "tsc -b",
     "watch": "tsc -b --watch"
   },
   "repository": {
@@ -41,5 +43,9 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
+  }
 }

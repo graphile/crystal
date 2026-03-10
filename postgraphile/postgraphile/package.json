@@ -223,6 +223,9 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "graphile": "node ../../utils/graphile/dist/cli-run.js",
     "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
@@ -230,7 +233,7 @@
     "//test:operations-exports": "yarn test:operations-exports:typeDefs && yarn test:operations-exports:graphql-js",
     "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs jest __tests__/queries __tests__/mutations",
     "test:operations-exports:graphql-js": "EXPORT_SCHEMA=graphql-js jest __tests__/queries __tests__/mutations",
-    "prepack": "tsc -b tsconfig.build.json"
+    "build": "tsc -b tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -302,8 +305,7 @@
   },
   "files": [
     "dist",
-    "fwd",
-    "index.js"
+    "fwd"
   ],
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -311,11 +313,14 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemon": "^3.1.1",
-    "graphile": "workspace:^",
     "graphile-export": "workspace:^",
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

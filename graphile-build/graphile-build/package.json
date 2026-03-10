@@ -12,7 +12,9 @@
     }
   },
   "scripts": {
-    "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {
     "type": "git",
@@ -54,13 +56,12 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "grafast": "workspace:^",
-    "graphile-config": "workspace:^",
+    "grafast": "workspace:^1.0.0-rc.8",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0"
   },
   "files": [
-    "dist",
-    "index.js"
+    "dist"
   ],
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -71,5 +72,9 @@
     "jest": "^30.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

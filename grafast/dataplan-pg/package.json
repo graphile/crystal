@@ -23,13 +23,15 @@
     }
   },
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "codegen": "yarn graphql-codegen -c codegen-examples-smallExample.ts",
     "update-schema": "ts-node ./src/examples/exampleSchema.ts",
     "test": "GRAPHILE_ENV=test jest",
     "posttest": "yarn test:exportSchema:graphql-js && yarn test:exportSchema:typeDefs",
     "test:exportSchema:graphql-js": "ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
     "test:exportSchema:typeDefs": "ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",
-    "prepack": "yarn codegen && tsc -b && cp src/.npmignore dist/.npmignore",
+    "build": "yarn codegen && tsc -b && cp src/.npmignore dist/.npmignore",
     "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --inspect --enable-source-maps serve-example-schema.js'"
   },
   "repository": {
@@ -73,7 +75,7 @@
   "peerDependencies": {
     "@dataplan/json": "workspace:^",
     "grafast": "workspace:^",
-    "graphile-config": "workspace:^",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "pg": "^8.7.1",
     "pg-sql2": "workspace:^"
@@ -114,5 +116,9 @@
     "webpack-cli": "^6.0.1",
     "webpack-node-externals": "^3.0.0",
     "zx": "^8.8.5"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

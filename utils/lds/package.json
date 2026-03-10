@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "//test": "jest -i",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "bin": {
     "graphile-lds": "./dist/cli.js"

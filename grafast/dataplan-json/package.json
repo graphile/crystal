@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "tsc -b"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -33,7 +35,7 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "grafast": "workspace:^"
+    "grafast": "workspace:^1.0.0-rc.8"
   },
   "files": [
     "dist"
@@ -43,5 +45,9 @@
     "jest": "^30.2.0",
     "jest-serializer-simple": "workspace:^",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

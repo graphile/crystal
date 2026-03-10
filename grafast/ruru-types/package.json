@@ -12,7 +12,9 @@
     }
   },
   "scripts": {
-    "prepack": "tsc -b"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -58,5 +60,9 @@
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

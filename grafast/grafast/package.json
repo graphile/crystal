@@ -27,12 +27,14 @@
     }
   },
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "graphile": "node ../../utils/graphile/dist/cli-run.js",
     "codegen": "cd __tests__/dcc && node --experimental-strip-types ../../../../node_modules/.bin/graphql-codegen",
-    "test": "yarn codegen && yarn test:mocha && yarn test:bundle",
-    "test:bundle": "node --experimental-strip-types scripts/testbundle.mts",
-    "test:mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
-    "build": "zx scripts/build-npm.mjs",
-    "postpack": "echo 'FORBIDDEN' && exit 1",
+    "test": "yarn codegen && yarn test-mocha && yarn test-bundle",
+    "test-bundle": "node --experimental-strip-types scripts/testbundle.mts",
+    "test-mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
+    "build": "tsc -b",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
   },
   "repository": {
@@ -84,8 +86,7 @@
   },
   "files": [
     "fwd",
-    "dist",
-    "browser"
+    "dist"
   ],
   "devDependencies": {
     "@graphql-codegen/cli": "^6.1.0",
@@ -98,7 +99,6 @@
     "@types/node": "^22.19.1",
     "@types/nodemon": "^3.1.1",
     "chai": "^5.3.3",
-    "graphile": "workspace:^",
     "graphql": "^16.9.0",
     "jest": "^30.2.0",
     "lodash": "^4.17.23",
@@ -114,7 +114,7 @@
     "zx": "^8.8.5"
   },
   "publishConfig": {
-    "access": "public",
-    "directory": "release"
+    "directory": "release",
+    "access": "public"
   }
 }
