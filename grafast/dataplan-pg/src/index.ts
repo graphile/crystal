@@ -145,6 +145,7 @@ import type { PgInsertSingleQueryBuilder } from "./steps/pgInsertSingle.ts";
 import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
 import type {
   PgGroupDetails,
+  PgRootStep,
   PgSelectArgumentDigest,
   PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
@@ -288,6 +289,7 @@ export type {
   PgResourceParameter,
   PgResourceUnique,
   PgResourceUniqueExtensions,
+  PgRootStep,
   PgSelectArgumentDigest,
   PgSelectArgumentRuntimeValue,
   PgSelectArgumentSpec,
