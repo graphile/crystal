@@ -270,3 +270,29 @@ have access to.
 - `Object.values(obj)` is better than `Object.keys(obj).map(k => obj[k])`.
 - `arr.find(...)` is better than `arr.filter(...)[0]`
 - use `async`/`await` - [it's fast!](https://v8.dev/blog/fast-async)
+
+## New packages
+
+If your package is internal, name it `@localrepo/*` (replacing `*` with a name),
+and be sure to set `private: true` in `package.json`. Otherwise...
+
+We use trusted publishing via CI and have particular setup to make this work;
+any new package should follow the conventions of existing packages, but in
+particular:
+
+- package.json `scripts.prepack` must be set and include
+  `node ../../scripts/build-release.mts`; this script will call
+  `yarn build-package`, and thus:
+- package.json `scripts.build-package` must be set; typically it will simply be
+  `yarn build` but if there's any tidyup or extra commands needed for publishing
+  that aren't needed for regular development, they would go here
+- package.json `scripts.build` will typically be `tsc -b`
+- package.json `publishConfig` must be present and have value
+  `{access: "public", directory: "release"}`
+- package.json `files` should be used, and will typically be `["dist"]`
+- package.json `peerDependencies` with `workspace:` spec should use an explicit
+  range (e.g. `workspace:^5.0.0-rc.8`)
+- package.json `dependencies` and `devDependencies` with `workspace:` should use
+  an implicit range (typically `workspace:^`)
+- `README.md` must be present
+- `LICENSE.md` must be present
