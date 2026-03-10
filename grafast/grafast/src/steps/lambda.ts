@@ -1,4 +1,3 @@
-import { isDev } from "../dev.ts";
 import type {
   PromiseOrDirect,
   UnbatchedExecutionExtra,
@@ -8,8 +7,6 @@ import { multistep } from "../multistep.ts";
 import type { Step } from "../step.ts";
 import { UnbatchedStep } from "../step.ts";
 import { sideEffect } from "./sideEffect.ts";
-
-const warnedCallbacks = new WeakSet<Function>();
 
 /**
  * Calls the given lambda function for each tuple
@@ -73,15 +70,6 @@ function lambda<const TInMultistep extends Multistep, TOut>(
   if (fn.length > 1) {
     throw new Error(
       "lambda callback should accept one argument, perhaps you forgot to destructure the arguments?",
-    );
-  }
-  if (isDev && !fn.name && !warnedCallbacks.has(fn)) {
-    warnedCallbacks.add(fn);
-    console.warn(
-      `lambda() was called with an anonymous (inline) callback function. ` +
-        `This prevents deduplication. Define the callback at file scope or ` +
-        `give it a name for better optimization. ` +
-        `See: https://grafast.org/grafast/standard-steps/lambda#define-callback-in-top-scope`,
     );
   }
   const $in = multistep(spec);
