@@ -69,16 +69,31 @@ to skip unnecessary work and optimize the plan more aggressively.
 [`lambda()`](../standard-steps/lambda.md) is an escape hatch &mdash; it
 processes values **one at a time** rather than in batches. This is fine for
 trivial synchronous transforms (string concatenation, simple math), but for
-anything more complex you should create a custom step class.
+anything more complex you should use a batch step such as `loadOne()`,
+`loadMany()`, or a custom class.
 
 ### Why custom steps are better
 
-| | `lambda` | Custom step |
+| | `lambda` | `loadOne` | Custom step |
 |---|---|---|
-| Batching | No &mdash; called once per value | Yes &mdash; `execute()` receives the full batch |
-| Deduplication | Only if callback is the same reference | Full control via `deduplicate()` |
-| Optimization | None | Can implement `optimize()` |
-| Side effects | Not supported (use `sideEffect()`) | Full control via `hasSideEffects` |
+| Batching | No &mdash; called once per value | Yes, batched and uniqued |  Yes with full control |
+| Deduplication | Only if callback is the same reference | Only if callback is the same reference | Full control via `deduplicate()` |
+| Optimization | None | Many automatic optimizations | Full control via `optimize()` / `finalize()` / `execute()` |
+
+:::note[Batching may not be relevant to mutations/side effects]
+
+According to
+[the GraphQL spec](https://spec.graphql.org/September2025/#sel-GANVLDCB-BBqFxyV),
+side effects may only occur in `Mutation` fields, and these fields are
+executed serially. This gives no opportunity for batching. Typically
+`sideEffect()` (like `lambda()`, but with side effects) is suitable for
+a mutation field plan resolver, and no other steps should be needed.
+
+Side-effects should not happen in other (non-Mutation) plan resolvers,
+however any step can be marked as having side effects via:
+
+```ts
+$step.hasSideEffects = true;
 
 ### When `lambda` is appropriate
 
@@ -86,13 +101,24 @@ anything more complex you should create a custom step class.
 - Simple math: `lambda($n, (n) => n + 1, true)`
 - Trivial data mapping that doesn't benefit from batching
 
+### When to use loadOne/loadMany
+
+Use [`loadOne()`](../standard-steps/loadOne.md) to loading a single record for each input, or [`loadMany()`](../standard-steps/loadMany.md) to load a collection of records for each input, when:
+
+- you have async work (except mutations),
+- you have I/O work (except mutations), or
+- the code would benefit from batching.
+
 ### When to create a custom step
 
-- The transform involves I/O or async work &mdash; use
-  [`loadOne()`](../standard-steps/loadOne.md) /
-  [`loadMany()`](../standard-steps/loadMany.md) instead
-- You want deduplication (e.g. multiple fields perform the same transform)
-- The logic is non-trivial or would benefit from batching
+Custom steps can be used for any purpose, typically you'll want
+to build your own step classes if:
+
+- You want to expose your own helper APIs (e.g. custom methods on your step)
+- You want full control over execution (e.g. if loadOne/loadMany's optimizations don't fit your needs)
+- You want full control over deduplication (reducing redundant work)
+- You want full control over plan optimization (in particular eliminating over- and under- fetching by communicating with other steps)
+- You want to do custom work one time only for your step (custom `finalize()`)
 
 ### Example: custom step
 
@@ -174,10 +200,12 @@ const objects = {
 
 ## Don't use `try`/`catch` in plan resolvers
 
-Plan resolvers run at **plan-time**, not execution-time. They build a
-declarative graph of steps &mdash; think of them like React component render
-functions where steps are like hooks. Using `try`/`catch` introduces imperative
-control flow that doesn't fit this model.
+Plan resolvers run at **plan-time**, before any input values are known and
+before any data has been fetched. They build a declarative graph of steps
+that will be executed later. Since they run at plan-time, `try`/`catch`
+will only catch planning errors (which shouldn't really happen!) - it will
+not catch execution-time errors (i.e. errors resulting from
+fetching/manipulating real data).
 
 ### Why it doesn't work
 
@@ -203,7 +231,14 @@ function post_author_plan($post) {
 }
 ```
 
-### Do: use flow control steps
+### Do: use `maskError` or similar to process errors
+
+GraphQL is designed to continue in the face of errors, allowing for
+"partial success"; however, you may wish to relabel an error when
+presenting it to a user. To do so, use Grafserv's `maskError`
+functionality, or similar methods that come with your server of choice.
+
+### If necessary: use flow control steps
 
 Gra*fast* provides declarative flow control for handling errors and null values
 at execution-time:
@@ -219,7 +254,7 @@ function post_author_plan($post) {
 
   // Load the author; if it errors, convert to null
   const $author = loadOne($guardedId, batchGetAuthorById);
-  return trap($author, TRAP_ERROR);
+  return trap($author, TRAP_ERROR, { valueForError: "NULL" });
 }
 ```
 
@@ -230,7 +265,8 @@ The key flow control steps are:
 - [`assertNotNull()`](../standard-steps/assertNotNull.mdx) &mdash; turns
   `null` into a `SafeError` visible to clients
 - [`trap()`](../standard-steps/trap.mdx) &mdash; recovers inhibited or errored
-  values back into ordinary data (e.g. `null` or an empty list)
+  values back into ordinary data (e.g. `null`, an empty list, or the error as
+  a simple "data value" rather than an exception)
 
 See [Thinking in plans: Flow control](../flow.mdx#flow-control) for more
 details on when and how to use these.
@@ -240,6 +276,6 @@ details on when and how to use these.
 | Recommendation | Why |
 |---|---|
 | [Extract arguments deeply](#extract-arguments-deeply) | Fewer intermediate steps, better optimization |
-| [Prefer custom steps over `lambda`](#prefer-custom-steps-over-lambda) | Batching, deduplication, optimization |
-| [File-scoped lambda callbacks](#define-lambda-callbacks-at-file-scope) | Enables deduplication |
-| [No `try`/`catch`](#dont-use-trycatch-in-plan-resolvers) | Plan resolvers are declarative; use flow control steps |
+| [Avoid `lambda`, except for inexpensive synchronous work](#prefer-custom-steps-over-lambda) | Batching, deduplication, optimization |
+| [File-scoped callbacks](#define-lambda-callbacks-at-file-scope) | Enables deduplication |
+| [No plan resolver `try`/`catch`](#dont-use-trycatch-in-plan-resolvers) | Plan resolvers are declarative; use `maskError` or flow control steps |
