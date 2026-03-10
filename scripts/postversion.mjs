@@ -51,8 +51,8 @@ export const version = ${JSON.stringify(packageJson.version)};
 
 releasedPackages.sort();
 
-// 3. run yarn
-await $`yarn`;
+// 3. run yarn (on CI, force mutation)
+await $`yarn install --mode=update-lockfile --no-immutable`;
 await $`git add yarn.lock`;
 
 // 4. Commit changes (including `.changeset/pre.json`) with helpful commit message
