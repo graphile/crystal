@@ -33,8 +33,9 @@
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\" --config webpack.config.mts",
     "watch": "yarn webpack --watch --mode=development",
     "make-ruru-html": "node --experimental-strip-types scripts/make-ruru-html.mts",
-    "postversion": "tsc -b tsconfig.build.json && yarn run make-ruru-html && git add ../website/static/myruru/index.html",
-    "build": "yarn webpack --mode=${BUILD_MODE:-production} && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html"
+    "postversion": "yarn workspace ruru-components build-package && yarn build-base && yarn run make-ruru-html && git add ../website/static/myruru/index.html",
+    "build-base": "yarn webpack --mode=${BUILD_MODE:-production} && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html",
+    "build": "yarn build-base && yarn make-ruru-html"
   },
   "repository": {
     "type": "git",
