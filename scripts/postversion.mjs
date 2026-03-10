@@ -65,7 +65,5 @@ RELEASING: Releasing ${releasedPackages.length} package(s)
 
 Releases:
 ${releasedPackages.map((p) => `  ${p}`).join("\n")}
-
-[skip ci]
 `;
 await $`git commit -m ${commitMessage}`;
