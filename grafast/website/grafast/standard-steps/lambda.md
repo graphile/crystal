@@ -7,7 +7,11 @@ batching!](#warning-no-batching)). It's highly suitable for usage when you just
 want to synchronously transform data (e.g. concatenating strings, mapping over
 arrays, etc) but is almost never well suited to asynchronous topics &mdash; you
 likely want [`loadOne()`](./loadOne.md) or [`loadMany()`](./loadMany.md) instead
-in those cases.
+in those cases. For non-trivial transforms that appear in multiple fields,
+consider creating a [custom step class](../step-classes.mdx) with
+`deduplicate()` support.
+
+See also [Plan resolver best practices](../plan-resolvers/best-practices.md).
 
 :::
 
@@ -79,22 +83,6 @@ then for the very best performance, you can pass the third argument,
 not do this unless you are certain!
 
 :::
-
-## When to use something else
-
-Before reaching for `lambda`, consider whether a better tool exists:
-
-- **I/O or async work** &rarr; use [`loadOne()`](./loadOne.md) or
-  [`loadMany()`](./loadMany.md) which support batching
-- **Non-trivial transforms that appear in multiple fields** &rarr; create a
-  [custom step class](../step-classes.mdx) with `deduplicate()` support
-- **Side effects** &rarr; use [`sideEffect()`](/grafast/standard-steps/sideEffect)
-
-`lambda` is best reserved for trivial, synchronous, pure transforms such as
-string concatenation or simple arithmetic.
-
-See [Plan resolver best practices](../plan-resolvers/best-practices.md) for
-more guidance.
 
 ## Warning: no batching!
 
