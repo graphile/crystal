@@ -46,10 +46,10 @@ pack_pkg graphile-build/graphile-build graphile-build
 pack_pkg utils/pg-introspection pg-introspection
 pack_pkg utils/pg-sql2 pg-sql2
 pack_pkg grafast/dataplan-pg dataplan__pg
-pack_pkg graphile-build/graphile-build-pg/ graphile-build-pg
+pack_pkg graphile-build/graphile-build-pg graphile-build-pg
 pack_pkg graphile-build/graphile-utils graphile-utils
-pack_pkg postgraphile/postgraphile/ postgraphile
-pack_pkg postgraphile/pgl/ pgl
+pack_pkg postgraphile/postgraphile postgraphile
+pack_pkg postgraphile/pgl pgl
 pack_pkg graphile-build/graphile-simplify-inflection graphile__simplify-inflection
 pack_pkg grafast/grafserv-persisted grafserv__persisted
 pack_pkg utils/graphile graphile
