@@ -56,7 +56,6 @@ await $`yarn install --mode=update-lockfile --no-immutable`;
 await $`git add yarn.lock`;
 
 // 4. Run `postversion` scripts
-await $`yarn build-init`;
 await $`yarn workspaces foreach --topological-dev --all run postversion`;
 
 // 5. Commit changes (including `.changeset/pre.json`) with helpful commit message
