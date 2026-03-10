@@ -30,11 +30,13 @@ Here's the rough process:
 
 (You can read why converting to TypeScript is so important in [the TypeScript section below](#typescript).)
 
-We recommend that you extend from the `@tsconfig/node18` preset; you can disable `noImplicitAny` to massively reduce the number of TypeScript errors you need to deal with:
+We recommend that you extend from the `@tsconfig/node22` preset; you can
+disable `noImplicitAny` to massively reduce the number of TypeScript errors you
+need to deal with:
 
 ```json title="tsconfig.json"
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
+  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     // You may want to enable this flag in V4 since V4 types were extremely
     // loose (since it was originally written in Flow, not TypeScript):
@@ -79,7 +81,7 @@ a `prepack` script to compile your TypeScript:
   },
   "devDependencies": {
     // ...
-    "@tsconfig/node18": "^18.2.4",
+    "@tsconfig/node22": "^22.0.5",
     "typescript": "^5.7.2"
   }
 }
