@@ -92,7 +92,7 @@ code that doesn't perform heavy computation and wouldn't benefit from
 batching).
 
 In most cases, you should use [`loadOne`](./loadOne) instead. Here's what the
-examples above might look like with `loadOne` - note that these callbacks
+examples below might look like with `loadOne` - note that these callbacks
 are now called with all the values at once, rather than one at a time:
 
 ```ts
