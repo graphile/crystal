@@ -62,9 +62,9 @@ function bookCount_plan($parent, fieldArgs) {
 
 Both `.getRaw()` with a path array and the `$`-prefixed destructuring give
 Gra*fast* direct visibility into exactly which leaf values you need. While
-current optimizations (such as the "eliminate eval" pass) reduce the impact of
-shallow extraction, deep extraction remains a good habit — it makes your intent
-explicit and may become more significant again in future optimizations.
+current optimizations make limited use of this, deep extraction remains a
+good habit — it makes your intent explicit and may become more significant
+in future optimizations.
 
 ## Choose the right step type
 
@@ -96,8 +96,6 @@ a mutation field plan resolver, and no other steps should be needed.
 Side-effects should not happen in other (non-Mutation) plan resolvers,
 however any step can be marked as having side effects via:
 
-```ts
-$step.hasSideEffects = true;
 
 ### When to use loadOne/loadMany
 
@@ -109,7 +107,7 @@ Use [`loadOne()`](../standard-steps/loadOne.md) to load a single record for each
 
 ### When `lambda` is appropriate
 
-- Concatenating strings: `lambda([$first, $last], ([f, l]) => \`${f} ${l}\`, true)`
+- Concatenating strings: ``lambda([$first, $last], ([f, l]) => `${f} ${l}`, true)``
 - Simple math: `lambda($n, (n) => n + 1, true)`
 - Trivial data mapping that doesn't benefit from batching
 
@@ -134,10 +132,10 @@ request and uses the
 to fetch only the data the GraphQL query actually needs.
 
 ```ts
-import { ExecutableStep, ExecutionExtra, access } from "grafast";
+import { Step, ExecutionExtra, access } from "grafast";
 
 /** Loads Google Drive file metadata, batching multiple IDs into one API call. */
-export class GoogleDriveFileStep extends ExecutableStep<GoogleDriveFile> {
+export class GoogleDriveFileStep extends Step<GoogleDriveFile> {
   static $$export = {
     moduleName: "my-app",
     exportName: "GoogleDriveFileStep",
@@ -155,7 +153,7 @@ export class GoogleDriveFileStep extends ExecutableStep<GoogleDriveFile> {
    * Helper: declare that downstream steps need a particular field.
    * Returns an access step that reads the field from the result.
    */
-  getField(name: string): ExecutableStep {
+  get(name: string): Step {
     this.fieldPaths.add(name);
     return access(this, name);
   }
@@ -163,7 +161,7 @@ export class GoogleDriveFileStep extends ExecutableStep<GoogleDriveFile> {
   /**
    * Helper: declare that downstream steps need a nested field.
    */
-  getNestedField(parent: string, child: string): ExecutableStep {
+  getNestedField(parent: string, child: string): Step {
     this.fieldPaths.add(`${parent}(${child})`);
     return access(this, [parent, child]);
   }
@@ -176,8 +174,8 @@ export class GoogleDriveFileStep extends ExecutableStep<GoogleDriveFile> {
   // Merge requested fields from deduplicated peers
   deduplicatedWith(peers: GoogleDriveFileStep[]): void {
     for (const peer of peers) {
-      for (const field of peer.fieldPaths) {
-        this.fieldPaths.add(field);
+      for (const field of this.fieldPaths) {
+        peer.fieldPaths.add(field);
       }
     }
   }
@@ -188,7 +186,9 @@ export class GoogleDriveFileStep extends ExecutableStep<GoogleDriveFile> {
     [fileIds]: [string[]],
   ): Promise<(GoogleDriveFile | null)[]> {
     const uniqueIds = [...new Set(fileIds)];
-    const fields = `files(${[...this.fieldPaths].join(",")})`;
+  async execute(details: ExecutionDetails) {
+    const { values: [fileIdEv], indexMap } = details;
+    const uniqueIds = [...new Set(indexMap(i => fileIdEV.at(i)))];
 
     // One HTTP request for the whole batch
     const url = new URL("https://www.googleapis.com/drive/v3/files");
@@ -200,11 +200,14 @@ export class GoogleDriveFileStep extends ExecutableStep<GoogleDriveFile> {
 
     // Build a lookup map and return results in the original order
     const byId = new Map(files.map((f: GoogleDriveFile) => [f.id, f]));
-    return fileIds.map((id) => byId.get(id) ?? null);
+    return indexMap.map((i) => {
+      const fileId = fileIdEV.at(i);
+      return byId.get(fileId) ?? null;
+    });
   }
 }
 
-export function googleDriveFile($fileId: ExecutableStep<string>) {
+export function googleDriveFile($fileId: Step<string>) {
   return new GoogleDriveFileStep($fileId);
 }
 ```
@@ -217,7 +220,7 @@ function file_plan($parent) {
   const $file = googleDriveFile($fileId);
 
   // Only the fields actually requested by the GraphQL query are fetched
-  const $name = $file.getField("name");
+  const $name = $file.get("name");
   const $ownerEmail = $file.getNestedField("owners", "emailAddress");
   // ...
 }
@@ -228,19 +231,19 @@ function file_plan($parent) {
 Many step functions accept a callback. **Always define these callbacks at
 file/module scope** (or import them from another file) rather than inline.
 Gra*fast* deduplicates steps by comparing the callback reference &mdash; inline
-arrow functions create a new reference on every call, defeating deduplication.
+functions create a new reference on every call, defeating deduplication.
 Named functions also produce more readable debug output and `explain` plans.
 
-This applies to the following functions, in order of importance:
+This applies to the following functions:
 
-**Most important** &mdash; commonly used in nearly every schema:
+**Most important** &mdash; lack of deduplication here can be expensive:
 
 - [`lambda()`](../standard-steps/lambda.md)
 - [`loadOne()`](../standard-steps/loadOne.md)
 - [`loadMany()`](../standard-steps/loadMany.md)
 - [`applyInput()`](../standard-steps/applyInput.md)
 
-**Also recommended** &mdash; less common, but the same principle applies:
+**Also recommended** &mdash; less critical, but the same principle applies:
 
 - [`each()`](../standard-steps/each.md)
 - [`filter()`](../standard-steps/filter.md)
