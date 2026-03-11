@@ -1,6 +1,6 @@
 {
   "name": "pgl",
-  "version": "5.0.0-rc.5",
+  "version": "5.0.0-rc.6",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "exports": {
@@ -207,7 +207,9 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "prepack": "tsc -b tsconfig.build.json"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -262,8 +264,7 @@
   },
   "files": [
     "dist",
-    "fwd",
-    "index.js"
+    "fwd"
   ],
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -275,5 +276,9 @@
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

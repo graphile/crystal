@@ -1,15 +1,17 @@
 {
   "name": "tamedevil",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.6",
   "description": "Build and evaluate JavaScript strings safely via tagged template literals",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "pretest": "node dist/index.js",
     "test": "jest",
     "posttest": "yarn test:docs",
     "test:docs": "markdown-doctest",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -52,5 +54,9 @@
   ],
   "engines": {
     "node": ">=22"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

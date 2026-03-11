@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-rc.6",
+  "version": "2.0.0-rc.7",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -28,10 +28,14 @@
     }
   },
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "rm -Rf dist static tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn build",
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\" --config webpack.config.mts",
     "watch": "yarn webpack --watch --mode=development",
     "make-ruru-html": "node --experimental-strip-types scripts/make-ruru-html.mts",
-    "prepack": "rm -Rf dist static tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=${BUILD_MODE:-production} && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html"
+    "postversion": "yarn workspace ruru-components build-package && yarn build-base && yarn run make-ruru-html && git add ../website/static/myruru/index.html",
+    "build-base": "yarn webpack --mode=${BUILD_MODE:-production} && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html",
+    "build": "yarn build-base && yarn make-ruru-html"
   },
   "repository": {
     "type": "git",
@@ -62,7 +66,7 @@
     "node": ">=22"
   },
   "peerDependencies": {
-    "graphile-config": "workspace:^",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
@@ -98,5 +102,9 @@
     "webpack": "^5.103.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

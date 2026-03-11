@@ -1,7 +1,7 @@
 /*
  * This file exists so that `yarn changeset` auto-commits, but
  * `yarn changeset version` does not - we want you to run
- * `yarn changeset:version` instead (which will commit).
+ * `yarn changeset-version` instead (which will commit).
  */
 const commit = require("@changesets/cli/commit");
 
