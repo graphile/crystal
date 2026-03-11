@@ -132,7 +132,9 @@ request and uses the
 to fetch only the data the GraphQL query actually needs.
 
 ```ts
-import { Step, ExecutionExtra, access } from "grafast";
+/* DISCLAIMER: this example has not been tested */
+
+import { Step, ExecutionDetails, access } from "grafast";
 
 /** Loads Google Drive file metadata, batching multiple IDs into one API call. */
 export class GoogleDriveFileStep extends Step<GoogleDriveFile> {
