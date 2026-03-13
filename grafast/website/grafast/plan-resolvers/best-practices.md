@@ -243,14 +243,14 @@ This applies to the following functions:
 - [`lambda()`](../standard-steps/lambda.md)
 - [`loadOne()`](../standard-steps/loadOne.md)
 - [`loadMany()`](../standard-steps/loadMany.md)
-- [`applyInput()`](../standard-steps/applyInput.md)
+- `applyInput()`
 
 **Also recommended** &mdash; less critical, but the same principle applies:
 
 - [`each()`](../standard-steps/each.md)
 - [`filter()`](../standard-steps/filter.md)
 - [`groupBy()`](../standard-steps/groupBy.md)
-- [`partitionByIndex()`](../standard-steps/partitionByIndex.md)
+- `partitionByIndex()`
 - [`sideEffect()`](../standard-steps/sideEffect.md)
 
 ### Don't: inline callback
