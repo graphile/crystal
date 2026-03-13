@@ -51,6 +51,15 @@ The plan resolver must return a `Step` that represents the result of the field.
 A field without a plan resolver will use the [default plan
 resolver](#default-plan-resolver).
 
+:::tip[Best practices]
+
+For recommendations on writing efficient and correct plan resolvers &mdash;
+including deep argument extraction; when to use custom steps, `loadOne()`, `loadMany()`, or `lambda()`;
+and how to handle errors declaratively &mdash; see the
+[Best practices](./best-practices.md) guide.
+
+:::
+
 ### Source step
 
 The `$source` step represents the data from the object that the field is being
