@@ -138,6 +138,15 @@ import { Step, ExecutionDetails, access } from "grafast";
 
 /** Loads Google Drive file metadata, batching multiple IDs into one API call. */
 export class GoogleDriveFileStep extends Step<GoogleDriveFile> {
+  /**
+   * Provides metadata for `graphile-export` to generate correct `import`
+   * statements in the exported schema. This ensures the exporter can find and
+   * reference this class in the generated code.
+   * `moduleName` must be the package name, and
+   * `exportName` the class identifier.
+   *
+   * @see https://star.graphile.org/graphile-export/exporting
+   */
   static $$export = {
     moduleName: "my-app",
     exportName: "GoogleDriveFileStep",
