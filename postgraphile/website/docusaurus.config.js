@@ -13,7 +13,8 @@ const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${ma
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "PostGraphile",
-  tagline: "Extensible high-performance automatic GraphQL API for PostgreSQL",
+  tagline:
+    "Extensible high-performance GraphQL APIs backed primarily by PostgreSQL",
   url: "https://postgraphile.org",
   baseUrl: "/",
   onBrokenLinks: "throw",
