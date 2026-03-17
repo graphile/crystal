@@ -45,6 +45,7 @@
 }
 
 .button {
+  --ifm-color-primary: #def;
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.1rem;

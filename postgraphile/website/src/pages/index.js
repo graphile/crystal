@@ -75,7 +75,7 @@ export default function Home() {
       <WarningSection
         title={`PostGraphile V5 is here!`}
         primaryLink={`/news/2025-10-28-v5-release-candidate/`}
-        primaryButtonText={`Read more in the announcement`}
+        primaryButtonText={`And more — see the announcement!`}
         secondaryLink={`/postgraphile/5/migrating-from-v4/`}
         secondaryButtonText={<>V4&rarr;V5 Migration Guide</>}
       />
