@@ -78,11 +78,11 @@ class.
 
 ### Comparison
 
-| | `lambda` | `loadOne` | Custom step |
-|---|---|---|
-| Batching | No &mdash; called once per value | Yes, batched and uniqued |  Yes with full control |
-| Deduplication | Only if callback is the same reference | Only if callback is the same reference | Full control via `deduplicate()` |
-| Optimization | None | Many automatic optimizations | Full control via `optimize()` / `finalize()` / `execute()` |
+|               | `lambda`                               | `loadOne`                              | Custom step                                                |
+| ------------- | -------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| Batching      | No &mdash; called once per value       | Yes, batched and uniqued               | Yes with full control                                      |
+| Deduplication | Only if callback is the same reference | Only if callback is the same reference | Full control via `deduplicate()`                           |
+| Optimization  | None                                   | Many automatic optimizations           | Full control via `optimize()` / `finalize()` / `execute()` |
 
 :::note[Batching may not be relevant to mutations/side effects]
 
@@ -95,7 +95,6 @@ a mutation field plan resolver, and no other steps should be needed.
 
 Side-effects should not happen in other (non-Mutation) plan resolvers,
 however any step can be marked as having side effects via:
-
 
 ### When to use loadOne/loadMany
 
@@ -193,8 +192,11 @@ export class GoogleDriveFileStep extends Step<GoogleDriveFile> {
 
   // Execute once for the entire batch
   async execute(details: ExecutionDetails) {
-    const { values: [fileIdEv], indexMap } = details;
-    const uniqueIds = [...new Set(indexMap(i => fileIdEV.at(i)))];
+    const {
+      values: [fileIdEv],
+      indexMap,
+    } = details;
+    const uniqueIds = [...new Set(indexMap((i) => fileIdEV.at(i)))];
 
     // One HTTP request for the whole batch
     const url = new URL("https://www.googleapis.com/drive/v3/files");
@@ -370,9 +372,7 @@ details on when and how to use these.
 
 ## Summary
 
-| Recommendation | Why |
-|---|---|
-| [Extract arguments deeply](#extract-arguments-deeply) | Fewer intermediate steps, better optimization |
-| [Use `loadOne`/`loadMany` for I/O; reserve `lambda` for trivial sync transforms](#choose-the-right-step-type) | Batching, deduplication, optimization |
-| [File-scoped callbacks](#define-callbacks-at-file-scope) | Enables deduplication |
-| [No plan resolver `try`/`catch`](#dont-use-trycatch-in-plan-resolvers) | Plan resolvers are declarative; use `maskError` or flow control steps |
+- [Extract arguments deeply](#extract-arguments-deeply) for fewer intermediate steps and better optimization
+- [Use `loadOne`/`loadMany` for I/O](#choose-the-right-step-type) to ensure you're making the most of batching, deduplication, and optimization; `lambda()` should only be used for trivial sync transforms
+- [Use file-scoped callbacks](#define-callbacks-at-file-scope) so steps can be deduplicated
+- [Avoid plan resolver `try`/`catch`](#dont-use-trycatch-in-plan-resolvers) because plan resolvers are declarative; use `maskError` or flow control steps
