@@ -28,7 +28,7 @@ export default function WarningContent({
             <ul className={styles.warningProse}>
               <li>
                 <a href="/postgraphile/5/grafast-for-postgraphile-users">
-                  🚀 Gra<em>fast</em> execution engine reduces database load
+                  🚀 Gra<em>fast</em> engine reduces database load
                 </a>
               </li>
               <li>
@@ -38,12 +38,12 @@ export default function WarningContent({
               </li>
               <li>
                 <a href="/postgraphile/5/polymorphism">
-                  🎭 Support for abstract types (interfaces and unions)
+                  🎭 Abstract types (interfaces and unions)
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/extend-schema">
-                  🌱 Simpler and smoother <tt>extendSchema()</tt>
+                  🌱 Simpler, smoother and safer <tt>extendSchema()</tt>
                 </a>
               </li>
               <li>
@@ -58,7 +58,7 @@ export default function WarningContent({
               </li>
               <li>
                 <a href="/postgraphile/5/requirements#typescript-v500-optional">
-                  💪 Stronger types throughout
+                  💪 Stronger types throughout; even plugins
                 </a>
               </li>
             </ul>
