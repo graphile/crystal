@@ -45,6 +45,66 @@ that need their own V5 migration strategy.
 
 Let's get started.
 
+## Upgrade to V5 dependencies
+
+Many users had package-mismatches and duplicate package issues with PostGraphile
+V4, so with V5 most of the core packages are available via
+[`exports`](https://nodejs.org/api/packages.html#exports) - so you can typically
+get away with just installing `postgraphile` and any plugins you need.
+
+| Instead of `import ...`    | Use `import ...`                       |
+| -------------------------- | -------------------------------------- |
+| `from 'graphile-build'`    | `from 'postgraphile/graphile-build'    |
+| `from 'graphile-build-pg'` | `from 'postgraphile/graphile-build-pg' |
+| `from 'graphql'`           | `from 'postgraphile/graphql'           |
+| `from 'pg-sql2'`           | `from 'postgraphile/pg-sql2'           |
+| `from 'graphile-utils'`    | `from 'postgraphile/utils'             |
+
+The same is true for builtins in the new system as well:
+
+| Instead of `import ...`           | Use `import ...`                         |
+| --------------------------------- | ---------------------------------------- |
+| `from 'grafast'`                  | `from 'postgraphile/grafast'             |
+| `from 'grafserv'`                 | `from 'postgraphile/grafserv'            |
+| `from 'grafserv/express/v4'`      | `from 'postgraphile/grafserv/express/v4' |
+| `from '@dataplan/json'`           | `from 'postgraphile/@dataplan/json'      |
+| `from '@dataplan/pg'`             | `from 'postgraphile/@dataplan/pg'        |
+| `from '@dataplan/pg/adaptors/pg'` | `from 'postgraphile/adaptors/pg'         |
+
+So if your previous package.json looked like:
+
+```json title="package.json before"
+{
+  "devDependencies": {
+    "graphql": "^15.0.0",
+    "graphile-build": "^4.14.1",
+    "graphile-build-pg": "^4.14.1",
+    "graphile-utils": "^4.14.1",
+    "postgraphile": "^4.14.1",
+    "postgraphile-plugin-connection-filter": "^2.3.0"
+  }
+}
+```
+
+You can remove the extra packages and simply run:
+
+```bash
+yarn add --dev \
+  postgraphile \
+  postgraphile-plugin-connection-filter
+```
+
+To get:
+
+```json title="package.json after"
+{
+  "devDependencies": {
+    "postgraphile": "^5.0.0",
+    "postgraphile-plugin-connection-filter": "^3.0.0"
+  }
+}
+```
+
 ## Basic configuration
 
 PostGraphile V5 requires a "preset" to be specified; this allows users to start
@@ -107,12 +167,12 @@ presets go into the `extends` list:
 ```ts title="graphile.config.ts"
 const preset: GraphileConfig.Preset = {
   extends: [
-    makeV4Preset({ /* ... */ }),
+    makeV4Preset({
+      /* ... */
+    }),
     SomePreset,
   ],
-  plugins: [
-    SomePlugin,
-  ]
+  plugins: [SomePlugin],
 };
 export default preset;
 ```

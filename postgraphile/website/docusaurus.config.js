@@ -51,10 +51,13 @@ const config = {
           lastVersion: "latest",
           //includeCurrentVersion: false,
           versions: {
+            current: { label: "🚧 Preview" },
             latest: { label: "Current" },
-            4: { label: "v4 (current)", banner: "none" },
-            5: { label: "v5 (rc)", banner: "unreleased" },
-            current: { label: "Draft" },
+            5: { label: "v5 - current", banner: "none" },
+            4: {
+              label: "v4",
+              banner: "none" /* later: unmaintained */,
+            },
           },
         },
         pages: {

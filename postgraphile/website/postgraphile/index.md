@@ -4,17 +4,7 @@ title: Introduction
 
 # PostGraphile Introduction
 
-:::warning[Use the `@rc` tag]
-
-This software is in release candidate stage, please be sure to use the `@rc` tag when installing any of the related modules, for example:
-
-```sh
-yarn add postgraphile-plugin-connection-filter@rc
-```
-
-:::
-
-:::tip[Migration Guide]
+:::tip[Migration Guide: V4 to V5]
 
 Coming from PostGraphile Version 4? Check out the
 [migration guide](./migrating-from-v4/index.mdx)!
