@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.9.2",
-    "@docusaurus/plugin-content-docs": "^3.9.2",
+    "@docusaurus/plugin-content-docs": "patch:@docusaurus/plugin-content-docs@npm%3A3.9.2#~/.yarn/patches/@docusaurus-plugin-content-docs-npm-3.9.2-65ef413098.patch",
     "@lezer/highlight": "^1.2.3",
     "@types/react": "^19.2.7",
     "dataloader": "^2.2.3",
