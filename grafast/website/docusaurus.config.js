@@ -163,14 +163,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      announcementBar: {
-        id: "announcementBar-2",
-        content:
-          '<a href="/news/2025-10-28-grafast-v1-release-candidate"><strong>Try out the Release Candidate!</strong></a> Documentation is not complete; PRs welcome ♥',
-        //backgroundColor: "#fafbfc",
-        //textColor: "#091E42",
-        isCloseable: false,
-      },
       navbar: {
         title: "Home",
         logo: {
