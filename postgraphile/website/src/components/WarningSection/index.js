@@ -25,19 +25,47 @@ export default function WarningContent({
           </div>
           <div className={clsx("col col--6", styles.inner)}>
             <h2 className={styles.header}>{title}</h2>
-            <p className={styles.warningProse}>
-              A ground-up re-architecture focused on long-term maintainability,
-              extensibility, performance, and correctness — whilst staying true
-              to PostGraphile's original goal:
-            </p>
-            <p className={styles.warningProseStrong}>
-              Implementing the obvious so you need only write code that truly
-              delivers value.
-            </p>
+            <ul className={styles.warningProse}>
+              <li>
+                <a href="/postgraphile/5/grafast-for-postgraphile-users">
+                  🚀 Gra<em>fast</em> execution engine reduces database load
+                </a>
+              </li>
+              <li>
+                <a href="/postgraphile/5/exporting-schema">
+                  ⏏️ &ldquo;Eject&rdquo; function for evolution and serverless
+                </a>
+              </li>
+              <li>
+                <a href="/postgraphile/5/polymorphism">
+                  🎭 Support for abstract types (interfaces and unions)
+                </a>
+              </li>
+              <li>
+                <a href="/postgraphile/5/extend-schema">
+                  🌱 Simpler and smoother <tt>extendSchema()</tt>
+                </a>
+              </li>
+              <li>
+                <a href="/postgraphile/5/customization-overview">
+                  💅 More customizeable; make it your own!
+                </a>
+              </li>
+              <li>
+                <a href="/postgraphile/5/config/">
+                  ⚙️ Overhauled configuration and plugin system
+                </a>
+              </li>
+              <li>
+                <a href="/postgraphile/5/requirements#typescript-v500-optional">
+                  💪 Stronger types throughout
+                </a>
+              </li>
+            </ul>
             <div className="buttons-container">
               <Link
                 className={clsx(
-                  "button button--primary button--lg",
+                  "button button--primary button--lg margin-right--md margin-bottom--md",
                   styles.button,
                 )}
                 to={primaryLink}
@@ -46,7 +74,7 @@ export default function WarningContent({
               </Link>
               <Link
                 className={clsx(
-                  "button button--primary button--lg",
+                  "button button--primary button--outline button--lg",
                   styles.button,
                 )}
                 to={secondaryLink}

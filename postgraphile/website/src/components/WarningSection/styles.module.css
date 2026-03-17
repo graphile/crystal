@@ -21,6 +21,19 @@
   font-size: 2rem;
 }
 
+.warningProse li {
+  list-style-type: none;
+  margin: 0.5rem;
+  a {
+    color: #def;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+}
+
 .warningProse,
 .warningProseStrong {
   font-size: var(--ifm-h3-font-size);
@@ -32,20 +45,12 @@
 }
 
 .button {
-  font-size: 0.8rem;
-  border-radius: 7px;
-  border: 1px solid var(--ifm-color-darkest);
-  background-color: #ffffff;
-  color: #ad1f32;
-  letter-spacing: 0.1rem;
   text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.1rem;
+  border-radius: 7px;
   margin-left: 1em;
   margin-right: 1em;
-}
-
-.button:hover {
-  color: var(--ifm-color-primary-dark);
-  border: 1px solid var(--ifm-color-dark);
 }
 
 .progressContainer {
