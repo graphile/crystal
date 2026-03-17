@@ -52,18 +52,6 @@ function HomepageHeader() {
                 Overview - 5min ⏱
               </Link>
             </div>
-            <div className={clsx("margin-top--md", styles.buttons)}>
-              <Link
-                className={clsx(
-                  "button button--outline button--lg margin-left--none",
-                  styles.buttonHero,
-                  styles.buttonHeroOutline,
-                )}
-                to="/postgraphile/4"
-              >
-                V4 Documentation (legacy)
-              </Link>
-            </div>
           </div>
           <div className="col col--6">
             <HeroImage
