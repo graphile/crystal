@@ -192,11 +192,6 @@ export class GoogleDriveFileStep extends Step<GoogleDriveFile> {
   }
 
   // Execute once for the entire batch
-  async execute(
-    _extra: ExecutionExtra,
-    [fileIds]: [string[]],
-  ): Promise<(GoogleDriveFile | null)[]> {
-    const uniqueIds = [...new Set(fileIds)];
   async execute(details: ExecutionDetails) {
     const { values: [fileIdEv], indexMap } = details;
     const uniqueIds = [...new Set(indexMap(i => fileIdEV.at(i)))];
