@@ -121,7 +121,6 @@ const config = {
          * Path to data on filesystem relative to site dir.
          */
         path: "./news",
-        blogSidebarCount: 0,
       },
     ],
     // PostCSS configuration
