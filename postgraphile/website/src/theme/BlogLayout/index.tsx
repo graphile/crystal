@@ -13,16 +13,15 @@ export default function BlogLayout(props: Props): ReactNode {
     <Layout {...layoutProps}>
       <div className="container margin-vert--lg">
         <div className="row">
-          <BlogSidebar sidebar={sidebar} />
-          <main
-            className={clsx("col", {
-              "col--7": hasSidebar,
-              "col--9 col--offset-1": !hasSidebar,
-            })}
-          >
+          <main className={clsx("col", "col--8 col--offset-1")}>
             {children}
           </main>
-          {toc && <div className="col col--2">{toc}</div>}
+          {toc || hasSidebar ? (
+            <aside className="col col--3">
+              {toc}
+              <BlogSidebar sidebar={sidebar} />
+            </aside>
+          ) : null}
         </div>
       </div>
     </Layout>
