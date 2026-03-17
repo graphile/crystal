@@ -33,7 +33,7 @@ may not be for you, PostGraphile has an [‘export’ feature](./exporting-schem
 so your generated API can be exported as executable JavaScript code which you
 can then maintain yourself ─ there's no lock-in.
 
-:::tip[Your schema should reflect client needs, not database tables]
+:::tip[Your schema should reflect client needs, not just database tables]
 
 PostGraphile doesn't have to be (and generally should not be) a “1-to-1 map” of
 your database.
