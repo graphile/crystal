@@ -1,8 +1,6 @@
 .warningSection {
-  background-color: var(--ifm-color-primary-darkest);
-  color: var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-darker);
   padding: 2rem 4.75rem 1rem;
-  text-align: center;
   margin-bottom: 1rem;
 }
 
