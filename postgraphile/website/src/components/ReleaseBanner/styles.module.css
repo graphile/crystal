@@ -1,13 +1,13 @@
-.warningSection {
+.banner {
   background-color: var(--ifm-color-primary-darker);
   color: var(--ifm-color-primary-lightest);
 }
 
-.warningSection h2 {
+.banner h2 {
   font-weight: bold;
 }
 
-.warningRow {
+.bannerRow {
   align-items: center;
   justify-content: center;
 }
@@ -21,7 +21,7 @@
   font-size: 2rem;
 }
 
-.warningProse li {
+.bannerProse li {
   list-style-type: none;
   margin: 0.5rem;
   a {
@@ -37,14 +37,14 @@
   }
 }
 
-.warningProse,
-.warningProseStrong {
+.bannerProse,
+.bannerProseStrong {
   font-size: var(--ifm-h3-font-size);
   line-height: var(--ifm-heading-line-height);
   text-align: left;
 }
 
-.warningProseStrong {
+.bannerProseStrong {
   font-weight: var(--ifm-heading-font-weight);
 }
 
