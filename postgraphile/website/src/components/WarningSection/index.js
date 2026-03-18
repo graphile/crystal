@@ -6,6 +6,10 @@ import v5betaStyles from "@site/src/pages/v5beta.module.css";
 import clsx from "clsx";
 import React from "react";
 
+import "@fortawesome/fontawesome-svg-core"; // Import the library component.
+import "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
+import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // Import the FontAwesomeIcon component.
+
 export default function WarningContent({
   title,
   primaryLink,
@@ -28,37 +32,44 @@ export default function WarningContent({
             <ul className={styles.warningProse}>
               <li>
                 <a href="/postgraphile/5/grafast-for-postgraphile-users">
-                  🚀 Gra<em>fast</em> engine reduces database load
+                  <Icon icon="fa-solid fa-rocket" size="lg" />
+                  Gra<em>fast</em> engine reduces database load
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/exporting-schema">
-                  ⏏️ &ldquo;Eject&rdquo; function for evolution and serverless
+                  <Icon icon="fa-solid fa-eject" size="lg" />
+                  &ldquo;Eject&rdquo; function for evolution and serverless
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/polymorphism">
-                  🎭 Abstract types (interfaces and unions)
+                  <Icon icon="fa-solid fa-masks-theater" size="lg" />
+                  Abstract types (interfaces and unions)
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/extend-schema">
-                  🌱 Simpler, smoother and safer <tt>extendSchema()</tt>
+                  <Icon icon="fa-solid fa-seedling" size="lg" />
+                  Simpler, smoother and safer <tt>extendSchema()</tt>
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/customization-overview">
-                  💅 More customizeable; make it your own!
+                  <Icon icon="fa-solid fa-palette" size="lg" />
+                  More customizable; make it your own!
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/config/">
-                  ⚙️ Overhauled configuration and plugin system
+                  <Icon icon="fa-solid fa-gears" size="lg" />
+                  Overhauled configuration and plugin system
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/requirements#typescript-v500-optional">
-                  💪 Stronger types throughout; even plugins
+                  <Icon icon="fa-solid fa-dumbbell" size="lg" />
+                  Stronger types throughout; even plugins
                 </a>
               </li>
             </ul>
@@ -74,8 +85,8 @@ export default function WarningContent({
               </Link>
               <Link
                 className={clsx(
+                  styles.outlineButton,
                   "button button--primary button--outline button--lg",
-                  styles.button,
                 )}
                 to={secondaryLink}
               >
