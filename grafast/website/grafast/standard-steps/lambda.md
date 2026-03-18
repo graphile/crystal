@@ -7,7 +7,11 @@ batching!](#warning-no-batching)). It's highly suitable for usage when you just
 want to synchronously transform data (e.g. concatenating strings, mapping over
 arrays, etc) but is almost never well suited to asynchronous topics &mdash; you
 likely want [`loadOne()`](./loadOne.md) or [`loadMany()`](./loadMany.md) instead
-in those cases.
+in those cases. For non-trivial transforms that appear in multiple fields,
+consider creating a [custom step class](../step-classes.mdx) with
+`deduplicate()` support.
+
+See also [Plan resolver best practices](../plan-resolvers/best-practices.md).
 
 :::
 
@@ -88,7 +92,7 @@ code that doesn't perform heavy computation and wouldn't benefit from
 batching).
 
 In most cases, you should use [`loadOne`](./loadOne) instead. Here's what the
-examples above might look like with `loadOne` - note that these callbacks
+examples below might look like with `loadOne` - note that these callbacks
 are now called with all the values at once, rather than one at a time:
 
 ```ts
