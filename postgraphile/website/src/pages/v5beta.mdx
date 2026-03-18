@@ -7,15 +7,15 @@ wrapperClassName: full-width
 import styles from "@site/src/css/common.module.css";
 import v5betaStyles from "./v5beta.module.css";
 
-import WarningSection from "@site/src/components/WarningSection";
+import ReleaseBanner from "@site/src/components/ReleaseBanner";
 import CalloutSection from "@site/src/components/CalloutSection";
 import SecondarySection from "@site/src/components/SecondarySection";
 import TertiarySection from "@site/src/components/TertiarySection";
 import clsx from "clsx";
 
-<div className={v5betaStyles.warningSection}>
+<div className={v5betaStyles.banner}>
 
-<WarningSection
+<ReleaseBanner
   title={`PostGraphile V5 is here!`}
   primaryLink={`/news/2025-10-28-v5-release-candidate/`}
   primaryButtonText={`And more — see the announcement!`}

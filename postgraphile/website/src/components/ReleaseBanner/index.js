@@ -1,16 +1,14 @@
 import Link from "@docusaurus/Link";
-import styles from "@site/src/components/WarningSection/styles.module.css";
+import styles from "@site/src/components/ReleaseBanner/styles.module.css";
 import V5Image from "@site/static/img/celebration.svg";
 
-import v5betaStyles from "@site/src/pages/v5beta.module.css";
 import clsx from "clsx";
-import React from "react";
 
 import "@fortawesome/fontawesome-svg-core"; // Import the library component.
 import "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // Import the FontAwesomeIcon component.
 
-export default function WarningContent({
+export default function ReleaseBanner({
   title,
   primaryLink,
   primaryButtonText,
@@ -18,9 +16,9 @@ export default function WarningContent({
   secondaryButtonText,
 }) {
   return (
-    <section className={styles.warningSection}>
+    <section className={styles.banner}>
       <div className={clsx("container margin-vert--lg")}>
-        <div className={clsx("row", styles.warningRow)}>
+        <div className={clsx("row", styles.bannerRow)}>
           <div className={clsx("col col--6", styles.inner)}>
             <V5Image
               title="Fireworks and celebration"
@@ -29,7 +27,7 @@ export default function WarningContent({
           </div>
           <div className={clsx("col col--6", styles.inner)}>
             <h2 className={styles.header}>{title}</h2>
-            <ul className={styles.warningProse}>
+            <ul className={styles.bannerProse}>
               <li>
                 <a href="/postgraphile/5/grafast-for-postgraphile-users">
                   <Icon icon="fa-solid fa-rocket" size="lg" />
