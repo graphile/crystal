@@ -32,26 +32,48 @@
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
   }
+  svg {
+    margin-right: 0.5rem;
+  }
 }
 
 .warningProse,
 .warningProseStrong {
   font-size: var(--ifm-h3-font-size);
   line-height: var(--ifm-heading-line-height);
+  text-align: left;
 }
 
 .warningProseStrong {
   font-weight: var(--ifm-heading-font-weight);
 }
 
-.button {
-  --ifm-color-primary: #def;
+.button,
+.outlineButton {
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.1rem;
   border-radius: 7px;
   margin-left: 1em;
   margin-right: 1em;
+  border-color: var(--ifm-color-primary-lightest);
+}
+
+.button {
+  color: var(--ifm-color-primary-darkest);
+  background: var(--ifm-color-primary-lightest);
+}
+
+.button:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.outlineButton {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.outlineButton:hover {
+  background: var(--ifm-color-primary-dark);
 }
 
 .progressContainer {
