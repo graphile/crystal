@@ -6,7 +6,7 @@ import HomepageTestimonials from "@site/src/components/HomepageTestimonials";
 import HomepageTools from "@site/src/components/HomepageTools";
 import SecondarySection from "@site/src/components/SecondarySection";
 import TertiarySection from "@site/src/components/TertiarySection";
-import ReleaseBanner from "@site/src/components/releaseBanner";
+import ReleaseBanner from "@site/src/components/ReleaseBanner";
 import styles from "@site/src/pages/index.module.css";
 import HeroImage from "@site/static/img/homepage/coder.svg";
 import Layout from "@theme/Layout";
