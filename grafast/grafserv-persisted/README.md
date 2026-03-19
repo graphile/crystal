@@ -1,10 +1,10 @@
 # @grafserv/persisted
 
-<span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support Graphile development on Patreon"><img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" /></a></span>
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Package on npm](https://img.shields.io/npm/v/@grafserv/persisted.svg?style=flat)](https://www.npmjs.com/package/@grafserv/persisted)
 ![MIT license](https://img.shields.io/npm/l/@grafserv/persisted.svg)
-[![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
+[![Follow](https://img.shields.io/badge/BSky-@Graphile.org-006aff.svg)](https://bsky.app/profile/graphile.org)
+[![Follow](https://img.shields.io/badge/Mastodon-@Graphile.fosstodon.org-6364ff.svg)](https://fosstodon.org/@graphile)
 
 Persisted operations (aka "persisted queries", "query allowlist", "persisted
 documents") support for [Grafserv](https://grafast.org/grafserv). Applies to
