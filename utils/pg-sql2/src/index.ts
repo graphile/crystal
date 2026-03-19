@@ -1403,11 +1403,14 @@ export const sql = sqlBase as PgSQL;
 export default sql;
 
 export {
+  falseNode as FALSE,
   falseNode as false,
   sql as fragment,
   isSQL,
+  nullNode as NULL,
   nullNode as null,
   sql as query,
+  trueNode as TRUE,
   trueNode as true,
 };
 
@@ -1439,8 +1442,11 @@ export interface PgSQL<TEmbed = never> {
   blank: typeof blank;
   fragment: PgSQL<TEmbed>;
   true: typeof trueNode;
+  TRUE: typeof trueNode;
   false: typeof falseNode;
+  FALSE: typeof falseNode;
   null: typeof nullNode;
+  NULL: typeof nullNode;
   isSQL: typeof isSQL;
   replaceSymbol: typeof replaceSymbol;
   sql: PgSQL<TEmbed>;
@@ -1472,8 +1478,11 @@ const attributes = {
   blank,
   fragment: sql,
   true: trueNode,
+  TRUE: trueNode,
   false: falseNode,
+  FALSE: falseNode,
   null: nullNode,
+  NULL: nullNode,
   replaceSymbol,
   isSQL,
   withTransformer,
