@@ -6,7 +6,6 @@ Graphile ecosystem. Find out
 
 ## Featured
 
-- The Guild
 - Steelhead
 
 ## Leaders
@@ -17,17 +16,19 @@ Graphile ecosystem. Find out
 - Axinom
 - Taiste
 - Trigger.dev
-- Cintra
 - Apollo
+- Cintra
 - BairesDev
 - Two Bit Solutions
 - Dimply
 - Ndustrial
 - Beacon
 - Ravio
-- prodready
 - Outbank
+- prodready
 - Carvajal Consultants, Inc.
+- Constructive
+- Seaber
 
 ## Supporters
 
@@ -39,19 +40,18 @@ Graphile ecosystem. Find out
 - nullachtvierzehn
 - Zymego
 - garpulon
-- Vizcom
 - Ether
-- Charlie Hadden
+- Vizcom
 - The Outbound Collective
 - Kiron Open Higher Education
 - Andrew Joseph
 - Peter C. Romano
 - mateo
-- Jody Hoon-Starr
 - kontakto-fi
 - Tailos, Inc.
-- Justin Carrus
+- Jody Hoon-Starr
 - WorkOS
+- Justin Carrus
 - Malachi Bergman
 - ProbablyBrianBurgess
 - Keweiqu

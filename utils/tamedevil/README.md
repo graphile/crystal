@@ -52,7 +52,6 @@ via sponsorship.
 And please give some love to our featured sponsors 🤩:
 
 <table><tr>
-<td align="center"><a href="https://www.the-guild.dev/"><img src="https://graphile.org/images/sponsors/theguild.png" width="90" height="90" alt="The Guild" /><br />The Guild</a> *</td>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
 </tr></table>
 
@@ -316,7 +315,7 @@ If `obj` is potentially expensive code and you need to reference it multiple
 times (e.g. `` te`(${obj}.foo === 3 ? ${obj}.bar : ${obj}.baz)` ``) then you can
 use `tmp` to create a temporary variable that stores reference to it and return
 the result of calling `callback` passing this temporary reference. E.g.
-``te.tmp(obj, tmp => te`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`)`` means
+`` te.tmp(obj, tmp => te`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`) `` means
 that the potentially expensive expression in the original `obj` variable only
 need to be evaluated once, not 3 times.
 
