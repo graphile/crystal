@@ -6,9 +6,9 @@ sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 
-- The Guild
 - Steelhead
 - Outbank
+- Constructive
 
 ## Leaders
 
@@ -18,8 +18,8 @@ sponsor](https://graphile.org/sponsor/).
 - Axinom
 - Taiste
 - Trigger.dev
-- Cintra
 - Apollo
+- Cintra
 - BairesDev
 - Two Bit Solutions
 - Dimply
@@ -28,6 +28,7 @@ sponsor](https://graphile.org/sponsor/).
 - Ravio
 - prodready
 - Carvajal Consultants, Inc.
+- Seaber
 
 ## Supporters
 
@@ -39,19 +40,18 @@ sponsor](https://graphile.org/sponsor/).
 - nullachtvierzehn
 - Zymego
 - garpulon
-- Vizcom
 - Ether
-- Charlie Hadden
+- Vizcom
 - The Outbound Collective
 - Kiron Open Higher Education
 - Andrew Joseph
 - Peter C. Romano
 - mateo
-- Jody Hoon-Starr
 - kontakto-fi
 - Tailos, Inc.
-- Justin Carrus
+- Jody Hoon-Starr
 - WorkOS
+- Justin Carrus
 - Malachi Bergman
 - ProbablyBrianBurgess
 - Keweiqu
