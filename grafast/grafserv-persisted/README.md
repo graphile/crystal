@@ -1,5 +1,6 @@
 # @grafserv/persisted
 
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Package on npm](https://img.shields.io/npm/v/@grafserv/persisted.svg?style=flat)](https://www.npmjs.com/package/@grafserv/persisted)
 ![MIT license](https://img.shields.io/npm/l/@grafserv/persisted.svg)
