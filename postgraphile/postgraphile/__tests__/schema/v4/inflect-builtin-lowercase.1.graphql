@@ -324,6 +324,80 @@ type AuthenticatePayloadPayload {
   query: query
 }
 
+type Building implements node {
+  address: String
+  code: String
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Building` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input BuildingCondition {
+  """Checks for equality with the object’s `address` field."""
+  address: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+}
+
+"""An input for mutations affecting `Building`"""
+input BuildingInput {
+  address: String
+  id: Int
+}
+
+"""
+Represents an update to a `Building`. Fields that are set will be updated.
+"""
+input BuildingPatch {
+  address: String
+  id: Int
+}
+
+"""A connection to a list of `Building` values."""
+type BuildingsConnection {
+  """
+  A list of edges which contains the `Building` and cursor to aid in pagination.
+  """
+  edges: [BuildingsEdge]!
+
+  """A list of `Building` objects."""
+  nodes: [Building]!
+
+  """Information to aid in pagination."""
+  pageInfo: pageinfo!
+
+  """The count of *all* `Building` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Building` edge in the connection."""
+type BuildingsEdge {
+  """A cursor for use in pagination."""
+  cursor: cursor
+
+  """The `Building` at the end of the edge."""
+  node: Building
+}
+
+"""Methods to use when ordering `Building`."""
+enum BuildingsOrderBy {
+  ADDRESS_ASC
+  ADDRESS_DESC
+  ID_ASC
+  ID_DESC
+  natural
+  primary_key_asc
+  primary_key_desc
+}
+
 """Represents the colours red, green and blue."""
 enum Color {
   BLUE
@@ -587,6 +661,41 @@ type Comptype {
 input ComptypeInput {
   isOptimised: Boolean
   schedule: datetime
+}
+
+"""All input for the create `Building` mutation."""
+input CreateBuildingInput {
+  """The `Building` to be created by this mutation."""
+  building: BuildingInput!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Building` mutation."""
+type CreateBuildingPayload {
+  """The `Building` that was created by this mutation."""
+  building: Building
+
+  """An edge for our `Building`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]! = [primary_key_asc]
+  ): BuildingsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: query
 }
 
 """All input for the create `CompoundKey` mutation."""
@@ -1079,6 +1188,41 @@ type CreatePersonSecretPayload {
   query: query
 }
 
+"""All input for the create `Pet` mutation."""
+input CreatePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Pet` to be created by this mutation."""
+  pet: PetInput!
+}
+
+"""The output of our create `Pet` mutation."""
+type CreatePetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Pet` that was created by this mutation."""
+  pet: Pet
+
+  """An edge for our `Pet`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering `Pet`."""
+    orderBy: [PetsOrderBy!]! = [primary_key_asc]
+  ): PetsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: query
+}
+
 """All input for the create `Post` mutation."""
 input CreatePostInput {
   """
@@ -1497,6 +1641,54 @@ enum DefaultValuesOrderBy {
   natural
   primary_key_asc
   primary_key_desc
+}
+
+"""All input for the `deleteBuildingById` mutation."""
+input DeleteBuildingByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deleteBuilding` mutation."""
+input DeleteBuildingInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Building` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Building` mutation."""
+type DeleteBuildingPayload {
+  """The `Building` that was deleted by this mutation."""
+  building: Building
+
+  """An edge for our `Building`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]! = [primary_key_asc]
+  ): BuildingsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedBuildingId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: query
 }
 
 """All input for the `deleteCompoundKeyByPersonId1AndPersonId2` mutation."""
@@ -2082,6 +2274,54 @@ type DeletePersonSecretPayload {
     """The method to use when ordering `PersonSecret`."""
     orderBy: [PersonSecretsOrderBy!]! = [primary_key_asc]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: query
+}
+
+"""All input for the `deletePetById` mutation."""
+input DeletePetByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `deletePet` mutation."""
+input DeletePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Pet` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Pet` mutation."""
+type DeletePetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPetId: ID
+
+  """The `Pet` that was deleted by this mutation."""
+  pet: Pet
+
+  """An edge for our `Pet`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering `Pet`."""
+    orderBy: [PetsOrderBy!]! = [primary_key_asc]
+  ): PetsEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -5016,6 +5256,77 @@ enum PersonSecretsOrderBy {
   primary_key_desc
 }
 
+type Pet implements node {
+  code: String
+  id: Int!
+  name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Pet` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PetCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""An input for mutations affecting `Pet`"""
+input PetInput {
+  id: Int
+  name: String
+}
+
+"""Represents an update to a `Pet`. Fields that are set will be updated."""
+input PetPatch {
+  id: Int
+  name: String
+}
+
+"""A connection to a list of `Pet` values."""
+type PetsConnection {
+  """
+  A list of edges which contains the `Pet` and cursor to aid in pagination.
+  """
+  edges: [PetsEdge]!
+
+  """A list of `Pet` objects."""
+  nodes: [Pet]!
+
+  """Information to aid in pagination."""
+  pageInfo: pageinfo!
+
+  """The count of *all* `Pet` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Pet` edge in the connection."""
+type PetsEdge {
+  """A cursor for use in pagination."""
+  cursor: cursor
+
+  """The `Pet` at the end of the edge."""
+  node: Pet
+}
+
+"""Methods to use when ordering `Pet`."""
+enum PetsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  natural
+  primary_key_asc
+  primary_key_desc
+}
+
 type Post implements node {
   authorId: Int
   body: String
@@ -6495,6 +6806,63 @@ enum UpdatableViewsOrderBy {
   natural
 }
 
+"""All input for the `updateBuildingById` mutation."""
+input UpdateBuildingByIdInput {
+  """
+  An object where the defined keys will be set on the `Building` being updated.
+  """
+  buildingPatch: BuildingPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the `updateBuilding` mutation."""
+input UpdateBuildingInput {
+  """
+  An object where the defined keys will be set on the `Building` being updated.
+  """
+  buildingPatch: BuildingPatch!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Building` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Building` mutation."""
+type UpdateBuildingPayload {
+  """The `Building` that was updated by this mutation."""
+  building: Building
+
+  """An edge for our `Building`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!]! = [primary_key_asc]
+  ): BuildingsEdge
+
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: query
+}
+
 """All input for the `updateCompoundKeyByPersonId1AndPersonId2` mutation."""
 input UpdateCompoundKeyByPersonId1AndPersonId2Input {
   """
@@ -7192,6 +7560,63 @@ type UpdatePersonSecretPayload {
     """The method to use when ordering `PersonSecret`."""
     orderBy: [PersonSecretsOrderBy!]! = [primary_key_asc]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: query
+}
+
+"""All input for the `updatePetById` mutation."""
+input UpdatePetByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `Pet` being updated.
+  """
+  petPatch: PetPatch!
+}
+
+"""All input for the `updatePet` mutation."""
+input UpdatePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Pet` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Pet` being updated.
+  """
+  petPatch: PetPatch!
+}
+
+"""The output of our update `Pet` mutation."""
+type UpdatePetPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Pet` that was updated by this mutation."""
+  pet: Pet
+
+  """An edge for our `Pet`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering `Pet`."""
+    orderBy: [PetsOrderBy!]! = [primary_key_asc]
+  ): PetsEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -8023,6 +8448,14 @@ type mutation {
     input: CompoundTypeSetMutationInput!
   ): CompoundTypeSetMutationPayload
 
+  """Creates a single `Building`."""
+  createBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateBuildingInput!
+  ): CreateBuildingPayload
+
   """Creates a single `CompoundKey`."""
   createCompoundKey(
     """
@@ -8135,6 +8568,14 @@ type mutation {
     input: CreatePersonSecretInput!
   ): CreatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
+  """Creates a single `Pet`."""
+  createPet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePetInput!
+  ): CreatePetPayload
+
   """Creates a single `Post`."""
   createPost(
     """
@@ -8214,6 +8655,22 @@ type mutation {
     """
     input: CreateViewTableInput!
   ): CreateViewTablePayload
+
+  """Deletes a single `Building` using its globally unique id."""
+  deleteBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingInput!
+  ): DeleteBuildingPayload
+
+  """Deletes a single `Building` using a unique key."""
+  deleteBuildingById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingByIdInput!
+  ): DeleteBuildingPayload
 
   """Deletes a single `CompoundKey` using its globally unique id."""
   deleteCompoundKey(
@@ -8414,6 +8871,22 @@ type mutation {
     """
     input: DeletePersonSecretByPersonIdInput!
   ): DeletePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Deletes a single `Pet` using its globally unique id."""
+  deletePet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePetInput!
+  ): DeletePetPayload
+
+  """Deletes a single `Pet` using a unique key."""
+  deletePetById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePetByIdInput!
+  ): DeletePetPayload
 
   """Deletes a single `Post` using its globally unique id."""
   deletePost(
@@ -8813,6 +9286,22 @@ type mutation {
     input: TypesMutationInput!
   ): TypesMutationPayload
 
+  """Updates a single `Building` using its globally unique id and a patch."""
+  updateBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBuildingInput!
+  ): UpdateBuildingPayload
+
+  """Updates a single `Building` using a unique key and a patch."""
+  updateBuildingById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBuildingByIdInput!
+  ): UpdateBuildingPayload
+
   """
   Updates a single `CompoundKey` using its globally unique id and a patch.
   """
@@ -9021,6 +9510,22 @@ type mutation {
     input: UpdatePersonSecretByPersonIdInput!
   ): UpdatePersonSecretPayload @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
+  """Updates a single `Pet` using its globally unique id and a patch."""
+  updatePet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePetInput!
+  ): UpdatePetPayload
+
+  """Updates a single `Pet` using a unique key and a patch."""
+  updatePetById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePetByIdInput!
+  ): UpdatePetPayload
+
   """Updates a single `Post` using its globally unique id and a patch."""
   updatePost(
     """
@@ -9206,6 +9711,35 @@ type query implements node {
 
   """lol, add some stuff 4 query"""
   add4Query(arg0: Int, b: Int): Int
+
+  """Reads and enables pagination through a set of `Building`."""
+  allBuildings(
+    """Read all values in the set after (below) this cursor."""
+    after: cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BuildingCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Building`."""
+    orderBy: [BuildingsOrderBy!] = [primary_key_asc]
+  ): BuildingsConnection
 
   """Reads and enables pagination through a set of `CompoundKey`."""
   allCompoundKeys(
@@ -9642,6 +10176,35 @@ type query implements node {
     orderBy: [PersonSecretsOrderBy!] = [primary_key_asc]
   ): PersonSecretsConnection @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
+  """Reads and enables pagination through a set of `Pet`."""
+  allPets(
+    """Read all values in the set after (below) this cursor."""
+    after: cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PetCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Pet`."""
+    orderBy: [PetsOrderBy!] = [primary_key_asc]
+  ): PetsConnection
+
   """Reads and enables pagination through a set of `Post`."""
   allPosts(
     """Read all values in the set after (below) this cursor."""
@@ -9952,6 +10515,15 @@ type query implements node {
     """
     offset: Int
   ): PeopleConnection @deprecated(reason: "This is deprecated (comment on function c.badly_behaved_function).")
+
+  """Reads a single `Building` using its globally unique `ID`."""
+  building(
+    """The globally unique `ID` to be used in selecting a single `Building`."""
+    nodeId: ID!
+  ): Building
+
+  """Get a single `Building`."""
+  buildingById(id: Int!): Building
 
   """Reads a single `CompoundKey` using its globally unique `ID`."""
   compoundKey(
@@ -10283,6 +10855,15 @@ type query implements node {
 
   """Get a single `PersonSecret`."""
   personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
+
+  """Reads a single `Pet` using its globally unique `ID`."""
+  pet(
+    """The globally unique `ID` to be used in selecting a single `Pet`."""
+    nodeId: ID!
+  ): Pet
+
+  """Get a single `Pet`."""
+  petById(id: Int!): Pet
 
   """Reads a single `Post` using its globally unique `ID`."""
   post(

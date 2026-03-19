@@ -23,10 +23,31 @@ import {
   EXPORTABLE_OBJECT_CLONE,
   gatherConfig,
 } from "graphile-build";
-import type { PgProc, PgProcArgument } from "pg-introspection";
+import type { PgProc, PgProcArgument, PgType } from "pg-introspection";
 
 import { exportNameHint, forbidRequired } from "../utils.ts";
 import { version } from "../version.ts";
+
+/**
+ * Given a type OID, walk through domain chains and return the type if
+ * it resolves to a composite type (typtype 'c' with a typrelid), or
+ * null otherwise.
+ */
+function resolveToCompositeType(
+  typeOid: string,
+  types: ReadonlyArray<PgType>,
+): PgType | null {
+  let type = types.find((t) => t._id === typeOid);
+  // Follow domain chains (typtype 'd') to reach the underlying type
+  while (type && type.typtype === "d" && type.typbasetype) {
+    type = types.find((t) => t._id === type!.typbasetype!);
+  }
+  // Return only if it resolved to a composite (table) type
+  if (type && type.typtype === "c" && type.typrelid) {
+    return type;
+  }
+  return null;
+}
 
 declare global {
   namespace GraphileBuild {
@@ -214,10 +235,68 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const executor =
             info.helpers.pgIntrospection.getExecutorForService(serviceName);
 
-          const name = info.inflection.functionResourceName({
+          let name = info.inflection.functionResourceName({
             serviceName,
             pgProc,
           });
+
+          // When overloaded functions target distinct composite types, each
+          // is allowed through the overload check in pgIntrospection_proc.
+          // However, the resource registry keys by name (see datasource.ts),
+          // so we must ensure each resource has a unique name. We suffix with
+          // the target table's schema and name, for example `code(a.pets)`
+          // becomes `code_a_pets`.
+          // GraphQL field names are unaffected since computedAttributeField
+          // inflection uses resource.extensions.pg.name (the raw SQL name).
+          {
+            const introspection = (
+              await info.helpers.pgIntrospection.getIntrospection()
+            ).find((n) => n.pgService.name === serviceName)!.introspection;
+            // Check if another proc in the same namespace shares this name
+            let hasOverload = false;
+            for (const p of introspection.procs) {
+              if (
+                p.pronamespace === pgProc.pronamespace &&
+                p.proname === pgProc.proname &&
+                p._id !== pgProc._id
+              ) {
+                hasOverload = true;
+                break;
+              }
+            }
+            if (hasOverload) {
+              // Resolve the first argument to its target table type
+              const firstArgType = pgProc.proargtypes?.[0];
+              if (firstArgType) {
+                const composite = resolveToCompositeType(
+                  firstArgType,
+                  introspection.types,
+                );
+                if (composite) {
+                  // Look up the pg_class and pg_namespace for the target
+                  // table so we can build the suffix
+                  let className: string | undefined;
+                  let schemaName: string | undefined;
+                  for (const c of introspection.classes) {
+                    if (c._id === composite.typrelid) {
+                      className = c.relname;
+                      for (const n of introspection.namespaces) {
+                        if (n._id === c.relnamespace) {
+                          schemaName = n.nspname;
+                          break;
+                        }
+                      }
+                      break;
+                    }
+                  }
+                  if (className && schemaName) {
+                    name = `${name}_${schemaName}_${className}`;
+                  }
+                }
+              }
+            }
+          }
+
           const identifier = `${serviceName}.${namespace.nspname}.${
             pgProc.proname
           }(${pgProc.getArguments().map(argTypeName).join(",")})`;
@@ -648,18 +727,65 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        // We also don’t want procedures that have been defined in our namespace
-        // twice. This leads to duplicate fields in the API which throws an
-        // error. In the future we may support this case. For now though, it is
-        // too complex.
-        const overload = introspection.procs.find(
-          (p) =>
-            p.pronamespace === pgProc.pronamespace &&
-            p.proname === pgProc.proname &&
-            p._id !== pgProc._id,
-        );
-        if (overload) {
-          return;
+        // We don’t want procedures that have been defined in our namespace
+        // twice, as this leads to duplicate fields in the API. However, we
+        // allow overloads where each targets a distinct composite type as its
+        // first argument (i.e. computed columns on different tables), since
+        // each will be exposed on a different GraphQL type.
+        {
+          let hasOverload = false;
+          for (const p of introspection.procs) {
+            if (
+              p.pronamespace === pgProc.pronamespace &&
+              p.proname === pgProc.proname &&
+              p._id !== pgProc._id
+            ) {
+              hasOverload = true;
+              break;
+            }
+          }
+          if (hasOverload) {
+            // This proc has overloads — check if it qualifies as a computed
+            // column on a unique composite type.
+            const thisFirstArgType = pgProc.proargtypes?.[0];
+            if (!thisFirstArgType) {
+              // No first arg — not a computed column candidate
+              return;
+            }
+            const thisComposite = resolveToCompositeType(
+              thisFirstArgType,
+              introspection.types,
+            );
+            if (!thisComposite) {
+              // First arg doesn’t resolve to a composite type
+              return;
+            }
+            // Check that no other overload targets the same composite type;
+            // if two overloads both target, they'd produce duplicate fields on
+            // the same GraphQL type so we must skip.
+            for (const p of introspection.procs) {
+              if (
+                p.pronamespace === pgProc.pronamespace &&
+                p.proname === pgProc.proname &&
+                p._id !== pgProc._id
+              ) {
+                const otherFirstArgType = p.proargtypes?.[0];
+                if (!otherFirstArgType) continue;
+                const otherComposite = resolveToCompositeType(
+                  otherFirstArgType,
+                  introspection.types,
+                );
+                if (
+                  otherComposite &&
+                  otherComposite._id === thisComposite._id
+                ) {
+                  // Another overload targets the same composite type — skip
+                  return;
+                }
+              }
+            }
+            // This proc targets a unique composite type — allow it through
+          }
         }
 
         await helpers.pgProcedures.getResourceOptions(serviceName, pgProc);
