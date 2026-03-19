@@ -1,9 +1,8 @@
 # 🔮 Graphile's Crystal Monorepo
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
-[![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
+[![Follow](https://img.shields.io/badge/BSky-@Graphile.org-blue.svg)](https://bsky.app/profile/graphile.org)
 
 At Graphile we love GraphQL so much we named ourself for our love of it! This
 repository houses many of the Graphile packages that relate to GraphQL (or
