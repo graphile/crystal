@@ -2,7 +2,8 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
-[![Follow](https://img.shields.io/badge/BSky-@Graphile.org-blue.svg)](https://bsky.app/profile/graphile.org)
+[![Follow](https://img.shields.io/badge/BSky-@Graphile.org-006aff.svg)](https://bsky.app/profile/graphile.org)
+[![Follow](https://img.shields.io/badge/Mastodon-@Graphile.fosstodon.org-#364ff.svg)](https://fosstodon.org/@graphile)
 
 At Graphile we love GraphQL so much we named ourself for our love of it! This
 repository houses many of the Graphile packages that relate to GraphQL (or
