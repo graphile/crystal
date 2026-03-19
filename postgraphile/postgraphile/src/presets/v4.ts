@@ -7,6 +7,7 @@ import { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "grafserv";
 import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.ts";
+import { PgV4BuildPlugin } from "../plugins/PgV4BuildPlugin.ts";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.ts";
 import { PgV4SimpleSubscriptionsPlugin } from "../plugins/PgV4SimpleSubscriptionsPlugin.ts";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.ts";
@@ -14,6 +15,7 @@ import PostGraphileAmberPreset from "./amber.ts";
 
 export {
   PgV4BehaviorPlugin,
+  PgV4BuildPlugin,
   PgV4InflectionPlugin,
   PgV4SimpleSubscriptionsPlugin,
   PgV4SmartTagsPlugin,
@@ -385,6 +387,7 @@ export const makeV4Preset = (
   return {
     extends: [PostGraphileAmberPreset, makeV4ErrorOutputPreset(options)],
     plugins: [
+      PgV4BuildPlugin,
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,
