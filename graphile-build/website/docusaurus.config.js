@@ -179,11 +179,11 @@ const config = {
             items: [
               {
                 label: "Graphile Build",
-                to: "/graphile-build/",
+                to: "/graphile-build/5",
               },
               {
                 label: "Graphile Build PG",
-                to: "/graphile-build-pg/",
+                to: "/graphile-build-pg/5",
               },
               {
                 html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
