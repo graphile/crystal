@@ -3175,7 +3175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@docusaurus/plugin-content-docs@npm:3.9.2, @docusaurus/plugin-content-docs@npm:^3.9.2":
+"@docusaurus/plugin-content-docs@npm:3.9.2":
   version: 3.9.2
   resolution: "@docusaurus/plugin-content-docs@npm:3.9.2"
   dependencies:
@@ -5868,7 +5868,7 @@ __metadata:
     "@codemirror/view": "npm:^6.38.8"
     "@docusaurus/core": "npm:^3.9.2"
     "@docusaurus/module-type-aliases": "npm:^3.9.2"
-    "@docusaurus/plugin-content-docs": "npm:^3.9.2"
+    "@docusaurus/plugin-content-docs": "patch:@docusaurus/plugin-content-docs@npm%3A3.9.2#~/.yarn/patches/@docusaurus-plugin-content-docs-npm-3.9.2-65ef413098.patch"
     "@docusaurus/preset-classic": "npm:^3.9.2"
     "@docusaurus/remark-plugin-npm2yarn": "npm:^3.9.2"
     "@docusaurus/theme-common": "npm:^3.9.2"
