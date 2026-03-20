@@ -145,12 +145,17 @@ const config = {
           src: "img/logo.svg",
         },
         items: [
-          {
+          /*{
             type: "doc",
             docId: "index",
             docsPluginId: "default",
             position: "left",
             label: "Graphile Build",
+          },*/
+          {
+            href: `/graphile-build/5`,
+            label: "Graphile Build",
+            position: "left",
           },
           {
             type: "docsVersionDropdown",
