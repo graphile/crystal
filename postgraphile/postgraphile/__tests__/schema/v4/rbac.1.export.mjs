@@ -509,43 +509,6 @@ const reservedInputCodec = recordCodec({
   executor: executor,
   description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table"
 });
-const buildingsIdentifier = sql.identifier("a", "buildings");
-const buildingsCodec = recordCodec({
-  name: "buildings",
-  identifier: buildingsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    },
-    address: {
-      codec: TYPES.text,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "buildings"
-    }
-  },
-  executor: executor
-});
 const defaultValueIdentifier = sql.identifier("a", "default_value");
 const defaultValueCodec = recordCodec({
   name: "defaultValue",
@@ -617,43 +580,6 @@ const noPrimaryKeyCodec = recordCodec({
       serviceName: "main",
       schemaName: "a",
       name: "no_primary_key"
-    }
-  },
-  executor: executor
-});
-const petsIdentifier = sql.identifier("a", "pets");
-const petsCodec = recordCodec({
-  name: "pets",
-  identifier: petsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    },
-    name: {
-      codec: TYPES.text,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "pets"
     }
   },
   executor: executor
@@ -3038,8 +2964,6 @@ const mutation_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "m
 const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
-const codeFunctionIdentifer = sql.identifier("a", "code");
-const key365 = (...args) => sql`${codeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
 const unique_foreign_key_resourceOptionsConfig = {
   executor: executor,
   name: "unique_foreign_key",
@@ -3403,10 +3327,8 @@ const registry = makeRegistry({
     reserved: reservedCodec,
     reservedPatchs: reservedPatchsCodec,
     reservedInput: reservedInputCodec,
-    buildings: buildingsCodec,
     defaultValue: defaultValueCodec,
     noPrimaryKey: noPrimaryKeyCodec,
-    pets: petsCodec,
     uniqueForeignKey: uniqueForeignKeyCodec,
     myTable: myTableCodec,
     personSecret: personSecretCodec,
@@ -5515,54 +5437,6 @@ const registry = makeRegistry({
       isUnique: true,
       isMutation: true
     },
-    code_a_buildings: {
-      executor: executor,
-      name: "code_a_buildings",
-      identifier: "main.a.code(a.buildings)",
-      from: key365,
-      parameters: [{
-        name: null,
-        codec: buildingsCodec
-      }],
-      codec: TYPES.text,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "code"
-        },
-        tags: {
-          behavior: "+typeField"
-        },
-        canExecute: false
-      },
-      isUnique: true
-    },
-    code_a_pets: {
-      executor: executor,
-      name: "code_a_pets",
-      identifier: "main.a.code(a.pets)",
-      from: key365,
-      parameters: [{
-        name: null,
-        codec: petsCodec
-      }],
-      codec: TYPES.text,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "code"
-        },
-        tags: {
-          behavior: "+typeField"
-        },
-        canExecute: false
-      },
-      isUnique: true
-    },
     non_updatable_view: {
       executor: executor,
       name: "non_updatable_view",
@@ -5698,28 +5572,6 @@ const registry = makeRegistry({
       }],
       description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table"
     },
-    buildings: {
-      executor: executor,
-      name: "buildings",
-      identifier: "main.a.buildings",
-      from: buildingsIdentifier,
-      codec: buildingsCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "buildings"
-        },
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      },
-      uniques: [{
-        attributes: ["id"],
-        isPrimary: true
-      }]
-    },
     default_value: {
       executor: executor,
       name: "default_value",
@@ -5761,28 +5613,6 @@ const registry = makeRegistry({
       },
       uniques: [{
         attributes: ["id"]
-      }]
-    },
-    pets: {
-      executor: executor,
-      name: "pets",
-      identifier: "main.a.pets",
-      from: petsIdentifier,
-      codec: petsCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "pets"
-        },
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      },
-      uniques: [{
-        attributes: ["id"],
-        isPrimary: true
       }]
     },
     unique_foreign_key: unique_foreign_key_resourceOptionsConfig,
@@ -6832,8 +6662,8 @@ const registry = makeRegistry({
       isMutation: true,
       returnsArray: true
     }),
-    query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
-      name: "query_compound_type_array",
+    compound_type_query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "compound_type_query_compound_type_array",
       identifier: "main.a.query_compound_type_array(c.compound_type)",
       from(...args) {
         return sql`${query_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
@@ -8077,7 +7907,7 @@ const resource_left_armPgResource = registry.pgResources["left_arm"];
 const resource_postPgResource = registry.pgResources["post"];
 const resource_personPgResource = registry.pgResources["person"];
 const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_code_a_buildings = () => EMPTY_ARRAY;
+const makeArgs_current_user_id = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
 const makeTableNodeIdHandler = ({
@@ -9809,7 +9639,7 @@ export const objects = {
         }
       },
       currentUserId($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_current_user_id(args);
         return resource_current_user_idPgResource.execute(selectArgs);
       },
       leftArm(_$parent, args) {
@@ -9881,7 +9711,7 @@ export const objects = {
         return rootValue();
       },
       returnTableWithoutGrants($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_current_user_id(args);
         return resource_return_table_without_grantsPgResource.execute(selectArgs);
       }
     }

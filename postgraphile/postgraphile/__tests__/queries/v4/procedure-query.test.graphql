@@ -47,7 +47,7 @@ query {
   noArgsQuery
   staticBigInteger { edges { node } totalCount }
 
-  queryCompoundTypeArray(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 }) { a b c d e f g { seconds minutes hours } fooBar }
+  compoundTypeQueryCompoundTypeArray(object: { a: 419, b: "easy cheesy baked potatoes", c: RED, e: BAR_FOO, f: _EMPTY_, g: {hours: 5 }, fooBar: 8 }) { a b c d e f g { seconds minutes hours } fooBar }
   queryTextArray
   queryIntervalArray { seconds minutes hours days months years }
   queryIntervalSet { nodes { seconds minutes hours days months years } edges { node { seconds minutes hours } cursor } totalCount }

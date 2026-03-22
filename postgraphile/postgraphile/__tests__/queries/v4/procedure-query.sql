@@ -255,16 +255,16 @@ select
 from "a"."static_big_integer"() as __static_big_integer__(v);
 
 select
-  __query_compound_type_array__."a"::text as "0",
-  __query_compound_type_array__."b" as "1",
-  __query_compound_type_array__."c"::text as "2",
-  __query_compound_type_array__."d" as "3",
-  __query_compound_type_array__."e"::text as "4",
-  __query_compound_type_array__."f"::text as "5",
-  to_char(__query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-  __query_compound_type_array__."foo_bar"::text as "7",
-  (not (__query_compound_type_array__ is null))::text as "8"
-from unnest("a"."query_compound_type_array"($1::"c"."compound_type")) as __query_compound_type_array__;
+  __compound_type_query_compound_type_array__."a"::text as "0",
+  __compound_type_query_compound_type_array__."b" as "1",
+  __compound_type_query_compound_type_array__."c"::text as "2",
+  __compound_type_query_compound_type_array__."d" as "3",
+  __compound_type_query_compound_type_array__."e"::text as "4",
+  __compound_type_query_compound_type_array__."f"::text as "5",
+  to_char(__compound_type_query_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+  __compound_type_query_compound_type_array__."foo_bar"::text as "7",
+  (not (__compound_type_query_compound_type_array__ is null))::text as "8"
+from unnest("a"."query_compound_type_array"($1::"c"."compound_type")) as __compound_type_query_compound_type_array__;
 
 select
   __query_text_array__.v::text as "0"

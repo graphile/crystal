@@ -313,23 +313,6 @@ const reservedInputCodec = recordCodec({
   executor: executor,
   description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table"
 });
-const buildingsIdentifier = sql.identifier("a", "buildings");
-const buildingsCodec = recordCodec({
-  name: "buildings",
-  identifier: buildingsIdentifier,
-  attributes: {
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    address: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {},
-  executor: executor
-});
 const defaultValueIdentifier = sql.identifier("a", "default_value");
 const defaultValueCodec = recordCodec({
   name: "defaultValue",
@@ -378,23 +361,6 @@ const noPrimaryKeyCodec = recordCodec({
     str: {
       codec: TYPES.text,
       notNull: true
-    }
-  },
-  extensions: {},
-  executor: executor
-});
-const petsIdentifier = sql.identifier("a", "pets");
-const petsCodec = recordCodec({
-  name: "pets",
-  identifier: petsIdentifier,
-  attributes: {
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    name: {
-      codec: TYPES.text
     }
   },
   extensions: {},
@@ -1491,8 +1457,6 @@ const mutation_out_unnamed_out_out_unnamedFunctionIdentifer = sql.identifier("c"
 const mutation_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "mutation_returns_table_multi_col");
 const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
 const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
-const codeFunctionIdentifer = sql.identifier("a", "code");
-const key364 = (...args) => sql`${codeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
 const inputsUniques = [{
   attributes: ["id"],
@@ -1514,10 +1478,6 @@ const reserved_inputUniques = [{
   attributes: ["id"],
   isPrimary: true
 }];
-const buildingsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
 const default_valueUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -1532,10 +1492,6 @@ const foreign_key_resourceOptionsConfig = {
 };
 const no_primary_keyUniques = [{
   attributes: ["id"]
-}];
-const petsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
 }];
 const unique_foreign_keyUniques = [{
   attributes: ["compound_key_1", "compound_key_2"]
@@ -1822,11 +1778,9 @@ const registry = makeRegistry({
     reserved: reservedCodec,
     reservedPatchs: reservedPatchsCodec,
     reservedInput: reservedInputCodec,
-    buildings: buildingsCodec,
     defaultValue: defaultValueCodec,
     foreignKey: foreignKeyCodec,
     noPrimaryKey: noPrimaryKeyCodec,
-    pets: petsCodec,
     testview: testviewCodec,
     uniqueForeignKey: uniqueForeignKeyCodec,
     myTable: myTableCodec,
@@ -3280,34 +3234,6 @@ const registry = makeRegistry({
       hasImplicitOrder: true,
       extensions: {}
     },
-    code_a_buildings: {
-      executor: executor,
-      name: "code_a_buildings",
-      identifier: "main.a.code(a.buildings)",
-      from: key364,
-      parameters: [{
-        name: null,
-        codec: buildingsCodec
-      }],
-      codec: TYPES.text,
-      hasImplicitOrder: false,
-      extensions: {},
-      isUnique: true
-    },
-    code_a_pets: {
-      executor: executor,
-      name: "code_a_pets",
-      identifier: "main.a.code(a.pets)",
-      from: key364,
-      parameters: [{
-        name: null,
-        codec: petsCodec
-      }],
-      codec: TYPES.text,
-      hasImplicitOrder: false,
-      extensions: {},
-      isUnique: true
-    },
     guid_fn: {
       executor: executor,
       name: "guid_fn",
@@ -3382,15 +3308,6 @@ const registry = makeRegistry({
       uniques: reserved_inputUniques,
       description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table"
     },
-    buildings: {
-      executor: executor,
-      name: "buildings",
-      identifier: "main.a.buildings",
-      from: buildingsIdentifier,
-      codec: buildingsCodec,
-      extensions: {},
-      uniques: buildingsUniques
-    },
     default_value: {
       executor: executor,
       name: "default_value",
@@ -3409,15 +3326,6 @@ const registry = makeRegistry({
       codec: noPrimaryKeyCodec,
       extensions: {},
       uniques: no_primary_keyUniques
-    },
-    pets: {
-      executor: executor,
-      name: "pets",
-      identifier: "main.a.pets",
-      from: petsIdentifier,
-      codec: petsCodec,
-      extensions: {},
-      uniques: petsUniques
     },
     testview: {
       executor: executor,
@@ -4474,8 +4382,8 @@ const registry = makeRegistry({
       isMutation: true,
       returnsArray: true
     }),
-    query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
-      name: "query_compound_type_array",
+    compound_type_query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "compound_type_query_compound_type_array",
       identifier: "main.a.query_compound_type_array(c.compound_type)",
       from(...args) {
         return sql`${query_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
@@ -4999,10 +4907,8 @@ const resource_patchsPgResource = registry.pgResources["patchs"];
 const resource_reservedPgResource = registry.pgResources["reserved"];
 const resource_reservedPatchsPgResource = registry.pgResources["reservedPatchs"];
 const resource_reserved_inputPgResource = registry.pgResources["reserved_input"];
-const resource_buildingsPgResource = registry.pgResources["buildings"];
 const resource_default_valuePgResource = registry.pgResources["default_value"];
 const resource_no_primary_keyPgResource = registry.pgResources["no_primary_key"];
-const resource_petsPgResource = registry.pgResources["pets"];
 const resource_unique_foreign_keyPgResource = registry.pgResources["unique_foreign_key"];
 const resource_my_tablePgResource = registry.pgResources["my_table"];
 const resource_view_tablePgResource = registry.pgResources["view_table"];
@@ -5017,12 +4923,12 @@ const resource_personPgResource = registry.pgResources["person"];
 const resource_listsPgResource = registry.pgResources["lists"];
 const resource_typesPgResource = registry.pgResources["types"];
 const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_code_a_buildings = () => EMPTY_ARRAY;
+const makeArgs_person_computed_out = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_func_outPgResource = registry.pgResources["func_out"];
 const resource_func_out_setofPgResource = registry.pgResources["func_out_setof"];
 const func_out_setof_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_func_out_setofPgResource.execute(selectArgs);
 };
 function applyFirstArg(_, $connection, arg) {
@@ -5045,13 +4951,13 @@ const resource_no_args_queryPgResource = registry.pgResources["no_args_query"];
 const resource_query_interval_arrayPgResource = registry.pgResources["query_interval_array"];
 const resource_query_interval_setPgResource = registry.pgResources["query_interval_set"];
 const query_interval_set_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_query_interval_setPgResource.execute(selectArgs);
 };
 const resource_query_text_arrayPgResource = registry.pgResources["query_text_array"];
 const resource_static_big_integerPgResource = registry.pgResources["static_big_integer"];
 const static_big_integer_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_static_big_integerPgResource.execute(selectArgs);
 };
 const argDetailsSimple_func_in_out = [{
@@ -5159,7 +5065,7 @@ const resource_func_in_inoutPgResource = registry.pgResources["func_in_inout"];
 const resource_func_out_outPgResource = registry.pgResources["func_out_out"];
 const resource_func_out_out_setofPgResource = registry.pgResources["func_out_out_setof"];
 const func_out_out_setof_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_func_out_out_setofPgResource.execute(selectArgs);
 };
 const resource_func_out_out_unnamedPgResource = registry.pgResources["func_out_out_unnamed"];
@@ -5343,7 +5249,7 @@ const makeArgs_table_query = (args, path = []) => argDetailsSimple_table_query.m
 const resource_table_queryPgResource = registry.pgResources["table_query"];
 const resource_compound_type_set_queryPgResource = registry.pgResources["compound_type_set_query"];
 const compound_type_set_query_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_compound_type_set_queryPgResource.execute(selectArgs);
 };
 const argDetailsSimple_compound_type_query = [{
@@ -5379,13 +5285,13 @@ const func_out_complex_setof_getSelectPlanFromParentAndArgs = ($root, args, _inf
   const selectArgs = makeArgs_func_out_complex_setof(args);
   return resource_func_out_complex_setofPgResource.execute(selectArgs);
 };
-const argDetailsSimple_query_compound_type_array = [{
+const argDetailsSimple_compound_type_query_compound_type_array = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
   postgresArgName: "object"
 }];
-const makeArgs_query_compound_type_array = (args, path = []) => argDetailsSimple_query_compound_type_array.map(details => makeArg(path, args, details));
-const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
+const makeArgs_compound_type_query_compound_type_array = (args, path = []) => argDetailsSimple_compound_type_query_compound_type_array.map(details => makeArg(path, args, details));
+const resource_compound_type_query_compound_type_arrayPgResource = registry.pgResources["compound_type_query_compound_type_array"];
 const argDetailsSimple_compound_type_array_query = [{
   graphqlArgName: "object",
   pgCodec: compoundTypeCodec,
@@ -5396,12 +5302,12 @@ const resource_compound_type_array_queryPgResource = registry.pgResources["compo
 const resource_func_out_tablePgResource = registry.pgResources["func_out_table"];
 const resource_func_out_table_setofPgResource = registry.pgResources["func_out_table_setof"];
 const func_out_table_setof_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_func_out_table_setofPgResource.execute(selectArgs);
 };
 const resource_table_set_queryPgResource = registry.pgResources["table_set_query"];
 const table_set_query_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_table_set_queryPgResource.execute(selectArgs);
 };
 function qbWhereBuilder(qb) {
@@ -5417,12 +5323,12 @@ function applyOrderByArgToConnection(parent, $connection, value) {
 }
 const resource_table_set_query_plpgsqlPgResource = registry.pgResources["table_set_query_plpgsql"];
 const table_set_query_plpgsql_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_table_set_query_plpgsqlPgResource.execute(selectArgs);
 };
 const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
 const type_function_connection_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_code_a_buildings(args);
+  const selectArgs = makeArgs_person_computed_out(args);
   return resource_type_function_connectionPgResource.execute(selectArgs);
 };
 const argDetailsSimple_type_function = [{
@@ -5540,17 +5446,6 @@ const nodeFetcher_ReservedInputRecord = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReservedInputRecord));
   return nodeIdHandler_ReservedInputRecord.get(nodeIdHandler_ReservedInputRecord.getSpec($decoded));
 };
-const nodeIdHandler_Building = makeTableNodeIdHandler({
-  typeName: "Building",
-  identifier: "buildings",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_buildingsPgResource,
-  pk: buildingsUniques[0].attributes
-});
-const nodeFetcher_Building = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
-  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
-};
 const nodeIdHandler_DefaultValue = makeTableNodeIdHandler({
   typeName: "DefaultValue",
   identifier: "default_values",
@@ -5561,17 +5456,6 @@ const nodeIdHandler_DefaultValue = makeTableNodeIdHandler({
 const nodeFetcher_DefaultValue = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_DefaultValue));
   return nodeIdHandler_DefaultValue.get(nodeIdHandler_DefaultValue.getSpec($decoded));
-};
-const nodeIdHandler_Pet = makeTableNodeIdHandler({
-  typeName: "Pet",
-  identifier: "pets",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_petsPgResource,
-  pk: petsUniques[0].attributes
-});
-const nodeFetcher_Pet = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Pet));
-  return nodeIdHandler_Pet.get(nodeIdHandler_Pet.getSpec($decoded));
 };
 const nodeIdHandler_MyTable = makeTableNodeIdHandler({
   typeName: "MyTable",
@@ -5727,9 +5611,7 @@ const nodeIdHandlerByTypeName = {
   Reserved: nodeIdHandler_Reserved,
   ReservedPatchRecord: nodeIdHandler_ReservedPatchRecord,
   ReservedInputRecord: nodeIdHandler_ReservedInputRecord,
-  Building: nodeIdHandler_Building,
   DefaultValue: nodeIdHandler_DefaultValue,
-  Pet: nodeIdHandler_Pet,
   MyTable: nodeIdHandler_MyTable,
   PersonSecret: nodeIdHandler_PersonSecret,
   ViewTable: nodeIdHandler_ViewTable,
@@ -5755,7 +5637,17 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-const resource_code_a_buildingsPgResource = registry.pgResources["code_a_buildings"];
+const UniqueForeignKey_compoundKey1Plan = $record => {
+  return $record.get("compound_key_1");
+};
+const UniqueForeignKey_compoundKey2Plan = $record => {
+  return $record.get("compound_key_2");
+};
+const UniqueForeignKey_compoundKeyByCompoundKey1AndCompoundKey2Plan = $record => resource_compound_keyPgResource.get({
+  person_id_1: $record.get("compound_key_1"),
+  person_id_2: $record.get("compound_key_2")
+});
+const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -5812,18 +5704,6 @@ const scalarComputed = (resource, $in, args) => {
   const from = pgFromExpression($row, resource.from, resource.parameters, selectArgs);
   return pgClassExpression($row, resource.codec, undefined)`${from}`;
 };
-const resource_code_a_petsPgResource = registry.pgResources["code_a_pets"];
-const UniqueForeignKey_compoundKey1Plan = $record => {
-  return $record.get("compound_key_1");
-};
-const UniqueForeignKey_compoundKey2Plan = $record => {
-  return $record.get("compound_key_2");
-};
-const UniqueForeignKey_compoundKeyByCompoundKey1AndCompoundKey2Plan = $record => resource_compound_keyPgResource.get({
-  person_id_1: $record.get("compound_key_1"),
-  person_id_2: $record.get("compound_key_2")
-});
-const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const resource_person_first_namePgResource = registry.pgResources["person_first_name"];
 const resource_person_computed_out_outPgResource = registry.pgResources["person_computed_out_out"];
 const argDetailsSimple_person_computed_inout = [{
@@ -5935,12 +5815,12 @@ const resource_person_first_postPgResource = registry.pgResources["person_first_
 const resource_person_computed_first_arg_inoutPgResource = registry.pgResources["person_computed_first_arg_inout"];
 const resource_person_friendsPgResource = registry.pgResources["person_friends"];
 const person_friends_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
-  const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+  const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
   return resource_person_friendsPgResource.execute(details.selectArgs);
 };
 const resource_person_type_function_connectionPgResource = registry.pgResources["person_type_function_connection"];
 const person_type_function_connection_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
-  const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+  const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
   return resource_person_type_function_connectionPgResource.execute(details.selectArgs);
 };
 const argDetailsSimple_person_type_function = [{
@@ -5977,7 +5857,7 @@ const coerce = string => {
 const resource_post_computed_interval_arrayPgResource = registry.pgResources["post_computed_interval_array"];
 const resource_post_computed_interval_setPgResource = registry.pgResources["post_computed_interval_set"];
 const post_computed_interval_set_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
-  const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+  const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
   return resource_post_computed_interval_setPgResource.execute(details.selectArgs);
 };
 const resource_post_computed_text_arrayPgResource = registry.pgResources["post_computed_text_array"];
@@ -6180,18 +6060,6 @@ const FuncOutOutCompoundTypeRecord_o2Plan = $record => {
   const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
   $select.getClassStep().setTrusted();
   return $select;
-};
-const PetsOrderBy_NAME_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "name",
-    direction: "ASC"
-  });
-};
-const PetsOrderBy_NAME_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "name",
-    direction: "DESC"
-  });
 };
 const TestviewCondition_col1Apply = ($condition, val) => applyAttributeCondition("col1", TYPES.int, $condition, val);
 const TestviewCondition_col2Apply = ($condition, val) => applyAttributeCondition("col2", TYPES.int, $condition, val);
@@ -6658,17 +6526,9 @@ const specFromArgs_ReservedInputRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ReservedInputRecord, $nodeId);
 };
-const specFromArgs_Building = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, $nodeId);
-};
 const specFromArgs_DefaultValue = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_DefaultValue, $nodeId);
-};
-const specFromArgs_Pet = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Pet, $nodeId);
 };
 const specFromArgs_MyTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -6813,20 +6673,12 @@ const CreatePatchPayload_patchEdgePlan = ($mutation, fieldArgs) => pgMutationPay
 const CreateReservedPayload_reservedEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
 const CreateReservedPatchRecordPayload_reservedPatchRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reservedPatchsPgResource, reservedPatchsUniques[0].attributes, $mutation, fieldArgs);
 const CreateReservedInputRecordPayload_reservedInputRecordEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_reserved_inputPgResource, reserved_inputUniques[0].attributes, $mutation, fieldArgs);
-const CreateBuildingPayload_buildingEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
-function BuildingInput_addressApply(obj, val, info) {
-  obj.set("address", bakedInputRuntime(info.schema, info.field.type, val));
-}
 const CreateDefaultValuePayload_defaultValueEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_default_valuePgResource, default_valueUniques[0].attributes, $mutation, fieldArgs);
 function DefaultValueInput_nullValueApply(obj, val, info) {
   obj.set("null_value", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function NoPrimaryKeyInput_strApply(obj, val, info) {
   obj.set("str", bakedInputRuntime(info.schema, info.field.type, val));
-}
-const CreatePetPayload_petEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_petsPgResource, petsUniques[0].attributes, $mutation, fieldArgs);
-function PetInput_nameApply(obj, val, info) {
-  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function TestviewInput_col1Apply(obj, val, info) {
   obj.set("col1", bakedInputRuntime(info.schema, info.field.type, val));
@@ -7103,10 +6955,8 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   reservedById(id: Int!): Reserved
   reservedPatchRecordById(id: Int!): ReservedPatchRecord
   reservedInputRecordById(id: Int!): ReservedInputRecord
-  buildingById(id: Int!): Building
   defaultValueById(id: Int!): DefaultValue
   noPrimaryKeyById(id: Int!): NoPrimaryKey
-  petById(id: Int!): Pet
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
   myTableById(id: Int!): MyTable
   viewTableById(id: Int!): ViewTable
@@ -7161,7 +7011,7 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
   funcOutComplexSetof(a: Int, b: String, first: Int, last: Int, offset: Int, before: Cursor, after: Cursor): FuncOutComplexSetofConnection
-  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  compoundTypeQueryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   funcOutTable: Person
   funcOutTableSetof(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor): PeopleConnection
@@ -7175,9 +7025,7 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   reserved(nodeId: ID!): Reserved
   reservedPatchRecord(nodeId: ID!): ReservedPatchRecord
   reservedInputRecord(nodeId: ID!): ReservedInputRecord
-  building(nodeId: ID!): Building
   defaultValue(nodeId: ID!): DefaultValue
-  pet(nodeId: ID!): Pet
   myTable(nodeId: ID!): MyTable
   viewTable(nodeId: ID!): ViewTable
   compoundKey(nodeId: ID!): CompoundKey
@@ -7196,11 +7044,9 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   allReserveds(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ReservedCondition, orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]): ReservedsConnection
   allReservedPatchRecords(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ReservedPatchRecordCondition, orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]): ReservedPatchRecordsConnection
   allReservedInputRecords(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ReservedInputRecordCondition, orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]): ReservedInputRecordsConnection
-  allBuildings(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: BuildingCondition, orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]): BuildingsConnection
   allDefaultValues(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: DefaultValueCondition, orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]): DefaultValuesConnection
   allForeignKeys(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ForeignKeyCondition, orderBy: [ForeignKeysOrderBy!] = [NATURAL]): ForeignKeysConnection
   allNoPrimaryKeys(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: NoPrimaryKeyCondition, orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]): NoPrimaryKeysConnection
-  allPets(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: PetCondition, orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]): PetsConnection
   allTestviews(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: TestviewCondition, orderBy: [TestviewsOrderBy!] = [NATURAL]): TestviewsConnection
   allMyTables(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: MyTableCondition, orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]): MyTablesConnection
   allViewTables(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ViewTableCondition, orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]): ViewTablesConnection
@@ -7247,13 +7093,6 @@ type ReservedInputRecord implements Node {
   id: Int!
 }
 
-type Building implements Node {
-  nodeId: ID!
-  code: String
-  id: Int!
-  address: String
-}
-
 type DefaultValue implements Node {
   nodeId: ID!
   id: Int!
@@ -7263,13 +7102,6 @@ type DefaultValue implements Node {
 type NoPrimaryKey {
   id: Int!
   str: String!
-}
-
-type Pet implements Node {
-  nodeId: ID!
-  code: String
-  id: Int!
-  name: String
 }
 
 type UniqueForeignKey {
@@ -8377,33 +8209,6 @@ enum ReservedInputRecordsOrderBy {
   ID_DESC
 }
 
-type BuildingsConnection {
-  nodes: [Building]!
-  edges: [BuildingsEdge]!
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type BuildingsEdge {
-  cursor: Cursor
-  node: Building
-}
-
-input BuildingCondition {
-  id: Int
-  address: String
-}
-
-enum BuildingsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ADDRESS_ASC
-  ADDRESS_DESC
-}
-
 type DefaultValuesConnection {
   nodes: [DefaultValue]!
   edges: [DefaultValuesEdge]!
@@ -8454,33 +8259,6 @@ enum NoPrimaryKeysOrderBy {
   ID_DESC
   STR_ASC
   STR_DESC
-}
-
-type PetsConnection {
-  nodes: [Pet]!
-  edges: [PetsEdge]!
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type PetsEdge {
-  cursor: Cursor
-  node: Pet
-}
-
-input PetCondition {
-  id: Int
-  name: String
-}
-
-enum PetsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
 }
 
 type TestviewsConnection {
@@ -8931,11 +8709,9 @@ type Mutation {
   createReserved(input: CreateReservedInput!): CreateReservedPayload
   createReservedPatchRecord(input: CreateReservedPatchRecordInput!): CreateReservedPatchRecordPayload
   createReservedInputRecord(input: CreateReservedInputRecordInput!): CreateReservedInputRecordPayload
-  createBuilding(input: CreateBuildingInput!): CreateBuildingPayload
   createDefaultValue(input: CreateDefaultValueInput!): CreateDefaultValuePayload
   createForeignKey(input: CreateForeignKeyInput!): CreateForeignKeyPayload
   createNoPrimaryKey(input: CreateNoPrimaryKeyInput!): CreateNoPrimaryKeyPayload
-  createPet(input: CreatePetInput!): CreatePetPayload
   createTestview(input: CreateTestviewInput!): CreateTestviewPayload
   createMyTable(input: CreateMyTableInput!): CreateMyTablePayload
   createViewTable(input: CreateViewTableInput!): CreateViewTablePayload
@@ -8961,13 +8737,9 @@ type Mutation {
   updateReservedPatchRecordById(input: UpdateReservedPatchRecordByIdInput!): UpdateReservedPatchRecordPayload
   updateReservedInputRecord(input: UpdateReservedInputRecordInput!): UpdateReservedInputRecordPayload
   updateReservedInputRecordById(input: UpdateReservedInputRecordByIdInput!): UpdateReservedInputRecordPayload
-  updateBuilding(input: UpdateBuildingInput!): UpdateBuildingPayload
-  updateBuildingById(input: UpdateBuildingByIdInput!): UpdateBuildingPayload
   updateDefaultValue(input: UpdateDefaultValueInput!): UpdateDefaultValuePayload
   updateDefaultValueById(input: UpdateDefaultValueByIdInput!): UpdateDefaultValuePayload
   updateNoPrimaryKeyById(input: UpdateNoPrimaryKeyByIdInput!): UpdateNoPrimaryKeyPayload
-  updatePet(input: UpdatePetInput!): UpdatePetPayload
-  updatePetById(input: UpdatePetByIdInput!): UpdatePetPayload
   updateMyTable(input: UpdateMyTableInput!): UpdateMyTablePayload
   updateMyTableById(input: UpdateMyTableByIdInput!): UpdateMyTablePayload
   updateViewTable(input: UpdateViewTableInput!): UpdateViewTablePayload
@@ -9004,13 +8776,9 @@ type Mutation {
   deleteReservedPatchRecordById(input: DeleteReservedPatchRecordByIdInput!): DeleteReservedPatchRecordPayload
   deleteReservedInputRecord(input: DeleteReservedInputRecordInput!): DeleteReservedInputRecordPayload
   deleteReservedInputRecordById(input: DeleteReservedInputRecordByIdInput!): DeleteReservedInputRecordPayload
-  deleteBuilding(input: DeleteBuildingInput!): DeleteBuildingPayload
-  deleteBuildingById(input: DeleteBuildingByIdInput!): DeleteBuildingPayload
   deleteDefaultValue(input: DeleteDefaultValueInput!): DeleteDefaultValuePayload
   deleteDefaultValueById(input: DeleteDefaultValueByIdInput!): DeleteDefaultValuePayload
   deleteNoPrimaryKeyById(input: DeleteNoPrimaryKeyByIdInput!): DeleteNoPrimaryKeyPayload
-  deletePet(input: DeletePetInput!): DeletePetPayload
-  deletePetById(input: DeletePetByIdInput!): DeletePetPayload
   deleteMyTable(input: DeleteMyTableInput!): DeleteMyTablePayload
   deleteMyTableById(input: DeleteMyTableByIdInput!): DeleteMyTablePayload
   deleteViewTable(input: DeleteViewTableInput!): DeleteViewTablePayload
@@ -9841,23 +9609,6 @@ input ReservedInputRecordInput {
   id: Int
 }
 
-type CreateBuildingPayload {
-  clientMutationId: String
-  building: Building
-  query: Query
-  buildingEdge(orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]): BuildingsEdge
-}
-
-input CreateBuildingInput {
-  clientMutationId: String
-  building: BuildingInput!
-}
-
-input BuildingInput {
-  id: Int
-  address: String
-}
-
 type CreateDefaultValuePayload {
   clientMutationId: String
   defaultValue: DefaultValue
@@ -9908,23 +9659,6 @@ input CreateNoPrimaryKeyInput {
 input NoPrimaryKeyInput {
   id: Int!
   str: String!
-}
-
-type CreatePetPayload {
-  clientMutationId: String
-  pet: Pet
-  query: Query
-  petEdge(orderBy: [PetsOrderBy!]! = [PRIMARY_KEY_ASC]): PetsEdge
-}
-
-input CreatePetInput {
-  clientMutationId: String
-  pet: PetInput!
-}
-
-input PetInput {
-  id: Int
-  name: String
 }
 
 type CreateTestviewPayload {
@@ -10393,30 +10127,6 @@ input UpdateReservedInputRecordByIdInput {
   reservedInputRecordPatch: ReservedInputRecordPatch!
 }
 
-type UpdateBuildingPayload {
-  clientMutationId: String
-  building: Building
-  query: Query
-  buildingEdge(orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]): BuildingsEdge
-}
-
-input UpdateBuildingInput {
-  clientMutationId: String
-  nodeId: ID!
-  buildingPatch: BuildingPatch!
-}
-
-input BuildingPatch {
-  id: Int
-  address: String
-}
-
-input UpdateBuildingByIdInput {
-  clientMutationId: String
-  id: Int!
-  buildingPatch: BuildingPatch!
-}
-
 type UpdateDefaultValuePayload {
   clientMutationId: String
   defaultValue: DefaultValue
@@ -10456,30 +10166,6 @@ input UpdateNoPrimaryKeyByIdInput {
 input NoPrimaryKeyPatch {
   id: Int
   str: String
-}
-
-type UpdatePetPayload {
-  clientMutationId: String
-  pet: Pet
-  query: Query
-  petEdge(orderBy: [PetsOrderBy!]! = [PRIMARY_KEY_ASC]): PetsEdge
-}
-
-input UpdatePetInput {
-  clientMutationId: String
-  nodeId: ID!
-  petPatch: PetPatch!
-}
-
-input PetPatch {
-  id: Int
-  name: String
-}
-
-input UpdatePetByIdInput {
-  clientMutationId: String
-  id: Int!
-  petPatch: PetPatch!
 }
 
 type UpdateMyTablePayload {
@@ -10985,24 +10671,6 @@ input DeleteReservedInputRecordByIdInput {
   id: Int!
 }
 
-type DeleteBuildingPayload {
-  clientMutationId: String
-  building: Building
-  deletedBuildingId: ID
-  query: Query
-  buildingEdge(orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]): BuildingsEdge
-}
-
-input DeleteBuildingInput {
-  clientMutationId: String
-  nodeId: ID!
-}
-
-input DeleteBuildingByIdInput {
-  clientMutationId: String
-  id: Int!
-}
-
 type DeleteDefaultValuePayload {
   clientMutationId: String
   defaultValue: DefaultValue
@@ -11028,24 +10696,6 @@ type DeleteNoPrimaryKeyPayload {
 }
 
 input DeleteNoPrimaryKeyByIdInput {
-  clientMutationId: String
-  id: Int!
-}
-
-type DeletePetPayload {
-  clientMutationId: String
-  pet: Pet
-  deletedPetId: ID
-  query: Query
-  petEdge(orderBy: [PetsOrderBy!]! = [PRIMARY_KEY_ASC]): PetsEdge
-}
-
-input DeletePetInput {
-  clientMutationId: String
-  nodeId: ID!
-}
-
-input DeletePetByIdInput {
   clientMutationId: String
   id: Int!
 }
@@ -11322,20 +10972,6 @@ export const objects = {
         const selectArgs = makeArgs_add_4_query(args);
         return resource_add_4_queryPgResource.execute(selectArgs);
       },
-      allBuildings: {
-        plan() {
-          return connection(resource_buildingsPgResource.find());
-        },
-        args: {
-          first: applyFirstArg,
-          last: applyLastArg,
-          offset: applyOffsetArg,
-          before: applyBeforeArg,
-          after: applyAfterArg,
-          condition: applyConditionArgToConnection,
-          orderBy: applyOrderByArgToConnection
-        }
-      },
       allCompoundKeys: {
         plan() {
           return connection(resource_compound_keyPgResource.find());
@@ -11532,20 +11168,6 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
-      allPets: {
-        plan() {
-          return connection(resource_petsPgResource.find());
-        },
-        args: {
-          first: applyFirstArg,
-          last: applyLastArg,
-          offset: applyOffsetArg,
-          before: applyBeforeArg,
-          after: applyAfterArg,
-          condition: applyConditionArgToConnection,
-          orderBy: applyOrderByArgToConnection
-        }
-      },
       allPosts: {
         plan() {
           return connection(resource_postPgResource.find());
@@ -11686,17 +11308,6 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
-      building(_$parent, args) {
-        const $nodeId = args.getRaw("nodeId");
-        return nodeFetcher_Building($nodeId);
-      },
-      buildingById(_$root, {
-        $id
-      }) {
-        return resource_buildingsPgResource.get({
-          id: $id
-        });
-      },
       compoundKey(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
         return nodeFetcher_CompoundKey($nodeId);
@@ -11718,6 +11329,10 @@ export const objects = {
         const selectArgs = makeArgs_compound_type_query(args);
         return resource_compound_type_queryPgResource.execute(selectArgs);
       },
+      compoundTypeQueryCompoundTypeArray($root, args, _info) {
+        const selectArgs = makeArgs_compound_type_query_compound_type_array(args);
+        return resource_compound_type_query_compound_type_arrayPgResource.execute(selectArgs);
+      },
       compoundTypeSetQuery: {
         plan($parent, args, info) {
           const $select = compound_type_set_query_getSelectPlanFromParentAndArgs($parent, args, info);
@@ -11732,7 +11347,7 @@ export const objects = {
         }
       },
       currentUserId($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_current_user_idPgResource.execute(selectArgs);
       },
       defaultValue(_$parent, args) {
@@ -11755,7 +11370,7 @@ export const objects = {
         return resource_func_in_outPgResource.execute(selectArgs);
       },
       funcOut($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_func_outPgResource.execute(selectArgs);
       },
       funcOutComplex($root, args, _info) {
@@ -11776,7 +11391,7 @@ export const objects = {
         }
       },
       funcOutOut($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_func_out_outPgResource.execute(selectArgs);
       },
       funcOutOutCompoundType($root, args, _info) {
@@ -11797,7 +11412,7 @@ export const objects = {
         }
       },
       funcOutOutUnnamed($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_func_out_out_unnamedPgResource.execute(selectArgs);
       },
       funcOutSetof: {
@@ -11814,7 +11429,7 @@ export const objects = {
         }
       },
       funcOutTable($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_func_out_tablePgResource.execute(selectArgs);
       },
       funcOutTableSetof: {
@@ -11831,11 +11446,11 @@ export const objects = {
         }
       },
       funcOutUnnamed($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_func_out_unnamedPgResource.execute(selectArgs);
       },
       funcOutUnnamedOutOutUnnamed($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_func_out_unnamed_out_out_unnamedPgResource.execute(selectArgs);
       },
       funcReturnsTableMultiCol: {
@@ -11948,7 +11563,7 @@ export const objects = {
         });
       },
       noArgsQuery($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_no_args_queryPgResource.execute(selectArgs);
       },
       node(_$root, fieldArgs) {
@@ -12025,17 +11640,6 @@ export const objects = {
           id: $id
         });
       },
-      pet(_$parent, args) {
-        const $nodeId = args.getRaw("nodeId");
-        return nodeFetcher_Pet($nodeId);
-      },
-      petById(_$root, {
-        $id
-      }) {
-        return resource_petsPgResource.get({
-          id: $id
-        });
-      },
       post(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
         return nodeFetcher_Post($nodeId);
@@ -12050,12 +11654,8 @@ export const objects = {
       query() {
         return rootValue();
       },
-      queryCompoundTypeArray($root, args, _info) {
-        const selectArgs = makeArgs_query_compound_type_array(args);
-        return resource_query_compound_type_arrayPgResource.execute(selectArgs);
-      },
       queryIntervalArray($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_query_interval_arrayPgResource.execute(selectArgs);
       },
       queryIntervalSet: {
@@ -12076,7 +11676,7 @@ export const objects = {
         return resource_query_output_two_rowsPgResource.execute(selectArgs);
       },
       queryTextArray($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_query_text_arrayPgResource.execute(selectArgs);
       },
       reserved(_$parent, args) {
@@ -12113,12 +11713,12 @@ export const objects = {
         });
       },
       returnTableWithoutGrants($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_return_table_without_grantsPgResource.execute(selectArgs);
       },
       searchTestSummariesList: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args);
+          const selectArgs = makeArgs_person_computed_out(args);
           return resource_search_test_summariesPgResource.execute(selectArgs);
         },
         args: {
@@ -12222,7 +11822,7 @@ export const objects = {
         }
       },
       typeFunctionList($root, args, _info) {
-        const selectArgs = makeArgs_code_a_buildings(args);
+        const selectArgs = makeArgs_person_computed_out(args);
         return resource_type_function_listPgResource.execute(selectArgs);
       },
       typesQuery($root, args, _info) {
@@ -12328,7 +11928,7 @@ export const objects = {
       },
       authenticateFail: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_authenticate_failPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -12396,18 +11996,6 @@ export const objects = {
         },
         args: {
           input: applyInputArgViaPgSelect
-        }
-      },
-      createBuilding: {
-        plan(_, args) {
-          const $insert = pgInsertSingle(resource_buildingsPgResource);
-          args.apply($insert);
-          return object({
-            result: $insert
-          });
-        },
-        args: {
-          input: applyInputToInsert
         }
       },
       createCompoundKey: {
@@ -12566,18 +12154,6 @@ export const objects = {
           input: applyInputToInsert
         }
       },
-      createPet: {
-        plan(_, args) {
-          const $insert = pgInsertSingle(resource_petsPgResource);
-          args.apply($insert);
-          return object({
-            result: $insert
-          });
-        },
-        args: {
-          input: applyInputToInsert
-        }
-      },
       createPost: {
         plan(_, args) {
           const $insert = pgInsertSingle(resource_postPgResource);
@@ -12696,32 +12272,6 @@ export const objects = {
         },
         args: {
           input: applyInputToInsert
-        }
-      },
-      deleteBuilding: {
-        plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_buildingsPgResource, specFromArgs_Building(args));
-          args.apply($delete);
-          return object({
-            result: $delete
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
-        }
-      },
-      deleteBuildingById: {
-        plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_buildingsPgResource, {
-            id: args.getRaw(['input', "id"])
-          });
-          args.apply($delete);
-          return object({
-            result: $delete
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
         }
       },
       deleteCompoundKey: {
@@ -13027,32 +12577,6 @@ export const objects = {
           input: applyInputToUpdateOrDelete
         }
       },
-      deletePet: {
-        plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_petsPgResource, specFromArgs_Pet(args));
-          args.apply($delete);
-          return object({
-            result: $delete
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
-        }
-      },
-      deletePetById: {
-        plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_petsPgResource, {
-            id: args.getRaw(['input', "id"])
-          });
-          args.apply($delete);
-          return object({
-            result: $delete
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
-        }
-      },
       deletePost: {
         plan(_$root, args) {
           const $delete = pgDeleteSingle(resource_postPgResource, specFromArgs_Post(args));
@@ -13287,7 +12811,7 @@ export const objects = {
       },
       issue756Mutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13299,7 +12823,7 @@ export const objects = {
       },
       issue756SetMutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13479,7 +13003,7 @@ export const objects = {
       },
       mutationIntervalArray: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_interval_arrayPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13491,7 +13015,7 @@ export const objects = {
       },
       mutationIntervalSet: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_interval_setPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13503,7 +13027,7 @@ export const objects = {
       },
       mutationOut: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_outPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13539,7 +13063,7 @@ export const objects = {
       },
       mutationOutOut: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_outPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13563,7 +13087,7 @@ export const objects = {
       },
       mutationOutOutSetof: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_out_setofPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13575,7 +13099,7 @@ export const objects = {
       },
       mutationOutOutUnnamed: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_out_unnamedPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13587,7 +13111,7 @@ export const objects = {
       },
       mutationOutSetof: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_setofPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13599,7 +13123,7 @@ export const objects = {
       },
       mutationOutTable: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13611,7 +13135,7 @@ export const objects = {
       },
       mutationOutTableSetof: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13623,7 +13147,7 @@ export const objects = {
       },
       mutationOutUnnamed: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_unnamedPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13635,7 +13159,7 @@ export const objects = {
       },
       mutationOutUnnamedOutOutUnnamed: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_out_unnamed_out_out_unnamedPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13671,7 +13195,7 @@ export const objects = {
       },
       mutationTextArray: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_mutation_text_arrayPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13683,7 +13207,7 @@ export const objects = {
       },
       noArgsMutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_no_args_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13707,7 +13231,7 @@ export const objects = {
       },
       returnVoidMutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_return_void_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13731,7 +13255,7 @@ export const objects = {
       },
       tableSetMutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13743,7 +13267,7 @@ export const objects = {
       },
       typeFunctionConnectionMutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_type_function_connection_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13755,7 +13279,7 @@ export const objects = {
       },
       typeFunctionListMutation: {
         plan($root, args, _info) {
-          const selectArgs = makeArgs_code_a_buildings(args, ["input"]);
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
           const $result = resource_type_function_list_mutationPgResource.execute(selectArgs, "mutation");
           return object({
             result: $result
@@ -13787,32 +13311,6 @@ export const objects = {
         },
         args: {
           input: applyInputArgViaPgSelect
-        }
-      },
-      updateBuilding: {
-        plan(_$root, args) {
-          const $update = pgUpdateSingle(resource_buildingsPgResource, specFromArgs_Building(args));
-          args.apply($update);
-          return object({
-            result: $update
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
-        }
-      },
-      updateBuildingById: {
-        plan(_$root, args) {
-          const $update = pgUpdateSingle(resource_buildingsPgResource, {
-            id: args.getRaw(['input', "id"])
-          });
-          args.apply($update);
-          return object({
-            result: $update
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
         }
       },
       updateCompoundKey: {
@@ -14107,32 +13605,6 @@ export const objects = {
       updatePersonById: {
         plan(_$root, args) {
           const $update = pgUpdateSingle(resource_personPgResource, {
-            id: args.getRaw(['input', "id"])
-          });
-          args.apply($update);
-          return object({
-            result: $update
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
-        }
-      },
-      updatePet: {
-        plan(_$root, args) {
-          const $update = pgUpdateSingle(resource_petsPgResource, specFromArgs_Pet(args));
-          args.apply($update);
-          return object({
-            result: $update
-          });
-        },
-        args: {
-          input: applyInputToUpdateOrDelete
-        }
-      },
-      updatePetById: {
-        plan(_$root, args) {
-          const $update = pgUpdateSingle(resource_petsPgResource, {
             id: args.getRaw(['input', "id"])
           });
           args.apply($update);
@@ -14447,31 +13919,6 @@ export const objects = {
       }
     }
   },
-  Building: {
-    assertStep: assertPgClassSingleStep,
-    plans: {
-      code($in, args, _info) {
-        return scalarComputed(resource_code_a_buildingsPgResource, $in, makeArgs_code_a_buildings(args));
-      },
-      nodeId($parent) {
-        const specifier = nodeIdHandler_Building.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Building.codec.name].encode);
-      }
-    },
-    planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of buildingsUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_buildingsPgResource.get(spec);
-    }
-  },
-  BuildingsConnection: {
-    assertStep: ConnectionStep,
-    plans: {
-      totalCount: totalCountConnectionPlan
-    }
-  },
   CompoundKey: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -14538,7 +13985,7 @@ export const objects = {
     assertStep: assertPgClassSingleStep,
     plans: {
       computedField($in, args, _info) {
-        return scalarComputed(resource_compound_type_computed_fieldPgResource, $in, makeArgs_code_a_buildings(args));
+        return scalarComputed(resource_compound_type_computed_fieldPgResource, $in, makeArgs_person_computed_out(args));
       },
       fooBar($record) {
         return $record.get("foo_bar");
@@ -14581,15 +14028,6 @@ export const objects = {
       isOptimised($record) {
         return $record.get("is_optimised");
       }
-    }
-  },
-  CreateBuildingPayload: {
-    assertStep: assertStep,
-    plans: {
-      building: planCreatePayloadResult,
-      buildingEdge: CreateBuildingPayload_buildingEdgePlan,
-      clientMutationId: getClientMutationIdForCreatePlan,
-      query: queryPlan
     }
   },
   CreateCompoundKeyPayload: {
@@ -14724,15 +14162,6 @@ export const objects = {
       query: queryPlan
     }
   },
-  CreatePetPayload: {
-    assertStep: assertStep,
-    plans: {
-      clientMutationId: getClientMutationIdForCreatePlan,
-      pet: planCreatePayloadResult,
-      petEdge: CreatePetPayload_petEdgePlan,
-      query: queryPlan
-    }
-  },
   CreatePostPayload: {
     assertStep: assertStep,
     plans: {
@@ -14847,20 +14276,6 @@ export const objects = {
     assertStep: ConnectionStep,
     plans: {
       totalCount: totalCountConnectionPlan
-    }
-  },
-  DeleteBuildingPayload: {
-    assertStep: ObjectStep,
-    plans: {
-      building: planCreatePayloadResult,
-      buildingEdge: CreateBuildingPayload_buildingEdgePlan,
-      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      deletedBuildingId($object) {
-        const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandler_Building.plan($record);
-        return lambda(specifier, base64JSONNodeIdCodec.encode);
-      },
-      query: queryPlan
     }
   },
   DeleteCompoundKeyPayload: {
@@ -15028,20 +14443,6 @@ export const objects = {
       query: queryPlan
     }
   },
-  DeletePetPayload: {
-    assertStep: ObjectStep,
-    plans: {
-      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      deletedPetId($object) {
-        const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandler_Pet.plan($record);
-        return lambda(specifier, base64JSONNodeIdCodec.encode);
-      },
-      pet: planCreatePayloadResult,
-      petEdge: CreatePetPayload_petEdgePlan,
-      query: queryPlan
-    }
-  },
   DeletePostPayload: {
     assertStep: ObjectStep,
     plans: {
@@ -15161,7 +14562,7 @@ export const objects = {
     assertStep: assertPgClassSingleStep,
     plans: {
       computed($in, args, _info) {
-        return scalarComputed(resource_edge_case_computedPgResource, $in, makeArgs_code_a_buildings(args));
+        return scalarComputed(resource_edge_case_computedPgResource, $in, makeArgs_person_computed_out(args));
       },
       notNullHasDefault($record) {
         return $record.get("not_null_has_default");
@@ -15931,11 +15332,11 @@ export const objects = {
         return resource_person_computed_complexPgResource.execute(details.selectArgs);
       },
       computedFirstArgInout($in, args, _info) {
-        const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+        const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
         return resource_person_computed_first_arg_inoutPgResource.execute(details.selectArgs);
       },
       computedFirstArgInoutOut($in, args, _info) {
-        const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+        const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
         return resource_person_computed_first_arg_inout_outPgResource.execute(details.selectArgs);
       },
       computedInout($in, args, _info) {
@@ -15946,20 +15347,20 @@ export const objects = {
         return resource_person_computed_inout_outPgResource.execute(details.selectArgs);
       },
       computedOut($in, args, _info) {
-        return scalarComputed(resource_person_computed_outPgResource, $in, makeArgs_code_a_buildings(args));
+        return scalarComputed(resource_person_computed_outPgResource, $in, makeArgs_person_computed_out(args));
       },
       computedOutOut($in, args, _info) {
-        const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+        const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
         return resource_person_computed_out_outPgResource.execute(details.selectArgs);
       },
       createdAt($record) {
         return $record.get("created_at");
       },
       firstName($in, args, _info) {
-        return scalarComputed(resource_person_first_namePgResource, $in, makeArgs_code_a_buildings(args));
+        return scalarComputed(resource_person_first_namePgResource, $in, makeArgs_person_computed_out(args));
       },
       firstPost($in, args, _info) {
-        const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+        const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
         return resource_person_first_postPgResource.execute(details.selectArgs);
       },
       foreignKeysByPersonId: {
@@ -16061,7 +15462,7 @@ export const objects = {
         }
       },
       typeFunctionList($in, args, _info) {
-        const details = pgFunctionArgumentsFromArgs($in, makeArgs_code_a_buildings(args));
+        const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
         return resource_person_type_function_listPgResource.execute(details.selectArgs);
       },
       userMac($record) {
@@ -16127,31 +15528,6 @@ export const objects = {
       totalCount: totalCountConnectionPlan
     }
   },
-  Pet: {
-    assertStep: assertPgClassSingleStep,
-    plans: {
-      code($in, args, _info) {
-        return scalarComputed(resource_code_a_petsPgResource, $in, makeArgs_code_a_buildings(args));
-      },
-      nodeId($parent) {
-        const specifier = nodeIdHandler_Pet.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Pet.codec.name].encode);
-      }
-    },
-    planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of petsUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_petsPgResource.get(spec);
-    }
-  },
-  PetsConnection: {
-    assertStep: ConnectionStep,
-    plans: {
-      totalCount: totalCountConnectionPlan
-    }
-  },
   Post: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -16169,7 +15545,7 @@ export const objects = {
         return resource_post_computed_compound_type_arrayPgResource.execute(details.selectArgs);
       },
       computedIntervalArray($in, args, _info) {
-        return scalarComputed(resource_post_computed_interval_arrayPgResource, $in, makeArgs_code_a_buildings(args));
+        return scalarComputed(resource_post_computed_interval_arrayPgResource, $in, makeArgs_person_computed_out(args));
       },
       computedIntervalSet: {
         plan($parent, args, info) {
@@ -16185,7 +15561,7 @@ export const objects = {
         }
       },
       computedTextArray($in, args, _info) {
-        return scalarComputed(resource_post_computed_text_arrayPgResource, $in, makeArgs_code_a_buildings(args));
+        return scalarComputed(resource_post_computed_text_arrayPgResource, $in, makeArgs_person_computed_out(args));
       },
       computedWithOptionalArg($in, args, _info) {
         return scalarComputed(resource_post_computed_with_optional_argPgResource, $in, makeArgs_post_computed_with_optional_arg(args));
@@ -16600,15 +15976,6 @@ export const objects = {
       totalCount: totalCountConnectionPlan
     }
   },
-  UpdateBuildingPayload: {
-    assertStep: ObjectStep,
-    plans: {
-      building: planCreatePayloadResult,
-      buildingEdge: CreateBuildingPayload_buildingEdgePlan,
-      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      query: queryPlan
-    }
-  },
   UpdateCompoundKeyPayload: {
     assertStep: ObjectStep,
     plans: {
@@ -16716,15 +16083,6 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       personSecret: planCreatePayloadResult,
-      query: queryPlan
-    }
-  },
-  UpdatePetPayload: {
-    assertStep: ObjectStep,
-    plans: {
-      clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
-      pet: planCreatePayloadResult,
-      petEdge: CreatePetPayload_petEdgePlan,
       query: queryPlan
     }
   },
@@ -16894,28 +16252,6 @@ export const inputObjects = {
       clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
-  BuildingCondition: {
-    plans: {
-      address($condition, val) {
-        return applyAttributeCondition("address", TYPES.text, $condition, val);
-      },
-      id: TypeCondition_idApply
-    }
-  },
-  BuildingInput: {
-    baked: createObjectAndApplyChildren,
-    plans: {
-      address: BuildingInput_addressApply,
-      id: LeftArmBaseInput_idApply
-    }
-  },
-  BuildingPatch: {
-    baked: createObjectAndApplyChildren,
-    plans: {
-      address: BuildingInput_addressApply,
-      id: LeftArmBaseInput_idApply
-    }
-  },
   CompoundKeyCondition: {
     plans: {
       extra($condition, val) {
@@ -16994,12 +16330,6 @@ export const inputObjects = {
       schedule(obj, val, info) {
         obj.set("schedule", bakedInputRuntime(info.schema, info.field.type, val));
       }
-    }
-  },
-  CreateBuildingInput: {
-    plans: {
-      building: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   CreateCompoundKeyInput: {
@@ -17086,12 +16416,6 @@ export const inputObjects = {
       personSecret: applyCreateFields
     }
   },
-  CreatePetInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation,
-      pet: applyCreateFields
-    }
-  },
   CreatePostInput: {
     plans: {
       clientMutationId: applyClientMutationIdForCustomMutation,
@@ -17172,16 +16496,6 @@ export const inputObjects = {
     plans: {
       id: LeftArmBaseInput_idApply,
       nullValue: DefaultValueInput_nullValueApply
-    }
-  },
-  DeleteBuildingByIdInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation
-    }
-  },
-  DeleteBuildingInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   DeleteCompoundKeyByPersonId1AndPersonId2Input: {
@@ -17305,16 +16619,6 @@ export const inputObjects = {
     }
   },
   DeletePersonSecretInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation
-    }
-  },
-  DeletePetByIdInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation
-    }
-  },
-  DeletePetInput: {
     plans: {
       clientMutationId: applyClientMutationIdForCustomMutation
     }
@@ -17985,28 +17289,6 @@ export const inputObjects = {
       secret: PersonSecretInput_secretApply
     }
   },
-  PetCondition: {
-    plans: {
-      id: TypeCondition_idApply,
-      name($condition, val) {
-        return applyAttributeCondition("name", TYPES.text, $condition, val);
-      }
-    }
-  },
-  PetInput: {
-    baked: createObjectAndApplyChildren,
-    plans: {
-      id: LeftArmBaseInput_idApply,
-      name: PetInput_nameApply
-    }
-  },
-  PetPatch: {
-    baked: createObjectAndApplyChildren,
-    plans: {
-      id: LeftArmBaseInput_idApply,
-      name: PetInput_nameApply
-    }
-  },
   PostCondition: {
     plans: {
       authorId($condition, val) {
@@ -18509,22 +17791,12 @@ export const inputObjects = {
       description(obj, val, info) {
         obj.set("description", bakedInputRuntime(info.schema, info.field.type, val));
       },
-      name: PetInput_nameApply,
+      name(obj, val, info) {
+        obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
+      },
       x(obj, val, info) {
         obj.set("x", bakedInputRuntime(info.schema, info.field.type, val));
       }
-    }
-  },
-  UpdateBuildingByIdInput: {
-    plans: {
-      buildingPatch: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCustomMutation
-    }
-  },
-  UpdateBuildingInput: {
-    plans: {
-      buildingPatch: applyCreateFields,
-      clientMutationId: applyClientMutationIdForCustomMutation
     }
   },
   UpdateCompoundKeyByPersonId1AndPersonId2Input: {
@@ -18675,18 +17947,6 @@ export const inputObjects = {
     plans: {
       clientMutationId: applyClientMutationIdForCustomMutation,
       personSecretPatch: applyCreateFields
-    }
-  },
-  UpdatePetByIdInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation,
-      petPatch: applyCreateFields
-    }
-  },
-  UpdatePetInput: {
-    plans: {
-      clientMutationId: applyClientMutationIdForCustomMutation,
-      petPatch: applyCreateFields
     }
   },
   UpdatePostByIdInput: {
@@ -19156,42 +18416,6 @@ export const enums = {
       },
       REJECTED: {
         value: "rejected"
-      }
-    }
-  },
-  BuildingsOrderBy: {
-    values: {
-      ADDRESS_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "address",
-          direction: "ASC"
-        });
-      },
-      ADDRESS_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "address",
-          direction: "DESC"
-        });
-      },
-      ID_ASC: TypesOrderBy_ID_ASCApply,
-      ID_DESC: TypesOrderBy_ID_DESCApply,
-      PRIMARY_KEY_ASC(queryBuilder) {
-        buildingsUniques[0].attributes.forEach(attributeName => {
-          queryBuilder.orderBy({
-            attribute: attributeName,
-            direction: "ASC"
-          });
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PRIMARY_KEY_DESC(queryBuilder) {
-        buildingsUniques[0].attributes.forEach(attributeName => {
-          queryBuilder.orderBy({
-            attribute: attributeName,
-            direction: "DESC"
-          });
-        });
-        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -19877,32 +19101,6 @@ export const enums = {
           attribute: "sekrit",
           direction: "DESC"
         });
-      }
-    }
-  },
-  PetsOrderBy: {
-    values: {
-      ID_ASC: TypesOrderBy_ID_ASCApply,
-      ID_DESC: TypesOrderBy_ID_DESCApply,
-      NAME_ASC: PetsOrderBy_NAME_ASCApply,
-      NAME_DESC: PetsOrderBy_NAME_DESCApply,
-      PRIMARY_KEY_ASC(queryBuilder) {
-        petsUniques[0].attributes.forEach(attributeName => {
-          queryBuilder.orderBy({
-            attribute: attributeName,
-            direction: "ASC"
-          });
-        });
-        queryBuilder.setOrderIsUnique();
-      },
-      PRIMARY_KEY_DESC(queryBuilder) {
-        petsUniques[0].attributes.forEach(attributeName => {
-          queryBuilder.orderBy({
-            attribute: attributeName,
-            direction: "DESC"
-          });
-        });
-        queryBuilder.setOrderIsUnique();
       }
     }
   },
@@ -20638,8 +19836,18 @@ export const enums = {
           direction: "DESC"
         });
       },
-      NAME_ASC: PetsOrderBy_NAME_ASCApply,
-      NAME_DESC: PetsOrderBy_NAME_DESCApply,
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+      },
       X_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "x",

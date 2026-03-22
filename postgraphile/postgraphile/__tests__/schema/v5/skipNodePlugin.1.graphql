@@ -1251,75 +1251,6 @@ strings and not numbers.
 """
 scalar BigInt
 
-type Building {
-  address: String
-  code: String
-  rowId: Int!
-}
-
-"""
-A condition to be used against `Building` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input BuildingCondition {
-  """Checks for equality with the object’s `address` field."""
-  address: String
-
-  """Checks for equality with the object’s `rowId` field."""
-  rowId: Int
-}
-
-"""A connection to a list of `Building` values."""
-type BuildingConnection {
-  """
-  A list of edges which contains the `Building` and cursor to aid in pagination.
-  """
-  edges: [BuildingEdge]!
-
-  """A list of `Building` objects."""
-  nodes: [Building]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Building` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Building` edge in the connection."""
-type BuildingEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Building` at the end of the edge."""
-  node: Building
-}
-
-"""An input for mutations affecting `Building`"""
-input BuildingInput {
-  address: String
-  rowId: Int
-}
-
-"""Methods to use when ordering `Building`."""
-enum BuildingOrderBy {
-  ADDRESS_ASC
-  ADDRESS_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROW_ID_ASC
-  ROW_ID_DESC
-}
-
-"""
-Represents an update to a `Building`. Fields that are set will be updated.
-"""
-input BuildingPatch {
-  address: String
-  rowId: Int
-}
-
 type CCompoundKey {
   """Reads a single `CPerson` that is related to this `CCompoundKey`."""
   cPersonByPersonId1: CPerson
@@ -3428,41 +3359,6 @@ type CreateBUpdatableViewPayload {
   query: Query
 }
 
-"""All input for the create `Building` mutation."""
-input CreateBuildingInput {
-  """The `Building` to be created by this mutation."""
-  building: BuildingInput!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our create `Building` mutation."""
-type CreateBuildingPayload {
-  """The `Building` that was created by this mutation."""
-  building: Building
-
-  """An edge for our `Building`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """All input for the create `CCompoundKey` mutation."""
 input CreateCCompoundKeyInput {
   """The `CCompoundKey` to be created by this mutation."""
@@ -3893,41 +3789,6 @@ type CreatePatchPayload {
     """The method to use when ordering `Patch`."""
     orderBy: [PatchOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PatchEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the create `Pet` mutation."""
-input CreatePetInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Pet` to be created by this mutation."""
-  pet: PetInput!
-}
-
-"""The output of our create `Pet` mutation."""
-type CreatePetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Pet` that was created by this mutation."""
-  pet: Pet
-
-  """An edge for our `Pet`. May be used by Relay 1."""
-  petEdge(
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PetEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -4427,39 +4288,6 @@ type DeleteBTypePayload {
   query: Query
 }
 
-"""All input for the `deleteBuildingByRowId` mutation."""
-input DeleteBuildingByRowIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  rowId: Int!
-}
-
-"""The output of our delete `Building` mutation."""
-type DeleteBuildingPayload {
-  """The `Building` that was deleted by this mutation."""
-  building: Building
-
-  """An edge for our `Building`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """
 All input for the `deleteCCompoundKeyByPersonId1AndPersonId2` mutation.
 """
@@ -4835,39 +4663,6 @@ type DeletePatchPayload {
     """The method to use when ordering `Patch`."""
     orderBy: [PatchOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PatchEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `deletePetByRowId` mutation."""
-input DeletePetByRowIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  rowId: Int!
-}
-
-"""The output of our delete `Pet` mutation."""
-type DeletePetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Pet` that was deleted by this mutation."""
-  pet: Pet
-
-  """An edge for our `Pet`. May be used by Relay 1."""
-  petEdge(
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PetEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -5700,14 +5495,6 @@ type Mutation {
     input: CreateBUpdatableViewInput!
   ): CreateBUpdatableViewPayload
 
-  """Creates a single `Building`."""
-  createBuilding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateBuildingInput!
-  ): CreateBuildingPayload
-
   """Creates a single `CCompoundKey`."""
   createCCompoundKey(
     """
@@ -5812,14 +5599,6 @@ type Mutation {
     input: CreatePatchInput!
   ): CreatePatchPayload
 
-  """Creates a single `Pet`."""
-  createPet(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePetInput!
-  ): CreatePetPayload
-
   """Creates a single `Post`."""
   createPost(
     """
@@ -5907,14 +5686,6 @@ type Mutation {
     """
     input: DeleteBTypeByRowIdInput!
   ): DeleteBTypePayload
-
-  """Deletes a single `Building` using a unique key."""
-  deleteBuildingByRowId(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteBuildingByRowIdInput!
-  ): DeleteBuildingPayload
 
   """Deletes a single `CCompoundKey` using a unique key."""
   deleteCCompoundKeyByPersonId1AndPersonId2(
@@ -6019,14 +5790,6 @@ type Mutation {
     """
     input: DeletePatchByRowIdInput!
   ): DeletePatchPayload
-
-  """Deletes a single `Pet` using a unique key."""
-  deletePetByRowId(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePetByRowIdInput!
-  ): DeletePetPayload
 
   """Deletes a single `Post` using a unique key."""
   deletePostByRowId(
@@ -6150,14 +5913,6 @@ type Mutation {
     input: UpdateBTypeByRowIdInput!
   ): UpdateBTypePayload
 
-  """Updates a single `Building` using a unique key and a patch."""
-  updateBuildingByRowId(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBuildingByRowIdInput!
-  ): UpdateBuildingPayload
-
   """Updates a single `CCompoundKey` using a unique key and a patch."""
   updateCCompoundKeyByPersonId1AndPersonId2(
     """
@@ -6261,14 +6016,6 @@ type Mutation {
     """
     input: UpdatePatchByRowIdInput!
   ): UpdatePatchPayload
-
-  """Updates a single `Pet` using a unique key and a patch."""
-  updatePetByRowId(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePetByRowIdInput!
-  ): UpdatePetPayload
 
   """Updates a single `Post` using a unique key and a patch."""
   updatePostByRowId(
@@ -6621,72 +6368,6 @@ input PatchPatch {
   rowId: Int
 }
 
-type Pet {
-  code: String
-  name: String
-  rowId: Int!
-}
-
-"""
-A condition to be used against `Pet` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PetCondition {
-  """Checks for equality with the object’s `name` field."""
-  name: String
-
-  """Checks for equality with the object’s `rowId` field."""
-  rowId: Int
-}
-
-"""A connection to a list of `Pet` values."""
-type PetConnection {
-  """
-  A list of edges which contains the `Pet` and cursor to aid in pagination.
-  """
-  edges: [PetEdge]!
-
-  """A list of `Pet` objects."""
-  nodes: [Pet]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Pet` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Pet` edge in the connection."""
-type PetEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Pet` at the end of the edge."""
-  node: Pet
-}
-
-"""An input for mutations affecting `Pet`"""
-input PetInput {
-  name: String
-  rowId: Int
-}
-
-"""Methods to use when ordering `Pet`."""
-enum PetOrderBy {
-  NAME_ASC
-  NAME_DESC
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROW_ID_ASC
-  ROW_ID_DESC
-}
-
-"""Represents an update to a `Pet`. Fields that are set will be updated."""
-input PetPatch {
-  name: String
-  rowId: Int
-}
-
 """A cartesian point."""
 type Point {
   x: Float!
@@ -7027,35 +6708,6 @@ type Query {
     """The method to use when ordering `BUpdatableView`."""
     orderBy: [BUpdatableViewOrderBy!] = [NATURAL]
   ): BUpdatableViewConnection
-
-  """Reads and enables pagination through a set of `Building`."""
-  allBuildings(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BuildingCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingOrderBy!] = [PRIMARY_KEY_ASC]
-  ): BuildingConnection
 
   """Reads and enables pagination through a set of `CCompoundKey`."""
   allCCompoundKeys(
@@ -7463,35 +7115,6 @@ type Query {
     orderBy: [PatchOrderBy!] = [PRIMARY_KEY_ASC]
   ): PatchConnection
 
-  """Reads and enables pagination through a set of `Pet`."""
-  allPets(
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PetCondition
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PetConnection
-
   """Reads and enables pagination through a set of `Post`."""
   allPosts(
     """Read all values in the set after (below) this cursor."""
@@ -7778,9 +7401,6 @@ type Query {
   ): BTypeConnection
   bTypeFunctionList: [BType]
 
-  """Get a single `Building`."""
-  buildingByRowId(rowId: Int!): Building
-
   """Reads and enables pagination through a set of `CPerson`."""
   cBadlyBehavedFunction(
     """Read all values in the set after (below) this cursor."""
@@ -8025,6 +7645,7 @@ type Query {
     offset: Int
   ): CPersonConnection
   cTypesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+  compoundTypeQueryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
 
   """Get a single `DefaultValue`."""
   defaultValueByRowId(rowId: Int!): DefaultValue
@@ -8043,9 +7664,6 @@ type Query {
   """Get a single `Patch`."""
   patchByRowId(rowId: Int!): Patch
 
-  """Get a single `Pet`."""
-  petByRowId(rowId: Int!): Pet
-
   """Get a single `Post`."""
   postByRowId(rowId: Int!): Post
 
@@ -8054,7 +7672,6 @@ type Query {
   which can only query top level fields if they are in a particular form.
   """
   query: Query!
-  queryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
   queryIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""
@@ -8790,44 +8407,6 @@ type UpdateBTypePayload {
   query: Query
 }
 
-"""All input for the `updateBuildingByRowId` mutation."""
-input UpdateBuildingByRowIdInput {
-  """
-  An object where the defined keys will be set on the `Building` being updated.
-  """
-  buildingPatch: BuildingPatch!
-
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  rowId: Int!
-}
-
-"""The output of our update `Building` mutation."""
-type UpdateBuildingPayload {
-  """The `Building` that was updated by this mutation."""
-  building: Building
-
-  """An edge for our `Building`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingEdge
-
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
 """
 All input for the `updateCCompoundKeyByPersonId1AndPersonId2` mutation.
 """
@@ -9268,44 +8847,6 @@ type UpdatePatchPayload {
     """The method to use when ordering `Patch`."""
     orderBy: [PatchOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PatchEdge
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the `updatePetByRowId` mutation."""
-input UpdatePetByRowIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  An object where the defined keys will be set on the `Pet` being updated.
-  """
-  petPatch: PetPatch!
-  rowId: Int!
-}
-
-"""The output of our update `Pet` mutation."""
-type UpdatePetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Pet` that was updated by this mutation."""
-  pet: Pet
-
-  """An edge for our `Pet`. May be used by Relay 1."""
-  petEdge(
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PetEdge
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.

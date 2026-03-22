@@ -32,17 +32,11 @@ type Query implements Node {
   """Get a single `ReservedInputRecord`."""
   reservedInputRecordById(id: Int!): ReservedInputRecord
 
-  """Get a single `Building`."""
-  buildingById(id: Int!): Building
-
   """Get a single `DefaultValue`."""
   defaultValueById(id: Int!): DefaultValue
 
   """Get a single `NoPrimaryKey`."""
   noPrimaryKeyById(id: Int!): NoPrimaryKey
-
-  """Get a single `Pet`."""
-  petById(id: Int!): Pet
 
   """Get a single `UniqueForeignKey`."""
   uniqueForeignKeyByCompoundKey1AndCompoundKey2(compoundKey1: Int!, compoundKey2: Int!): UniqueForeignKey
@@ -341,7 +335,7 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): FuncOutComplexSetofConnection
-  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  compoundTypeQueryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
 
   """Reads and enables pagination through a set of `Person`."""
@@ -494,12 +488,6 @@ type Query implements Node {
     nodeId: ID!
   ): ReservedInputRecord
 
-  """Reads a single `Building` using its globally unique `ID`."""
-  building(
-    """The globally unique `ID` to be used in selecting a single `Building`."""
-    nodeId: ID!
-  ): Building
-
   """Reads a single `DefaultValue` using its globally unique `ID`."""
   defaultValue(
     """
@@ -507,12 +495,6 @@ type Query implements Node {
     """
     nodeId: ID!
   ): DefaultValue
-
-  """Reads a single `Pet` using its globally unique `ID`."""
-  pet(
-    """The globally unique `ID` to be used in selecting a single `Pet`."""
-    nodeId: ID!
-  ): Pet
 
   """Reads a single `MyTable` using its globally unique `ID`."""
   myTable(
@@ -776,35 +758,6 @@ type Query implements Node {
     orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]
   ): ReservedInputRecordsConnection
 
-  """Reads and enables pagination through a set of `Building`."""
-  allBuildings(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BuildingCondition
-
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): BuildingsConnection
-
   """Reads and enables pagination through a set of `DefaultValue`."""
   allDefaultValues(
     """Only read the first `n` values of the set."""
@@ -891,35 +844,6 @@ type Query implements Node {
     """The method to use when ordering `NoPrimaryKey`."""
     orderBy: [NoPrimaryKeysOrderBy!] = [NATURAL]
   ): NoPrimaryKeysConnection
-
-  """Reads and enables pagination through a set of `Pet`."""
-  allPets(
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PetCondition
-
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PetsConnection
 
   """Reads and enables pagination through a set of `Testview`."""
   allTestviews(
@@ -1442,16 +1366,6 @@ type ReservedInputRecord implements Node {
   id: Int!
 }
 
-type Building implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  code: String
-  id: Int!
-  address: String
-}
-
 type DefaultValue implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -1464,16 +1378,6 @@ type DefaultValue implements Node {
 type NoPrimaryKey {
   id: Int!
   str: String!
-}
-
-type Pet implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  code: String
-  id: Int!
-  name: String
 }
 
 type UniqueForeignKey {
@@ -3569,55 +3473,6 @@ enum ReservedInputRecordsOrderBy {
   ID_DESC
 }
 
-"""A connection to a list of `Building` values."""
-type BuildingsConnection {
-  """A list of `Building` objects."""
-  nodes: [Building]!
-
-  """
-  A list of edges which contains the `Building` and cursor to aid in pagination.
-  """
-  edges: [BuildingsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Building` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Building` edge in the connection."""
-type BuildingsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Building` at the end of the edge."""
-  node: Building
-}
-
-"""
-A condition to be used against `Building` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input BuildingCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `address` field."""
-  address: String
-}
-
-"""Methods to use when ordering `Building`."""
-enum BuildingsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ADDRESS_ASC
-  ADDRESS_DESC
-}
-
 """A connection to a list of `DefaultValue` values."""
 type DefaultValuesConnection {
   """A list of `DefaultValue` objects."""
@@ -3712,54 +3567,6 @@ enum NoPrimaryKeysOrderBy {
   ID_DESC
   STR_ASC
   STR_DESC
-}
-
-"""A connection to a list of `Pet` values."""
-type PetsConnection {
-  """A list of `Pet` objects."""
-  nodes: [Pet]!
-
-  """
-  A list of edges which contains the `Pet` and cursor to aid in pagination.
-  """
-  edges: [PetsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Pet` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Pet` edge in the connection."""
-type PetsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Pet` at the end of the edge."""
-  node: Pet
-}
-
-"""
-A condition to be used against `Pet` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PetCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
-
-  """Checks for equality with the object’s `name` field."""
-  name: String
-}
-
-"""Methods to use when ordering `Pet`."""
-enum PetsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
 }
 
 """A connection to a list of `Testview` values."""
@@ -4851,14 +4658,6 @@ type Mutation {
     input: CreateReservedInputRecordInput!
   ): CreateReservedInputRecordPayload
 
-  """Creates a single `Building`."""
-  createBuilding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateBuildingInput!
-  ): CreateBuildingPayload
-
   """Creates a single `DefaultValue`."""
   createDefaultValue(
     """
@@ -4882,14 +4681,6 @@ type Mutation {
     """
     input: CreateNoPrimaryKeyInput!
   ): CreateNoPrimaryKeyPayload
-
-  """Creates a single `Pet`."""
-  createPet(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePetInput!
-  ): CreatePetPayload
 
   """Creates a single `Testview`."""
   createTestview(
@@ -5103,22 +4894,6 @@ type Mutation {
     input: UpdateReservedInputRecordByIdInput!
   ): UpdateReservedInputRecordPayload
 
-  """Updates a single `Building` using its globally unique id and a patch."""
-  updateBuilding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBuildingInput!
-  ): UpdateBuildingPayload
-
-  """Updates a single `Building` using a unique key and a patch."""
-  updateBuildingById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateBuildingByIdInput!
-  ): UpdateBuildingPayload
-
   """
   Updates a single `DefaultValue` using its globally unique id and a patch.
   """
@@ -5144,22 +4919,6 @@ type Mutation {
     """
     input: UpdateNoPrimaryKeyByIdInput!
   ): UpdateNoPrimaryKeyPayload
-
-  """Updates a single `Pet` using its globally unique id and a patch."""
-  updatePet(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePetInput!
-  ): UpdatePetPayload
-
-  """Updates a single `Pet` using a unique key and a patch."""
-  updatePetById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePetByIdInput!
-  ): UpdatePetPayload
 
   """Updates a single `MyTable` using its globally unique id and a patch."""
   updateMyTable(
@@ -5475,22 +5234,6 @@ type Mutation {
     input: DeleteReservedInputRecordByIdInput!
   ): DeleteReservedInputRecordPayload
 
-  """Deletes a single `Building` using its globally unique id."""
-  deleteBuilding(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteBuildingInput!
-  ): DeleteBuildingPayload
-
-  """Deletes a single `Building` using a unique key."""
-  deleteBuildingById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteBuildingByIdInput!
-  ): DeleteBuildingPayload
-
   """Deletes a single `DefaultValue` using its globally unique id."""
   deleteDefaultValue(
     """
@@ -5514,22 +5257,6 @@ type Mutation {
     """
     input: DeleteNoPrimaryKeyByIdInput!
   ): DeleteNoPrimaryKeyPayload
-
-  """Deletes a single `Pet` using its globally unique id."""
-  deletePet(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePetInput!
-  ): DeletePetPayload
-
-  """Deletes a single `Pet` using a unique key."""
-  deletePetById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePetByIdInput!
-  ): DeletePetPayload
 
   """Deletes a single `MyTable` using its globally unique id."""
   deleteMyTable(
@@ -7522,47 +7249,6 @@ input ReservedInputRecordInput {
   id: Int
 }
 
-"""The output of our create `Building` mutation."""
-type CreateBuildingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Building` that was created by this mutation."""
-  building: Building
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Building`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingsEdge
-}
-
-"""All input for the create `Building` mutation."""
-input CreateBuildingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Building` to be created by this mutation."""
-  building: BuildingInput!
-}
-
-"""An input for mutations affecting `Building`"""
-input BuildingInput {
-  id: Int
-  address: String
-}
-
 """The output of our create `DefaultValue` mutation."""
 type CreateDefaultValuePayload {
   """
@@ -7679,47 +7365,6 @@ input CreateNoPrimaryKeyInput {
 input NoPrimaryKeyInput {
   id: Int!
   str: String!
-}
-
-"""The output of our create `Pet` mutation."""
-type CreatePetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Pet` that was created by this mutation."""
-  pet: Pet
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Pet`. May be used by Relay 1."""
-  petEdge(
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PetsEdge
-}
-
-"""All input for the create `Pet` mutation."""
-input CreatePetInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `Pet` to be created by this mutation."""
-  pet: PetInput!
-}
-
-"""An input for mutations affecting `Pet`"""
-input PetInput {
-  id: Int
-  name: String
 }
 
 """The output of our create `Testview` mutation."""
@@ -8784,71 +8429,6 @@ input UpdateReservedInputRecordByIdInput {
   reservedInputRecordPatch: ReservedInputRecordPatch!
 }
 
-"""The output of our update `Building` mutation."""
-type UpdateBuildingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Building` that was updated by this mutation."""
-  building: Building
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Building`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingsEdge
-}
-
-"""All input for the `updateBuilding` mutation."""
-input UpdateBuildingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `Building` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the `Building` being updated.
-  """
-  buildingPatch: BuildingPatch!
-}
-
-"""
-Represents an update to a `Building`. Fields that are set will be updated.
-"""
-input BuildingPatch {
-  id: Int
-  address: String
-}
-
-"""All input for the `updateBuildingById` mutation."""
-input UpdateBuildingByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `Building` being updated.
-  """
-  buildingPatch: BuildingPatch!
-}
-
 """The output of our update `DefaultValue` mutation."""
 type UpdateDefaultValuePayload {
   """
@@ -8952,69 +8532,6 @@ Represents an update to a `NoPrimaryKey`. Fields that are set will be updated.
 input NoPrimaryKeyPatch {
   id: Int
   str: String
-}
-
-"""The output of our update `Pet` mutation."""
-type UpdatePetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Pet` that was updated by this mutation."""
-  pet: Pet
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Pet`. May be used by Relay 1."""
-  petEdge(
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PetsEdge
-}
-
-"""All input for the `updatePet` mutation."""
-input UpdatePetInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `Pet` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the `Pet` being updated.
-  """
-  petPatch: PetPatch!
-}
-
-"""Represents an update to a `Pet`. Fields that are set will be updated."""
-input PetPatch {
-  id: Int
-  name: String
-}
-
-"""All input for the `updatePetById` mutation."""
-input UpdatePetByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `Pet` being updated.
-  """
-  petPatch: PetPatch!
 }
 
 """The output of our update `MyTable` mutation."""
@@ -10237,54 +9754,6 @@ input DeleteReservedInputRecordByIdInput {
   id: Int!
 }
 
-"""The output of our delete `Building` mutation."""
-type DeleteBuildingPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Building` that was deleted by this mutation."""
-  building: Building
-  deletedBuildingId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Building`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering `Building`."""
-    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingsEdge
-}
-
-"""All input for the `deleteBuilding` mutation."""
-input DeleteBuildingInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `Building` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the `deleteBuildingById` mutation."""
-input DeleteBuildingByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
 """The output of our delete `DefaultValue` mutation."""
 type DeleteDefaultValuePayload {
   """
@@ -10352,54 +9821,6 @@ type DeleteNoPrimaryKeyPayload {
 
 """All input for the `deleteNoPrimaryKeyById` mutation."""
 input DeleteNoPrimaryKeyByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
-"""The output of our delete `Pet` mutation."""
-type DeletePetPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The `Pet` that was deleted by this mutation."""
-  pet: Pet
-  deletedPetId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our `Pet`. May be used by Relay 1."""
-  petEdge(
-    """The method to use when ordering `Pet`."""
-    orderBy: [PetsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PetsEdge
-}
-
-"""All input for the `deletePet` mutation."""
-input DeletePetInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `Pet` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the `deletePetById` mutation."""
-input DeletePetByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
