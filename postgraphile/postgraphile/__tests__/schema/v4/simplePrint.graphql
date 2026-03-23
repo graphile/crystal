@@ -335,7 +335,7 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): FuncOutComplexSetofConnection
-  compoundTypeQueryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
 
   """Reads and enables pagination through a set of `Person`."""

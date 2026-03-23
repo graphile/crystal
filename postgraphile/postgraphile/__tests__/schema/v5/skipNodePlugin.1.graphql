@@ -7645,7 +7645,6 @@ type Query {
     offset: Int
   ): CPersonConnection
   cTypesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
-  compoundTypeQueryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
 
   """Get a single `DefaultValue`."""
   defaultValueByRowId(rowId: Int!): DefaultValue
@@ -7672,6 +7671,7 @@ type Query {
   which can only query top level fields if they are in a particular form.
   """
   query: Query!
+  queryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
   queryIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""

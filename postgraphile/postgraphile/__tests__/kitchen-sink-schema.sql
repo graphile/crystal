@@ -30,9 +30,7 @@ drop schema if exists
   issue_2334,
   relay,
   cjk,
-  scifi,
-  function_overloads,
-  function_overloads_other_schema
+  scifi
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -2476,7 +2474,7 @@ create function function_returning_enum.applicants_next_stage(
   a function_returning_enum.applicants
 ) returns function_returning_enum.stage_options_enum_domain
 as $$
-  select (case when a.stage = 'round 2' then 'hired'
+  select (case when a.stage = 'round 2' then 'hired' 
     else 'rejected' end)::function_returning_enum.stage_options_enum_domain;
 $$ language sql stable;
 comment on function function_returning_enum.applicants_next_stage is E'@filterable';
@@ -2496,7 +2494,7 @@ create function function_returning_enum.text_length(
   min_length int
 ) returns function_returning_enum.length
 as $$
-  select (case when length(text) < min_length then 'too_short'
+  select (case when length(text) < min_length then 'too_short' 
     else 'ok' end)::function_returning_enum.length;
 $$ language sql stable;
 
@@ -2511,14 +2509,14 @@ comment on function function_returning_enum.applicants_name_length is E'@filtera
 create function function_returning_enum.applicants_by_stage(
   wanted_stage function_returning_enum.stage_options_enum_domain
 ) returns setof function_returning_enum.applicants
-as $$
+as $$ 
   select * from function_returning_enum.applicants a where a.stage = wanted_stage;
 $$ language sql stable;
 
 create function function_returning_enum.applicants_by_favorite_pet(
   pet function_returning_enum.animal_type
 ) returns setof function_returning_enum.applicants
-as $$
+as $$ 
   select * from function_returning_enum.applicants a where a.favorite_pet = pet;
 $$ language sql stable;
 
@@ -2526,8 +2524,8 @@ create function function_returning_enum.applicants_pet_food(
   a function_returning_enum.applicants
 ) returns function_returning_enum.animal_type
 as $$
-  select (case
-    when a.favorite_pet = 'FISH' then null
+  select (case 
+    when a.favorite_pet = 'FISH' then null 
     when a.favorite_pet = 'CAT' then 'FISH'
     when a.favorite_pet = 'DOG' then 'CAT'
     else null
@@ -2541,7 +2539,7 @@ comment on domain function_returning_enum.transportation is E'@enum enum_table_t
 create function function_returning_enum.applicants_by_transportation(
   transportation function_returning_enum.transportation
 ) returns setof function_returning_enum.applicants
-as $$
+as $$ 
   select * from function_returning_enum.applicants a where a.transportation = applicants_by_transportation.transportation;
 $$ language sql stable;
 
@@ -2549,8 +2547,8 @@ create function function_returning_enum.applicants_favorite_pet_transportation(
   a function_returning_enum.applicants
 ) returns function_returning_enum.transportation
 as $$
-  select (case
-    when a.favorite_pet = 'FISH' then 'SUBWAY'
+  select (case 
+    when a.favorite_pet = 'FISH' then 'SUBWAY' 
     when a.favorite_pet = 'CAT' then 'CAR'
     when a.favorite_pet = 'DOG' then 'BIKE'
     else null
@@ -2583,31 +2581,3 @@ create table scifi."Accessory" (
   "Name" varchar(200) not null,
   "Id" integer not null primary key
 );
-
---------------------------------------------------------------------------------
-
--- Test overloaded computed column functions targeting different tables
-create schema function_overloads;
-create schema function_overloads_other_schema;
-create table function_overloads.pets (id serial primary key, name text);
-create table function_overloads.buildings (id serial primary key, address text);
-
--- Two overloaded functions in the SAME schema as their target tables
-create function function_overloads.code(function_overloads.pets) returns text
-  as $$ select 'P' || $1.id::text; $$ language sql stable;
-create function function_overloads.code(function_overloads.buildings) returns text
-  as $$ select 'B' || $1.id::text; $$ language sql stable;
-comment on function function_overloads.code(function_overloads.pets)
-  is E'@behavior +typeField -queryField';
-comment on function function_overloads.code(function_overloads.buildings)
-  is E'@behavior +typeField -queryField';
-
--- Cross-schema computed column functions (different schema from target tables)
-create function function_overloads_other_schema.age(function_overloads.pets) returns int
-  as $$ select 42; $$ language sql stable;
-create function function_overloads_other_schema.age(function_overloads.buildings) returns int
-  as $$ select 99; $$ language sql stable;
-comment on function function_overloads_other_schema.age(function_overloads.pets)
-  is E'@behavior +typeField -queryField';
-comment on function function_overloads_other_schema.age(function_overloads.buildings)
-  is E'@behavior +typeField -queryField';

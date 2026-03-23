@@ -6662,8 +6662,8 @@ const registry = makeRegistry({
       isMutation: true,
       returnsArray: true
     }),
-    compound_type_query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
-      name: "compound_type_query_compound_type_array",
+    query_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
+      name: "query_compound_type_array",
       identifier: "main.a.query_compound_type_array(c.compound_type)",
       from(...args) {
         return sql`${query_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;

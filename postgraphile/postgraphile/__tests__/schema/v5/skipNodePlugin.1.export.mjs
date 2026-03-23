@@ -6053,8 +6053,8 @@ const registry = makeRegistry({
       isMutation: true,
       returnsArray: true
     }),
-    compound_type_query_compound_type_array: PgResource.functionResourceOptions(c_compound_type_resourceOptionsConfig, {
-      name: "compound_type_query_compound_type_array",
+    query_compound_type_array: PgResource.functionResourceOptions(c_compound_type_resourceOptionsConfig, {
+      name: "query_compound_type_array",
       identifier: "main.a.query_compound_type_array(c.compound_type)",
       from(...args) {
         return sql`${query_compound_type_arrayFunctionIdentifer}(${sqlFromArgDigests(args)})`;
@@ -7139,13 +7139,13 @@ const c_func_out_complex_setof_getSelectPlanFromParentAndArgs = ($root, args, _i
   const selectArgs = makeArgs_c_func_out_complex_setof(args);
   return resource_c_func_out_complex_setofPgResource.execute(selectArgs);
 };
-const argDetailsSimple_compound_type_query_compound_type_array = [{
+const argDetailsSimple_query_compound_type_array = [{
   graphqlArgName: "object",
   pgCodec: cCompoundTypeCodec,
   postgresArgName: "object"
 }];
-const makeArgs_compound_type_query_compound_type_array = (args, path = []) => argDetailsSimple_compound_type_query_compound_type_array.map(details => makeArg(path, args, details));
-const resource_compound_type_query_compound_type_arrayPgResource = registry.pgResources["compound_type_query_compound_type_array"];
+const makeArgs_query_compound_type_array = (args, path = []) => argDetailsSimple_query_compound_type_array.map(details => makeArg(path, args, details));
+const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
 const argDetailsSimple_b_compound_type_array_query = [{
   graphqlArgName: "object",
   pgCodec: cCompoundTypeCodec,
@@ -8733,7 +8733,7 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): CFuncOutComplexSetofConnection
-  compoundTypeQueryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
+  queryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
   bCompoundTypeArrayQuery(object: CCompoundTypeInput): [CCompoundType]
 
   """Reads and enables pagination through a set of \`CPerson\`."""
@@ -18300,10 +18300,6 @@ export const objects = {
           id: $rowId
         });
       },
-      compoundTypeQueryCompoundTypeArray($root, args, _info) {
-        const selectArgs = makeArgs_compound_type_query_compound_type_array(args);
-        return resource_compound_type_query_compound_type_arrayPgResource.execute(selectArgs);
-      },
       cPersonByEmail(_$root, {
         $email
       }) {
@@ -18431,6 +18427,10 @@ export const objects = {
       },
       query() {
         return rootValue();
+      },
+      queryCompoundTypeArray($root, args, _info) {
+        const selectArgs = makeArgs_query_compound_type_array(args);
+        return resource_query_compound_type_arrayPgResource.execute(selectArgs);
       },
       queryIntervalArray($root, args, _info) {
         const selectArgs = makeArgs_c_person_computed_out(args);
@@ -20585,7 +20585,7 @@ export const objects = {
       },
       queryCompoundTypeArray($in, args, _info) {
         const details = pgFunctionArgumentsFromArgs($in, makeArgs_c_person_computed_out(args));
-        return resource_compound_type_query_compound_type_arrayPgResource.execute(details.selectArgs);
+        return resource_query_compound_type_arrayPgResource.execute(details.selectArgs);
       }
     }
   },

@@ -36,7 +36,7 @@ graph TD
     Bucket25("Bucket 25 (listItem)<br /><br />ROOT __Item{25}ᐸ268ᐳ[284]"):::bucket
     Bucket26("Bucket 26 (listItem)<br /><br />ROOT __Item{26}ᐸ274ᐳ[285]"):::bucket
     Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 281<br /><br />ROOT PgSelectSingle{23}ᐸcompound_type_array_queryᐳ[281]"):::bucket
-    Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 283<br /><br />ROOT PgSelectSingle{24}ᐸcompound_type_query_compound_type_arrayᐳ[283]"):::bucket
+    Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 283<br /><br />ROOT PgSelectSingle{24}ᐸquery_compound_type_arrayᐳ[283]"):::bucket
     Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 285<br /><br />ROOT __Item{26}ᐸ274ᐳ[285]"):::bucket
     Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 392<br /><br />ROOT PgClassExpression{1}ᐸ__compound...uery__.”g”ᐳ[392]"):::bucket
     Bucket52("Bucket 52 (listItem)<br />Deps: 459<br /><br />ROOT __Item{52}ᐸ287ᐳ[394]"):::bucket
@@ -81,7 +81,7 @@ graph TD
     Bucket91("Bucket 91 (nullableBoundary)<br />Deps: 434<br /><br />ROOT PgClassExpression{71}ᐸ__query_in...al_set__.vᐳ[434]"):::bucket
     Bucket92("Bucket 92 (nullableBoundary)<br />Deps: 435, 434, 644<br /><br />ROOT Edge{71}[435]"):::bucket
     Bucket93("Bucket 93 (nullableBoundary)<br />Deps: 454<br /><br />ROOT PgClassExpression{27}ᐸ__compound...uery__.”g”ᐳ[454]"):::bucket
-    Bucket94("Bucket 94 (nullableBoundary)<br />Deps: 455<br /><br />ROOT PgClassExpression{28}ᐸ__compound...rray__.”g”ᐳ[455]"):::bucket
+    Bucket94("Bucket 94 (nullableBoundary)<br />Deps: 455<br /><br />ROOT PgClassExpression{28}ᐸ__query_co...rray__.”g”ᐳ[455]"):::bucket
     Bucket95("Bucket 95 (nullableBoundary)<br />Deps: 434<br /><br />ROOT PgClassExpression{71}ᐸ__query_in...al_set__.vᐳ[434]"):::bucket
     Bucket96("Bucket 96 (nullableBoundary)<br />Deps: 623<br /><br />ROOT PgSelectSingle{72}ᐸcompound_type_set_queryᐳ[623]"):::bucket
     Bucket97("Bucket 97 (nullableBoundary)<br />Deps: 624<br /><br />ROOT PgSelectSingle{73}ᐸtable_set_queryᐳ[624]"):::bucket
@@ -314,7 +314,7 @@ graph TD
     PgSelect236 --> Connection238
     PgSelect244[["PgSelect[244∈0] ➊<br />ᐸint_set_queryᐳ"]]:::plan
     Object10 & PgFromExpression246 --> PgSelect244
-    PgSelect260[["PgSelect[260∈0] ➊<br />ᐸcompound_type_query_compound_type_arrayᐳ"]]:::plan
+    PgSelect260[["PgSelect[260∈0] ➊<br />ᐸquery_compound_type_arrayᐳ"]]:::plan
     PgFromExpression262{{"PgFromExpression[262∈0] ➊"}}:::plan
     Object10 & PgFromExpression262 --> PgSelect260
     PgSelect369[["PgSelect[369∈0] ➊<br />ᐸint_set_query(aggregate)ᐳ"]]:::plan
@@ -690,7 +690,7 @@ graph TD
     __Item280 --> PgSelectSingle281
     __Item282[/"__Item[282∈24]<br />ᐸ279ᐳ"\]:::itemplan
     PgSelectRows279 ==> __Item282
-    PgSelectSingle283{{"PgSelectSingle[283∈24]<br />ᐸcompound_type_query_compound_type_arrayᐳ"}}:::plan
+    PgSelectSingle283{{"PgSelectSingle[283∈24]<br />ᐸquery_compound_type_arrayᐳ"}}:::plan
     __Item282 --> PgSelectSingle283
     __Item284[/"__Item[284∈25]<br />ᐸ268ᐳ"\]:::itemplan
     PgClassExpression268 ==> __Item284
@@ -712,21 +712,21 @@ graph TD
     PgSelectSingle281 --> PgClassExpression454
     PgClassExpression456{{"PgClassExpression[456∈27]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
     PgClassExpression451 o--o PgClassExpression456
-    PgClassExpression437{{"PgClassExpression[437∈28]<br />ᐸ__compound...rray__.”a”ᐳ"}}:::plan
+    PgClassExpression437{{"PgClassExpression[437∈28]<br />ᐸ__query_co...rray__.”a”ᐳ"}}:::plan
     PgSelectSingle283 --> PgClassExpression437
-    PgClassExpression440{{"PgClassExpression[440∈28]<br />ᐸ__compound...rray__.”b”ᐳ"}}:::plan
+    PgClassExpression440{{"PgClassExpression[440∈28]<br />ᐸ__query_co...rray__.”b”ᐳ"}}:::plan
     PgClassExpression437 o--o PgClassExpression440
-    PgClassExpression443{{"PgClassExpression[443∈28]<br />ᐸ__compound...rray__.”c”ᐳ"}}:::plan
+    PgClassExpression443{{"PgClassExpression[443∈28]<br />ᐸ__query_co...rray__.”c”ᐳ"}}:::plan
     PgClassExpression440 o--o PgClassExpression443
-    PgClassExpression446{{"PgClassExpression[446∈28]<br />ᐸ__compound...rray__.”d”ᐳ"}}:::plan
+    PgClassExpression446{{"PgClassExpression[446∈28]<br />ᐸ__query_co...rray__.”d”ᐳ"}}:::plan
     PgClassExpression443 o--o PgClassExpression446
-    PgClassExpression449{{"PgClassExpression[449∈28]<br />ᐸ__compound...rray__.”e”ᐳ"}}:::plan
+    PgClassExpression449{{"PgClassExpression[449∈28]<br />ᐸ__query_co...rray__.”e”ᐳ"}}:::plan
     PgClassExpression446 o--o PgClassExpression449
-    PgClassExpression452{{"PgClassExpression[452∈28]<br />ᐸ__compound...rray__.”f”ᐳ"}}:::plan
+    PgClassExpression452{{"PgClassExpression[452∈28]<br />ᐸ__query_co...rray__.”f”ᐳ"}}:::plan
     PgClassExpression449 o--o PgClassExpression452
-    PgClassExpression455{{"PgClassExpression[455∈28]<br />ᐸ__compound...rray__.”g”ᐳ"}}:::plan
+    PgClassExpression455{{"PgClassExpression[455∈28]<br />ᐸ__query_co...rray__.”g”ᐳ"}}:::plan
     PgSelectSingle283 --> PgClassExpression455
-    PgClassExpression457{{"PgClassExpression[457∈28]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
+    PgClassExpression457{{"PgClassExpression[457∈28]<br />ᐸ__query_co....”foo_bar”ᐳ"}}:::plan
     PgClassExpression452 o--o PgClassExpression457
     Access438{{"Access[438∈29]<br />ᐸ285.secondsᐳ"}}:::plan
     __Item285 --> Access438

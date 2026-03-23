@@ -7480,7 +7480,6 @@ type Q implements N {
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  compoundTypeQueryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
 
   """Reads and enables pagination through a set of `CompoundType`."""
   compoundTypeSetQuery(
@@ -7814,6 +7813,7 @@ type Q implements N {
   which can only query top level fields if they are in a particular form.
   """
   query: Q!
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [I]
 
   """Reads and enables pagination through a set of `Interval`."""

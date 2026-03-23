@@ -2713,7 +2713,6 @@ type Query implements Node {
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  compoundTypeQueryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   compoundTypeSetQuery(after: Cursor, before: Cursor, first: Int, last: Int, offset: Int): CompoundTypesConnection
   currentUserId: Int
   defaultValue(nodeId: ID!): DefaultValue
@@ -2767,6 +2766,7 @@ type Query implements Node {
   post(nodeId: ID!): Post
   postById(id: Int!): Post
   query: Query!
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [Interval]
   queryIntervalSet(after: Cursor, before: Cursor, first: Int, last: Int, offset: Int): QueryIntervalSetConnection
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord

@@ -23,7 +23,7 @@ import {
   EXPORTABLE_OBJECT_CLONE,
   gatherConfig,
 } from "graphile-build";
-import type { PgProc, PgProcArgument } from "pg-introspection";
+import type { PgProc, PgProcArgument, PgType } from "pg-introspection";
 
 import { exportNameHint, forbidRequired } from "../utils.ts";
 import { version } from "../version.ts";
@@ -41,6 +41,13 @@ declare global {
           pgProc: PgProc;
         },
       ): string;
+      functionResourceNameShouldPrefixCompositeType(
+        this: Inflection,
+        details: {
+          pgProc: PgProc;
+          firstArgCompositeType: PgType;
+        },
+      ): boolean;
       functionRecordReturnCodecName(
         this: Inflection,
         details: {
@@ -137,7 +144,14 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         // distinct names (pets_code, buildings_code).
         if (pgProc.provolatile !== "v") {
           const firstArg = pgProc.getArguments().find((a) => a.isIn);
-          if (firstArg && firstArg.type.typtype === "c") {
+          if (
+            firstArg &&
+            firstArg.type.typtype === "c" &&
+            this.functionResourceNameShouldPrefixCompositeType({
+              pgProc,
+              firstArgCompositeType: firstArg.type,
+            })
+          ) {
             const compositePrefix = firstArg.type.typname + "_";
             if (!pgProc.proname.startsWith(compositePrefix)) {
               return `${schemaPrefix}${firstArg.type.typname}_${pgProc.proname}`;
@@ -145,6 +159,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           }
         }
         return `${schemaPrefix}${pgProc.proname}`;
+      },
+      functionResourceNameShouldPrefixCompositeType(
+        _options,
+        { pgProc, firstArgCompositeType },
+      ) {
+        // By default, only consider a function as a computed column if it
+        // belongs to the same schema as the composite type. Override this
+        // inflector to support cross-schema computed columns.
+        return firstArgCompositeType.typnamespace === pgProc.pronamespace;
       },
       functionRecordReturnCodecName(options, details) {
         return this.upperCamelCase(
@@ -684,6 +707,20 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               }),
         );
         if (overload) {
+          // Warn if both functions target composite types — the user likely
+          // intended these as computed columns on different tables, but the
+          // inflector produced the same name (e.g. cross-schema overloads).
+          const thisFirstArg = pgProc.getArguments().find((a) => a.isIn);
+          const otherFirstArg = overload.getArguments().find((a) => a.isIn);
+          if (
+            thisFirstArg?.type.typtype === "c" &&
+            otherFirstArg?.type.typtype === "c" &&
+            thisFirstArg.type._id !== otherFirstArg.type._id
+          ) {
+            console.warn(
+              `Skipping function '${namespace!.nspname}.${pgProc.proname}' because its resource name clashes with an overload. Consider overriding the 'functionResourceNameShouldPrefixCompositeType' inflector to support cross-schema computed columns.`,
+            );
+          }
           return;
         }
 

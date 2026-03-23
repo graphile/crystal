@@ -558,7 +558,7 @@
     ],
     totalCount: 11,
   },
-  compoundTypeQueryCompoundTypeArray: [
+  queryCompoundTypeArray: [
     {
       a: 419,
       b: "easy cheesy baked potatoes",

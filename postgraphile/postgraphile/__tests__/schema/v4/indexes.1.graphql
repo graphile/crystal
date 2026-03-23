@@ -7221,7 +7221,6 @@ type Query implements Node {
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  compoundTypeQueryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
 
   """Reads and enables pagination through a set of `CompoundType`."""
   compoundTypeSetQuery(
@@ -7555,6 +7554,7 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   """
   query: Query!
+  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""
