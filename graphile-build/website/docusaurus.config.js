@@ -152,11 +152,6 @@ const config = {
             position: "left",
             label: "Graphile Build",
           },
-          /*{
-            href: `/graphile-build/5`,
-            label: "Graphile Build",
-            position: "left",
-          },*/
           {
             type: "docsVersionDropdown",
             position: "left",
