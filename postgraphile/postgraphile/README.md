@@ -18,30 +18,39 @@ If you use Postgres as your primary datastore, PostGraphile helps you build
 best-practices, well-structured, frontend-focussed, and high-performance GraphQL
 APIs, honed exactly to your needs, with minimal effort expended.
 
-## How
+## How it works
 
-PostGraphile understands your PostgreSQL database and builds out a GraphQL
-schema tuned to your preferences and backed by the tables, relations, functions,
-indexes and permissions therein. From this instant starting point, you can spend
-minutes rather than months fine-tuning it to your client needs:
+Out of the box, PostGraphile analyzes your PostgreSQL database and builds an
+initial GraphQL schema informed by its tables, relations, functions, indexes,
+permissions, and your preferences. This acts as a complete, consistent API that
+evolves alongside your database. On top of this living baseline, you can apply
+customizations to sculpt the schema to meet the needs of your clients:
 
+- Seamlessly extend the schema with your own custom types and fields that can
+  execute SQL or Node.js code (see "Extensible" below).
+- Use database permissions to govern which parts of your schema to expose; it's
+  quick, ergonomic, granular, and it improves your overall security posture.
 - Use our powerful plugin and preset system to apply your general preferences to
-  the generated GraphQL schema
+  the generated GraphQL schema.
+- Use simple "tags" to fine-tune individual database entities: renaming them,
+  choosing when/how to expose them, changing their
+  type/presentation/nullability, indicating abstract types (interfaces/unions),
+  introducing additional relations, and more.
 - Use our "inflection" system to overhaul naming across the generated schema (we
   recommend
   [`@graphile/simplify-inflection`](https://www.npmjs.com/package/@graphile/simplify-inflection)
-  if your database schema meets the requirements!)
-- Use "tags" to fine-tune individual database entities: renaming them, choosing
-  when/how to expose them, changing their type/presentation/nullability,
-  indicating abstract types (interfaces/unions), introducing additional
-  relations, and more
+  if your database schema meets the requirements).
+- And much more!
+
+PostGraphile handles the repetitive parts, so you can focus on code that really
+brings value.
 
 ## Execution efficiency
 
 Backed by the cutting edge [Gra*fast*](https://grafast.org) planning and
 execution engine for GraphQL, PostGraphile has outstanding performance,
 typically out-performing hand-written GraphQL schemas using traditional
-GraphQL.js resolvers and DataLoader.
+GraphQL.js resolvers.
 
 ## Consistency
 
@@ -51,7 +60,7 @@ of your schema to your heart's content.
 
 ## No lock-in
 
-And, if you ever feel the need to leave PostGraphile, you can
+If you ever feel the need to leave PostGraphile, you can
 [export your schema as executable code](https://postgraphile.org/postgraphile/5/exporting-schema),
 and take over maintenance yourself — all without losing the performance
 advantages of our fully-planned execution.
@@ -59,33 +68,38 @@ advantages of our fully-planned execution.
 ## Extensible
 
 Your GraphQL schema should generally not be a 1-to-1 map of your database;
-GraphQL is a frontend-focussed technology so you should be exposing the data
-that your GraphQL clients need in the shape that makes sense for them. For most
-of your business domain objects, it's likely that the representation on the
-frontend, backend, and database are very similar, and spending a moment applying
-tags is enough to make any necessary adjustments.
+GraphQL is frontend-focussed, so your API should be shaped by client needs.
 
-PostGraphile is built with extensibility and composability at its heart to help
-you address the times when your database domain model and frontend domain models
-don't match. Almost every feature in PostGraphile, from introspection through to
-type generation and on to adding pagination arguments, is implemented via
-plugins. PostGraphile's plugin API is incredibly powerful and flexible; it's
-designed for you to use and even has helper factories to give more ergonomic
-APIs for common needs.
+In practice, many of your business domain objects naturally align across the
+frontend, backend, and database; spending a moment applying tags and creating
+helper functions is typically enough to make any necessary adjustments for
+these.
+
+For those that don't fit that model, PostGraphile is built with extensibility
+and composability at its heart. You can seamlessly adjust the schema to fit,
+without sacrificing the productivity and performance gains you get from the rest
+of the system.
+
+Almost every feature in PostGraphile, from introspection through to type
+generation and on to adding pagination arguments, is implemented via plugins.
+PostGraphile's plugin API is incredibly powerful and flexible; it's designed for
+you to use and even has helper factories to give more ergonomic APIs for common
+needs.
 
 Let's take the example of a checkout process. Your database only exposes the
 underlying `products`, `prices`, `cart_items`, and so on, but your frontend
 needs to know `subtotal`, `tax`, etc. Prices may vary depending on promotional
 discounts or other business rules. It should not be up to the client to
-implement these details client-side.
+implement these details client-side, instead your GraphQL schema should expose
+them as helpful strongly typed and well documented fields.
 
 In PostGraphile, you can handle this in the database:
 
 ```sql
--- Hide the "prices" table
+-- Hide the "prices" table from the GraphQL schema.
 comment on table prices is '@behavior -*';
 
--- Create a helper to get the current price of an item
+-- Create the `Product.unitPrice` field to get the current price of an item
 create function products_unit_price(p products) returns money as $$
   select unit_price
   from prices
@@ -93,6 +107,10 @@ create function products_unit_price(p products) returns money as $$
   and now() >= valid_from
   and now() < valid_until;
 $$ language sql stable;
+
+-- Add documentation for this field
+comment on function products_unit_price is
+  'The unit price at the current time, reflecting promotional discounts.';
 ```
 
 This will automatically add a `Product.unitPrice` field that finds the current
@@ -102,7 +120,11 @@ the time periods will not overlap, but if they do then you can add
 
 If your business logic is more complex, you could instead achieve this via a
 schema extension; this also allows for more advanced logic such as querying an
-external service to determine shipping costs:
+external service to determine shipping costs.
+
+Let's imagine we didn't add the above function, and instead want to implement
+the logic in a plugin, along with adding cart "summary" logic (subtotal,
+shipping, tax, total).
 
 ```ts
 import { extendSchema } from "postgraphile/utils";
@@ -117,6 +139,7 @@ export default extendSchema((build) => {
   return {
     typeDefs: /* GraphQL */ `
       extend type Product {
+        "The unit price at the current time, reflecting promotional discounts."
         unitPrice: Money!
       }
 
@@ -134,10 +157,10 @@ export default extendSchema((build) => {
     plans: {
       Product: {
         unitPrice($item) {
-          // Find the relevant prices
+          // Find the relevant price
           const productId = $item.get("product_id");
           const $prices = prices.find({ productId: $productId });
-          $prices.where(sql`now() >= valid_from and now() < valid_from`);
+          $prices.where(sql`now() >= valid_from and now() < valid_until`);
 
           // There's exactly one row, fetch it and return the unit price
           return $prices.single().get("unit_price");
@@ -154,6 +177,12 @@ export default extendSchema((build) => {
   };
 });
 ```
+
+With `extendSchema()` you can add custom types and fields that invoke arbitrary
+Node.js business logic, integrating with any datasource Node.js can communicate
+with. This can also be used to maintain backwards compatibility if and when you
+make breaking changes to your database schema. And that's just one of our plugin
+helpers, there's so much more you can do to make the schema your own!
 
 <details>
   <summary>
@@ -250,18 +279,12 @@ async function batchCalculateTax(carts: CartInfoWithShipping[]) {
 
 </details>
 
-You can use this extensibility to expand your schema with custom types and
-fields that can run any custom business logic or integrate with any datasource
-Node.js can communicate with. You can even use it to backfill fields to maintain
-backwards compatibility for clients when you make breaking changes to your
-database schema.
-
 ## Summary
 
 If your backend uses PostgreSQL as its primary datastore, and you use a
 conventional relational schema, PostGraphile is the best way to get your project
 up and running in record time; and, thanks to its incredibly efficient execution
-that eliminates under- and over-fetching on the backend, it help you reach
+that eliminates under- and over-fetching on the backend, it helps you reach
 significant scale with minimal resources and minimal complexity.
 
 Stop building boilerplate, iterate faster, and start shipping today with
