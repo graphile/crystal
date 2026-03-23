@@ -21,13 +21,14 @@ APIs, honed exactly to your needs, with minimal effort expended.
 ## How it works
 
 Rather than spending months hand-writing and maintaining an entire schema,
-PostGraphile handles the repetative parts so you only need to implement the code
-that really matters.
+PostGraphile handles the repetative parts so you can focus on the code that
+really matters.
 
 Out of the box, PostGraphile analyzes your PostgreSQL database and builds a
 complete, consistent GraphQL schema informed by its tables, relations,
-functions, indexes, and permissions. Via the configuration, you can apply your
-own preferences and customizations to meet client needs with minimal effort:
+functions, indexes, and permissions. This schema evolves alongside your
+database, and via the configuration you can apply your own preferences and
+customizations to meet client needs with minimal effort:
 
 - Seamlessly extend the schema with your own custom types and fields that can
   execute SQL or Node.js code (see "Extensible" below).
@@ -68,15 +69,16 @@ advantages of our fully-planned execution.
 
 ## Extensible
 
-Your GraphQL schema should generally not be a 1-to-1 map of your database;
-GraphQL is frontend-focused, so your API should be shaped by client needs.
+GraphQL is frontend-focused, so in most cases your API should be shaped by
+client needs rather than being a simple 1-to-1 map of your database.
+PostGraphile strongly supports this tenet.
 
 In practice, many of your business domain objects naturally align across the
 frontend, backend, and database; spending a moment applying tags and creating
 helper functions is typically enough to make any necessary adjustments for
 these.
 
-For those that don't fit that model, PostGraphile is built with extensibility
+For domains that don't fit that model, PostGraphile is built with extensibility
 and composability at its heart. You can seamlessly adjust the schema to fit,
 without sacrificing the productivity and performance gains you get from the rest
 of the system.
