@@ -87,7 +87,7 @@ const config = {
         id: "graphile-build-pg",
         path: "graphile-build-pg",
         routeBasePath: "graphile-build-pg",
-        sidebarPath: require.resolve("./sidebars.js"),
+        sidebarPath: require.resolve("./graphile-build-pg-sidebars.js"),
         editUrl,
         showLastUpdateTime: true,
         lastVersion: "5",
