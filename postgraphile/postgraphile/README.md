@@ -32,7 +32,7 @@ And please give some love to our featured sponsors 🤩:
 
 <table><tr>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
-<td align="center"><a href=""><img src="https://graphile.org/images/sponsors/https://outbankapp.com/" width="90" height="90" alt="Outbank" /><br />Outbank</a></td>
+<td align="center"><a href="https://outbankapp.com/"><img src="https://graphile.org/images/sponsors/outbank.png" width="90" height="90" alt="Outbank" /><br />Outbank</a></td>
 <td align="center"><a href="https://constructive.io/"><img src="https://graphile.org/images/sponsors/constructive.svg" width="90" height="90" alt="Constructive" /><br />Constructive</a></td>
 </tr></table>
 
