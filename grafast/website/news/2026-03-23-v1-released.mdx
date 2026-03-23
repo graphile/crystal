@@ -192,35 +192,3 @@ deduplication, eager loading, one-time preparation, caching and more).
 Why not start by reading [an overview of Grafast](/grafast) or digging in to
 [`loadMany()`'s advantages over
 DataLoader](https://grafast.org/grafast/standard-steps/loadMany#enhancements-over-dataloader)?
-
-{/*
-
-Changes the fundamental by separating the concepts of dataflow (through
-planning) and execution.
-
-Errors handled natively
-
-Doesn't even go through JSON.stringify - build the JSON string directly
-
-Optimize your logic without impacting plan resolvers.
-
-GraphQL.js - N+1 problems, promises
-GraphQL.js iteration 1 - add dataloader
-
-Grafast starting point - dataloader
-
-GraphQL.js want to optimize columns fetched, need to explore resolveInfo, need
-new DataLoader
-
-Grafast - info already given to loader
-
-GraphQL.js want to add condition to relation, need to integrate with dataloader
-
-Grafast - set param
-
-GraphQL.js want to do efficient ahead of time fetch
-
-Grafast - plan resolvers not impacted. Optimization takes place in steps. Much
-greater optimization.
-
-*/}
