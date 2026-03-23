@@ -1,22 +1,272 @@
 # PostGraphile
 
+> **High-performance GraphQL APIs, honed exactly to your needs, with minimal
+> effort expended**
+
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Discord chat room](https://img.shields.io/discord/489127045289476126.svg)](http://discord.gg/graphile)
 [![Follow](https://img.shields.io/badge/BSky-@Graphile.org-006aff.svg)](https://bsky.app/profile/graphile.org)
 [![Follow](https://img.shields.io/badge/Mastodon-@Graphile.fosstodon.org-6364ff.svg)](https://fosstodon.org/@graphile)
 
-_**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL
-database. Highly customisable and extensible thanks to incredibly powerful
-plugin system.**_
-
 **Documentation**: https://postgraphile.org/postgraphile/next/
 
-An incredibly low-effort way to build a well structured and high-performance
-GraphQL API backed primarily by a PostgreSQL database. Our main focusses are
-performance, automatic best-practices and customisability/extensibility. Use
-this if you have a PostgreSQL database and you want to use it as the primary
-"source of truth" for an auto-generated GraphQL API (which you can still make
-significant changes to).
+## About
+
+**Focus on only writing the code that brings value.**
+
+If you use Postgres as your primary datastore, PostGraphile helps you build
+best-practices, well-structured, frontend-focussed, and high-performance GraphQL
+APIs, honed exactly to your needs, with minimal effort expended.
+
+## How
+
+PostGraphile understands your PostgreSQL database and builds out a GraphQL
+schema tuned to your preferences and backed by the tables, relations, functions,
+indexes and permissions therein. From this instant starting point, you can spend
+minutes rather than months fine-tuning it to your client needs:
+
+- Use our powerful plugin and preset system to apply your general preferences to
+  the generated GraphQL schema
+- Use our "inflection" system to overhaul naming across the generated schema (we
+  recommend
+  [`@graphile/simplify-inflection`](https://www.npmjs.com/package/@graphile/simplify-inflection)
+  if your database schema meets the requirements!)
+- Use "tags" to fine-tune individual database entities: renaming them, choosing
+  when/how to expose them, changing their type/presentation/nullability,
+  indicating abstract types (interfaces/unions), introducing additional
+  relations, and more
+
+## Execution efficiency
+
+Backed by the cutting edge [Gra*fast*](https://grafast.org) planning and
+execution engine for GraphQL, PostGraphile has outstanding performance,
+typically out-performing hand-written GraphQL schemas using traditional
+GraphQL.js resolvers and DataLoader.
+
+## Consistency
+
+PostGraphile's autogeneration of the common parts of your API helps ensure
+consistency, whilst its plugin and preset system allows you to tweak every facet
+of your schema to your heart's content.
+
+## No lock-in
+
+And, if you ever feel the need to leave PostGraphile, you can
+[export your schema as executable code](https://postgraphile.org/postgraphile/5/exporting-schema),
+and take over maintenance yourself — all without losing the performance
+advantages of our fully-planned execution.
+
+## Extensible
+
+Your GraphQL schema should generally not be a 1-to-1 map of your database;
+GraphQL is a frontend-focussed technology so you should be exposing the data
+that your GraphQL clients need in the shape that makes sense for them. For most
+of your business domain objects, it's likely that the representation on the
+frontend, backend, and database are very similar, and spending a moment applying
+tags is enough to make any necessary adjustments.
+
+PostGraphile is built with extensibility and composability at its heart to help
+you address the times when your database domain model and frontend domain models
+don't match. Almost every feature in PostGraphile, from introspection through to
+type generation and on to adding pagination arguments, is implemented via
+plugins. PostGraphile's plugin API is incredibly powerful and flexible; it's
+designed for you to use and even has helper factories to give more ergonomic
+APIs for common needs.
+
+Let's take the example of a checkout process. Your database only exposes the
+underlying `products`, `prices`, `cart_items`, and so on, but your frontend
+needs to know `subtotal`, `tax`, etc. Prices may vary depending on promotional
+discounts or other business rules. It should not be up to the client to
+implement these details client-side.
+
+In PostGraphile, you can handle this in the database:
+
+```sql
+-- Hide the "prices" table
+comment on table prices is '@behavior -*';
+
+-- Create a helper to get the current price of an item
+create function products_unit_price(p products) returns money as $$
+  select unit_price
+  from prices
+  where product_id = p.product_id
+  and now() >= valid_from
+  and now() < valid_until;
+$$ language sql stable;
+```
+
+This will automatically add a `Product.unitPrice` field that finds the current
+unit price of the given product according to the time validity. (Here we assume
+the time periods will not overlap, but if they do then you can add
+`order by unit_price asc limit 1` to the query.)
+
+If your business logic is more complex, you could instead achieve this via a
+schema extension; this also allows for more advanced logic such as querying an
+external service to determine shipping costs:
+
+```ts
+import { extendSchema } from "postgraphile/utils";
+import { constant, context, get } from "postgraphile/grafast";
+import { batchSummarizeCart } from "./businessLogic/cart";
+
+export default extendSchema((build) => {
+  const {
+    pgExecutor,
+    pgResources: { cartItems, products, prices },
+  } = build;
+  return {
+    typeDefs: /* GraphQL */ `
+      extend type Product {
+        unitPrice: Money!
+      }
+
+      extend type Cart {
+        summary: CartSummary
+      }
+
+      type CartSummary {
+        subtotal: Money!
+        shipping: Money!
+        tax: Money!
+        total: Money!
+      }
+    `,
+    plans: {
+      Product: {
+        unitPrice($item) {
+          // Find the relevant prices
+          const productId = $item.get("product_id");
+          const $prices = prices.find({ productId: $productId });
+          $prices.where(sql`now() >= valid_from and now() < valid_from`);
+
+          // There's exactly one row, fetch it and return the unit price
+          return $prices.single().get("unit_price");
+        },
+      },
+      Cart: {
+        summary($cart) {
+          const $cartId = $cart.get("id");
+          return loadOne($cartId, batchSummarizeCart);
+        },
+      },
+      // CartSummary doesn't need plan resolvers, it can use the defaults.
+    },
+  };
+});
+```
+
+<details>
+  <summary>
+    Click to see example business logic for this schema
+  </summary>
+
+Your business logic can be implemented in any way that you want and can do
+anything Node.js can do; typically we assume you're using DataLoader-style
+callbacks (you can actually use your DataLoader callbacks with
+`loadOne`/`loadMany` directly!) to enable batched loading, but the `loadOne()`
+and `loadMany()` steps you'd use to call them can
+[have many advantages over DataLoader](https://grafast.org/grafast/standard-steps/loadMany#enhancements-over-dataloader).
+
+```ts
+// businessLogic/cart.ts
+
+import { context } from "postgraphile/grafast";
+
+export const batchSummarizeCart = {
+  // Plan to get access to the GraphQL context in our loader
+  shared: () => context(),
+
+  // `cartIds` is the batch of Cart identifiers, `shared` is the runtime GraphQL
+  // context (shared by everything in the batch)
+  async load(cartIds, { shared }) {
+    const carts = await batchGetCartInfo(shared, cartIds);
+    const cartsWithShipping = await batchCalculateShippingCosts(carts);
+    const cartsWithTax = await batchCalculateTax(cartsWithShipping);
+    return cartIds.map((cartId) => {
+      const cartInfo = cartsWithTax.find((c) => c.cart_id === cartId);
+      const { subtotal, shipping, tax } = cartInfo;
+      const total = subtotal + shipping + tax;
+      return { subtotal, shipping, tax, total };
+    });
+  },
+};
+
+/** Cart info from the database */
+interface CartInfo {
+  cart_id: number;
+  shipping_address: Address;
+  subtotal: number;
+  mass: number;
+}
+async function batchGetCartInfo(shared, cartIds) {
+  // Single DB fetch across all carts; you could use you ORM instead if you want.
+  const result = await shared.withPgClient(shared.pgSettings, (db) =>
+    db.query<CartInfo>({
+      text: `
+        select
+          carts.id as cart_id,
+          to_json(carts.shipping_address) as shipping_address,
+          sum(cart_items.quantity * prices.unit_amount) as subtotal,
+          sum(cart_items.quantity * products.mass) as mass
+        from carts
+        inner join cart_items
+        on (cart_items.cart_id = carts.id)
+        inner join prices
+        on (
+          prices.product_id = cart_items.product_id
+          and now() >= valid_from
+          and now() < valid_to
+        )
+        where carts.id = any($1::int[])
+        group by carts.id
+      `,
+      values: [cartIds],
+    }),
+  );
+  return result.rows;
+}
+
+interface CartInfoWithShipping extends CartInfo {
+  shipping: number;
+}
+
+async function batchCalculateShippingCosts(carts: CartInfo[]) {
+  // TODO: given the mass and address for each cart, determine its shipping cost
+  return carts.map((cart) => ({ ...cart, shipping: 500 }));
+}
+
+interface CartInfoWithShippingAndTax extends CartInfoWithShipping {
+  shipping: number;
+}
+async function batchCalculateTax(carts: CartInfoWithShipping[]) {
+  // TODO: update with the correct taxes for the region
+  const TAX_PERCENTAGE = 20;
+  return carts.map((cart) => ({
+    ...cart,
+    tax: ((cart.subtotal + cart.shipping) * TAX_PERCENTAGE) / 100,
+  }));
+}
+```
+
+</details>
+
+You can use this extensibility to expand your schema with custom types and
+fields that can run any custom business logic or integrate with any datasource
+Node.js can communicate with. You can even use it to backfill fields to maintain
+backwards compatibility for clients when you make breaking changes to your
+database schema.
+
+## Summary
+
+If your backend uses PostgreSQL as its primary datastore, and you use a
+conventional relational schema, PostGraphile is the best way to get your project
+up and running in record time; and, thanks to its incredibly efficient execution
+that eliminates under- and over-fetching on the backend, it help you reach
+significant scale with minimal resources and minimal complexity.
+
+Stop building boilerplate, iterate faster, and start shipping today with
+PostGraphile;
+[click here to get started](https://postgraphile.org/postgraphile/5).
 
 <!-- SPONSORS_BEGIN -->
 
