@@ -22,16 +22,40 @@ modes of traditional resolvers.
 
 </div>
 
-**No more N+1 queries or promise explosions. Reduce round-trips, data size, and
-deserialization costs from your datastores. Say goodbye to exponentially
-increasing resolver calls in nested lists.** Gra*fast* even reduces event loop
-tick counts, eliminates the need for per-request AST traversal, and reduces
-response serialization costs by producing the JSON string directly without
-creating intermediate objects.
+Many don't realise just how costly traditional GraphQL execution can be until
+it's too late. The GraphQL specification outlines a reference execution
+algorithm, but implementations may implement any solution so long as the
+perceived result is equivalent. GraphQL.js follows the reference execution
+algorithm nearly verbatim, passing the problems of the depth-first "resolvers"
+pattern down to consumers.
+
+Gra*fast* is a complete spec-compliant replacement execution algorithm. Instead
+of the myopic and uncoordinated "resolver"-based execution model, Gra*fast*
+takes a holistic approach, performing planning before moving on to execution.
+
+When an operation is seen for the first time, planning begins: each field
+indicates its data needs and planned execution steps via synchronous "plan
+resolvers". The resulting plan is then deduplicated and optimized so that the
+minimal number of steps, each backed by a batched function, are scheduled for
+execution. When executing the plan, the number of calls to these functions is
+independent of the size of the various lists, no matter how deeply they are
+nested, leading to predictable and scalable execution. And the plan can be
+re-used for future requests that perform the same operation.
+
+**No more backend over- and under-fetching: eliminate the N+1 problem, reduce
+round-trips, data size, and deserialization costs from your datastores.**
+
+You can also say goodbye to exponentially increasing resolver and telemetry
+calls in nested lists; and Gra*fast* even reduces event loop tick counts,
+eliminates the need for per-request AST traversal, and reduces response
+serialization costs by producing the JSON string directly without creating
+intermediate objects.
+
+And Gra*fast* even implements a resolver compatibility layer to aid in
+incremental adoption of this more efficient execution algorithm.
 
 {/* truncate */}
 
-Many don't realise just how costly GraphQL execution can be until it's too late.
 Shopify recently shared a post on their [journey to faster breadth-first GraphQL
 execution](https://shopify.engineering/faster-breadth-first-graphql-execution)
 that goes into detail on these costs, how it is impacting them at scale, and
