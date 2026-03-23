@@ -34,6 +34,6 @@ rc2latest graphile-utils
 rc2latest pg-sql2
 rc2latest postgraphile
 rc2latest postgraphile-plugin-connection-filter
-rc2latest @graphile/pg-agregates
+rc2latest @graphile/pg-aggregates
 rc2latest @graphile-contrib/pg-many-to-many
 rc2latest @graphile-contrib/postgraphile-plugin-fulltext-filter
