@@ -21,7 +21,7 @@ APIs, honed exactly to your needs, with minimal effort expended.
 ## How it works
 
 Rather than spending months hand-writing and maintaining an entire schema,
-PostGraphile handles the repetative parts so you can focus on the code that
+PostGraphile handles the repetitive parts so you can focus on the code that
 really matters.
 
 Out of the box, PostGraphile analyzes your PostgreSQL database and builds a
