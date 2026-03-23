@@ -15,21 +15,24 @@
 **Focus on only writing the code that brings value.**
 
 If you use Postgres as your primary datastore, PostGraphile helps you build
-best-practices, well-structured, frontend-focussed, and high-performance GraphQL
+best-practices, well-structured, frontend-focused, and high-performance GraphQL
 APIs, honed exactly to your needs, with minimal effort expended.
 
 ## How it works
 
-Out of the box, PostGraphile analyzes your PostgreSQL database and builds an
-initial GraphQL schema informed by its tables, relations, functions, indexes,
-permissions, and your preferences. This acts as a complete, consistent API that
-evolves alongside your database. On top of this living baseline, you can apply
-customizations to sculpt the schema to meet the needs of your clients:
+Rather than spending months hand-writing and maintaining an entire schema,
+PostGraphile handles the repetative parts so you only need to implement the code
+that really matters.
+
+Out of the box, PostGraphile analyzes your PostgreSQL database and builds a
+complete, consistent GraphQL schema informed by its tables, relations,
+functions, indexes, and permissions. Via the configuration, you can apply your
+own preferences and customizations to meet client needs with minimal effort:
 
 - Seamlessly extend the schema with your own custom types and fields that can
   execute SQL or Node.js code (see "Extensible" below).
 - Use database permissions to govern which parts of your schema to expose; it's
-  quick, ergonomic, granular, and it improves your overall security posture.
+  quick, ergonomic, granular, and it improves your security posture.
 - Use our powerful plugin and preset system to apply your general preferences to
   the generated GraphQL schema.
 - Use simple "tags" to fine-tune individual database entities: renaming them,
@@ -40,10 +43,8 @@ customizations to sculpt the schema to meet the needs of your clients:
   recommend
   [`@graphile/simplify-inflection`](https://www.npmjs.com/package/@graphile/simplify-inflection)
   if your database schema meets the requirements).
+- Use third party plugins to add new features and capabilities.
 - And much more!
-
-PostGraphile handles the repetitive parts, so you can focus on code that really
-brings value.
 
 ## Execution efficiency
 
@@ -68,7 +69,7 @@ advantages of our fully-planned execution.
 ## Extensible
 
 Your GraphQL schema should generally not be a 1-to-1 map of your database;
-GraphQL is frontend-focussed, so your API should be shaped by client needs.
+GraphQL is frontend-focused, so your API should be shaped by client needs.
 
 In practice, many of your business domain objects naturally align across the
 frontend, backend, and database; spending a moment applying tags and creating
