@@ -125,9 +125,9 @@ If your business logic is more complex, you could instead achieve this via a
 schema extension; this also allows for more advanced logic such as querying an
 external service to determine shipping costs.
 
-Let's imagine we didn't add the above function, and instead want to implement
-the logic in a plugin, along with adding cart "summary" logic (subtotal,
-shipping, tax, total).
+Let's imagine we didn't add the above database function, and instead want to
+implement the logic in TypeScript, along with adding cart "summary" logic
+(subtotal, shipping, tax, total).
 
 ```ts
 import { extendSchema } from "postgraphile/utils";
