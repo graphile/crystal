@@ -74,7 +74,7 @@ export default function Home() {
     >
       <ReleaseBanner
         title={`PostGraphile V5 is here!`}
-        primaryLink={`/news/2026-03-23-v5-published/`}
+        primaryLink={`/news/2026-03-24-v5-published/`}
         primaryButtonText={`And more — see the announcement!`}
         secondaryLink={`/postgraphile/5/migrating-from-v4/`}
         secondaryButtonText={<>V4&rarr;V5 Migration Guide</>}
