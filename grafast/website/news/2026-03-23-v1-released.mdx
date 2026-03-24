@@ -22,35 +22,34 @@ costs and failure modes of traditional resolvers.
 </div>
 
 Many don’t realise just how costly traditional GraphQL execution can be until
-it’s too late. The GraphQL specification outlines a
-reference execution algorithm, but implementations may use any solution so long
-as the perceived result is equivalent. GraphQL.js — the GraphQL reference implementation —
-follows the reference
-execution algorithm nearly verbatim, passing the problems of the depth-first
-“resolver” pattern down to consumers instead of tackling them in-house.
+it’s too late. The GraphQL specification outlines a reference execution
+algorithm that focusses on being clear and instructive rather than efficient,
+but implementations may use any solution so long as the perceived result is
+equivalent. GraphQL.js — the GraphQL reference implementation — follows the
+reference execution algorithm nearly verbatim, passing the problems of the
+depth-first “resolver” pattern down to consumers.
 
-Gra*fast*, however, is a complete, spec-compliant replacement execution algorithm. Instead
-of the myopic, uncoordinated, resolver-based execution model of GraphQL.js, Gra*fast*
-takes a holistic approach by planning the full request before executing it.
+Gra*fast* is a radical alternative execution algorithm focussing on efficiency
+and performance. Instead of the myopic, uncoordinated, resolver-based execution
+model of GraphQL.js, Gra*fast* takes a holistic approach by planning the full
+request before executing it, whilst being sure to keep the perceived result
+equivalent for spec compliance.
 
 When an operation is seen for the first time, planning begins: each field
 indicates its data needs and planned execution steps via synchronous “plan
 resolvers”. The resulting plan is then deduplicated and optimized so that the
 minimal number of steps, each backed by a batched function, are scheduled for
-execution. This final plan can be re-used for future requests that perform the
-same operation[^1].
-
-[^1]:
-    Even with different variables and context, so long as they’re compatible
-    with the plan’s assertions (such as `@skip` and `@include`).
+execution. This final plan can be re-used for compatible future requests.
 
 When executing the plan, the number of calls to these functions is
 independent of the size of the various lists, no matter how deeply they are
 nested, leading to predictable and scalable execution.
 
-### No more backend over- and under-fetching.
+### Greater efficiency throughout the stack
 
-Eliminate the N+1 problem, reduce
+Gra*fast* isn't just about making GraphQL execution itself more efficient; it
+aims to **reduce computation costs and latency across your entire backend stack**.
+No more backend over- and under-fetching. Eliminate the N+1 problem, reduce
 round-trips, and cut serialization/deserialization costs by fetching less data
 from your datastores.
 
@@ -59,9 +58,14 @@ calls in nested lists. Gra*fast* even reduces event loop tick counts, eliminates
 per-request AST traversal, and produces the JSON payload directly without
 intermediate objects.
 
-**If Gra*fast* sounds like a great fit, you can even try it out with an existing project by
-using its resolver compatibility layer**, [find out how to use Gra*fast* with an existing project
-in the documentation](/grafast/getting-started/existing-schema).
+### Backwards compatible
+
+Gra*fast* has a resolver compatibility layer that means that many existing
+GraphQL.js projects can move directly to Gra*fast*. The requirements for
+existing schemas to be compatible with Gra*fast* are outline in the 
+[using Gra*fast* with an existing GraphQL.js
+project documentation](/grafast/getting-started/existing-schema). We hope to
+expand this compatibility to cover more esoteric resolvers over time.
 
 {/* truncate */}
 
@@ -143,7 +147,7 @@ in the amount of data sent over the wire on the backend, but more importantly
 it’s **less data to serialize/deserialize on our infrastructure, reducing our
 compute costs and latency**.
 
-### Batched by default
+### Batched by design
 
 Gra*fast* uses batch execution, so it calls once into your business logic to get
 the products, and once to get all of the variants across all of the products.
@@ -198,7 +202,7 @@ batching automatically since it understands the full lifecycle of the request.
 
 ### Easy to optimize
 
-To further optimize, the loader callback can be wrapped in an object and indicate
+To further optimize, the loader callback can be wrapped in an object which indicates
 to Gra*fast* its supported features. For example, support for
 limit/offset pagination can be indicated via `paginationSupport: { offset: true }`:
 
@@ -235,6 +239,8 @@ built-in steps designed to work with any datasource; you can build your own
 custom steps with not much more effort than creating a `DataLoader` instance.
 Custom steps can enable improved DX and more advanced optimizations (think:
 deduplication, eager loading, one-time preparation, caching and more).
+
+### Embrace efficient execution
 
 **Stop papering over the cracks in GraphQL execution** with DataLoader,
 lookahead, and dodgy ResolveInfo hacks; instead **embrace a new paradigm with
