@@ -74,9 +74,9 @@ GraphQL is frontend-focused, so in most cases your API should be shaped by
 client needs rather than being a simple 1-to-1 map of your database.
 PostGraphile helps you achieve this with minimal effort.
 
-In practice, many of your business domain objects naturally align across the
-frontend, backend, and database; for these, a few tags or helper functions are
-typically sufficient to accommodate minor differences.
+Many of your business domain objects will naturally align across the frontend,
+backend, and database; for these, a few tags or helper functions are typically
+sufficient to accommodate minor differences.
 
 For domains that don't fit that model, PostGraphile is built with extensibility
 and composability at its heart. You can seamlessly adjust the schema to fit,
