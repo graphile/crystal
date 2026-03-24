@@ -48,7 +48,7 @@ const FeatureList = [
     link: "/pg-introspection/",
     description: (
       <>
-        A strongly typed PostgreSQL introspection library for PostgresSQL built
+        A strongly typed PostgreSQL introspection library for PostgreSQL built
         automatically from the PostgreSQL documentation.
       </>
     ),
