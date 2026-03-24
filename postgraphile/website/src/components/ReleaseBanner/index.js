@@ -4,11 +4,16 @@ import V5Image from "@site/static/img/celebration.svg";
 
 import clsx from "clsx";
 
-import { library } from "@fortawesome/fontawesome-svg-core"; // Import the library component.
-import { fas } from "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
+import {
+  faRocket,
+  faEject,
+  faMasksTheater,
+  faSeedling,
+  faPalette,
+  faGears,
+  faDumbbell,
+} from "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // Import the FontAwesomeIcon component.
-
-library.add(fas);
 
 export default function ReleaseBanner({
   title,
@@ -32,43 +37,43 @@ export default function ReleaseBanner({
             <ul className={styles.bannerProse}>
               <li>
                 <a href="/postgraphile/5/grafast-for-postgraphile-users">
-                  <Icon icon="fa-solid fa-rocket" size="lg" />
+                  <Icon icon={faRocket} size="lg" />
                   Gra<em>fast</em> engine reduces database load
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/exporting-schema">
-                  <Icon icon="fa-solid fa-eject" size="lg" />
+                  <Icon icon={faEject} size="lg" />
                   &ldquo;Eject&rdquo; function for evolution and serverless
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/polymorphism">
-                  <Icon icon="fa-solid fa-masks-theater" size="lg" />
+                  <Icon icon={faMasksTheater} size="lg" />
                   Abstract types (interfaces and unions)
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/extend-schema">
-                  <Icon icon="fa-solid fa-seedling" size="lg" />
+                  <Icon icon={faSeedling} size="lg" />
                   Simpler, smoother and safer <tt>extendSchema()</tt>
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/customization-overview">
-                  <Icon icon="fa-solid fa-palette" size="lg" />
+                  <Icon icon={faPalette} size="lg" />
                   More customizable; make it your own!
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/config/">
-                  <Icon icon="fa-solid fa-gears" size="lg" />
+                  <Icon icon={faGears} size="lg" />
                   Overhauled configuration and plugin system
                 </a>
               </li>
               <li>
                 <a href="/postgraphile/5/requirements#typescript-v500-optional">
-                  <Icon icon="fa-solid fa-dumbbell" size="lg" />
+                  <Icon icon={faDumbbell} size="lg" />
                   Stronger types throughout; even plugins
                 </a>
               </li>
