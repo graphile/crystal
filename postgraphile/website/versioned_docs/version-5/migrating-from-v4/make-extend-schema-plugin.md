@@ -178,6 +178,112 @@ Please refer to the
 [@dataplan/pg](https://grafast.org/grafast/step-library/dataplan-pg/)
 documentation for additional details.
 
+## `@pgSubscription`
+
+In V4, `@pgSubscription` (from `@graphile/pg-pubsub`) let you embed a topic
+generator in SDL. In V5, you should remove this directive and instead place the
+logic into a Gra*fast* `subscribePlan` using `listen(...)`.
+
+V4:
+
+```ts
+import { makeExtendSchemaPlugin, gql, embed } from "graphile-utils";
+
+const currentUserTopicFromContext = async (_args, context) => {
+  if (!context.jwtClaims?.user_id) throw new Error("You're not logged in");
+  return `graphql:user:${context.jwtClaims.user_id}`;
+};
+
+export default makeExtendSchemaPlugin(() => ({
+  typeDefs: gql`
+    extend type Subscription {
+      currentUserUpdated: UserSubscriptionPayload
+        @pgSubscription(topic: ${embed(currentUserTopicFromContext)})
+    }
+
+    type UserSubscriptionPayload {
+      user: User
+      event: String
+    }
+
+  `,
+  resolvers: {
+    UserSubscriptionPayload: {
+      user(event) {
+        /* ... */
+      },
+    },
+  },
+}));
+```
+
+V5:
+
+```ts
+import { extendSchema } from "postgraphile/utils";
+
+export default extendSchema((build) => {
+  const {
+    grafast: { context, get, listen, lambda },
+    dataplanJson: { jsonParse },
+    pgResources: { users },
+  } = build;
+
+  return {
+    typeDefs: /* GraphQL */ `
+      extend type Subscription {
+        currentUserUpdated: UserSubscriptionPayload
+      }
+
+      type UserSubscriptionPayload {
+        user: User
+        event: String
+      }
+    `,
+    objects: {
+      Subscription: {
+        plans: {
+          currentUserUpdated: {
+            subscribePlan(_$root, _args) {
+              const $pgSubscriber = context().get("pgSubscriber");
+              const $userId = get(context().get("jwtClaims"), "user_id");
+              const $topic = lambda($id, (id) => `graphql:user:${id}`);
+              return listen($pgSubscriber, $topic, jsonParse);
+            },
+            plan($event) {
+              return $event;
+            },
+          },
+        },
+      },
+      UserSubscriptionPayload: {
+        plans: {
+          user($payload) {
+            const $id = get($payload, "subject");
+            return users.get({ id: $id });
+          },
+        },
+      },
+    },
+  };
+});
+```
+
+The key migration point is that topic selection is now plain code in
+`subscribePlan`, rather than directive metadata.
+
+If your V4 topic came from field arguments, use `fieldArgs.getRaw(...)` in
+`subscribePlan`:
+
+```ts
+const $forumId = fieldArgs.getRaw("forumId");
+```
+
+Then use that step when constructing your `$topic`.
+
+For more subscription guidance, see [Realtime](../realtime) and
+[Subscriptions](../subscriptions).
+
 ## `selectGraphQLResultFromTable`
 
 In Version 4, this method was needed to kick off a "look-ahead" enhanced data

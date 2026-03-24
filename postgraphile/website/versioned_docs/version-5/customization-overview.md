@@ -186,6 +186,10 @@ behavior, these include:
   Relay-centric GraphQL schema; in particular this turns off things like primary
   keys and tries to make it so the system uses [GraphQL global object
   identifiers](./node-id) everywhere
+- `postgraphile/presets/minify` - an experimental preset for schema exporting
+  workflows (particularly those targetting serverless) that _destructively_
+  strips schema descriptions/deprecations and registry metadata to reduce export
+  size
 
 As mentioned above, your `graphile.config.ts` (or similar) file itself defines
 a preset.
