@@ -63,7 +63,7 @@ intermediate objects.
 
 Gra*fast* has a resolver compatibility layer that means that many existing
 GraphQL.js projects can move directly to Gra*fast*. The requirements for
-existing schemas to be compatible with Gra*fast* are outline in the 
+existing schemas to be compatible with Gra*fast* are outline in the
 [using Gra*fast* with an existing GraphQL.js
 project documentation](/grafast/getting-started/existing-schema). We hope to
 expand this compatibility to cover more esoteric resolvers over time.
@@ -178,17 +178,21 @@ export const schema = makeGrafastSchema({
   `,
   plans: {
     Query: {
+      // highlight-start
       products(_, fieldArgs) {
         const $products = loadMany(null, batchLoadProducts);
         return connection($products, { fieldArgs });
       },
+      // highlight-end
     },
     Product: {
+      // highlight-start
       variants($product, fieldArgs) {
         const $productId = get($product, "id");
         const $variants = loadMany($productId, batchLoadVariantsByProductId);
         return connection($variants, { fieldArgs });
       },
+      // highlight-end
     },
   },
 });
@@ -211,18 +215,22 @@ limit/offset pagination can be indicated via `paginationSupport: { offset: true 
 export const batchLoadVariantsByProductId = {
   name: "batchLoadVariantsByProductId",
 
+  // highlight-next-line
   paginationSupport: { offset: true },
 
   async load(productIds, info) {
     const {
       attributes,
+      // highlight-next-line
       params: { limit, offset },
     } = info;
 
     // Implementing business logic is left as an exercise to the reader
     const variantsByProductId = await getVariantsFromBusinessLogic({
       productIds,
+      // highlight-next-line
       limit,
+      // highlight-next-line
       offset,
       attributes,
     });
