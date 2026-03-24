@@ -38,12 +38,11 @@ can then maintain yourself ─ there's no lock-in.
 PostGraphile doesn't have to be (and generally should not be) a “1-to-1 map” of
 your database.
 
-Whilst its common for a significant portion of your data model to
-remain unchanged all the way from database to frontend, that's not true of every
-resource. Thus, PostGraphile gives you a wide array of tools and techniques to
-shape your schema in the way that makes sense for your frontend, whilst still
-eliminating unnecessary work for the parts of your datamodel that are standard
-and consistent throughout the stack.
+Whilst its common for a significant portion of your data model to remain broadly
+aligned from database through to frontend, that's not true of every resource.
+Thus, PostGraphile gives you a wide array of tools and techniques to sculpt your
+schema to fit frontend needs, whilst still eliminating unnecessary work for the
+parts of your data model that are standard and consistent throughout the stack.
 
 PostGraphile automatically reflects the permissions in your database and only
 exposes the tables, columns, functions and mutations that are granted to it.
