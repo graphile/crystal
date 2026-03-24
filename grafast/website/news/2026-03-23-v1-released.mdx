@@ -30,10 +30,11 @@ reference execution algorithm nearly verbatim, passing the problems of the
 depth-first “resolver” pattern down to consumers.
 
 Gra*fast* is a radical alternative execution algorithm focussing on efficiency
-and performance. Instead of the myopic resolver model of GraphQL.js which has
-limited coordination, Gra*fast* takes a holistic approach by planning the full
-request before executing it, whilst being sure to keep the perceived result
-equivalent for spec compliance.
+throughout the stack. Instead of the myopic resolver model of GraphQL.js which
+has limited coordination with business logic, Gra*fast* takes a holistic
+approach by planning the full request and optimizing business logic integration
+before executing it, whilst being sure to keep the perceived result equivalent
+for spec compliance.
 
 When an operation is seen for the first time, planning begins: each field
 indicates its data needs and planned execution steps via synchronous “plan
