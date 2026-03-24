@@ -26,9 +26,10 @@ really matters.
 
 Out of the box, PostGraphile analyzes your PostgreSQL database and builds a
 complete, consistent GraphQL schema informed by its tables, relations,
-functions, indexes, permissions, and your configuration. This schema evolves
-alongside your database, and seamlessly composes your customizations and
-extensions into it so you can meet client needs with minimal effort:
+functions, indexes, permissions, and your configuration. Into this living
+baseline that evolves with your database, you seamlessly compose customizations
+and extensions to sculpt the perfect GraphQL API for your client's needs with
+minimal effort:
 
 - Seamlessly extend the schema with your own custom types and fields that can
   execute SQL or Node.js code (see "Extensible" below).
