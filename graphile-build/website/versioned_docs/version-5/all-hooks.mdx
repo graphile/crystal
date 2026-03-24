@@ -1,0 +1,128 @@
+---
+layout: page
+path: /graphile-build/all-hooks/
+title: All Hooks
+sidebar_position: 4
+---
+
+## Registering a schema hook
+
+Registering a hook is done via a graphile-config plugin via the
+`plugin.schema.hooks.*` object:
+
+```ts
+import type {} from "graphile-build";
+
+export const ExampleFieldsHookPlugin: GraphileConfig.Plugin = {
+  name: "ExampleFieldsHookPlugin",
+  schema: {
+    hooks: {
+      // Hooks go here, e.g.:
+      GraphQLObjectType_fields(fields, build, context) {
+        // ...
+        return fields;
+      },
+    },
+  },
+};
+```
+
+See [AllHooksNoopPlugin](#allhooksnoopplugin) for a more complete example.
+
+## Hook list
+
+The following hooks are currently supported:
+
+- `build`: Extend the `build` object. Do not construct GraphQL types here.
+- `init`: Register types via `build.registerType`.
+- `GraphQLSchema`: Configure the schema root types and options.
+- `GraphQLSchema_types`: Add named types that are not otherwise referenced
+  (typically interface implementations).
+- `GraphQLObjectType`: Extend object type configuration.
+- `GraphQLObjectType_interfaces` (deferred): Add interfaces to the object type.
+- `GraphQLObjectType_fields` (deferred): Add fields to the object type.
+- `GraphQLObjectType_fields_field`: Adjust a single field config.
+- `GraphQLObjectType_fields_field_args`: Add arguments to the field.
+- `GraphQLObjectType_fields_field_args_arg`: Adjust a single argument config.
+- `GraphQLInputObjectType`: Extend input object configuration.
+- `GraphQLInputObjectType_fields` (deferred): Add fields to the input object.
+- `GraphQLInputObjectType_fields_field`: Adjust a single input field config.
+- `GraphQLEnumType`: Extend enum configuration.
+- `GraphQLEnumType_values` (deferred): Add or adjust enum values.
+- `GraphQLEnumType_values_value`: Adjust a single enum value config.
+- `GraphQLUnionType`: Extend union configuration.
+- `GraphQLUnionType_types` (deferred): Add types to the union.
+- `GraphQLInterfaceType`: Extend interface configuration.
+- `GraphQLInterfaceType_interfaces` (deferred): Add interfaces to the interface.
+- `GraphQLInterfaceType_fields` (deferred): Add fields to the interface.
+- `GraphQLInterfaceType_fields_field`: Adjust a single field config.
+- `GraphQLInterfaceType_fields_field_args`: Add arguments to the field.
+- `GraphQLInterfaceType_fields_field_args_arg`: Adjust a single argument config.
+- `GraphQLScalarType`: Extend scalar configuration.
+- `finalize`: Perform assertions, or inspect/wrap/replace the built schema.
+
+Children of a hook run during the parent hook (unless deferred).
+
+The deferred hooks are called after the type instance is constructed (GraphQL
+uses a thunk callback), which allows for cyclic references or referencing the
+type itself via `context.Self`. GraphQL calls the thunk when the relevant
+property is needed, which can still be in the same tick.
+
+## Specification
+
+The first argument to each hook is the "specification" that is to be
+manipulated. For most hooks this will be an object, but for some it will be an
+array. Here's the specification type for each hook:
+
+- `build` - `Build` (the current build object)
+- `init` - `Record<string, never>` (an empty object)
+- `GraphQLSchema` - [`GraphQLSchemaConfig`][graphql-schema]
+- `GraphQLSchema_types` - `GraphQLNamedType[]`
+- `GraphQLObjectType` - `GraphileBuild.GrafastObjectTypeConfig`
+- `GraphQLObjectType_interfaces` - [`GraphQLInterfaceType[]`][graphql-interface]
+- `GraphQLObjectType_fields` - `GraphileBuild.GrafastFieldConfigMap`
+- `GraphQLObjectType_fields_field` - `GraphileBuild.GrafastFieldConfig`
+- `GraphQLObjectType_fields_field_args` -
+  `GraphileBuild.GrafastFieldConfigArgumentMap`
+- `GraphQLObjectType_fields_field_args_arg` -
+  `GraphileBuild.GrafastArgumentConfig`
+- `GraphQLInputObjectType` - `GraphileBuild.GrafastInputObjectTypeConfig`
+- `GraphQLInputObjectType_fields` -
+  [`GraphQLInputFieldConfigMap`][graphql-input]
+- `GraphQLInputObjectType_fields_field` -
+  `GraphileBuild.GrafastInputFieldConfig`
+- `GraphQLEnumType` - [`GraphQLEnumTypeConfig`][graphql-enum]
+- `GraphQLEnumType_values` - [`GraphQLEnumValueConfigMap`][graphql-enum]
+- `GraphQLEnumType_values_value` - [`GraphQLEnumValueConfig`][graphql-enum]
+- `GraphQLUnionType` - `GraphileBuild.GrafastUnionTypeConfig`
+- `GraphQLUnionType_types` - [`GraphQLObjectType[]`][graphql-object]
+- `GraphQLInterfaceType` - `GraphileBuild.GrafastInterfaceTypeConfig`
+- `GraphQLInterfaceType_interfaces` -
+  [`GraphQLInterfaceType[]`][graphql-interface]
+- `GraphQLInterfaceType_fields` - [`GraphQLFieldConfigMap`][graphql-object]
+- `GraphQLInterfaceType_fields_field` - [`GraphQLFieldConfig`][graphql-object]
+- `GraphQLInterfaceType_fields_field_args` -
+  [`GraphQLFieldConfigArgumentMap`][graphql-object]
+- `GraphQLInterfaceType_fields_field_args_arg` -
+  [`GraphQLArgumentConfig`][graphql-object]
+- `GraphQLScalarType` - [`GraphQLScalarTypeConfig`][graphql-scalar]
+- `finalize` - [`GraphQLSchema`][graphql-schema]
+
+## AllHooksNoopPlugin
+
+This plugin doesn't do anything, it's merely present to demonstrate the usage of
+the various hooks.
+
+import pluginSource from "!!raw-loader!@site/../graphile-build/src/AllHooksNoopPlugin.ts";
+import CodeBlock from "@theme/CodeBlock";
+
+<CodeBlock language="ts">
+{pluginSource.replace(/^[\s\S]*?\/\*{10,}\//, '').trim()}
+</CodeBlock>
+
+[graphql-schema]: https://graphql.org/graphql-js/type/#graphqlschema
+[graphql-interface]: https://graphql.org/graphql-js/type/#graphqlinterfacetype
+[graphql-input]: https://graphql.org/graphql-js/type/#graphqlinputobjecttype
+[graphql-enum]: https://graphql.org/graphql-js/type/#graphqlenumtype
+[graphql-object]: https://graphql.org/graphql-js/type/#graphqlobjecttype
+[graphql-scalar]: https://graphql.org/graphql-js/type/#graphqlscalartype
