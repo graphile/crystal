@@ -1,5 +1,9 @@
 # @dataplan/json
 
+## 1.0.0
+
+Identical to 1.0.0-rc.6.
+
 ## 1.0.0-rc.6
 
 ### Patch Changes

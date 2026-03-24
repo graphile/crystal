@@ -1,5 +1,9 @@
 # ruru-components
 
+## 2.0.0
+
+Identical to 2.0.0-rc.7.
+
 ## 2.0.0-rc.7
 
 ### Patch Changes

@@ -1,5 +1,9 @@
 # tamedevil
 
+## 0.1.0
+
+Identical to 0.1.0-rc.6.
+
 ## 0.1.0-rc.6
 
 ### Patch Changes

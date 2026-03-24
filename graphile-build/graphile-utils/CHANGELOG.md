@@ -1,5 +1,9 @@
 # graphile-utils
 
+## 5.0.0
+
+Identical to 5.0.0-rc.8.
+
 ## 5.0.0-rc.8
 
 ### Patch Changes
