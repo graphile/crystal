@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+import "zx/globals";
+
 import { rm, cp, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,3 +16,4 @@ await writeFile(
   `${__dirname}/../versioned_sidebars/version-5-sidebars.json`,
   JSON.stringify(sidebars, null, 2) + "\n",
 );
+await $`git add versioned_docs versioned_sidebars`;
