@@ -1,5 +1,0 @@
----
-"grafast": patch
----
-
-Internal refactoring

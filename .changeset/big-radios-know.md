@@ -1,5 +1,0 @@
----
-"grafast": patch
----
-
-`EnumValueInput` type.
