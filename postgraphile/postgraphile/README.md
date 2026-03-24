@@ -33,8 +33,8 @@ minimal effort:
 
 - Seamlessly extend the schema with your own custom types and fields that can
   execute SQL or Node.js code (see "Extensible" below).
-- Use database permissions to govern which parts of your schema to expose; it's
-  quick, ergonomic, granular, and it improves your security posture.
+- Use database permissions to govern which parts to expose; it's quick,
+  ergonomic, granular, and it improves your security posture.
 - Use our powerful plugin and preset system to apply your general preferences to
   the generated GraphQL schema.
 - Use simple "tags" to fine-tune individual database entities: renaming them,
