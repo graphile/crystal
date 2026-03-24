@@ -26,3 +26,14 @@ rc2latest ruru-components
 rc2latest ruru-types
 rc2latest tamedevil
 
+# V5 release
+rc2latest @graphile/lru
+rc2latest graphile-build
+rc2latest graphile-build-pg
+rc2latest graphile-utils
+rc2latest pg-sql2
+rc2latest postgraphile
+rc2latest postgraphile-plugin-connection-filter
+rc2latest @graphile/pg-aggregates
+rc2latest @graphile-contrib/pg-many-to-many
+rc2latest @graphile-contrib/postgraphile-plugin-fulltext-filter

@@ -1,0 +1,103 @@
+.banner {
+  background-color: var(--ifm-color-primary-darker);
+  color: var(--ifm-color-primary-lightest);
+}
+
+.banner h2 {
+  font-weight: bold;
+}
+
+.bannerRow {
+  align-items: center;
+  justify-content: center;
+}
+
+.inner {
+  text-align: center;
+}
+
+.header {
+  composes: header from "@site/src/css/common.module.css";
+  font-size: 2rem;
+}
+
+.bannerProse li {
+  list-style-type: none;
+  margin: 0.5rem;
+  a {
+    color: #def;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.25);
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  svg {
+    margin-right: 0.5rem;
+  }
+}
+
+.bannerProse,
+.bannerProseStrong {
+  font-size: var(--ifm-h3-font-size);
+  line-height: var(--ifm-heading-line-height);
+  text-align: left;
+}
+
+.bannerProseStrong {
+  font-weight: var(--ifm-heading-font-weight);
+}
+
+.button,
+.outlineButton {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.1rem;
+  border-radius: 7px;
+  margin-left: 1em;
+  margin-right: 1em;
+  border-color: var(--ifm-color-primary-lightest);
+}
+
+.button {
+  color: var(--ifm-color-primary-darkest);
+  background: var(--ifm-color-primary-lightest);
+}
+
+.button:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.outlineButton {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.outlineButton:hover {
+  background: var(--ifm-color-primary-dark);
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.progressLink {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .progressLink {
+  color: var(--ifm-color-primary-darker);
+}
+
+.progressBarContainer {
+  width: 100%;
+  margin: auto;
+  margin-top: none;
+}
+
+.v5Image {
+  max-width: 70%;
+  height: auto;
+}

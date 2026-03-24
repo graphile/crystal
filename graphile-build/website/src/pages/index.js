@@ -25,7 +25,7 @@ function HomepageHeader() {
                   "button button--primary button--lg margin-left--none margin-right--md",
                   styles.buttonHero,
                 )}
-                to="/graphile-build/"
+                to="/graphile-build/5"
               >
                 Documentation
               </Link>

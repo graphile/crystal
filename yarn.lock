@@ -3175,7 +3175,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@docusaurus/plugin-content-docs@npm:3.9.2, @docusaurus/plugin-content-docs@npm:^3.9.2":
+"@docusaurus/plugin-content-docs@npm:3.9.2":
   version: 3.9.2
   resolution: "@docusaurus/plugin-content-docs@npm:3.9.2"
   dependencies:
@@ -3201,6 +3201,35 @@ __metadata:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
   checksum: 10/5a3fb39a1add1f5db8aabd03b56f65e988a776d5983def89b6b4f17ab0c78dd4de255aab080a082aa8e7e7915da1705277148789fada56d9c6d9ad8f468e784e
+  languageName: node
+  linkType: hard
+
+"@docusaurus/plugin-content-docs@patch:@docusaurus/plugin-content-docs@npm%3A3.9.2#~/.yarn/patches/@docusaurus-plugin-content-docs-npm-3.9.2-65ef413098.patch":
+  version: 3.9.2
+  resolution: "@docusaurus/plugin-content-docs@patch:@docusaurus/plugin-content-docs@npm%3A3.9.2#~/.yarn/patches/@docusaurus-plugin-content-docs-npm-3.9.2-65ef413098.patch::version=3.9.2&hash=91c977"
+  dependencies:
+    "@docusaurus/core": "npm:3.9.2"
+    "@docusaurus/logger": "npm:3.9.2"
+    "@docusaurus/mdx-loader": "npm:3.9.2"
+    "@docusaurus/module-type-aliases": "npm:3.9.2"
+    "@docusaurus/theme-common": "npm:3.9.2"
+    "@docusaurus/types": "npm:3.9.2"
+    "@docusaurus/utils": "npm:3.9.2"
+    "@docusaurus/utils-common": "npm:3.9.2"
+    "@docusaurus/utils-validation": "npm:3.9.2"
+    "@types/react-router-config": "npm:^5.0.7"
+    combine-promises: "npm:^1.1.0"
+    fs-extra: "npm:^11.1.1"
+    js-yaml: "npm:^4.1.0"
+    lodash: "npm:^4.17.21"
+    schema-dts: "npm:^1.1.2"
+    tslib: "npm:^2.6.0"
+    utility-types: "npm:^3.10.0"
+    webpack: "npm:^5.88.1"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10/95f5a2554d70e852132931e69de62e23f9ce35d8c766148a80b7dd3116772cc3c842f734bb95e530a70b96ebf490e67d10db117d765cea89eddfaff2d5f37297
   languageName: node
   linkType: hard
 
@@ -5839,7 +5868,7 @@ __metadata:
     "@codemirror/view": "npm:^6.38.8"
     "@docusaurus/core": "npm:^3.9.2"
     "@docusaurus/module-type-aliases": "npm:^3.9.2"
-    "@docusaurus/plugin-content-docs": "npm:^3.9.2"
+    "@docusaurus/plugin-content-docs": "patch:@docusaurus/plugin-content-docs@npm%3A3.9.2#~/.yarn/patches/@docusaurus-plugin-content-docs-npm-3.9.2-65ef413098.patch"
     "@docusaurus/preset-classic": "npm:^3.9.2"
     "@docusaurus/remark-plugin-npm2yarn": "npm:^3.9.2"
     "@docusaurus/theme-common": "npm:^3.9.2"
@@ -15068,9 +15097,9 @@ __metadata:
   linkType: hard
 
 "graphql@npm:^16.9.0":
-  version: 16.12.0
-  resolution: "graphql@npm:16.12.0"
-  checksum: 10/e299bc97cca178e549c8c1ed4cb164f631f07be987d3657f76cdf18c0250040cc0d456d4b6d41c87b855cac97b15a62ed345557527efcb0546492895a893bb87
+  version: 16.13.2
+  resolution: "graphql@npm:16.13.2"
+  checksum: 10/9ede86f0a7227d47a41e2076e0132839f66fbd14899abfd818d7de2ab81076ee249c8788ad42243367d68a027a8763cc4c7be2e441ccfb03a8549490c7b66c2f
   languageName: node
   linkType: hard
 

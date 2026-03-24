@@ -1,0 +1,20 @@
+diff --git a/lib/versions/version.js b/lib/versions/version.js
+index a3e1ab6d6e8fa7c2b480493682c22397d071a25f..4615b2684d1c86331552a88c15a9ff9ad409dcd2 100644
+--- a/lib/versions/version.js
++++ b/lib/versions/version.js
+@@ -142,12 +142,12 @@ async function createVersionMetadata(context) {
+ /**
+  * Filter versions according to provided options (i.e. `onlyIncludeVersions`).
+  *
+- * Note: we preserve the order in which versions are provided; the order of the
+- * `onlyIncludeVersions` array does not matter
++ * Note: to work around object ordering limitations relating to numeric keys,
++ * the order of `onlyIncludeVersions` overrides that of the versions object.
+  */
+ function filterVersions(versionNamesUnfiltered, options) {
+     if (options.onlyIncludeVersions) {
+-        return versionNamesUnfiltered.filter((name) => options.onlyIncludeVersions.includes(name));
++        return options.onlyIncludeVersions.filter((name) => versionNamesUnfiltered.includes(name));
+     }
+     return versionNamesUnfiltered;
+ }

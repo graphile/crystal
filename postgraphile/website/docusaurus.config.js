@@ -13,7 +13,8 @@ const editUrl = `https://github.com/${organizationName}/${projectName}/tree/${ma
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "PostGraphile",
-  tagline: "Extensible high-performance automatic GraphQL API for PostgresSQL",
+  tagline:
+    "Extensible high-performance GraphQL APIs backed primarily by PostgreSQL",
   url: "https://postgraphile.org",
   baseUrl: "/",
   onBrokenLinks: "throw",
@@ -48,13 +49,31 @@ const config = {
           remarkPlugins: [
             [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
           ],
-          lastVersion: "latest",
+          editCurrentVersion: true,
+          lastVersion: "5",
           //includeCurrentVersion: false,
+          onlyIncludeVersions: ["current", "5", "4"],
           versions: {
-            latest: { label: "Current" },
-            4: { label: "v4 (current)", banner: "none" },
-            5: { label: "v5 (rc)", banner: "unreleased" },
-            current: { label: "Draft" },
+            current: {
+              noIndex: true,
+              path: "next/",
+              badge: false,
+              label: "🚧 Preview",
+              banner: "unreleased",
+            },
+            // latest: { noIndex: true, path: "", label: "Current", banner: "none" },
+            5: {
+              path: "5/",
+              badge: false,
+              label: "v5.x",
+              banner: "none",
+            },
+            4: {
+              path: "4/",
+              badge: true,
+              label: "v4.x",
+              banner: "none" /* later: unmaintained */,
+            },
           },
         },
         pages: {
@@ -127,14 +146,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      announcementBar: {
-        id: "announcementBar-2",
-        content:
-          "This documentation is a work in progress, please forgive gaps, and feel free to send pull requests!",
-        //backgroundColor: "#fafbfc",
-        //textColor: "#091E42",
-        isCloseable: false,
-      },
       navbar: {
         title: "PostGraphile",
         logo: {

@@ -97,6 +97,7 @@
   "packageManager": "yarn@4.12.0",
   "resolutions": {
     "@changesets/apply-release-plan@npm:^7.0.13": "patch:@changesets/apply-release-plan@npm%3A7.0.13#~/.yarn/patches/@changesets-apply-release-plan-npm-7.0.13-14603bf9e7.patch",
+    "@docusaurus/plugin-content-docs@npm:3.9.2": "patch:@docusaurus/plugin-content-docs@npm%3A3.9.2#~/.yarn/patches/@docusaurus-plugin-content-docs-npm-3.9.2-65ef413098.patch",
     "graphql": "^16.9.0"
   },
   "dependencies": {

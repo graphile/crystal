@@ -16,7 +16,7 @@ resolvers and DataLoader.
 
 An example of a system build with Graphile Build is
 [PostGraphile](https://postgraphile.org), which automatically builds a high performance,
-highly customizeable, and best practices GraphQL API from your PostgreSQL
+highly customizable, and best practices GraphQL API from your PostgreSQL
 database.
 
 ## Automatically build GraphQL objects and fields through database introspection

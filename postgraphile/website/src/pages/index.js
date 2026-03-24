@@ -6,7 +6,7 @@ import HomepageTestimonials from "@site/src/components/HomepageTestimonials";
 import HomepageTools from "@site/src/components/HomepageTools";
 import SecondarySection from "@site/src/components/SecondarySection";
 import TertiarySection from "@site/src/components/TertiarySection";
-import WarningSection from "@site/src/components/WarningSection";
+import ReleaseBanner from "@site/src/components/ReleaseBanner";
 import styles from "@site/src/pages/index.module.css";
 import HeroImage from "@site/static/img/homepage/coder.svg";
 import Layout from "@theme/Layout";
@@ -52,18 +52,6 @@ function HomepageHeader() {
                 Overview - 5min ⏱
               </Link>
             </div>
-            <div className={clsx("margin-top--md", styles.buttons)}>
-              <Link
-                className={clsx(
-                  "button button--outline button--lg margin-left--none",
-                  styles.buttonHero,
-                  styles.buttonHeroOutline,
-                )}
-                to="/postgraphile/4"
-              >
-                V4 Documentation (legacy)
-              </Link>
-            </div>
           </div>
           <div className="col col--6">
             <HeroImage
@@ -82,12 +70,12 @@ export default function Home() {
   return (
     <Layout
       title={`PostGraphile`}
-      description="Extensible high-performance automatic GraphQL API for PostgreSQL"
+      description="Extensible high-performance GraphQL APIs backed primarily by PostgreSQL"
     >
-      <WarningSection
-        title={`PostGraphile Version 5 Release Candidate`}
-        primaryLink={`/news/2025-10-28-v5-release-candidate/`}
-        primaryButtonText={`RC Announcement`}
+      <ReleaseBanner
+        title={`PostGraphile V5 is here!`}
+        primaryLink={`/news/2026-03-23-v5-published/`}
+        primaryButtonText={`And more — see the announcement!`}
         secondaryLink={`/postgraphile/5/migrating-from-v4/`}
         secondaryButtonText={<>V4&rarr;V5 Migration Guide</>}
       />
