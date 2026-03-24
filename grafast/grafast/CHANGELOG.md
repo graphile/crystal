@@ -4,6 +4,9 @@
 
 Identical to 1.0.0-rc.9.
 
+For details, see the
+**[Gra*fast* v1.0.0 release post](https://postgraphile.org/postgraphile/5/migrating-from-v4/v5-new-feature-summary)**.
+
 ## 1.0.0-rc.9
 
 ### Patch Changes
