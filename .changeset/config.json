@@ -3,12 +3,7 @@
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   },
-  "changelog": [
-    "@changesets/changelog-github",
-    {
-      "repo": "graphile/crystal"
-    }
-  ],
+  "changelog": false,
   "//": {
     "snapshot": {
       "useCalculatedVersion": true
