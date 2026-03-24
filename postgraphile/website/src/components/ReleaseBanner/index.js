@@ -4,9 +4,11 @@ import V5Image from "@site/static/img/celebration.svg";
 
 import clsx from "clsx";
 
-import "@fortawesome/fontawesome-svg-core"; // Import the library component.
-import "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
+import { library } from "@fortawesome/fontawesome-svg-core"; // Import the library component.
+import { fas } from "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // Import the FontAwesomeIcon component.
+
+library.add(fas);
 
 export default function ReleaseBanner({
   title,
