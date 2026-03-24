@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @ts-check
 import { rm, cp, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
