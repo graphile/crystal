@@ -1,5 +1,9 @@
 # @grafserv/persisted
 
+## 1.0.0
+
+Identical to 1.0.0-rc.7.
+
 ## 1.0.0-rc.7
 
 ### Patch Changes

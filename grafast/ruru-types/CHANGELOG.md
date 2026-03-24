@@ -1,5 +1,9 @@
 # ruru-types
 
+## 2.0.0
+
+Identical to 2.0.0-rc.6.
+
 ## 2.0.0-rc.6
 
 ### Patch Changes

@@ -1,5 +1,9 @@
 # eslint-plugin-graphile-export
 
+## 1.0.0
+
+Identical to 1.0.0-rc.5.
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

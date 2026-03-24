@@ -1,5 +1,9 @@
 # grafast
 
+## 1.0.0
+
+Identical to 1.0.0-rc.9.
+
 ## 1.0.0-rc.9
 
 ### Patch Changes

@@ -1,4 +1,8 @@
-# v8.0.0
+# @graphile/simplify-inflection
+
+## 8.0.0
+
+Identical to 8.0.0-rc.5.
 
 ## 8.0.0-rc.5
 

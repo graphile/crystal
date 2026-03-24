@@ -1,5 +1,9 @@
 # graphile
 
+## 5.0.0
+
+Identical to 5.0.0-rc.6.
+
 ## 5.0.0-rc.6
 
 ### Patch Changes

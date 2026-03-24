@@ -1,5 +1,9 @@
 # postgraphile
 
+## 5.0.0
+
+Identical to 5.0.0-rc.10.
+
 ## 5.0.0-rc.10
 
 ### Patch Changes

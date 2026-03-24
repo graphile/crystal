@@ -1,5 +1,9 @@
 # @dataplan/pg
 
+## 1.0.0
+
+Identical to 1.0.0-rc.8.
+
 ## 1.0.0-rc.8
 
 ### Patch Changes

@@ -1,5 +1,9 @@
 # jest-serializer-graphql-schema
 
+## 5.0.0
+
+Identical to 5.0.0-rc.5.
+
 ## 5.0.0-rc.5
 
 ### Patch Changes
