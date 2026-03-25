@@ -59,6 +59,14 @@ function descriptionKey(
   return `${spec.classoid}|${spec.objoid}|${spec.objsubid}`;
 }
 
+function namespaceNameKey(namespaceId: string, name: string | null) {
+  return `${namespaceId}|${name}`;
+}
+
+function attributeRelNumKey(relid: string, attnum: number) {
+  return `${relid}|${attnum}`;
+}
+
 function createLookups(introspection: Omit<Introspection, `_${string}`>) {
   const lookups: Introspection["_lookups"] = {
     oidByCatalog: Object.create(null),
@@ -69,17 +77,24 @@ function createLookups(introspection: Omit<Introspection, `_${string}`>) {
     namespaceByName: new Map(),
     typeById: new Map(),
     classById: new Map(),
+    classByNamespaceName: new Map(),
     rangeByTypid: new Map(),
     attributesByRelId: new Map(),
+    attributeByRelIdAndNum: new Map(),
     constraintById: new Map(),
     constraintsByRelid: new Map(),
+    constraintByNamespaceName: new Map(),
     foreignConstraintsByRelid: new Map(),
     enumById: new Map(),
     enumsByTypid: new Map(),
+    indexById: new Map(),
     indexesByRelid: new Map(),
     descriptionByDescriptionKey: new Map(),
     procById: new Map(),
+    procsByNamespaceName: new Map(),
     extensionById: new Map(),
+    languageById: new Map(),
+    accessMethodById: new Map(),
   };
 
   const {
@@ -91,17 +106,24 @@ function createLookups(introspection: Omit<Introspection, `_${string}`>) {
     namespaceByName,
     typeById,
     classById,
+    classByNamespaceName,
     rangeByTypid,
     attributesByRelId,
+    attributeByRelIdAndNum,
     constraintById,
     constraintsByRelid,
+    constraintByNamespaceName,
     foreignConstraintsByRelid,
     enumById,
     enumsByTypid,
+    indexById,
     indexesByRelid,
     descriptionByDescriptionKey,
     procById,
+    procsByNamespaceName,
     extensionById,
+    languageById,
+    accessMethodById,
   } = lookups;
 
   for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
@@ -116,12 +138,27 @@ function createLookups(introspection: Omit<Introspection, `_${string}`>) {
   }
   for (const entity of introspection.classes) {
     classById.set(entity._id, entity);
+    classByNamespaceName.set(
+      namespaceNameKey(entity.relnamespace, entity.relname),
+      entity,
+    );
   }
   for (const entity of introspection.procs) {
     procById.set(entity._id, entity);
+    addListItem(
+      procsByNamespaceName,
+      namespaceNameKey(entity.pronamespace, entity.proname),
+      entity,
+    );
   }
   for (const entity of introspection.extensions) {
     extensionById.set(entity._id, entity);
+  }
+  for (const entity of introspection.languages) {
+    languageById.set(entity._id, entity);
+  }
+  for (const entity of introspection.am) {
+    accessMethodById.set(entity._id, entity);
   }
   for (const entity of introspection.ranges) {
     if (entity.rngtypid == null) continue;
@@ -147,6 +184,10 @@ function createLookups(introspection: Omit<Introspection, `_${string}`>) {
   // Constraints (sorted)
   for (const entity of introspection.constraints) {
     constraintById.set(entity._id, entity);
+    constraintByNamespaceName.set(
+      namespaceNameKey(entity.connamespace, entity.conname),
+      entity,
+    );
     if (entity.conrelid !== "0") {
       addListItem(constraintsByRelid, entity.conrelid, entity);
     }
@@ -161,6 +202,10 @@ function createLookups(introspection: Omit<Introspection, `_${string}`>) {
   // Attributes (sorted)
   for (const entity of introspection.attributes) {
     addListItem(attributesByRelId, entity.attrelid, entity);
+    attributeByRelIdAndNum.set(
+      attributeRelNumKey(entity.attrelid, entity.attnum),
+      entity,
+    );
   }
   for (const list of attributesByRelId.values()) {
     list.sort((a, z) => a.attnum - z.attnum);
@@ -176,6 +221,7 @@ function createLookups(introspection: Omit<Introspection, `_${string}`>) {
   }
 
   for (const entity of introspection.indexes) {
+    indexById.set(entity.indexrelid, entity);
     addListItem(indexesByRelid, entity.indrelid, entity);
   }
 
@@ -237,17 +283,24 @@ export function augmentIntrospectionParsed(
     namespaceByName,
     typeById,
     classById,
+    classByNamespaceName,
     rangeByTypid,
     attributesByRelId,
+    attributeByRelIdAndNum,
     constraintById,
     constraintsByRelid,
+    constraintByNamespaceName,
     foreignConstraintsByRelid,
     enumById,
     enumsByTypid,
+    indexById,
     indexesByRelid,
     descriptionByDescriptionKey,
     procById,
+    procsByNamespaceName,
     extensionById,
+    languageById,
+    accessMethodById,
   } = introspection._lookups;
 
   if (!includeExtensionResources) {
@@ -369,10 +422,8 @@ export function augmentIntrospectionParsed(
   introspection.getType = (by) => typeById.get(by.id);
   introspection.getEnum = (by) => enumById.get(by.id);
   introspection.getExtension = (by) => extensionById.get(by.id);
-  introspection.getIndex = (by) =>
-    introspection.indexes.find((c) => c.indexrelid === by.id);
-  introspection.getLanguage = (by) =>
-    introspection.languages.find((c) => c._id === by.id);
+  introspection.getIndex = (by) => indexById.get(by.id);
+  introspection.getLanguage = (by) => languageById.get(by.id);
 
   introspection.database._type = "PgDatabase";
   introspection.database.getOwner = memo(() =>
@@ -403,21 +454,11 @@ export function augmentIntrospectionParsed(
     );
 
     entity.getClass = (by) =>
-      introspection.classes.find(
-        (child) =>
-          child.relnamespace === entity._id && child.relname === by.name,
-      );
+      classByNamespaceName.get(namespaceNameKey(entity._id, by.name));
     entity.getConstraint = (by) =>
-      introspection.constraints.find(
-        (child) =>
-          child.connamespace === entity._id && child.conname === by.name,
-      );
-    entity.getProcs = (by) => {
-      return introspection.procs.filter(
-        (child) =>
-          child.pronamespace === entity._id && child.proname === by.name,
-      );
-    };
+      constraintByNamespaceName.get(namespaceNameKey(entity._id, by.name));
+    entity.getProcs = (by) =>
+      procsByNamespaceName.get(namespaceNameKey(entity._id, by.name)) ?? [];
   });
 
   introspection.classes.forEach((entity) => {
@@ -463,9 +504,7 @@ export function augmentIntrospectionParsed(
       introspection.inherits.filter((inh) => inh.inhrelid === entity._id),
     );
     entity.getAccessMethod = memo(() =>
-      entity.relam != null
-        ? introspection.am.find((am) => am._id === entity.relam)
-        : undefined,
+      entity.relam != null ? accessMethodById.get(entity.relam) : undefined,
     );
   });
   introspection.indexes.forEach((entity) => {
@@ -474,10 +513,11 @@ export function augmentIntrospectionParsed(
     entity.getClass = memo(() => getClass(entity.indrelid));
     entity.getKeys = memo(() => {
       const owner = getClass(entity.indrelid);
-      const attrs = owner!.getAttributes();
       const keys = entity.indkey;
       return keys.map((key) =>
-        key === 0 ? null : attrs.find((a) => a.attnum === key)!,
+        key === 0
+          ? null
+          : attributeByRelIdAndNum.get(attributeRelNumKey(owner!._id, key))!,
       );
     });
     entity.getDescription = memo(() =>
@@ -534,9 +574,9 @@ export function augmentIntrospectionParsed(
           return;
         }
       }
-      const attrs = klass.getAttributes();
       return entity.conkey.map(
-        (key) => attrs.find((att) => att.attnum === key)!,
+        (key) =>
+          attributeByRelIdAndNum.get(attributeRelNumKey(klass._id, key))!,
       );
     });
     entity.getType = memo(() => getType(entity.contypid));
@@ -569,9 +609,9 @@ export function augmentIntrospectionParsed(
           return;
         }
       }
-      const attrs = klass.getAttributes();
       return entity.confkey.map(
-        (key) => attrs.find((att) => att.attnum === key)!,
+        (key) =>
+          attributeByRelIdAndNum.get(attributeRelNumKey(klass._id, key))!,
       );
     });
     entity.getDescription = memo(() =>
@@ -613,7 +653,7 @@ export function augmentIntrospectionParsed(
       if (proallargtypes) {
         for (let i = 0, l = proallargtypes.length; i < l; i++) {
           const typeId = proallargtypes[i];
-          const type = introspection.types.find((t) => t._id === typeId);
+          const type = typeById.get(typeId);
           if (!type) {
             throw new Error("Corrupted introspection data");
           }
@@ -636,7 +676,7 @@ export function augmentIntrospectionParsed(
       } else if (proargtypes) {
         for (let i = 0, l = proargtypes.length; i < l; i++) {
           const typeId = proargtypes[i];
-          const type = introspection.types.find((t) => t._id === typeId);
+          const type = typeById.get(typeId);
           if (!type) {
             throw new Error("Corrupted introspection data");
           }
@@ -697,10 +737,8 @@ export function augmentIntrospectionParsed(
   });
 
   introspection.inherits.forEach((entity) => {
-    entity.getParent = () =>
-      introspection.classes.find((child) => child._id === entity.inhparent);
-    entity.getChild = () =>
-      introspection.classes.find((child) => child._id === entity.inhrelid);
+    entity.getParent = () => classById.get(entity.inhparent);
+    entity.getChild = () => classById.get(entity.inhrelid);
   });
   return introspection;
 }
