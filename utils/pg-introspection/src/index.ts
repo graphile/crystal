@@ -72,8 +72,34 @@ export function parseIntrospectionResults(
 
 export type { PgSmartTagsAndDescription, PgSmartTagsDict };
 
+interface IntrospectionLookups {
+  oidByCatalog: Record<string, string>;
+  roleById: Map<string, PgRoles>;
+  roleByName: Record<string, PgRoles>;
+  authMembersByMemberId: Map<string, Set<PgAuthMembers>>;
+}
+interface IntrospectionCaches {
+  expandRoles: Map<string, readonly PgRoles[]>;
+}
+
 declare module "./introspection.js" {
   interface Introspection {
+    /**
+     * Use Record/Map to turn O(N) lookups into O(1) lookups. Populated at
+     * startup.
+     *
+     * @internal
+     */
+    _lookups: IntrospectionLookups;
+
+    /**
+     * For calculated values that should not be pre-computed (since they may
+     * not be needed), add caches here to avoid needing WeakMap.
+     *
+     * @internal
+     */
+    _caches: IntrospectionCaches;
+
     getCurrentUser(): PgRoles | undefined;
 
     getNamespace(

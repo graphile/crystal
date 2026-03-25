@@ -89,72 +89,6 @@ export const PUBLIC_ROLE: PgRoles = Object.freeze({
   _id: "0",
 });
 
-// ── Optimized lookup caches (WeakMap keyed by introspection — auto-GC) ──
-
-const _roleByIdCache = new WeakMap<Introspection, Map<string, PgRoles>>();
-const _roleByNameCache = new WeakMap<Introspection, Map<string, PgRoles>>();
-const _membersByMemberIdCache = new WeakMap<
-  Introspection,
-  Map<string, string[]>
->();
-const _expandRolesCache = new WeakMap<Introspection, Map<string, PgRoles[]>>();
-
-function _getRoleByIdMap(introspection: Introspection): Map<string, PgRoles> {
-  let map = _roleByIdCache.get(introspection);
-  if (!map) {
-    map = new Map();
-    map.set("0", PUBLIC_ROLE);
-    for (const r of introspection.roles) {
-      map.set(r._id, r);
-    }
-    _roleByIdCache.set(introspection, map);
-  }
-  return map;
-}
-
-function _getRoleByNameMap(introspection: Introspection): Map<string, PgRoles> {
-  let map = _roleByNameCache.get(introspection);
-  if (!map) {
-    map = new Map();
-    map.set("public", PUBLIC_ROLE);
-    for (const r of introspection.roles) {
-      map.set(r.rolname, r);
-    }
-    _roleByNameCache.set(introspection, map);
-  }
-  return map;
-}
-
-function _getMembersByMemberIdMap(
-  introspection: Introspection,
-): Map<string, string[]> {
-  let map = _membersByMemberIdCache.get(introspection);
-  if (!map) {
-    map = new Map();
-    for (const am of introspection.auth_members) {
-      let arr = map.get(am.member);
-      if (!arr) {
-        arr = [];
-        map.set(am.member, arr);
-      }
-      arr.push(am.roleid);
-    }
-    _membersByMemberIdCache.set(introspection, map);
-  }
-  return map;
-}
-
-function _getExpandRolesCache(
-  introspection: Introspection,
-): Map<string, PgRoles[]> {
-  let cache = _expandRolesCache.get(introspection);
-  if (!cache) {
-    cache = new Map();
-    _expandRolesCache.set(introspection, cache);
-  }
-  return cache;
-}
-
 /**
  * Gets a role given an OID; throws an error if the role is not found.
  */
@@ -162,7 +96,7 @@ function getRole(introspection: Introspection, oid: string): PgRoles {
   if (oid === "0") {
     return PUBLIC_ROLE;
   }
-  const role = _getRoleByIdMap(introspection).get(oid);
+  const role = introspection._lookups.roleById.get(oid);
   if (!role) {
     throw new Error(`Could not find role with identifier '${oid}'`);
   }
@@ -176,7 +110,7 @@ function getRoleByName(introspection: Introspection, name: string): PgRoles {
   if (name === "public") {
     return PUBLIC_ROLE;
   }
-  const role = _getRoleByNameMap(introspection).get(name);
+  const role = introspection._lookups.roleByName[name];
   if (!role) {
     throw new Error(`Could not find role with name '${name}'`);
   }
@@ -531,19 +465,17 @@ export const Permission = {
 /**
  * Returns all the roles role has been granted (including PUBLIC),
  * respecting `NOINHERIT`.
- *
- * Uses Map-based indexes and per-introspection caching to avoid O(n)
- * linear scans on every call — significant for schemas with many roles.
  */
 export function expandRoles(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit = false,
-): PgRoles[] {
-  // For single-role calls (the common path), use per-introspection cache
+): readonly PgRoles[] {
+  // To avoid potential memory exhaustion, we only cache the common case, where
+  // `roles` is an array of size 1.
   if (roles.length === 1) {
-    const cacheKey = `${roles[0]._id}:${includeNoInherit ? 1 : 0}`;
-    const cache = _getExpandRolesCache(introspection);
+    const cacheKey = `${roles[0]._id}:${includeNoInherit ? "N" : "I"}`;
+    const cache = introspection._caches.expandRoles;
     const cached = cache.get(cacheKey);
     if (cached) {
       return cached;
@@ -559,35 +491,30 @@ function _expandRolesUncached(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit: boolean,
-): PgRoles[] {
-  const visitedIds = new Set<string>(["0"]); // PUBLIC_ROLE._id
-  const allRoles = [PUBLIC_ROLE];
-  const memberIndex = _getMembersByMemberIdMap(introspection);
-  const roleByIdMap = _getRoleByIdMap(introspection);
+): readonly PgRoles[] {
+  const allRoles = new Set([PUBLIC_ROLE]);
+  const { authMembersByMemberId } = introspection._lookups;
 
   const addRole = (member: PgRoles) => {
-    if (!visitedIds.has(member._id)) {
-      visitedIds.add(member._id);
-      allRoles.push(member);
+    if (!allRoles.has(member)) {
+      allRoles.add(member);
       if (includeNoInherit || member.rolinherit !== false) {
-        const grants = memberIndex.get(member._id);
-        if (grants) {
-          for (const roleid of grants) {
-            const rol = roleByIdMap.get(roleid);
-            if (rol) {
-              addRole(rol);
-            }
+        const memberships = authMembersByMemberId.get(member._id);
+        if (memberships) {
+          for (const membership of memberships) {
+            const role = getRole(introspection, membership.roleid);
+            addRole(role);
           }
         }
       }
     }
   };
 
-  for (const r of roles) {
-    addRole(r);
+  for (const role of roles) {
+    addRole(role);
   }
 
-  return allRoles;
+  return [...allRoles];
 }
 
 /**
