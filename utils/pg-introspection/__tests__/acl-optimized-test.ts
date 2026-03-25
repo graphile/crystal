@@ -2,41 +2,35 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 
 import {
-  type AclObject,
-  PUBLIC_ROLE,
   aclContainsRole,
   expandRoles,
-  resolvePermissions,
   parseAcl,
+  PUBLIC_ROLE,
+  resolvePermissions,
 } from "../dist/acl.js";
-import type { Introspection, PgRoles } from "../dist/introspection.js";
+import type {
+  Introspection,
+  PgAuthMembers,
+  PgRoles,
+} from "../dist/introspection.js";
 
 function makeRole(
-  id: string,
-  name: string,
-  opts: Partial<PgRoles> = {},
+  _id: string,
+  rolname: string,
+  opts: Partial<Omit<PgRoles, "_id" | "rolname">> = {},
 ): PgRoles {
   return {
-    _id: id,
-    rolname: name,
-    rolsuper: false,
+    ...PUBLIC_ROLE,
     rolinherit: true,
-    rolcreaterole: false,
-    rolcreatedb: false,
-    rolcanlogin: false,
-    rolreplication: false,
-    rolconnlimit: null,
-    rolpassword: null,
-    rolbypassrls: false,
-    rolconfig: null,
-    rolvaliduntil: null,
     ...opts,
+    _id,
+    rolname,
   };
 }
 
-function makeIntrospection(
+function fakeIntrospection(
   roles: PgRoles[],
-  authMembers: { member: string; roleid: string }[] = [],
+  authMembers: Pick<PgAuthMembers, "member" | "roleid">[] = [],
 ): Introspection {
   return {
     roles,
@@ -51,14 +45,14 @@ function makeIntrospection(
 describe("expandRoles", () => {
   it("always includes PUBLIC_ROLE", () => {
     const role = makeRole("1", "alice");
-    const introspection = makeIntrospection([role]);
+    const introspection = fakeIntrospection([role]);
     const result = expandRoles(introspection, [role]);
     assert.ok(result.includes(PUBLIC_ROLE));
   });
 
   it("includes the role itself", () => {
     const role = makeRole("1", "alice");
-    const introspection = makeIntrospection([role]);
+    const introspection = fakeIntrospection([role]);
     const result = expandRoles(introspection, [role]);
     assert.ok(result.includes(role));
   });
@@ -66,7 +60,7 @@ describe("expandRoles", () => {
   it("expands inherited roles via auth_members", () => {
     const alice = makeRole("1", "alice");
     const editors = makeRole("2", "editors");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [alice, editors],
       [{ member: "1", roleid: "2" }], // alice is member of editors
     );
@@ -80,11 +74,11 @@ describe("expandRoles", () => {
     const alice = makeRole("1", "alice");
     const editors = makeRole("2", "editors");
     const admins = makeRole("3", "admins");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [alice, editors, admins],
       [
-        { member: "1", roleid: "2" }, // alice -> editors
-        { member: "2", roleid: "3" }, // editors -> admins
+        { member: "1", roleid: "2" }, // grant editors to alice
+        { member: "2", roleid: "3" }, // grant admins to editors
       ],
     );
     const result = expandRoles(introspection, [alice]);
@@ -96,7 +90,7 @@ describe("expandRoles", () => {
   it("does not expand roles with NOINHERIT by default", () => {
     const alice = makeRole("1", "alice", { rolinherit: false });
     const editors = makeRole("2", "editors");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [alice, editors],
       [{ member: "1", roleid: "2" }],
     );
@@ -109,7 +103,7 @@ describe("expandRoles", () => {
   it("expands NOINHERIT roles when includeNoInherit=true", () => {
     const alice = makeRole("1", "alice", { rolinherit: false });
     const editors = makeRole("2", "editors");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [alice, editors],
       [{ member: "1", roleid: "2" }],
     );
@@ -120,7 +114,7 @@ describe("expandRoles", () => {
   it("returns cached result for repeated calls", () => {
     const alice = makeRole("1", "alice");
     const editors = makeRole("2", "editors");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [alice, editors],
       [{ member: "1", roleid: "2" }],
     );
@@ -129,10 +123,12 @@ describe("expandRoles", () => {
     assert.strictEqual(result1, result2); // same reference = cached
   });
 
+  // NOTE: Postgres currently forbids circular permissions so we should never
+  // see this in introspection, but lets guard against it anyway.
   it("handles circular role membership without infinite loop", () => {
     const a = makeRole("1", "a");
     const b = makeRole("2", "b");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [a, b],
       [
         { member: "1", roleid: "2" },
@@ -148,14 +144,14 @@ describe("expandRoles", () => {
 describe("aclContainsRole", () => {
   it("returns true when role matches ACL directly", () => {
     const alice = makeRole("1", "alice");
-    const introspection = makeIntrospection([alice]);
+    const introspection = fakeIntrospection([alice]);
     const acl = parseAcl("alice=r/postgres");
     assert.ok(aclContainsRole(introspection, acl, alice));
   });
 
   it("returns true for PUBLIC ACL and any role", () => {
     const alice = makeRole("1", "alice");
-    const introspection = makeIntrospection([alice]);
+    const introspection = fakeIntrospection([alice]);
     const acl = parseAcl("=r/postgres");
     assert.ok(aclContainsRole(introspection, acl, alice));
   });
@@ -163,7 +159,7 @@ describe("aclContainsRole", () => {
   it("returns true when role inherits ACL role", () => {
     const alice = makeRole("1", "alice");
     const editors = makeRole("2", "editors");
-    const introspection = makeIntrospection(
+    const introspection = fakeIntrospection(
       [alice, editors],
       [{ member: "1", roleid: "2" }],
     );
@@ -174,7 +170,7 @@ describe("aclContainsRole", () => {
   it("returns false when role does not match", () => {
     const alice = makeRole("1", "alice");
     const bob = makeRole("2", "bob");
-    const introspection = makeIntrospection([alice, bob]);
+    const introspection = fakeIntrospection([alice, bob]);
     const acl = parseAcl("bob=r/postgres");
     assert.ok(!aclContainsRole(introspection, acl, alice));
   });
@@ -183,7 +179,7 @@ describe("aclContainsRole", () => {
 describe("resolvePermissions", () => {
   it("grants permissions from matching ACLs", () => {
     const alice = makeRole("1", "alice");
-    const introspection = makeIntrospection([alice]);
+    const introspection = fakeIntrospection([alice]);
     const acls = [parseAcl("alice=rw/postgres")];
     const perms = resolvePermissions(introspection, acls, alice);
     assert.strictEqual(perms.select, true);
@@ -193,7 +189,7 @@ describe("resolvePermissions", () => {
 
   it("grants all permissions to superuser", () => {
     const superuser = makeRole("1", "super", { rolsuper: true });
-    const introspection = makeIntrospection([superuser]);
+    const introspection = fakeIntrospection([superuser]);
     const perms = resolvePermissions(introspection, [], superuser);
     assert.strictEqual(perms.select, true);
     assert.strictEqual(perms.insert, true);
