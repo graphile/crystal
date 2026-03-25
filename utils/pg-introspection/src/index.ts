@@ -1,5 +1,6 @@
 import type {
   Introspection,
+  PgAm,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -77,9 +78,31 @@ interface IntrospectionLookups {
   roleById: Map<string, PgRoles>;
   roleByName: Record<string, PgRoles>;
   authMembersByMemberId: Map<string, Set<PgAuthMembers>>;
+  namespaceById: Map<string, PgNamespace>;
+  namespaceByName: Map<string, PgNamespace>;
+  typeById: Map<string, PgType>;
+  classById: Map<string, PgClass>;
+  classByNamespaceName: Map<string, PgClass>;
+  rangeByTypid: Map<string, PgRange>;
+  attributesByRelId: Map<string, PgAttribute[]>;
+  attributeByRelIdAndNum: Map<string, PgAttribute>;
+  constraintById: Map<string, PgConstraint>;
+  constraintsByRelid: Map<string, PgConstraint[]>;
+  constraintByNamespaceName: Map<string, PgConstraint>;
+  foreignConstraintsByRelid: Map<string, PgConstraint[]>;
+  enumById: Map<string, PgEnum>;
+  enumsByTypid: Map<string, PgEnum[]>;
+  indexById: Map<string, PgIndex>;
+  indexesByRelid: Map<string, PgIndex[]>;
+  descriptionByDescriptionKey: Map<string, PgDescription>;
+  procById: Map<string, PgProc>;
+  procsByNamespaceName: Map<string, PgProc[]>;
+  extensionById: Map<string, PgExtension>;
+  languageById: Map<string, PgLanguage>;
+  accessMethodById: Map<string, PgAm>;
 }
 interface IntrospectionCaches {
-  expandRoles: Map<string, readonly PgRoles[]>;
+  expandRoles: Map<string, PgRoles[]>;
 }
 
 declare module "./introspection.js" {

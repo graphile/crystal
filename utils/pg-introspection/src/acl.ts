@@ -470,7 +470,7 @@ export function expandRoles(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit = false,
-): readonly PgRoles[] {
+): PgRoles[] {
   // To avoid potential memory exhaustion, we only cache the common case, where
   // `roles` is an array of size 1.
   if (roles.length === 1) {
@@ -491,7 +491,7 @@ function _expandRolesUncached(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit: boolean,
-): readonly PgRoles[] {
+): PgRoles[] {
   const allRoles = new Set([PUBLIC_ROLE]);
   const { authMembersByMemberId } = introspection._lookups;
 

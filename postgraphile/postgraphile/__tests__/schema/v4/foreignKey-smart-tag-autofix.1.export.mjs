@@ -4195,13 +4195,6 @@ const registry = makeRegistry({
     },
     personSecret: {
       __proto__: null,
-      personByMySekrit: {
-        localCodec: personSecretCodec,
-        remoteResourceOptions: person_resourceOptionsConfig,
-        localAttributes: ["sekrit"],
-        remoteAttributes: ["about"],
-        isUnique: true
-      },
       personByMyPersonId: {
         localCodec: personSecretCodec,
         remoteResourceOptions: person_resourceOptionsConfig,
@@ -4215,6 +4208,13 @@ const registry = makeRegistry({
             backwardDescription: "This `Person`'s `PersonSecret`."
           }
         }
+      },
+      personByMySekrit: {
+        localCodec: personSecretCodec,
+        remoteResourceOptions: person_resourceOptionsConfig,
+        localAttributes: ["sekrit"],
+        remoteAttributes: ["about"],
+        isUnique: true
       }
     }
   }
@@ -5989,11 +5989,11 @@ type PersonSecret implements Node {
   """A secret held by the associated Person"""
   secret: String
 
-  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
-  personBySecret: Person
-
   """The \`Person\` this \`PersonSecret\` belongs to."""
   personByPersonId: Person
+
+  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
+  personBySecret: Person
 }
 
 """Person test comment"""
@@ -8750,11 +8750,11 @@ type CreatePersonSecretPayload {
     orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
-  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
-  personBySecret: Person
-
   """The \`Person\` this \`PersonSecret\` belongs to."""
   personByPersonId: Person
+
+  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
+  personBySecret: Person
 }
 
 """All input for the create \`PersonSecret\` mutation."""
@@ -9131,11 +9131,11 @@ type UpdatePersonSecretPayload {
     orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
-  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
-  personBySecret: Person
-
   """The \`Person\` this \`PersonSecret\` belongs to."""
   personByPersonId: Person
+
+  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
+  personBySecret: Person
 }
 
 """All input for the \`updatePersonSecret\` mutation."""
@@ -9637,11 +9637,11 @@ type DeletePersonSecretPayload {
     orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): PersonSecretsEdge @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
 
-  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
-  personBySecret: Person
-
   """The \`Person\` this \`PersonSecret\` belongs to."""
   personByPersonId: Person
+
+  """Reads a single \`Person\` that is related to this \`PersonSecret\`."""
+  personBySecret: Person
 }
 
 """All input for the \`deletePersonSecret\` mutation."""
