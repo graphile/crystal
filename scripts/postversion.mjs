@@ -13,7 +13,11 @@ const changedPackages = changedFiles.filter((file) =>
   file.endsWith("/package.json"),
 );
 
-const toCommit = [".changeset/pre.json"];
+const toCommit = [];
+const CHANGESET_PRE = ".changeset/pre.json";
+if (existsSync(CHANGESET_PRE)) {
+  toCommit.push(CHANGESET_PRE);
+}
 
 const releasedPackages = [];
 
