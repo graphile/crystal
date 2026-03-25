@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 
-import { type AclObject, parseAcl, serializeAcl } from "../dist/acl.js";
+import { type AclObject, parseAcl, serializeAcl } from "../src/acl.ts";
 
 const allBase = {
   select: true,
