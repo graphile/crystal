@@ -470,7 +470,7 @@ export function expandRoles(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit = false,
-): readonly PgRoles[] {
+): PgRoles[] {
   // To avoid potential memory exhaustion, we only cache the common case, where
   // `roles` is an array of size 1.
   if (roles.length === 1) {
