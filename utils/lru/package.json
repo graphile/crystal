@@ -1,12 +1,14 @@
 {
   "name": "@graphile/lru",
-  "version": "5.0.0-rc.4",
+  "version": "5.0.0",
   "description": "Extremely simple zero-dependencies ES6 LRU (you probably want lru-cache instead)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "test": "jest",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -38,5 +40,9 @@
     "jest": "^30.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

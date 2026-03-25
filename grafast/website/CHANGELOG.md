@@ -1,5 +1,9 @@
 # @localrepo/grafast-website
 
+## 0.0.1
+
+Identical to 0.0.1-beta.24.
+
 ## 0.0.1-beta.24
 
 ### Patch Changes

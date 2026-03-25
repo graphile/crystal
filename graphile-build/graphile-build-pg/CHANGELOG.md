@@ -1,5 +1,25 @@
 # graphile-build-pg
 
+## 5.0.0
+
+Identical to 5.0.0-rc.8.
+
+## 5.0.0-rc.8
+
+### Patch Changes
+
+- [#2990](https://github.com/graphile/crystal/pull/2990)
+  [`5d408bd`](https://github.com/graphile/crystal/commit/5d408bd4fc33d1d4f2dc0410c7379a97406682e6)
+  Thanks [@benjie](https://github.com/benjie)! - No code changes. Updates the
+  release process, cleans up package.json, uses fixed identifiers for peer
+  dependencies (unless they're explicit dependencies also). Hopefully move to
+  trusted publishing.
+- Updated dependencies
+  [[`5d408bd`](https://github.com/graphile/crystal/commit/5d408bd4fc33d1d4f2dc0410c7379a97406682e6)]:
+  - pg-introspection@1.0.0-rc.5
+  - graphile-config@1.0.0-rc.6
+  - pg-sql2@5.0.0-rc.5
+
 ## 5.0.0-rc.7
 
 ### Patch Changes

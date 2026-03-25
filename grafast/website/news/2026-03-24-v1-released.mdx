@@ -1,0 +1,280 @@
+---
+title: Grafast V1; solving GraphQL's execution woes
+description: "GraphQL's depth-first execution leads to N+1 problems, promise explosions, missed optimizations, and more. Grafast solves this with a fundamentally different take."
+slug: 2026-03-24-v1-released
+authors: [benjie, jem]
+tags: [releases, v5]
+---
+
+import Mermaid from "@theme/Mermaid";
+import init from "../grafast/mermaid-init.mermaid?raw";
+import styles from "@site/src/css/common.module.css";
+
+<div className={styles.intro}>
+
+### Gra*fast* V1.0.0 is live!
+
+A radical new approach to GraphQL execution: Gra*fast*’s breadth-first, batched,
+plan-based execution model integrates deeply with your business logic, making
+previously challenging optimizations straightforward whilst eliminating the
+costs and failure modes of traditional resolvers.
+
+</div>
+
+Many don’t realise just how costly traditional GraphQL execution can be until
+it’s too late. The GraphQL specification outlines a reference execution
+algorithm that focusses on being clear and instructive rather than efficient,
+but implementations may use any solution so long as the perceived result is
+equivalent. GraphQL.js — the GraphQL reference implementation — follows the
+reference execution algorithm nearly verbatim, passing the problems of the
+depth-first “resolver” pattern down to consumers.
+
+Gra*fast* is a radical alternative execution algorithm focussing on efficiency
+throughout the stack. Instead of the myopic resolver model of GraphQL.js which
+has limited coordination with business logic, Gra*fast* takes a holistic
+approach by planning the full request and optimizing business logic integration
+before executing it, whilst being sure to keep the perceived result equivalent
+for spec compliance.
+
+When an operation is seen for the first time, planning begins: each field
+indicates its data needs and planned execution steps via synchronous “plan
+resolvers”. The resulting plan is then deduplicated and optimized so that the
+minimal number of steps, each backed by a batched function, are scheduled for
+execution. This final plan can be re-used for compatible future requests.
+
+When executing the plan, the number of calls to these functions is
+independent of the size of the various lists, no matter how deeply they are
+nested, leading to predictable and scalable execution.
+
+### Greater efficiency throughout the stack
+
+Gra*fast* isn't just about making GraphQL execution itself more efficient; it
+aims to **reduce computation costs and latency across your entire backend stack**.
+No more backend over- and under-fetching. Eliminate the N+1 problem, reduce
+round-trips, and cut serialization/deserialization costs by fetching less data
+from your datastores.
+
+You can also say goodbye to exponentially increasing resolver and telemetry
+calls in nested lists. Gra*fast* even reduces event loop tick counts, eliminates
+per-request AST traversal, and produces the JSON payload directly without
+intermediate objects.
+
+### Backwards compatible
+
+Gra*fast* has a resolver compatibility layer that means that many existing
+GraphQL.js projects can move directly to Gra*fast*. The requirements for
+existing schemas to be compatible with Gra*fast* are outline in the
+[using Gra*fast* with an existing GraphQL.js
+project documentation](/grafast/getting-started/existing-schema). We hope to
+expand this compatibility to cover more esoteric resolvers over time.
+
+{/* truncate */}
+
+### An introduction to plan resolvers
+
+Shopify recently shared a post on their [journey to faster breadth-first GraphQL
+execution](https://shopify.engineering/faster-breadth-first-graphql-execution)
+that goes into detail on these costs, how it is impacting them at scale, and
+what they’re doing about it, acknowledging inspiration they took from Gra*fast*.
+
+When you have a list with 250 items, each containing a nested list of 250 items,
+and each of those with 10 fields, that’s already well over half a million
+resolver calls _per request_! If you’re wrapping resolver calls with telemetry
+hooks, authentication checks, or other logic then although the logic itself may
+seem efficient, calling it half a million times per request is likely to start
+having a measurable impact on your main runloop!
+
+With Gra*fast*, instead of writing traditional resolvers you write plan
+resolvers. Plan resolvers describe the dataflow of your operations, indicating
+which pieces of business logic will be called and determining what is needed for
+and from each of them, all without actually calling it. This synchronous process
+outlines the steps necessary to execute your query.
+
+These steps form a tree we call the “execution plan”; for a query such as:
+
+```graphql
+{
+  products(first: 3) {
+    nodes {
+      variants(first: 2) {
+        nodes {
+          id
+        }
+      }
+    }
+  }
+}
+```
+
+You might build an execution plan such as:
+
+<figure>
+
+<Mermaid
+  chart={`\
+${init}
+  S1{{"Constant(3)"}}:::plan
+  S2[["LoadMany(GetProducts)"]]:::plan
+  S1-->S2
+  Product1[/"Item: 'Product'"\\]:::itemplan
+  S2-->Product1
+  S4{{"Constant(2)"}}:::plan
+  S3[["LoadMany(GetVariantsByProductId)"]]:::plan
+  S4-->S3
+  S6{{"Get('id')"}}:::plan
+  Product1-->S6
+  S6-->S3
+  Variant1[/"Item: 'Variant'"\\]:::itemplan
+  S3-->Variant1
+  S5{{"Get('id')"}}:::plan
+  Variant1-->S5
+`}
+/>
+
+</figure>
+
+Gra*fast* can derive a lot from this plan.
+
+Firstly, it can immediately spot the two asynchronous calls:
+`LoadMany(GetProducts)` and `LoadMany(GetVariantsByProductId)`. Since everything
+else is synchronous, these are the two steps to wrap with observability. **Half a
+million observability calls in GraphQL.js become just 2 in Gra*fast***... roughly
+5 orders of magnitude fewer!
+
+Secondly, Gra*fast* can see exactly what attributes are necessary. Rather than
+fetching all products and all their data from the underlying datastores, the
+business logic can now be told just to fetch the `id`. That’s a massive decrease
+in the amount of data sent over the wire on the backend, but more importantly
+it’s **less data to serialize/deserialize on our infrastructure, reducing our
+compute costs and latency**.
+
+### Batched by design
+
+Gra*fast* uses batch execution, so it calls once into your business logic to get
+the products, and once to get all of the variants across all of the products.
+Only two calls into your business logic, only two promises created. This significantly
+reduces the overhead of
+garbage collection and micro-ticks when compared to traditional GraphQL.js techniques
+such as DataLoader. There are no
+per-item promises in Gra*fast*, unlike with DataLoader, since the entire
+execution algorithm is batched.
+
+The Gra*fast* plan resolvers to achieve this are straightforward, designed to be
+written and read by humans:
+
+```ts
+export const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      products(first: Int): ProductsConnection
+    }
+    type Product {
+      variants(first: Int): VariantConnection
+    }
+    type Variant {
+      id: ID
+    }
+    # Connection types omitted for brevity
+  `,
+  plans: {
+    Query: {
+      // highlight-start
+      products(_, fieldArgs) {
+        const $products = loadMany(null, batchLoadProducts);
+        return connection($products, { fieldArgs });
+      },
+      // highlight-end
+    },
+    Product: {
+      // highlight-start
+      variants($product, fieldArgs) {
+        const $productId = get($product, "id");
+        const $variants = loadMany($productId, batchLoadVariantsByProductId);
+        return connection($variants, { fieldArgs });
+      },
+      // highlight-end
+    },
+  },
+});
+```
+
+The `batchLoadProducts` and `batchLoadVariantsByProductId` functions can be the
+exact same functions that you would use with a `DataLoader` — batch loading
+functions that receive a list of inputs and must return a list of associated
+outputs. Unlike in GraphQL.js, you don’t need to create DataLoaders for each of
+these functions and add them to the GraphQL context; Gra*fast* takes care of the
+batching automatically since it understands the full lifecycle of the request.
+
+### Easy to optimize
+
+To further optimize, the loader callback can be wrapped in an object which indicates
+to Gra*fast* its supported features. For example, support for
+limit/offset pagination can be indicated via `paginationSupport: { offset: true }`:
+
+```ts
+export const batchLoadVariantsByProductId = {
+  name: "batchLoadVariantsByProductId",
+
+  // highlight-next-line
+  paginationSupport: { offset: true },
+
+  async load(productIds, info) {
+    const {
+      attributes,
+      // highlight-next-line
+      params: { limit, offset },
+    } = info;
+
+    // Implementing business logic is left as an exercise to the reader
+    const variantsByProductId = await getVariantsFromBusinessLogic({
+      productIds,
+      // highlight-next-line
+      limit,
+      // highlight-next-line
+      offset,
+      attributes,
+    });
+
+    // Correlate the results for each product ID.
+    return productIds.map((productId) => variantsByProductId[productId]);
+  },
+};
+```
+
+### Easy to customize
+
+But it doesn’t stop there... `loadMany()` and `connection()` are just generic
+built-in steps designed to work with any datasource; you can build your own
+custom steps with not much more effort than creating a `DataLoader` instance.
+Custom steps can enable improved DX and more advanced optimizations (think:
+deduplication, eager loading, one-time preparation, caching and more).
+
+### Embrace efficient execution
+
+**Stop papering over the cracks in GraphQL execution** with DataLoader,
+lookahead, and dodgy ResolveInfo hacks; instead **embrace a new paradigm with
+Gra*fast***. Start by reading [an overview of Grafast](/grafast) or digging in
+to [`loadMany()`’s advantages over
+DataLoader](https://grafast.org/grafast/standard-steps/loadMany#enhancements-over-dataloader).
+
+### Thank you
+
+Gra*fast* is crowd-funded open-source software, relying on sponsorship from
+individuals and companies to keep advancing.
+
+We want to extend our sincere thanks to every person, company and organization
+that has sponsored us throughout the lifetime of the Gra*fast* project, and
+extend a special thanks to the Featured Sponsors who helped support many of the
+key efforts during the Gra*fast* and [PostGraphile V5](https://postgraphile.org)
+development effort: **The Guild, Dovetail, Steelhead, Surge, Netflix, StoryScript,
+Chad Furman, Fanatics, Enzuzo and Accenture**.
+
+If your employer benefits from Gra*fast*, or the wider Graphile suite, please encourage them to fund our work. Our software saves companies substantial time and money by reducing development effort and running costs. Sponsorship is an investment in your product’s future, ensuring the foundations of your software stack remain secure and reliable for years to come.
+
+Find out more about sponsorship at [graphile.org/sponsor](https://graphile.org/sponsor)
+
+<figure>
+
+![Thank you](../static/img/news/thank-you.svg)
+
+</figure>

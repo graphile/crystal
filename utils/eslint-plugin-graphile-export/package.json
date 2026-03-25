@@ -1,11 +1,13 @@
 {
   "name": "eslint-plugin-graphile-export",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0",
   "description": "ESLint plugin to help ensure your schema is exportable by graphile-export",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "tsc -b"
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -45,5 +47,9 @@
     "jest": "^30.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

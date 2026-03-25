@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-# Build everything in the relevant order according to TypeScript project references
-yarn build
-
-# Now run `prepack` on each package (slightly parallelised)
-yarn workspaces foreach --parallel --topological --all run prepack

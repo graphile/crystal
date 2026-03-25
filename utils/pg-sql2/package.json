@@ -1,15 +1,17 @@
 {
   "name": "pg-sql2",
-  "version": "5.0.0-rc.4",
+  "version": "5.0.0",
   "description": "Generate safe Postgres-compliant SQL with tagged template literals",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "pretest": "node dist/index.js",
     "test": "jest",
     "posttest": "yarn test:docs",
     "test:docs": "markdown-doctest",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -52,5 +54,9 @@
   ],
   "engines": {
     "node": ">=22"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

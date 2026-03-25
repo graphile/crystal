@@ -1,5 +1,59 @@
 # postgraphile
 
+## 5.0.0
+
+Identical to 5.0.0-rc.10.
+
+PostGraphile has been rewritten from the ground-up on top of the cutting edge
+[Gra*fast* planning and execution engine for GraphQL](https://grafast.org/news/2026-03-24-v1-released).
+This has done away with the complexity and awkwardness of V4's lookahead system
+and replaced it with a much more concise, straightforward, and ergonomic API in
+the form of "plan resolvers".
+
+This re-write gave us a chance to also solve a huge number of longstanding
+issues in PostGraphile and enable a wealth of new features and capabilities.
+
+Read more about the PostGraphile V5 release in the
+[release announcement](https://postgraphile.org/news/2026-03-24-v5-published),
+find out how to migrate from V4 to V5 in the
+[migration guide](https://postgraphile.org/postgraphile/5/migrating-from-v4/)
+(and keep an eye out for the codemods we hope to publish soon!), or check out a
+list of some of the
+[main new features of PostGraphile V5](https://postgraphile.org/postgraphile/5/migrating-from-v4/v5-new-feature-summary).
+
+A huge thank you to all of our sponsors and testers who have made this release
+possible; some people have been running PostGraphile V5 in production for well
+over a year already, and we really appreciate their dedication and feedback.
+
+We'd also like to extend our heartfelt thanks to the Featured Sponsors who
+helped support many of the key PostGraphile V5 and Gra*fast* development
+efforts: **The Guild, Dovetail, Steelhead, Surge, Netflix, StoryScript, Chad
+Furman, Fanatics, Enzuzo and Accenture**.
+
+## 5.0.0-rc.10
+
+### Patch Changes
+
+- [#2990](https://github.com/graphile/crystal/pull/2990)
+  [`5d408bd`](https://github.com/graphile/crystal/commit/5d408bd4fc33d1d4f2dc0410c7379a97406682e6)
+  Thanks [@benjie](https://github.com/benjie)! - No code changes. Updates the
+  release process, cleans up package.json, uses fixed identifiers for peer
+  dependencies (unless they're explicit dependencies also). Hopefully move to
+  trusted publishing.
+- Updated dependencies
+  [[`5d408bd`](https://github.com/graphile/crystal/commit/5d408bd4fc33d1d4f2dc0410c7379a97406682e6)]:
+  - graphile-build-pg@5.0.0-rc.8
+  - graphile-build@5.0.0-rc.6
+  - graphile-utils@5.0.0-rc.8
+  - @dataplan/json@1.0.0-rc.6
+  - graphile-config@1.0.0-rc.6
+  - @dataplan/pg@1.0.0-rc.8
+  - grafserv@1.0.0-rc.7
+  - grafast@1.0.0-rc.9
+  - tamedevil@0.1.0-rc.6
+  - pg-sql2@5.0.0-rc.5
+  - @graphile/lru@5.0.0-rc.5
+
 ## 5.0.0-rc.9
 
 ### Patch Changes

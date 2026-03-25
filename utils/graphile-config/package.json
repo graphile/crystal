@@ -1,6 +1,6 @@
 {
   "name": "graphile-config",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0",
   "description": "Standard plugin interface and helpers to be used across the Graphile stack.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -20,8 +20,10 @@
     }
   },
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "test": "mocha '__tests__/**/*.test.ts'",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -39,9 +41,6 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/interpret": "^1.1.4",
-    "@types/node": "^22.19.1",
-    "@types/semver": "^7.7.1",
     "chalk": "^4.1.2",
     "debug": "^4.4.3",
     "interpret": "^3.1.1",
@@ -57,10 +56,17 @@
   ],
   "devDependencies": {
     "@types/debug": "^4.1.12",
+    "@types/interpret": "^1.1.4",
     "@types/mocha": "^10.0.10",
+    "@types/node": "^22.19.1",
+    "@types/semver": "^7.7.1",
     "chai": "^5.3.3",
     "mocha": "^11.7.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

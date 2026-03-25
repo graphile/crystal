@@ -30,11 +30,13 @@ Here's the rough process:
 
 (You can read why converting to TypeScript is so important in [the TypeScript section below](#typescript).)
 
-We recommend that you extend from the `@tsconfig/node18` preset; you can disable `noImplicitAny` to massively reduce the number of TypeScript errors you need to deal with:
+We recommend that you extend from the `@tsconfig/node22` preset; you can
+disable `noImplicitAny` to massively reduce the number of TypeScript errors you
+need to deal with:
 
 ```json title="tsconfig.json"
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
+  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     // You may want to enable this flag in V4 since V4 types were extremely
     // loose (since it was originally written in Flow, not TypeScript):
@@ -79,7 +81,7 @@ a `prepack` script to compile your TypeScript:
   },
   "devDependencies": {
     // ...
-    "@tsconfig/node18": "^18.2.4",
+    "@tsconfig/node22": "^22.0.5",
     "typescript": "^5.7.2"
   }
 }
@@ -87,9 +89,8 @@ a `prepack` script to compile your TypeScript:
 
 ### Upgrade to V5 dependencies
 
-At time of writing, V5 is in release candidate status, so you should use the `@rc` tag to
-install devDependencies. Go through each PostGraphile V4 related package
-referenced in package.json and install the `@rc` version of it, for example:
+Go through each PostGraphile V4 related package referenced in package.json and
+install the latest version of it, for example:
 
 ```json title="package.json before"
 {
@@ -104,10 +105,10 @@ referenced in package.json and install the `@rc` version of it, for example:
 
 ```bash
 yarn add --dev \
-  graphile-build@rc \
-  graphile-build-pg@rc \
-  postgraphile@rc \
-  postgraphile-plugin-connection-filter@rc
+  graphile-build \
+  graphile-build-pg \
+  postgraphile \
+  postgraphile-plugin-connection-filter
 ```
 
 ```json title="package.json after"

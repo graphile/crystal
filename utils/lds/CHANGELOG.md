@@ -1,5 +1,9 @@
 # @graphile/lds
 
+## 5.0.0
+
+Identical to 5.0.0-rc.1
+
 ## 5.0.0-rc.1
 
 ### Patch Changes

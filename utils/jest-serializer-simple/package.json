@@ -1,11 +1,13 @@
 {
   "name": "jest-serializer-simple",
-  "version": "5.0.0-rc.4",
+  "version": "5.0.0",
   "description": "Jest serializer that gives really simple formatting",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "tsc -b",
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
+    "build": "tsc -b",
     "watch": "tsc -b --watch"
   },
   "repository": {
@@ -40,5 +42,9 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
+  }
 }

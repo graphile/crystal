@@ -146,7 +146,7 @@ npm init -y
 Install the required packages:
 
 ```bash npm2yarn
-npm install --save express postgraphile@rc
+npm install --save express postgraphile
 ```
 
 ### Environment variables
@@ -403,7 +403,7 @@ nvm use
 Install the required packages:
 
 ```bash npm2yarn
-npm install --legacy-peer-deps --save express postgraphile@rc @graphile/simplify-inflection
+npm install --legacy-peer-deps --save express postgraphile @graphile/simplify-inflection
 npm install --save-dev typescript @tsconfig/node24 @tsconfig/node-ts @types/express @types/node
 ```
 

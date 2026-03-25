@@ -4,17 +4,7 @@ title: Introduction
 
 # PostGraphile Introduction
 
-:::warning[Use the `@rc` tag]
-
-This software is in release candidate stage, please be sure to use the `@rc` tag when installing any of the related modules, for example:
-
-```sh
-yarn add postgraphile-plugin-connection-filter@rc
-```
-
-:::
-
-:::tip[Migration Guide]
+:::tip[Migration Guide: V4 to V5]
 
 Coming from PostGraphile Version 4? Check out the
 [migration guide](./migrating-from-v4/index.mdx)!
@@ -43,21 +33,30 @@ may not be for you, PostGraphile has an [‘export’ feature](./exporting-schem
 so your generated API can be exported as executable JavaScript code which you
 can then maintain yourself ─ there's no lock-in.
 
-:::tip[PostGraphile is not always a 1-to-1 map of the database]
+:::tip[Your schema should reflect client needs, not just database tables]
 
-PostGraphile doesn't have to be (and _generally_ should not be) a “1-to-1 map”
-of your database.
+PostGraphile doesn't have to be (and generally should not be) a “1-to-1 map” of
+your database.
 
-Via schema extensions, you can add any types/fields/args that you need to, which
+Whilst its common for a significant portion of your data model to remain broadly
+aligned from database through to frontend, that's not true of every resource.
+Thus, PostGraphile gives you a wide array of tools and techniques to sculpt your
+schema to fit frontend needs, whilst still eliminating unnecessary work for the
+parts of your data model that are standard and consistent throughout the stack.
+
+PostGraphile automatically reflects the permissions in your database and only
+exposes the tables, columns, functions and mutations that are granted to it.
+
+[Smart tags](./smart-tags) and similar techniques allow you to hone the GraphQL
+schema to your needs: hide or exposing tables/columns/functions, change their
+naming or presentation, indicate abstract types/polymorphism, or otherwise
+manipulate the generated schema with simple tagging.
+
+With schema extensions, you can add any types/fields/args that you need to, which
 can communicate with any data source that Node itself can communicate with. You
 can also use the plugin interface to wrap _plan resolvers_ with your own logic,
 which gives huge control over authorization, presentation, filtering, and
 various other topics.
-
-PostGraphile will automatically reflect the permissions in your
-database and only expose the tables, columns, functions and mutations that are
-granted to it; but you should use [smart tags](./smart-tags) and similar
-techniques to hone the GraphQL API to your needs.
 
 By exporting the executable schema, you can see the plan resolvers/types/fields
 that PostGraphile has generated for you and, should you choose to, you can take

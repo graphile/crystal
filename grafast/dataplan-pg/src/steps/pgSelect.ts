@@ -221,6 +221,7 @@ export type PgSelectMode = "normal" | "aggregate" | "mutation";
  * but not guaranteed.
  */
 export type PgRootStep = Step & {
+  placeholder(step: PgTypedStep): SQL;
   placeholder(step: Step, codec: PgCodec): SQL;
   deferredSQL($step: Step<SQL>): SQL;
 };

@@ -1,10 +1,10 @@
 # Contributing
 
-Thanks for your interesting in contributing to Graphile's GraphQL libraries!
+Thanks for your interest in contributing to Graphile's GraphQL libraries!
 
 First, and most importantly, contributions to Graphile are governed by the
 Graphile Code of Conduct (which uses the Contributor Covenant); you can read it
-here: https://www.graphile.org/postgraphile/code-of-conduct/
+[here](https://www.graphile.org/postgraphile/code-of-conduct).
 
 Following are some guidelines for contributions.
 
@@ -14,6 +14,9 @@ We use `yarn` to manage this monorepo; we strongly recommend that you only use
 `yarn` when dealing with it - not `npm`, `pnpm` or similar. (Not because these
 technologies are in any way inferior to `yarn`, simply because they're not 100%
 compatible with each other and we require that you use `yarn` to contribute.)
+
+You will need Node.js 22 or higher. We generally recommend the current active
+LTS release.
 
 ### Install dependencies
 
@@ -135,7 +138,8 @@ yarn test
 
 If the above succeeds, you're good to go! If not, please try again after running
 `yarn install --force` and always feel free to reach out via
-[our discord chat](http://discord.gg/graphile) on the #core-development channel.
+[our Discord chat](https://discord.gg/graphile) on the `#core-development`
+channel.
 
 ### Platform specific quirks
 
@@ -189,8 +193,8 @@ UPDATE_SNAPSHOTS="sql,mermaid" yarn jest __tests__/path/to/test.file.graphql
 
 There's nothing worse than having your PR with 3 days of work in it rejected
 because it's just too complex to be sensibly reviewed! If you're interested in
-opening a PR please open an issue to discuss it first, or come chat with us:
-http://discord.gg/graphile
+opening a PR please open an issue to discuss it first, or come chat with us on
+[Discord](https://discord.gg/graphile).
 
 Sometimes, your suggestions are more appropriate as a plugin rather than in
 core - if this is the case then we'll let you know and can guide you how to
@@ -252,8 +256,9 @@ for (const letter of ["a", "b", "c"]) {
 ### `String.endsWith(...)` vs regexp
 
 Regexps that end with `$` like `/_id$/` are typically fairly expensive (much
-more so than regexps that lock the start `/^foo_`); is generally more efficient
-to do `.endsWith('_id')` when appropriate, but use whatever makes sense.
+more so than regexps that lock the start `/^foo_`); it is generally more
+efficient to do `.endsWith('_id')` when appropriate, but use whatever makes
+sense.
 
 ### DRY
 
@@ -261,12 +266,57 @@ Try to avoid repeating yourself - by putting shared logic into a shared
 function, V8 can perform shared JIT optimisations and ultimately this should
 mean that the code runs faster (and uses less memory).
 
-### Leverage ES2021
+### Leverage Node 22+
 
-Graphile's software typically requires at least Node 16; this means we get
-access to a lot of ES2021 goodness. Use https://node.green/ to check what we
-have access to.
+Graphile's software typically requires Node.js 22+, so contributors should make
+use of the modern JavaScript and Node.js APIs that this unlocks. Use
+[node.green](https://node.green) to check language support when in doubt.
 
-- `Object.values(obj)` is better than `Object.keys(obj).map(k => obj[k])`.
-- `arr.find(...)` is better than `arr.filter(...)[0]`
-- use `async`/`await` - [it's fast!](https://v8.dev/blog/fast-async)
+- Prefer `node:` specifiers for Node builtins, e.g. `node:fs/promises`.
+- Prefer `Object.hasOwn(obj, key)` over `Object.prototype.hasOwnProperty.call`.
+- Prefer `arr.find(...)` over `arr.filter(...)[0]`.
+- Prefer `arr.findLast(...)` over reversing or scanning twice from the front.
+- Prefer `Map`/`Set` for dynamic keyed collections and repeated membership
+  tests. For tiny fixed-shape string-keyed maps, especially when keys are added
+  in a consistent order, `Object.create(null)` can still be a strong choice; do
+  not convert small arrays into `Set`s unless you benefit from repeated lookups.
+- Prefer `??` and `??=` over `||` and manual defaulting when falsy values such
+  as `0`, `false`, and `""` are valid.
+- Prefer `AbortSignal.timeout(...)` when wiring simple timeouts into APIs that
+  already accept a signal. This is primarily a composability and correctness
+  recommendation, not a raw performance claim; in a tight hot path a manual
+  timer can be cheaper.
+- Prefer `process.hrtime.bigint()` or `performance.now()` for benchmarks and
+  instrumentation rather than `Date.now()`.
+- Use `async`/`await` - [it's fast!](https://v8.dev/blog/fast-async)
+
+Be mindful that some modern APIs trade clarity for extra allocations. In hot
+paths, avoid allocation-heavy immutable helpers such as `toSorted()`,
+`toReversed()`, `toSpliced()`, object spread, and array spread when a simple
+mutation or explicit loop will do.
+
+## New packages
+
+If your package is internal, name it `@localrepo/*` (replacing `*` with a name),
+and be sure to set `private: true` in `package.json`. Otherwise...
+
+We use trusted publishing via CI and have particular setup to make this work;
+any new package should follow the conventions of existing packages, but in
+particular:
+
+- package.json `scripts.prepack` must be set and include
+  `node ../../scripts/build-release.mts`; this script will call
+  `yarn build-package`, and thus:
+- package.json `scripts.build-package` must be set; typically it will simply be
+  `yarn build` but if there's any tidyup or extra commands needed for publishing
+  that aren't needed for regular development, they would go here
+- package.json `scripts.build` will typically be `tsc -b`
+- package.json `publishConfig` must be present and have value
+  `{access: "public", directory: "release"}`
+- package.json `files` should be used, and will typically be `["dist"]`
+- package.json `peerDependencies` with `workspace:` spec should use an explicit
+  range (e.g. `workspace:^5.0.0-rc.8`)
+- package.json `dependencies` and `devDependencies` with `workspace:` should use
+  an implicit range (typically `workspace:^`)
+- `README.md` must be present
+- `LICENSE.md` must be present

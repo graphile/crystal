@@ -92,6 +92,33 @@ your own `preset.grafast.context` if you need finer-grained control. Remember to
 extend Amber alongside it. For guidance on managing JWTs yourself, see the
 [JWT guide](.././jwt-guide.mdx).
 
+## The "Minify schema" preset
+
+```ts title="graphile.config.ts"
+import { PgMinifySchemaPreset } from "postgraphile/presets/minify";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset, PgMinifySchemaPreset],
+  /* ... */
+};
+export default preset;
+```
+
+`PgMinifySchemaPreset` is an experimental preset that aims to reduce the schema
+size for production usage when exporting the schema, to allow for minification
+of the bundle size in serverless environments such as AWS Lambda. It does so
+through _destructive_ minification: it strips schema descriptions and
+deprecations, and reduces registry metadata.
+
+It is not recommended to use this if tooling will be introspecting this schema
+(for example, GraphiQL or code generation), since the tooling will no longer
+receive documentation of the schema nor information about deprecated fields;
+prefer it for production export builds rather than developer-facing schemas
+where introspection documentation is useful.
+
+See [exporting your schema](../exporting-schema) for guidance.
+
 ## Third-party preset bundles
 
 Many contrib plugins now publish presets (for example,

@@ -1,13 +1,15 @@
 {
   "name": "graphile",
-  "version": "5.0.0-rc.5",
+  "version": "5.0.0",
   "description": "Swiss army knife for dealing with all things Graphile",
   "main": "dist/index.js",
   "bin": "dist/cli-run.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "test": "true",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "repository": {
     "type": "git",
@@ -39,9 +41,9 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "graphile-build": "workspace:^",
-    "graphile-config": "workspace:^",
-    "postgraphile": "workspace:^"
+    "graphile-build": "workspace:^5.0.0-rc.5",
+    "graphile-config": "workspace:^1.0.0-rc.5",
+    "postgraphile": "workspace:^5.0.0-rc.9"
   },
   "peerDependenciesMeta": {
     "graphile-build": {
@@ -55,6 +57,11 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22.19.1",
     "jest": "^30.2.0",
+    "postgraphile": "workspace:^",
     "ts-node": "^10.9.2"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

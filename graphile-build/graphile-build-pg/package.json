@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "5.0.0-rc.7",
+  "version": "5.0.0",
   "description": "PostgreSQL plugins for Graphile Build - build a supercharged GraphQL schema by reflection over a PostgreSQL database and executed by Grafast.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -37,8 +37,10 @@
     }
   },
   "scripts": {
+    "prepack": "node ../../scripts/build-release.mts",
+    "build-package": "yarn build",
     "test": "jest",
-    "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
+    "build": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {
     "type": "git",
@@ -74,14 +76,14 @@
     "tslib": "^2.8.1"
   },
   "peerDependencies": {
-    "@dataplan/pg": "workspace:^",
-    "grafast": "workspace:^",
-    "graphile-build": "workspace:^",
-    "graphile-config": "workspace:^",
+    "@dataplan/pg": "workspace:^1.0.0-rc.7",
+    "grafast": "workspace:^1.0.0-rc.8",
+    "graphile-build": "workspace:^5.0.0-rc.5",
+    "graphile-config": "workspace:^1.0.0-rc.5",
     "graphql": "^16.9.0",
     "pg": "^8.7.1",
-    "pg-sql2": "workspace:^",
-    "tamedevil": "workspace:^"
+    "pg-sql2": "workspace:^5.0.0-rc.4",
+    "tamedevil": "workspace:^0.1.0-rc.5"
   },
   "peerDependenciesMeta": {
     "pg": {
@@ -93,8 +95,7 @@
   },
   "files": [
     "dist",
-    "fwd",
-    "index.js"
+    "fwd"
   ],
   "devDependencies": {
     "@envelop/core": "^5.3.0",
@@ -107,7 +108,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "chalk": "^4.1.2",
     "express": "^4.21.2",
-    "fastify": "^4.29.1 || ^5.0.0",
+    "fastify": "^5.8.1",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-export": "workspace:^",
@@ -120,5 +121,9 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "ws": "^8.18.3"
+  },
+  "publishConfig": {
+    "directory": "release",
+    "access": "public"
   }
 }

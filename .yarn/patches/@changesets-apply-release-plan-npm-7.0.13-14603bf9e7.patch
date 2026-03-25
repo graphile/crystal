@@ -1,0 +1,38 @@
+diff --git a/dist/changesets-apply-release-plan.cjs.js b/dist/changesets-apply-release-plan.cjs.js
+index 6ec629342ce6651477413724380bc24a512ac60c..c15d121ddf44d0fb91627cb9797ba929fc81aacf 100644
+--- a/dist/changesets-apply-release-plan.cjs.js
++++ b/dist/changesets-apply-release-plan.cjs.js
+@@ -111,12 +111,13 @@ function getBumpLevel(type) {
+   return level;
+ }
+ function shouldUpdateDependencyBasedOnConfig(release, {
+-  depVersionRange,
++  depVersionRange: rawDVR,
+   depType
+ }, {
+   minReleaseType,
+   onlyUpdatePeerDependentsWhenOutOfRange
+ }) {
++  const depVersionRange = rawDVR.startsWith("workspace:") ? rawDVR.slice(10) : rawDVR;
+   if (!semverSatisfies__default["default"](release.version, depVersionRange)) {
+     // Dependencies leaving semver range should always be updated
+     return true;
+diff --git a/dist/changesets-apply-release-plan.esm.js b/dist/changesets-apply-release-plan.esm.js
+index 468a3d7b9f4e3c5687d6e09638ba03a9168c22fd..5e0157b438b776fd886e2ab0ad994fd2d64db2ba 100644
+--- a/dist/changesets-apply-release-plan.esm.js
++++ b/dist/changesets-apply-release-plan.esm.js
+@@ -74,12 +74,13 @@ function getBumpLevel(type) {
+   return level;
+ }
+ function shouldUpdateDependencyBasedOnConfig(release, {
+-  depVersionRange,
++  depVersionRange: rawDVR,
+   depType
+ }, {
+   minReleaseType,
+   onlyUpdatePeerDependentsWhenOutOfRange
+ }) {
++  const depVersionRange = rawDVR.startsWith("workspace:") ? rawDVR.slice(10) : rawDVR;
+   if (!semverSatisfies(release.version, depVersionRange)) {
+     // Dependencies leaving semver range should always be updated
+     return true;

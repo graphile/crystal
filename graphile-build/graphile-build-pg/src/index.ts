@@ -191,3 +191,5 @@ export {
   getWithPgClientFromPgService,
   withPgClientFromPgService,
 } from "@dataplan/pg";
+export type { SQL } from "pg-sql2";
+export { sql } from "pg-sql2";

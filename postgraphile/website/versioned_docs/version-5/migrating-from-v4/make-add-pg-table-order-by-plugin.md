@@ -62,10 +62,16 @@ In V5, the signature has changed a little.
 The first change is trivial: we've combined the first two arguments into a
 "match" object which also optionally accepts the `serviceName`.
 
-The second change, however, is much more significant — order generation now
-operates based on the Gra*fast* plan system (which operates based on "steps"
-which represent all possible values) rather than V4's lookahead engine (which
-deals in concrete runtime values).
+The `ordersGenerator` has changed a bit more though:
+
+- `orderByAscDesc`'s callback now accepts `queryBuilder` directly rather than
+  extracting it from an object
+- `queryBuilder.getTableAlias()` is now just `queryBuilder.alias`
+- `sqlValueWithCodec(value, codec)` should be used over `sql.value(value)` as it
+  will take care of casting the value according to the rules of `codec`
+- The return type of `orderByAscDesc`'s callback is now an object containing the
+  `fragment` alongside the `codec` that tells the system what type of data the
+  fragment represents (int/bigint/text/etc).
 
 The (simplified) new signatures are:
 
@@ -83,23 +89,20 @@ export function addPgTableOrderBy(
 ): GraphileConfig.Plugin;
 
 export interface MakeAddPgTableOrderByPluginOrders {
-  [orderByEnumValue: string]: {
-    extensions: {
-      grafast: {
-        applyPlan($select: PgSelectStep): void;
-      };
-    };
-  };
+  [orderByEnumValue: string]: GraphQLEnumValueConfig;
 }
 
 type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | ((
+      queryBuilder: PgSelectQueryBuilder,
+      info: { scope: unknown },
+    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export function orderByAscDesc(
   baseName: string,
-  columnOrSqlFragment: OrderBySpecIdentity,
+  attributeOrSqlFragment: OrderBySpecIdentity,
   uniqueOrOptions: boolean | OrderByAscDescOptions = false,
 ): MakeAddPgTableOrderByPluginOrders;
 ```
@@ -148,11 +151,11 @@ const OrderByAveragePetIdPlugin = addPgTableOrderBy(
 
     const customOrderBy = orderByAscDesc(
       "PET_ID_AVERAGE", // this is a ridiculous and unrealistic column but it will serve for testing purposes
-      ($select) => {
+      (queryBuilder) => {
         const orderByFrag = sql`(
             select avg(${sqlIdentifier}.id)
             from graphile_utils.pets as ${sqlIdentifier}
-            where ${sqlIdentifier}.user_id = ${$select.alias}.id
+            where ${sqlIdentifier}.user_id = ${queryBuilder.alias}.id
           )`;
 
         return { fragment: orderByFrag, codec: TYPES.int };
@@ -201,11 +204,11 @@ const OrderByMemberNamePlugin = addPgTableOrderBy(
     return orderByAscDesc(
       "MEMBER_NAME",
       // Order spec callback:
-      ($organizationMemberships) => {
+      (queryBuilder) => {
         const fragment = sql.fragment`(
           select ${sqlIdentifier}.name
           from app_public.users as ${sqlIdentifier}
-          where ${sqlIdentifier}.id = ${$organizationMemberships.alias}.user_id
+          where ${sqlIdentifier}.id = ${queryBuilder.alias}.user_id
           limit 1
         )`;
         return {
@@ -236,13 +239,13 @@ const OrderByMemberNamePlugin = addPgTableOrderBy(
     return orderByAscDesc(
       "MEMBER_NAME",
       // Order spec callback:
-      ($organizationMemberships) => {
-        $organizationMemberships.join({
+      (queryBuilder) => {
+        queryBuilder.join({
           type: "inner",
           source: usersSource.source as SQL,
           alias: sqlIdentifier,
           conditions: [
-            sql`${sqlIdentifier}.id = ${$organizationMemberships.alias}.user_id`,
+            sql`${sqlIdentifier}.id = ${queryBuilder.alias}.user_id`,
           ],
         });
         return {

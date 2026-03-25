@@ -240,7 +240,7 @@ const oldConfig = {
     // Stricter rules for source code
     {
       files: ["*/*/src/**/*.ts", "*/*/src/**/*.tsx"],
-      ignores: ["*/*/src/examples/**"],
+      ignores: ["*/*/src/examples/**", "*/website/src/**"],
       languageOptions: {
         parser: tsParser,
         parserOptions: {

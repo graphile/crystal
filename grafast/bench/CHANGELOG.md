@@ -1,5 +1,9 @@
 # @localrepo/grafast-bench
 
+## 0.0.1
+
+Identical to 0.0.1-beta.32.
+
 ## 0.0.1-beta.32
 
 ### Patch Changes

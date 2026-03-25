@@ -1,12 +1,12 @@
 {
   "name": "@graphile/lds",
-  "version": "5.0.0-rc.1",
+  "version": "5.0.0",
   "description": "Logical decoding server for PostgreSQL, monitors for new/edited/deleted rows and announces them to interested clients.",
   "main": "dist/index.js",
   "private": true,
   "scripts": {
     "//test": "jest -i",
-    "prepack": "tsc -b"
+    "build": "tsc -b"
   },
   "bin": {
     "graphile-lds": "./dist/cli.js"

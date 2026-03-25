@@ -66,7 +66,7 @@ introspect your datastore you can automatically build your GraphQL objects and
 eliminate the development work required to keep your codebase and database
 schema in sync.
 
-[`graphile-build-pg`](/graphile-build-pg) is a collection of plugins which adds extensive support for
+[`graphile-build-pg`](/graphile-build-pg/4) is a collection of plugins which adds extensive support for
 the popular PostgreSQL database system by performing introspection of your
 database schema and **automatically** building the relevant GraphQL objects and
 fields based on the tables, columns, functions, relations that it finds. This is

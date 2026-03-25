@@ -46,13 +46,30 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
           showLastUpdateTime: true,
-          lastVersion: "latest",
+          editCurrentVersion: true,
+          lastVersion: "5",
           //includeCurrentVersion: false,
+          onlyIncludeVersions: ["current", "5", "4"],
           versions: {
-            latest: { label: "Current" },
-            4: { label: "v4 (current)", banner: "none" },
-            5: { label: "v5 (rc)", banner: "unreleased" },
-            current: { label: "Draft" },
+            current: {
+              noIndex: true,
+              path: "next/",
+              badge: false,
+              label: "🚧 Preview",
+              banner: "unreleased",
+            },
+            5: {
+              path: "5/",
+              badge: false,
+              label: "v5.x",
+              banner: "none",
+            },
+            4: {
+              path: "4/",
+              badge: true,
+              label: "v4.x",
+              banner: "none" /* later: unmaintained */,
+            },
           },
         },
         blog: false,
@@ -70,16 +87,32 @@ const config = {
         id: "graphile-build-pg",
         path: "graphile-build-pg",
         routeBasePath: "graphile-build-pg",
-        sidebarPath: require.resolve("./sidebars.js"),
+        sidebarPath: require.resolve("./graphile-build-pg-sidebars.js"),
         editUrl,
         showLastUpdateTime: true,
-        lastVersion: "latest",
+        lastVersion: "5",
         //includeCurrentVersion: false,
+        onlyIncludeVersions: ["current", "5", "4"],
         versions: {
-          latest: { label: "Current" },
-          4: { label: "v4 (current)", banner: "none" },
-          5: { label: "v5 (rc)", banner: "unreleased" },
-          current: { label: "Draft" },
+          current: {
+            noIndex: true,
+            path: "next/",
+            badge: false,
+            label: "🚧 Preview",
+            banner: "unreleased",
+          },
+          5: {
+            path: "5/",
+            badge: false,
+            label: "v5.x",
+            banner: "none",
+          },
+          4: {
+            path: "4/",
+            badge: true,
+            label: "v4.x",
+            banner: "none" /* later: unmaintained */,
+          },
         },
       },
     ],
@@ -105,14 +138,6 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      announcementBar: {
-        id: "announcementBar-2",
-        content:
-          "This documentation is a work in progress, please forgive gaps, and feel free to send pull requests!",
-        //backgroundColor: "#fafbfc",
-        //textColor: "#091E42",
-        isCloseable: false,
-      },
       navbar: {
         title: "Home",
         logo: {
@@ -170,11 +195,11 @@ const config = {
             items: [
               {
                 label: "Graphile Build",
-                to: "/graphile-build/",
+                to: "/graphile-build/5",
               },
               {
                 label: "Graphile Build PG",
-                to: "/graphile-build-pg/",
+                to: "/graphile-build-pg/5",
               },
               {
                 html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
