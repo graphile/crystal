@@ -153,7 +153,7 @@
     "@whatwg-node/fetch": "^0.10.8",
     "@whatwg-node/server": "^0.10.10",
     "express": "^4.21.2",
-    "fastify": "^5.8.1",
+    "fastify": "^5.8.3",
     "grafast": "workspace:^",
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.4",
