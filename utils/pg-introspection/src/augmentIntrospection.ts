@@ -426,9 +426,8 @@ export function augmentIntrospectionParsed(
   introspection.getLanguage = (by) => languageById.get(by.id);
 
   introspection.database._type = "PgDatabase";
-  introspection.database.getOwner = memo(() =>
-    getRole(introspection.database.datdba),
-  );
+  const dba = roleById.get(introspection.database.datdba);
+  introspection.database.getOwner = () => dba;
   introspection.database.getDba = introspection.database.getOwner;
   introspection.database.getACL = memo(() =>
     parseAcls(
