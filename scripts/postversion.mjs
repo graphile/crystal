@@ -1,6 +1,8 @@
 /* global $, fs */
 import "zx/globals";
 
+import { existsSync } from "node:fs";
+
 // 1. Determine packages updated
 const gitStatus = await $`git status --porcelain`;
 const changedFiles = gitStatus.stdout
