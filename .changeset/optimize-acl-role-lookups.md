@@ -1,5 +1,7 @@
 ---
 "pg-introspection": patch
+"postgraphile": patch
 ---
 
-Optimize ACL role lookups with Map-based indexes and WeakMap caching. Replace O(n) linear scans in `getRole()`, `getRoleByName()`, and `expandRoles()` with O(1) Map lookups, and cache `expandRoles` results per introspection object. Significantly improves performance for schemas with many roles.
+Optimize ACL role lookups, significantly improving performance for schemas with
+many roles (reported 11,000 roles goes from 20+ minutes to 5 seconds!)
