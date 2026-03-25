@@ -839,17 +839,17 @@ const registry = makeRegistry({
     },
     letterDescriptions: {
       __proto__: null,
-      abcdViewByMyLetterViaView: {
-        localCodec: letterDescriptionsCodec,
-        remoteResourceOptions: abcd_view_resourceOptionsConfig,
-        localAttributes: ["letter_via_view"],
-        remoteAttributes: ["letter"],
-        isUnique: true
-      },
       abcdByMyLetter: {
         localCodec: letterDescriptionsCodec,
         remoteResourceOptions: abcd_resourceOptionsConfig,
         localAttributes: ["letter"],
+        remoteAttributes: ["letter"],
+        isUnique: true
+      },
+      abcdViewByMyLetterViaView: {
+        localCodec: letterDescriptionsCodec,
+        remoteResourceOptions: abcd_view_resourceOptionsConfig,
+        localAttributes: ["letter_via_view"],
         remoteAttributes: ["letter"],
         isUnique: true
       }
