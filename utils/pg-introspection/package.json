@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "update-raw-introspection-results": "node scripts/update-raw-introspection-results.ts",
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
     "test": "node --experimental-strip-types --test",
