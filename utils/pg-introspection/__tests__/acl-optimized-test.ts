@@ -7,12 +7,14 @@ import {
   parseAcl,
   PUBLIC_ROLE,
   resolvePermissions,
-} from "../dist/acl.js";
+} from "../src/acl.ts";
+import { augmentIntrospectionParsed } from "../src/augmentIntrospection.ts";
 import type {
   Introspection,
   PgAuthMembers,
   PgRoles,
-} from "../dist/introspection.js";
+} from "../src/introspection.ts";
+import { rawIntrospectionResults } from "./rawIntrospectionResults.ts";
 
 function makeRole(
   _id: string,
@@ -32,14 +34,15 @@ function fakeIntrospection(
   roles: PgRoles[],
   authMembers: Pick<PgAuthMembers, "member" | "roleid">[] = [],
 ): Introspection {
-  return {
+  return augmentIntrospectionParsed({
+    ...rawIntrospectionResults,
     roles,
     auth_members: authMembers.map((am) => ({
       ...am,
       admin_option: false,
       grantor: "0",
     })),
-  } as unknown as Introspection;
+  } as Introspection);
 }
 
 describe("expandRoles", () => {

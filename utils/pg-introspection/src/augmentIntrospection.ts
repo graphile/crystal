@@ -103,8 +103,15 @@ export function augmentIntrospection(
   introspectionResultsString: string,
   includeExtensionResources = false,
 ): Introspection {
-  const introspectionResults = JSON.parse(introspectionResultsString);
-  const introspection = introspectionResults as Introspection;
+  const introspection = JSON.parse(introspectionResultsString) as Introspection;
+  return augmentIntrospectionParsed(introspection, includeExtensionResources);
+}
+
+/** @internal */
+export function augmentIntrospectionParsed(
+  introspection: Introspection,
+  includeExtensionResources = false,
+): Introspection {
   introspection._lookups = createLookups(introspection);
   introspection._caches = createCaches();
 
