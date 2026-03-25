@@ -96,7 +96,7 @@ function getRole(introspection: Introspection, oid: string): PgRoles {
   if (oid === "0") {
     return PUBLIC_ROLE;
   }
-  const role = introspection.roles.find((r) => r._id === oid);
+  const role = introspection._lookups.roleById.get(oid);
   if (!role) {
     throw new Error(`Could not find role with identifier '${oid}'`);
   }
@@ -110,7 +110,7 @@ function getRoleByName(introspection: Introspection, name: string): PgRoles {
   if (name === "public") {
     return PUBLIC_ROLE;
   }
-  const role = introspection.roles.find((r) => r.rolname === name);
+  const role = introspection._lookups.roleByName[name];
   if (!role) {
     throw new Error(`Could not find role with name '${name}'`);
   }
@@ -464,35 +464,57 @@ export const Permission = {
 
 /**
  * Returns all the roles role has been granted (including PUBLIC),
- * respecting `NOINHERIT`
+ * respecting `NOINHERIT`.
  */
 export function expandRoles(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit = false,
-): PgRoles[] {
-  const allRoles = [PUBLIC_ROLE];
+): readonly PgRoles[] {
+  // To avoid potential memory exhaustion, we only cache the common case, where
+  // `roles` is an array of size 1.
+  if (roles.length === 1) {
+    const cacheKey = `${roles[0]._id}:${includeNoInherit ? "N" : "I"}`;
+    const cache = introspection._caches.expandRoles;
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+    const result = _expandRolesUncached(introspection, roles, includeNoInherit);
+    cache.set(cacheKey, result);
+    return result;
+  }
+  return _expandRolesUncached(introspection, roles, includeNoInherit);
+}
+
+function _expandRolesUncached(
+  introspection: Introspection,
+  roles: PgRoles[],
+  includeNoInherit: boolean,
+): readonly PgRoles[] {
+  const allRoles = new Set([PUBLIC_ROLE]);
+  const { authMembersByMemberId } = introspection._lookups;
 
   const addRole = (member: PgRoles) => {
-    if (!allRoles.includes(member)) {
-      allRoles.push(member);
+    if (!allRoles.has(member)) {
+      allRoles.add(member);
       if (includeNoInherit || member.rolinherit !== false) {
-        introspection.auth_members.forEach((am) => {
-          // auth_members - role `am.member` gains the privileges of
-          // `am.roleid`
-
-          if (am.member === member._id) {
-            const rol = getRole(introspection, am.roleid);
-            addRole(rol);
+        const memberships = authMembersByMemberId.get(member._id);
+        if (memberships) {
+          for (const membership of memberships) {
+            const role = getRole(introspection, membership.roleid);
+            addRole(role);
           }
-        });
+        }
       }
     }
   };
 
-  roles.forEach(addRole);
+  for (const role of roles) {
+    addRole(role);
+  }
 
-  return allRoles;
+  return [...allRoles];
 }
 
 /**

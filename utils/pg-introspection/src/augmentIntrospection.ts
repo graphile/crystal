@@ -6,6 +6,7 @@ import {
   OBJECT_SEQUENCE,
   OBJECT_TABLE,
   parseAcls,
+  PUBLIC_ROLE,
 } from "./acl.ts";
 import type {
   Introspection,
@@ -51,6 +52,50 @@ function del<T extends Record<string, any>, TKey extends keyof T>(
   }
 }
 
+function createLookups(introspection: Omit<Introspection, `_${string}`>) {
+  const lookups: Introspection["_lookups"] = {
+    oidByCatalog: Object.create(null),
+    authMembersByMemberId: new Map(),
+    roleById: new Map(),
+    roleByName: Object.create(null),
+  };
+
+  const { oidByCatalog, authMembersByMemberId, roleById, roleByName } = lookups;
+
+  for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
+    oidByCatalog[catalog] = oid;
+  }
+
+  roleById.set(PUBLIC_ROLE._id, PUBLIC_ROLE);
+  roleByName[PUBLIC_ROLE.rolname] = PUBLIC_ROLE;
+  authMembersByMemberId.set(PUBLIC_ROLE._id, new Set());
+  for (const role of introspection.roles) {
+    roleById.set(role._id, role);
+    roleByName[role.rolname] = role;
+    authMembersByMemberId.set(role._id, new Set());
+  }
+
+  for (const am of introspection.auth_members) {
+    const set = authMembersByMemberId.get(am.member);
+    if (!set) {
+      // This should never happen
+      console.warn(
+        `Introspection has membership for role with id '${am.member}', but there is no such role`,
+      );
+      continue;
+    }
+    set.add(am);
+  }
+
+  return lookups;
+}
+
+function createCaches(): Introspection["_caches"] {
+  return {
+    expandRoles: new Map(),
+  };
+}
+
 /**
  * Adds helpers to the introspection results.
  */
@@ -58,13 +103,19 @@ export function augmentIntrospection(
   introspectionResultsString: string,
   includeExtensionResources = false,
 ): Introspection {
-  const introspectionResults = JSON.parse(introspectionResultsString);
-  const introspection = introspectionResults as Introspection;
+  const introspection = JSON.parse(introspectionResultsString) as Introspection;
+  return augmentIntrospectionParsed(introspection, includeExtensionResources);
+}
 
-  const oidByCatalog: { [catalog: string]: string } = Object.create(null);
-  for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
-    oidByCatalog[catalog] = oid;
-  }
+/** @internal */
+export function augmentIntrospectionParsed(
+  introspection: Introspection,
+  includeExtensionResources = false,
+): Introspection {
+  introspection._lookups = createLookups(introspection);
+  introspection._caches = createCaches();
+
+  const { oidByCatalog } = introspection._lookups;
 
   if (!includeExtensionResources) {
     // Go through and delete things from the extensions
