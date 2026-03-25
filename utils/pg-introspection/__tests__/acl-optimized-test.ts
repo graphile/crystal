@@ -14,7 +14,7 @@ import type {
   PgAuthMembers,
   PgRoles,
 } from "../src/introspection.ts";
-import { rawIntrospectionResults } from "./rawIntrospectionResults.ts";
+import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 function makeRole(
   _id: string,
