@@ -13,6 +13,7 @@ import type {
   PgAttribute,
   PgClass,
   PgConstraint,
+  PgDescription,
   PgEnum,
   PgIndex,
   PgNamespace,
@@ -52,18 +53,130 @@ function del<T extends Record<string, any>, TKey extends keyof T>(
   }
 }
 
+function descriptionKey(
+  spec: Pick<PgDescription, "classoid" | "objoid" | "objsubid">,
+) {
+  return `${spec.classoid}|${spec.objoid}|${spec.objsubid}`;
+}
+
 function createLookups(introspection: Omit<Introspection, `_${string}`>) {
   const lookups: Introspection["_lookups"] = {
     oidByCatalog: Object.create(null),
-    authMembersByMemberId: new Map(),
     roleById: new Map(),
     roleByName: Object.create(null),
+    authMembersByMemberId: new Map(),
+    namespaceById: new Map(),
+    namespaceByName: new Map(),
+    typeById: new Map(),
+    classById: new Map(),
+    rangeByTypid: new Map(),
+    attributesByRelId: new Map(),
+    constraintById: new Map(),
+    constraintsByRelid: new Map(),
+    foreignConstraintsByRelid: new Map(),
+    enumById: new Map(),
+    enumsByTypid: new Map(),
+    indexesByRelid: new Map(),
+    descriptionByDescriptionKey: new Map(),
+    procById: new Map(),
+    extensionById: new Map(),
   };
 
-  const { oidByCatalog, authMembersByMemberId, roleById, roleByName } = lookups;
+  const {
+    oidByCatalog,
+    authMembersByMemberId,
+    roleById,
+    roleByName,
+    namespaceById,
+    namespaceByName,
+    typeById,
+    classById,
+    rangeByTypid,
+    attributesByRelId,
+    constraintById,
+    constraintsByRelid,
+    foreignConstraintsByRelid,
+    enumById,
+    enumsByTypid,
+    indexesByRelid,
+    descriptionByDescriptionKey,
+    procById,
+    extensionById,
+  } = lookups;
 
   for (const [oid, catalog] of Object.entries(introspection.catalog_by_oid)) {
     oidByCatalog[catalog] = oid;
+  }
+  for (const entity of introspection.namespaces) {
+    namespaceById.set(entity._id, entity);
+    namespaceByName.set(entity.nspname, entity);
+  }
+  for (const entity of introspection.types) {
+    typeById.set(entity._id, entity);
+  }
+  for (const entity of introspection.classes) {
+    classById.set(entity._id, entity);
+  }
+  for (const entity of introspection.procs) {
+    procById.set(entity._id, entity);
+  }
+  for (const entity of introspection.extensions) {
+    extensionById.set(entity._id, entity);
+  }
+  for (const entity of introspection.ranges) {
+    if (entity.rngtypid == null) continue;
+    rangeByTypid.set(entity.rngtypid, entity);
+  }
+  for (const entity of introspection.descriptions) {
+    descriptionByDescriptionKey.set(descriptionKey(entity), entity);
+  }
+
+  function addListItem<T>(
+    cache: Map<string, T[]>,
+    cacheKey: string,
+    entity: T,
+  ): void {
+    const list = cache.get(cacheKey);
+    if (list) {
+      list.push(entity);
+    } else {
+      cache.set(cacheKey, [entity]);
+    }
+  }
+
+  // Constraints (sorted)
+  for (const entity of introspection.constraints) {
+    constraintById.set(entity._id, entity);
+    if (entity.conrelid !== "0") {
+      addListItem(constraintsByRelid, entity.conrelid, entity);
+    }
+    if (entity.confrelid !== "0") {
+      addListItem(foreignConstraintsByRelid, entity.confrelid, entity);
+    }
+  }
+  for (const list of constraintsByRelid.values()) {
+    list.sort((a, z) => a.conname.localeCompare(z.conname, "en-US"));
+  }
+
+  // Attributes (sorted)
+  for (const entity of introspection.attributes) {
+    addListItem(attributesByRelId, entity.attrelid, entity);
+  }
+  for (const list of attributesByRelId.values()) {
+    list.sort((a, z) => a.attnum - z.attnum);
+  }
+
+  // Enums (sorted)
+  for (const entity of introspection.enums) {
+    enumById.set(entity._id, entity);
+    addListItem(enumsByTypid, entity.enumtypid, entity);
+  }
+  for (const list of enumsByTypid.values()) {
+    list.sort((a, z) => a.enumsortorder - z.enumsortorder);
+  }
+
+  for (const entity of introspection.indexes) {
+    addListItem(indexesByRelid, entity.indrelid, entity);
   }
 
   roleById.set(PUBLIC_ROLE._id, PUBLIC_ROLE);
@@ -115,7 +228,27 @@ export function augmentIntrospectionParsed(
   introspection._lookups = createLookups(introspection);
   introspection._caches = createCaches();
 
-  const { oidByCatalog } = introspection._lookups;
+  const {
+    oidByCatalog,
+    // authMembersByMemberId,
+    roleById,
+    // roleByName,
+    namespaceById,
+    namespaceByName,
+    typeById,
+    classById,
+    rangeByTypid,
+    attributesByRelId,
+    constraintById,
+    constraintsByRelid,
+    foreignConstraintsByRelid,
+    enumById,
+    enumsByTypid,
+    indexesByRelid,
+    descriptionByDescriptionKey,
+    procById,
+    extensionById,
+  } = introspection._lookups;
 
   if (!includeExtensionResources) {
     // Go through and delete things from the extensions
@@ -148,31 +281,25 @@ export function augmentIntrospectionParsed(
   }
 
   const getRole = (id: string | null): PgRoles | undefined =>
-    introspection.roles.find((entity) => entity._id === id);
+    id != null ? roleById.get(id) : undefined;
   const getNamespace = (id: string | null): PgNamespace | undefined =>
-    introspection.namespaces.find((entity) => entity._id === id);
+    id != null ? namespaceById.get(id) : undefined;
   const getType = (id: string | null): PgType | undefined =>
-    introspection.types.find((entity) => entity._id === id);
+    id != null ? typeById.get(id) : undefined;
   const getClass = (id: string | null): PgClass | undefined =>
-    introspection.classes.find((entity) => entity._id === id);
+    id != null ? classById.get(id) : undefined;
   const getRange = (id: string | null): PgRange | undefined =>
-    introspection.ranges.find((entity) => entity.rngtypid === id);
+    id != null ? rangeByTypid.get(id) : undefined;
   const getAttributes = (id: string | null): PgAttribute[] =>
-    introspection.attributes
-      .filter((entity) => entity.attrelid === id)
-      .sort((a, z) => a.attnum - z.attnum);
+    id != null ? (attributesByRelId.get(id) ?? []) : [];
   const getConstraints = (id: string | null): PgConstraint[] =>
-    introspection.constraints
-      .filter((entity) => entity.conrelid === id)
-      .sort((a, z) => a.conname.localeCompare(z.conname, "en-US"));
+    id != null ? (constraintsByRelid.get(id) ?? []) : [];
   const getForeignConstraints = (id: string | null): PgConstraint[] =>
-    introspection.constraints.filter((entity) => entity.confrelid === id);
+    id != null ? (foreignConstraintsByRelid.get(id) ?? []) : [];
   const getEnums = (id: string | null): PgEnum[] =>
-    introspection.enums
-      .filter((entity) => entity.enumtypid === id)
-      .sort((a, z) => a.enumsortorder - z.enumsortorder);
+    id != null ? (enumsByTypid.get(id) ?? []) : [];
   const getIndexes = (id: string | null): PgIndex[] =>
-    introspection.indexes.filter((entity) => entity.indrelid === id);
+    id != null ? (indexesByRelid.get(id) ?? []) : [];
 
   const PG_NAMESPACE = oidByCatalog["pg_namespace"];
   const PG_CLASS = oidByCatalog["pg_class"];
@@ -197,18 +324,11 @@ export function augmentIntrospectionParsed(
   const getDescription = (
     classoid: string,
     objoid: string,
-    objsubid?: number,
+    objsubid = 0,
   ): string | undefined =>
-    objsubid == null
-      ? (introspection.descriptions.find(
-          (d) => d.classoid === classoid && d.objoid === objoid,
-        )?.description ?? undefined)
-      : (introspection.descriptions.find(
-          (d) =>
-            d.classoid === classoid &&
-            d.objoid === objoid &&
-            d.objsubid === objsubid,
-        )?.description ?? undefined);
+    descriptionByDescriptionKey.get(
+      descriptionKey({ classoid, objoid, objsubid }),
+    )?.description;
 
   const getTagsAndDescription = (
     classoid: string,
@@ -231,32 +351,24 @@ export function augmentIntrospectionParsed(
     return parseSmartComment(description);
   };
 
-  introspection.getCurrentUser = memo(() =>
-    introspection.roles.find((r) => r.rolname === introspection.current_user),
-  );
+  const currentUser =
+    introspection._lookups.roleByName[introspection.current_user];
+  introspection.getCurrentUser = () => currentUser;
 
   introspection.getNamespace = (by) => {
     if ("id" in by && by.id) {
-      return getNamespace(by.id);
+      return namespaceById.get(by.id);
     } else if ("name" in by && by.name) {
-      return introspection.namespaces.find(
-        (entity) => entity.nspname === by.name,
-      );
+      return namespaceByName.get(by.name);
     }
   };
-  introspection.getClass = (by) => getClass(by.id);
-  introspection.getConstraint = (by) =>
-    introspection.constraints.find((c) => c._id === by.id);
-  introspection.getProc = (by) =>
-    introspection.procs.find((c) => c._id === by.id);
-  introspection.getRoles = (by) =>
-    introspection.roles.find((c) => c._id === by.id);
-  introspection.getType = (by) =>
-    introspection.types.find((c) => c._id === by.id);
-  introspection.getEnum = (by) =>
-    introspection.enums.find((c) => c._id === by.id);
-  introspection.getExtension = (by) =>
-    introspection.extensions.find((c) => c._id === by.id);
+  introspection.getClass = (by) => classById.get(by.id);
+  introspection.getConstraint = (by) => constraintById.get(by.id);
+  introspection.getProc = (by) => procById.get(by.id);
+  introspection.getRoles = (by) => roleById.get(by.id);
+  introspection.getType = (by) => typeById.get(by.id);
+  introspection.getEnum = (by) => enumById.get(by.id);
+  introspection.getExtension = (by) => extensionById.get(by.id);
   introspection.getIndex = (by) =>
     introspection.indexes.find((c) => c.indexrelid === by.id);
   introspection.getLanguage = (by) =>
@@ -590,6 +702,5 @@ export function augmentIntrospectionParsed(
     entity.getChild = () =>
       introspection.classes.find((child) => child._id === entity.inhrelid);
   });
-
   return introspection;
 }

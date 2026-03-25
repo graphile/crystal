@@ -491,7 +491,7 @@ function _expandRolesUncached(
   introspection: Introspection,
   roles: PgRoles[],
   includeNoInherit: boolean,
-): readonly PgRoles[] {
+): PgRoles[] {
   const allRoles = new Set([PUBLIC_ROLE]);
   const { authMembersByMemberId } = introspection._lookups;
 

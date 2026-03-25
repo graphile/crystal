@@ -77,9 +77,24 @@ interface IntrospectionLookups {
   roleById: Map<string, PgRoles>;
   roleByName: Record<string, PgRoles>;
   authMembersByMemberId: Map<string, Set<PgAuthMembers>>;
+  namespaceById: Map<string, PgNamespace>;
+  namespaceByName: Map<string, PgNamespace>;
+  typeById: Map<string, PgType>;
+  classById: Map<string, PgClass>;
+  rangeByTypid: Map<string, PgRange>;
+  attributesByRelId: Map<string, PgAttribute[]>;
+  constraintById: Map<string, PgConstraint>;
+  constraintsByRelid: Map<string, PgConstraint[]>;
+  foreignConstraintsByRelid: Map<string, PgConstraint[]>;
+  enumById: Map<string, PgEnum>;
+  enumsByTypid: Map<string, PgEnum[]>;
+  indexesByRelid: Map<string, PgIndex[]>;
+  descriptionByDescriptionKey: Map<string, PgDescription>;
+  procById: Map<string, PgProc>;
+  extensionById: Map<string, PgExtension>;
 }
 interface IntrospectionCaches {
-  expandRoles: Map<string, readonly PgRoles[]>;
+  expandRoles: Map<string, PgRoles[]>;
 }
 
 declare module "./introspection.js" {
