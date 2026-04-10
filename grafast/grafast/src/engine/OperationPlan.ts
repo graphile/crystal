@@ -2710,7 +2710,17 @@ export class OperationPlan {
         }
 
         // find all selections compatible with `type`
-        const fieldNodes = fieldSelectionsForType(this, type, selections);
+        const fieldNodes = withGlobalLayerPlan(
+          layerPlan,
+          newPolymorphicPaths,
+          polymorphicPlanningPath,
+          null,
+          fieldSelectionsForType,
+          null,
+          this,
+          type,
+          selections,
+        );
         this.queueNextLayer(this.polymorphicPlanObjectType, {
           outputPlan: polymorphicOutputPlan,
           path,
