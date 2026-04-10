@@ -1,5 +1,5 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
-import { assertConformance, makeConformanceSchema } from "./utils";
+import { assertConformance, makeConformanceSchema } from "./utils.ts";
 
 const schema = makeConformanceSchema(/* GraphQL */ `
   type Query implements Interface {

@@ -26,7 +26,7 @@ import {
   Step,
   UnionPlan,
 } from "../../dist/index.js";
-import { endResult } from "../incrementalUtils.js";
+import { endResult } from "../incrementalUtils.ts";
 
 export const resolvedPreset = resolvePreset({});
 
