@@ -237,6 +237,7 @@ export interface GrafastSchemaConfig {
   unions?: { [typeName: string]: UnionPlan<any> };
   interfaces?: { [typeName: string]: InterfacePlan<any> };
   inputObjects?: { [typeName: string]: InputObjectPlan };
+  extensions?: graphql.GraphQLSchemaExtensions;
   enableDeferStream?: boolean;
 }
 
@@ -254,6 +255,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     inputObjects,
     scalars,
     enums,
+    extensions,
     enableDeferStream = false,
   } = details;
 
@@ -954,6 +956,9 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
         argConfig.type = mapType(argConfig.type);
       }
     }
+  }
+  if (extensions) {
+    schemaConfig.extensions = extensions;
   }
   const schema = new GraphQLSchema(schemaConfig);
   const errors = graphql.validateSchema(schema);
