@@ -7,7 +7,7 @@ import type {
 } from "graphql";
 import { isAsyncIterable } from "iterall";
 
-import { grafast } from "../dist/index.js";
+import { grafast, PromiseOrDirect } from "../dist/index.js";
 
 export async function streamToArray(r: Awaited<ReturnType<typeof grafast>>) {
   if (isAsyncIterable(r)) {
@@ -46,7 +46,9 @@ function getObj(
 
 function deepMerge(target: Record<string | number, any>, source: object) {
   for (const [key, val] of Object.entries(source)) {
-    if (!target[key]) {
+    if (target[key] === val) {
+      // already merged
+    } else if (target[key] === undefined) {
       target[key] = val;
     } else if (Array.isArray(val)) {
       throw new Error(`Don't know how to merge arrays`);
@@ -190,4 +192,16 @@ export function assertNotIterable<T>(
   stream: AsyncIterable<any> | AsyncGenerator<any> | T,
 ): asserts stream is T {
   expect(stream).not.to.have.property(Symbol.asyncIterator);
+}
+
+export async function endResult(
+  r: PromiseOrDirect<Awaited<ReturnType<typeof grafast>>>,
+): Promise<ExecutionResult> {
+  const result = await r;
+  const payloadOrPayloads = await streamToArray(result);
+  if (Array.isArray(payloadOrPayloads)) {
+    return resolveStreamDefer(payloadOrPayloads);
+  } else {
+    return payloadOrPayloads;
+  }
 }
