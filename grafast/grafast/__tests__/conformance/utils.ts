@@ -1,10 +1,9 @@
 import { expect } from "chai";
 import { resolvePreset } from "graphile-config";
+import type { GraphQLFieldMap, GraphQLOutputType } from "graphql";
 import {
   buildSchema,
   graphql,
-  GraphQLFieldMap,
-  GraphQLOutputType,
   GraphQLSchema,
   isEnumType,
   isInterfaceType,
@@ -15,16 +14,18 @@ import {
   isUnionType,
 } from "graphql";
 
+import type {
+  FieldPlan,
+  InterfacePlan,
+  ObjectPlan,
+  UnionPlan,
+} from "../../dist/index.js";
 import {
   constant,
-  FieldPlan,
   get,
   grafast,
-  InterfacePlan,
   makeGrafastSchema,
-  ObjectPlan,
   Step,
-  UnionPlan,
 } from "../../dist/index.js";
 import { endResult } from "../incrementalUtils.ts";
 
