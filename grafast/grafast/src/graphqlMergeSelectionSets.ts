@@ -6,6 +6,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
+import { selectionIsSkipped } from "./graphqlCollectFields.ts";
 import type { OperationPlan } from "./index.ts";
 import { inspect } from "./inspect.ts";
 
@@ -46,6 +47,9 @@ export function fieldSelectionsForType(
 ): ReadonlyArray<FieldNode> {
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
+    if (selectionIsSkipped(operationPlan, selection)) {
+      continue;
+    }
     switch (selection.kind) {
       case Kind.FRAGMENT_SPREAD: {
         // Assumed to exist because query passed validation.

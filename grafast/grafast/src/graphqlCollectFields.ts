@@ -203,6 +203,38 @@ export function newSelectionSetDigest(resolverEmulation: boolean) {
   };
 }
 
+export function selectionIsSkipped(
+  operationPlan: OperationPlan,
+  selection: SelectionNode,
+) {
+  const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
+  if (selection.directives !== undefined) {
+    if (
+      evalDirectiveArg<boolean | null>(
+        selection,
+        "skip",
+        "if",
+        trackedVariableValuesStep,
+        true,
+      ) === true
+    ) {
+      return true;
+    }
+    if (
+      evalDirectiveArg<boolean | null>(
+        selection,
+        "include",
+        "if",
+        trackedVariableValuesStep,
+        true,
+      ) === false
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * Implements the `GraphQLCollectFields` algorithm - like `CollectFields` the
  * GraphQL spec, but modified such that access to variables is tracked.
@@ -222,32 +254,10 @@ export function graphqlCollectFields(
   visitedFragments: { [fragmentName: string]: true } = Object.create(null),
 ): SelectionSetDigest {
   // const objectTypeFields = objectType.getFields();
-  const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
   for (let i = 0, l = selections.length; i < l; i++) {
     const selection = selections[i];
-    if (selection.directives !== undefined) {
-      if (
-        evalDirectiveArg<boolean | null>(
-          selection,
-          "skip",
-          "if",
-          trackedVariableValuesStep,
-          true,
-        ) === true
-      ) {
-        continue;
-      }
-      if (
-        evalDirectiveArg<boolean | null>(
-          selection,
-          "include",
-          "if",
-          trackedVariableValuesStep,
-          true,
-        ) === false
-      ) {
-        continue;
-      }
+    if (selectionIsSkipped(operationPlan, selection)) {
+      continue;
     }
 
     switch (selection.kind) {
