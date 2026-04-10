@@ -109,7 +109,7 @@ export async function assertConformance(
   expect(grafastResult).to.deep.equal(graphqljsResult);
 }
 
-function valueForType(schema: GraphQLSchema, type: GraphQLOutputType) {
+function valueForType(schema: GraphQLSchema, type: GraphQLOutputType): any {
   if (isNonNullType(type)) {
     return valueForType(schema, type.ofType);
   } else if (isListType(type)) {
