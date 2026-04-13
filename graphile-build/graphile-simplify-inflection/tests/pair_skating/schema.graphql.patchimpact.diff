@@ -1,0 +1,126 @@
+3,27c3
+< @@ -16,10 +16,7 @@
+<    nodeId: ID!
+<  
+<    """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByFemaleSkater: Skater
+< -
+< -  """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByMaleSkater: Skater
+< +  skater: Skater
+<  }
+<  
+<  """
+< @@ -125,10 +122,7 @@
+<    query: Query
+<  
+<    """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByFemaleSkater: Skater
+< -
+< -  """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByMaleSkater: Skater
+< +  skater: Skater
+<  }
+<  
+<  """All input for the create `Skater` mutation."""
+< @@ -176,24 +170,28 @@
+---
+> @@ -176,24 +176,28 @@
+62c38
+< @@ -203,11 +201,7 @@
+---
+> @@ -203,11 +207,7 @@
+75c51
+< @@ -226,7 +220,7 @@
+---
+> @@ -226,7 +226,7 @@
+84,92c60,61
+< @@ -234,20 +228,21 @@
+<    query: Query
+<  
+<    """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByFemaleSkater: Skater
+< -
+< -  """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByMaleSkater: Skater
+< +  skater: Skater
+---
+> @@ -240,14 +240,18 @@
+>    skaterByMaleSkater: Skater
+113c82
+< @@ -257,11 +252,7 @@
+---
+> @@ -257,11 +261,7 @@
+126c95
+< @@ -271,7 +262,7 @@
+---
+> @@ -271,7 +271,7 @@
+135c104
+< @@ -308,7 +299,7 @@
+---
+> @@ -308,7 +308,7 @@
+144c113
+< @@ -325,22 +316,22 @@
+---
+> @@ -325,22 +325,22 @@
+173c142
+< @@ -348,17 +339,15 @@
+---
+> @@ -348,17 +348,15 @@
+195c164
+< @@ -375,19 +364,21 @@
+---
+> @@ -375,19 +373,21 @@
+222c191
+< @@ -416,8 +407,25 @@
+---
+> @@ -416,8 +416,25 @@
+249c218
+< @@ -446,7 +454,7 @@
+---
+> @@ -446,7 +463,7 @@
+258c227
+< @@ -462,8 +470,34 @@
+---
+> @@ -462,8 +479,34 @@
+294c263
+< @@ -492,7 +526,7 @@
+---
+> @@ -492,7 +535,7 @@
+303c272
+< @@ -507,57 +541,11 @@
+---
+> @@ -507,49 +550,6 @@
+353,362c322
+<    """Reads a single `CompetingPair` that is related to this `Skater`."""
+< -  competingPairByFemaleSkater: CompetingPair
+< -
+< -  """Reads a single `CompetingPair` that is related to this `Skater`."""
+< -  competingPairByMaleSkater: CompetingPair
+< +  competingPair: CompetingPair
+<    id: BigInt!
+<  
+<    """
+< @@ -616,31 +604,31 @@
+---
+> @@ -616,31 +616,31 @@
+402c362
+< @@ -648,10 +636,14 @@
+---
+> @@ -648,10 +648,14 @@
+419c379
+< @@ -661,16 +653,12 @@
+---
+> @@ -661,16 +665,12 @@
+438,448d397
+< @@ -696,8 +684,5 @@
+<    query: Query
+<  
+<    """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByFemaleSkater: Skater
+< -
+< -  """Reads a single `Skater` that is related to this `CompetingPair`."""
+< -  skaterByMaleSkater: Skater
+< +  skater: Skater
+<  }
+< \ No newline at end of file
