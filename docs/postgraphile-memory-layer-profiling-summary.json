@@ -1,0 +1,122 @@
+[
+  {
+    "phase": "makeSchema",
+    "count": 5,
+    "avgMs": 290.917,
+    "p95Ms": 329.033,
+    "avgHeapDelta": 3208424,
+    "peakHeapDelta": 5007280,
+    "avgHeapAfterGC": 3197226,
+    "peakHeapAfterGC": 4985424
+  },
+  {
+    "phase": "makeSchema.resolvePreset",
+    "count": 5,
+    "avgMs": 2.339,
+    "p95Ms": 4.211,
+    "avgHeapDelta": 938397,
+    "peakHeapDelta": 978072,
+    "avgHeapAfterGC": 4288,
+    "peakHeapAfterGC": 9376
+  },
+  {
+    "phase": "buildInflection",
+    "count": 5,
+    "avgMs": 0.847,
+    "p95Ms": 1.64,
+    "avgHeapDelta": 152736,
+    "peakHeapDelta": 191928,
+    "avgHeapAfterGC": 30931,
+    "peakHeapAfterGC": 66296
+  },
+  {
+    "phase": "gather",
+    "count": 5,
+    "avgMs": 62.209,
+    "p95Ms": 79.375,
+    "avgHeapDelta": 3434610,
+    "peakHeapDelta": 4187944,
+    "avgHeapAfterGC": 1967707,
+    "peakHeapAfterGC": 2597968
+  },
+  {
+    "phase": "buildSchema",
+    "count": 5,
+    "avgMs": 84.368,
+    "p95Ms": 135.754,
+    "avgHeapDelta": 11826696,
+    "peakHeapDelta": 15127512,
+    "avgHeapAfterGC": 1186643,
+    "peakHeapAfterGC": 2290896
+  },
+  {
+    "phase": "postgraphile",
+    "count": 5,
+    "avgMs": 102.61,
+    "p95Ms": 114.219,
+    "avgHeapDelta": 84082,
+    "peakHeapDelta": 216736,
+    "avgHeapAfterGC": 83030,
+    "peakHeapAfterGC": 210096
+  },
+  {
+    "phase": "postgraphile.createServ",
+    "count": 5,
+    "avgMs": 95.934,
+    "p95Ms": 101.321,
+    "avgHeapDelta": 16854,
+    "peakHeapDelta": 45808,
+    "avgHeapAfterGC": 12682,
+    "peakHeapAfterGC": 40416
+  },
+  {
+    "phase": "grafserv.constructor",
+    "count": 5,
+    "avgMs": 59.717,
+    "p95Ms": 64.706,
+    "avgHeapDelta": 13462,
+    "peakHeapDelta": 37440,
+    "avgHeapAfterGC": 8829,
+    "peakHeapAfterGC": 31496
+  },
+  {
+    "phase": "grafserv.setPreset",
+    "count": 5,
+    "avgMs": 142.377,
+    "p95Ms": 148.944,
+    "avgHeapDelta": -1994229,
+    "peakHeapDelta": 19600,
+    "avgHeapAfterGC": -1998328,
+    "peakHeapAfterGC": 15032
+  },
+  {
+    "phase": "grafserv.setSchema",
+    "count": 5,
+    "avgMs": 34.835,
+    "p95Ms": 40.331,
+    "avgHeapDelta": 5314,
+    "peakHeapDelta": 7544,
+    "avgHeapAfterGC": 1262,
+    "peakHeapAfterGC": 2296
+  },
+  {
+    "phase": "grafserv.refreshHandlers",
+    "count": 10,
+    "avgMs": 0.104,
+    "p95Ms": 0.424,
+    "avgHeapDelta": 2874,
+    "peakHeapDelta": 9136,
+    "avgHeapAfterGC": 717,
+    "peakHeapAfterGC": 2912
+  },
+  {
+    "phase": "postgraphile.release",
+    "count": 5,
+    "avgMs": 0.095,
+    "p95Ms": 0.198,
+    "avgHeapDelta": 2770,
+    "peakHeapDelta": 3648,
+    "avgHeapAfterGC": 1248,
+    "peakHeapAfterGC": 2088
+  }
+]

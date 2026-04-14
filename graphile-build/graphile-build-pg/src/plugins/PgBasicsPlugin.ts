@@ -17,6 +17,7 @@ import type { PgSQL, SQL } from "pg-sql2";
 import { getBehavior } from "../behavior.ts";
 import type { PgCodecMetaLookup } from "../inputUtils.ts";
 import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.ts";
+import { wrapSchemaPlaceholder } from "../multiTenancy.ts";
 import { version } from "../version.ts";
 
 declare global {
@@ -153,8 +154,14 @@ declare global {
       pgRefDefinition: PgRefDefinition;
     }
     interface GatherOptions {
-      /** Set to 'unqualified' to omit the schema name from table, function, and type identifiers */
-      pgIdentifiers?: "qualified" | "unqualified";
+      /**
+       * Set to 'unqualified' to omit the schema name from table, function,
+       * and type identifiers. Set to 'dynamic' to wrap schema names in
+       * template placeholders (`__pgmt_<schemaName>__`) for multi-tenancy
+       * use cases where the physical schema is resolved at execution time
+       * via `PgExecutorContext.sqlTextTransform`.
+       */
+      pgIdentifiers?: "qualified" | "unqualified" | "dynamic";
     }
   }
 
@@ -200,6 +207,28 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               [partsWithoutSchema, sql],
             );
           }
+          case "dynamic": {
+            // Only wrap when there are 2+ parts (schema + name). A
+            // single-part identifier has no schema to replace — fall
+            // through to qualified behaviour to avoid mistakenly
+            // wrapping a table/type name as a schema placeholder.
+            if (parts.length < 2) {
+              return EXPORTABLE(
+                (parts, sql) => sql.identifier(...parts),
+                [parts, sql],
+              );
+            }
+            // Wrap the schema name in template placeholders so that
+            // sqlTextTransform can replace them at execution time.
+            // e.g. sql.identifier('__pgmt_my_schema__', 'my_table')
+            const [schemaName, ...rest] = parts;
+            const placeholderSchema = wrapSchemaPlaceholder(schemaName);
+            const dynamicParts = [placeholderSchema, ...rest];
+            return EXPORTABLE(
+              (dynamicParts, sql) => sql.identifier(...dynamicParts),
+              [dynamicParts, sql],
+            );
+          }
           case "qualified":
           case undefined: {
             return EXPORTABLE(
@@ -209,7 +238,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           }
           default: {
             throw new Error(
-              `Setting preset.gather.pgIdentifiers had unsupported value '${info.options.pgIdentifiers}'; please use a supported value: 'qualified' or 'unqualified'.`,
+              `Setting preset.gather.pgIdentifiers had unsupported value '${info.options.pgIdentifiers}'; please use a supported value: 'qualified', 'unqualified', or 'dynamic'.`,
             );
           }
         }

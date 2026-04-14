@@ -11,7 +11,7 @@ import {
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { Middleware } from "graphile-config";
-import { resolvePreset } from "graphile-config";
+import { phaseStart, resolvePreset } from "graphile-config";
 
 import { getGrafservMiddleware } from "../hooks.ts";
 import type {
@@ -85,6 +85,7 @@ export class GrafservBase {
   public graphiqlStaticHandler!: ReturnType<typeof makeGraphiQLStaticHandler>;
 
   constructor(config: GrafservConfig) {
+    const _ph = phaseStart("grafserv.constructor");
     this.eventEmitter = new EventEmitter();
     this.resolvedPreset = resolvePreset(config.preset ? config.preset : {});
     this.dynamicOptions = {
@@ -117,6 +118,7 @@ export class GrafservBase {
     this.graphiqlHandler = this.waitForGraphiqlHandler;
     this.graphiqlStaticHandler = this.waitForGraphiqlStaticHandler;
     this.readyTask(this.setPreset(this.resolvedPreset));
+    _ph.end();
   }
 
   private readyPromise: PromiseOrDirect<void> = undefined;
@@ -251,6 +253,7 @@ export class GrafservBase {
 
   private _settingPreset = false;
   public setPreset(newPreset: GraphileConfig.Preset): PromiseOrDirect<void> {
+    const _ph = phaseStart("grafserv.setPreset");
     if (this._settingPreset) {
       throw new Error(
         `Setting a preset is currently in progress; please wait for it to complete.`,
@@ -298,11 +301,13 @@ export class GrafservBase {
         // Finally:
         .then(() => {
           this._settingPreset = false;
+          _ph.end();
         })
     );
   }
 
   public setSchema(newSchema: GraphQLSchema) {
+    const _ph = phaseStart("grafserv.setSchema");
     if (!newSchema) {
       throw new Error(`setSchema must be called with a GraphQL schema`);
     }
@@ -323,11 +328,14 @@ export class GrafservBase {
       this.eventEmitter.emit("schema:ready", newSchema);
       this.refreshHandlers();
     }
+    _ph.end();
   }
 
   private refreshHandlers() {
+    const _ph = phaseStart("grafserv.refreshHandlers");
     if (!this.initialized) {
       // This will be handled once `setPreset` completes
+      _ph.end();
       return;
     }
     this.graphqlHandler = makeGraphQLHandler(this);
@@ -341,6 +349,7 @@ export class GrafservBase {
       this.middleware,
       this.dynamicOptions,
     );
+    _ph.end();
   }
 
   private waitForGraphqlHandler: ReturnType<typeof makeGraphQLHandler> =

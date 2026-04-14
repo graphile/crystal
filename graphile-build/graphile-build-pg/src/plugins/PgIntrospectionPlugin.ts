@@ -367,6 +367,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   return object({
                     pgSettings: ctx.get(pgSettingsKey),
                     withPgClient: ctx.get(withPgClientKey),
+                    sqlTextTransform: ctx.get("pgSqlTextTransform"),
                   }) as Step<PgExecutorContext<any>>;
                 },
                 [context, object, pgSettingsKey, withPgClientKey],
@@ -378,6 +379,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   return object({
                     pgSettings: constant(null),
                     withPgClient: ctx.get(withPgClientKey),
+                    sqlTextTransform: ctx.get("pgSqlTextTransform"),
                   }) as Step<PgExecutorContext<any>>;
                 },
                 [constant, context, object, withPgClientKey],

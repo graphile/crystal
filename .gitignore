@@ -53,3 +53,5 @@ grafast/grafast/__tests__/dcc/**/*.mermaid
 /WHAT_ARE_YOU_DOING.md
 contrib
 /env
+
+.npm/

@@ -8,7 +8,13 @@ import {
   lexicographicSortSchema,
   printSchema,
 } from "grafast/graphql";
-import { AsyncHooks, orderedApply, resolvePreset } from "graphile-config";
+import {
+  AsyncHooks,
+  orderedApply,
+  phaseStart,
+  profileAsync,
+  resolvePreset,
+} from "graphile-config";
 
 export { isValidBehaviorString } from "./behavior.ts";
 import extend from "./extend.ts";
@@ -109,6 +115,7 @@ export const buildInflection = (
   /** @internal */
   trace?: Map<string, InflectorSource[]>,
 ): GraphileBuild.Inflection => {
+  const _ph = phaseStart("buildInflection");
   const resolvedPreset = resolvePreset(preset);
   const { plugins, inflection: _options = {} } = resolvedPreset;
 
@@ -201,6 +208,7 @@ export const buildInflection = (
     );
   }
 
+  _ph.end();
   return inflectors as GraphileBuild.Inflection;
 };
 
@@ -441,7 +449,7 @@ export const gather = (
   },
 ): Promise<GraphileBuild.BuildInput> => {
   const { run } = gatherBase(preset, helpers);
-  return run();
+  return profileAsync("gather", () => run());
 };
 
 /**
@@ -517,6 +525,7 @@ export const buildSchema = (
     inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
+  const _ph = phaseStart("buildSchema");
   const preset = {
     extends: [GraphileBuildLibPreset, rawPreset],
   };
@@ -553,6 +562,7 @@ export const buildSchema = (
     });
   }
 
+  _ph.end();
   return schema;
 };
 
@@ -597,7 +607,10 @@ export async function makeSchema(
   preset: GraphileConfig.Preset,
   // ENHANCE: AbortSignal
 ): Promise<SchemaResult> {
+  const _phMake = phaseStart("makeSchema");
+  const _phResolve = phaseStart("makeSchema.resolvePreset");
   const resolvedPreset = resolvePreset(preset);
+  _phResolve.end();
   // An error caused here cannot be solved by retrying, so don't catch it.
   const inflection = buildInflection(resolvedPreset);
   const shared = { inflection };
@@ -630,7 +643,9 @@ export async function makeSchema(
       }
     }
   } else {
-    return make();
+    const result = await make();
+    _phMake.end();
+    return result;
   }
 }
 

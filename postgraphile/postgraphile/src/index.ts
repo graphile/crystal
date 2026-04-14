@@ -7,7 +7,7 @@ import type { GraphQLSchema } from "grafast/graphql";
 import type { GrafservBase, GrafservConfig } from "grafserv";
 import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
-import { resolvePreset } from "graphile-config";
+import { phaseStart, resolvePreset } from "graphile-config";
 
 export { makeSchema, watchSchema };
 
@@ -24,6 +24,7 @@ export interface PostGraphileInstance {
 export function postgraphile(
   preset: GraphileConfig.Preset,
 ): PostGraphileInstance {
+  const _phPG = phaseStart("postgraphile");
   const resolvedPreset = resolvePreset(preset);
   let schemaResult: PromiseLike<SchemaResult> | SchemaResult;
   let stopWatchingPromise: Promise<() => void> | null = null;
@@ -75,8 +76,10 @@ export function postgraphile(
     }
   }
 
+  _phPG.end();
   return {
     createServ(grafserv) {
+      const _phServ = phaseStart("postgraphile.createServ");
       assertAlive();
       if (server) {
         throw new Error(
@@ -98,6 +101,7 @@ export function postgraphile(
         }
       });
       server = newServer;
+      _phServ.end();
       return newServer;
     },
     async getSchemaResult() {
@@ -112,6 +116,7 @@ export function postgraphile(
       return resolvedPreset;
     },
     async release() {
+      const _phRelease = phaseStart("postgraphile.release");
       assertAlive();
       released = true;
       if (server) {
@@ -125,6 +130,7 @@ export function postgraphile(
           /* nom nom nom */
         }
       }
+      _phRelease.end();
     },
   };
 }

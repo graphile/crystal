@@ -19,6 +19,13 @@ export {
   resolvePreset,
   resolvePresets,
 } from "./resolvePresets.ts";
+export {
+  phaseStart,
+  profileAsync,
+  profilingEnabled,
+  profilingHeapMode,
+} from "./profiling.ts";
+export type { PhaseHandle } from "./profiling.ts";
 
 export function sortedPlugins(
   plugins: GraphileConfig.Plugin[] | undefined,
