@@ -1,5 +1,22 @@
 # grafast
 
+## 1.0.1
+
+### Patch Changes
+
+- [#3025](https://github.com/graphile/crystal/pull/3025)
+  [`86fa95c`](https://github.com/graphile/crystal/commit/86fa95c93937e5483cceb16b5afaafb0fdec5397)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where `@skip` and
+  `@include` on fragment spreads were not honoured in abstract positions.
+
+- [#3023](https://github.com/graphile/crystal/pull/3023)
+  [`647ed8b`](https://github.com/graphile/crystal/commit/647ed8b5993f1e676fbce8e9c6e9dfec7b99ed10)
+  Thanks [@benjie](https://github.com/benjie)! - Allow `extensions` to be passed
+  to `makeGrafastSchema` to become schema extensions.
+- Updated dependencies
+  [[`92106c3`](https://github.com/graphile/crystal/commit/92106c3b8e8ef34e68c52503dc22d13d30d85a9e)]:
+  - graphile-config@1.0.1
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.9.

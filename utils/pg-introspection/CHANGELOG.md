@@ -1,5 +1,20 @@
 # pg-introspection
 
+## 1.0.1
+
+### Patch Changes
+
+- [#2983](https://github.com/graphile/crystal/pull/2983)
+  [`86aab72`](https://github.com/graphile/crystal/commit/86aab720d5f963fe1f41845a465e7684097df09d)
+  Thanks [@msotnikov](https://github.com/msotnikov)! - Optimize ACL role
+  lookups, significantly improving performance for schemas with many roles
+  (reported 11,000 roles goes from 20+ minutes to 5 seconds!)
+
+- [#3012](https://github.com/graphile/crystal/pull/3012)
+  [`23c5c6e`](https://github.com/graphile/crystal/commit/23c5c6e80ca831c84b65b3c3442253a80cb28633)
+  Thanks [@benjie](https://github.com/benjie)! - Further enhance performance of
+  pgIntrospection through precomputed lookups.
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.5.

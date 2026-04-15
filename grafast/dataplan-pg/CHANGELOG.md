@@ -1,5 +1,21 @@
 # @dataplan/pg
 
+## 1.0.1
+
+### Patch Changes
+
+- [#2984](https://github.com/graphile/crystal/pull/2984)
+  [`be429b8`](https://github.com/graphile/crystal/commit/be429b8d2ce7e9923af076cb89d8483fa44e6ae0)
+  Thanks [@benjie](https://github.com/benjie)! - Export `PgRootStep` interface,
+  and improve said interface to support `placeholder` of a `PgTypedStep` (with
+  no codec necessary).
+- Updated dependencies
+  [[`86fa95c`](https://github.com/graphile/crystal/commit/86fa95c93937e5483cceb16b5afaafb0fdec5397),
+  [`dda2e78`](https://github.com/graphile/crystal/commit/dda2e7897e69681b326baed5e15d047b6393e314),
+  [`647ed8b`](https://github.com/graphile/crystal/commit/647ed8b5993f1e676fbce8e9c6e9dfec7b99ed10)]:
+  - grafast@1.0.1
+  - pg-sql2@5.0.1
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.8.
