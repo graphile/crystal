@@ -1,5 +1,23 @@
 # graphile-build-pg
 
+## 5.0.1
+
+### Patch Changes
+
+- [#2984](https://github.com/graphile/crystal/pull/2984)
+  [`4555428`](https://github.com/graphile/crystal/commit/45554280b59d955e4e1e2a589d1f87717f4e48a0)
+  Thanks [@benjie](https://github.com/benjie)! - Re-export `sql` and `SQL` from
+  `graphile-build-pg`.
+
+- Updated dependencies
+  [[`92106c3`](https://github.com/graphile/crystal/commit/92106c3b8e8ef34e68c52503dc22d13d30d85a9e),
+  [`86aab72`](https://github.com/graphile/crystal/commit/86aab720d5f963fe1f41845a465e7684097df09d),
+  [`23c5c6e`](https://github.com/graphile/crystal/commit/23c5c6e80ca831c84b65b3c3442253a80cb28633),
+  [`dda2e78`](https://github.com/graphile/crystal/commit/dda2e7897e69681b326baed5e15d047b6393e314)]:
+  - graphile-config@1.0.1
+  - pg-introspection@1.0.1
+  - pg-sql2@5.0.1
+
 ## 5.0.0
 
 Identical to 5.0.0-rc.8.
