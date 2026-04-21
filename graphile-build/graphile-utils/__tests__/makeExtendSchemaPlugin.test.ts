@@ -872,6 +872,8 @@ it("enables setting apply for enum values", async () => {
   }
   class ThingyStep extends Step {
     private applyDepIds: number[] = [];
+    // Disable warning
+    isSyncAndSafe = false;
     apply($step: Step<(n: Thingy) => void>) {
       this.applyDepIds.push(this.addUnaryDependency($step));
     }
@@ -960,6 +962,8 @@ it("enables setting apply for enum values", async () => {
 
 class NumberStep extends Step {
   baseValue: number;
+  // Disable warning
+  isSyncAndSafe = false;
   operations: { opName: "add" | "subtract"; depId: number }[];
   constructor(value: number) {
     super();
