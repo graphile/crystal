@@ -1137,6 +1137,7 @@ function encodeUnknown(value: unknown): string | null {
  * names (those that would be found in the `pg_type` table).
  */
 export const TYPES = {
+  /** Experimental support for "unknown" data on input. @experimental */
   unknown: t<SQLRawValue>()("705", "unknown", {
     toPg(value) {
       return encodeUnknown(value);
