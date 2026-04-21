@@ -428,6 +428,72 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
   });
 });
 
+it("supports arbitrary sql queries with unknown placeholders", async () => {
+  const preset: GraphileConfig.Preset = {
+    extends: [PostGraphileAmberPreset],
+    plugins: [
+      extendSchema((build) => {
+        const { users } = build.input.pgRegistry.pgResources;
+        const { sql } = build;
+        return {
+          typeDefs: gql`
+            extend type Query {
+              usersByUnknownName(name: String!): UserConnection
+            }
+          `,
+          objects: {
+            Query: {
+              plans: {
+                usersByUnknownName(_$root, { $name }) {
+                  const $users = users.find();
+                  $users.where(
+                    sql`${$users.alias}.name = ${$users.placeholder($name, TYPES.unknown)}`,
+                  );
+                  return connection($users);
+                },
+              },
+            },
+          },
+        };
+      }),
+    ],
+    pgServices: [
+      makePgService({
+        pool: pgPool!,
+        schemas: ["graphile_utils"],
+      }),
+    ],
+  };
+  const { schema, resolvedPreset } = await makeSchema(preset);
+  const result = await grafast({
+    schema,
+    resolvedPreset,
+    requestContext: {},
+    source: /* GraphQL */ `
+      {
+        usersByUnknownName(name: "Alice") {
+          nodes {
+            name
+            email
+          }
+        }
+      }
+    `,
+  });
+  expect(result).toEqual({
+    data: {
+      usersByUnknownName: {
+        nodes: [
+          {
+            name: "Alice",
+            email: "alice@example.com",
+          },
+        ],
+      },
+    },
+  });
+});
+
 it("scope", async () => {
   const scopes: Record<string, any> = Object.create(null);
   const preset: GraphileConfig.Preset = {
@@ -806,6 +872,8 @@ it("enables setting apply for enum values", async () => {
   }
   class ThingyStep extends Step {
     private applyDepIds: number[] = [];
+    // Disable warning
+    isSyncAndSafe = false;
     apply($step: Step<(n: Thingy) => void>) {
       this.applyDepIds.push(this.addUnaryDependency($step));
     }
@@ -894,6 +962,8 @@ it("enables setting apply for enum values", async () => {
 
 class NumberStep extends Step {
   baseValue: number;
+  // Disable warning
+  isSyncAndSafe = false;
   operations: { opName: "add" | "subtract"; depId: number }[];
   constructor(value: number) {
     super();

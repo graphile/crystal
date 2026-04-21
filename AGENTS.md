@@ -131,6 +131,14 @@ represented (even if the contents are mutated).
 Exception to the above: `const $foo = context().get("foo");` is fine, and
 preferred over the two statement equivalent.
 
+When writing plan resolvers against PostgreSQL resources, prefer the resource
+and step helpers before constructing low-level plans by hand. For example, use
+argument destructuring such as `(_$root, { $name })`, `users.find()`,
+`$users.where(...)`, and `$users.placeholder($name, TYPES.text)` where they fit,
+rather than building a custom `pgSelect({ identifiers, args, from })` wrapper.
+Reach for low-level constructors only when the resource/step APIs do not express
+the query shape.
+
 ## Testing Rules
 
 - Prefer **incremental** tests: cover public APIs and critical paths first.

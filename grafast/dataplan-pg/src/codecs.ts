@@ -649,6 +649,40 @@ type PgCodecTFromJavaScript<
     ? UFromJs
     : any;
 
+function listEncode(
+  innerCodecToPg: PgEncode<any>,
+  typeDelim: string,
+  value: readonly unknown[],
+) {
+  let result = "{";
+  for (let i = 0, l = value.length; i < l; i++) {
+    if (i > 0) {
+      result += typeDelim;
+    }
+    const v = value[i];
+    if (v == null) {
+      result += "NULL";
+      continue;
+    }
+    const str = innerCodecToPg(v);
+    if (str == null) {
+      result += "NULL";
+      continue;
+    }
+    if (typeof str !== "string" && typeof str !== "number") {
+      throw new Error(
+        `Do not know how to encode ${inspect(str)} to an array (send a PR!)`,
+      );
+    }
+    // > To put a double quote or backslash in a quoted array element
+    // > value, precede it with a backslash.
+    // -- https://www.postgresql.org/docs/current/arrays.html#ARRAYS-IO
+    result += `"${String(str).replace(/[\\"]/g, "\\$&")}"`;
+  }
+  result += "}";
+  return result;
+}
+
 /**
  * Given a PgCodec, this returns a new PgCodec that represents a list
  * of the former.
@@ -732,37 +766,7 @@ export function listOfCodec<
       innerCodecFromPg === identity && typeDelim === ","
         ? parseArray
         : makeParseArrayWithTransform(innerCodecFromPg, typeDelim),
-    toPg: (value) => {
-      let result = "{";
-      for (let i = 0, l = value.length; i < l; i++) {
-        if (i > 0) {
-          result += typeDelim;
-        }
-        const v = value[i];
-        if (v == null) {
-          result += "NULL";
-          continue;
-        }
-        const str = innerCodecToPg(v);
-        if (str == null) {
-          result += "NULL";
-          continue;
-        }
-        if (typeof str !== "string" && typeof str !== "number") {
-          throw new Error(
-            `Do not know how to encode ${inspect(
-              str,
-            )} to an array (send a PR!)`,
-          );
-        }
-        // > To put a double quote or backslash in a quoted array element
-        // > value, precede it with a backslash.
-        // -- https://www.postgresql.org/docs/current/arrays.html#ARRAYS-IO
-        result += `"${String(str).replace(/[\\"]/g, "\\$&")}"`;
-      }
-      result += "}";
-      return result;
-    },
+    toPg: (value) => listEncode(innerCodecToPg, typeDelim, value),
     attributes: undefined,
     description,
     extensions,
@@ -1101,12 +1105,48 @@ const stripSubnet32 = {
   },
 };
 const reg = { hasNaturalOrdering: false };
+
+// Rough emulation of what I think the `pg` module does
+function encodeUnknown(value: unknown): string | null {
+  if (value == null) {
+    return null;
+  }
+  const t = typeof value;
+  if (t === "string") {
+    return value as string;
+  } else if (t === "boolean") {
+    return String(value);
+  } else if (t === "number") {
+    return String(value);
+  } else if (Array.isArray(value)) {
+    return listEncode(encodeUnknown, ",", value);
+  } else if (value instanceof Date) {
+    return value.toISOString();
+  } else if (Buffer.isBuffer(value)) {
+    throw new Error("Encoding buffer not supported for unknown");
+  } else if (t === "object") {
+    return JSON.stringify(value);
+  } else {
+    return String(value);
+  }
+}
+
 /**
  * Built in PostgreSQL types that we support; note the keys are the "ergonomic"
  * names (like 'bigint'), but the values use the underlying PostgreSQL true
  * names (those that would be found in the `pg_type` table).
  */
 export const TYPES = {
+  /** Experimental support for "unknown" data on input. @experimental */
+  unknown: t<SQLRawValue>()("705", "unknown", {
+    toPg(value) {
+      return encodeUnknown(value);
+    },
+    fromPg(value) {
+      // TODO: warning?
+      return String(value);
+    },
+  }), // unknown: 705
   void: t<void>()("2278", "void"), // void: 2278
   boolean: s<boolean>()("16", "bool", {
     fromPg: (value) => value[0] === "t",
@@ -1382,7 +1422,7 @@ export const LIST_TYPES = {
 } satisfies {
   [name in Exclude<
     keyof typeof TYPES,
-    "void"
+    "unknown" | "void"
   >]: (typeof TYPES)[name] extends PgCodec<
     infer UName,
     any,
@@ -1414,6 +1454,8 @@ for (const [name, codec] of Object.entries(LIST_TYPES)) {
  */
 export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
   switch (pgCatalogTypeName) {
+    case "unknown":
+      return TYPES.unknown;
     case "void":
       return TYPES.void;
     case "bool":
