@@ -1,0 +1,35 @@
+19c19,22
+<   skater: Skater
+---
+>   skaterByFemaleSkater: Skater
+> 
+>   """Reads a single `Skater` that is related to this `CompetingPair`."""
+>   skaterByMaleSkater: Skater
+125c128,131
+<   skater: Skater
+---
+>   skaterByFemaleSkater: Skater
+> 
+>   """Reads a single `Skater` that is related to this `CompetingPair`."""
+>   skaterByMaleSkater: Skater
+231c237,240
+<   skater: Skater
+---
+>   skaterByFemaleSkater: Skater
+> 
+>   """Reads a single `Skater` that is related to this `CompetingPair`."""
+>   skaterByMaleSkater: Skater
+548c557,560
+<   competingPair: CompetingPair
+---
+>   competingPairByFemaleSkater: CompetingPair
+> 
+>   """Reads a single `CompetingPair` that is related to this `Skater`."""
+>   competingPairByMaleSkater: CompetingPair
+687c699,702
+<   skater: Skater
+---
+>   skaterByFemaleSkater: Skater
+> 
+>   """Reads a single `Skater` that is related to this `CompetingPair`."""
+>   skaterByMaleSkater: Skater
