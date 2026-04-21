@@ -989,6 +989,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               | null
               | { [situation: string]: string | null };
           } = {
+            unknown: null,
             void: null,
             boolean: "Boolean",
             int2: "Int",

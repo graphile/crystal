@@ -1107,6 +1107,7 @@ const reg = { hasNaturalOrdering: false };
  * names (those that would be found in the `pg_type` table).
  */
 export const TYPES = {
+  unknown: t<SQLRawValue>()("705", "unknown"), // unknown: 705
   void: t<void>()("2278", "void"), // void: 2278
   boolean: s<boolean>()("16", "bool", {
     fromPg: (value) => value[0] === "t",
@@ -1382,7 +1383,7 @@ export const LIST_TYPES = {
 } satisfies {
   [name in Exclude<
     keyof typeof TYPES,
-    "void"
+    "unknown" | "void"
   >]: (typeof TYPES)[name] extends PgCodec<
     infer UName,
     any,
@@ -1414,6 +1415,8 @@ for (const [name, codec] of Object.entries(LIST_TYPES)) {
  */
 export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
   switch (pgCatalogTypeName) {
+    case "unknown":
+      return TYPES.unknown;
     case "void":
       return TYPES.void;
     case "bool":
