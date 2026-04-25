@@ -1,13 +1,14 @@
 import {
-  grafast,
-  makeGrafastSchema,
-  lambda,
   context,
-  ExecutableStep,
+  grafast,
+  lambda,
   LambdaStep,
+  makeGrafastSchema,
+  Step,
 } from "grafast";
-import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
+
 import { graphqlQuery } from "../steps/graphqlOperation";
+import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
 import { GraphQLSelectionSetStep } from "../steps/graphqlSelectionSet";
 declare global {
   namespace Grafast {
@@ -24,7 +25,7 @@ function githubSchema() {
   return $schema;
 }
 
-function githubUser($login: ExecutableStep) {
+function githubUser($login: Step) {
   const $schema = githubSchema();
   return graphqlQuery($schema).get("user", { login: $login });
 }
@@ -59,7 +60,7 @@ const schema = makeGrafastSchema({
         // return object({ id: $userId });
         return lambda($userId, (userId) => (userId ? { id: userId } : null));
       },
-      gitHubUserByUsername($username: ExecutableStep<string>) {
+      gitHubUserByUsername($username: Step<string>) {
         return githubUser($username);
       },
     },

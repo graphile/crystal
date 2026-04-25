@@ -1,9 +1,11 @@
-import { ExecutableStep, GrafastResultsList, GrafastValuesList } from "grafast";
-import { GraphQLOperationStep } from "..";
-import { ArgsObject } from "../interfaces";
+import type { ExecutionDetails, GrafastResultsList } from "grafast";
+import { Step } from "grafast";
+
+import type { GraphQLOperationStep } from "..";
+import type { ArgsObject } from "../interfaces";
 import { GraphQLSelectionSetStep } from "./graphqlSelectionSet";
 
-export class GraphQLSelectFieldStep extends ExecutableStep {
+export class GraphQLSelectFieldStep extends Step {
   static $$export = {
     moduleName: "@dataplan/graphql",
     exportName: "GraphQLSelectFieldStep",
@@ -15,7 +17,7 @@ export class GraphQLSelectFieldStep extends ExecutableStep {
 
   constructor(
     $operation: GraphQLOperationStep,
-    $parent: ExecutableStep,
+    $parent: Step,
     private fieldName: string,
     args?: ArgsObject,
     options?: { directives?: ArgsObject },
@@ -40,10 +42,11 @@ export class GraphQLSelectFieldStep extends ExecutableStep {
     return new GraphQLSelectionSetStep(this.getOperation(), this, typeName);
   }
 
-  execute(
-    count: number,
-    values: [GrafastValuesList<any>],
-  ): GrafastResultsList<any> {
-    return values[0];
+  execute(details: ExecutionDetails): GrafastResultsList<any> {
+    const {
+      values: [v],
+      indexMap,
+    } = details;
+    return indexMap((i) => v.at(i));
   }
 }

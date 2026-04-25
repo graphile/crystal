@@ -1,5 +1,14 @@
-import { ExecutableStep, GrafastValuesList, PromiseOrDirect } from "grafast";
-import { AsyncExecutionResult, ExecutionArgs, ExecutionResult } from "graphql";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  PromiseOrDirect,
+} from "grafast";
+import { Step } from "grafast";
+import type {
+  AsyncExecutionResult,
+  ExecutionArgs,
+  ExecutionResult,
+} from "graphql";
 
 export interface GraphQLClient {
   execute(
@@ -16,8 +25,13 @@ export interface GraphQLClient {
   >;
 }
 
-export class GraphQLSchema extends ExecutableStep {
-  constructor($client: ExecutableStep<GraphQLClient | null | undefined>) {
+export class GraphQLSchemaStep extends Step {
+  static $$export = {
+    moduleName: "@dataplan/graphql",
+    exportName: "GraphQLSchemaStep",
+  };
+
+  constructor($client: Step<GraphQLClient | null | undefined>) {
     super();
     this.addDependency($client);
   }
@@ -26,13 +40,15 @@ export class GraphQLSchema extends ExecutableStep {
     return this.getDep(0);
   }
 
-  execute(count: number, values: [any[]]): GrafastValuesList<any> {
-    return values[0];
+  execute(details: ExecutionDetails): GrafastResultsList<any> {
+    const {
+      indexMap,
+      values: [v],
+    } = details;
+    return indexMap((i) => v.at(i));
   }
 }
 
-export function graphqlSchema(
-  $client: ExecutableStep<GraphQLClient | null | undefined>,
-) {
-  return new GraphQLSchema($client);
+export function graphqlSchema($client: Step<GraphQLClient | null | undefined>) {
+  return new GraphQLSchemaStep($client);
 }
