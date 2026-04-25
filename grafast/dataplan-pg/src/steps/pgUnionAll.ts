@@ -5,7 +5,6 @@ import type {
   ConnectionHandlingStep,
   ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   Maybe,
 } from "grafast";
 import {
@@ -961,7 +960,7 @@ on (${sql.indent(
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
   async execute(
     executionDetails: ExecutionDetails,
-  ): Promise<GrafastValuesList<any>> {
+  ): Promise<GrafastResultsList<any>> {
     const {
       indexMap,
       values,
