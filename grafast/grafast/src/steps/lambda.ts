@@ -60,12 +60,12 @@ export class LambdaStep<TIn, TOut> extends UnbatchedStep<TOut> {
 
   get<TKey extends keyof Exclude<TOut, null | undefined>>(
     key: TKey,
-  ): AccessStep<Exclude<TOut, null | undefined>[TKey]> {
+  ): Step<Exclude<TOut, null | undefined>[TKey] | undefined> {
     return access(this, key);
   }
   at<TIndex extends keyof Exclude<TOut, null | undefined> & number>(
     index: TIndex,
-  ): AccessStep<Exclude<TOut, null | undefined>[TIndex]> {
+  ): Step<Exclude<TOut, null | undefined>[TIndex] | undefined> {
     return access(this, index);
   }
 }
