@@ -1,38 +1,45 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
-  AccessStep,
 } from "grafast";
-import { access, ExecutableStep, exportAs } from "grafast";
-import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.js";
-import { GraphQLSchemaStep } from "./graphqlSchema.js";
+import { exportAs, Step } from "grafast";
 
-export class GraphQLOperationStep extends ExecutableStep {
+import type { GraphQLSchemaStep } from "./graphqlSchema.js";
+import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.js";
+
+export class GraphQLOperationStep extends Step {
   static $$export = {
     moduleName: "@dataplan/graphql",
     exportName: "GraphQLOperationStep",
   };
 
   isSyncAndSafe = false;
+  public readonly operationType: "query" | "mutation" | "subscription";
 
   constructor(
     $schema: GraphQLSchemaStep,
-    public readonly operationType: "query" | "mutation" | "subscription", // TODO: schema, request, etc
+    operationType: "query" | "mutation" | "subscription", // TODO: schema, request, etc
   ) {
     super();
     this.addDependency($schema);
+    this.operationType = operationType;
   }
 
   rootSelectionSet() {
-    return new GraphQLSelectionSetStep(this, null);
+    return this.cacheStep(
+      "rootSelectionSet",
+      "",
+      () => new GraphQLSelectionSetStep(this, null),
+    );
   }
 
   get(...args: Parameters<GraphQLSelectionSetStep["get"]>) {
     return this.rootSelectionSet().get(...args);
   }
 
-  execute(count: number, values: never[]): GrafastResultsList<any> {
+  execute(details: ExecutionDetails): GrafastResultsList<any> {
+    const { count, values } = details;
     const result: Array<PromiseOrDirect<any>> = [];
     for (let i = 0; i < count; i++) {
       result[i] = null as any;
@@ -41,24 +48,17 @@ export class GraphQLOperationStep extends ExecutableStep {
   }
 }
 
-export function graphqlQuery($schema: GraphQLSchemaStep): GraphQLOperationStep {
+export function graphqlQuery($schema: GraphQLSchemaStep) {
   return new GraphQLOperationStep($schema, "query");
 }
-
 exportAs("@dataplan/graphql", graphqlQuery, "graphqlQuery");
 
-export function graphqlMutation(
-  $schema: GraphQLSchemaStep,
-): GraphQLOperationStep {
+export function graphqlMutation($schema: GraphQLSchemaStep) {
   return new GraphQLOperationStep($schema, "mutation");
 }
-
 exportAs("@dataplan/graphql", graphqlMutation, "graphqlMutation");
 
-export function graphqlSubscription(
-  $schema: GraphQLSchemaStep,
-): GraphQLOperationStep {
+export function graphqlSubscription($schema: GraphQLSchemaStep) {
   return new GraphQLOperationStep($schema, "subscription");
 }
-
 exportAs("@dataplan/graphql", graphqlSubscription, "graphqlSubscription");

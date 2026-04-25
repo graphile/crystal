@@ -1,6 +1,6 @@
 export {
-  graphqlQuery,
   graphqlMutation,
-  graphqlSubscription,
   GraphQLOperationStep,
+  graphqlQuery,
+  graphqlSubscription,
 } from "./steps/graphqlOperation.js";
