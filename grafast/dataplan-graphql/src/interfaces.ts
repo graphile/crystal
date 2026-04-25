@@ -1,4 +1,4 @@
-import { ExecutableStep } from "grafast";
+import type { Step } from "grafast";
 
 export interface GraphQLDirective {
   name: string;
@@ -23,9 +23,9 @@ export interface GraphQLSelectionInlineFragment {
 }
 
 export type ArgsObject = {
-  [key: string]: ExecutableStep | ArgsObject | ArgsList;
+  [key: string]: Step | ArgsObject | ArgsList;
 };
-export type ArgsList = ReadonlyArray<ExecutableStep | ArgsObject | ArgsList>;
+export type ArgsList = ReadonlyArray<Step | ArgsObject | ArgsList>;
 
 export type GraphQLSelection =
   | GraphQLSelectionField
