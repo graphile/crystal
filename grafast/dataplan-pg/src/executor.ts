@@ -4,7 +4,6 @@ import debugFactory from "debug";
 import type {
   ExecutableStep,
   ExecutionEventEmitter,
-  GrafastValuesList,
   PromiseOrDirect,
   Step,
 } from "grafast";
@@ -374,10 +373,10 @@ ${duration}
   }
 
   public async executeWithCache<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    values: GrafastValuesList<ReadonlyArray<TOutput>>;
+    values: ReadonlyArray<ReadonlyArray<TOutput>>;
   }> {
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
@@ -387,10 +386,10 @@ ${duration}
   }
 
   public async executeWithoutCache<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
-    values: GrafastValuesList<ReadonlyArray<TOutput>>;
+    values: ReadonlyArray<ReadonlyArray<TOutput>>;
   }> {
     return this._executeWithOrWithoutCache<TInput, TOutput>(
       values,
@@ -400,11 +399,11 @@ ${duration}
   }
 
   private async _executeWithOrWithoutCache<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
     useCache: boolean,
   ): Promise<{
-    values: GrafastValuesList<ReadonlyArray<TOutput>>;
+    values: ReadonlyArray<ReadonlyArray<TOutput>>;
   }> {
     const { rawSqlValues, identifierIndex, eventEmitter } = common;
 
@@ -619,7 +618,7 @@ ${duration}
    * `common.text` with the given variables.
    */
   public async executeStream<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     common: PgExecutorOptions,
   ): Promise<{
     streams: Array<AsyncIterable<TOutput> | PromiseLike<never>>;

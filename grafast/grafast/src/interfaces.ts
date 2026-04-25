@@ -138,7 +138,6 @@ export interface IndexByListItemStepId {
 }
 
 // These values are just to make reading the code a little clearer
-export type GrafastValuesList<TData> = ReadonlyArray<TData>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
 export type ExecutionResultValue<T> =
   | T
