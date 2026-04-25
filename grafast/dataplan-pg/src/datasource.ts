@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
-import type { GrafastValuesList, Step } from "grafast";
+import type { Step } from "grafast";
 import {
   __ValueStep,
   arraysMatch,
@@ -803,23 +803,23 @@ export class PgResource<
 
   /** @internal */
   public executeWithCache<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
-  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+  ): Promise<{ values: ReadonlyArray<ReadonlyArray<TOutput>> }> {
     return this.executor.executeWithCache(values, options);
   }
 
   /** @internal */
   public executeWithoutCache<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
-  ): Promise<{ values: GrafastValuesList<ReadonlyArray<TOutput>> }> {
+  ): Promise<{ values: ReadonlyArray<ReadonlyArray<TOutput>> }> {
     return this.executor.executeWithoutCache(values, options);
   }
 
   /** @internal */
   public executeStream<TInput = any, TOutput = any>(
-    values: GrafastValuesList<PgExecutorInput<TInput>>,
+    values: ReadonlyArray<PgExecutorInput<TInput>>,
     options: PgExecutorOptions,
   ) {
     return this.executor.executeStream<TInput, TOutput>(values, options);
