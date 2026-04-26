@@ -15,16 +15,19 @@ export class GraphQLSelectFieldStep extends Step {
 
   operationStepId: number;
 
+  private readonly fieldName: string;
+
   constructor(
     $operation: GraphQLOperationStep,
     $parent: Step,
-    private fieldName: string,
+    fieldName: string,
     args?: ArgsObject,
     options?: { directives?: ArgsObject },
   ) {
     super();
     this.operationStepId = $operation.id;
     this.addDependency($parent);
+    this.fieldName = fieldName;
   }
 
   getOperation() {

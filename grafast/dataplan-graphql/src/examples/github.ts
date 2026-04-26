@@ -36,10 +36,10 @@ const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
     type Query {
       currentUser: User
-      gitHubUserByUsername(username: String!): GitHubUser
+      githubUserByUsername(username: String!): GitHubUser
     }
     type User {
-      id: Int!
+      id: String!
       name: String
       githubRepositories: [GitHubRepository!]
     }
@@ -60,7 +60,7 @@ const schema = makeGrafastSchema({
         // return object({ id: $userId });
         return lambda($userId, (userId) => (userId ? { id: userId } : null));
       },
-      gitHubUserByUsername($username: Step<string>) {
+      githubUserByUsername($username: Step<string>) {
         return githubUser($username);
       },
     },
@@ -98,21 +98,21 @@ const schema = makeGrafastSchema({
 });
 
 async function main() {
-  await grafast({
+  const result = await grafast({
     schema,
     source: /* GraphQL */ `
       query Q {
         currentUser {
           ...User
         }
-        gitHubUserByUsername(username: "jemgillam") {
-          ...User
+        githubUserByUsername(username: "jemgillam") {
+          username
         }
       }
       fragment User on User {
         id
         name
-        gitHubRepositories {
+        githubRepositories {
           name
           issueCount
           owner {
@@ -125,6 +125,7 @@ async function main() {
       currentUserId: "benjie",
     },
   });
+  console.dir(result);
 }
 
 main().catch((e) => {
