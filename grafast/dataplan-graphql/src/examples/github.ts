@@ -1,9 +1,12 @@
 import {
   context,
+  get,
   grafast,
+  inhibitOnNull,
   lambda,
   LambdaStep,
   makeGrafastSchema,
+  object,
   Step,
 } from "grafast";
 
@@ -30,7 +33,7 @@ function githubUser($login: Step) {
   return graphqlQuery($schema).get("user", { login: $login });
 }
 
-type UserStep = LambdaStep<any, { id: string } | null>;
+type UserStep = Step<{ id: string } | null>;
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
@@ -55,10 +58,8 @@ const schema = makeGrafastSchema({
   plans: {
     Query: {
       currentUser(): UserStep {
-        const $userId = context().get("currentUserId");
-        // returnIfNx($userId, null);
-        // return object({ id: $userId });
-        return lambda($userId, (userId) => (userId ? { id: userId } : null));
+        const $userId = inhibitOnNull(context().get("currentUserId"));
+        return object({ id: $userId });
       },
       githubUserByUsername($username: Step<string>) {
         return githubUser($username);
@@ -66,15 +67,15 @@ const schema = makeGrafastSchema({
     },
     User: {
       id($user: UserStep) {
-        const $login = $user.get("id");
+        const $login = get($user, "id");
         return $login;
       },
       name($user: UserStep) {
-        const $login = $user.get("id");
+        const $login = get($user, "id");
         return githubUser($login).get("name");
       },
       githubRepositories($user: UserStep) {
-        const $login = $user.get("id");
+        const $login = get($user, "id");
         return githubUser($login).get("repositories").get("nodes");
       },
     },
