@@ -198,7 +198,7 @@ const MyRandomFieldPlugin = {
             },
           },
           plan(_, fieldArgs) {
-            const $sides = fieldArgs.get("sides");
+            const $sides = fieldArgs.getRaw("sides");
             return lambda(
               $sides,
               (sides) =>
