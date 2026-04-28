@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.0.1
+
+### Patch Changes
+
+- [#3022](https://github.com/graphile/crystal/pull/3022)
+  [`385d557`](https://github.com/graphile/crystal/commit/385d557a464d8e273f8e5bd0688421d52fa0e8ea)
+  Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lodash from
+  4.17.23 to 4.18.1
+
 ## 5.0.0
 
 Identical to 5.0.0-rc.6.

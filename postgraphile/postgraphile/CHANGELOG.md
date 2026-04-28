@@ -1,5 +1,21 @@
 # postgraphile
 
+## 5.0.2
+
+### Patch Changes
+
+- [#3034](https://github.com/graphile/crystal/pull/3034)
+  [`582476e`](https://github.com/graphile/crystal/commit/582476e69c58a6e192dec8be53adf590dfa9c769)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add `TYPES.unknown` codec to
+  make porting from V4 easier
+
+- Updated dependencies
+  [[`582476e`](https://github.com/graphile/crystal/commit/582476e69c58a6e192dec8be53adf590dfa9c769),
+  [`385d557`](https://github.com/graphile/crystal/commit/385d557a464d8e273f8e5bd0688421d52fa0e8ea)]:
+  - graphile-build-pg@5.0.2
+  - @dataplan/pg@1.0.2
+  - graphile-build@5.0.1
+
 ## 5.0.1
 
 ### Patch Changes
