@@ -29,6 +29,7 @@ export const $$idempotent = Symbol("idempotent");
  * The event emitter used for outputting execution events.
  */
 export const $$eventEmitter = Symbol("executionEventEmitter");
+export const $$originalRootValue = Symbol("originalRootValue");
 
 /**
  * Used to indicate that an array has more results available via a stream.

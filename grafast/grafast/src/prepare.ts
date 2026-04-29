@@ -12,6 +12,7 @@ import {
   $$contextPlanCache,
   $$eventEmitter,
   $$extensions,
+  $$originalRootValue,
   $$streamMore,
   FLAG_ERROR,
   NO_FLAGS,
@@ -359,6 +360,7 @@ function executePreemptive(
     executionTimeout !== null ? startTime + executionTimeout : null;
   const requestContext: RequestTools = {
     args,
+    currentRootValue: args[$$originalRootValue],
     onError,
     startTime,
     stopTime,
@@ -404,14 +406,21 @@ function executePreemptive(
       iterators: [new Set()],
       size: 1, //store.size
     });
-    const bucketPromise = executeBucket(subscriptionBucket, requestContext);
+    const subscriptionRequestContext: RequestTools = {
+      ...requestContext,
+      currentRootValue: payload,
+    };
+    const bucketPromise = executeBucket(
+      subscriptionBucket,
+      subscriptionRequestContext,
+    );
     function outputStreamBucket() {
       // NOTE: this is the root output plan for a subscription operation.
       const [ctx, result] = outputBucket(
         operationPlan.rootOutputPlan,
         subscriptionBucket,
         ZERO,
-        requestContext,
+        subscriptionRequestContext,
         [],
         rootBucket.store
           .get(operationPlan.variableValuesStep.id)!

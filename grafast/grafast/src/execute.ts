@@ -6,7 +6,11 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue.js";
 
-import { $$eventEmitter, $$extensions } from "./constants.ts";
+import {
+  $$eventEmitter,
+  $$extensions,
+  $$originalRootValue,
+} from "./constants.ts";
 import type {
   ExecuteEvent,
   ExecutionEventEmitter,
@@ -28,6 +32,10 @@ export function withGrafastArgs(
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   const options = args.resolvedPreset?.grafast;
+  args[$$originalRootValue] = args.rootValue;
+  if (args.rootValue == null) {
+    args.rootValue = Object.create(null);
+  }
   const explain = options?.explain;
   const shouldExplain = !!explain;
 
@@ -51,8 +59,6 @@ export function withGrafastArgs(
     eventEmitter!.on("explainOperation", handleExplainOperation);
     unlisten = () => {
       eventEmitter!.removeListener("explainOperation", handleExplainOperation);
-      delete args[$$eventEmitter];
-      delete args[$$extensions];
     };
   }
 

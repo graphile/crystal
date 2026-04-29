@@ -31,6 +31,7 @@ import type { Bucket, RequestTools } from "./bucket.ts";
 import {
   $$eventEmitter,
   $$extensions,
+  $$originalRootValue,
   type $$streamMore,
   type $$timeout,
   type $$ts,
@@ -829,6 +830,7 @@ export interface GrafastExecutionArgs extends ExecutionArgs {
   outputDataAsString?: boolean;
   [$$eventEmitter]?: ExecutionEventEmitter;
   [$$extensions]?: Record<string, unknown>;
+  [$$originalRootValue]?: any;
 }
 
 export interface ValidateSchemaEvent {
