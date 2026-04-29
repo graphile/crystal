@@ -74,6 +74,7 @@ export type OutputPlanTypeRoot = {
    */
   mode: "root";
   typeName: string;
+  deferLabel?: string | undefined;
 };
 export type OutputPlanTypeObject = {
   /**
@@ -214,10 +215,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     | undefined;
 
   /**
-   * For object output plan types only.
+   * For root and object output plan types only.
    */
   public deferredOutputPlans: OutputPlan<
-    OutputPlanTypeObject | OutputPlanTypePolymorphicObject
+    OutputPlanTypeRoot | OutputPlanTypeObject | OutputPlanTypePolymorphicObject
   >[] = [];
 
   public layerPlan: LayerPlan;

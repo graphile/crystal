@@ -1503,7 +1503,7 @@ export class OperationPlan {
           deferredLayerPlan,
           outputPlan.rootStep,
           {
-            mode: "object",
+            mode: outputPlan.type.mode === "root" ? "root" : "object",
             deferLabel: deferred.label,
             typeName: objectType.name,
           },
