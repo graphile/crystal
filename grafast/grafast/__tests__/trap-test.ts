@@ -87,7 +87,7 @@ const makeSchema = () => {
             const $guarded = inhibitIfEmpty($value);
             const $result = lambda(
               $guarded,
-              (list) => list.map((n: number) => n + 1),
+              (list) => [0, ...list.map((n: number) => n + 1)],
               true,
             );
             return trap($result, TRAP_INHIBITED, {
@@ -118,7 +118,7 @@ const makeSchema = () => {
             const $guarded = inhibitIf($value, $isEmpty);
             const $result = lambda(
               $guarded,
-              (list) => list.map((n: number) => n + 1),
+              (list) => [0, ...list.map((n: number) => n + 1)],
               true,
             );
             return trap($result, TRAP_INHIBITED, {
@@ -133,7 +133,8 @@ const makeSchema = () => {
           inhibitIfPreservesInhibition(_, { $setNullToNull }) {
             const $a = inhibitOnNull($setNullToNull);
             const $guarded = inhibitIf($a, constant(false));
-            return trap($guarded, TRAP_INHIBITED, {
+            const $result = lambda($guarded, () => 42, true);
+            return trap($result, TRAP_INHIBITED, {
               valueForInhibited: "NULL",
             });
           },
@@ -282,13 +283,13 @@ it("supports inhibitIf and inhibitIfEmpty", async () => {
     emptyString: null,
     nonEmptyString: "hi",
     emptyList: [],
-    nonEmptyList: [2, 3],
+    nonEmptyList: [0, 2, 3],
     emptyInput: null,
     nonEmptyInput: "NOT_EMPTY",
     falseValue: false,
     zeroValue: 0,
     inhibitEmptyList: [],
-    inhibitNonEmptyList: [4, 5],
+    inhibitNonEmptyList: [0, 4, 5],
     preservedError: null,
     preservedInhibition: null,
   });
