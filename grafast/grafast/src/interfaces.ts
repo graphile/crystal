@@ -28,11 +28,13 @@ import type {
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.ts";
-import type {
-  $$streamMore,
-  $$timeout,
-  $$ts,
-  ExecutionEntryFlags,
+import {
+  $$eventEmitter,
+  $$extensions,
+  type $$streamMore,
+  type $$timeout,
+  type $$ts,
+  type ExecutionEntryFlags,
 } from "./constants.ts";
 import type { Constraint } from "./constraints.ts";
 import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.ts";
@@ -825,6 +827,8 @@ export interface GrafastExecutionArgs extends ExecutionArgs {
   middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
   requestContext?: Partial<Grafast.RequestContext>;
   outputDataAsString?: boolean;
+  [$$eventEmitter]?: ExecutionEventEmitter;
+  [$$extensions]?: Record<string, unknown>;
 }
 
 export interface ValidateSchemaEvent {

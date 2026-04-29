@@ -363,7 +363,7 @@ function executePreemptive(
     startTime,
     stopTime,
     // toSerialize: [],
-    eventEmitter: rootValue?.[$$eventEmitter],
+    eventEmitter: args[$$eventEmitter],
     abortSignal,
     insideGraphQL: false,
   };
@@ -421,7 +421,7 @@ function executePreemptive(
       return finalize(
         result,
         ctx,
-        index === 0 ? (rootValue[$$extensions] ?? undefined) : undefined,
+        index === 0 ? (args[$$extensions] ?? undefined) : undefined,
         outputDataAsString,
       );
     }
@@ -460,7 +460,7 @@ function executePreemptive(
       ];
       const payload = Object.create(null) as ExecutionResult;
       payload.errors = errors;
-      const extensions = bucketRootValue[$$extensions];
+      const extensions = args[$$extensions];
       if (extensions != null) {
         payload.extensions = extensions;
       }
@@ -564,7 +564,7 @@ function executePreemptive(
     return finalize(
       result,
       ctx,
-      rootValue[$$extensions] ?? undefined,
+      args[$$extensions] ?? undefined,
       outputDataAsString,
     );
   }
@@ -601,7 +601,7 @@ export function grafastPrepare(
   const {
     schema,
     contextValue: context,
-    rootValue = Object.create(null),
+    rootValue,
     // operationName,
     // document,
     middleware,
@@ -612,7 +612,7 @@ export function grafastPrepare(
   if (Array.isArray(exeContext) || "length" in exeContext) {
     return Object.assign(Object.create(bypassGraphQLObj), {
       errors: exeContext,
-      extensions: rootValue[$$extensions],
+      extensions: args[$$extensions],
     });
   }
 
@@ -674,7 +674,7 @@ export function grafastPrepare(
     if (operationPlan[$$contextPlanCache] == null) {
       operationPlan[$$contextPlanCache] = operationPlan.generatePlanJSON();
     }
-    rootValue[$$extensions]?.explain?.operations.push({
+    (args[$$extensions] as any)?.explain?.operations.push({
       type: "plan",
       title: "Plan",
       plan: operationPlan[$$contextPlanCache],
