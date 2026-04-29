@@ -1,0 +1,28 @@
+# inhibitIfEmpty
+
+Returns a step that yields the same values as the passed in step, but
+downstream work is inhibited when the yielded value is considered empty.
+
+Gra*fast* currently considers a value empty if it is:
+
+- `undefined`
+- `null`
+- `""`
+- an empty array
+- an object with no own enumerable string keys
+
+`false`, `0`, and other non-empty primitive values are not treated as empty.
+
+## Example
+
+```ts
+const $myList = fieldArgs.getRaw("myList");
+const $guardedList = inhibitIfEmpty($myList);
+const $result = doSomethingWith($guardedList);
+return trap($result, TRAP_INHIBITED, {
+  valueForInhibited: "EMPTY_LIST",
+});
+```
+
+`inhibitIfEmpty` is a convenience helper built on top of
+[`inhibitIf`](./inhibitIf.mdx).
