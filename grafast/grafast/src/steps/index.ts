@@ -30,6 +30,7 @@ export { first, FirstStep } from "./first.ts";
 export { get } from "./get.ts";
 export type { GroupByPlanMemo } from "./groupBy.ts";
 export { groupBy } from "./groupBy.ts";
+export { inhibitIf, inhibitIfEmpty, InhibitIfStep } from "./inhibitIf.ts";
 export { lambda, LambdaStep } from "./lambda.ts";
 export { last, LastStep } from "./last.ts";
 export { list, ListStep } from "./list.ts";

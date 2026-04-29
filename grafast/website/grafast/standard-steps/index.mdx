@@ -80,6 +80,8 @@ foundation for your project, and are often sufficient for a schema's needs
 See [Flow control](../flow.mdx#flow-control) for a conceptual overview.
 
 - [inhibitOnNull][]: inhibit dependent work when an input is null-ish
+- [inhibitIf][]: inhibit dependent work when a condition yields `true`
+- [inhibitIfEmpty][]: inhibit dependent work when an input is empty
 - [assertNotNull][]: raise an error when a value is unexpectedly null-ish
 - [trap][]: turn inhibited or errored values back into usable data
 
@@ -96,6 +98,8 @@ See [Flow control](../flow.mdx#flow-control) for a conceptual overview.
 [last]: ./last
 [list]: ./list
 [listen]: ./listen
+[inhibitIf]: ./inhibitIf
+[inhibitIfEmpty]: ./inhibitIfEmpty
 [inhibitOnNull]: ./inhibitOnNull
 [assertNotNull]: ./assertNotNull
 [trap]: ./trap
