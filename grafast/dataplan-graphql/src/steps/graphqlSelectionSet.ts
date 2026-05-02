@@ -6,6 +6,11 @@ import type { GraphQLOperationStep } from "./graphqlOperation.js";
 import type { OperationType } from "./graphqlSchema.js";
 import { GraphQLSelectFieldStep } from "./graphqlSelectField.js";
 
+type SelectionParent<TSchema, TOperationType extends OperationType> =
+  | GraphQLOperationStep<TSchema, TOperationType> // Root selection
+  | GraphQLSelectionSetStep<TSchema, TOperationType> // E.g. fragment
+  | GraphQLSelectFieldStep<TSchema, TOperationType>; // Field
+
 export class GraphQLSelectionSetStep<
   TSchema,
   TOperationType extends OperationType,
@@ -20,27 +25,26 @@ export class GraphQLSelectionSetStep<
   isRoot: boolean;
 
   selections: GraphQLSelection[] = [];
-  operationStepId: number;
   private typeName: string | undefined;
 
   constructor(
-    $operation: GraphQLOperationStep<TSchema, TOperationType>,
-    // Could be an __ItemStep for lists
-    $parent: Step | null,
+    $parent: SelectionParent<TSchema, TOperationType>,
+    $data: Step, // Could be an __ItemStep for lists
     typeName?: string,
   ) {
     super();
-    this.operationStepId = $operation.id;
     this.isRoot = $parent == null;
-    this.addDependency($parent ?? $operation);
+    this.addUnaryDependency($parent);
+    this.addDependency($data);
     this.typeName = typeName;
   }
 
-  getOperation() {
-    return this.getStep(this.operationStepId) as GraphQLOperationStep<
-      TSchema,
-      TOperationType
-    >;
+  getParent() {
+    return this.getDep(0) as SelectionParent<TSchema, TOperationType>;
+  }
+
+  getOperation(): GraphQLOperationStep<TSchema, TOperationType> {
+    return this.getParent().getOperation();
   }
 
   get(

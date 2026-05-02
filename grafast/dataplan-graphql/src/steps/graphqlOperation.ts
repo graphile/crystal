@@ -43,11 +43,16 @@ export class GraphQLOperationStep<
     return this.getDep(0) as Step<GraphQLClient | null | undefined>;
   }
 
+  // Convenience method
+  getOperation(): GraphQLOperationStep<TSchema, TOperationType> {
+    return this;
+  }
+
   rootSelectionSet() {
     return this.cacheStep(
       "rootSelectionSet",
       "",
-      () => new GraphQLSelectionSetStep(this, null),
+      () => new GraphQLSelectionSetStep(this, this),
     );
   }
 
