@@ -1,5 +1,7 @@
+/* eslint-disable graphile-export/export-methods, graphile-export/export-plans */
 import {
   context,
+  execute,
   get,
   grafast,
   inhibitOnNull,
@@ -97,10 +99,32 @@ const schema = makeGrafastSchema({
   },
 });
 
+const testSchema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      user(login: String): User
+    }
+    type User {
+      login: String
+    }
+  `,
+  objects: {
+    Query: {
+      plans: {
+        user(_, { $login }) {
+          return object({ login: $login });
+        },
+      },
+    },
+  },
+});
+
 const githubClient: GraphQLClient = {
   async execute(args) {
-    console.dir(args);
-    return { errors: [new GraphQLError("Not yet implemented")] };
+    return execute({
+      ...args,
+      schema: testSchema,
+    });
   },
 };
 
