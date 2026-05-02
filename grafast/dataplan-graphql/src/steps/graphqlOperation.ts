@@ -1,29 +1,46 @@
-import type {
-  ExecutionDetails,
-  GrafastResultsList,
-  PromiseOrDirect,
-} from "grafast";
-import { exportAs, Step } from "grafast";
+import type { ExecutionDetails, GrafastResultsList } from "grafast";
+import { exportAs, flagError, isAsyncIterable, Step } from "grafast";
+import { type DocumentNode, Kind } from "graphql";
+import { toe } from "graphql-toe";
 
-import type { GraphQLSchemaStep } from "./graphqlSchema.js";
+import type {
+  GraphQLClient,
+  GraphQLSchemaStep,
+  OperationType,
+} from "./graphqlSchema.js";
 import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.js";
 
-export class GraphQLOperationStep extends Step {
+/**
+ * This step represents a single GraphQL operation (query, mutation,
+ * subscription) and is the jumping off point for making selections.
+ */
+export class GraphQLOperationStep<
+  TSchema,
+  TOperationType extends OperationType,
+> extends Step {
   static $$export = {
     moduleName: "@dataplan/graphql",
     exportName: "GraphQLOperationStep",
   };
 
   isSyncAndSafe = false;
-  public readonly operationType: "query" | "mutation" | "subscription";
+  public readonly operationType: TOperationType;
 
   constructor(
-    $schema: GraphQLSchemaStep,
-    operationType: "query" | "mutation" | "subscription", // TODO: schema, request, etc
+    $schema: GraphQLSchemaStep<TSchema>,
+    operationType: TOperationType,
   ) {
     super();
-    this.addDependency($schema);
+    this.addUnaryDependency($schema);
     this.operationType = operationType;
+    this.document = {
+      kind: Kind.DOCUMENT,
+      definitions: [],
+    };
+  }
+
+  getClient() {
+    return this.getDep(0) as Step<GraphQLClient | null | undefined>;
   }
 
   rootSelectionSet() {
@@ -34,17 +51,42 @@ export class GraphQLOperationStep extends Step {
     );
   }
 
-  get(...args: Parameters<GraphQLSelectionSetStep["get"]>) {
+  get(
+    ...args: Parameters<GraphQLSelectionSetStep<TSchema, TOperationType>["get"]>
+  ) {
     return this.rootSelectionSet().get(...args);
   }
 
+  document: DocumentNode;
+
   execute(details: ExecutionDetails): GrafastResultsList<any> {
-    const { count, values } = details;
-    const result: Array<PromiseOrDirect<any>> = [];
-    for (let i = 0; i < count; i++) {
-      result[i] = null as any;
-    }
-    return result;
+    const { values, indexMap, stream } = details;
+    const client = values[0].unaryValue() as GraphQLClient | null | undefined;
+    const { document } = this;
+    return indexMap(async (i) => {
+      if (!client) {
+        return flagError(new Error("No GraphQL client passed"));
+      }
+      if (!document) {
+        return flagError(
+          new Error("Failed to construct document during finalize?"),
+        );
+      }
+      if (this.operationType === "subscription" && !stream) {
+        return flagError(new Error("Must stream subscription operations"));
+      }
+      const variableValues: Record<string, any> = Object.create(null);
+      // TODO: add variables
+      const result = await client.execute({ document, variableValues });
+
+      if (isAsyncIterable(result)) {
+        throw new Error("Incremental delivery is currently unsupported");
+      }
+
+      const data = toe(result);
+
+      return { data, extensions: result.extensions };
+    });
   }
 
   optimize() {
@@ -66,7 +108,6 @@ export function graphqlMutation($schema: GraphQLSchemaStep) {
   return new GraphQLOperationStep($schema, "mutation");
 }
 exportAs("@dataplan/graphql", graphqlMutation, "graphqlMutation");
-
 export function graphqlSubscription($schema: GraphQLSchemaStep) {
   return new GraphQLOperationStep($schema, "subscription");
 }

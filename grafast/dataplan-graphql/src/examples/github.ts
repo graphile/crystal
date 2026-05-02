@@ -9,7 +9,6 @@ import {
 } from "grafast";
 import { GraphQLError } from "graphql";
 
-import { graphqlQuery } from "../steps/graphqlOperation";
 import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
 import { GraphQLSelectionSetStep } from "../steps/graphqlSelectionSet";
 declare global {
@@ -21,15 +20,16 @@ declare global {
   }
 }
 
+type GitHubSchema = any;
+
 function githubSchema() {
   const $client = context().get("githubClient");
-  const $schema = graphqlSchema($client);
-  return $schema;
+  return graphqlSchema($client);
 }
 
 function githubUser($login: Step) {
   const $schema = githubSchema();
-  return $schema.query().get("user", { login: inhibitOnNull($login) });
+  return $schema.get("user", { login: inhibitOnNull($login) });
 }
 
 type UserStep = Step<{ id: string } | null>;
@@ -80,17 +80,17 @@ const schema = makeGrafastSchema({
       },
     },
     GitHubRepository: {
-      issueCount($repo: GraphQLSelectionSetStep) {
+      issueCount($repo: GraphQLSelectionSetStep<GitHubSchema, "query">) {
         return $repo.get("issues").get("totalCount");
         // return $repo.get("issues>totalCount");
       },
-      owner($repo: GraphQLSelectionSetStep) {
+      owner($repo: GraphQLSelectionSetStep<GitHubSchema, "query">) {
         return $repo.get("owner").ofType("User");
         // return $repo.get("owner>User.")
       },
     },
     GitHubUser: {
-      username($user: GraphQLSelectionSetStep) {
+      username($user: GraphQLSelectionSetStep<GitHubSchema, "query">) {
         return $user.get("login");
       },
     },

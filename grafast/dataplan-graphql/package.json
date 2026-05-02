@@ -27,6 +27,7 @@
   "homepage": "https://github.com/graphile/crystal/tree/main/grafast/dataplan-graphql",
   "dependencies": {
     "chalk": "^4.1.2",
+    "graphql-toe": "^1.0.0",
     "tslib": "^2.8.1"
   },
   "engines": {
