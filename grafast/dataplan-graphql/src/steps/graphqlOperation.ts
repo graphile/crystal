@@ -1,6 +1,7 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { exportAs, flagError, isAsyncIterable, Step } from "grafast";
-import { type DocumentNode, Kind } from "graphql";
+import type { DocumentNode, SelectionNode } from "graphql";
+import { Kind, OperationTypeNode } from "graphql";
 import { toe } from "graphql-toe";
 
 import type {
@@ -9,6 +10,12 @@ import type {
   OperationType,
 } from "./graphqlSchema.js";
 import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.js";
+
+const OPERATION_TYPE_LOOKUP = {
+  query: OperationTypeNode.QUERY,
+  mutation: OperationTypeNode.MUTATION,
+  subscription: OperationTypeNode.SUBSCRIPTION,
+};
 
 /**
  * This step represents a single GraphQL operation (query, mutation,
@@ -26,6 +33,9 @@ export class GraphQLOperationStep<
   isSyncAndSafe = false;
   public readonly operationType: TOperationType;
 
+  private document: DocumentNode;
+  private selections: SelectionNode[];
+
   constructor(
     $schema: GraphQLSchemaStep<TSchema>,
     operationType: TOperationType,
@@ -33,9 +43,19 @@ export class GraphQLOperationStep<
     super();
     this.addUnaryDependency($schema);
     this.operationType = operationType;
+    this.selections = [];
     this.document = {
       kind: Kind.DOCUMENT,
-      definitions: [],
+      definitions: [
+        {
+          kind: Kind.OPERATION_DEFINITION,
+          operation: OPERATION_TYPE_LOOKUP[this.operationType],
+          selectionSet: {
+            kind: Kind.SELECTION_SET,
+            selections: this.selections,
+          },
+        },
+      ],
     };
   }
 
@@ -62,7 +82,9 @@ export class GraphQLOperationStep<
     return this.rootSelectionSet().get(...args);
   }
 
-  document: DocumentNode;
+  addSelection(selection: SelectionNode) {
+    this.selections.push(selection);
+  }
 
   execute(details: ExecutionDetails): GrafastResultsList<any> {
     const { values, indexMap, stream } = details;
@@ -74,7 +96,7 @@ export class GraphQLOperationStep<
       }
       if (!document) {
         return flagError(
-          new Error("Failed to construct document during finalize?"),
+          new Error("Failed to construct document during optimize?"),
         );
       }
       if (this.operationType === "subscription" && !stream) {
@@ -89,8 +111,9 @@ export class GraphQLOperationStep<
       }
 
       const data = toe(result);
+      console.dir(data);
 
-      return { data, extensions: result.extensions };
+      return data;
     });
   }
 

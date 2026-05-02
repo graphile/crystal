@@ -1,7 +1,8 @@
 import type { __ItemStep, ExecutionDetails } from "grafast";
 import { Step } from "grafast";
+import type { InlineFragmentNode, SelectionNode } from "graphql";
+import { Kind } from "graphql";
 
-import type { GraphQLSelection } from "../interfaces.js";
 import type { GraphQLOperationStep } from "./graphqlOperation.js";
 import type { OperationType } from "./graphqlSchema.js";
 import { GraphQLSelectFieldStep } from "./graphqlSelectField.js";
@@ -24,8 +25,9 @@ export class GraphQLSelectionSetStep<
 
   isRoot: boolean;
 
-  selections: GraphQLSelection[] = [];
+  // selections: GraphQLSelection[] = [];
   private typeName: string | undefined;
+  private selections: SelectionNode[];
 
   constructor(
     $parent: SelectionParent<TSchema, TOperationType> | __ItemStep<any>,
@@ -35,6 +37,7 @@ export class GraphQLSelectionSetStep<
     this.isRoot = $parent == null;
     this.addDependency($parent);
     this.typeName = typeName;
+    this.selections = [];
   }
 
   getParent() {
@@ -62,8 +65,33 @@ export class GraphQLSelectionSetStep<
     return new GraphQLSelectFieldStep(this, ...args);
   }
 
+  addSelection(selection: SelectionNode) {
+    this.selections.push(selection);
+  }
+
   optimize() {
-    return this.getDep(0);
+    if (this.typeName) {
+      const selection: InlineFragmentNode = {
+        kind: Kind.INLINE_FRAGMENT,
+        typeCondition: {
+          kind: Kind.NAMED_TYPE,
+          name: {
+            kind: Kind.NAME,
+            value: this.typeName,
+          },
+        },
+        selectionSet: {
+          kind: Kind.SELECTION_SET,
+          selections: this.selections,
+        },
+      };
+      this.getGraphQLParent().addSelection(selection);
+    } else {
+      for (const selection of this.selections) {
+        this.getGraphQLParent().addSelection(selection);
+      }
+    }
+    return this.getParent();
   }
 
   execute(details: ExecutionDetails) {
