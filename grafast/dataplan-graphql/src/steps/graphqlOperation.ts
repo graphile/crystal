@@ -1,5 +1,5 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
-import { exportAs, flagError, isAsyncIterable, Step } from "grafast";
+import { access, exportAs, flagError, isAsyncIterable, Step } from "grafast";
 import type { DocumentNode, SelectionNode } from "graphql";
 import { Kind, OperationTypeNode } from "graphql";
 import { toe } from "graphql-toe";
@@ -72,8 +72,12 @@ export class GraphQLOperationStep<
     return this.cacheStep(
       "rootSelectionSet",
       "",
-      () => new GraphQLSelectionSetStep(this),
+      () => new GraphQLSelectionSetStep(this.data()),
     );
+  }
+
+  data() {
+    return access(this, "data");
   }
 
   get(
@@ -113,7 +117,7 @@ export class GraphQLOperationStep<
       const data = toe(result);
       console.dir(data);
 
-      return data;
+      return { data };
     });
   }
 
