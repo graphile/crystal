@@ -3,9 +3,13 @@ import { Step } from "grafast";
 
 import type { GraphQLSelection } from "../interfaces.js";
 import type { GraphQLOperationStep } from "./graphqlOperation.js";
+import type { OperationType } from "./graphqlSchema.js";
 import { GraphQLSelectFieldStep } from "./graphqlSelectField.js";
 
-export class GraphQLSelectionSetStep extends Step {
+export class GraphQLSelectionSetStep<
+  TSchema,
+  TOperationType extends OperationType,
+> extends Step {
   static $$export = {
     moduleName: "@dataplan/graphql",
     exportName: "GraphQLSelectionSetStep",
@@ -20,7 +24,7 @@ export class GraphQLSelectionSetStep extends Step {
   private typeName: string | undefined;
 
   constructor(
-    $operation: GraphQLOperationStep,
+    $operation: GraphQLOperationStep<TSchema, TOperationType>,
     // Could be an __ItemStep for lists
     $parent: Step | null,
     typeName?: string,
@@ -33,7 +37,10 @@ export class GraphQLSelectionSetStep extends Step {
   }
 
   getOperation() {
-    return this.getStep(this.operationStepId) as GraphQLOperationStep;
+    return this.getStep(this.operationStepId) as GraphQLOperationStep<
+      TSchema,
+      TOperationType
+    >;
   }
 
   get(
