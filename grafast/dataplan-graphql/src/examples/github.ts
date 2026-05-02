@@ -3,12 +3,11 @@ import {
   get,
   grafast,
   inhibitOnNull,
-  lambda,
-  LambdaStep,
   makeGrafastSchema,
   object,
   Step,
 } from "grafast";
+import { GraphQLError } from "graphql";
 
 import { graphqlQuery } from "../steps/graphqlOperation";
 import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
@@ -30,7 +29,7 @@ function githubSchema() {
 
 function githubUser($login: Step) {
   const $schema = githubSchema();
-  return graphqlQuery($schema).get("user", { login: $login });
+  return $schema.query().get("user", { login: inhibitOnNull($login) });
 }
 
 type UserStep = Step<{ id: string } | null>;
@@ -77,17 +76,17 @@ const schema = makeGrafastSchema({
       githubRepositories($user: UserStep) {
         const $login = get($user, "id");
         return githubUser($login).get("repositories").get("nodes");
+        // return githubUser($login).get("repositories>nodes");
       },
     },
     GitHubRepository: {
-      name($repo: GraphQLSelectionSetStep) {
-        return $repo.get("name");
-      },
       issueCount($repo: GraphQLSelectionSetStep) {
         return $repo.get("issues").get("totalCount");
+        // return $repo.get("issues>totalCount");
       },
       owner($repo: GraphQLSelectionSetStep) {
         return $repo.get("owner").ofType("User");
+        // return $repo.get("owner>User.")
       },
     },
     GitHubUser: {
@@ -97,6 +96,13 @@ const schema = makeGrafastSchema({
     },
   },
 });
+
+const githubClient: GraphQLClient = {
+  async execute(args) {
+    console.dir(args);
+    return { errors: [new GraphQLError("Not yet implemented")] };
+  },
+};
 
 async function main() {
   const result = await grafast({
@@ -124,6 +130,7 @@ async function main() {
     `,
     contextValue: {
       currentUserId: "benjie",
+      githubClient,
     },
   });
   console.dir(result);

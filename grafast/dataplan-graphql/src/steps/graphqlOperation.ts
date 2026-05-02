@@ -46,6 +46,15 @@ export class GraphQLOperationStep extends Step {
     }
     return result;
   }
+
+  optimize() {
+    // NOTE: It's important that we don't merge with other operations unless
+    // their `inhibitOnNull` statuses for each variable match our own. We don't
+    // want to inhibit ourself because some other query was inhibited.
+    // e.g. `{userById(id: $userId)}` & `{organizationById(id: $orgId)}` can
+    // only merge if neither $userId nor $orgId have inhibit on null.
+    return this;
+  }
 }
 
 export function graphqlQuery($schema: GraphQLSchemaStep) {
