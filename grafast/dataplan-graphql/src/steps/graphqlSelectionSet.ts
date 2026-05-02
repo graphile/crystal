@@ -1,9 +1,9 @@
 import type { __ItemStep, ExecutionDetails } from "grafast";
-import { Step } from "grafast";
+import { AccessStep, Step } from "grafast";
 import type { InlineFragmentNode, SelectionNode } from "graphql";
 import { Kind } from "graphql";
 
-import type { GraphQLOperationStep } from "./graphqlOperation.js";
+import { GraphQLOperationStep } from "./graphqlOperation.js";
 import type { OperationType } from "./graphqlSchema.js";
 import { GraphQLSelectFieldStep } from "./graphqlSelectField.js";
 
@@ -11,6 +11,11 @@ type SelectionParent<TSchema, TOperationType extends OperationType> =
   | GraphQLOperationStep<TSchema, TOperationType> // Root selection
   | GraphQLSelectionSetStep<TSchema, TOperationType> // E.g. fragment
   | GraphQLSelectFieldStep<TSchema, TOperationType>; // Field
+
+type SelectionDataParent<TSchema, TOperationType extends OperationType> =
+  | SelectionParent<TSchema, TOperationType>
+  | __ItemStep<any>
+  | AccessStep<any>;
 
 export class GraphQLSelectionSetStep<
   TSchema,
@@ -30,7 +35,7 @@ export class GraphQLSelectionSetStep<
   private selections: SelectionNode[];
 
   constructor(
-    $parent: SelectionParent<TSchema, TOperationType> | __ItemStep<any>,
+    $parent: SelectionDataParent<TSchema, TOperationType>,
     typeName?: string,
   ) {
     super();
@@ -41,13 +46,33 @@ export class GraphQLSelectionSetStep<
   }
 
   getParent() {
-    return this.getDep(0) as
-      | SelectionParent<TSchema, TOperationType>
-      | __ItemStep<any>;
+    return this.getDep(0) as SelectionDataParent<TSchema, TOperationType>;
   }
 
   getGraphQLParent() {
-    return this.getDepDeep(0) as SelectionParent<TSchema, TOperationType>;
+    let $parent = this.getDepDeep(0) as SelectionDataParent<
+      TSchema,
+      TOperationType
+    >;
+    if ($parent instanceof AccessStep) {
+      if ($parent.path.length === 1 && $parent.path[0] === "data") {
+        $parent = $parent.getParentStep() as SelectionDataParent<
+          TSchema,
+          TOperationType
+        >;
+      }
+    }
+    if (
+      $parent instanceof GraphQLOperationStep ||
+      $parent instanceof GraphQLSelectionSetStep ||
+      $parent instanceof GraphQLSelectFieldStep
+    ) {
+      return $parent;
+    } else {
+      throw new Error(
+        `Couldn't find suitable parent for ${this}; found ${$parent}`,
+      );
+    }
   }
 
   getOperation(): GraphQLOperationStep<TSchema, TOperationType> {
