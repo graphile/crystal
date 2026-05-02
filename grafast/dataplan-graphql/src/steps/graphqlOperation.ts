@@ -52,7 +52,7 @@ export class GraphQLOperationStep<
     return this.cacheStep(
       "rootSelectionSet",
       "",
-      () => new GraphQLSelectionSetStep(this, this),
+      () => new GraphQLSelectionSetStep(this),
     );
   }
 
