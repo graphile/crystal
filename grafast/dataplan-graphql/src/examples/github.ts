@@ -121,10 +121,15 @@ const testSchema = makeGrafastSchema({
 
 const githubClient: GraphQLClient = {
   async execute(args) {
-    return execute({
-      ...args,
-      schema: testSchema,
-    });
+    console.log("Executing...");
+    try {
+      return await execute({
+        ...args,
+        schema: testSchema,
+      });
+    } finally {
+      console.log("...Executed");
+    }
   },
 };
 
