@@ -22,15 +22,16 @@ export class GraphQLSelectFieldStep<
   private readonly fieldName: string;
 
   constructor(
-    $operation: GraphQLOperationStep<TSchema, TOperationType>,
-    $parent: Step,
+    $parent: GraphQLSelectionSetStep<TSchema, TOperationType>,
+    $data: Step,
     fieldName: string,
     args?: ArgsObject,
     options?: { directives?: ArgsObject },
   ) {
     super();
     this.operationStepId = $operation.id;
-    this.addDependency($parent);
+    this.addUnaryDependency($parent);
+    this.addDependency($data);
     this.fieldName = fieldName;
   }
 

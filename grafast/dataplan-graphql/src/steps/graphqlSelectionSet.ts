@@ -56,7 +56,7 @@ export class GraphQLSelectionSetStep<
       ? U
       : never
   ) {
-    return new GraphQLSelectFieldStep(this.getOperation(), this, ...args);
+    return new GraphQLSelectFieldStep(this, ...args);
   }
 
   optimize() {
