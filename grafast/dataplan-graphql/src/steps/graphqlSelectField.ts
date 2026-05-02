@@ -1,7 +1,6 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { Step } from "grafast";
 
-import type { GraphQLOperationStep } from "..";
 import type { ArgsObject } from "../interfaces";
 import type { OperationType } from "./graphqlSchema";
 import { GraphQLSelectionSetStep } from "./graphqlSelectionSet";
@@ -17,33 +16,28 @@ export class GraphQLSelectFieldStep<
 
   isSyncAndSafe = true;
 
-  operationStepId: number;
-
   private readonly fieldName: string;
 
   constructor(
     $parent: GraphQLSelectionSetStep<TSchema, TOperationType>,
-    $data: Step,
     fieldName: string,
     args?: ArgsObject,
     options?: { directives?: ArgsObject },
   ) {
     super();
-    this.operationStepId = $operation.id;
-    this.addUnaryDependency($parent);
-    this.addDependency($data);
+    this.addDependency($parent);
     this.fieldName = fieldName;
   }
 
+  getParent() {
+    return this.getDep(0) as GraphQLSelectionSetStep<TSchema, TOperationType>;
+  }
   getOperation() {
-    return this.getStep(this.operationStepId) as GraphQLOperationStep<
-      TSchema,
-      TOperationType
-    >;
+    return this.getParent().getOperation();
   }
 
   selectionSet() {
-    return new GraphQLSelectionSetStep(this.getOperation(), this);
+    return new GraphQLSelectionSetStep(this);
   }
 
   get(
@@ -52,7 +46,7 @@ export class GraphQLSelectFieldStep<
     return this.selectionSet().get(...args);
   }
   ofType(typeName: string) {
-    return new GraphQLSelectionSetStep(this.getOperation(), this, typeName);
+    return new GraphQLSelectionSetStep(this, typeName);
   }
 
   execute(details: ExecutionDetails): GrafastResultsList<any> {

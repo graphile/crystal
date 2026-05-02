@@ -1,4 +1,4 @@
-import type { ExecutionDetails } from "grafast";
+import type { __ItemStep, ExecutionDetails } from "grafast";
 import { Step } from "grafast";
 
 import type { GraphQLSelection } from "../interfaces.js";
@@ -28,28 +28,31 @@ export class GraphQLSelectionSetStep<
   private typeName: string | undefined;
 
   constructor(
-    $parent: SelectionParent<TSchema, TOperationType>,
-    $data: Step, // Could be an __ItemStep for lists
+    $parent: SelectionParent<TSchema, TOperationType> | __ItemStep<any>,
     typeName?: string,
   ) {
     super();
     this.isRoot = $parent == null;
-    this.addUnaryDependency($parent);
-    this.addDependency($data);
+    this.addDependency($parent);
     this.typeName = typeName;
   }
 
   getParent() {
-    return this.getDep(0) as SelectionParent<TSchema, TOperationType>;
+    return this.getDep(0) as
+      | SelectionParent<TSchema, TOperationType>
+      | __ItemStep<any>;
+  }
+
+  getGraphQLParent() {
+    return this.getDepDeep(0) as SelectionParent<TSchema, TOperationType>;
   }
 
   getOperation(): GraphQLOperationStep<TSchema, TOperationType> {
-    return this.getParent().getOperation();
+    return this.getGraphQLParent().getOperation();
   }
 
   get(
     ...args: ConstructorParameters<typeof GraphQLSelectFieldStep> extends [
-      any,
       any,
       ...infer U,
     ]
@@ -68,6 +71,5 @@ export class GraphQLSelectionSetStep<
     const v = values[0];
     return indexMap((i) => v.at(i));
   }
-
   // TODO: support `stream`
 }
