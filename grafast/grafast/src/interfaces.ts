@@ -770,7 +770,9 @@ export type StreamMoreableArray<T = any> = Array<T> & {
   [$$streamMore]: AsyncIterator<any, any, any> | Iterator<any, any, any>;
 };
 
-export interface GrafastArgs extends GraphQLArgs {
+export interface GrafastArgs extends Omit<GraphQLArgs, "contextValue"> {
+  contextValue?: Grafast.Context;
+
   // This should ultimately come from graphql
   onError?: ErrorBehavior;
 
