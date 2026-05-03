@@ -65,7 +65,7 @@ console.log(values); // [ 22 ]
 
 ## History
 
-This is a replacement for [@calebmer's pg-sql](https://www.npmjs.com/package/pg-sql), combining the additional work that was done to it [in `postgraphql`](https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts) and offering the following enhancements:
+This is a replacement for [@calebmer's pg-sql](https://www.npmjs.com/package/pg-sql), combining the additional work that was done to it [in postgraphql](https://github.com/postgraphql/postgraphql/blob/9c36d7e9b9ad74e665de18964fd2554f9f639903/src/postgres/utils/sql.ts) and offering the following enhancements:
 
 - Better development experience for people not using TypeScript (throws errors a lot earlier allowing you to catch issues at the source)
 - Slightly more helpful error messages
