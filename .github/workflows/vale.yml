@@ -11,4 +11,4 @@ jobs:
         with:
           files:
             '["postgraphile/website", "grafast/website",
-            "graphile-build/website", "utils/wesbite"]'
+            "graphile-build/website", "utils/website"]'
