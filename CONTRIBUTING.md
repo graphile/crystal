@@ -208,9 +208,9 @@ locally with Docker:
 docker run --rm -v "$PWD:/work" -w /work jdkato/vale:latest postgraphile/website grafast/website graphile-build/website utils/website
 ```
 
-Vale may report existing issues outside the lines you changed; CI uses
-reviewdog so pull requests focus on changed lines. If Vale flags a project term
-or API name that is intentionally spelled that way, add it to
+Vale may report existing issues outside the lines you changed; CI uses reviewdog
+so pull requests focus on changed lines. If Vale flags a project term or API
+name that is intentionally spelled that way, add it to
 `.github/styles/config/vocabularies/Graphile/accept.txt` rather than changing
 the term in prose.
 
