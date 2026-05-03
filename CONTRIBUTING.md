@@ -189,6 +189,31 @@ cd postgraphile/postgraphile
 UPDATE_SNAPSHOTS="sql,mermaid" yarn jest __tests__/path/to/test.file.graphql
 ```
 
+### Check documentation style
+
+Pull requests run Vale against the website documentation. Vale is configured by
+`.vale.ini` and the styles in `.github/styles`.
+
+The CI workflow currently checks:
+
+- `postgraphile/website`
+- `grafast/website`
+- `graphile-build/website`
+- `utils/website`
+
+If you are changing documentation in one of these folders, you can run Vale
+locally with Docker:
+
+```shell
+docker run --rm -v "$PWD:/work" -w /work jdkato/vale:latest postgraphile/website grafast/website graphile-build/website utils/website
+```
+
+Vale may report existing issues outside the lines you changed; CI uses
+reviewdog so pull requests focus on changed lines. If Vale flags a project term
+or API name that is intentionally spelled that way, add it to
+`.github/styles/config/vocabularies/Graphile/accept.txt` rather than changing
+the term in prose.
+
 ## ASK FIRST!
 
 There's nothing worse than having your PR with 3 days of work in it rejected
