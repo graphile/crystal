@@ -77,7 +77,7 @@ export function loadManyCallback<
  * LoadManyLoader.
  */
 export function loadManyLoader<
-  const TLookup extends Multistep,
+  const TSpec,
   TItem,
   TData extends Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>> = Maybe<
     ReadonlyArrayOrAsyncIterable<Maybe<TItem>>
@@ -85,8 +85,8 @@ export function loadManyLoader<
   TParams extends Record<string, any> = Record<string, any>,
   const TShared extends Multistep = never,
 >(
-  load: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
-): LoadManyLoader<TLookup, TItem, TData, TParams, TShared> {
+  load: LoadManyLoader<TSpec, TItem, TData, TParams, TShared>,
+): LoadManyLoader<TSpec, TItem, TData, TParams, TShared> {
   return load;
 }
 
