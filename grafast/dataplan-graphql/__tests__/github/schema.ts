@@ -1,7 +1,8 @@
 /* eslint-disable graphile-export/export-methods, graphile-export/export-plans */
 import { context, get, inhibitOnNull, object, Step } from "grafast";
 
-import { GraphQLClient, graphqlSchema } from "../../src/steps/graphqlSchema.ts";
+import type { GraphQLClient } from "../../src/steps/graphqlSchema.ts";
+import { graphqlSchema } from "../../src/steps/graphqlSchema.ts";
 import { GraphQLSelectionSetStep } from "../../src/steps/graphqlSelectionSet.ts";
 import { typedMakeGrafastSchema } from "./schema-generated.ts";
 

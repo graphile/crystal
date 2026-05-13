@@ -3,9 +3,9 @@ import { access, Step } from "grafast";
 import type { FieldNode, SelectionNode } from "graphql";
 import { Kind } from "graphql";
 
-import type { ArgsObject } from "../interfaces";
-import type { OperationType } from "./graphqlSchema";
-import { GraphQLSelectionSetStep } from "./graphqlSelectionSet";
+import type { ArgsObject } from "../interfaces.ts";
+import type { OperationType } from "./graphqlSchema.ts";
+import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.ts";
 
 export class GraphQLSelectFieldStep<
   TSchema,

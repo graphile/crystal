@@ -3,9 +3,9 @@ import { AccessStep, Step } from "grafast";
 import type { InlineFragmentNode, SelectionNode } from "graphql";
 import { Kind } from "graphql";
 
-import { GraphQLOperationStep } from "./graphqlOperation.js";
-import type { OperationType } from "./graphqlSchema.js";
-import { GraphQLSelectFieldStep } from "./graphqlSelectField.js";
+import { GraphQLOperationStep } from "./graphqlOperation.ts";
+import type { OperationType } from "./graphqlSchema.ts";
+import { GraphQLSelectFieldStep } from "./graphqlSelectField.ts";
 
 type SelectionParent<TSchema, TOperationType extends OperationType> =
   | GraphQLOperationStep<TSchema, TOperationType> // Root selection

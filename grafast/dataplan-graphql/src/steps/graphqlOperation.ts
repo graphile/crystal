@@ -1,15 +1,20 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { access, exportAs, flagError, isAsyncIterable, Step } from "grafast";
-import type { DocumentNode, SelectionNode } from "graphql";
-import { Kind, OperationTypeNode } from "graphql";
+import type {
+  DocumentNode,
+  OperationDefinitionNode,
+  SelectionNode,
+  VariableDefinitionNode,
+} from "graphql";
+import { Kind, OperationTypeNode, print } from "graphql";
 import { toe } from "graphql-toe";
 
 import type {
   GraphQLClient,
   GraphQLSchemaStep,
   OperationType,
-} from "./graphqlSchema.js";
-import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.js";
+} from "./graphqlSchema.ts";
+import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.ts";
 
 const OPERATION_TYPE_LOOKUP = {
   query: OperationTypeNode.QUERY,
