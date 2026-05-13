@@ -1,9 +1,7 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { access, Step } from "grafast";
-import type { FieldNode, SelectionNode } from "graphql";
-import { Kind } from "graphql";
 
-import type { ArgsObject } from "../interfaces.ts";
+import type { ArgsObject, GraphQLSelection } from "../interfaces.ts";
 import type { OperationType } from "./graphqlSchema.ts";
 import { GraphQLSelectionSetStep } from "./graphqlSelectionSet.ts";
 
@@ -19,7 +17,7 @@ export class GraphQLSelectFieldStep<
   isSyncAndSafe = true;
 
   private readonly fieldName: string;
-  private selections: SelectionNode[];
+  private selections: GraphQLSelection[];
 
   argsDeps: { [argName: string]: number };
 
@@ -79,7 +77,7 @@ export class GraphQLSelectFieldStep<
     return new GraphQLSelectionSetStep(this, typeName);
   }
 
-  addSelection(selection: SelectionNode) {
+  addSelection(selection: GraphQLSelection) {
     this.selections.push(selection);
   }
 
