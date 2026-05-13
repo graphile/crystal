@@ -1,18 +1,10 @@
 /* eslint-disable graphile-export/export-methods, graphile-export/export-plans */
-import {
-  context,
-  execute,
-  get,
-  grafast,
-  inhibitOnNull,
-  lambda,
-  makeGrafastSchema,
-  object,
-  Step,
-} from "grafast";
+import { context, get, inhibitOnNull, object, Step } from "grafast";
 
-import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
-import { GraphQLSelectionSetStep } from "../steps/graphqlSelectionSet";
+import { GraphQLClient, graphqlSchema } from "../../src/steps/graphqlSchema.ts";
+import { GraphQLSelectionSetStep } from "../../src/steps/graphqlSelectionSet.ts";
+import { typedMakeGrafastSchema } from "./schema-generated.ts";
+
 declare global {
   namespace Grafast {
     interface Context {
@@ -36,7 +28,7 @@ function githubUser($login: Step) {
 
 type UserStep = Step<{ id: string } | null>;
 
-const schema = makeGrafastSchema({
+export const schema = typedMakeGrafastSchema({
   typeDefs: /* GraphQL */ `
     type Query {
       currentUser: User
@@ -56,124 +48,53 @@ const schema = makeGrafastSchema({
       username: String!
     }
   `,
-  plans: {
-    Query: {
-      currentUser(): UserStep {
-        const $userId = inhibitOnNull(context().get("currentUserId"));
-        return object({ id: $userId });
-      },
-      githubUserByUsername(_, { $username }) {
-        return githubUser($username);
-      },
-    },
-    User: {
-      id($user: UserStep) {
-        const $login = get($user, "id");
-        return $login;
-      },
-      name($user: UserStep) {
-        const $login = get($user, "id");
-        return githubUser($login).get("name");
-      },
-      githubRepositories($user: UserStep) {
-        const $login = get($user, "id");
-        return githubUser($login).get("repositories").get("nodes");
-        // return githubUser($login).get("repositories>nodes");
-      },
-    },
-    GitHubRepository: {
-      issueCount($repo: GraphQLSelectionSetStep<GitHubSchema, "query">) {
-        return $repo.get("issues").get("totalCount");
-        // return $repo.get("issues>totalCount");
-      },
-      owner($repo: GraphQLSelectionSetStep<GitHubSchema, "query">) {
-        return $repo.get("owner").ofType("User");
-        // return $repo.get("owner>User.")
-      },
-    },
-    GitHubUser: {
-      username($user: GraphQLSelectionSetStep<GitHubSchema, "query">) {
-        return $user.get("login");
-      },
-    },
-  },
-});
-
-const testSchema = makeGrafastSchema({
-  typeDefs: /* GraphQL */ `
-    type Query {
-      user(login: String): User
-    }
-    type User {
-      login: String
-      name: String
-    }
-  `,
   objects: {
     Query: {
       plans: {
-        user(_, { $login }) {
-          return object({ login: $login });
+        currentUser(): UserStep {
+          const $userId = inhibitOnNull(context().get("currentUserId"));
+          return object({ id: $userId });
+        },
+        githubUserByUsername(_, { $username }) {
+          return githubUser($username);
         },
       },
     },
     User: {
       plans: {
-        name($user) {
-          return lambda($user, (user) => (user as any)?.login.toUpperCase());
+        id($user: UserStep) {
+          const $login = get($user, "id");
+          return $login;
+        },
+        name($user: UserStep) {
+          const $login = get($user, "id");
+          return githubUser($login).get("name");
+        },
+        githubRepositories($user: UserStep) {
+          const $login = get($user, "id");
+          return githubUser($login).get("repositories").get("nodes");
+          // return githubUser($login).get("repositories>nodes");
+        },
+      },
+    },
+    GitHubRepository: {
+      plans: {
+        issueCount($repo: GraphQLSelectionSetStep<GitHubSchema, "query">) {
+          return $repo.get("issues").get("totalCount");
+          // return $repo.get("issues>totalCount");
+        },
+        owner($repo: GraphQLSelectionSetStep<GitHubSchema, "query">) {
+          return $repo.get("owner").ofType("User");
+          // return $repo.get("owner>User.")
+        },
+      },
+    },
+    GitHubUser: {
+      plans: {
+        username($user: GraphQLSelectionSetStep<GitHubSchema, "query">) {
+          return $user.get("login");
         },
       },
     },
   },
-});
-
-const githubClient: GraphQLClient = {
-  async execute(args) {
-    console.log("Executing...");
-    try {
-      return await execute({
-        ...args,
-        schema: testSchema,
-      });
-    } finally {
-      console.log("...Executed");
-    }
-  },
-};
-
-async function main() {
-  const result = await grafast({
-    schema,
-    source: /* GraphQL */ `
-      query Q {
-        currentUser {
-          ...User
-        }
-        githubUserByUsername(username: "jemgillam") {
-          username
-        }
-      }
-      fragment User on User {
-        id
-        name
-        githubRepositories {
-          name
-          issueCount
-          owner {
-            username
-          }
-        }
-      }
-    `,
-    contextValue: {
-      currentUserId: "benjie",
-      githubClient,
-    },
-  });
-  console.dir(result);
-}
-
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
 });
