@@ -66,6 +66,7 @@ export class PgCondition<
 
   private conditions: PgWhereConditionSpec<any>[] = [];
   private havingConditions: PgHavingConditionSpec<any>[] = [];
+  private minimumConditionsLength = 0;
 
   public readonly alias: SQL;
 
@@ -100,6 +101,17 @@ export class PgCondition<
         break;
       }
     }
+  }
+
+  /**
+   * Indicates that additional conditions must be added for this filter to take
+   * place. Exists specifically so that postgraphile-plugin-connection-filter
+   * can return a condition for children to use, but then not actually add that
+   * condition if no children add any requirements to it.
+   */
+  public ignoreUnlessAmended() {
+    this.minimumConditionsLength =
+      (this.isHaving ? this.havingConditions : this.conditions).length + 1;
   }
 
   /**
@@ -199,6 +211,10 @@ where ${sqlCondition}`})`;
 
   apply(): void {
     if (this.isHaving) {
+      if (this.havingConditions.length < this.minimumConditionsLength) {
+        // Do nothing
+        return;
+      }
       if (!this.parent.having) {
         throw new Error(`${this.parent} doesn't support 'having'`);
       }
@@ -213,6 +229,10 @@ where ${sqlCondition}`})`;
         }
       }
     } else {
+      if (this.conditions.length < this.minimumConditionsLength) {
+        // Do nothing
+        return;
+      }
       if (this.resolvedMode.mode === "PASS_THRU") {
         this.conditions.forEach((condition) => {
           this.parent.where(condition);
