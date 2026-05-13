@@ -39,10 +39,15 @@ type PgConditionModeExists = {
   equals?: boolean;
 };
 
-type PgConditionModeTableExpression = {
+type PgConditionModeRecordExpression = {
   mode: "RECORD_EXPRESSION";
+  /**
+   * BEWARE: this expression may be _repeated_ multiple times in the generated
+   * query, so it should be inexpensive and have no side effects. Intended for
+   * use with columns of a composite type, so expression should typically be
+   * wrapped in parenthesis, enabling `(my_table.my_column).my_attribute`
+   */
   expression: SQL;
-  alias?: string;
 };
 
 export type PgConditionResolvedMode =
@@ -51,7 +56,7 @@ export type PgConditionResolvedMode =
   | { mode: "OR" }
   | { mode: "NOT" }
   | PgConditionModeExists
-  | PgConditionModeTableExpression;
+  | PgConditionModeRecordExpression;
 
 export type PgConditionMode =
   | "PASS_THRU"
@@ -137,9 +142,7 @@ export class PgCondition<
         break;
       }
       case "RECORD_EXPRESSION": {
-        this.alias = sql.identifier(
-          Symbol(this.resolvedMode.alias ?? "table_expression"),
-        );
+        this.alias = this.resolvedMode.expression;
         break;
       }
       default: {
@@ -238,10 +241,7 @@ where ${sqlCondition}`})`;
         }
       }
       case "RECORD_EXPRESSION": {
-        return sql`(${sql.indent`\
-select ${sqlCondition}
-from (select ${this.resolvedMode.expression}.*) as ${this.alias}
-`})`;
+        return sqlCondition;
       }
       default: {
         const never: never = this.resolvedMode;
