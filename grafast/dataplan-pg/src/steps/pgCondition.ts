@@ -53,6 +53,32 @@ export type PgConditionMode =
   | "NOT"
   | PgConditionResolvedMode;
 
+interface PgConditionOptions {
+  /** @defaultValue `false` */
+  isHaving?: boolean;
+  /** @defaultValue `"PASS_THRU"` */
+  mode?: PgConditionMode;
+}
+
+function resolveOptions(
+  isHavingOrOptions: PgConditionOptions | boolean | undefined,
+  maybeMode: PgConditionMode | undefined,
+) {
+  if (typeof isHavingOrOptions === "boolean") {
+    return { isHaving: isHavingOrOptions, mode: maybeMode };
+  } else if (isHavingOrOptions == null) {
+    return { mode: maybeMode };
+  } else if (maybeMode !== undefined) {
+    throw new Error(
+      `Invalid call signature to PgCondition constructor, use \`new PgCondition(parent, options)\``,
+    );
+  } else if (isHavingOrOptions) {
+    return isHavingOrOptions;
+  } else {
+    return {};
+  }
+}
+
 export class PgCondition<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
   >
@@ -73,12 +99,16 @@ export class PgCondition<
   public readonly resolvedMode: PgConditionResolvedMode;
   private isHaving: boolean;
 
+  constructor(parent: TParent, options: PgConditionOptions);
+  constructor(parent: TParent, isHaving?: boolean, mode?: PgConditionMode);
   constructor(
     parent: TParent,
-    isHaving = false,
-    mode: PgConditionMode = "PASS_THRU",
+    isHavingOrOptions?: PgConditionOptions | boolean,
+    maybeMode?: PgConditionMode,
   ) {
     super(parent);
+    const options = resolveOptions(isHavingOrOptions, maybeMode);
+    const { isHaving = false, mode = "PASS_THRU" } = options;
     this.isHaving = isHaving;
     if (typeof mode === "string") {
       this.resolvedMode = { mode };
