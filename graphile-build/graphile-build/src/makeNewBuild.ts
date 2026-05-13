@@ -96,7 +96,7 @@ export default function makeNewBuild(
       );
     }
     const newTypeSource =
-      origin || `'addType' call during hook '${build.status.currentHookName}'`;
+      origin || `'register' call during hook '${build.status.currentHookName}'`;
     if (allTypesSources[typeName]) {
       const oldTypeSource = allTypesSources[typeName];
       const firstEntityDetails = !oldTypeSource
