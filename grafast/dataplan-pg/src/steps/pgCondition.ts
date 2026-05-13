@@ -1,4 +1,4 @@
-import { Modifier } from "grafast";
+import { inspect, Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
@@ -39,12 +39,19 @@ type PgConditionModeExists = {
   equals?: boolean;
 };
 
+type PgConditionModeTableExpression = {
+  mode: "RECORD_EXPRESSION";
+  expression: SQL;
+  alias?: string;
+};
+
 export type PgConditionResolvedMode =
   | { mode: "PASS_THRU" }
   | { mode: "AND" }
   | { mode: "OR" }
   | { mode: "NOT" }
-  | PgConditionModeExists;
+  | PgConditionModeExists
+  | PgConditionModeTableExpression;
 
 export type PgConditionMode =
   | "PASS_THRU"
@@ -128,6 +135,16 @@ export class PgCondition<
           Symbol(this.resolvedMode.alias ?? "exists"),
         );
         break;
+      }
+      case "RECORD_EXPRESSION": {
+        this.alias = sql.identifier(
+          Symbol(this.resolvedMode.alias ?? "table_expression"),
+        );
+        break;
+      }
+      default: {
+        const never: never = this.resolvedMode;
+        throw new Error(`Unexpected mode ${inspect(never)}`);
       }
     }
   }
@@ -219,6 +236,12 @@ where ${sqlCondition}`})`;
           // Assume true
           return sqlExists;
         }
+      }
+      case "RECORD_EXPRESSION": {
+        return sql`(${sql.indent`\
+select ${sqlCondition}
+from (select ${this.resolvedMode.expression}.*) as ${this.alias}
+`})`;
       }
       default: {
         const never: never = this.resolvedMode;
