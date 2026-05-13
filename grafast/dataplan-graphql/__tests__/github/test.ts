@@ -1,7 +1,7 @@
 /* eslint-disable graphile-export/export-methods, graphile-export/export-plans */
 import { execute, grafast } from "grafast";
 
-import { GraphQLClient } from "../../src/steps/graphqlSchema.ts";
+import type { GraphQLClient } from "../../dist/index.js";
 import { githubSchema } from "./githubSchema.ts";
 import { schema } from "./schema.ts";
 
