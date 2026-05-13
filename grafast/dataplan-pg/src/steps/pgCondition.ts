@@ -1,4 +1,4 @@
-import { Modifier } from "grafast";
+import { inspect, Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
@@ -39,12 +39,24 @@ type PgConditionModeExists = {
   equals?: boolean;
 };
 
+type PgConditionModeRecordExpression = {
+  mode: "RECORD_EXPRESSION";
+  /**
+   * BEWARE: this expression may be _repeated_ multiple times in the generated
+   * query, so it should be inexpensive and have no side effects. Intended for
+   * use with columns of a composite type, so expression should typically be
+   * wrapped in parenthesis, enabling `(my_table.my_column).my_attribute`
+   */
+  expression: SQL;
+};
+
 export type PgConditionResolvedMode =
   | { mode: "PASS_THRU" }
   | { mode: "AND" }
   | { mode: "OR" }
   | { mode: "NOT" }
-  | PgConditionModeExists;
+  | PgConditionModeExists
+  | PgConditionModeRecordExpression;
 
 export type PgConditionMode =
   | "PASS_THRU"
@@ -52,6 +64,30 @@ export type PgConditionMode =
   | "OR"
   | "NOT"
   | PgConditionResolvedMode;
+
+interface PgConditionOptions {
+  /** @defaultValue `false` */
+  isHaving?: boolean;
+  /** @defaultValue `"PASS_THRU"` */
+  mode?: PgConditionMode;
+}
+
+function resolveOptions(
+  isHavingOrOptions: PgConditionOptions | boolean | undefined,
+  maybeMode: PgConditionMode | undefined,
+): PgConditionOptions {
+  if (typeof isHavingOrOptions === "boolean") {
+    return { isHaving: isHavingOrOptions, mode: maybeMode };
+  } else if (isHavingOrOptions == null) {
+    return { mode: maybeMode };
+  } else if (maybeMode !== undefined) {
+    throw new Error(
+      `Invalid call signature to PgCondition constructor, use \`new PgCondition(parent, options)\``,
+    );
+  } else {
+    return isHavingOrOptions;
+  }
+}
 
 export class PgCondition<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
@@ -74,12 +110,16 @@ export class PgCondition<
   public readonly resolvedMode: PgConditionResolvedMode;
   private isHaving: boolean;
 
+  constructor(parent: TParent, options: PgConditionOptions);
+  constructor(parent: TParent, isHaving?: boolean, mode?: PgConditionMode);
   constructor(
     parent: TParent,
-    isHaving = false,
-    mode: PgConditionMode = "PASS_THRU",
+    isHavingOrOptions?: PgConditionOptions | boolean,
+    maybeMode?: PgConditionMode,
   ) {
     super(parent);
+    const options = resolveOptions(isHavingOrOptions, maybeMode);
+    const { isHaving = false, mode = "PASS_THRU" } = options;
     this.isHaving = isHaving;
     if (typeof mode === "string") {
       this.resolvedMode = { mode };
@@ -99,6 +139,14 @@ export class PgCondition<
           Symbol(this.resolvedMode.alias ?? "exists"),
         );
         break;
+      }
+      case "RECORD_EXPRESSION": {
+        this.alias = this.resolvedMode.expression;
+        break;
+      }
+      default: {
+        const never: never = this.resolvedMode;
+        throw new Error(`Unexpected mode ${inspect(never)}`);
       }
     }
   }
@@ -201,6 +249,9 @@ where ${sqlCondition}`})`;
           // Assume true
           return sqlExists;
         }
+      }
+      case "RECORD_EXPRESSION": {
+        return sqlCondition;
       }
       default: {
         const never: never = this.resolvedMode;
