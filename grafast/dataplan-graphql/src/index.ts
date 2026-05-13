@@ -3,4 +3,4 @@ export {
   GraphQLOperationStep,
   graphqlQuery,
   graphqlSubscription,
-} from "./steps/graphqlOperation.js";
+} from "./steps/graphqlOperation.ts";

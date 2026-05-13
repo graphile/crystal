@@ -10,8 +10,8 @@ import type {
   ExecutionResult,
 } from "graphql";
 
-import { GraphQLOperationStep } from "./graphqlOperation";
-import type { GraphQLSelectionSetStep } from "./graphqlSelectionSet";
+import { GraphQLOperationStep } from "./graphqlOperation.ts";
+import type { GraphQLSelectionSetStep } from "./graphqlSelectionSet.ts";
 
 export type OperationType = "query" | "mutation" | "subscription";
 
