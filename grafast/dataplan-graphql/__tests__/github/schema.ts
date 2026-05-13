@@ -5,11 +5,11 @@ import {
   get,
   grafast,
   inhibitOnNull,
+  lambda,
   makeGrafastSchema,
   object,
   Step,
 } from "grafast";
-import { GraphQLError } from "graphql";
 
 import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
 import { GraphQLSelectionSetStep } from "../steps/graphqlSelectionSet";
@@ -62,7 +62,7 @@ const schema = makeGrafastSchema({
         const $userId = inhibitOnNull(context().get("currentUserId"));
         return object({ id: $userId });
       },
-      githubUserByUsername($username: Step<string>) {
+      githubUserByUsername(_, { $username }) {
         return githubUser($username);
       },
     },
@@ -106,6 +106,7 @@ const testSchema = makeGrafastSchema({
     }
     type User {
       login: String
+      name: String
     }
   `,
   objects: {
@@ -113,6 +114,13 @@ const testSchema = makeGrafastSchema({
       plans: {
         user(_, { $login }) {
           return object({ login: $login });
+        },
+      },
+    },
+    User: {
+      plans: {
+        name($user) {
+          return lambda($user, (user) => (user as any)?.login.toUpperCase());
         },
       },
     },
