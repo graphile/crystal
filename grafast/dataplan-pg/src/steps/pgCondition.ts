@@ -75,7 +75,7 @@ interface PgConditionOptions {
 function resolveOptions(
   isHavingOrOptions: PgConditionOptions | boolean | undefined,
   maybeMode: PgConditionMode | undefined,
-) {
+): PgConditionOptions {
   if (typeof isHavingOrOptions === "boolean") {
     return { isHaving: isHavingOrOptions, mode: maybeMode };
   } else if (isHavingOrOptions == null) {
@@ -84,10 +84,8 @@ function resolveOptions(
     throw new Error(
       `Invalid call signature to PgCondition constructor, use \`new PgCondition(parent, options)\``,
     );
-  } else if (isHavingOrOptions) {
-    return isHavingOrOptions;
   } else {
-    return {};
+    return isHavingOrOptions;
   }
 }
 
