@@ -21,16 +21,37 @@ export class GraphQLSelectFieldStep<
   private readonly fieldName: string;
   private selections: SelectionNode[];
 
+  argsDeps: { [argName: string]: number };
+
   constructor(
     $parent: GraphQLSelectionSetStep<TSchema, TOperationType>,
     fieldName: string,
-    args?: ArgsObject,
+    args?: Record<string, Step>, // ArgsObject,
     options?: { directives?: ArgsObject },
   ) {
     super();
-    this.addDependency($parent);
     this.fieldName = fieldName;
     this.selections = [];
+    this.addDependency($parent);
+    if (args) {
+      this.argsDeps = Object.fromEntries(
+        Object.entries(args).map(([argName, $dep]) => [
+          argName,
+          this.addUnaryDependency($dep),
+        ]),
+      );
+    } else {
+      this.argsDeps = Object.create(null);
+    }
+  }
+
+  getArgs(): Record<string, Step> {
+    return Object.fromEntries(
+      Object.entries(this.argsDeps).map(([argName, depId]) => [
+        argName,
+        this.getDep(depId),
+      ]),
+    );
   }
 
   getParent() {
@@ -53,6 +74,7 @@ export class GraphQLSelectFieldStep<
   ) {
     return this.selectionSet().get(...args);
   }
+
   ofType(typeName: string) {
     return new GraphQLSelectionSetStep(this, typeName);
   }
@@ -62,22 +84,11 @@ export class GraphQLSelectFieldStep<
   }
 
   optimize(): Step {
-    const selection: FieldNode = {
-      kind: Kind.FIELD,
-      name: {
-        kind: Kind.NAME,
-        value: this.fieldName,
-      },
-      alias: undefined, // TODO
-      selectionSet: {
-        kind: Kind.SELECTION_SET,
-        selections: this.selections,
-      },
-    };
-    // TODO: const alias = this.getParent().addField(this.fieldName, ...)
-    this.getParent().addSelection(selection);
-    const alias = this.fieldName;
-    return access(this.getParent(), alias);
+    const $parent = this.getParent();
+    const args = this.getArgs();
+    const { selections } = this;
+    const alias = $parent.selectField(this.fieldName, { args, selections });
+    return access($parent, alias);
   }
 
   execute(details: ExecutionDetails): GrafastResultsList<any> {

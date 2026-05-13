@@ -39,6 +39,9 @@ export class GraphQLOperationStep<
   public readonly operationType: TOperationType;
 
   private document: DocumentNode;
+  private operation: Omit<OperationDefinitionNode, "variableDefinitions"> & {
+    variableDefinitions?: VariableDefinitionNode[];
+  };
   private selections: SelectionNode[];
 
   constructor(
@@ -49,18 +52,17 @@ export class GraphQLOperationStep<
     this.addUnaryDependency($schema);
     this.operationType = operationType;
     this.selections = [];
+    this.operation = {
+      kind: Kind.OPERATION_DEFINITION,
+      operation: OPERATION_TYPE_LOOKUP[this.operationType],
+      selectionSet: {
+        kind: Kind.SELECTION_SET,
+        selections: this.selections,
+      },
+    };
     this.document = {
       kind: Kind.DOCUMENT,
-      definitions: [
-        {
-          kind: Kind.OPERATION_DEFINITION,
-          operation: OPERATION_TYPE_LOOKUP[this.operationType],
-          selectionSet: {
-            kind: Kind.SELECTION_SET,
-            selections: this.selections,
-          },
-        },
-      ],
+      definitions: [this.operation],
     };
   }
 
@@ -81,6 +83,56 @@ export class GraphQLOperationStep<
     );
   }
 
+  usedVariableNames = new Set<string>();
+  variableNameByDepId = new Map<number, string>();
+  getVariableName($step: Step, hint: string) {
+    if (!this.canAddDependency($step)) {
+      throw new Error(
+        `Invalid dependency chain: ${this} is not allowed to depend on ${$step}`,
+      );
+    }
+    // TODO: it is unreasonable to assume this can be unary. We're going to
+    // have to do variable batching or similar. Potentially we could do
+    // excessive selection sets (one field per arg value) but that's more
+    // complex.
+    const depId = this.addUnaryDependency($step);
+    const existing = this.variableNameByDepId.get(depId);
+    if (existing) {
+      return existing;
+    }
+    let name = hint;
+    let counter = 1;
+    while (this.usedVariableNames.has(name)) {
+      name = `${hint}${++counter}`;
+    }
+    this.usedVariableNames.add(name);
+    this.variableNameByDepId.set(depId, name);
+    if (!this.operation.variableDefinitions) {
+      this.operation.variableDefinitions = [];
+    }
+    this.operation.variableDefinitions!.push({
+      kind: Kind.VARIABLE_DEFINITION,
+      type: {
+        kind: Kind.NON_NULL_TYPE,
+        type: {
+          kind: Kind.NAMED_TYPE,
+          name: {
+            kind: Kind.NAME,
+            value: "String",
+          },
+        },
+      }, // TODO: NEED PROPER VARIABLE TYPE!!
+      variable: {
+        kind: Kind.VARIABLE,
+        name: {
+          kind: Kind.NAME,
+          value: name,
+        },
+      },
+    });
+    return name;
+  }
+
   data() {
     return access(this, "data");
   }
@@ -95,25 +147,36 @@ export class GraphQLOperationStep<
     this.selections.push(selection);
   }
 
-  execute(details: ExecutionDetails): GrafastResultsList<any> {
+  async execute(details: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { values, indexMap, stream } = details;
     const client = values[0].unaryValue() as GraphQLClient | null | undefined;
-    const { document } = this;
-    return indexMap(async (i) => {
-      if (!client) {
-        return flagError(new Error("No GraphQL client passed"));
-      }
-      if (!document) {
-        return flagError(
-          new Error("Failed to construct document during optimize?"),
-        );
-      }
-      if (this.operationType === "subscription" && !stream) {
-        return flagError(new Error("Must stream subscription operations"));
-      }
-      const variableValues: Record<string, any> = Object.create(null);
-      // TODO: add variables
-      const result = await client.execute({ document, variableValues });
+    const { document, variableNameByDepId } = this;
+    if (!client) {
+      return indexMap((i) => flagError(new Error("No GraphQL client passed")));
+    }
+    if (!document) {
+      return indexMap((i) =>
+        flagError(new Error("Failed to construct document during optimize?")),
+      );
+    }
+    console.log(print(document));
+    if (this.operationType === "subscription" && !stream) {
+      return indexMap(() =>
+        flagError(new Error("Must stream subscription operations")),
+      );
+    }
+
+    const variableDepIdAndNames = [...variableNameByDepId.entries()];
+
+    async function getResult(index: number) {
+      const variableValues = Object.fromEntries(
+        variableDepIdAndNames.map(([depId, name]) => [
+          name,
+          values[depId].at(index),
+        ]),
+      );
+
+      const result = await client!.execute({ document, variableValues });
 
       if (isAsyncIterable(result)) {
         throw new Error("Incremental delivery is currently unsupported");
@@ -123,7 +186,14 @@ export class GraphQLOperationStep<
       console.dir(data);
 
       return { data };
-    });
+    }
+
+    if (variableDepIdAndNames.every(([depId]) => !values[depId].isBatch)) {
+      // All unary - execute once, use result for everything
+      const result = getResult(0);
+      return indexMap(() => result);
+    }
+    return indexMap(getResult);
   }
 
   optimize() {
