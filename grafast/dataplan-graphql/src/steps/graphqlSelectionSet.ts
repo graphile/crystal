@@ -1,8 +1,7 @@
 import type { __ItemStep, ExecutionDetails } from "grafast";
 import { AccessStep, Step } from "grafast";
-import type { InlineFragmentNode, SelectionNode } from "graphql";
-import { Kind } from "graphql";
 
+import type { GraphQLArgumentValue, GraphQLSelection } from "../interfaces.ts";
 import { GraphQLOperationStep } from "./graphqlOperation.ts";
 import type { OperationType } from "./graphqlSchema.ts";
 import { GraphQLSelectFieldStep } from "./graphqlSelectField.ts";
@@ -19,7 +18,7 @@ type SelectionDataParent<TSchema, TOperationType extends OperationType> =
 
 interface FieldDetails {
   args?: Record<string, Step>;
-  selections?: SelectionNode[];
+  selections?: GraphQLSelection[];
 }
 export class GraphQLSelectionSetStep<
   TSchema,
@@ -36,7 +35,7 @@ export class GraphQLSelectionSetStep<
 
   // selections: GraphQLSelection[] = [];
   private typeName: string | undefined;
-  private selections: SelectionNode[];
+  private selections: GraphQLSelection[];
 
   constructor(
     $parent: SelectionDataParent<TSchema, TOperationType>,
@@ -112,38 +111,31 @@ export class GraphQLSelectionSetStep<
   }
 
   selectField(fieldName: string, details: FieldDetails = {}): string {
-    const { args, selections } = details;
+    const { selections } = details;
     const $op = this.getOperation();
     const $owningSS = this.owningSelectionSet();
     const alias = $owningSS.getFieldAlias(fieldName, details);
+    const argTuples = details.args
+      ? Object.entries(details.args).map(
+          ([argName, $step]): [string, GraphQLArgumentValue] => [
+            argName,
+            {
+              kind: "variable",
+              name: $op.getVariableName(
+                $step,
+                "String!", // TODO: NEED PROPER VARIABLE TYPE!!
+                argName,
+              ),
+            },
+          ],
+        )
+      : [];
     this.selections.push({
-      kind: Kind.FIELD,
-      alias:
-        alias === fieldName ? undefined : { kind: Kind.NAME, value: alias },
-      name: { kind: Kind.NAME, value: fieldName },
-      arguments:
-        args && Object.keys(args).length > 0
-          ? Object.entries(args).map(([argName, $step]) => ({
-              kind: Kind.ARGUMENT,
-              name: {
-                kind: Kind.NAME,
-                value: argName,
-              },
-              value: {
-                kind: Kind.VARIABLE,
-                name: {
-                  kind: Kind.NAME,
-                  value: $op.getVariableName($step, argName),
-                },
-              },
-            }))
-          : undefined,
-      selectionSet: selections
-        ? {
-            kind: Kind.SELECTION_SET,
-            selections,
-          }
-        : undefined,
+      kind: "field",
+      alias,
+      fieldName,
+      args: argTuples.length ? Object.fromEntries(argTuples) : undefined,
+      selections,
     });
     return alias;
   }
@@ -170,27 +162,17 @@ export class GraphQLSelectionSetStep<
     return alias;
   }
 
-  addSelection(selection: SelectionNode) {
+  addSelection(selection: GraphQLSelection) {
     this.selections.push(selection);
   }
 
   optimize() {
     if (this.typeName) {
-      const selection: InlineFragmentNode = {
-        kind: Kind.INLINE_FRAGMENT,
-        typeCondition: {
-          kind: Kind.NAMED_TYPE,
-          name: {
-            kind: Kind.NAME,
-            value: this.typeName,
-          },
-        },
-        selectionSet: {
-          kind: Kind.SELECTION_SET,
-          selections: this.selections,
-        },
-      };
-      this.getGraphQLParent().addSelection(selection);
+      this.getGraphQLParent().addSelection({
+        kind: "inlineFragment",
+        typeSpecifier: this.typeName,
+        selections: this.selections,
+      });
     } else {
       for (const selection of this.selections) {
         this.getGraphQLParent().addSelection(selection);

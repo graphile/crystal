@@ -2,22 +2,29 @@ import type { Step } from "grafast";
 
 export interface GraphQLDirective {
   name: string;
-  arguments?: { [key: string]: any };
+  args?: { [key: string]: any };
 }
+
+export interface GraphQLVariable {
+  kind: "variable";
+  name: string;
+}
+
+export type GraphQLArgumentValue = GraphQLVariable | { kind: never };
 
 export interface GraphQLSelectionField {
   kind: "field";
-  fieldName: string;
   alias?: string;
-  directives: GraphQLDirective[];
-  // TODO: CCN
-  selections: GraphQLSelection[];
+  fieldName: string;
+  args?: { [key: string]: GraphQLArgumentValue };
+  directives?: GraphQLDirective[];
+  selections?: GraphQLSelection[];
 }
 
 export interface GraphQLSelectionInlineFragment {
   kind: "inlineFragment";
   typeSpecifier: string | null;
-  directives: GraphQLDirective[];
+  directives?: GraphQLDirective[];
   // TODO: alias?
   selections: GraphQLSelection[];
 }
