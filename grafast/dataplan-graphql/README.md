@@ -9,6 +9,22 @@
 
 Docs: https://grafast.org/grafast/step-library/dataplan-graphql/
 
+## WORK IN PROGRESS
+
+TODO:
+
+- [x] Get exceedingly basic querying working
+- [ ] Use GraphQL schema definition to:
+  - [ ] infer types of variables
+  - [ ] pro-actively throw on invalid field/type/arg/etc reference
+  - [ ] provide a typed API
+- [ ] Implement variable batching for requests (where possible), allow for
+      non-unary arguments
+- [ ] Allow use of static inputs rather than variables when step is a constant
+- [ ] Add tests
+- [ ] Ensure null and error handling work correctly - GraphQL-TOE style
+- [ ] Remove all the console statements
+
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
