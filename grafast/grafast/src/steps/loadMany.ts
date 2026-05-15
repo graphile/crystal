@@ -3,7 +3,9 @@ import type {
   ConnectionOptimizedStep,
   ExecutionDetails,
 } from "../index.ts";
+import { currentFieldStreamDetails } from "../index.ts";
 import type {
+  ExecutionDetailsStream,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -147,8 +149,13 @@ export class LoadManyStep<
     >,
   ) {
     super();
-    // TODO: prompt users to disable this if they don't need it.
-    this.cloneStreams = true;
+    const $streamDetails = currentFieldStreamDetails();
+    if ($streamDetails === null || $streamDetails === true) {
+      // It won't stream, don't clone
+    } else {
+      // TODO: prompt users to disable this if they don't need it.
+      this.cloneStreams = true;
+    }
 
     const { load, shared, ioEquivalence, paginationSupport } = loader;
     this.name = loader.name || load.displayName || load.name;
@@ -172,6 +179,13 @@ export class LoadManyStep<
       delete this.applyPagination;
     } else {
       this.paginationSupport = paginationSupport;
+    }
+  }
+  addStreamDetails?(
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+  ) {
+    if ($streamDetails === null) {
+      this.cloneStreams = false;
     }
   }
   toStringMeta() {
