@@ -1,5 +1,13 @@
 # graphile-build
 
+## 5.0.2
+
+### Patch Changes
+
+- [#3049](https://github.com/graphile/crystal/pull/3049)
+  [`2d92a4b`](https://github.com/graphile/crystal/commit/2d92a4bc456cd087721e418ea3ac97e3af68ac38)
+  Thanks [@benjie](https://github.com/benjie)! - Minor error message fix.
+
 ## 5.0.1
 
 ### Patch Changes
