@@ -1,5 +1,15 @@
 # postgraphile
 
+## 5.0.3
+
+### Patch Changes
+
+- [#3054](https://github.com/graphile/crystal/pull/3054)
+  [`109c7fe`](https://github.com/graphile/crystal/commit/109c7fea6147e2bc82f805b148c33b6233481098)
+  Thanks [@benjie](https://github.com/benjie)! - Require newer versions of
+  @dataplan/pg graphile-build and grafast so we can rely on the new
+  PgCondition/setParams methods
+
 ## 5.0.2
 
 ### Patch Changes
