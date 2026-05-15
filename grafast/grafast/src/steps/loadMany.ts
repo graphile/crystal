@@ -3,7 +3,9 @@ import type {
   ConnectionOptimizedStep,
   ExecutionDetails,
 } from "../index.ts";
+import { currentFieldStreamDetails } from "../index.ts";
 import type {
+  ExecutionDetailsStream,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -136,6 +138,12 @@ export class LoadManyStep<
   >;
   paginationSupport?: PaginationFeatures;
   private name: Maybe<string>;
+
+  /** Direct field stream */
+  private _fieldMightStream: boolean;
+  /** Maybe its a connection with a `nodes @stream` or `edges @stream`. Null = unknown */
+  private _fieldMightStreamViaConnection: boolean | null = null;
+
   constructor(
     lookup: TLookup,
     loader: LoadManyLoader<
@@ -147,8 +155,8 @@ export class LoadManyStep<
     >,
   ) {
     super();
-    // TODO: prompt users to disable this if they don't need it.
-    this.cloneStreams = true;
+    const $streamDetails = currentFieldStreamDetails();
+    this._fieldMightStream = $streamDetails != null && $streamDetails !== true;
 
     const { load, shared, ioEquivalence, paginationSupport } = loader;
     this.name = loader.name || load.displayName || load.name;
@@ -174,6 +182,25 @@ export class LoadManyStep<
       this.paginationSupport = paginationSupport;
     }
   }
+
+  addStreamDetails?(
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+  ) {
+    if ($streamDetails === null) {
+      this._fieldMightStreamViaConnection = false;
+    } else {
+      if (this._fieldMightStreamViaConnection === null) {
+        this._fieldMightStreamViaConnection = true;
+      }
+    }
+  }
+
+  private mightHaveStream() {
+    return (
+      this._fieldMightStream || this._fieldMightStreamViaConnection || false
+    );
+  }
+
   toStringMeta() {
     return this.name ?? null;
   }
@@ -239,6 +266,15 @@ export class LoadManyStep<
       (depId) => this.getDepOptions(depId).step.id,
     ));
   }
+
+  optimize() {
+    if (this.mightHaveStream()) {
+      // TODO: prompt users to disable this if they don't need it.
+      this.cloneStreams = true;
+    }
+    return this;
+  }
+
   finalize() {
     // Find all steps of this type that use the same callback and have
     // equivalent params and then match their list of attributes together.
