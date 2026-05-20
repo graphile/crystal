@@ -97,15 +97,17 @@ export class GraphQLResolverStep extends UnbatchedStep {
     variableValues: any,
     rootValue: any,
   ): any {
+    const executionRootValue = extra._requestContext.currentRootValue;
     if (!extra.stream) {
       if (this.isNotRoot && source == null) {
         return source;
       }
+      const resolverSource = this.isNotRoot ? source : executionRootValue;
       const resolveInfo: GraphQLResolveInfo = Object.assign(
         Object.create(this.resolveInfoBase),
         {
           variableValues,
-          rootValue,
+          rootValue: executionRootValue,
           path: {
             typename: this.resolveInfoBase.parentType.name,
             key: this.resolveInfoBase.fieldName,
@@ -114,7 +116,12 @@ export class GraphQLResolverStep extends UnbatchedStep {
           },
         },
       );
-      const data = this.resolver?.(source, args, context, resolveInfo);
+      const data = this.resolver?.(
+        resolverSource,
+        args,
+        context,
+        resolveInfo,
+      );
       return flagErrorIfErrorAsync(data);
     } else {
       if (this.isNotRoot) {
@@ -128,10 +135,15 @@ export class GraphQLResolverStep extends UnbatchedStep {
         {
           // ENHANCE: add support for path
           variableValues,
-          rootValue,
+          rootValue: executionRootValue,
         },
       );
-      const data = this.subscriber(source, args, context, resolveInfo);
+      const data = this.subscriber(
+        executionRootValue,
+        args,
+        context,
+        resolveInfo,
+      );
       return flagErrorIfErrorAsync(data);
     }
   }

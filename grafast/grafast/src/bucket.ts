@@ -16,6 +16,8 @@ export interface RequestTools {
   /** @internal */
   args: GrafastExecutionArgs;
   /** @internal */
+  currentRootValue: any;
+  /** @internal */
   onError: ErrorBehavior;
   /** The `timeSource.now()` at which the request started executing */
   startTime: number;

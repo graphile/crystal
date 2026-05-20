@@ -6,9 +6,11 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue.js";
 
-import { $$eventEmitter, $$extensions } from "./constants.ts";
-import { isDev } from "./dev.ts";
-import { inspect } from "./inspect.ts";
+import {
+  $$eventEmitter,
+  $$extensions,
+  $$originalRootValue,
+} from "./constants.ts";
 import type {
   ExecuteEvent,
   ExecutionEventEmitter,
@@ -30,24 +32,9 @@ export function withGrafastArgs(
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
   const options = args.resolvedPreset?.grafast;
-  if (isDev) {
-    if (
-      args.rootValue != null &&
-      (typeof args.rootValue !== "object" ||
-        Object.keys(args.rootValue).length > 0)
-    ) {
-      throw new Error(
-        `Grafast executor doesn't support there being a rootValue (found ${inspect(
-          args.rootValue,
-        )})`,
-      );
-    }
-  }
+  args[$$originalRootValue] = args.rootValue;
   if (args.rootValue == null) {
     args.rootValue = Object.create(null);
-  }
-  if (typeof args.rootValue !== "object" || args.rootValue == null) {
-    throw new Error("Grafast requires that the 'rootValue' be an object");
   }
   const explain = options?.explain;
   const shouldExplain = !!explain;
@@ -56,14 +43,12 @@ export function withGrafastArgs(
   if (shouldExplain) {
     const eventEmitter: ExecutionEventEmitter | undefined = new EventEmitter();
     const explainOperations: any[] = [];
-    args.rootValue = Object.assign(Object.create(null), args.rootValue, {
-      [$$eventEmitter]: eventEmitter,
-      [$$extensions]: {
-        explain: {
-          operations: explainOperations,
-        },
+    args[$$eventEmitter] = eventEmitter;
+    args[$$extensions] = {
+      explain: {
+        operations: explainOperations,
       },
-    });
+    };
     const handleExplainOperation = ({
       operation,
     }: ExecutionEventMap["explainOperation"]) => {
