@@ -8,6 +8,7 @@ import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
+  GraphQLSchema,
 } from "graphql";
 
 import { GraphQLOperationStep } from "./graphqlOperation.ts";
@@ -48,8 +49,14 @@ export class GraphQLSchemaStep<TSchema = any> extends Step<
     exportName: "GraphQLSchemaStep",
   };
 
-  constructor($client: Step<GraphQLClient | null | undefined>) {
+  public readonly schema: GraphQLSchema;
+
+  constructor(
+    schema: GraphQLSchema,
+    $client: Step<GraphQLClient | null | undefined>,
+  ) {
     super();
+    this.schema = schema;
     this.addUnaryDependency($client);
   }
 
@@ -93,6 +100,10 @@ export class GraphQLSchemaStep<TSchema = any> extends Step<
     return indexMap((i) => v.at(i));
   }
 }
-export function graphqlSchema($client: Step<GraphQLClient | null | undefined>) {
-  return new GraphQLSchemaStep($client);
+
+export function graphqlSchema(
+  schema: GraphQLSchema,
+  $client: Step<GraphQLClient | null | undefined>,
+) {
+  return new GraphQLSchemaStep(schema, $client);
 }

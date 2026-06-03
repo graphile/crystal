@@ -1,5 +1,13 @@
-import type { __ItemStep, ExecutionDetails } from "grafast";
-import { AccessStep, Step } from "grafast";
+import type { ExecutionDetails } from "grafast";
+import { __ItemStep, AccessStep, Step } from "grafast";
+import type { GraphQLCompositeType } from "graphql";
+import {
+  getNamedType,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  GraphQLUnionType,
+  isCompositeType,
+} from "graphql";
 
 import type { GraphQLArgumentValue, GraphQLSelection } from "../interfaces.ts";
 import { GraphQLOperationStep } from "./graphqlOperation.ts";
@@ -20,6 +28,82 @@ interface FieldDetails {
   args?: Record<string, Step>;
   selections?: GraphQLSelection[];
 }
+
+function getExpectedType<TSchema, TOperationType extends OperationType>(
+  $parent: SelectionDataParent<TSchema, TOperationType>,
+  explicitTypeName?: string,
+): GraphQLCompositeType {
+  let $underlying = $parent;
+  if ($underlying instanceof AccessStep) {
+    if ($underlying.path.length !== 1 || $underlying.path[0] !== "data") {
+      throw new Error(
+        `Didn't understand ${$parent} passed to graphqlSelectionSet()`,
+      );
+    }
+    const $source = $underlying.getParentStep();
+    if (!($source instanceof GraphQLOperationStep)) {
+      throw new Error(
+        `Expected ${$parent} to have a reference to GraphQLOperationStep`,
+      );
+    }
+    $underlying = $source;
+  }
+  while ($underlying instanceof __ItemStep) {
+    $underlying = $underlying.getParentStep() as SelectionDataParent<
+      TSchema,
+      TOperationType
+    >;
+  }
+  if (
+    $underlying instanceof GraphQLOperationStep ||
+    $underlying instanceof GraphQLSelectFieldStep ||
+    $underlying instanceof GraphQLSelectionSetStep
+  ) {
+    const expectedType = getNamedType($underlying.getExpectedType());
+    const typeName = explicitTypeName ?? expectedType.name;
+    if (typeName !== expectedType.name) {
+      const schema = $underlying.getSchema();
+      const t = schema.getType(typeName);
+      if (!t) {
+        throw new Error(`Type '${typeName}' does not exist in the schema`);
+      }
+      if (!isCompositeType(t)) {
+        throw new Error(`Type '${typeName}' is not a composite type`);
+      }
+      if (t instanceof GraphQLUnionType) {
+        if (!t.getTypes().some((o) => o.name === typeName)) {
+          throw new Error(
+            `Union type '${typeName}' is not valid on a selection of type ${expectedType}`,
+          );
+        } else {
+          return t;
+        }
+      } else if (t instanceof GraphQLInterfaceType) {
+        if (
+          !schema.getImplementations(t).objects.some((o) => o.name === typeName)
+        ) {
+          throw new Error(
+            `Interface type '${typeName}' is not valid on a selection of type ${expectedType}`,
+          );
+        } else {
+          return t;
+        }
+      } else {
+        throw new Error(
+          `Object type '${typeName}' is not valid on a selection of type ${expectedType}`,
+        );
+      }
+    } else if (isCompositeType(expectedType)) {
+      return expectedType;
+    } else {
+      throw new Error(`Selection not permitted on ${typeName}`);
+    }
+  } else {
+    throw new Error(
+      `Parent step ${$parent} doesn't seem appropriate for use here`,
+    );
+  }
+}
 export class GraphQLSelectionSetStep<
   TSchema,
   TOperationType extends OperationType,
@@ -34,6 +118,7 @@ export class GraphQLSelectionSetStep<
   isRoot: boolean;
 
   // selections: GraphQLSelection[] = [];
+  public readonly expectedType: GraphQLCompositeType;
   private typeName: string | undefined;
   private selections: GraphQLSelection[];
 
@@ -45,11 +130,20 @@ export class GraphQLSelectionSetStep<
     this.isRoot = $parent == null;
     this.addDependency($parent);
     this.typeName = typeName;
+    this.expectedType = getExpectedType($parent, typeName);
     this.selections = [];
   }
 
   getParent() {
     return this.getDep(0) as SelectionDataParent<TSchema, TOperationType>;
+  }
+
+  getExpectedType() {
+    return this.expectedType;
+  }
+
+  getSchema() {
+    return this.getOperation().getSchema();
   }
 
   getGraphQLParent() {
