@@ -3,6 +3,7 @@ import { context, get, inhibitOnNull, object, Step } from "grafast";
 
 import type { GraphQLClient } from "../../dist/index.js";
 import { graphqlSchema, GraphQLSelectionSetStep } from "../../dist/index.js";
+import { githubSchema as actualGitHubSchema } from "./githubSchema.ts";
 import { typedMakeGrafastSchema } from "./schema-generated.ts";
 
 declare global {
@@ -18,7 +19,7 @@ type GitHubSchema = any;
 
 function githubSchema() {
   const $client = context().get("githubClient");
-  return graphqlSchema($client);
+  return graphqlSchema(actualGitHubSchema, $client);
 }
 
 function githubUser($login: Step) {

@@ -11,6 +11,8 @@ import type {
   ArgumentNode,
   DirectiveNode,
   DocumentNode,
+  GraphQLObjectType,
+  GraphQLSchema,
   ListTypeNode,
   NamedTypeNode,
   OperationDefinitionNode,
@@ -60,7 +62,9 @@ export class GraphQLOperationStep<
   };
 
   isSyncAndSafe = false;
+  public readonly schema: GraphQLSchema;
   public readonly operationType: TOperationType;
+  public readonly rootType: GraphQLObjectType;
   private variables: Record<string, GraphQLOperationVariable>;
   private selections: GraphQLSelection[];
 
@@ -71,6 +75,19 @@ export class GraphQLOperationStep<
     super();
     this.addUnaryDependency($schema);
     this.operationType = operationType;
+    this.schema = $schema.schema;
+    const rootType =
+      operationType === "query"
+        ? this.schema.getQueryType()
+        : operationType === "mutation"
+          ? this.schema.getMutationType()
+          : operationType === "subscription"
+            ? this.schema.getSubscriptionType()
+            : null;
+    if (!rootType) {
+      throw new Error(`Schema does not support this operation type`);
+    }
+    this.rootType = rootType;
     this.variables = Object.create(null);
     this.selections = [];
   }
@@ -82,6 +99,14 @@ export class GraphQLOperationStep<
   // Convenience method
   getOperation(): GraphQLOperationStep<TSchema, TOperationType> {
     return this;
+  }
+
+  getSchema() {
+    return (this.getDep(0) as GraphQLSchemaStep).schema;
+  }
+
+  getExpectedType() {
+    return this.rootType;
   }
 
   rootSelectionSet() {

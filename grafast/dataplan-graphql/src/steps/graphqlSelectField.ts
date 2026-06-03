@@ -1,5 +1,7 @@
 import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { access, Step } from "grafast";
+import type { GraphQLOutputType } from "graphql";
+import { GraphQLUnionType, TypeNameMetaFieldDef } from "graphql";
 
 import type { ArgsObject, GraphQLSelection } from "../interfaces.ts";
 import type { OperationType } from "./graphqlSchema.ts";
@@ -18,6 +20,7 @@ export class GraphQLSelectFieldStep<
 
   private readonly fieldName: string;
   private selections: GraphQLSelection[];
+  private expectedType: GraphQLOutputType;
 
   argsDeps: { [argName: string]: number };
 
@@ -28,6 +31,21 @@ export class GraphQLSelectFieldStep<
     options?: { directives?: ArgsObject },
   ) {
     super();
+    const parentType = $parent.getExpectedType();
+    if (fieldName === "__typename") {
+      this.expectedType = TypeNameMetaFieldDef.type;
+    } else if (parentType instanceof GraphQLUnionType) {
+      throw new Error(`Cannot select fields on a union`);
+    } else {
+      const fields = parentType.getFields();
+      const field = fields[fieldName];
+      if (!field) {
+        throw new Error(
+          `Field ${fieldName} does not exist on type ${parentType.name}`,
+        );
+      }
+      this.expectedType = field.type;
+    }
     this.fieldName = fieldName;
     this.selections = [];
     this.addDependency($parent);
@@ -41,6 +59,14 @@ export class GraphQLSelectFieldStep<
     } else {
       this.argsDeps = Object.create(null);
     }
+  }
+
+  getSchema() {
+    return this.getOperation().getSchema();
+  }
+
+  getExpectedType() {
+    return this.expectedType;
   }
 
   getArgs(): Record<string, Step> {
