@@ -1332,6 +1332,10 @@ function modFields(
                 });
 
             const namedType = build.graphql.getNamedType(type!);
+            const preferredConnectionTypeName =
+              resource.extensions?.tags?.returnType && namedType
+                ? inflection.connectionType(namedType.name)
+                : null;
             const connectionTypeName = shouldUseCustomConnection(resource)
               ? resource.codec.attributes
                 ? inflection.recordFunctionConnectionType({
@@ -1340,11 +1344,13 @@ function modFields(
                 : inflection.scalarFunctionConnectionType({
                     resource,
                   })
-              : resource.codec.attributes
-                ? inflection.tableConnectionType(resource.codec)
-                : namedType
-                  ? inflection.connectionType(namedType.name)
-                  : null;
+              : preferredConnectionTypeName
+                ? preferredConnectionTypeName
+                : resource.codec.attributes
+                  ? inflection.tableConnectionType(resource.codec)
+                  : namedType
+                    ? inflection.connectionType(namedType.name)
+                    : null;
 
             const ConnectionType = connectionTypeName
               ? build.getOutputTypeByName(connectionTypeName)
@@ -1368,9 +1374,10 @@ function modFields(
                       {
                         description:
                           resource.description ??
-                          `Reads and enables pagination through a set of \`${inflection.tableType(
-                            resource.codec,
-                          )}\`.`,
+                          `Reads and enables pagination through a set of \`${
+                            namedType?.name ??
+                            inflection.tableType(resource.codec)
+                          }\`.`,
                         type: build.nullableIf(
                           isRootQuery ?? false,
                           ConnectionType,

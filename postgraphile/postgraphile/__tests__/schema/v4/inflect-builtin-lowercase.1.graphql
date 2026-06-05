@@ -5023,7 +5023,7 @@ type Post implements node {
   computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   computedIntervalArray: [interval]
 
-  """Reads and enables pagination through a set of `Interval`."""
+  """Reads and enables pagination through a set of `interval`."""
   computedIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10053,7 +10053,7 @@ type query implements node {
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10125,7 +10125,7 @@ type query implements node {
     offset: Int
   ): FuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10156,7 +10156,7 @@ type query implements node {
   """Get a single `Input`."""
   inputById(id: Int!): Input
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10301,7 +10301,7 @@ type query implements node {
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [interval]
 
-  """Reads and enables pagination through a set of `Interval`."""
+  """Reads and enables pagination through a set of `interval`."""
   queryIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10385,7 +10385,7 @@ type query implements node {
   """Get a single `SimilarTable2`."""
   similarTable2ById(id: Int!): SimilarTable2
 
-  """Reads and enables pagination through a set of `Int8`."""
+  """Reads and enables pagination through a set of `bigint`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: cursor

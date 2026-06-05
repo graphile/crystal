@@ -2716,6 +2716,7 @@ const single_table_items_resourceOptionsConfig = {
 };
 const all_single_tablesFunctionIdentifer = sql.identifier("polymorphic", "all_single_tables");
 const get_single_table_topic_by_idFunctionIdentifer = sql.identifier("polymorphic", "get_single_table_topic_by_id");
+const single_table_items_topicsFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_topics");
 const relational_itemsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -3343,6 +3344,29 @@ const registryConfig = {
           returnType: "SingleTableTopic"
         }
       }
+    }),
+    single_table_items_topics: PgResource.functionResourceOptions(single_table_items_resourceOptionsConfig, {
+      name: "single_table_items_topics",
+      identifier: "main.polymorphic.single_table_items_topics(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_topicsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        codec: singleTableItemsCodec
+      }],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "single_table_items_topics"
+        },
+        tags: {
+          returnType: "SingleTableTopic"
+        }
+      },
+      hasImplicitOrder: true
     }),
     relational_items: relational_items_resourceOptionsConfig,
     all_relational_items_fn: PgResource.functionResourceOptions(relational_items_resourceOptionsConfig, {
@@ -4086,6 +4110,30 @@ const scalarComputed = (resource, $in, args) => {
 const single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
   return scalarComputed(resource_single_table_items_meaning_of_lifePgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
 };
+const resource_single_table_items_topicsPgResource = registry.pgResources["single_table_items_topics"];
+const single_table_items_topics_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
+  const details = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+  return resource_single_table_items_topicsPgResource.execute(details.selectArgs);
+};
+function SingleTableTopic_topicsPlan($parent, args, info) {
+  const $select = single_table_items_topics_getSelectPlanFromParentAndArgs($parent, args, info);
+  return connection($select);
+}
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 const SingleTableTopic_parentIdPlan = $record => {
   return $record.get("parent_id");
 };
@@ -4120,21 +4168,6 @@ const SingleTableTopic_singleTableItemsByParentIdPlan = $record => {
   });
   return connection($records);
 };
-function applyFirstArg(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function applyLastArg(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function applyOffsetArg(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function applyBeforeArg(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function applyAfterArg(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
@@ -6218,6 +6251,27 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
   """
   nodeId: ID!
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   id: Int!
   type: ItemType!
   parentId: Int
@@ -7935,6 +7989,34 @@ type SingleTableItemRelationCompositePksEdge {
   node: SingleTableItemRelationCompositePk
 }
 
+"""A connection to a list of \`SingleTableTopic\` values."""
+type SingleTableTopicConnection {
+  """A list of \`SingleTableTopic\` objects."""
+  nodes: [SingleTableTopic]!
+
+  """
+  A list of edges which contains the \`SingleTableTopic\` and cursor to aid in pagination.
+  """
+  edges: [SingleTableTopicEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`SingleTableItem\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`SingleTableTopic\` edge in the connection."""
+type SingleTableTopicEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`SingleTableTopic\` at the end of the edge."""
+  node: SingleTableTopic
+}
+
 """
 A condition to be used against \`SingleTableItemRelation\` object types. All
 fields are tested for equality and combined with a logical ‘and.’
@@ -7992,6 +8074,27 @@ type SingleTablePost implements SingleTableItem & Node {
   """
   nodeId: ID!
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   id: Int!
   type: ItemType!
   parentId: Int
@@ -8221,6 +8324,27 @@ type SingleTableDivider implements SingleTableItem & Node {
   """
   nodeId: ID!
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   id: Int!
   type: ItemType!
   parentId: Int
@@ -8407,6 +8531,27 @@ type SingleTableChecklist implements SingleTableItem & Node {
   """
   nodeId: ID!
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   id: Int!
   type: ItemType!
   parentId: Int
@@ -8597,6 +8742,27 @@ type SingleTableChecklistItem implements SingleTableItem & Node {
   """
   nodeId: ID!
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   id: Int!
   type: ItemType!
   parentId: Int
@@ -18970,6 +19136,16 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
@@ -19052,6 +19228,16 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
@@ -19130,6 +19316,16 @@ export const objects = {
           after: applyAfterArg,
           condition: applyConditionArgToConnection,
           orderBy: applyOrderByArgToConnection
+        }
+      },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
         }
       },
       updatedAt: SingleTableTopic_updatedAtPlan
@@ -19275,6 +19471,16 @@ export const objects = {
       subject($record) {
         return $record.get("title");
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
@@ -19355,7 +19561,23 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
+    }
+  },
+  SingleTableTopicConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount: totalCountConnectionPlan
     }
   },
   ThirdPartyVulnerabilitiesConnection: {

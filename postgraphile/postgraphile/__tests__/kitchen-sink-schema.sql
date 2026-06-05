@@ -1445,6 +1445,19 @@ returns setof polymorphic.single_table_items as $$
   select * from polymorphic.single_table_items
 $$ language sql stable;
 
+create function polymorphic.single_table_items_topics(
+  sti polymorphic.single_table_items
+)
+returns setof polymorphic.single_table_items as $$
+  select *
+  from polymorphic.single_table_items
+  where type = 'TOPIC'
+  order by id asc;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_topics(
+  polymorphic.single_table_items
+) is '@returnType SingleTableTopic';
+
 comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
   @behavior -*
   $$;
