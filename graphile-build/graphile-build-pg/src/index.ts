@@ -62,6 +62,8 @@ declare global {
       nodeIdCodec: string;
       /** For functions returning polymorphic type, which type to choose? */
       returnType: string;
+      /** For computed attribute functions, which GraphQL type should receive this field? */
+      applyToType: string;
 
       /** For enum tables; we shouldn't expose these through GraphQL */
       enum: string | true;
