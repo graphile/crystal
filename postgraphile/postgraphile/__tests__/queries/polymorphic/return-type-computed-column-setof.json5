@@ -11,6 +11,13 @@
         },
       },
       {
+        name: "postOnly",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
         name: "meaningOfLife",
         type: {
           name: "Int",

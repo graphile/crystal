@@ -1440,6 +1440,16 @@ create function polymorphic.single_table_items_meaning_of_life(sti polymorphic.s
 select 42;
 $$ language sql stable;
 
+create function polymorphic.single_table_items_post_only(
+  sti polymorphic.single_table_items
+)
+returns text as $$
+select 'post only: ' || sti.title;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_post_only(
+  polymorphic.single_table_items
+) is '@applyToType SingleTablePost';
+
 create function polymorphic.all_single_tables ()
 returns setof polymorphic.single_table_items as $$
   select * from polymorphic.single_table_items

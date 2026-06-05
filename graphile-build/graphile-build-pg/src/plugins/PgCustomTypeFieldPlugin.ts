@@ -1158,6 +1158,16 @@ function modFields(
   return procSources.reduce(
     (memo, resource) =>
       build.recoverable(memo, () => {
+        const applyToType = tagToString(resource.extensions?.tags?.applyToType);
+        const shouldSkipForApplyToType =
+          isRootQuery || isRootMutation
+            ? false
+            : applyToType
+              ? applyToType !== SelfName
+              : false;
+        if (shouldSkipForApplyToType) {
+          return memo;
+        }
         // "Computed attributes" skip a parameter
         const offset = isRootMutation || isRootQuery ? 0 : 1;
 

@@ -5224,6 +5224,7 @@ type SingleTablePost implements SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+  postOnly: String
 
   """Reads a single `Priority` that is related to this `SingleTableItem`."""
   priorityByPriorityId: Priority
