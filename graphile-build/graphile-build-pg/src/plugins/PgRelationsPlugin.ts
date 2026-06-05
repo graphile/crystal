@@ -933,10 +933,15 @@ function addRelations(
       }
 
       const isUnique = relation.isUnique ?? false;
+      const preferredTypeName = !relation.isReferencee
+        ? tagToString(relation.extensions?.tags?.returnType)
+        : null;
       const otherCodec = remoteResource.codec;
-      const typeName = build.inflection.tableType(otherCodec);
-      const connectionTypeName =
-        build.inflection.tableConnectionType(otherCodec);
+      const typeName =
+        preferredTypeName ?? build.inflection.tableType(otherCodec);
+      const connectionTypeName = preferredTypeName
+        ? build.inflection.connectionType(preferredTypeName)
+        : build.inflection.tableConnectionType(otherCodec);
 
       const deprecationReason =
         tagToString(relation.extensions?.tags?.deprecated) ??
