@@ -1462,6 +1462,17 @@ comment on constraint single_table_items_root_topic_fkey on polymorphic.single_t
   @behavior -*
   $$;
 
+create table polymorphic.foreign_key_return_type_tests (
+  id serial primary key,
+  topic_id int constraint foreign_key_return_type_tests_topic_fkey references polymorphic.single_table_items on delete cascade
+);
+comment on table polymorphic.foreign_key_return_type_tests is E'@behavior -insert -update -delete -filter -filterBy -order -orderBy';
+comment on constraint foreign_key_return_type_tests_topic_fkey on polymorphic.foreign_key_return_type_tests is $$
+  @behavior -manyRelation:resource:list -manyRelation:resource:connection
+  @fieldName topicByReturnType
+  @returnType SingleTableTopic
+  $$;
+
 create table polymorphic.single_table_item_relations (
   id serial primary key,
   parent_id int not null references polymorphic.single_table_items on delete cascade,

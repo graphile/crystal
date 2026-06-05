@@ -1,0 +1,41 @@
+{
+  __type: {
+    fields: [
+      {
+        name: "nodeId",
+        type: {
+          name: null,
+        },
+      },
+      {
+        name: "id",
+        type: {
+          name: null,
+        },
+      },
+      {
+        name: "topicId",
+        type: {
+          name: "Int",
+        },
+      },
+      {
+        name: "topicByReturnType",
+        type: {
+          name: "SingleTableTopic",
+        },
+      },
+    ],
+  },
+  allForeignKeyReturnTypeTests: {
+    nodes: [
+      {
+        id: 1,
+        topicByReturnType: {
+          id: 1,
+          title: "PostGraphile version 5",
+        },
+      },
+    ],
+  },
+}

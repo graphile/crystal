@@ -74,6 +74,35 @@ const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
   },
   executor: executor
 });
+const foreignKeyReturnTypeTestsIdentifier = sql.identifier("polymorphic", "foreign_key_return_type_tests");
+const foreignKeyReturnTypeTestsCodec = recordCodec({
+  name: "foreignKeyReturnTypeTests",
+  identifier: foreignKeyReturnTypeTestsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    topic_id: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "foreign_key_return_type_tests"
+    },
+    tags: {
+      __proto__: null,
+      behavior: "-insert -update -delete -filter -filterBy -order -orderBy"
+    }
+  },
+  executor: executor
+});
 const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities");
 const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
   name: "gcpApplicationFirstPartyVulnerabilities",
@@ -2234,6 +2263,28 @@ const aws_application_third_party_vulnerabilities_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
+const foreign_key_return_type_testsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const foreign_key_return_type_tests_resourceOptionsConfig = {
+  executor: executor,
+  name: "foreign_key_return_type_tests",
+  identifier: "main.polymorphic.foreign_key_return_type_tests",
+  from: foreignKeyReturnTypeTestsIdentifier,
+  codec: foreignKeyReturnTypeTestsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "foreign_key_return_type_tests"
+    },
+    tags: {
+      behavior: "-insert -update -delete -filter -filterBy -order -orderBy"
+    }
+  },
+  uniques: foreign_key_return_type_testsUniques
+};
 const gcp_application_first_party_vulnerabilities_resourceOptionsConfig = {
   executor: executor,
   name: "gcp_application_first_party_vulnerabilities",
@@ -2744,6 +2795,7 @@ const registryConfig = {
     awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
     int4: TYPES.int,
     awsApplicationThirdPartyVulnerabilities: awsApplicationThirdPartyVulnerabilitiesCodec,
+    foreignKeyReturnTypeTests: foreignKeyReturnTypeTestsCodec,
     gcpApplicationFirstPartyVulnerabilities: gcpApplicationFirstPartyVulnerabilitiesCodec,
     gcpApplicationThirdPartyVulnerabilities: gcpApplicationThirdPartyVulnerabilitiesCodec,
     organizations: organizationsCodec,
@@ -3104,6 +3156,7 @@ const registryConfig = {
     __proto__: null,
     aws_application_first_party_vulnerabilities: aws_application_first_party_vulnerabilities_resourceOptionsConfig,
     aws_application_third_party_vulnerabilities: aws_application_third_party_vulnerabilities_resourceOptionsConfig,
+    foreign_key_return_type_tests: foreign_key_return_type_tests_resourceOptionsConfig,
     gcp_application_first_party_vulnerabilities: gcp_application_first_party_vulnerabilities_resourceOptionsConfig,
     gcp_application_third_party_vulnerabilities: gcp_application_third_party_vulnerabilities_resourceOptionsConfig,
     organizations: organizations_resourceOptionsConfig,
@@ -3513,6 +3566,23 @@ const registryConfig = {
         localAttributes: ["id"],
         remoteAttributes: ["first_party_vulnerability_id"],
         isReferencee: true
+      }
+    },
+    foreignKeyReturnTypeTests: {
+      __proto__: null,
+      topicByReturnType: {
+        localCodec: foreignKeyReturnTypeTestsCodec,
+        remoteResourceOptions: single_table_items_resourceOptionsConfig,
+        localAttributes: ["topic_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        extensions: {
+          tags: {
+            behavior: ["-manyRelation:resource:list -manyRelation:resource:connection"],
+            fieldName: "topicByReturnType",
+            returnType: "SingleTableTopic"
+          }
+        }
       }
     },
     gcpApplicationFirstPartyVulnerabilities: {
@@ -3945,6 +4015,20 @@ const registryConfig = {
         extensions: {
           tags: {
             behavior: ["-*"]
+          }
+        }
+      },
+      foreignKeyReturnTypeTestsByTheirTopicId: {
+        localCodec: singleTableItemsCodec,
+        remoteResourceOptions: foreign_key_return_type_tests_resourceOptionsConfig,
+        localAttributes: ["id"],
+        remoteAttributes: ["topic_id"],
+        isReferencee: true,
+        extensions: {
+          tags: {
+            behavior: ["-manyRelation:resource:list -manyRelation:resource:connection"],
+            fieldName: "topicByReturnType",
+            returnType: "SingleTableTopic"
           }
         }
       },
@@ -5079,6 +5163,7 @@ const Collection_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
   return typeNameFromType;
 })("Collection", spec_collections.polymorphism);
+const resource_foreign_key_return_type_testsPgResource = registry.pgResources["foreign_key_return_type_tests"];
 const argDetailsSimple_relational_topic_by_id_fn = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
@@ -9636,6 +9721,9 @@ type Query {
   """
   query: Query!
 
+  """Get a single \`ForeignKeyReturnTypeTest\`."""
+  foreignKeyReturnTypeTestById(id: Int!): ForeignKeyReturnTypeTest
+
   """Get a single \`Organization\`."""
   organizationByOrganizationId(organizationId: Int!): Organization
 
@@ -9830,6 +9918,29 @@ type Query {
     """The method to use when ordering \`ZeroImplementation\`."""
     orderBy: [ZeroImplementationsOrderBy!]
   ): ZeroImplementationsConnection
+
+  """
+  Reads and enables pagination through a set of \`ForeignKeyReturnTypeTest\`.
+  """
+  allForeignKeyReturnTypeTests(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): ForeignKeyReturnTypeTestsConnection
 
   """Reads and enables pagination through a set of \`Organization\`."""
   allOrganizations(
@@ -10418,6 +10529,16 @@ type Query {
   ): CollectionsConnection
 }
 
+type ForeignKeyReturnTypeTest {
+  id: Int!
+  topicId: Int
+
+  """
+  Reads a single \`SingleTableTopic\` that is related to this \`ForeignKeyReturnTypeTest\`.
+  """
+  topicByReturnType: SingleTableTopic
+}
+
 type FirstPartyVulnerability implements Vulnerability {
   cvssScoreInt: Int
   id: Int!
@@ -10556,6 +10677,34 @@ enum ZeroImplementationsOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
+}
+
+"""A connection to a list of \`ForeignKeyReturnTypeTest\` values."""
+type ForeignKeyReturnTypeTestsConnection {
+  """A list of \`ForeignKeyReturnTypeTest\` objects."""
+  nodes: [ForeignKeyReturnTypeTest]!
+
+  """
+  A list of edges which contains the \`ForeignKeyReturnTypeTest\` and cursor to aid in pagination.
+  """
+  edges: [ForeignKeyReturnTypeTestsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`ForeignKeyReturnTypeTest\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`ForeignKeyReturnTypeTest\` edge in the connection."""
+type ForeignKeyReturnTypeTestsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`ForeignKeyReturnTypeTest\` at the end of the edge."""
+  node: ForeignKeyReturnTypeTest
 }
 
 """A connection to a list of \`Organization\` values."""
@@ -13989,6 +14138,18 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      allForeignKeyReturnTypeTests: {
+        plan() {
+          return connection(resource_foreign_key_return_type_testsPgResource.find());
+        },
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       allGcpApplications: {
         plan() {
           return connection(otherSource_gcp_applicationsPgResource.find());
@@ -14303,6 +14464,13 @@ export const objects = {
         $id
       }) {
         return paths_0_resource_first_party_vulnerabilitiesPgResource.get({
+          id: $id
+        });
+      },
+      foreignKeyReturnTypeTestById(_$root, {
+        $id
+      }) {
+        return resource_foreign_key_return_type_testsPgResource.get({
           id: $id
         });
       },
@@ -15424,6 +15592,32 @@ export const objects = {
         spec[pkCol] = get2($specifier, pkCol);
       }
       return paths_0_resource_first_party_vulnerabilitiesPgResource.get(spec);
+    }
+  },
+  ForeignKeyReturnTypeTest: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      topicByReturnType($record) {
+        return otherSource_single_table_itemsPgResource.get({
+          id: $record.get("topic_id")
+        });
+      },
+      topicId($record) {
+        return $record.get("topic_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of foreign_key_return_type_testsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_foreign_key_return_type_testsPgResource.get(spec);
+    }
+  },
+  ForeignKeyReturnTypeTestsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount: totalCountConnectionPlan
     }
   },
   GcpApplication: {

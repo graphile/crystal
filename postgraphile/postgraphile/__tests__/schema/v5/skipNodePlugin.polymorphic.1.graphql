@@ -2613,6 +2613,44 @@ input FirstPartyVulnerabilityPatch {
   teamName: String
 }
 
+type ForeignKeyReturnTypeTest {
+  rowId: Int!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `ForeignKeyReturnTypeTest`.
+  """
+  topicByReturnType: SingleTableTopic
+  topicId: Int
+}
+
+"""A connection to a list of `ForeignKeyReturnTypeTest` values."""
+type ForeignKeyReturnTypeTestConnection {
+  """
+  A list of edges which contains the `ForeignKeyReturnTypeTest` and cursor to aid in pagination.
+  """
+  edges: [ForeignKeyReturnTypeTestEdge]!
+
+  """A list of `ForeignKeyReturnTypeTest` objects."""
+  nodes: [ForeignKeyReturnTypeTest]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ForeignKeyReturnTypeTest` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ForeignKeyReturnTypeTest` edge in the connection."""
+type ForeignKeyReturnTypeTestEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ForeignKeyReturnTypeTest` at the end of the edge."""
+  node: ForeignKeyReturnTypeTest
+}
+
 type GcpApplication implements Application {
   """
   Reads and enables pagination through a set of `GcpApplicationFirstPartyVulnerability`.
@@ -4421,6 +4459,29 @@ type Query {
   ): FirstPartyVulnerabilityConnection
 
   """
+  Reads and enables pagination through a set of `ForeignKeyReturnTypeTest`.
+  """
+  allForeignKeyReturnTypeTests(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): ForeignKeyReturnTypeTestConnection
+
+  """
   Reads and enables pagination through a set of `GcpApplicationFirstPartyVulnerability`.
   """
   allGcpApplicationFirstPartyVulnerabilities(
@@ -5089,6 +5150,9 @@ type Query {
 
   """Get a single `FirstPartyVulnerability`."""
   firstPartyVulnerabilityByRowId(rowId: Int!): FirstPartyVulnerability
+
+  """Get a single `ForeignKeyReturnTypeTest`."""
+  foreignKeyReturnTypeTestByRowId(rowId: Int!): ForeignKeyReturnTypeTest
 
   """Get a single `GcpApplication`."""
   gcpApplicationByRowId(rowId: Int!): GcpApplication
