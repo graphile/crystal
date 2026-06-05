@@ -357,6 +357,46 @@ may occur.
 
 :::
 
+## @applyToType
+
+Applies to:
+
+- Computed Column functions
+
+Details the _named_ GraphQL type that should receive the computed column field.
+This is useful when a computed column function is defined against a PostgreSQL
+polymorphic table type, but the field only makes sense on one concrete
+(monomorphic) GraphQL type that implements the polymorphic interface.
+
+When `@applyToType` is set, PostGraphile only generates the computed column on
+the named type. The field is not added to the polymorphic interface or to the
+other concrete types that implement it.
+
+The value must be the GraphQL type name, after inflection and smart tags have
+been applied. If no generated type has this exact name, the computed column is
+not generated.
+
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    procedure: {
+      single_table_items_post_only: {
+        tags: {
+          applyToType: "SingleTablePost",
+        },
+      },
+    },
+  },
+}
+```
+
+```sql
+comment on function polymorphic.single_table_items_post_only(
+  polymorphic.single_table_items
+) is E'@applyToType SingleTablePost';
+```
+
 ## @resultFieldName
 
 Applies to:

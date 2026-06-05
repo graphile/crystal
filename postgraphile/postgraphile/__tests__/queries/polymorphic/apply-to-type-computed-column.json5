@@ -1,0 +1,393 @@
+{
+  interfaceType: {
+    fields: [
+      {
+        name: "nodeId",
+      },
+      {
+        name: "id",
+      },
+      {
+        name: "type",
+      },
+      {
+        name: "parentId",
+      },
+      {
+        name: "rootTopicId",
+      },
+      {
+        name: "authorId",
+      },
+      {
+        name: "position",
+      },
+      {
+        name: "createdAt",
+      },
+      {
+        name: "updatedAt",
+      },
+      {
+        name: "isExplicitlyArchived",
+      },
+      {
+        name: "archivedAt",
+      },
+      {
+        name: "personByAuthorId",
+      },
+      {
+        name: "singleTableItemByParentId",
+      },
+      {
+        name: "singleTableItemsByParentId",
+      },
+      {
+        name: "singleTableItemsByParentIdList",
+      },
+      {
+        name: "childTopicsByReturnType",
+      },
+      {
+        name: "childTopicsByReturnTypeList",
+      },
+      {
+        name: "singleTableItemRelationsByChildId",
+      },
+      {
+        name: "singleTableItemRelationsByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationsByParentId",
+      },
+      {
+        name: "singleTableItemRelationsByParentIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentIdList",
+      },
+      {
+        name: "rootTopic",
+      },
+    ],
+  },
+  postType: {
+    fields: [
+      {
+        name: "nodeId",
+      },
+      {
+        name: "postOnly",
+      },
+      {
+        name: "meaningOfLife",
+      },
+      {
+        name: "topics",
+      },
+      {
+        name: "topicsList",
+      },
+      {
+        name: "id",
+      },
+      {
+        name: "type",
+      },
+      {
+        name: "parentId",
+      },
+      {
+        name: "rootTopicId",
+      },
+      {
+        name: "authorId",
+      },
+      {
+        name: "position",
+      },
+      {
+        name: "createdAt",
+      },
+      {
+        name: "updatedAt",
+      },
+      {
+        name: "isExplicitlyArchived",
+      },
+      {
+        name: "archivedAt",
+      },
+      {
+        name: "subject",
+      },
+      {
+        name: "description",
+      },
+      {
+        name: "note",
+      },
+      {
+        name: "priorityId",
+      },
+      {
+        name: "personByAuthorId",
+      },
+      {
+        name: "singleTableItemByParentId",
+      },
+      {
+        name: "priorityByPriorityId",
+      },
+      {
+        name: "singleTableItemsByParentId",
+      },
+      {
+        name: "singleTableItemsByParentIdList",
+      },
+      {
+        name: "childTopicsByReturnType",
+      },
+      {
+        name: "childTopicsByReturnTypeList",
+      },
+      {
+        name: "singleTableItemRelationsByChildId",
+      },
+      {
+        name: "singleTableItemRelationsByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationsByParentId",
+      },
+      {
+        name: "singleTableItemRelationsByParentIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentIdList",
+      },
+      {
+        name: "rootTopic",
+      },
+    ],
+  },
+  topicType: {
+    fields: [
+      {
+        name: "nodeId",
+      },
+      {
+        name: "meaningOfLife",
+      },
+      {
+        name: "topics",
+      },
+      {
+        name: "topicsList",
+      },
+      {
+        name: "id",
+      },
+      {
+        name: "type",
+      },
+      {
+        name: "parentId",
+      },
+      {
+        name: "rootTopicId",
+      },
+      {
+        name: "authorId",
+      },
+      {
+        name: "position",
+      },
+      {
+        name: "createdAt",
+      },
+      {
+        name: "updatedAt",
+      },
+      {
+        name: "isExplicitlyArchived",
+      },
+      {
+        name: "archivedAt",
+      },
+      {
+        name: "title",
+      },
+      {
+        name: "personByAuthorId",
+      },
+      {
+        name: "singleTableItemByParentId",
+      },
+      {
+        name: "singleTableItemsByParentId",
+      },
+      {
+        name: "singleTableItemsByParentIdList",
+      },
+      {
+        name: "childTopicsByReturnType",
+      },
+      {
+        name: "childTopicsByReturnTypeList",
+      },
+      {
+        name: "singleTableItemRelationsByChildId",
+      },
+      {
+        name: "singleTableItemRelationsByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationsByParentId",
+      },
+      {
+        name: "singleTableItemRelationsByParentIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentIdList",
+      },
+      {
+        name: "rootTopic",
+      },
+    ],
+  },
+  dividerType: {
+    fields: [
+      {
+        name: "nodeId",
+      },
+      {
+        name: "meaningOfLife",
+      },
+      {
+        name: "topics",
+      },
+      {
+        name: "topicsList",
+      },
+      {
+        name: "id",
+      },
+      {
+        name: "type",
+      },
+      {
+        name: "parentId",
+      },
+      {
+        name: "rootTopicId",
+      },
+      {
+        name: "authorId",
+      },
+      {
+        name: "position",
+      },
+      {
+        name: "createdAt",
+      },
+      {
+        name: "updatedAt",
+      },
+      {
+        name: "isExplicitlyArchived",
+      },
+      {
+        name: "archivedAt",
+      },
+      {
+        name: "title",
+      },
+      {
+        name: "color",
+      },
+      {
+        name: "personByAuthorId",
+      },
+      {
+        name: "singleTableItemByParentId",
+      },
+      {
+        name: "singleTableItemsByParentId",
+      },
+      {
+        name: "singleTableItemsByParentIdList",
+      },
+      {
+        name: "childTopicsByReturnType",
+      },
+      {
+        name: "childTopicsByReturnTypeList",
+      },
+      {
+        name: "singleTableItemRelationsByChildId",
+      },
+      {
+        name: "singleTableItemRelationsByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationsByParentId",
+      },
+      {
+        name: "singleTableItemRelationsByParentIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildIdList",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentId",
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentIdList",
+      },
+      {
+        name: "rootTopic",
+      },
+    ],
+  },
+  allSingleTableItems: {
+    nodes: [
+      {
+        id: 4,
+        type: "POST",
+        postOnly: "post only: Better planning",
+      },
+    ],
+  },
+}
