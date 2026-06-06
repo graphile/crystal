@@ -517,6 +517,17 @@ export const buildSchema = (
     inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
+  return _buildSchema(rawPreset, input, shared).schema;
+};
+
+const _buildSchema = (
+  rawPreset: GraphileConfig.Preset,
+  input: GraphileBuild.BuildInput,
+  shared: {
+    inflection?: GraphileBuild.Inflection;
+  } = {},
+): { schema: GraphQLSchema; writePromise: Promise<void> | null } => {
+  let writePromise: Promise<void> | null = null;
   const preset = {
     extends: [GraphileBuildLibPreset, rawPreset],
   };
@@ -533,7 +544,7 @@ export const buildSchema = (
       : schema;
   if (exportSchemaSDLPath) {
     const text = printSchema(schemaToExport) + "\n";
-    writeFileIfDiffers(exportSchemaSDLPath, text).catch((e) => {
+    writePromise = writeFileIfDiffers(exportSchemaSDLPath, text).catch((e) => {
       console.error(
         `Failed to write schema in GraphQL format to '${exportSchemaSDLPath}': ${e}`,
       );
@@ -553,7 +564,7 @@ export const buildSchema = (
     });
   }
 
-  return schema;
+  return { schema, writePromise };
 };
 
 export {
@@ -610,7 +621,12 @@ export async function makeSchema(
     const input = await gather(resolvedPreset, shared);
 
     phase = "SCHEMA";
-    const schema = buildSchema(resolvedPreset, input, shared);
+    const { schema, writePromise } = _buildSchema(
+      resolvedPreset,
+      input,
+      shared,
+    );
+    await writePromise;
 
     return { schema, resolvedPreset };
   };
