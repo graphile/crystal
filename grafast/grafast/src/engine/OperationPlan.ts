@@ -365,12 +365,6 @@ export class OperationPlan {
   public readonly fragments: {
     [fragmentName: string]: FragmentDefinitionNode;
   };
-  /** @internal */
-  public readonly variableValues: { [key: string]: any };
-  /** @internal */
-  public readonly context: { [key: string]: any };
-  /** @internal */
-  public readonly rootValue: any;
   public readonly errorBehavior: ErrorBehavior;
 
   private readonly planningTimeout: number | null;
@@ -394,9 +388,6 @@ export class OperationPlan {
     this.schema = schema;
     this.operation = operation;
     this.fragments = fragments;
-    this.variableValues = variableValues;
-    this.context = context;
-    this.rootValue = rootValue;
     this.errorBehavior = errorBehavior;
     this.planningTimeout = options?.timeouts?.planning ?? null;
     this.maxPlanningDepth = options?.maxPlanningDepth ?? DEFAULT_MAX_DEPTH;
