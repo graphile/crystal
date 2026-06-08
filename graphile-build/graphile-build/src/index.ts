@@ -101,6 +101,12 @@ export interface InflectorSource {
   source: string;
 }
 
+export interface GatherShared {
+  /** If inflection is not passed, it will be built for you from the preset */
+  inflection?: GraphileBuild.Inflection;
+}
+export interface BuildSchemaShared extends GatherShared {}
+
 /**
  * Generate 'build.inflection' from the given preset.
  */
@@ -213,10 +219,9 @@ function pluginNamespace(plugin: GraphileConfig.Plugin): string {
  */
 const gatherBase = (
   preset: GraphileConfig.Preset,
-  { inflection }: { inflection: GraphileBuild.Inflection } = {
-    inflection: buildInflection(preset),
-  },
+  shared: GatherShared = {},
 ) => {
+  const { inflection = buildInflection(preset) } = shared;
   const resolvedPreset = resolvePreset(preset);
   const options = resolvedPreset.gather || {};
   const plugins = resolvedPreset.plugins;
@@ -436,11 +441,9 @@ function promiseToCallback<T, U>(
  */
 export const gather = (
   preset: GraphileConfig.Preset,
-  helpers?: {
-    inflection: GraphileBuild.Inflection;
-  },
+  shared?: GatherShared,
 ): Promise<GraphileBuild.BuildInput> => {
-  const { run } = gatherBase(preset, helpers);
+  const { run } = gatherBase(preset, shared);
   return run();
 };
 
@@ -454,7 +457,7 @@ export const gather = (
  */
 export const watchGather = (
   preset: GraphileConfig.Preset,
-  helpers: { inflection: GraphileBuild.Inflection } | undefined,
+  helpers: GatherShared | undefined,
   callback: (
     gather: GraphileBuild.BuildInput | null,
     error: Error | undefined,
@@ -505,11 +508,6 @@ async function writeFileIfDiffers(
   if (oldContents !== contents) {
     await writeFile(path, contents);
   }
-}
-
-export interface BuildSchemaShared {
-  /** If inflection is not passed, it will be built for you from the preset */
-  inflection?: GraphileBuild.Inflection;
 }
 
 /**
@@ -635,7 +633,7 @@ export async function makeSchema(
   const resolvedPreset = resolvePreset(preset);
   // An error caused here cannot be solved by retrying, so don't catch it.
   const inflection = buildInflection(resolvedPreset);
-  const shared = { inflection };
+  const shared: BuildSchemaShared = { inflection };
 
   const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
 
@@ -746,7 +744,9 @@ export async function watchSchema(
   ) => PromiseOrDirect<void>,
 ): Promise<() => void> {
   const resolvedPreset = resolvePreset(preset);
-  const shared = { inflection: buildInflection(resolvedPreset) };
+  const shared: BuildSchemaShared = {
+    inflection: buildInflection(resolvedPreset),
+  };
 
   const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
   let attempts = 0;
