@@ -416,6 +416,8 @@ create function c.table_mutation(id int) returns a.post as $$ select * from a.po
 create function c.table_set_query() returns setof c.person as $$ select * from c.person order by id asc $$ language sql stable;
 create function c.table_set_query_plpgsql() returns setof c.person as $$ begin return query select * from c.person order by id asc; end $$ language plpgsql stable;
 comment on function c.table_set_query() is E'@sortable\n@filterable';
+create function c.table_set_query_volatile() returns setof c.person as $$ select * from c.person order by id asc $$ language sql volatile;
+comment on function c.table_set_query_volatile() is E'@behavior +sort +filter +queryField -mutationField +list +connection';
 create function c.table_set_mutation() returns setof c.person as $$ select * from c.person order by id asc $$ language sql;
 create function c.int_set_query(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql stable;
 create function c.int_set_mutation(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql;
