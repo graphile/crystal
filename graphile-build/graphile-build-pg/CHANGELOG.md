@@ -1,5 +1,14 @@
 # graphile-build-pg
 
+## 5.0.3
+
+### Patch Changes
+
+- [#3063](https://github.com/graphile/crystal/pull/3063)
+  [`d3156df`](https://github.com/graphile/crystal/commit/d3156df8cd95c517f329ffa904bb2fec9db2b370)
+  Thanks [@benjie](https://github.com/benjie)! - Improve scopes around
+  PgMutationCreatePlugin
+
 ## 5.0.2
 
 ### Patch Changes

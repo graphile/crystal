@@ -1,5 +1,21 @@
 # grafast
 
+## 1.0.3
+
+### Patch Changes
+
+- [#3061](https://github.com/graphile/crystal/pull/3061)
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537)
+  Thanks [@benjie](https://github.com/benjie)! - Exposes rootValueStep on
+  OperationPlan and removes some transient values from being stored. Adds new
+  global `variableValues()` step retriever, useful for helping produce
+  GraphQLResolveInfo and similar.
+
+- [#3062](https://github.com/graphile/crystal/pull/3062)
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1)
+  Thanks [@benjie](https://github.com/benjie)! - Internals: clear
+  \_\_TrackedValueStep initialValue on finalize.
+
 ## 1.0.2
 
 ### Patch Changes
