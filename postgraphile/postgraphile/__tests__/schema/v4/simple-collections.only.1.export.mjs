@@ -1,5 +1,5 @@
 import { LIST_TYPES, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, constant, context, createObjectAndApplyChildren, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
 const rawNodeIdCodec = {
@@ -1704,6 +1704,7 @@ const mutation_out_table_setofFunctionIdentifer = sql.identifier("c", "mutation_
 const table_set_mutationFunctionIdentifer = sql.identifier("c", "table_set_mutation");
 const table_set_queryFunctionIdentifer = sql.identifier("c", "table_set_query");
 const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_query_plpgsql");
+const table_set_query_volatileFunctionIdentifer = sql.identifier("c", "table_set_query_volatile");
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
 const person_type_function_connectionFunctionIdentifer = sql.identifier("c", "person_type_function_connection");
@@ -3991,6 +3992,27 @@ const registry = makeRegistry({
       },
       hasImplicitOrder: true
     }),
+    table_set_query_volatile: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
+      name: "table_set_query_volatile",
+      identifier: "main.c.table_set_query_volatile()",
+      from(...args) {
+        return sql`${table_set_query_volatileFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "table_set_query_volatile"
+        },
+        tags: {
+          behavior: "+sort +filter +queryField -mutationField +list +connection"
+        }
+      },
+      isMutation: true,
+      hasImplicitOrder: true
+    }),
     person_computed_first_arg_inout: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "person_computed_first_arg_inout",
       identifier: "main.c.person_computed_first_arg_inout(c.person)",
@@ -4402,6 +4424,11 @@ function applyOrderByArg(parent, $select, value) {
   value.apply($select);
 }
 const resource_table_set_query_plpgsqlPgResource = registry.pgResources["table_set_query_plpgsql"];
+const resource_table_set_query_volatilePgResource = registry.pgResources["table_set_query_volatile"];
+const table_set_query_volatile_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_person_computed_out(args);
+  return resource_table_set_query_volatilePgResource.execute(selectArgs);
+};
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -5399,6 +5426,44 @@ type Query implements Node {
     offset: Int
   ): [Person!]
 
+  """Reads and enables pagination through a set of \`Person\`."""
+  tableSetQueryVolatile(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+  ): PeopleConnection
+  tableSetQueryVolatileList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+  ): [Person!]
+
   """Reads a single \`MyTable\` using its globally unique \`ID\`."""
   myTable(
     """The globally unique \`ID\` to be used in selecting a single \`MyTable\`."""
@@ -6282,6 +6347,50 @@ input PersonCondition {
 """An input for mutations affecting \`WrappedUrl\`"""
 input WrappedUrlInput {
   url: NotNullUrl!
+}
+
+"""A connection to a list of \`Person\` values."""
+type PeopleConnection {
+  """A list of \`Person\` objects."""
+  nodes: [Person!]!
+
+  """
+  A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Person\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Person\` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Person\` at the end of the edge."""
+  node: Person!
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
 }
 
 """
@@ -9277,6 +9386,37 @@ export const objects = {
           offset: applyOffsetArg
         }
       },
+      tableSetQueryVolatile: {
+        plan($parent, args, info) {
+          const $select = table_set_query_volatile_getSelectPlanFromParentAndArgs($parent, args, info);
+          return connection($select);
+        },
+        args: {
+          first: applyFirstArg,
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset: applyOffsetArg,
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          }
+        }
+      },
+      tableSetQueryVolatileList: {
+        plan: table_set_query_volatile_getSelectPlanFromParentAndArgs,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg
+        }
+      },
       typesQuery($root, args, _info) {
         const selectArgs = makeArgs_types_query(args);
         return resource_types_queryPgResource.execute(selectArgs);
@@ -10792,6 +10932,14 @@ export const objects = {
       return resource_null_test_recordPgResource.get(spec);
     }
   },
+  PeopleConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
   Person: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11922,6 +12070,16 @@ export const scalars = {
         return ast.value;
       }
       throw new GraphQLError(`BigInt can only parse string values (kind='${ast.kind}')`);
+    }
+  },
+  Cursor: {
+    serialize: toString,
+    parseValue: toString,
+    parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) {
+        return ast.value;
+      }
+      throw new GraphQLError(`Cursor can only parse string values (kind='${ast.kind}')`);
     }
   },
   Date: {
