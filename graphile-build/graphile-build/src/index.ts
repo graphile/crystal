@@ -507,51 +507,42 @@ async function writeFileIfDiffers(
   }
 }
 
+export interface BuildSchemaShared {
+  /** If inflection is not passed, it will be built for you from the preset */
+  inflection?: GraphileBuild.Inflection;
+}
+
 /**
  * Builds a GraphQL schema according to the given preset and input data.
  */
-export const buildSchema = (
+export function buildSchema(
   rawPreset: GraphileConfig.Preset,
   input: GraphileBuild.BuildInput,
-  shared: {
-    inflection?: GraphileBuild.Inflection;
-  } = {},
-): GraphQLSchema => {
+  shared?: BuildSchemaShared,
+): GraphQLSchema {
   const { builder, schema } = _buildSchema(rawPreset, input, shared);
-  maybeWriteSchema(builder, schema, true);
+  writeOutputsDetached(builder, schema);
   return schema;
-};
+}
 
-const _buildSchema = (
+function _buildSchema(
   rawPreset: GraphileConfig.Preset,
   input: GraphileBuild.BuildInput,
-  shared: {
-    inflection?: GraphileBuild.Inflection;
-  } = {},
-): { builder: SchemaBuilder; schema: GraphQLSchema } => {
-  const preset = {
-    extends: [GraphileBuildLibPreset, rawPreset],
-  };
+  shared: BuildSchemaShared = {},
+): { builder: SchemaBuilder; schema: GraphQLSchema } {
+  const preset = { extends: [GraphileBuildLibPreset, rawPreset] };
   const builder = getBuilder(preset, shared.inflection);
   const schema = builder.buildSchema(input);
   return { builder, schema };
-};
+}
 
-function maybeWriteSchema(
+/**
+ * If the builder settings indicate to export SDL and/or introspection, do so.
+ */
+async function writeOutputs(
   builder: SchemaBuilder,
   schema: GraphQLSchema,
-  eatErrors: true,
-): void;
-function maybeWriteSchema(
-  builder: SchemaBuilder,
-  schema: GraphQLSchema,
-): void | Promise<void[]>;
-function maybeWriteSchema(
-  builder: SchemaBuilder,
-  schema: GraphQLSchema,
-  eatErrors = false,
-): void | Promise<void[]> {
-  let promises: Promise<void>[] | undefined;
+): Promise<void> {
   const {
     exportSchemaSDLPath,
     exportSchemaIntrospectionResultPath,
@@ -563,17 +554,12 @@ function maybeWriteSchema(
       : schema;
   if (exportSchemaSDLPath) {
     const text = printSchema(schemaToExport) + "\n";
-    const promise = writeFileIfDiffers(exportSchemaSDLPath, text);
-    if (eatErrors) {
-      promise.catch((e) => {
-        console.error(
-          `Failed to write schema in GraphQL format to '${exportSchemaSDLPath}': ${e}`,
-        );
-      });
-    } else {
-      promises ??= [];
-      promises.push(promise);
-    }
+    await writeFileIfDiffers(exportSchemaSDLPath, text).catch((e) => {
+      throw new Error(
+        `Failed to write schema in GraphQL format to '${exportSchemaSDLPath}': ${e.message ?? e}`,
+        { cause: e },
+      );
+    });
   }
   if (exportSchemaIntrospectionResultPath) {
     const introspectionQuery = getIntrospectionQuery();
@@ -582,24 +568,26 @@ function maybeWriteSchema(
       schema: schemaToExport,
     });
     const text = JSON.stringify(introspectionResult, null, 2) + "\n";
-    const promise = writeFileIfDiffers(
-      exportSchemaIntrospectionResultPath,
-      text,
-    );
-    if (eatErrors) {
-      promise.catch((e) => {
-        console.error(
-          `Failed to write schema introspection results in JSON format to '${exportSchemaIntrospectionResultPath}': ${e}`,
+    await writeFileIfDiffers(exportSchemaIntrospectionResultPath, text).catch(
+      (e) => {
+        throw new Error(
+          `Failed to write schema introspection results in JSON format to '${exportSchemaIntrospectionResultPath}': ${e.message ?? e}`,
+          { cause: e },
         );
-      });
-    } else {
-      promises ??= [];
-      promises.push(promise);
-    }
+      },
+    );
   }
-  if (promises) {
-    return Promise.all(promises);
-  }
+}
+
+/**
+ * As `writeOutputs`, but return synchronously (handling any errors in the
+ * background via logging).
+ */
+function writeOutputsDetached(
+  builder: SchemaBuilder,
+  schema: GraphQLSchema,
+): void {
+  writeOutputs(builder, schema).catch((e) => void console.error(e));
 }
 
 export {
@@ -635,7 +623,8 @@ export interface SchemaResult {
 
 /**
  * Builds the GraphQL schema by resolving the preset, running inflection then
- * gather and building the schema. Returns the results.
+ * gather and building the schema. Returns the results (after waiting for any
+ * exports to be written if configured).
  *
  * @experimental
  */
@@ -650,15 +639,18 @@ export async function makeSchema(
 
   const retryOnInitFail = resolvedPreset.schema?.retryOnInitFail;
 
-  let phase: "GATHER" | "SCHEMA" | "UNKNOWN" = "UNKNOWN";
+  let phase: "GATHER" | "SCHEMA" | "WRITE" | "UNKNOWN" = "UNKNOWN";
   const make = async () => {
     phase = "GATHER";
     const input = await gather(resolvedPreset, shared);
 
     phase = "SCHEMA";
     const { builder, schema } = _buildSchema(resolvedPreset, input, shared);
-    await maybeWriteSchema(builder, schema);
 
+    phase = "WRITE";
+    await writeOutputs(builder, schema);
+
+    phase = "UNKNOWN";
     return { schema, resolvedPreset };
   };
   if (retryOnInitFail) {
@@ -689,7 +681,7 @@ async function sleepFromRetryOnInitFail(
         attempts: number,
         delay: number,
       ) => boolean | Promise<boolean>),
-  phase: "GATHER" | "SCHEMA" | "UNKNOWN",
+  phase: "GATHER" | "SCHEMA" | "WRITE" | "UNKNOWN",
   attempts: number,
   error: Error,
 ) {
@@ -807,7 +799,13 @@ export async function watchSchema(
         attempts = 0;
         haveHadSuccess = true;
         try {
-          const schema = buildSchema(resolvedPreset, input!, shared);
+          const { builder, schema } = _buildSchema(
+            resolvedPreset,
+            input!,
+            shared,
+          );
+          // Don't delay schema update for file writing.
+          writeOutputsDetached(builder, schema);
           await callback(null, { schema, resolvedPreset });
         } catch (e) {
           // Retrying this on its own is pointless, we need the gather phase to
