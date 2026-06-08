@@ -72,6 +72,17 @@ const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
 const $$computed = Symbol("PgCustomTypeFieldPluginComputedSources");
 
+function tagToStrings(
+  tag: undefined | null | boolean | string | (string | boolean)[],
+): string[] {
+  if (!tag || (Array.isArray(tag) && tag.length === 0)) {
+    return [];
+  }
+  return (Array.isArray(tag) ? tag : [tag]).flatMap((entry) =>
+    typeof entry === "string" ? [entry] : [],
+  );
+}
+
 declare global {
   namespace GraphileConfig {
     interface Plugins {
@@ -1158,6 +1169,18 @@ function modFields(
   return procSources.reduce(
     (memo, resource) =>
       build.recoverable(memo, () => {
+        const applyToTypes = tagToStrings(
+          resource.extensions?.tags?.applyToType,
+        );
+        const shouldSkipForApplyToType =
+          isRootQuery || isRootMutation
+            ? false
+            : applyToTypes.length > 0
+              ? !applyToTypes.includes(SelfName)
+              : false;
+        if (shouldSkipForApplyToType) {
+          return memo;
+        }
         // "Computed attributes" skip a parameter
         const offset = isRootMutation || isRootQuery ? 0 : 1;
 
@@ -1332,6 +1355,10 @@ function modFields(
                 });
 
             const namedType = build.graphql.getNamedType(type!);
+            const preferredConnectionTypeName =
+              resource.extensions?.tags?.returnType && namedType
+                ? inflection.connectionType(namedType.name)
+                : null;
             const connectionTypeName = shouldUseCustomConnection(resource)
               ? resource.codec.attributes
                 ? inflection.recordFunctionConnectionType({
@@ -1340,11 +1367,13 @@ function modFields(
                 : inflection.scalarFunctionConnectionType({
                     resource,
                   })
-              : resource.codec.attributes
-                ? inflection.tableConnectionType(resource.codec)
-                : namedType
-                  ? inflection.connectionType(namedType.name)
-                  : null;
+              : preferredConnectionTypeName
+                ? preferredConnectionTypeName
+                : resource.codec.attributes
+                  ? inflection.tableConnectionType(resource.codec)
+                  : namedType
+                    ? inflection.connectionType(namedType.name)
+                    : null;
 
             const ConnectionType = connectionTypeName
               ? build.getOutputTypeByName(connectionTypeName)
@@ -1368,9 +1397,10 @@ function modFields(
                       {
                         description:
                           resource.description ??
-                          `Reads and enables pagination through a set of \`${inflection.tableType(
-                            resource.codec,
-                          )}\`.`,
+                          `Reads and enables pagination through a set of \`${
+                            namedType?.name ??
+                            inflection.tableType(resource.codec)
+                          }\`.`,
                         type: build.nullableIf(
                           isRootQuery ?? false,
                           ConnectionType,

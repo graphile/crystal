@@ -9000,7 +9000,7 @@ type Q implements N {
   currentUserId: Int
   funcOut: Int
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcOutSetof(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9024,7 +9024,7 @@ type Q implements N {
   noArgsQuery: Int
   queryIntervalArray: [I]
 
-  """Reads and enables pagination through a set of \`Interval\`."""
+  """Reads and enables pagination through a set of \`I\`."""
   queryIntervalSet(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9046,7 +9046,7 @@ type Q implements N {
   ): QueryIntervalSetConnection
   queryTextArray: [String]
 
-  """Reads and enables pagination through a set of \`Int8\`."""
+  """Reads and enables pagination through a set of \`BigInt\`."""
   staticBigInteger(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9068,7 +9068,7 @@ type Q implements N {
   ): StaticBigIntegerConnection
   funcInOut(i: Int): Int
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcReturnsTableOneCol(
     i: Int
 
@@ -9142,7 +9142,7 @@ type Q implements N {
   optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   intSetQuery(
     x: Int
     y: Int
@@ -10658,7 +10658,7 @@ type Post implements N {
   nodeId: ID!
   computedIntervalArray: [I]
 
-  """Reads and enables pagination through a set of \`Interval\`."""
+  """Reads and enables pagination through a set of \`I\`."""
   computedIntervalSet(
     """Only read the first \`n\` values of the set."""
     first: Int

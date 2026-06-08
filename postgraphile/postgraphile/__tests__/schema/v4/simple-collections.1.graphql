@@ -3856,7 +3856,7 @@ type Query implements Node {
   ): [FuncOutOutSetofRecord!]
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3953,7 +3953,7 @@ type Query implements Node {
     offset: Int
   ): [FuncReturnsTableMultiColRecord!]
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -3983,7 +3983,7 @@ type Query implements Node {
     offset: Int
   ): [Int!]
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
