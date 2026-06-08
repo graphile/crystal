@@ -128,6 +128,10 @@ declare global {
       foreignSimpleFieldName?: string;
       /** The (generally plural) backward relation name, also used as a fallback from foreignSimpleFieldName, foreignSingleFieldName */
       foreignFieldName?: string;
+      /** The GraphQL return type for the forward relation */
+      returnType?: string;
+      /** The GraphQL return type for the backward relation */
+      foreignReturnType?: string;
     }
   }
 
@@ -933,9 +937,11 @@ function addRelations(
       }
 
       const isUnique = relation.isUnique ?? false;
-      const preferredTypeName = !relation.isReferencee
-        ? tagToString(relation.extensions?.tags?.returnType)
-        : null;
+      const preferredTypeName = tagToString(
+        relation.isReferencee
+          ? relation.extensions?.tags?.foreignReturnType
+          : relation.extensions?.tags?.returnType,
+      );
       const otherCodec = remoteResource.codec;
       const typeName =
         preferredTypeName ?? build.inflection.tableType(otherCodec);

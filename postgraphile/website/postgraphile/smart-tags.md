@@ -265,18 +265,95 @@ Applies to:
 - Custom Query functions
 - Custom Mutation functions
 - Computed Column functions
+- foreign key constraints: the related type for forward relationship fields
 
 Details the _named_ GraphQL type to use to represent the result of the function
-(this may then be wrapped in a list or connection or non-null or similar, if
-the function demands it). This type must be compatible with the derived type;
-currently this means that if the function returns a polymorphic type then
-the named type must either be the polymorphic type itself, or one of its
-implementations.
+or foreign-key relationship field. This may then be wrapped in a list or
+connection or non-null or similar, if needed.
+
+This type must be compatible with the derived type; currently this means that
+if the function returns a polymorphic type, or the constraint references a
+polymorphic table type, then the named type must either be the polymorphic type
+itself, or one of its implementations.
+
+For foreign key constraints, `@returnType` is useful when the related table is
+polymorphic but this relationship only targets one concrete (monomorphic)
+GraphQL type. This applies to the forward relationship field; for the backward
+relationship fields, use `@foreignReturnType`.
+
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      single_table_items: {
+        constraint: {
+          single_table_items_root_topic_fkey: {
+            tags: {
+              fieldName: "rootTopic",
+              returnType: "SingleTableTopic",
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+```sql
+comment on constraint single_table_items_root_topic_fkey
+  on polymorphic.single_table_items is
+  E'@fieldName rootTopic\n@returnType SingleTableTopic';
+```
+
+## @foreignReturnType
+
+Applies to:
+
+- foreign key constraints: the related type for backward relationship fields
+
+Details the _named_ GraphQL type to use to represent the result of the backward
+foreign-key relationship field. This may then be wrapped in a list or connection
+or non-null or similar, if needed.
+
+This is useful when the referencing table is polymorphic but the backward
+relationship only targets one concrete (monomorphic) GraphQL type.
+
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    class: {
+      single_table_items: {
+        constraint: {
+          single_table_items_root_topic_fkey: {
+            tags: {
+              foreignFieldName: "postsWithThisRootTopic",
+              foreignReturnType: "SingleTablePost",
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+```sql
+comment on constraint single_table_items_root_topic_fkey
+  on polymorphic.single_table_items is
+  $$
+  @foreignFieldName postsWithThisRootTopic
+  @foreignReturnType SingleTablePost
+  $$;
+```
 
 :::warning
 
-We trust that you will ensure that results from the function conform to the
-type specified; if you break this then Weird Things may occur.
+We trust that you will ensure that results from the function or foreign-key
+relationship conform to the type specified; if you break this then Weird Things
+may occur.
 
 :::
 

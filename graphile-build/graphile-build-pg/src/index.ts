@@ -80,6 +80,10 @@ declare global {
       behavior: string | string[];
       deprecated: string | string[];
       notNull: true;
+      /** For forward relations against polymorphic types, which type to choose? */
+      returnType: string;
+      /** For backward relations against polymorphic types, which type to choose? */
+      foreignReturnType: string;
     }
 
     interface PgCodecRefTags extends PgSmartTagsDict {
