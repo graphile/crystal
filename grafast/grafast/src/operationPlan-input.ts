@@ -112,43 +112,47 @@ export function withFieldArgsForArguments<T extends Step>(
       }
     },
     getRaw(path?: string | ReadonlyArray<string | number>) {
-      assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
-      if (path === undefined) {
-        return object(trackedArguments);
-      } else if (typeof path === "string") {
-        return trackedArguments[path];
-      } else if (Array.isArray(path)) {
-        const [first, ...rest] = path;
-        if (!first) {
-          throw new Error(`getRaw() must be called with a non-empty path`);
-        }
-        let $entry = trackedArguments[first];
-        for (const pathSegment of rest) {
-          if (typeof pathSegment === "number" && "at" in $entry) {
-            $entry = $entry.at(pathSegment);
-          } else if ("get" in $entry) {
-            $entry = ($entry.get as any)(pathSegment);
-          } else {
-            throw new Error(
-              `'getRaw' path must only relate to input objects right now; path was: '${path}' (failed at '${pathSegment}')`,
-            );
+      return operationPlan.withRootLayerPlan(() => {
+        assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
+        if (path === undefined) {
+          return object(trackedArguments);
+        } else if (typeof path === "string") {
+          return trackedArguments[path];
+        } else if (Array.isArray(path)) {
+          const [first, ...rest] = path;
+          if (!first) {
+            throw new Error(`getRaw() must be called with a non-empty path`);
           }
+          let $entry = trackedArguments[first];
+          for (const pathSegment of rest) {
+            if (typeof pathSegment === "number" && "at" in $entry) {
+              $entry = $entry.at(pathSegment);
+            } else if ("get" in $entry) {
+              $entry = ($entry.get as any)(pathSegment);
+            } else {
+              throw new Error(
+                `'getRaw' path must only relate to input objects right now; path was: '${path}' (failed at '${pathSegment}')`,
+              );
+            }
+          }
+          return $entry;
+        } else {
+          throw new Error(
+            `Invalid path passed to FieldArgs.getRaw(); please check your code. Path: ${inspect(
+              path,
+            )}`,
+          );
         }
-        return $entry;
-      } else {
-        throw new Error(
-          `Invalid path passed to FieldArgs.getRaw(); please check your code. Path: ${inspect(
-            path,
-          )}`,
-        );
-      }
+      });
     },
     getBaked(inPath: string | ReadonlyArray<string | number>) {
-      const path = typeof inPath === "string" ? [inPath] : inPath;
-      const $raw = this.getRaw(path);
-      const inputType = this.typeAt(path);
-      const $baked = bakedInput(inputType, $raw);
-      return $baked;
+      return operationPlan.withRootLayerPlan(() => {
+        const path = typeof inPath === "string" ? [inPath] : inPath;
+        const $raw = this.getRaw(path);
+        const inputType = this.typeAt(path);
+        const $baked = bakedInput(inputType, $raw);
+        return $baked;
+      });
     },
     autoApply($target) {
       if (!autoApplyDisabled) {
@@ -164,53 +168,59 @@ export function withFieldArgsForArguments<T extends Step>(
       }
     },
     apply($target, inPathOrGetTargetFromParent, maybeGetTargetFromParent) {
-      const inPath =
-        typeof inPathOrGetTargetFromParent === "function"
-          ? undefined
-          : inPathOrGetTargetFromParent;
-      const getTargetFromParent =
-        typeof inPathOrGetTargetFromParent === "function"
-          ? inPathOrGetTargetFromParent
-          : maybeGetTargetFromParent;
-      assertNotRuntime(operationPlan, `fieldArgs.apply()`);
-      const path = Array.isArray(inPath) ? inPath : inPath ? [inPath] : [];
-      const pathString = path.join(".");
-      const $existing = applied.get(pathString);
-      if ($existing) {
-        throw new Error(
-          `Attempted to apply 'applyPlan' at input path ${pathString} more than once - first time to ${$existing}, second time to ${$target}. Multiple applications are not currently supported.`,
-        );
-      }
-      if (path.length === 0) {
-        autoApplyDisabled = true;
-        // Auto-apply all the arguments
-        for (const argName of Object.keys(args)) {
-          fieldArgs.apply($target, [argName]);
-        }
-      } else {
-        const [argName, ...rest] = path;
-        if (typeof argName !== "string") {
+      return $target.withLayerPlan(() => {
+        const inPath =
+          typeof inPathOrGetTargetFromParent === "function"
+            ? undefined
+            : inPathOrGetTargetFromParent;
+        const getTargetFromParent =
+          typeof inPathOrGetTargetFromParent === "function"
+            ? inPathOrGetTargetFromParent
+            : maybeGetTargetFromParent;
+        assertNotRuntime(operationPlan, `fieldArgs.apply()`);
+        const path = Array.isArray(inPath) ? inPath : inPath ? [inPath] : [];
+        const pathString = path.join(".");
+        const $existing = applied.get(pathString);
+        if ($existing) {
           throw new Error(
-            `Invalid path; argument '${argName}' is an invalid argument name`,
+            `Attempted to apply 'applyPlan' at input path ${pathString} more than once - first time to ${$existing}, second time to ${$target}. Multiple applications are not currently supported.`,
           );
         }
-        const arg = args[argName];
-        if (!arg) {
-          throw new Error(`Invalid path; argument '${argName}' does not exist`);
-        }
-        const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
-        const $valueAtPath = fieldArgs.getRaw(inPath as any) as AnyInputStep;
-        if (
-          $valueAtPath instanceof ConstantStep &&
-          $valueAtPath.data === undefined
-        ) {
-          // Skip applying!
+        if (path.length === 0) {
+          autoApplyDisabled = true;
+          // Auto-apply all the arguments
+          for (const argName of Object.keys(args)) {
+            fieldArgs.apply($target, [argName]);
+          }
         } else {
-          $target.apply(
-            applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
-          );
+          const [argName, ...rest] = path;
+          if (typeof argName !== "string") {
+            throw new Error(
+              `Invalid path; argument '${argName}' is an invalid argument name`,
+            );
+          }
+          const arg = args[argName];
+          if (!arg) {
+            throw new Error(
+              `Invalid path; argument '${argName}' does not exist`,
+            );
+          }
+          const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
+          const $valueAtPath = fieldArgs.getRaw(inPath as any) as AnyInputStep;
+          if (
+            $valueAtPath instanceof ConstantStep &&
+            $valueAtPath.data === undefined
+          ) {
+            // Skip applying!
+          } else {
+            $target.withLayerPlan(() => {
+              $target.apply(
+                applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
+              );
+            });
+          }
         }
-      }
+      });
     },
   };
   for (const argName of Object.keys(args)) {
@@ -285,11 +295,13 @@ function processAfter(
           }
         },
       };
-      const result = autoApply($parent, $result, input, {
-        schema,
-        arg,
-        argName,
-      });
+      const result = $result.withLayerPlan(() =>
+        autoApply($parent, $result, input, {
+          schema,
+          arg,
+          argName,
+        }),
+      );
       if (result !== undefined) {
         const fullCoordinate = `${coordinate}(${argName}:)`;
         throw new Error(
