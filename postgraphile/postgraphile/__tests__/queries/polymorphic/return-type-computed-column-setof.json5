@@ -187,6 +187,24 @@
         },
       },
       {
+        name: "childTopicsByReturnType",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTablePostConnection",
+          },
+        },
+      },
+      {
+        name: "childTopicsByReturnTypeList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
         name: "singleTableItemRelationsByChildId",
         type: {
           name: null,

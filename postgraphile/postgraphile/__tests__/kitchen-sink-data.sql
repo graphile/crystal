@@ -632,7 +632,7 @@ update polymorphic.single_table_items
 
 insert into polymorphic.foreign_key_return_type_tests
   (id, topic_id) values
-  (1, 1);
+  (4, 1);
 alter sequence polymorphic.foreign_key_return_type_tests_id_seq restart with 9999;
 
 insert into polymorphic.single_table_item_relations

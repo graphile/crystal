@@ -1,14 +1,40 @@
 ## expect(errors).toBeFalsy()
-## expect(JSON.stringify(data.__type.fields)).toContain("SingleTableTopic")
 #> schema: ["polymorphic"]
 #> simpleCollections: "both"
+#> mask: ["postType.fields", "topicType.fields"]
 
 {
-  __type(name: "ForeignKeyReturnTypeTest") {
+  postType: __type(name: "ForeignKeyReturnTypeTest") {
     fields {
       name
       type {
         name
+        ofType {
+          name
+          ofType {
+            name
+            ofType {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+  topicType: __type(name: "SingleTableTopic") {
+    fields {
+      name
+      type {
+        name
+        ofType {
+          name
+          ofType {
+            name
+            ofType {
+              name
+            }
+          }
+        }
       }
     }
   }
@@ -16,6 +42,7 @@
     nodes {
       id
       topicByReturnType {
+        __typename
         id
         title
       }

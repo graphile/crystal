@@ -3572,9 +3572,10 @@ const registryConfig = {
         isUnique: true,
         extensions: {
           tags: {
-            behavior: ["-manyRelation:resource:list -manyRelation:resource:connection"],
             fieldName: "topicByReturnType",
-            returnType: "SingleTableTopic"
+            returnType: "SingleTableTopic",
+            foreignFieldName: "childTopicsByReturnType",
+            foreignReturnType: "SingleTablePost"
           }
         }
       }
@@ -4012,7 +4013,7 @@ const registryConfig = {
           }
         }
       },
-      foreignKeyReturnTypeTestsByTheirTopicId: {
+      childTopicsByReturnType: {
         localCodec: singleTableItemsCodec,
         remoteResourceOptions: foreign_key_return_type_tests_resourceOptionsConfig,
         localAttributes: ["id"],
@@ -4020,9 +4021,10 @@ const registryConfig = {
         isReferencee: true,
         extensions: {
           tags: {
-            behavior: ["-manyRelation:resource:list -manyRelation:resource:connection"],
             fieldName: "topicByReturnType",
-            returnType: "SingleTableTopic"
+            returnType: "SingleTableTopic",
+            foreignFieldName: "childTopicsByReturnType",
+            foreignReturnType: "SingleTablePost"
           }
         }
       },
@@ -4208,6 +4210,13 @@ function applyOrderByArgToConnection(parent, $connection, value) {
   const $select = $connection.getSubplan();
   value.apply($select);
 }
+const otherSource_foreign_key_return_type_testsPgResource = registry.pgResources["foreign_key_return_type_tests"];
+const SingleTableTopic_childTopicsByReturnTypePlan = $record => {
+  const $records = otherSource_foreign_key_return_type_testsPgResource.find({
+    topic_id: $record.get("id")
+  });
+  return connection($records);
+};
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const SingleTableTopic_singleTableItemRelationsByChildIdPlan = $record => {
   const $records = otherSource_single_table_item_relationsPgResource.find({
@@ -5604,7 +5613,6 @@ const Collection_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   return typeNameFromType;
 })("Collection", spec_collections.polymorphism);
 const JSONSerialize = value => value;
-const resource_foreign_key_return_type_testsPgResource = registry.pgResources["foreign_key_return_type_tests"];
 const argDetailsSimple_relational_topic_by_id_fn = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
@@ -5910,6 +5918,27 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
 
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
+
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
   """
@@ -6080,6 +6109,27 @@ interface SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -8057,6 +8107,34 @@ enum RelationalItemOrderBy {
   ARCHIVED_AT_DESC
 }
 
+"""A connection to a list of \`SingleTablePost\` values."""
+type SingleTablePostConnection {
+  """A list of \`SingleTablePost\` objects."""
+  nodes: [SingleTablePost]!
+
+  """
+  A list of edges which contains the \`SingleTablePost\` and cursor to aid in pagination.
+  """
+  edges: [SingleTablePostEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`SingleTableItem\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`SingleTablePost\` edge in the connection."""
+type SingleTablePostEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`SingleTablePost\` at the end of the edge."""
+  node: SingleTablePost
+}
+
 """A connection to a list of \`SingleTableItemRelation\` values."""
 type SingleTableItemRelationConnection {
   """A list of \`SingleTableItemRelation\` objects."""
@@ -8295,6 +8373,27 @@ type SingleTablePost implements SingleTableItem {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
 
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
+
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
   """
@@ -8526,6 +8625,27 @@ type SingleTableDivider implements SingleTableItem {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
 
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
+
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
   """
@@ -8721,6 +8841,27 @@ type SingleTableChecklist implements SingleTableItem {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -8927,6 +9068,27 @@ type SingleTableChecklistItem implements SingleTableItem {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -15588,7 +15750,7 @@ export const objects = {
       },
       allForeignKeyReturnTypeTests: {
         plan() {
-          return connection(resource_foreign_key_return_type_testsPgResource.find());
+          return connection(otherSource_foreign_key_return_type_testsPgResource.find());
         },
         args: {
           first: applyFirstArg,
@@ -15962,7 +16124,7 @@ export const objects = {
       foreignKeyReturnTypeTestByRowId(_$root, {
         $rowId
       }) {
-        return resource_foreign_key_return_type_testsPgResource.get({
+        return otherSource_foreign_key_return_type_testsPgResource.get({
           id: $rowId
         });
       },
@@ -17506,7 +17668,7 @@ export const objects = {
       for (const pkCol of foreign_key_return_type_testsUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return resource_foreign_key_return_type_testsPgResource.get(spec);
+      return otherSource_foreign_key_return_type_testsPgResource.get(spec);
     }
   },
   ForeignKeyReturnTypeTestConnection: {
@@ -19220,6 +19382,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -19306,6 +19478,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -19393,6 +19575,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -19529,6 +19721,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -19614,11 +19816,27 @@ export const objects = {
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
+  SingleTablePostConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount: totalCountConnectionPlan
+    }
+  },
   SingleTableTopic: {
     assertStep: assertPgClassSingleStep,
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,

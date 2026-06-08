@@ -4123,6 +4123,27 @@ type SeriesCollection implements Collection {
 type SingleTableChecklist implements SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
+
+  """Reads and enables pagination through a set of `SingleTablePost`."""
+  childTopicsByReturnType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTablePostConnection!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
@@ -4330,6 +4351,27 @@ type SingleTableChecklist implements SingleTableItem {
 type SingleTableChecklistItem implements SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
+
+  """Reads and enables pagination through a set of `SingleTablePost`."""
+  childTopicsByReturnType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTablePostConnection!
   createdAt: Datetime!
   description: String
   id: Int!
@@ -4537,6 +4579,27 @@ type SingleTableChecklistItem implements SingleTableItem {
 type SingleTableDivider implements SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
+
+  """Reads and enables pagination through a set of `SingleTablePost`."""
+  childTopicsByReturnType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTablePostConnection!
   color: String
   createdAt: Datetime!
   id: Int!
@@ -4740,6 +4803,27 @@ type SingleTableDivider implements SingleTableItem {
 interface SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
+
+  """Reads and enables pagination through a set of `SingleTablePost`."""
+  childTopicsByReturnType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTablePostConnection!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
@@ -5108,6 +5192,27 @@ enum SingleTableItemsOrderBy {
 type SingleTablePost implements SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
+
+  """Reads and enables pagination through a set of `SingleTablePost`."""
+  childTopicsByReturnType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTablePostConnection!
   createdAt: Datetime!
   description: String
   id: Int!
@@ -5313,9 +5418,58 @@ type SingleTablePost implements SingleTableItem {
   updatedAt: Datetime!
 }
 
+"""A connection to a list of `SingleTablePost` values."""
+type SingleTablePostConnection {
+  """
+  A list of edges which contains the `SingleTablePost` and cursor to aid in pagination.
+  """
+  edges: [SingleTablePostEdge]!
+
+  """A list of `SingleTablePost` objects."""
+  nodes: [SingleTablePost]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTablePost` edge in the connection."""
+type SingleTablePostEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTablePost` at the end of the edge."""
+  node: SingleTablePost
+}
+
 type SingleTableTopic implements SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
+
+  """Reads and enables pagination through a set of `SingleTablePost`."""
+  childTopicsByReturnType(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTablePostConnection!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!

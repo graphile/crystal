@@ -1468,9 +1468,10 @@ create table polymorphic.foreign_key_return_type_tests (
 );
 comment on table polymorphic.foreign_key_return_type_tests is E'@behavior -insert -update -delete -filter -filterBy -order -orderBy';
 comment on constraint foreign_key_return_type_tests_topic_fkey on polymorphic.foreign_key_return_type_tests is $$
-  @behavior -manyRelation:resource:list -manyRelation:resource:connection
   @fieldName topicByReturnType
   @returnType SingleTableTopic
+  @foreignFieldName childTopicsByReturnType
+  @foreignReturnType SingleTablePost
   $$;
 
 create table polymorphic.single_table_item_relations (
