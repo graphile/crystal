@@ -517,7 +517,9 @@ export const buildSchema = (
     inflection?: GraphileBuild.Inflection;
   } = {},
 ): GraphQLSchema => {
-  return _buildSchema(rawPreset, input, shared).schema;
+  const { builder, schema } = _buildSchema(rawPreset, input, shared);
+  maybeWriteSchema(builder, schema, true);
+  return schema;
 };
 
 const _buildSchema = (
@@ -526,13 +528,30 @@ const _buildSchema = (
   shared: {
     inflection?: GraphileBuild.Inflection;
   } = {},
-): { schema: GraphQLSchema; writePromise: Promise<void> | null } => {
-  let writePromise: Promise<void> | null = null;
+): { builder: SchemaBuilder; schema: GraphQLSchema } => {
   const preset = {
     extends: [GraphileBuildLibPreset, rawPreset],
   };
   const builder = getBuilder(preset, shared.inflection);
   const schema = builder.buildSchema(input);
+  return { builder, schema };
+};
+
+function maybeWriteSchema(
+  builder: SchemaBuilder,
+  schema: GraphQLSchema,
+  eatErrors: true,
+): void;
+function maybeWriteSchema(
+  builder: SchemaBuilder,
+  schema: GraphQLSchema,
+): void | Promise<void[]>;
+function maybeWriteSchema(
+  builder: SchemaBuilder,
+  schema: GraphQLSchema,
+  eatErrors = false,
+): void | Promise<void[]> {
+  let promises: Promise<void>[] | undefined;
   const {
     exportSchemaSDLPath,
     exportSchemaIntrospectionResultPath,
@@ -544,11 +563,17 @@ const _buildSchema = (
       : schema;
   if (exportSchemaSDLPath) {
     const text = printSchema(schemaToExport) + "\n";
-    writePromise = writeFileIfDiffers(exportSchemaSDLPath, text).catch((e) => {
-      console.error(
-        `Failed to write schema in GraphQL format to '${exportSchemaSDLPath}': ${e}`,
-      );
-    });
+    const promise = writeFileIfDiffers(exportSchemaSDLPath, text);
+    if (eatErrors) {
+      promise.catch((e) => {
+        console.error(
+          `Failed to write schema in GraphQL format to '${exportSchemaSDLPath}': ${e}`,
+        );
+      });
+    } else {
+      promises ??= [];
+      promises.push(promise);
+    }
   }
   if (exportSchemaIntrospectionResultPath) {
     const introspectionQuery = getIntrospectionQuery();
@@ -557,15 +582,25 @@ const _buildSchema = (
       schema: schemaToExport,
     });
     const text = JSON.stringify(introspectionResult, null, 2) + "\n";
-    writeFileIfDiffers(exportSchemaIntrospectionResultPath, text).catch((e) => {
-      console.error(
-        `Failed to write schema introspection results in JSON format to '${exportSchemaIntrospectionResultPath}': ${e}`,
-      );
-    });
+    const promise = writeFileIfDiffers(
+      exportSchemaIntrospectionResultPath,
+      text,
+    );
+    if (eatErrors) {
+      promise.catch((e) => {
+        console.error(
+          `Failed to write schema introspection results in JSON format to '${exportSchemaIntrospectionResultPath}': ${e}`,
+        );
+      });
+    } else {
+      promises ??= [];
+      promises.push(promise);
+    }
   }
-
-  return { schema, writePromise };
-};
+  if (promises) {
+    return Promise.all(promises);
+  }
+}
 
 export {
   AddNodeInterfaceToSuitableTypesPlugin,
@@ -621,12 +656,8 @@ export async function makeSchema(
     const input = await gather(resolvedPreset, shared);
 
     phase = "SCHEMA";
-    const { schema, writePromise } = _buildSchema(
-      resolvedPreset,
-      input,
-      shared,
-    );
-    await writePromise;
+    const { builder, schema } = _buildSchema(resolvedPreset, input, shared);
+    await maybeWriteSchema(builder, schema);
 
     return { schema, resolvedPreset };
   };
