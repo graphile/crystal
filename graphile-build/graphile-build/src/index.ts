@@ -457,14 +457,14 @@ export const gather = (
  */
 export const watchGather = (
   preset: GraphileConfig.Preset,
-  helpers: GatherShared | undefined,
+  shared: GatherShared | undefined,
   callback: (
     gather: GraphileBuild.BuildInput | null,
     error: Error | undefined,
     retry: () => void,
   ) => PromiseOrDirect<void>,
 ): Promise<() => void> => {
-  const { watch } = gatherBase(preset, helpers);
+  const { watch } = gatherBase(preset, shared);
   return watch(callback);
 };
 
