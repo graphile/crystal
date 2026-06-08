@@ -363,18 +363,19 @@ Applies to:
 
 - Computed Column functions
 
-Details the _named_ GraphQL type that should receive the computed column field.
-This is useful when a computed column function is defined against a PostgreSQL
-polymorphic table type, but the field only makes sense on one concrete
-(monomorphic) GraphQL type that implements the polymorphic interface.
+Details the _named_ GraphQL type, or types, that should receive the computed
+column field. This is useful when a computed column function is defined against
+a PostgreSQL polymorphic table type, but the field only makes sense on one or
+more concrete (monomorphic) GraphQL types that implement the polymorphic
+interface.
 
 When `@applyToType` is set, PostGraphile only generates the computed column on
-the named type. The field is not added to the polymorphic interface or to the
-other concrete types that implement it.
+the named type or types. The field is not added to the polymorphic interface or
+to the other concrete types that implement it.
 
-The value must be the GraphQL type name, after inflection and smart tags have
-been applied. If no generated type has this exact name, the computed column is
-not generated.
+Each value must be a GraphQL type name, after inflection and smart tags have
+been applied. If no generated type has a matching name, the computed column is
+not generated for that value.
 
 ```json5 title="postgraphile.tags.json5"
 {
@@ -395,6 +396,17 @@ not generated.
 comment on function polymorphic.single_table_items_post_only(
   polymorphic.single_table_items
 ) is E'@applyToType SingleTablePost';
+```
+
+To apply the computed column to multiple types, repeat the smart tag:
+
+```sql
+comment on function polymorphic.single_table_items_post_and_divider_only(
+  polymorphic.single_table_items
+) is $$
+  @applyToType SingleTablePost
+  @applyToType SingleTableDivider
+  $$;
 ```
 
 ## @resultFieldName

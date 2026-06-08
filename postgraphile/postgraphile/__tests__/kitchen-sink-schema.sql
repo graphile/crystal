@@ -1450,6 +1450,19 @@ comment on function polymorphic.single_table_items_post_only(
   polymorphic.single_table_items
 ) is '@applyToType SingleTablePost';
 
+create function polymorphic.single_table_items_post_and_divider_only(
+  sti polymorphic.single_table_items
+)
+returns text as $$
+select 'post or divider only: ' || sti.title;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_post_and_divider_only(
+  polymorphic.single_table_items
+) is $$
+  @applyToType SingleTablePost
+  @applyToType SingleTableDivider
+  $$;
+
 create function polymorphic.all_single_tables ()
 returns setof polymorphic.single_table_items as $$
   select * from polymorphic.single_table_items

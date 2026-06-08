@@ -7251,6 +7251,7 @@ type SingleTableDivider implements Node & SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+  postAndDividerOnly: String
 
   """
   Reads a single `SingleTableTopic` that is related to this `SingleTableDivider`.
@@ -7915,6 +7916,7 @@ type SingleTablePost implements Node & SingleTableItem {
   """Reads a single `Person` that is related to this `SingleTableItem`."""
   personByAuthorId: Person
   position: BigInt!
+  postAndDividerOnly: String
   postOnly: String
 
   """Reads a single `Priority` that is related to this `SingleTableItem`."""

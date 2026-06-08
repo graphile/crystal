@@ -2738,6 +2738,7 @@ const gcp_applications_resourceOptionsConfig = {
   },
   uniques: gcp_applicationsUniques
 };
+const single_table_items_post_and_divider_onlyFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_post_and_divider_only");
 const single_table_items_post_onlyFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_post_only");
 const single_table_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_meaning_of_life");
 const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
@@ -3286,6 +3287,31 @@ const registryConfig = {
     }),
     aws_applications: aws_applications_resourceOptionsConfig,
     gcp_applications: gcp_applications_resourceOptionsConfig,
+    single_table_items_post_and_divider_only: {
+      executor: executor,
+      name: "single_table_items_post_and_divider_only",
+      identifier: "main.polymorphic.single_table_items_post_and_divider_only(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_post_and_divider_onlyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        codec: singleTableItemsCodec
+      }],
+      codec: TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "single_table_items_post_and_divider_only"
+        },
+        tags: {
+          applyToType: ["SingleTablePost", "SingleTableDivider"]
+        }
+      },
+      isUnique: true
+    },
     single_table_items_post_only: {
       executor: executor,
       name: "single_table_items_post_only",
@@ -5220,6 +5246,10 @@ const SingleTableItemRelationsOrderBy_CHILD_ID_DESCApply = queryBuilder => {
     attribute: "child_id",
     direction: "DESC"
   });
+};
+const resource_single_table_items_post_and_divider_onlyPgResource = registry.pgResources["single_table_items_post_and_divider_only"];
+const single_table_items_post_and_divider_only_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
+  return scalarComputed(resource_single_table_items_post_and_divider_onlyPgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
 };
 const resource_single_table_items_post_onlyPgResource = registry.pgResources["single_table_items_post_only"];
 const SingleTablePost_priorityIdPlan = $record => {
@@ -8275,6 +8305,7 @@ type SingleTablePost implements SingleTableItem & Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  postAndDividerOnly: String
   postOnly: String
   meaningOfLife: Int
 
@@ -8547,6 +8578,7 @@ type SingleTableDivider implements SingleTableItem & Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  postAndDividerOnly: String
   meaningOfLife: Int
 
   """Reads and enables pagination through a set of \`SingleTableTopic\`."""
@@ -19703,6 +19735,7 @@ export const objects = {
       },
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId: SingleTableTopic_personByAuthorIdPlan,
+      postAndDividerOnly: single_table_items_post_and_divider_only_getSelectPlanFromParentAndArgs,
       rootTopic: SingleTableTopic_rootTopicPlan,
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
       singleTableItemByParentId: SingleTableTopic_singleTableItemByParentIdPlan,
@@ -19861,6 +19894,7 @@ export const objects = {
       },
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId: SingleTableTopic_personByAuthorIdPlan,
+      postAndDividerOnly: single_table_items_post_and_divider_only_getSelectPlanFromParentAndArgs,
       postOnly($in, args, _info) {
         return scalarComputed(resource_single_table_items_post_onlyPgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
       },

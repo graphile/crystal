@@ -11,6 +11,13 @@
         },
       },
       {
+        name: "postAndDividerOnly",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
         name: "postOnly",
         type: {
           name: "String",
