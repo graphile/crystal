@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.0.3
+
+### Patch Changes
+
+- [#3060](https://github.com/graphile/crystal/pull/3060)
+  [`c21f24c`](https://github.com/graphile/crystal/commit/c21f24c2f34dac34f7c264b66ce56721bb155ae5)
+  Thanks [@benjie](https://github.com/benjie)! - `makeSchema` now awaits the
+  writing of the SDL if enabled by `exportSchemaSDLPath`
+
 ## 5.0.2
 
 ### Patch Changes
