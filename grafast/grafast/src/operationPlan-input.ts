@@ -206,9 +206,11 @@ export function withFieldArgsForArguments<T extends Step>(
         ) {
           // Skip applying!
         } else {
-          $target.apply(
-            applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
-          );
+          $target.withLayerPlan(() => {
+            $target.apply(
+              applyInput(typeAtPath, $valueAtPath, getTargetFromParent),
+            );
+          });
         }
       }
     },
