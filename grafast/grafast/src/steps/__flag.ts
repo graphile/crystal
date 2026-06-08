@@ -292,10 +292,15 @@ export function inhibitOnNull<TStep extends Step>(
   $step: TStep,
   options?: { if?: FlagStepOptions["if"] },
 ) {
-  return new __FlagStep<TStep>($step, {
-    ...options,
-    acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-  }) as Step<TStep extends Step<infer U> ? Exclude<U, null | undefined> : any>;
+  return $step.withLayerPlan(
+    () =>
+      new __FlagStep<TStep>($step, {
+        ...options,
+        acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
+      }) as Step<
+        TStep extends Step<infer U> ? Exclude<U, null | undefined> : any
+      >,
+  );
 }
 
 /**
@@ -308,10 +313,12 @@ export function assertNotNull<TStep extends Step>(
   message: string,
   options?: { if?: FlagStepOptions["if"] },
 ) {
-  return new __FlagStep<TStep>($step, {
-    ...options,
-    acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-    onReject: new SafeError(message),
+  return $step.withLayerPlan(() => {
+    new __FlagStep<TStep>($step, {
+      ...options,
+      acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
+      onReject: new SafeError(message),
+    });
   });
 }
 
@@ -324,10 +331,13 @@ export function trap<TStep extends Step>(
     if?: FlagStepOptions["if"];
   },
 ) {
-  return new __FlagStep<TStep>($step, {
-    ...options,
-    acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
-  });
+  return $step.withLayerPlan(
+    () =>
+      new __FlagStep<TStep>($step, {
+        ...options,
+        acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
+      }),
+  );
 }
 
 // Have to overwrite the getDep method due to circular dependency
@@ -351,6 +361,8 @@ export function trap<TStep extends Step>(
       );
     }
     // Return a __FlagStep around options.step so that all the options are preserved.
-    return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
+    return step.withLayerPlan(
+      () => new __FlagStep(step, { acceptFlags, onReject, dataOnly }),
+    );
   }
 };
