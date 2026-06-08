@@ -65,9 +65,7 @@ const applyConditionArgToConnection = EXPORTABLE(
       arg: FieldArg,
     ) => {
       const $select = $connection.getSubplan();
-      $select.withLayerPlan(() => {
-        arg.apply($select, qbWhereBuilder);
-      });
+      arg.apply($select, qbWhereBuilder);
     },
   [qbWhereBuilder],
   "applyConditionArgToConnection",
