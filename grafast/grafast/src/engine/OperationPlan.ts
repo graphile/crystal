@@ -309,7 +309,7 @@ export class OperationPlan {
 
   /** Constraints based on evaluating rootValue. @internal */
   public readonly rootValueConstraints: Constraint[];
-  /** Stores the actual value of rootValue. @internal */
+  /** Stores the actual value of rootValue. */
   public readonly rootValueStep: __ValueStep<any>;
   /** Allows accessing rootValue in a tracked manner (allowing eval). @internal */
   public readonly trackedRootValueStep: __TrackedValueStep<any>;
@@ -365,9 +365,6 @@ export class OperationPlan {
   public readonly fragments: {
     [fragmentName: string]: FragmentDefinitionNode;
   };
-  public readonly variableValues: { [key: string]: any };
-  public readonly context: { [key: string]: any };
-  public readonly rootValue: any;
   public readonly errorBehavior: ErrorBehavior;
 
   private readonly planningTimeout: number | null;
@@ -391,9 +388,6 @@ export class OperationPlan {
     this.schema = schema;
     this.operation = operation;
     this.fragments = fragments;
-    this.variableValues = variableValues;
-    this.context = context;
-    this.rootValue = rootValue;
     this.errorBehavior = errorBehavior;
     this.planningTimeout = options?.timeouts?.planning ?? null;
     this.maxPlanningDepth = options?.maxPlanningDepth ?? DEFAULT_MAX_DEPTH;
