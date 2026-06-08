@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/polymorphic/apply-to-type-computed-column"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 39, 7, 13, 15<br />2: PgSelect[10]<br />3: Connection[14]<br />4: ConnectionItems[17]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 40, 7, 13, 15<br />2: PgSelect[10]<br />3: Connection[14]<br />4: ConnectionItems[17]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ17ᐳ[20]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 21, 26, 22, 25"):::bucket
@@ -18,7 +18,7 @@ graph TD
     Bucket3 --> Bucket4
 
     %% plan dependencies
-    __InputObject7{{"__InputObject[7∈0] ➊<br />More deps:<br />- Constantᐸ4ᐳ[39]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    __InputObject7{{"__InputObject[7∈0] ➊<br />More deps:<br />- Constantᐸ4ᐳ[40]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     PgSelect10[["PgSelect[10∈0] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
@@ -46,6 +46,8 @@ graph TD
     PgClassExpression25 --> Lambda26
     PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ”polymorph...e_items__)ᐳ<br />ᐳSingleTablePost"}}:::plan
     PgClassExpression22 o--o PgClassExpression38
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ”polymorph...e_items__)ᐳ<br />ᐳSingleTablePost"}}:::plan
+    PgClassExpression38 o--o PgClassExpression39
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -55,5 +57,5 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item20,PgSelectSingle21,PgClassExpression22,PgClassExpression25,Lambda26 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression38 bucket4
+    class Bucket4,PgClassExpression38,PgClassExpression39 bucket4
 

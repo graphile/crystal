@@ -87,6 +87,9 @@
         name: "nodeId",
       },
       {
+        name: "postAndDividerOnly",
+      },
+      {
         name: "postOnly",
       },
       {
@@ -290,6 +293,9 @@
         name: "nodeId",
       },
       {
+        name: "postAndDividerOnly",
+      },
+      {
         name: "meaningOfLife",
       },
       {
@@ -387,6 +393,7 @@
         id: 4,
         type: "POST",
         postOnly: "post only: Better planning",
+        postAndDividerOnly: "post or divider only: Better planning",
       },
     ],
   },

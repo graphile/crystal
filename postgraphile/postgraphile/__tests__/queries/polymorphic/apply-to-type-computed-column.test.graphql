@@ -1,8 +1,12 @@
 ## expect(errors).toBeFalsy()
 ## expect(data.postType.fields.some((field) => field.name === "postOnly")).toBe(true)
+## expect(data.postType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(true)
 ## expect(data.interfaceType.fields.some((field) => field.name === "postOnly")).toBe(false)
+## expect(data.interfaceType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(false)
 ## expect(data.topicType.fields.some((field) => field.name === "postOnly")).toBe(false)
+## expect(data.topicType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(false)
 ## expect(data.dividerType.fields.some((field) => field.name === "postOnly")).toBe(false)
+## expect(data.dividerType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(true)
 #> schema: ["polymorphic"]
 #> simpleCollections: "both"
 
@@ -33,6 +37,7 @@
       type
       ... on SingleTablePost {
         postOnly
+        postAndDividerOnly
       }
     }
   }
