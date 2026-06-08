@@ -1,0 +1,88 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for queries/v4/procedure-query-volatile"
+    Bucket0("Bucket 0 (root)<br /><br />1: Access[11]<br />2: Access[12]<br />3: Object[13]<br />4: Constantᐸ2ᐳ[43]<br />5: Constantᐸundefinedᐳ[7]<br />6: Constantᐸ'Budd Deey'ᐳ[44]<br />7: __InputObject[8]<br />8: ApplyInput[15]<br />9: PgSelect[10]<br />10: __InputObject[16]<br />11: ApplyInput[21]<br />12: PgSelect[17]<br />13: Connection[14], PgSelectRows[22]<br />ᐳ: Access[33], Access[39]<br />14: ConnectionItems[25]<br />ᐳ: 32, 34, 35, 36"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 10, 39, 25, 34, 36<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br />Deps: 17<br /><br />ROOT __Item{2}ᐸ22ᐳ[23]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24<br /><br />ROOT PgSelectSingle{2}ᐸtable_set_query_volatileᐳ[24]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 39<br /><br />ROOT __Item{5}ᐸ25ᐳ[29]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 29, 30, 40<br /><br />ROOT Edge{5}[30]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 41<br /><br />ROOT PgSelectSingle{6}ᐸtable_set_query_volatileᐳ[41]"):::bucket
+    end
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket1 --> Bucket5
+    Bucket2 --> Bucket3
+    Bucket5 --> Bucket6
+    Bucket6 --> Bucket7
+
+    %% plan dependencies
+    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸtable_set_query_volatile+1(mutation)ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[43]"]]:::sideeffectplan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
+    Object13 & ApplyInput15 --> PgSelect10
+    PgSelect17[["PgSelect[17∈0] ➊<br />ᐸtable_set_query_volatile(mutation)ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[43]"]]:::sideeffectplan
+    ApplyInput21{{"ApplyInput[21∈0] ➊"}}:::plan
+    Object13 & ApplyInput21 --> PgSelect17
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'Budd Deey'ᐳ[44]"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access11 & Access12 --> Object13
+    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 4<br />More deps:<br />- Constantᐸ2ᐳ[43]"]]:::plan
+    PgSelect10 --> Connection14
+    __InputObject16{{"__InputObject[16∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'Budd Deey'ᐳ[44]"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access11
+    __Value2 --> Access12
+    __InputObject8 --> ApplyInput15
+    __InputObject16 --> ApplyInput21
+    PgSelectRows22[["PgSelectRows[22∈0] ➊"]]:::plan
+    PgSelect17 --> PgSelectRows22
+    ConnectionItems25[["ConnectionItems[25∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[14]"]]:::plan
+    First32{{"First[32∈0] ➊<br />More deps:<br />- ConnectionItems[25]"}}:::plan
+    Access33{{"Access[33∈0] ➊<br />ᐸ10.cursorDetailsᐳ"}}:::plan
+    PgSelect10 --> Access33
+    Last35{{"Last[35∈0] ➊<br />More deps:<br />- ConnectionItems[25]"}}:::plan
+    Access39{{"Access[39∈0] ➊<br />ᐸ10.cursorDetailsᐳ"}}:::plan
+    PgSelect10 --> Access39
+    PageInfo28{{"PageInfo[28∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
+    Access37{{"Access[37∈1] ➊<br />ᐸ14.hasNextPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
+    Access38{{"Access[38∈1] ➊<br />ᐸ14.hasPreviousPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
+    __Item23[/"__Item[23∈2]<br />ᐸ22ᐳ"\]:::itemplan
+    PgSelectRows22 ==> __Item23
+    PgSelectSingle24{{"PgSelectSingle[24∈2]<br />ᐸtable_set_query_volatileᐳ"}}:::plan
+    __Item23 --> PgSelectSingle24
+    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression31
+    Edge30{{"Edge[30∈5]"}}:::plan
+    __Item29[/"__Item[29∈5]<br />ᐸ25ᐳ<br />More deps:<br />- ConnectionItems[25]"\]:::itemplan
+    PgCursor40{{"PgCursor[40∈5]"}}:::plan
+    __Item29 & PgCursor40 --> Edge30
+    __Item29 & Access39 --> PgCursor40
+    PgSelectSingle41{{"PgSelectSingle[41∈6]<br />ᐸtable_set_query_volatileᐳ"}}:::plan
+    __Item29 --> PgSelectSingle41
+    PgClassExpression42{{"PgClassExpression[42∈7]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
+    PgSelectSingle41 --> PgClassExpression42
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,__InputObject8,PgSelect10,Access11,Access12,Object13,Connection14,ApplyInput15,__InputObject16,PgSelect17,ApplyInput21,PgSelectRows22,ConnectionItems25,First32,Access33,Last35,Access39 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PageInfo28,Access37,Access38 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item23,PgSelectSingle24 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression31 bucket3
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item29,Edge30,PgCursor40 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,PgSelectSingle41 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgClassExpression42 bucket7
+
