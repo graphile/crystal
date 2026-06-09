@@ -1,0 +1,703 @@
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+type CompetingPair implements Node {
+  femaleSkater: BigInt!
+  id: BigInt!
+  maleSkater: BigInt!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByFemaleSkater: Skater
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByMaleSkater: Skater
+}
+
+"""
+A condition to be used against `CompetingPair` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input CompetingPairCondition {
+  """Checks for equality with the object’s `femaleSkater` field."""
+  femaleSkater: BigInt
+
+  """Checks for equality with the object’s `id` field."""
+  id: BigInt
+
+  """Checks for equality with the object’s `maleSkater` field."""
+  maleSkater: BigInt
+}
+
+"""An input for mutations affecting `CompetingPair`"""
+input CompetingPairInput {
+  femaleSkater: BigInt!
+  maleSkater: BigInt!
+}
+
+"""
+Represents an update to a `CompetingPair`. Fields that are set will be updated.
+"""
+input CompetingPairPatch {
+  femaleSkater: BigInt
+  maleSkater: BigInt
+}
+
+"""A connection to a list of `CompetingPair` values."""
+type CompetingPairsConnection {
+  """
+  A list of edges which contains the `CompetingPair` and cursor to aid in pagination.
+  """
+  edges: [CompetingPairsEdge]!
+
+  """A list of `CompetingPair` objects."""
+  nodes: [CompetingPair]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `CompetingPair` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `CompetingPair` edge in the connection."""
+type CompetingPairsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `CompetingPair` at the end of the edge."""
+  node: CompetingPair
+}
+
+"""Methods to use when ordering `CompetingPair`."""
+enum CompetingPairsOrderBy {
+  FEMALE_SKATER_ASC
+  FEMALE_SKATER_DESC
+  ID_ASC
+  ID_DESC
+  MALE_SKATER_ASC
+  MALE_SKATER_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the create `CompetingPair` mutation."""
+input CreateCompetingPairInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `CompetingPair` to be created by this mutation."""
+  competingPair: CompetingPairInput!
+}
+
+"""The output of our create `CompetingPair` mutation."""
+type CreateCompetingPairPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `CompetingPair` that was created by this mutation."""
+  competingPair: CompetingPair
+
+  """An edge for our `CompetingPair`. May be used by Relay 1."""
+  competingPairEdge(
+    """The method to use when ordering `CompetingPair`."""
+    orderBy: [CompetingPairsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CompetingPairsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByFemaleSkater: Skater
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByMaleSkater: Skater
+}
+
+"""All input for the create `Skater` mutation."""
+input CreateSkaterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our create `Skater` mutation."""
+type CreateSkaterPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Skater` that was created by this mutation."""
+  skater: Skater
+
+  """An edge for our `Skater`. May be used by Relay 1."""
+  skaterEdge(
+    """The method to use when ordering `Skater`."""
+    orderBy: [SkatersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SkatersEdge
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""All input for the `deleteCompetingPairByFemaleSkater` mutation."""
+input DeleteCompetingPairByFemaleSkaterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  femaleSkater: BigInt!
+}
+
+"""All input for the `deleteCompetingPairById` mutation."""
+input DeleteCompetingPairByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: BigInt!
+}
+
+"""All input for the `deleteCompetingPairByMaleSkater` mutation."""
+input DeleteCompetingPairByMaleSkaterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  maleSkater: BigInt!
+}
+
+"""All input for the `deleteCompetingPair` mutation."""
+input DeleteCompetingPairInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `CompetingPair` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `CompetingPair` mutation."""
+type DeleteCompetingPairPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `CompetingPair` that was deleted by this mutation."""
+  competingPair: CompetingPair
+
+  """An edge for our `CompetingPair`. May be used by Relay 1."""
+  competingPairEdge(
+    """The method to use when ordering `CompetingPair`."""
+    orderBy: [CompetingPairsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CompetingPairsEdge
+  deletedCompetingPairId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByFemaleSkater: Skater
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByMaleSkater: Skater
+}
+
+"""All input for the `deleteSkaterById` mutation."""
+input DeleteSkaterByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: BigInt!
+}
+
+"""All input for the `deleteSkater` mutation."""
+input DeleteSkaterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Skater` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Skater` mutation."""
+type DeleteSkaterPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedSkaterId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `Skater` that was deleted by this mutation."""
+  skater: Skater
+
+  """An edge for our `Skater`. May be used by Relay 1."""
+  skaterEdge(
+    """The method to use when ordering `Skater`."""
+    orderBy: [SkatersOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SkatersEdge
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single `CompetingPair`."""
+  createCompetingPair(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCompetingPairInput!
+  ): CreateCompetingPairPayload
+
+  """Creates a single `Skater`."""
+  createSkater(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSkaterInput!
+  ): CreateSkaterPayload
+
+  """Deletes a single `CompetingPair` using its globally unique id."""
+  deleteCompetingPair(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCompetingPairInput!
+  ): DeleteCompetingPairPayload
+
+  """Deletes a single `CompetingPair` using a unique key."""
+  deleteCompetingPairByFemaleSkater(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCompetingPairByFemaleSkaterInput!
+  ): DeleteCompetingPairPayload
+
+  """Deletes a single `CompetingPair` using a unique key."""
+  deleteCompetingPairById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCompetingPairByIdInput!
+  ): DeleteCompetingPairPayload
+
+  """Deletes a single `CompetingPair` using a unique key."""
+  deleteCompetingPairByMaleSkater(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCompetingPairByMaleSkaterInput!
+  ): DeleteCompetingPairPayload
+
+  """Deletes a single `Skater` using its globally unique id."""
+  deleteSkater(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSkaterInput!
+  ): DeleteSkaterPayload
+
+  """Deletes a single `Skater` using a unique key."""
+  deleteSkaterById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSkaterByIdInput!
+  ): DeleteSkaterPayload
+
+  """
+  Updates a single `CompetingPair` using its globally unique id and a patch.
+  """
+  updateCompetingPair(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCompetingPairInput!
+  ): UpdateCompetingPairPayload
+
+  """Updates a single `CompetingPair` using a unique key and a patch."""
+  updateCompetingPairByFemaleSkater(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCompetingPairByFemaleSkaterInput!
+  ): UpdateCompetingPairPayload
+
+  """Updates a single `CompetingPair` using a unique key and a patch."""
+  updateCompetingPairById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCompetingPairByIdInput!
+  ): UpdateCompetingPairPayload
+
+  """Updates a single `CompetingPair` using a unique key and a patch."""
+  updateCompetingPairByMaleSkater(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCompetingPairByMaleSkaterInput!
+  ): UpdateCompetingPairPayload
+}
+
+"""An object with a globally unique `ID`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """Reads and enables pagination through a set of `CompetingPair`."""
+  allCompetingPairs(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompetingPairCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CompetingPair`."""
+    orderBy: [CompetingPairsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CompetingPairsConnection
+
+  """Reads a set of `CompetingPair`."""
+  allCompetingPairsList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompetingPairCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `CompetingPair`."""
+    orderBy: [CompetingPairsOrderBy!]
+  ): [CompetingPair!]
+
+  """Reads and enables pagination through a set of `Skater`."""
+  allSkaters(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SkaterCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Skater`."""
+    orderBy: [SkatersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SkatersConnection
+
+  """Reads a set of `Skater`."""
+  allSkatersList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SkaterCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+
+    """The method to use when ordering `Skater`."""
+    orderBy: [SkatersOrderBy!]
+  ): [Skater!]
+
+  """Reads a single `CompetingPair` using its globally unique `ID`."""
+  competingPair(
+    """
+    The globally unique `ID` to be used in selecting a single `CompetingPair`.
+    """
+    nodeId: ID!
+  ): CompetingPair
+
+  """Get a single `CompetingPair`."""
+  competingPairByFemaleSkater(femaleSkater: BigInt!): CompetingPair
+
+  """Get a single `CompetingPair`."""
+  competingPairById(id: BigInt!): CompetingPair
+
+  """Get a single `CompetingPair`."""
+  competingPairByMaleSkater(maleSkater: BigInt!): CompetingPair
+
+  """Fetches an object given its globally unique `ID`."""
+  node(
+    """The globally unique `ID`."""
+    nodeId: ID!
+  ): Node
+
+  """
+  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+  """
+  nodeId: ID!
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Reads a single `Skater` using its globally unique `ID`."""
+  skater(
+    """The globally unique `ID` to be used in selecting a single `Skater`."""
+    nodeId: ID!
+  ): Skater
+
+  """Get a single `Skater`."""
+  skaterById(id: BigInt!): Skater
+}
+
+type Skater implements Node {
+  """Reads a single `CompetingPair` that is related to this `Skater`."""
+  competingPairByFemaleSkater: CompetingPair
+
+  """Reads a single `CompetingPair` that is related to this `Skater`."""
+  competingPairByMaleSkater: CompetingPair
+  id: BigInt!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Skater` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input SkaterCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: BigInt
+}
+
+"""A connection to a list of `Skater` values."""
+type SkatersConnection {
+  """
+  A list of edges which contains the `Skater` and cursor to aid in pagination.
+  """
+  edges: [SkatersEdge]!
+
+  """A list of `Skater` objects."""
+  nodes: [Skater]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Skater` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Skater` edge in the connection."""
+type SkatersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Skater` at the end of the edge."""
+  node: Skater
+}
+
+"""Methods to use when ordering `Skater`."""
+enum SkatersOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""All input for the `updateCompetingPairByFemaleSkater` mutation."""
+input UpdateCompetingPairByFemaleSkaterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `CompetingPair` being updated.
+  """
+  competingPairPatch: CompetingPairPatch!
+  femaleSkater: BigInt!
+}
+
+"""All input for the `updateCompetingPairById` mutation."""
+input UpdateCompetingPairByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `CompetingPair` being updated.
+  """
+  competingPairPatch: CompetingPairPatch!
+  id: BigInt!
+}
+
+"""All input for the `updateCompetingPairByMaleSkater` mutation."""
+input UpdateCompetingPairByMaleSkaterInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `CompetingPair` being updated.
+  """
+  competingPairPatch: CompetingPairPatch!
+  maleSkater: BigInt!
+}
+
+"""All input for the `updateCompetingPair` mutation."""
+input UpdateCompetingPairInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `CompetingPair` being updated.
+  """
+  competingPairPatch: CompetingPairPatch!
+
+  """
+  The globally unique `ID` which will identify a single `CompetingPair` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `CompetingPair` mutation."""
+type UpdateCompetingPairPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `CompetingPair` that was updated by this mutation."""
+  competingPair: CompetingPair
+
+  """An edge for our `CompetingPair`. May be used by Relay 1."""
+  competingPairEdge(
+    """The method to use when ordering `CompetingPair`."""
+    orderBy: [CompetingPairsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CompetingPairsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByFemaleSkater: Skater
+
+  """Reads a single `Skater` that is related to this `CompetingPair`."""
+  skaterByMaleSkater: Skater
+}
