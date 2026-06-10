@@ -1210,25 +1210,28 @@ export function connection<
       `connection() was completely overhauled during the beta; this usage is no longer supported. Usage is much more straightforward now.`,
     );
   }
-  const $connection = new ConnectionStep<
-    TItem,
-    TNodeStep,
-    TEdgeDataStep,
-    TEdgeStep,
-    TCursorValue,
-    TCollectionStep
-  >(step, params);
-  const fieldArgs = params?.fieldArgs;
-  if (fieldArgs) {
-    const { $first, $last, $before, $after, $offset } = fieldArgs as FieldArgs;
-    // Connections may have a mixture of these arguments, so we must check each exists
-    if ($first) $connection.setFirst($first);
-    if ($last) $connection.setLast($last);
-    if ($before) $connection.setBefore($before);
-    if ($after) $connection.setAfter($after);
-    if ($offset) $connection.setOffset($offset);
-  }
-  return $connection;
+  return step.withLayerPlan(() => {
+    const $connection = new ConnectionStep<
+      TItem,
+      TNodeStep,
+      TEdgeDataStep,
+      TEdgeStep,
+      TCursorValue,
+      TCollectionStep
+    >(step, params);
+    const fieldArgs = params?.fieldArgs;
+    if (fieldArgs) {
+      const { $first, $last, $before, $after, $offset } =
+        fieldArgs as FieldArgs;
+      // Connections may have a mixture of these arguments, so we must check each exists
+      if ($first) $connection.setFirst($first);
+      if ($last) $connection.setLast($last);
+      if ($before) $connection.setBefore($before);
+      if ($after) $connection.setAfter($after);
+      if ($offset) $connection.setOffset($offset);
+    }
+    return $connection;
+  });
 }
 
 interface StepWithItems<TItem = any> extends Step {

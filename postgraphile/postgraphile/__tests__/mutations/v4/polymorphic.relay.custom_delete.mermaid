@@ -14,12 +14,12 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Parent side effect step: 44<br />Deps: 4, 61, 44, 63, 60, 113, 117, 121, 125, 129<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 61, 44, 63, 60, 113, 117, 121, 125, 129<br /><br />ROOT Connection{2}ᐸ57ᐳ[61]"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 44, 60, 113, 117, 121, 125, 129<br /><br />ROOT __Item{6}ᐸ63ᐳ[66]"):::bucket
-    Bucket7("Bucket 7 (polymorphic)<br />__typename: Lambda[72]<br />Deps: 72, 60, 68, 44, 113, 117, 121, 125, 129, 133"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalTopic<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 113, 133<br />ᐳRelationalTopic<br /><br />1: PgSelect[74]<br />2: PgSelectRows[79]<br />ᐳ: 78, 80, 114, 115, 116"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalPost<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 117, 133<br />ᐳRelationalPost<br /><br />1: PgSelect[82]<br />2: PgSelectRows[87]<br />ᐳ: 86, 88, 118, 119, 120"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />|RelationalDivider<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 121, 133<br />ᐳRelationalDivider<br /><br />1: PgSelect[90]<br />2: PgSelectRows[95]<br />ᐳ: 94, 96, 122, 123, 124"):::bucket
-    Bucket11("Bucket 11 (polymorphicPartition)<br />|RelationalChecklist<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 125, 133<br />ᐳRelationalChecklist<br /><br />1: PgSelect[98]<br />2: PgSelectRows[103]<br />ᐳ: 102, 104, 126, 127, 128"):::bucket
-    Bucket12("Bucket 12 (polymorphicPartition)<br />|RelationalChecklistItem<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 129, 133<br />ᐳRelationalChecklistItem<br /><br />1: PgSelect[106]<br />2: PgSelectRows[111]<br />ᐳ: 110, 112, 130, 131, 132"):::bucket
+    Bucket7("Bucket 7 (polymorphic)<br />__typename: Lambda[72]<br />Parent side effect step: 44<br />Deps: 72, 60, 68, 44, 113, 117, 121, 125, 129, 71"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalTopic<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 113, 71<br />ᐳRelationalTopic<br /><br />1: PgSelect[74]<br />2: PgSelectRows[79]<br />ᐳ: 78, 80, 114, 115, 116"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalPost<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 117, 71<br />ᐳRelationalPost<br /><br />1: PgSelect[82]<br />2: PgSelectRows[87]<br />ᐳ: 86, 88, 118, 119, 120"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|RelationalDivider<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 121, 71<br />ᐳRelationalDivider<br /><br />1: PgSelect[90]<br />2: PgSelectRows[95]<br />ᐳ: 94, 96, 122, 123, 124"):::bucket
+    Bucket11("Bucket 11 (polymorphicPartition)<br />|RelationalChecklist<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 125, 71<br />ᐳRelationalChecklist<br /><br />1: PgSelect[98]<br />2: PgSelectRows[103]<br />ᐳ: 102, 104, 126, 127, 128"):::bucket
+    Bucket12("Bucket 12 (polymorphicPartition)<br />|RelationalChecklistItem<br />Parent side effect step: 44<br />Deps: 60, 68, 44, 129, 71<br />ᐳRelationalChecklistItem<br /><br />1: PgSelect[106]<br />2: PgSelectRows[111]<br />ᐳ: 110, 112, 130, 131, 132"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -113,8 +113,6 @@ graph TD
     PgSelectSingle67 --> PgClassExpression71
     Lambda72{{"Lambda[72∈6]<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
     PgClassExpression71 --> Lambda72
-    PgClassExpression133{{"PgClassExpression[133∈6]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle67 --> PgClassExpression133
     PgSelect74[["PgSelect[74∈8]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object60 & PgClassExpression68 --> PgSelect74
     List115{{"List[115∈8]^<br />ᐸ113,114ᐳ<br />More deps:<br />- Constantᐸ'relational_topics'ᐳ[113]"}}:::plan
@@ -198,7 +196,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item66,PgSelectSingle67,PgClassExpression68,PgClassExpression71,Lambda72,PgClassExpression133 bucket6
+    class Bucket6,__Item66,PgSelectSingle67,PgClassExpression68,PgClassExpression71,Lambda72 bucket6
     classDef bucket7 stroke:#808000
     class Bucket7 bucket7
     classDef bucket8 stroke:#dda0dd

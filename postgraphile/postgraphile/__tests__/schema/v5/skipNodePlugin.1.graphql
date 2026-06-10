@@ -7644,6 +7644,38 @@ type Query {
     """
     offset: Int
   ): CPersonConnection
+
+  """Reads and enables pagination through a set of `CPerson`."""
+  cTableSetQueryVolatile(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CPersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): CPersonConnection
+  cTableSetQueryVolatileList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CPersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [CPerson]
   cTypesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 
   """Get a single `DefaultValue`."""
