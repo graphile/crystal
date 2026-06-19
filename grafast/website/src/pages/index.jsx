@@ -52,9 +52,9 @@ function HomepageHeader() {
               GraphQL.
             </p>
             <p className={styles.heroSubtitle}>
-              🆕 <strong>v1 release candidate is here!</strong> <Grafast /> is
-              production ready, feature complete, and waiting for your feedback
-              before 1.0 officially launches.
+              🆕 <strong>v1 is live!</strong> Feature complete,
+              production-ready, and already trusted in production &mdash; with
+              some deployments running for over a year!
             </p>
             <div className={styles.buttons}>
               <Link
@@ -67,9 +67,9 @@ function HomepageHeader() {
                 className={clsx(
                   "button button--secondary button--lg margin-left--md",
                 )}
-                to="/news/2025-10-28-grafast-v1-release-candidate/"
+                to="/news/2026-03-24-v1-released"
               >
-                Read the RC announcement
+                Read the V1 announcement
               </Link>
             </div>
           </div>
