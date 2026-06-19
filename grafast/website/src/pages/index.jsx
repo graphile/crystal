@@ -1,7 +1,6 @@
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import Grafast from "@site/src/components/Grafast";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import GrafastLogo from "@site/static/img/grafast-wordmark.svg";
 import Layout from "@theme/Layout";
