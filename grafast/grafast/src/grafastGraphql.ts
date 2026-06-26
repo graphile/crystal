@@ -103,14 +103,9 @@ const parseAndValidate = (
       const cacheResult = [
         error instanceof GraphQLError
           ? error
-          : new GraphQLError(
-              "Validation error occurred",
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              error,
-            ),
+          : new GraphQLError("Validation error occurred", {
+              originalError: error,
+            }),
       ];
       queryCache.set(hash, cacheResult);
       return cacheResult;
