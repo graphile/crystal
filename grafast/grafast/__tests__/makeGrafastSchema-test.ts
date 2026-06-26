@@ -1,9 +1,8 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import { constant } from "lodash";
 import { it } from "mocha";
 
-import { grafast, lambda, makeGrafastSchema } from "../dist/index.js";
+import { constant, grafast, lambda, makeGrafastSchema } from "../dist/index.js";
 
 it("can create a schema with an input", async () => {
   const schema = makeGrafastSchema({
