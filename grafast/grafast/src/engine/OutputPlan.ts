@@ -602,14 +602,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
-          type.mode === "root",
+          type.mode === "root" || type.hasRootBehavior,
           false,
         );
         this.executeString = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
-          type.mode === "root",
+          type.mode === "root" || type.hasRootBehavior,
           true,
         );
         break;
