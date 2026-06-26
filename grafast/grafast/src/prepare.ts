@@ -265,7 +265,6 @@ function outputBucket(
   const operationPlan = rootBucket.layerPlan.operationPlan;
   const root: PayloadRoot = {
     errorBehavior: requestContext.args.onError ?? "PROPAGATE",
-    insideGraphQL: false,
     errors: [],
     queue: [],
     streams: [],
@@ -365,7 +364,6 @@ function executePreemptive(
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
     abortSignal,
-    insideGraphQL: false,
   };
 
   const bucketPromise = executeBucket(rootBucket, requestContext);

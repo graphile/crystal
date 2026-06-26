@@ -1028,16 +1028,6 @@ const nullExecutorString = makeExecutor({
   asString: true,
 });
 
-/* This is what leafExecutor should use if insideGraphQL (which isn't currently
-   * supported)
-  `\
-    if (root.insideGraphQL) {
-      // Don't serialize to avoid the double serialization problem
-      return bucketRootValue;
-    } else {
-      return this.type.graphqlType.serialize(bucketRootValue);
-    }
-  ` */
 const leafExecutor = makeExecutor<false, OutputPlanTypeLeaf>({
   inner(bucketRootValue) {
     return this.type.graphqlType.serialize(bucketRootValue) as JSONValue;
