@@ -7,6 +7,7 @@ import type {
   ExecutionEntryFlags,
   ExecutionEventEmitter,
   ExecutionValue,
+  GrafastInternalExecutionArgs,
 } from "./interfaces.ts";
 
 /**
@@ -14,7 +15,7 @@ import type {
  */
 export interface RequestTools {
   /** @internal */
-  args: GrafastExecutionArgs;
+  args: GrafastInternalExecutionArgs;
   /** @internal */
   onError: ErrorBehavior;
   /** The `timeSource.now()` at which the request started executing */

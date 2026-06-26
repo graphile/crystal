@@ -82,6 +82,12 @@ export type OutputPlanTypeObject = {
   mode: "object";
   typeName: string;
   deferLabel: string | undefined;
+  /**
+   * If we've not traversed any fields yet, then the fields that are executed
+   * get the "root" behavior, wherein a `null` source does not prevent their
+   * execution.
+   */
+  hasRootBehavior: boolean;
 };
 export type OutputPlanTypePolymorphicObject = {
   /**

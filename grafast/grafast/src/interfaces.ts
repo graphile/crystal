@@ -29,6 +29,8 @@ import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.ts";
 import type {
+  $$eventEmitter,
+  $$extensions,
   $$streamMore,
   $$timeout,
   $$ts,
@@ -825,6 +827,16 @@ export interface GrafastExecutionArgs extends ExecutionArgs {
   middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
   requestContext?: Partial<Grafast.RequestContext>;
   outputDataAsString?: boolean;
+}
+
+/** @internal */
+export interface GrafastInternalExecutionArgs extends GrafastExecutionArgs {
+  [$$eventEmitter]?: ExecutionEventEmitter;
+  [$$extensions]?: {
+    explain: {
+      operations: any[];
+    };
+  };
 }
 
 export interface ValidateSchemaEvent {
