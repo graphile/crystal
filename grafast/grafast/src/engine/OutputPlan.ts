@@ -630,26 +630,19 @@ export function coerceError(
     if (error.path !== undefined) {
       return error;
     } else {
-      return new GraphQLError(
-        error.message,
-        locationDetails.node,
-        null,
-        null,
+      return new GraphQLError(error.message, {
+        nodes: locationDetails.node,
         path,
-        error.originalError ?? error,
-        error.extensions,
-      );
+        originalError: error.originalError ?? error,
+        extensions: error.extensions,
+      });
     }
   } else {
-    return new GraphQLError(
-      error?.message ?? String(error),
-      locationDetails.node,
-      null,
-      null,
+    return new GraphQLError(error?.message ?? String(error), {
+      nodes: locationDetails.node,
       path,
-      error,
-      null,
-    );
+      originalError: error,
+    });
   }
 }
 
@@ -661,22 +654,12 @@ export function nonNullError(
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(
       `GrafastInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
-      node,
-      null,
-      null,
-      path,
-      null,
-      null,
+      { nodes: node, path },
     );
   }
   return new GraphQLError(
     `Cannot return null for non-nullable field ${parentTypeName}.${fieldName}.`,
-    node,
-    null,
-    null,
-    path,
-    null,
-    null,
+    { nodes: node, path },
   );
 }
 
@@ -1427,15 +1410,10 @@ function introspect<TAsString extends boolean>(
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
     const { node } = locationDetails;
-    throw new GraphQLError(
-      "INTROSPECTION FAILED!",
-      node,
-      null,
-      null,
-      mutablePath.slice(1),
-      null,
-      null,
-    );
+    throw new GraphQLError("INTROSPECTION FAILED!", {
+      nodes: node,
+      path: mutablePath.slice(1),
+    });
   }
   const result = graphqlResult.data!.a as JSONValue;
   introspectionCacheByVariableValues.set(canonical, result);

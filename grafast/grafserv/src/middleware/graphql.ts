@@ -457,7 +457,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       if (!operation || operation.operation !== "query") {
         const error = new GraphQLError(
           "Only queries may take place over non-POST requests.",
-          operation,
+          { nodes: operation },
         );
         return {
           type: "graphql",
@@ -559,7 +559,10 @@ function handleGraphQLHandlerError(
       dynamicOptions,
       payload: {
         errors: [
-          new GraphQLError(e.message, null, null, null, null, e, e.extensions),
+          new GraphQLError(e.message, {
+            originalError: e,
+            extensions: e.extensions,
+          }),
         ],
       },
       statusCode: e.extensions?.statusCode ?? 500,
@@ -571,7 +574,7 @@ function handleGraphQLHandlerError(
   const graphqlError =
     e instanceof GraphQLError
       ? e
-      : new GraphQLError("Unknown error occurred", null, null, null, null, e);
+      : new GraphQLError("Unknown error occurred", { originalError: e });
   // Special error handling for GraphQL route
   console.error(
     "An error occurred whilst attempting to handle the GraphQL request:",
