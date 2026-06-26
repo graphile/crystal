@@ -52,7 +52,6 @@ import {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
-  rootValue,
   Step,
 } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
@@ -130,6 +129,8 @@ import {
   sideEffectWithPgClientTransaction,
 } from "../steps/withPgClient.ts";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const EMPTY_OBJECT = Object.freeze({});
 
 export function EXPORTABLE<T, TScope extends readonly any[]>(
   factory: (...args: TScope) => T,
@@ -3831,9 +3832,7 @@ export function makeExampleSchema(
 
   ////////////////////////////////////////
 
-  const Query = newObjectTypeBuilder<__ValueStep<BaseGraphQLRootValue>>(
-    __ValueStep,
-  )({
+  const Query = newObjectTypeBuilder(Step)({
     name: "Query",
     fields: {
       forums: {
@@ -4867,11 +4866,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (rootValue) =>
+          (constant, EMPTY_OBJECT) =>
             function plan() {
-              return rootValue();
+              return constant(EMPTY_OBJECT);
             },
-          [rootValue],
+          [constant, EMPTY_OBJECT],
         ),
       },
     },
@@ -4905,11 +4904,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (rootValue) =>
+          (constant, EMPTY_OBJECT) =>
             function plan() {
-              return rootValue();
+              return constant(EMPTY_OBJECT);
             },
-          [rootValue],
+          [constant, EMPTY_OBJECT],
         ),
       },
     },
@@ -4949,11 +4948,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (rootValue) =>
+          (constant, EMPTY_OBJECT) =>
             function plan() {
-              return rootValue();
+              return constant(EMPTY_OBJECT);
             },
-          [rootValue],
+          [constant, EMPTY_OBJECT],
         ),
       },
     },

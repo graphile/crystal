@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const pkCols = ["id"];
@@ -1327,6 +1327,7 @@ function RelationalTopic_buildingByConstructorPlan($record) {
   $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
   return $buildings.single();
 }
+const EMPTY_OBJECT = Object.freeze({});
 const spec_resource___proto__PgResource = registry.pgResources["__proto__"];
 const nodeIdHandler__Proto__ = makeTableNodeIdHandler({
   typeName: "_Proto__",
@@ -1429,7 +1430,7 @@ const nodeIdHandlerByTypeName = {
       return "irrelevant";
     },
     get() {
-      return rootValue();
+      return constant(EMPTY_OBJECT);
     },
     plan() {
       return constant`query`;
@@ -1565,6 +1566,7 @@ const RelationalItemsOrderBy_TYPE_DESCApply = queryBuilder => {
     direction: "DESC"
   });
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const detailsByAttributeName = {
   __proto__: null,
   constructor: {
@@ -1992,8 +1994,9 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -6912,7 +6915,7 @@ export const objects = {
         return spec_resource_projectPgResource.get(spec);
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT2);
       },
       relationalStatus(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
