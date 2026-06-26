@@ -1,0 +1,340 @@
+{
+  __type: {
+    fields: [
+      {
+        name: "nodeId",
+        type: {
+          name: null,
+          ofType: {
+            name: "ID",
+          },
+        },
+      },
+      {
+        name: "postAndDividerOnly",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
+        name: "postOnly",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
+        name: "meaningOfLife",
+        type: {
+          name: "Int",
+          ofType: null,
+        },
+      },
+      {
+        name: "topics",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableTopicConnection",
+          },
+        },
+      },
+      {
+        name: "topicsList",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableTopic",
+          },
+        },
+      },
+      {
+        name: "id",
+        type: {
+          name: null,
+          ofType: {
+            name: "Int",
+          },
+        },
+      },
+      {
+        name: "type",
+        type: {
+          name: null,
+          ofType: {
+            name: "ItemType",
+          },
+        },
+      },
+      {
+        name: "parentId",
+        type: {
+          name: "Int",
+          ofType: null,
+        },
+      },
+      {
+        name: "rootTopicId",
+        type: {
+          name: "Int",
+          ofType: null,
+        },
+      },
+      {
+        name: "authorId",
+        type: {
+          name: null,
+          ofType: {
+            name: "Int",
+          },
+        },
+      },
+      {
+        name: "position",
+        type: {
+          name: null,
+          ofType: {
+            name: "BigInt",
+          },
+        },
+      },
+      {
+        name: "createdAt",
+        type: {
+          name: null,
+          ofType: {
+            name: "Datetime",
+          },
+        },
+      },
+      {
+        name: "updatedAt",
+        type: {
+          name: null,
+          ofType: {
+            name: "Datetime",
+          },
+        },
+      },
+      {
+        name: "isExplicitlyArchived",
+        type: {
+          name: null,
+          ofType: {
+            name: "Boolean",
+          },
+        },
+      },
+      {
+        name: "archivedAt",
+        type: {
+          name: "Datetime",
+          ofType: null,
+        },
+      },
+      {
+        name: "subject",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
+        name: "description",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
+        name: "note",
+        type: {
+          name: "String",
+          ofType: null,
+        },
+      },
+      {
+        name: "priorityId",
+        type: {
+          name: "Int",
+          ofType: null,
+        },
+      },
+      {
+        name: "personByAuthorId",
+        type: {
+          name: "Person",
+          ofType: null,
+        },
+      },
+      {
+        name: "singleTableItemByParentId",
+        type: {
+          name: "SingleTableItem",
+          ofType: null,
+        },
+      },
+      {
+        name: "priorityByPriorityId",
+        type: {
+          name: "Priority",
+          ofType: null,
+        },
+      },
+      {
+        name: "singleTableItemsByParentId",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableItemsConnection",
+          },
+        },
+      },
+      {
+        name: "singleTableItemsByParentIdList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
+        name: "childTopicsByReturnType",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTablePostConnection",
+          },
+        },
+      },
+      {
+        name: "childTopicsByReturnTypeList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationsByChildId",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableItemRelationsConnection",
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationsByChildIdList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationsByParentId",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableItemRelationsConnection",
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationsByParentIdList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildId",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableItemRelationCompositePksConnection",
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationCompositePksByChildIdList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentId",
+        type: {
+          name: null,
+          ofType: {
+            name: "SingleTableItemRelationCompositePksConnection",
+          },
+        },
+      },
+      {
+        name: "singleTableItemRelationCompositePksByParentIdList",
+        type: {
+          name: null,
+          ofType: {
+            name: null,
+          },
+        },
+      },
+      {
+        name: "rootTopic",
+        type: {
+          name: "SingleTableTopic",
+          ofType: null,
+        },
+      },
+    ],
+  },
+  allSingleTableItems: {
+    nodes: [
+      {
+        id: 4,
+        type: "POST",
+        topics: {
+          nodes: [
+            {
+              id: 1,
+              title: "PostGraphile version 5",
+            },
+            {
+              id: 2,
+              title: "Temporary test topic",
+            },
+          ],
+        },
+        topicsList: [
+          {
+            id: 1,
+            title: "PostGraphile version 5",
+          },
+          {
+            id: 2,
+            title: "Temporary test topic",
+          },
+          {
+            id: 10,
+            title: "Notes",
+          },
+          {
+            id: 11,
+            title: "Other aims",
+          },
+        ],
+      },
+    ],
+  },
+}

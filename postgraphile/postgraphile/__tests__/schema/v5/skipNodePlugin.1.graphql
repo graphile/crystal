@@ -7480,7 +7480,7 @@ type Query {
   ): CFuncOutOutSetofConnection
   cFuncOutOutUnnamed: CFuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   cFuncOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7534,7 +7534,7 @@ type Query {
     offset: Int
   ): CFuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   cFuncReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7550,7 +7550,7 @@ type Query {
     offset: Int
   ): CFuncReturnsTableOneColConnection
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   cIntSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7705,7 +7705,7 @@ type Query {
   """Get a single `SimilarTable2`."""
   similarTable2ByRowId(rowId: Int!): SimilarTable2
 
-  """Reads and enables pagination through a set of `Int8`."""
+  """Reads and enables pagination through a set of `BigInt`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: Cursor

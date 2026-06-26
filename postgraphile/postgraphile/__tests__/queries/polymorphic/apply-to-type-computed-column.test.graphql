@@ -1,0 +1,44 @@
+## expect(errors).toBeFalsy()
+## expect(data.postType.fields.some((field) => field.name === "postOnly")).toBe(true)
+## expect(data.postType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(true)
+## expect(data.interfaceType.fields.some((field) => field.name === "postOnly")).toBe(false)
+## expect(data.interfaceType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(false)
+## expect(data.topicType.fields.some((field) => field.name === "postOnly")).toBe(false)
+## expect(data.topicType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(false)
+## expect(data.dividerType.fields.some((field) => field.name === "postOnly")).toBe(false)
+## expect(data.dividerType.fields.some((field) => field.name === "postAndDividerOnly")).toBe(true)
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  interfaceType: __type(name: "SingleTableItem") {
+    fields {
+      name
+    }
+  }
+  postType: __type(name: "SingleTablePost") {
+    fields {
+      name
+    }
+  }
+  topicType: __type(name: "SingleTableTopic") {
+    fields {
+      name
+    }
+  }
+  dividerType: __type(name: "SingleTableDivider") {
+    fields {
+      name
+    }
+  }
+  allSingleTableItems(condition: { id: 4 }) {
+    nodes {
+      id
+      type
+      ... on SingleTablePost {
+        postOnly
+        postAndDividerOnly
+      }
+    }
+  }
+}

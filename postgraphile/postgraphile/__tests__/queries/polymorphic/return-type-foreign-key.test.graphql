@@ -1,0 +1,51 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+#> mask: ["postType.fields", "topicType.fields"]
+
+{
+  postType: __type(name: "ForeignKeyReturnTypeTest") {
+    fields {
+      name
+      type {
+        name
+        ofType {
+          name
+          ofType {
+            name
+            ofType {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+  topicType: __type(name: "SingleTableTopic") {
+    fields {
+      name
+      type {
+        name
+        ofType {
+          name
+          ofType {
+            name
+            ofType {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+  allForeignKeyReturnTypeTests {
+    nodes {
+      id
+      topicByReturnType {
+        __typename
+        id
+        title
+      }
+    }
+  }
+}

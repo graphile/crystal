@@ -8527,7 +8527,7 @@ type Query {
   cCurrentUserId: Int
   cFuncOut: Int
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   cFuncOutSetof(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -8561,7 +8561,7 @@ type Query {
   ): QueryIntervalSetConnection
   queryTextArray: [String]
 
-  """Reads and enables pagination through a set of \`Int8\`."""
+  """Reads and enables pagination through a set of \`BigInt\`."""
   staticBigInteger(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -8577,7 +8577,7 @@ type Query {
   ): StaticBigIntegerConnection
   cFuncInOut(i: Int): Int
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   cFuncReturnsTableOneCol(
     i: Int
 
@@ -8651,7 +8651,7 @@ type Query {
   optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
   cFuncOutUnnamedOutOutUnnamed: CFuncOutUnnamedOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   cIntSetQuery(
     x: Int
     y: Int

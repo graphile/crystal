@@ -72,6 +72,35 @@ const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
   },
   executor: executor
 });
+const foreignKeyReturnTypeTestsIdentifier = sql.identifier("polymorphic", "foreign_key_return_type_tests");
+const foreignKeyReturnTypeTestsCodec = recordCodec({
+  name: "foreignKeyReturnTypeTests",
+  identifier: foreignKeyReturnTypeTestsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    topic_id: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "foreign_key_return_type_tests"
+    },
+    tags: {
+      __proto__: null,
+      behavior: "-insert -update -delete -filter -filterBy -order -orderBy"
+    }
+  },
+  executor: executor
+});
 const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities");
 const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
   name: "gcpApplicationFirstPartyVulnerabilities",
@@ -2229,6 +2258,28 @@ const aws_application_third_party_vulnerabilities_resourceOptionsConfig = {
   },
   uniques: aws_application_third_party_vulnerabilitiesUniques
 };
+const foreign_key_return_type_testsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const foreign_key_return_type_tests_resourceOptionsConfig = {
+  executor: executor,
+  name: "foreign_key_return_type_tests",
+  identifier: "main.polymorphic.foreign_key_return_type_tests",
+  from: foreignKeyReturnTypeTestsIdentifier,
+  codec: foreignKeyReturnTypeTestsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "foreign_key_return_type_tests"
+    },
+    tags: {
+      behavior: "-insert -update -delete -filter -filterBy -order -orderBy"
+    }
+  },
+  uniques: foreign_key_return_type_testsUniques
+};
 const gcp_application_first_party_vulnerabilitiesUniques = [{
   attributes: ["gcp_application_id", "first_party_vulnerability_id"],
   isPrimary: true
@@ -2668,6 +2719,8 @@ const gcp_applications_resourceOptionsConfig = {
   },
   uniques: gcp_applicationsUniques
 };
+const single_table_items_post_and_divider_onlyFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_post_and_divider_only");
+const single_table_items_post_onlyFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_post_only");
 const single_table_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_meaning_of_life");
 const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
 const relational_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "relational_items_meaning_of_life");
@@ -2697,6 +2750,7 @@ const single_table_items_resourceOptionsConfig = {
 };
 const all_single_tablesFunctionIdentifer = sql.identifier("polymorphic", "all_single_tables");
 const get_single_table_topic_by_idFunctionIdentifer = sql.identifier("polymorphic", "get_single_table_topic_by_id");
+const single_table_items_topicsFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_topics");
 const relational_itemsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -2737,6 +2791,7 @@ const registryConfig = {
     awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
     int4: TYPES.int,
     awsApplicationThirdPartyVulnerabilities: awsApplicationThirdPartyVulnerabilitiesCodec,
+    foreignKeyReturnTypeTests: foreignKeyReturnTypeTestsCodec,
     gcpApplicationFirstPartyVulnerabilities: gcpApplicationFirstPartyVulnerabilitiesCodec,
     gcpApplicationThirdPartyVulnerabilities: gcpApplicationThirdPartyVulnerabilitiesCodec,
     organizations: organizationsCodec,
@@ -3097,6 +3152,7 @@ const registryConfig = {
     __proto__: null,
     aws_application_first_party_vulnerabilities: aws_application_first_party_vulnerabilities_resourceOptionsConfig,
     aws_application_third_party_vulnerabilities: aws_application_third_party_vulnerabilities_resourceOptionsConfig,
+    foreign_key_return_type_tests: foreign_key_return_type_tests_resourceOptionsConfig,
     gcp_application_first_party_vulnerabilities: gcp_application_first_party_vulnerabilities_resourceOptionsConfig,
     gcp_application_third_party_vulnerabilities: gcp_application_third_party_vulnerabilities_resourceOptionsConfig,
     organizations: organizations_resourceOptionsConfig,
@@ -3212,6 +3268,56 @@ const registryConfig = {
     }),
     aws_applications: aws_applications_resourceOptionsConfig,
     gcp_applications: gcp_applications_resourceOptionsConfig,
+    single_table_items_post_and_divider_only: {
+      executor: executor,
+      name: "single_table_items_post_and_divider_only",
+      identifier: "main.polymorphic.single_table_items_post_and_divider_only(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_post_and_divider_onlyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        codec: singleTableItemsCodec
+      }],
+      codec: TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "single_table_items_post_and_divider_only"
+        },
+        tags: {
+          applyToType: ["SingleTablePost", "SingleTableDivider"]
+        }
+      },
+      isUnique: true
+    },
+    single_table_items_post_only: {
+      executor: executor,
+      name: "single_table_items_post_only",
+      identifier: "main.polymorphic.single_table_items_post_only(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_post_onlyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        codec: singleTableItemsCodec
+      }],
+      codec: TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "single_table_items_post_only"
+        },
+        tags: {
+          applyToType: "SingleTablePost"
+        }
+      },
+      isUnique: true
+    },
     single_table_items_meaning_of_life: {
       executor: executor,
       name: "single_table_items_meaning_of_life",
@@ -3324,6 +3430,29 @@ const registryConfig = {
           returnType: "SingleTableTopic"
         }
       }
+    }),
+    single_table_items_topics: PgResource.functionResourceOptions(single_table_items_resourceOptionsConfig, {
+      name: "single_table_items_topics",
+      identifier: "main.polymorphic.single_table_items_topics(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_topicsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        codec: singleTableItemsCodec
+      }],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "single_table_items_topics"
+        },
+        tags: {
+          returnType: "SingleTableTopic"
+        }
+      },
+      hasImplicitOrder: true
     }),
     relational_items: relational_items_resourceOptionsConfig,
     all_relational_items_fn: PgResource.functionResourceOptions(relational_items_resourceOptionsConfig, {
@@ -3483,6 +3612,24 @@ const registryConfig = {
         localAttributes: ["id"],
         remoteAttributes: ["first_party_vulnerability_id"],
         isReferencee: true
+      }
+    },
+    foreignKeyReturnTypeTests: {
+      __proto__: null,
+      topicByReturnType: {
+        localCodec: foreignKeyReturnTypeTestsCodec,
+        remoteResourceOptions: single_table_items_resourceOptionsConfig,
+        localAttributes: ["topic_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        extensions: {
+          tags: {
+            fieldName: "topicByReturnType",
+            returnType: "SingleTableTopic",
+            foreignFieldName: "childTopicsByReturnType",
+            foreignReturnType: "SingleTablePost"
+          }
+        }
       }
     },
     gcpApplicationFirstPartyVulnerabilities: {
@@ -3918,6 +4065,21 @@ const registryConfig = {
           }
         }
       },
+      childTopicsByReturnType: {
+        localCodec: singleTableItemsCodec,
+        remoteResourceOptions: foreign_key_return_type_tests_resourceOptionsConfig,
+        localAttributes: ["id"],
+        remoteAttributes: ["topic_id"],
+        isReferencee: true,
+        extensions: {
+          tags: {
+            fieldName: "topicByReturnType",
+            returnType: "SingleTableTopic",
+            foreignFieldName: "childTopicsByReturnType",
+            foreignReturnType: "SingleTablePost"
+          }
+        }
+      },
       singleTableItemRelationsByTheirChildId: {
         localCodec: singleTableItemsCodec,
         remoteResourceOptions: single_table_item_relations_resourceOptionsConfig,
@@ -4027,6 +4189,24 @@ const scalarComputed = (resource, $in, args) => {
 const single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
   return scalarComputed(resource_single_table_items_meaning_of_lifePgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
 };
+const resource_single_table_items_topicsPgResource = registry.pgResources["single_table_items_topics"];
+const single_table_items_topics_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
+  const details = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+  return resource_single_table_items_topicsPgResource.execute(details.selectArgs);
+};
+function SingleTableTopic_topicsPlan($parent, args, info) {
+  const $select = single_table_items_topics_getSelectPlanFromParentAndArgs($parent, args, info);
+  return connection($select);
+}
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 const SingleTableTopic_rowIdPlan = $record => {
   return $record.get("id");
 };
@@ -4065,20 +4245,11 @@ const SingleTableTopic_singleTableItemsByParentIdPlan = $record => {
   });
   return connection($records);
 };
-function applyFirstArg(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
 function applyLastArg(_, $connection, val) {
   $connection.setLast(val.getRaw());
 }
-function applyOffsetArg(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
 function applyBeforeArg(_, $connection, val) {
   $connection.setBefore(val.getRaw());
-}
-function applyAfterArg(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
 }
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -4091,6 +4262,13 @@ function applyOrderByArgToConnection(parent, $connection, value) {
   const $select = $connection.getSubplan();
   value.apply($select);
 }
+const otherSource_foreign_key_return_type_testsPgResource = registry.pgResources["foreign_key_return_type_tests"];
+const SingleTableTopic_childTopicsByReturnTypePlan = $record => {
+  const $records = otherSource_foreign_key_return_type_testsPgResource.find({
+    topic_id: $record.get("id")
+  });
+  return connection($records);
+};
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const SingleTableTopic_singleTableItemRelationsByChildIdPlan = $record => {
   const $records = otherSource_single_table_item_relationsPgResource.find({
@@ -5164,6 +5342,11 @@ const SingleTableItemRelationOrderBy_CHILD_ID_DESCApply = queryBuilder => {
     direction: "DESC"
   });
 };
+const resource_single_table_items_post_and_divider_onlyPgResource = registry.pgResources["single_table_items_post_and_divider_only"];
+const single_table_items_post_and_divider_only_getSelectPlanFromParentAndArgs = ($in, args, _info) => {
+  return scalarComputed(resource_single_table_items_post_and_divider_onlyPgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+};
+const resource_single_table_items_post_onlyPgResource = registry.pgResources["single_table_items_post_only"];
 const SingleTablePost_priorityIdPlan = $record => {
   return $record.get("priority_id");
 };
@@ -5728,6 +5911,21 @@ function getClientMutationIdForUpdateOrDeletePlan($mutation) {
 }
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem {
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -5776,6 +5974,27 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -5947,6 +6166,27 @@ interface SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -7924,6 +8164,34 @@ enum RelationalItemOrderBy {
   ARCHIVED_AT_DESC
 }
 
+"""A connection to a list of \`SingleTablePost\` values."""
+type SingleTablePostConnection {
+  """A list of \`SingleTablePost\` objects."""
+  nodes: [SingleTablePost]!
+
+  """
+  A list of edges which contains the \`SingleTablePost\` and cursor to aid in pagination.
+  """
+  edges: [SingleTablePostEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`SingleTableItem\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`SingleTablePost\` edge in the connection."""
+type SingleTablePostEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`SingleTablePost\` at the end of the edge."""
+  node: SingleTablePost
+}
+
 """A connection to a list of \`SingleTableItemRelation\` values."""
 type SingleTableItemRelationConnection {
   """A list of \`SingleTableItemRelation\` objects."""
@@ -8011,6 +8279,34 @@ type SingleTableItemRelationCompositePkEdge {
   node: SingleTableItemRelationCompositePk
 }
 
+"""A connection to a list of \`SingleTableTopic\` values."""
+type SingleTableTopicConnection {
+  """A list of \`SingleTableTopic\` objects."""
+  nodes: [SingleTableTopic]!
+
+  """
+  A list of edges which contains the \`SingleTableTopic\` and cursor to aid in pagination.
+  """
+  edges: [SingleTableTopicEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`SingleTableItem\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`SingleTableTopic\` edge in the connection."""
+type SingleTableTopicEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`SingleTableTopic\` at the end of the edge."""
+  node: SingleTableTopic
+}
+
 """
 A condition to be used against \`SingleTableItemRelation\` object types. All
 fields are tested for equality and combined with a logical ‘and.’
@@ -8063,7 +8359,24 @@ enum SingleTableItemRelationCompositePkOrderBy {
 }
 
 type SingleTablePost implements SingleTableItem {
+  postAndDividerOnly: String
+  postOnly: String
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -8118,6 +8431,27 @@ type SingleTablePost implements SingleTableItem {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -8284,7 +8618,23 @@ type Priority {
 }
 
 type SingleTableDivider implements SingleTableItem {
+  postAndDividerOnly: String
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -8334,6 +8684,27 @@ type SingleTableDivider implements SingleTableItem {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -8467,6 +8838,21 @@ type SingleTableDivider implements SingleTableItem {
 
 type SingleTableChecklist implements SingleTableItem {
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -8515,6 +8901,27 @@ type SingleTableChecklist implements SingleTableItem {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -8653,6 +9060,21 @@ type SingleTableChecklist implements SingleTableItem {
 
 type SingleTableChecklistItem implements SingleTableItem {
   meaningOfLife: Int
+
+  """Reads and enables pagination through a set of \`SingleTableTopic\`."""
+  topics(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTableTopicConnection!
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -8706,6 +9128,27 @@ type SingleTableChecklistItem implements SingleTableItem {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of \`SingleTablePost\`."""
+  childTopicsByReturnType(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): SingleTablePostConnection!
 
   """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
@@ -10170,6 +10613,9 @@ type Query {
   """Get a single \`AwsApplicationThirdPartyVulnerability\`."""
   awsApplicationThirdPartyVulnerabilityByAwsApplicationIdAndThirdPartyVulnerabilityId(awsApplicationId: Int!, thirdPartyVulnerabilityId: Int!): AwsApplicationThirdPartyVulnerability
 
+  """Get a single \`ForeignKeyReturnTypeTest\`."""
+  foreignKeyReturnTypeTestByRowId(rowId: Int!): ForeignKeyReturnTypeTest
+
   """Get a single \`GcpApplicationFirstPartyVulnerability\`."""
   gcpApplicationFirstPartyVulnerabilityByGcpApplicationIdAndFirstPartyVulnerabilityId(gcpApplicationId: Int!, firstPartyVulnerabilityId: Int!): GcpApplicationFirstPartyVulnerability
 
@@ -10424,6 +10870,29 @@ type Query {
     """
     orderBy: [AwsApplicationThirdPartyVulnerabilityOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationThirdPartyVulnerabilityConnection
+
+  """
+  Reads and enables pagination through a set of \`ForeignKeyReturnTypeTest\`.
+  """
+  allForeignKeyReturnTypeTests(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): ForeignKeyReturnTypeTestConnection
 
   """
   Reads and enables pagination through a set of \`GcpApplicationFirstPartyVulnerability\`.
@@ -11086,6 +11555,16 @@ type Query {
   ): CollectionConnection
 }
 
+type ForeignKeyReturnTypeTest {
+  rowId: Int!
+  topicId: Int
+
+  """
+  Reads a single \`SingleTableTopic\` that is related to this \`ForeignKeyReturnTypeTest\`.
+  """
+  topicByReturnType: SingleTableTopic
+}
+
 """A connection to a list of \`ZeroImplementation\` values."""
 type ZeroImplementationConnection {
   """A list of \`ZeroImplementation\` objects."""
@@ -11138,6 +11617,34 @@ enum ZeroImplementationOrderBy {
   ROW_ID_DESC
   NAME_ASC
   NAME_DESC
+}
+
+"""A connection to a list of \`ForeignKeyReturnTypeTest\` values."""
+type ForeignKeyReturnTypeTestConnection {
+  """A list of \`ForeignKeyReturnTypeTest\` objects."""
+  nodes: [ForeignKeyReturnTypeTest]!
+
+  """
+  A list of edges which contains the \`ForeignKeyReturnTypeTest\` and cursor to aid in pagination.
+  """
+  edges: [ForeignKeyReturnTypeTestEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`ForeignKeyReturnTypeTest\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`ForeignKeyReturnTypeTest\` edge in the connection."""
+type ForeignKeyReturnTypeTestEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`ForeignKeyReturnTypeTest\` at the end of the edge."""
+  node: ForeignKeyReturnTypeTest
 }
 
 """A connection to a list of \`Organization\` values."""
@@ -15301,6 +15808,18 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      allForeignKeyReturnTypeTests: {
+        plan() {
+          return connection(otherSource_foreign_key_return_type_testsPgResource.find());
+        },
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       allGcpApplicationFirstPartyVulnerabilities: {
         plan() {
           return connection(otherSource_gcp_application_first_party_vulnerabilitiesPgResource.find());
@@ -15659,6 +16178,13 @@ export const objects = {
         $rowId
       }) {
         return paths_0_resource_first_party_vulnerabilitiesPgResource.get({
+          id: $rowId
+        });
+      },
+      foreignKeyReturnTypeTestByRowId(_$root, {
+        $rowId
+      }) {
+        return otherSource_foreign_key_return_type_testsPgResource.get({
           id: $rowId
         });
       },
@@ -17179,6 +17705,33 @@ export const objects = {
     }
   },
   FirstPartyVulnerabilityConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount: totalCountConnectionPlan
+    }
+  },
+  ForeignKeyReturnTypeTest: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      rowId: SingleTableTopic_rowIdPlan,
+      topicByReturnType($record) {
+        return otherSource_single_table_itemsPgResource.get({
+          id: $record.get("topic_id")
+        });
+      },
+      topicId($record) {
+        return $record.get("topic_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of foreign_key_return_type_testsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_foreign_key_return_type_testsPgResource.get(spec);
+    }
+  },
+  ForeignKeyReturnTypeTestConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount: totalCountConnectionPlan
@@ -18889,6 +19442,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -18959,6 +19522,14 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
@@ -18967,6 +19538,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -19038,6 +19619,14 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
@@ -19046,11 +19635,22 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId: SingleTableTopic_personByAuthorIdPlan,
+      postAndDividerOnly: single_table_items_post_and_divider_only_getSelectPlanFromParentAndArgs,
       rootTopic: SingleTableTopic_rootTopicPlan,
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
       rowId: SingleTableTopic_rowIdPlan,
@@ -19115,6 +19715,14 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     }
   },
@@ -19174,11 +19782,25 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId: SingleTableTopic_personByAuthorIdPlan,
+      postAndDividerOnly: single_table_items_post_and_divider_only_getSelectPlanFromParentAndArgs,
+      postOnly($in, args, _info) {
+        return scalarComputed(resource_single_table_items_post_onlyPgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+      },
       priorityByPriorityId: SingleTablePost_priorityByPriorityIdPlan,
       priorityId: SingleTablePost_priorityIdPlan,
       rootTopic: SingleTableTopic_rootTopicPlan,
@@ -19248,7 +19870,21 @@ export const objects = {
       subject($record) {
         return $record.get("title");
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
+    }
+  },
+  SingleTablePostConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount: totalCountConnectionPlan
     }
   },
   SingleTableTopic: {
@@ -19256,6 +19892,16 @@ export const objects = {
     plans: {
       archivedAt: SingleTableTopic_archivedAtPlan,
       authorId: SingleTableTopic_authorIdPlan,
+      childTopicsByReturnType: {
+        plan: SingleTableTopic_childTopicsByReturnTypePlan,
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
+        }
+      },
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
       meaningOfLife: single_table_items_meaning_of_life_getSelectPlanFromParentAndArgs,
@@ -19325,7 +19971,21 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      topics: {
+        plan: SingleTableTopic_topicsPlan,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          after: applyAfterArg
+        }
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
+    }
+  },
+  SingleTableTopicConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount: totalCountConnectionPlan
     }
   },
   ThirdPartyVulnerability: {

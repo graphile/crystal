@@ -6462,7 +6462,7 @@ type Post implements N {
   computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   computedIntervalArray: [I]
 
-  """Reads and enables pagination through a set of `Interval`."""
+  """Reads and enables pagination through a set of `I`."""
   computedIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7568,7 +7568,7 @@ type Q implements N {
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7640,7 +7640,7 @@ type Q implements N {
     offset: Int
   ): FuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7671,7 +7671,7 @@ type Q implements N {
   """Get a single `Input`."""
   inputById(id: Int!): Input
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7816,7 +7816,7 @@ type Q implements N {
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [I]
 
-  """Reads and enables pagination through a set of `Interval`."""
+  """Reads and enables pagination through a set of `I`."""
   queryIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7900,7 +7900,7 @@ type Q implements N {
   """Get a single `SimilarTable2`."""
   similarTable2ById(id: Int!): SimilarTable2
 
-  """Reads and enables pagination through a set of `Int8`."""
+  """Reads and enables pagination through a set of `BigInt`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: Cursor

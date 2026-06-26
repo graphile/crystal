@@ -1440,13 +1440,61 @@ create function polymorphic.single_table_items_meaning_of_life(sti polymorphic.s
 select 42;
 $$ language sql stable;
 
+create function polymorphic.single_table_items_post_only(
+  sti polymorphic.single_table_items
+)
+returns text as $$
+select 'post only: ' || sti.title;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_post_only(
+  polymorphic.single_table_items
+) is '@applyToType SingleTablePost';
+
+create function polymorphic.single_table_items_post_and_divider_only(
+  sti polymorphic.single_table_items
+)
+returns text as $$
+select 'post or divider only: ' || sti.title;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_post_and_divider_only(
+  polymorphic.single_table_items
+) is $$
+  @applyToType SingleTablePost
+  @applyToType SingleTableDivider
+  $$;
+
 create function polymorphic.all_single_tables ()
 returns setof polymorphic.single_table_items as $$
   select * from polymorphic.single_table_items
 $$ language sql stable;
 
+create function polymorphic.single_table_items_topics(
+  sti polymorphic.single_table_items
+)
+returns setof polymorphic.single_table_items as $$
+  select *
+  from polymorphic.single_table_items
+  where type = 'TOPIC'
+  order by id asc;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_topics(
+  polymorphic.single_table_items
+) is '@returnType SingleTableTopic';
+
 comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
   @behavior -*
+  $$;
+
+create table polymorphic.foreign_key_return_type_tests (
+  id serial primary key,
+  topic_id int constraint foreign_key_return_type_tests_topic_fkey references polymorphic.single_table_items on delete cascade
+);
+comment on table polymorphic.foreign_key_return_type_tests is E'@behavior -insert -update -delete -filter -filterBy -order -orderBy';
+comment on constraint foreign_key_return_type_tests_topic_fkey on polymorphic.foreign_key_return_type_tests is $$
+  @fieldName topicByReturnType
+  @returnType SingleTableTopic
+  @foreignFieldName childTopicsByReturnType
+  @foreignReturnType SingleTablePost
   $$;
 
 create table polymorphic.single_table_item_relations (
