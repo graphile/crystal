@@ -39,12 +39,6 @@ export interface RequestTools {
    * Called when the request either completes or is aborted.
    */
   readonly abortSignal: AbortSignal;
-
-  /**
-   * If we're running inside GraphQL then we should not serialize scalars,
-   * otherwise we'll face the double-serialization problem.
-   */
-  insideGraphQL: false;
 }
 
 /** @internal */
