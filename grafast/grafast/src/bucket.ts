@@ -2,7 +2,7 @@
 
 import type { LayerPlan } from "./engine/LayerPlan.ts";
 import type { MetaByMetaKey } from "./engine/OperationPlan.ts";
-import type { ErrorBehavior, GrafastExecutionArgs, Step } from "./index.ts";
+import type { ErrorBehavior, Step } from "./index.ts";
 import type {
   ExecutionEntryFlags,
   ExecutionEventEmitter,
