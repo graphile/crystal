@@ -83,9 +83,9 @@ export type OutputPlanTypeObject = {
   typeName: string;
   deferLabel: string | undefined;
   /**
-   * If we've not traversed any fields yet, then the fields that are executed
-   * get the "root" behavior, wherein a `null` source does not prevent their
-   * execution.
+   * If we represent a defer then, though we aren't technically the root, we
+   * will have a non-null result (unless there are errors). We do not need to
+   * check the parent value (which could be null/undefined rootValue).
    */
   hasRootBehavior: boolean;
 };
