@@ -1500,6 +1500,10 @@ export class OperationPlan {
             mode: "object",
             deferLabel: deferred.label,
             typeName: objectType.name,
+            hasRootBehavior:
+              outputPlan.type.mode === "root" ||
+              (outputPlan.type.mode === "object" &&
+                outputPlan.type.hasRootBehavior),
           },
           // LOGGING: the location details should be tweaked to reference this
           // fragment
@@ -2428,6 +2432,7 @@ export class OperationPlan {
             mode: "object",
             deferLabel: undefined,
             typeName: nullableFieldType.name,
+            hasRootBehavior: false,
           },
           locationDetails,
         );
@@ -2781,6 +2786,7 @@ export class OperationPlan {
           mode: "object",
           deferLabel: undefined,
           typeName: type.name,
+          hasRootBehavior: false,
         },
         locationDetails,
       );

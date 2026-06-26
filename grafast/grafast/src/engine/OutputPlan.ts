@@ -82,6 +82,12 @@ export type OutputPlanTypeObject = {
   mode: "object";
   typeName: string;
   deferLabel: string | undefined;
+  /**
+   * If we represent a defer then, though we aren't technically the root, we
+   * will have a non-null result (unless there are errors). We do not need to
+   * check the parent value (which could be null/undefined rootValue).
+   */
+  hasRootBehavior: boolean;
 };
 export type OutputPlanTypePolymorphicObject = {
   /**
@@ -596,14 +602,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
-          type.mode === "root",
+          type.mode === "root" || type.hasRootBehavior,
           false,
         );
         this.executeString = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
-          type.mode === "root",
+          type.mode === "root" || type.hasRootBehavior,
           true,
         );
         break;
