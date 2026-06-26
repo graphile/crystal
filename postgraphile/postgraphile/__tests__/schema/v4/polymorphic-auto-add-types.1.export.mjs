@@ -1,5 +1,5 @@
 import { PgExecutor, PgResource, PgSelectSingleStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgFromExpression, pgSelectSingleFromRecord, pgUnionAll, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, ConstantStep, bakedInput, connection, context, get as get2, lambda, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, ConstantStep, bakedInput, connection, constant, context, get as get2, lambda, makeGrafastSchema, object, operationPlan, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const EMPTY_ARRAY = Object.freeze([]);
@@ -4807,6 +4807,7 @@ const Collection_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
   return typeNameFromType;
 })("Collection", spec_collections.polymorphism);
+const EMPTY_OBJECT = Object.freeze({});
 const argDetailsSimple_relational_topic_by_id_fn = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
@@ -11389,7 +11390,7 @@ export const objects = {
         });
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       relationalChecklistByChecklistItemId(_$root, {
         $checklistItemId
