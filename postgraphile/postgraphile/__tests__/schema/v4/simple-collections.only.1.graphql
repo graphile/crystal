@@ -420,6 +420,9 @@ type CreatePersonSecretPayload {
   query: Query
 }
 
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
 """A calendar date in YYYY-MM-DD format."""
 scalar Date
 
@@ -2422,6 +2425,47 @@ enum NullTestRecordsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A connection to a list of `Person` values."""
+type PeopleConnection {
+  """
+  A list of edges which contains the `Person` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge!]!
+
+  """A list of `Person` objects."""
+  nodes: [Person!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Person` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Person` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Person` at the end of the edge."""
+  node: Person!
+}
+
 """Methods to use when ordering `Person`."""
 enum PeopleOrderBy {
   ABOUT_ASC
@@ -3071,6 +3115,44 @@ type Query implements Node {
     orderBy: [PeopleOrderBy!]
   ): [Person!]
   tableSetQueryPlpgsqlList(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [Person!]
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQueryVolatile(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PeopleConnection
+  tableSetQueryVolatileList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
