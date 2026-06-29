@@ -3,22 +3,22 @@ import path from "node:path";
 
 import chalk from "chalk";
 import type { InflectorSource } from "graphile-build";
-import { buildInflection } from "graphile-build";
 import { resolvePreset } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
 import type { CompletionEntry } from "typescript";
 
 import type { ResolvedDefinition } from "../../../utils/typescriptVfs.ts";
-import {
-  accessKey,
-  configVfs,
-  prettyDocumentation,
-  prettyQuickInfoDisplayParts,
-  tightDisplayParts,
-  tightDocumentation,
-} from "../../../utils/typescriptVfs.ts";
 
 export async function main(options: { filename?: string; quiet?: boolean }) {
+  const {
+    accessKey,
+    configVfs,
+    prettyDocumentation,
+    prettyQuickInfoDisplayParts,
+    tightDisplayParts,
+    tightDocumentation,
+  } = await import("../../../utils/typescriptVfs.ts");
+  const { buildInflection } = await import("graphile-build");
   const { filename, quiet } = options;
 
   // Create inflection so we can determine where the inflectors came from
