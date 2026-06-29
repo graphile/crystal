@@ -1,4 +1,6 @@
 // @ts-check
+import { builtinModules } from "node:module";
+
 import babelParser from "@babel/eslint-parser";
 import js from "@eslint/js";
 import graphql from "@graphql-eslint/eslint-plugin";
@@ -18,6 +20,78 @@ import path from "path";
 import tseslint from "typescript-eslint";
 
 const __dirname = import.meta.dirname;
+const graphileCliRoot = "/utils/graphile/src";
+const stripAnsiPath = `${graphileCliRoot}/stripAnsi.ts`;
+const builtinModuleNames = new Set(
+  builtinModules.flatMap((name) =>
+    name.startsWith("node:") ? [name, name.slice("node:".length)] : [name],
+  ),
+);
+
+function normalizePath(filePath) {
+  return filePath.replaceAll(path.sep, "/");
+}
+
+function isGraphileCliFile(filename) {
+  const normalized = normalizePath(filename);
+  return normalized.includes(graphileCliRoot) && normalized.endsWith("/cli.ts");
+}
+
+function resolvesToAllowedRelativeImport(filename, source) {
+  if (!source.startsWith(".")) {
+    return false;
+  }
+  const resolved = normalizePath(path.resolve(path.dirname(filename), source));
+  return resolved.endsWith("/cli.ts") || resolved.endsWith(stripAnsiPath);
+}
+
+const graphileCliImportsRule = {
+  meta: {
+    type: "problem",
+    schema: [],
+  },
+  create(context) {
+    const filename = context.filename ?? context.getFilename();
+    if (!isGraphileCliFile(filename)) {
+      return {};
+    }
+
+    return {
+      ImportDeclaration(node) {
+        if (node.importKind === "type") {
+          return;
+        }
+        const source = node.source.value;
+        if (typeof source !== "string") {
+          context.report({
+            node,
+            message:
+              "Static imports in `utils/graphile/src/**/cli.ts` must use a string module specifier.",
+          });
+          return;
+        }
+        const allowed =
+          source === "graphile-config" ||
+          source.startsWith("graphile-config/") ||
+          source === "chalk" ||
+          source === "yargs" ||
+          source === "yargs/helpers" ||
+          builtinModuleNames.has(source) ||
+          resolvesToAllowedRelativeImport(filename, source);
+        if (!allowed) {
+          context.report({
+            node,
+            message:
+              "Static import '{{ source }}' is not allowed in `utils/graphile/src/**/cli.ts`; use `await import(...)` inside `run()` instead.",
+            data: {
+              source,
+            },
+          });
+        }
+      },
+    };
+  },
+};
 
 const globalIgnoresFromFile = fs
   .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
@@ -64,6 +138,11 @@ const config = {
   },
 
   plugins: {
+    crystal: {
+      rules: {
+        "graphile-cli-imports": graphileCliImportsRule,
+      },
+    },
     jest,
     "@graphql-eslint": graphql,
     tsdoc,
@@ -328,6 +407,13 @@ const oldConfig = {
       rules: {
         "import/no-unresolved": "off",
         "simple-import-sort/imports": "off",
+      },
+    },
+
+    {
+      files: ["utils/graphile/src/**/cli.ts"],
+      rules: {
+        "crystal/graphile-cli-imports": "error",
       },
     },
 
