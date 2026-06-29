@@ -82,7 +82,7 @@ const graphileCliImportsRule = {
           context.report({
             node,
             message:
-              "Static import '{{ source }}' is not allowed in `utils/graphile/src/**/cli.ts`; use `await import(...)` inside `run()` instead.",
+              "Static import '{{ source }}' is not allowed in `utils/graphile/src/**/cli.ts` because it might require software to be installed even when this command isn't invoked; use `await import(...)` inside `run()` instead.",
             data: {
               source,
             },
