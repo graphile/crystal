@@ -162,6 +162,15 @@ export class LoadOneStep<
       value instanceof Step ? value : constant(value),
     );
   }
+  setParams<
+    TParams extends {
+      [key in keyof TParams]?: TParams[key] | Step<TParams[key]>;
+    },
+  >(params: TParams): void {
+    for (const [key, val] of Object.entries(params)) {
+      this.setParam(key, val as any);
+    }
+  }
   addAttributes(attributes: Set<keyof TItem>): void {
     for (const attribute of attributes) {
       this.attributes.add(attribute);

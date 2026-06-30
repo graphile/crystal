@@ -508,6 +508,7 @@ const undefinedNode = makeExportedRawNode(`undefined`, "undefined");
 const MAX_SHORT_STRING_LENGTH = 200; // TODO: what should this be?
 
 const BACKSLASH_CODE = "\\".charCodeAt(0);
+const DOLLAR_CODE = "$".charCodeAt(0);
 const QUOTE_CODE = '"'.charCodeAt(0);
 
 /**
@@ -608,11 +609,12 @@ function substring(text: string, stringType: "'" | '"' | "`"): TE {
       const code = text.charCodeAt(i);
       if (
         code === BACKSLASH_CODE ||
+        code === DOLLAR_CODE ||
         code === stringTypeCode ||
         (code & 0xffe0) === 0 || // equivalent to `code <= 0x001f`
         (code & 0xc000) !== 0 // Not quite equivalent to `code >= 0xd800`, but good enough for our purposes
       ) {
-        // Backslash, quote, control character or surrogate
+        // Backslash, dollar, quote, control character or surrogate
         verbatim = false;
         break;
       }

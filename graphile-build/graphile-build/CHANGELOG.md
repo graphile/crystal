@@ -1,5 +1,26 @@
 # graphile-build
 
+## 5.0.2
+
+### Patch Changes
+
+- [#3049](https://github.com/graphile/crystal/pull/3049)
+  [`2d92a4b`](https://github.com/graphile/crystal/commit/2d92a4bc456cd087721e418ea3ac97e3af68ac38)
+  Thanks [@benjie](https://github.com/benjie)! - Minor error message fix.
+
+## 5.0.1
+
+### Patch Changes
+
+- [#3022](https://github.com/graphile/crystal/pull/3022)
+  [`385d557`](https://github.com/graphile/crystal/commit/385d557a464d8e273f8e5bd0688421d52fa0e8ea)
+  Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump lodash from
+  4.17.23 to 4.18.1
+
+- Updated dependencies
+  [[`b992c23`](https://github.com/graphile/crystal/commit/b992c23948b168859c9e911d87dba41557af3f10)]:
+  - tamedevil@0.1.1
+
 ## 5.0.0
 
 Identical to 5.0.0-rc.6.

@@ -33,12 +33,6 @@ export interface PayloadRoot {
   errorBehavior: ErrorBehavior;
 
   /**
-   * Serialization works differently if we're running inside GraphQL. (Namely:
-   * we don't serialize - that's GraphQL's job.)
-   */
-  insideGraphQL: false;
-
-  /**
    * The errors that have occurred; these are proper GraphQLErrors and will be
    * returned directly to clients so they must be complete.
    */

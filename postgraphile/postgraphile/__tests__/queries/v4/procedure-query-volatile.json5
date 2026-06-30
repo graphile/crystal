@@ -1,0 +1,23 @@
+{
+  tableSetQueryVolatile: {
+    edges: [
+      {
+        cursor: "WyJuYXR1cmFsIiwxXQ==",
+        node: {
+          name: "Budd Deey",
+        },
+      },
+    ],
+    pageInfo: {
+      startCursor: "WyJuYXR1cmFsIiwxXQ==",
+      endCursor: "WyJuYXR1cmFsIiwxXQ==",
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+  },
+  tableSetQueryVolatileList: [
+    {
+      name: "Budd Deey",
+    },
+  ],
+}

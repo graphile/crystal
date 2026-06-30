@@ -1,7 +1,8 @@
 import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, makeGrafastSchema, object, operationPlan, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -2368,6 +2369,7 @@ const mutation_out_table_setofFunctionIdentifer = sql.identifier("c", "mutation_
 const table_set_mutationFunctionIdentifer = sql.identifier("c", "table_set_mutation");
 const table_set_queryFunctionIdentifer = sql.identifier("c", "table_set_query");
 const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_query_plpgsql");
+const table_set_query_volatileFunctionIdentifer = sql.identifier("c", "table_set_query_volatile");
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
 const b_listsUniques = [{
@@ -6323,6 +6325,27 @@ const registry = makeRegistry({
       },
       hasImplicitOrder: true
     }),
+    c_table_set_query_volatile: PgResource.functionResourceOptions(c_person_resourceOptionsConfig, {
+      name: "c_table_set_query_volatile",
+      identifier: "main.c.table_set_query_volatile()",
+      from(...args) {
+        return sql`${table_set_query_volatileFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "table_set_query_volatile"
+        },
+        tags: {
+          behavior: "+sort +filter +queryField -mutationField +list +connection"
+        }
+      },
+      isMutation: true,
+      hasImplicitOrder: true
+    }),
     c_person_computed_first_arg_inout: PgResource.functionResourceOptions(c_person_resourceOptionsConfig, {
       name: "c_person_computed_first_arg_inout",
       identifier: "main.c.person_computed_first_arg_inout(c.person)",
@@ -7174,6 +7197,18 @@ const c_table_set_query_plpgsql_getSelectPlanFromParentAndArgs = ($root, args, _
   const selectArgs = makeArgs_c_person_computed_out(args);
   return resource_c_table_set_query_plpgsqlPgResource.execute(selectArgs);
 };
+const resource_c_table_set_query_volatilePgResource = registry.pgResources["c_table_set_query_volatile"];
+const c_table_set_query_volatile_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_c_person_computed_out(args);
+  return resource_c_table_set_query_volatilePgResource.execute(selectArgs);
+};
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
 const resource_b_type_function_connectionPgResource = registry.pgResources["b_type_function_connection"];
 const b_type_function_connection_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_c_person_computed_out(args);
@@ -7194,13 +7229,6 @@ function applyLastArg(_, $connection, val) {
 function applyBeforeArg(_, $connection, val) {
   $connection.setBefore(val.getRaw());
 }
-function qbWhereBuilder(qb) {
-  return qb.whereBuilder();
-}
-const applyConditionArgToConnection = (_condition, $connection, arg) => {
-  const $select = $connection.getSubplan();
-  arg.apply($select, qbWhereBuilder);
-};
 function applyOrderByArgToConnection(parent, $connection, value) {
   const $select = $connection.getSubplan();
   value.apply($select);
@@ -8098,8 +8126,9 @@ function getClientMutationIdForCustomMutationPlan($object) {
 const planCustomMutationPayloadResult = $object => {
   return $object.get("result");
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT2);
 }
 function applyClientMutationIdForCustomMutation(qb, val) {
   qb.setMeta("clientMutationId", val);
@@ -8796,6 +8825,38 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): CPersonConnection
+
+  """Reads and enables pagination through a set of \`CPerson\`."""
+  cTableSetQueryVolatile(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CPersonCondition
+  ): CPersonConnection
+  cTableSetQueryVolatileList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CPersonCondition
+  ): [CPerson]
 
   """Reads and enables pagination through a set of \`BType\`."""
   bTypeFunctionConnection(
@@ -11144,6 +11205,35 @@ type CFuncOutComplexSetofEdge {
   node: CFuncOutComplexSetofRecord
 }
 
+"""
+A condition to be used against \`CPerson\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input CPersonCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+
+  """Checks for equality with the object’s \`about\` field."""
+  about: String
+
+  """Checks for equality with the object’s \`email\` field."""
+  email: BEmail
+
+  """Checks for equality with the object’s \`lastLoginFromIp\` field."""
+  lastLoginFromIp: InternetAddress
+
+  """Checks for equality with the object’s \`lastLoginFromSubnet\` field."""
+  lastLoginFromSubnet: CidrAddress
+
+  """Checks for equality with the object’s \`userMac\` field."""
+  userMac: MacAddress
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+}
+
 """A connection to a list of \`NonUpdatableView\` values."""
 type NonUpdatableViewConnection {
   """A list of \`NonUpdatableView\` objects."""
@@ -12175,35 +12265,6 @@ enum CIssue756OrderBy {
   ROW_ID_DESC
   TS_ASC
   TS_DESC
-}
-
-"""
-A condition to be used against \`CPerson\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input CPersonCondition {
-  """Checks for equality with the object’s \`rowId\` field."""
-  rowId: Int
-
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
-
-  """Checks for equality with the object’s \`about\` field."""
-  about: String
-
-  """Checks for equality with the object’s \`email\` field."""
-  email: BEmail
-
-  """Checks for equality with the object’s \`lastLoginFromIp\` field."""
-  lastLoginFromIp: InternetAddress
-
-  """Checks for equality with the object’s \`lastLoginFromSubnet\` field."""
-  lastLoginFromSubnet: CidrAddress
-
-  """Checks for equality with the object’s \`userMac\` field."""
-  userMac: MacAddress
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
 }
 
 """Methods to use when ordering \`CPerson\`."""
@@ -18366,6 +18427,28 @@ export const objects = {
           after: applyAfterArg
         }
       },
+      cTableSetQueryVolatile: {
+        plan($parent, args, info) {
+          const $select = c_table_set_query_volatile_getSelectPlanFromParentAndArgs($parent, args, info);
+          return connection($select);
+        },
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection
+        }
+      },
+      cTableSetQueryVolatileList: {
+        plan: c_table_set_query_volatile_getSelectPlanFromParentAndArgs,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          }
+        }
+      },
       cTypesQuery($root, args, _info) {
         const selectArgs = makeArgs_c_types_query(args);
         return resource_c_types_queryPgResource.execute(selectArgs);
@@ -18426,7 +18509,7 @@ export const objects = {
         });
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       queryCompoundTypeArray($root, args, _info) {
         const selectArgs = makeArgs_query_compound_type_array(args);

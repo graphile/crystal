@@ -3,7 +3,9 @@ import type {
   ConnectionOptimizedStep,
   ExecutionDetails,
 } from "../index.ts";
+import { currentFieldStreamDetails } from "../index.ts";
 import type {
+  ExecutionDetailsStream,
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
@@ -77,7 +79,7 @@ export function loadManyCallback<
  * LoadManyLoader.
  */
 export function loadManyLoader<
-  const TLookup extends Multistep,
+  const TSpec,
   TItem,
   TData extends Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>> = Maybe<
     ReadonlyArrayOrAsyncIterable<Maybe<TItem>>
@@ -85,8 +87,8 @@ export function loadManyLoader<
   TParams extends Record<string, any> = Record<string, any>,
   const TShared extends Multistep = never,
 >(
-  load: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
-): LoadManyLoader<TLookup, TItem, TData, TParams, TShared> {
+  load: LoadManyLoader<TSpec, TItem, TData, TParams, TShared>,
+): LoadManyLoader<TSpec, TItem, TData, TParams, TShared> {
   return load;
 }
 
@@ -136,6 +138,12 @@ export class LoadManyStep<
   >;
   paginationSupport?: PaginationFeatures;
   private name: Maybe<string>;
+
+  /** Direct field stream */
+  private _fieldMightStream: boolean;
+  /** Maybe its a connection with a `nodes @stream` or `edges @stream`. Null = unknown */
+  private _fieldMightStreamViaConnection: boolean | null = null;
+
   constructor(
     lookup: TLookup,
     loader: LoadManyLoader<
@@ -147,8 +155,8 @@ export class LoadManyStep<
     >,
   ) {
     super();
-    // TODO: prompt users to disable this if they don't need it.
-    this.cloneStreams = true;
+    const $streamDetails = currentFieldStreamDetails();
+    this._fieldMightStream = $streamDetails != null && $streamDetails !== true;
 
     const { load, shared, ioEquivalence, paginationSupport } = loader;
     this.name = loader.name || load.displayName || load.name;
@@ -174,6 +182,25 @@ export class LoadManyStep<
       this.paginationSupport = paginationSupport;
     }
   }
+
+  addStreamDetails?(
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+  ) {
+    if ($streamDetails === null) {
+      this._fieldMightStreamViaConnection = false;
+    } else {
+      if (this._fieldMightStreamViaConnection === null) {
+        this._fieldMightStreamViaConnection = true;
+      }
+    }
+  }
+
+  private mightHaveStream() {
+    return (
+      this._fieldMightStream || this._fieldMightStreamViaConnection || false
+    );
+  }
+
   toStringMeta() {
     return this.name ?? null;
   }
@@ -203,6 +230,15 @@ export class LoadManyStep<
       value instanceof Step ? value : constant(value),
     );
   }
+  setParams<
+    TParams extends {
+      [key in keyof TParams]?: TParams[key] | Step<Maybe<TParams[key]>>;
+    },
+  >(params: TParams): void {
+    for (const [key, val] of Object.entries(params)) {
+      this.setParam(key, val as any);
+    }
+  }
   addAttributes(attributes: Set<keyof TItem>): void {
     for (const attribute of attributes) {
       this.attributes.add(attribute);
@@ -230,6 +266,15 @@ export class LoadManyStep<
       (depId) => this.getDepOptions(depId).step.id,
     ));
   }
+
+  optimize() {
+    if (this.mightHaveStream()) {
+      // TODO: prompt users to disable this if they don't need it.
+      this.cloneStreams = true;
+    }
+    return this;
+  }
+
   finalize() {
     // Find all steps of this type that use the same callback and have
     // equivalent params and then match their list of attributes together.

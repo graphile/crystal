@@ -42,7 +42,7 @@ import { establishOperationPlan } from "./establishOperationPlan.ts";
 import type {
   ErrorBehavior,
   EstablishOperationPlanEvent,
-  GrafastExecutionArgs,
+  GrafastInternalExecutionArgs,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
@@ -265,7 +265,6 @@ function outputBucket(
   const operationPlan = rootBucket.layerPlan.operationPlan;
   const root: PayloadRoot = {
     errorBehavior: requestContext.args.onError ?? "PROPAGATE",
-    insideGraphQL: false,
     errors: [],
     queue: [],
     streams: [],
@@ -318,12 +317,11 @@ function outputBucket(
   }
 }
 
+/** @internal */
 function executePreemptive(
-  args: GrafastExecutionArgs,
+  args: GrafastInternalExecutionArgs,
   operationPlan: OperationPlan,
   variableValues: any,
-  context: any,
-  rootValue: any,
   onError: ErrorBehavior,
   outputDataAsString: boolean,
   executionTimeout: number | null,
@@ -342,8 +340,14 @@ function executePreemptive(
     operationPlan.variableValuesStep.id,
     unaryExecutionValue(variableValues),
   );
-  store.set(operationPlan.contextStep.id, unaryExecutionValue(context));
-  store.set(operationPlan.rootValueStep.id, unaryExecutionValue(rootValue));
+  store.set(
+    operationPlan.contextStep.id,
+    unaryExecutionValue(args.contextValue),
+  );
+  store.set(
+    operationPlan.rootValueStep.id,
+    unaryExecutionValue(args.rootValue),
+  );
 
   const rootBucket = newBucket(null, {
     layerPlan: operationPlan.rootLayerPlan,
@@ -363,9 +367,8 @@ function executePreemptive(
     startTime,
     stopTime,
     // toSerialize: [],
-    eventEmitter: rootValue?.[$$eventEmitter],
+    eventEmitter: args[$$eventEmitter],
     abortSignal,
-    insideGraphQL: false,
   };
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
@@ -421,7 +424,7 @@ function executePreemptive(
       return finalize(
         result,
         ctx,
-        index === 0 ? (rootValue[$$extensions] ?? undefined) : undefined,
+        index === 0 ? (args[$$extensions] ?? undefined) : undefined,
         outputDataAsString,
       );
     }
@@ -448,15 +451,14 @@ function executePreemptive(
       releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
       const errors = [
-        new GraphQLError(
-          bucketRootValue.message,
-          operationPlan.rootOutputPlan.locationDetails.node, // node
-          undefined, // source
-          null, // positions
-          null, // path
-          bucketRootValue, // originalError
-          null, // extensions
-        ),
+        new GraphQLError(bucketRootValue.message, {
+          nodes: operationPlan.rootOutputPlan.locationDetails.node,
+          source: undefined,
+          positions: null,
+          path: null,
+          originalError: bucketRootValue,
+          extensions: null,
+        }),
       ];
       const payload = Object.create(null) as ExecutionResult;
       payload.errors = errors;
@@ -561,12 +563,7 @@ function executePreemptive(
       rootBucket.store.get(operationPlan.variableValuesStep.id)!.at(0),
       outputDataAsString,
     );
-    return finalize(
-      result,
-      ctx,
-      rootValue[$$extensions] ?? undefined,
-      outputDataAsString,
-    );
+    return finalize(result, ctx, args[$$extensions], outputDataAsString);
   }
 
   if (isPromiseLike(bucketPromise)) {
@@ -593,7 +590,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
  * @internal
  */
 export function grafastPrepare(
-  args: GrafastExecutionArgs,
+  args: GrafastInternalExecutionArgs,
   options: GrafastOperationOptions,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
@@ -601,7 +598,7 @@ export function grafastPrepare(
   const {
     schema,
     contextValue: context,
-    rootValue = Object.create(null),
+    rootValue,
     // operationName,
     // document,
     middleware,
@@ -612,7 +609,7 @@ export function grafastPrepare(
   if (Array.isArray(exeContext) || "length" in exeContext) {
     return Object.assign(Object.create(bypassGraphQLObj), {
       errors: exeContext,
-      extensions: rootValue[$$extensions],
+      extensions: args[$$extensions],
     });
   }
 
@@ -654,15 +651,10 @@ export function grafastPrepare(
     const graphqlError =
       error instanceof GraphQLError
         ? error
-        : new GraphQLError(
-            error.message,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            error,
-            error.extensions ?? null,
-          );
+        : new GraphQLError(error.message, {
+            originalError: error,
+            extensions: error.extensions ?? null,
+          });
     return { errors: [graphqlError] };
   }
 
@@ -674,7 +666,7 @@ export function grafastPrepare(
     if (operationPlan[$$contextPlanCache] == null) {
       operationPlan[$$contextPlanCache] = operationPlan.generatePlanJSON();
     }
-    rootValue[$$extensions]?.explain?.operations.push({
+    args[$$extensions]?.explain?.operations.push({
       type: "plan",
       title: "Plan",
       plan: operationPlan[$$contextPlanCache],
@@ -688,8 +680,6 @@ export function grafastPrepare(
       args,
       operationPlan,
       variableValues,
-      context,
-      rootValue,
       onError,
       options.outputDataAsString ?? false,
       executionTimeout,

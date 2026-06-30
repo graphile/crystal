@@ -1,4 +1,4 @@
-import { Modifier } from "grafast";
+import { inspect, Modifier } from "grafast";
 import type { SQL } from "pg-sql2";
 import { $$toSQL, sql } from "pg-sql2";
 
@@ -39,12 +39,24 @@ type PgConditionModeExists = {
   equals?: boolean;
 };
 
+type PgConditionModeRecordExpression = {
+  mode: "RECORD_EXPRESSION";
+  /**
+   * BEWARE: this expression may be _repeated_ multiple times in the generated
+   * query, so it should be inexpensive and have no side effects. Intended for
+   * use with columns of a composite type, so expression should typically be
+   * wrapped in parenthesis, enabling `(my_table.my_column).my_attribute`
+   */
+  expression: SQL;
+};
+
 export type PgConditionResolvedMode =
   | { mode: "PASS_THRU" }
   | { mode: "AND" }
   | { mode: "OR" }
   | { mode: "NOT" }
-  | PgConditionModeExists;
+  | PgConditionModeExists
+  | PgConditionModeRecordExpression;
 
 export type PgConditionMode =
   | "PASS_THRU"
@@ -52,6 +64,30 @@ export type PgConditionMode =
   | "OR"
   | "NOT"
   | PgConditionResolvedMode;
+
+interface PgConditionOptions {
+  /** @defaultValue `false` */
+  isHaving?: boolean;
+  /** @defaultValue `"PASS_THRU"` */
+  mode?: PgConditionMode;
+}
+
+function resolveOptions(
+  isHavingOrOptions: PgConditionOptions | boolean | undefined,
+  maybeMode: PgConditionMode | undefined,
+): PgConditionOptions {
+  if (typeof isHavingOrOptions === "boolean") {
+    return { isHaving: isHavingOrOptions, mode: maybeMode };
+  } else if (isHavingOrOptions == null) {
+    return { mode: maybeMode };
+  } else if (maybeMode !== undefined) {
+    throw new Error(
+      `Invalid call signature to PgCondition constructor, use \`new PgCondition(parent, options)\``,
+    );
+  } else {
+    return isHavingOrOptions;
+  }
+}
 
 export class PgCondition<
     TParent extends PgConditionCapableParent = PgConditionCapableParent,
@@ -66,6 +102,7 @@ export class PgCondition<
 
   private conditions: PgWhereConditionSpec<any>[] = [];
   private havingConditions: PgHavingConditionSpec<any>[] = [];
+  private minimumConditionsLength = 0;
 
   public readonly alias: SQL;
 
@@ -73,12 +110,16 @@ export class PgCondition<
   public readonly resolvedMode: PgConditionResolvedMode;
   private isHaving: boolean;
 
+  constructor(parent: TParent, options: PgConditionOptions);
+  constructor(parent: TParent, isHaving?: boolean, mode?: PgConditionMode);
   constructor(
     parent: TParent,
-    isHaving = false,
-    mode: PgConditionMode = "PASS_THRU",
+    isHavingOrOptions?: PgConditionOptions | boolean,
+    maybeMode?: PgConditionMode,
   ) {
     super(parent);
+    const options = resolveOptions(isHavingOrOptions, maybeMode);
+    const { isHaving = false, mode = "PASS_THRU" } = options;
     this.isHaving = isHaving;
     if (typeof mode === "string") {
       this.resolvedMode = { mode };
@@ -99,7 +140,26 @@ export class PgCondition<
         );
         break;
       }
+      case "RECORD_EXPRESSION": {
+        this.alias = this.resolvedMode.expression;
+        break;
+      }
+      default: {
+        const never: never = this.resolvedMode;
+        throw new Error(`Unexpected mode ${inspect(never)}`);
+      }
     }
+  }
+
+  /**
+   * Indicates that additional conditions must be added for this filter to take
+   * place. Exists specifically so that postgraphile-plugin-connection-filter
+   * can return a condition for children to use, but then not actually add that
+   * condition if no children add any requirements to it.
+   */
+  public ignoreUnlessAmended() {
+    this.minimumConditionsLength =
+      (this.isHaving ? this.havingConditions : this.conditions).length + 1;
   }
 
   /**
@@ -190,6 +250,9 @@ where ${sqlCondition}`})`;
           return sqlExists;
         }
       }
+      case "RECORD_EXPRESSION": {
+        return sqlCondition;
+      }
       default: {
         const never: never = this.resolvedMode;
         throw new Error(`Unhandled mode: ${(never as any).mode}`);
@@ -199,6 +262,10 @@ where ${sqlCondition}`})`;
 
   apply(): void {
     if (this.isHaving) {
+      if (this.havingConditions.length < this.minimumConditionsLength) {
+        // Do nothing
+        return;
+      }
       if (!this.parent.having) {
         throw new Error(`${this.parent} doesn't support 'having'`);
       }
@@ -213,6 +280,10 @@ where ${sqlCondition}`})`;
         }
       }
     } else {
+      if (this.conditions.length < this.minimumConditionsLength) {
+        // Do nothing
+        return;
+      }
       if (this.resolvedMode.mode === "PASS_THRU") {
         this.conditions.forEach((condition) => {
           this.parent.where(condition);

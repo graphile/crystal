@@ -82,6 +82,12 @@ export type OutputPlanTypeObject = {
   mode: "object";
   typeName: string;
   deferLabel: string | undefined;
+  /**
+   * If we represent a defer then, though we aren't technically the root, we
+   * will have a non-null result (unless there are errors). We do not need to
+   * check the parent value (which could be null/undefined rootValue).
+   */
+  hasRootBehavior: boolean;
 };
 export type OutputPlanTypePolymorphicObject = {
   /**
@@ -596,14 +602,14 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
-          type.mode === "root",
+          type.mode === "root" || type.hasRootBehavior,
           false,
         );
         this.executeString = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
-          type.mode === "root",
+          type.mode === "root" || type.hasRootBehavior,
           true,
         );
         break;
@@ -630,26 +636,19 @@ export function coerceError(
     if (error.path !== undefined) {
       return error;
     } else {
-      return new GraphQLError(
-        error.message,
-        locationDetails.node,
-        null,
-        null,
+      return new GraphQLError(error.message, {
+        nodes: locationDetails.node,
         path,
-        error.originalError ?? error,
-        error.extensions,
-      );
+        originalError: error.originalError ?? error,
+        extensions: error.extensions,
+      });
     }
   } else {
-    return new GraphQLError(
-      error?.message ?? String(error),
-      locationDetails.node,
-      null,
-      null,
+    return new GraphQLError(error?.message ?? String(error), {
+      nodes: locationDetails.node,
       path,
-      error,
-      null,
-    );
+      originalError: error,
+    });
   }
 }
 
@@ -661,22 +660,12 @@ export function nonNullError(
   if (!parentTypeName || !fieldName) {
     return new GraphQLError(
       `GrafastInternalError<a3706bba-4f88-4643-8a47-2fe2eaaadbea>: null bubbled to root`,
-      node,
-      null,
-      null,
-      path,
-      null,
-      null,
+      { nodes: node, path },
     );
   }
   return new GraphQLError(
     `Cannot return null for non-nullable field ${parentTypeName}.${fieldName}.`,
-    node,
-    null,
-    null,
-    path,
-    null,
-    null,
+    { nodes: node, path },
   );
 }
 
@@ -1028,16 +1017,6 @@ const nullExecutorString = makeExecutor({
   asString: true,
 });
 
-/* This is what leafExecutor should use if insideGraphQL (which isn't currently
-   * supported)
-  `\
-    if (root.insideGraphQL) {
-      // Don't serialize to avoid the double serialization problem
-      return bucketRootValue;
-    } else {
-      return this.type.graphqlType.serialize(bucketRootValue);
-    }
-  ` */
 const leafExecutor = makeExecutor<false, OutputPlanTypeLeaf>({
   inner(bucketRootValue) {
     return this.type.graphqlType.serialize(bucketRootValue) as JSONValue;
@@ -1427,15 +1406,10 @@ function introspect<TAsString extends boolean>(
     console.error("INTROSPECTION FAILED!");
     console.error(graphqlResult);
     const { node } = locationDetails;
-    throw new GraphQLError(
-      "INTROSPECTION FAILED!",
-      node,
-      null,
-      null,
-      mutablePath.slice(1),
-      null,
-      null,
-    );
+    throw new GraphQLError("INTROSPECTION FAILED!", {
+      nodes: node,
+      path: mutablePath.slice(1),
+    });
   }
   const result = graphqlResult.data!.a as JSONValue;
   introspectionCacheByVariableValues.set(canonical, result);

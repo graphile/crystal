@@ -74,6 +74,15 @@ export class LoadedRecordStep<
       value instanceof Step ? value : constant(value),
     );
   }
+  setParams<
+    TParams extends {
+      [key in keyof TParams]?: TParams[key] | Step<TParams[key]>;
+    },
+  >(params: TParams): void {
+    for (const [key, val] of Object.entries(params)) {
+      this.setParam(key, val as any);
+    }
+  }
   deduplicate(peers: LoadedRecordStep<any, any>[]) {
     return peers.filter(
       (p) =>
