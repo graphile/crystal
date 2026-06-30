@@ -1,5 +1,17 @@
 # tamedevil
 
+## 0.1.1
+
+### Patch Changes
+
+- [`b992c23`](https://github.com/graphile/crystal/commit/b992c23948b168859c9e911d87dba41557af3f10)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a security issue in
+  `te.substring` when handling specially crafted input. We are not aware of any
+  Graphile software being affected by this issue, though other uses of
+  `tamedevil` may be impacted. We recommend upgrading as a precaution.
+
+  Thanks to @aslein1413-sys for responsibly reporting this issue.
+
 ## 0.1.0
 
 Identical to 0.1.0-rc.6.

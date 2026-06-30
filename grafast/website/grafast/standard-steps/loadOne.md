@@ -181,7 +181,7 @@ they need multiple resources, you may pass them as a tuple or object of steps:
 
 ```ts
 const $organizationId = $org.get("id");
-const $membershipNumber = fieldArgs.get("membershipNumber");
+const $membershipNumber = fieldArgs.getRaw("membershipNumber");
 const $person = loadOne(
   { org: $organizationId, num: $membershipNumber },
   getPersonByOrganizationIdAndMembershipNumber,

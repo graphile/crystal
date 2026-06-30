@@ -1,7 +1,8 @@
 import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -1704,6 +1706,7 @@ const mutation_out_table_setofFunctionIdentifer = sql.identifier("c", "mutation_
 const table_set_mutationFunctionIdentifer = sql.identifier("c", "table_set_mutation");
 const table_set_queryFunctionIdentifer = sql.identifier("c", "table_set_query");
 const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_query_plpgsql");
+const table_set_query_volatileFunctionIdentifer = sql.identifier("c", "table_set_query_volatile");
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
 const person_type_function_connectionFunctionIdentifer = sql.identifier("c", "person_type_function_connection");
@@ -3991,6 +3994,27 @@ const registry = makeRegistry({
       },
       hasImplicitOrder: true
     }),
+    table_set_query_volatile: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
+      name: "table_set_query_volatile",
+      identifier: "main.c.table_set_query_volatile()",
+      from(...args) {
+        return sql`${table_set_query_volatileFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "table_set_query_volatile"
+        },
+        tags: {
+          behavior: "+sort +filter +queryField -mutationField +list +connection"
+        }
+      },
+      isMutation: true,
+      hasImplicitOrder: true
+    }),
     person_computed_first_arg_inout: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "person_computed_first_arg_inout",
       identifier: "main.c.person_computed_first_arg_inout(c.person)",
@@ -4462,6 +4486,11 @@ const resource_table_set_query_plpgsqlPgResource = registry.pgResources["table_s
 const table_set_query_plpgsql_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_person_computed_out(args);
   return resource_table_set_query_plpgsqlPgResource.execute(selectArgs);
+};
+const resource_table_set_query_volatilePgResource = registry.pgResources["table_set_query_volatile"];
+const table_set_query_volatile_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_person_computed_out(args);
+  return resource_table_set_query_volatilePgResource.execute(selectArgs);
 };
 const makeTableNodeIdHandler = ({
   typeName,
@@ -5200,8 +5229,9 @@ function getClientMutationIdForCustomMutationPlan($object) {
 const planCustomMutationPayloadResult = $object => {
   return $object.get("result");
 };
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 function applyClientMutationIdForCustomMutation(qb, val) {
   qb.setMeta("clientMutationId", val);
@@ -5750,6 +5780,44 @@ type Query implements Node {
 
     """Skip the first \`n\` values."""
     offset: Int
+  ): [Person!]
+
+  """Reads and enables pagination through a set of \`Person\`."""
+  tableSetQueryVolatile(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+  ): PeopleConnection
+  tableSetQueryVolatileList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
   ): [Person!]
 
   """Reads a single \`MyTable\` using its globally unique \`ID\`."""
@@ -10705,7 +10773,7 @@ export const objects = {
         });
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       queryOutputTwoRows($root, args, _info) {
         const selectArgs = makeArgs_query_output_two_rows(args);
@@ -10771,6 +10839,28 @@ export const objects = {
         args: {
           first: applyFirstArg,
           offset: applyOffsetArg
+        }
+      },
+      tableSetQueryVolatile: {
+        plan($parent, args, info) {
+          const $select = table_set_query_volatile_getSelectPlanFromParentAndArgs($parent, args, info);
+          return connection($select);
+        },
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection
+        }
+      },
+      tableSetQueryVolatileList: {
+        plan: table_set_query_volatile_getSelectPlanFromParentAndArgs,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition: applyConditionArg
         }
       },
       typesQuery($root, args, _info) {

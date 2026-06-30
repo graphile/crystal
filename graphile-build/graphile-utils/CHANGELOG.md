@@ -1,5 +1,14 @@
 # graphile-utils
 
+## 5.0.1
+
+### Patch Changes
+
+- [#2973](https://github.com/graphile/crystal/pull/2973)
+  [`dda2e78`](https://github.com/graphile/crystal/commit/dda2e7897e69681b326baed5e15d047b6393e314)
+  Thanks [@benjie](https://github.com/benjie)! - Restore `sql.TRUE`, `sql.FALSE`
+  and `sql.NULL` from v4 of pg-sql2.
+
 ## 5.0.0
 
 Identical to 5.0.0-rc.8.

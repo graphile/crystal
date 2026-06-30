@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "5.0.0",
+  "version": "5.0.3",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -258,7 +258,7 @@
   "bugs": {
     "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://graphile.org/graphile-engine/",
+  "homepage": "https://postgraphile.org/",
   "dependencies": {
     "@dataplan/json": "workspace:^",
     "@dataplan/pg": "workspace:^",

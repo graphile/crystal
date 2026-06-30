@@ -2,6 +2,10 @@ name: Posttest
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   star_and_build_websites:
     name: star/build website posttests

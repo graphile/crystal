@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { rootValue } from "grafast";
+import { constant } from "grafast";
 import type { GraphQLOutputType } from "graphql";
 
 import { EXPORTABLE } from "../utils.ts";
@@ -18,12 +18,14 @@ declare global {
   }
 }
 
+const EMPTY_OBJECT = Object.freeze({});
+
 const queryPlan = EXPORTABLE(
-  (rootValue) =>
+  (EMPTY_OBJECT, constant) =>
     function plan() {
-      return rootValue();
+      return constant(EMPTY_OBJECT);
     },
-  [rootValue],
+  [EMPTY_OBJECT, constant],
   "queryPlan",
 );
 

@@ -82,7 +82,6 @@ requirements:
 - for every request:
   - `context` must be an object (anything suitable to be used as the key to a
     `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
-  - `rootValue` must be an object or `null`/`undefined`
 - resolver limitations:
   - only explicit field resolvers (baked into the GraphQL schema) are supported,
     i.e. resolvers passed via `rootValue` are not (currently) supported

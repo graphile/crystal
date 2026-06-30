@@ -39,6 +39,16 @@ export {
   extendSchema,
   makeExtendSchemaPlugin,
 } from "./makeExtendSchemaPlugin.ts";
+export type {
+  JSONPgSmartTags,
+  PgSmartTagFilterFunction,
+  PgSmartTagRule,
+  PgSmartTagTags,
+  SubscribeToJSONPgSmartTagsUpdatesCallback,
+  SubscribeToPgSmartTagUpdatesCallback,
+  UpdateJSONPgSmartTagsCallback,
+  UpdatePgSmartTagRulesCallback,
+} from "./makePgSmartTagsPlugin.ts";
 export {
   jsonPgSmartTags,
   makeJSONPgSmartTagsPlugin,

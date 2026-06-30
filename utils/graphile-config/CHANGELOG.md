@@ -1,5 +1,14 @@
 # graphile-config
 
+## 1.0.1
+
+### Patch Changes
+
+- [#2998](https://github.com/graphile/crystal/pull/2998)
+  [`92106c3`](https://github.com/graphile/crystal/commit/92106c3b8e8ef34e68c52503dc22d13d30d85a9e)
+  Thanks [@benjie](https://github.com/benjie)! - Move some type dependencies to
+  dev dependencies
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.6.

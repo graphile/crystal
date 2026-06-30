@@ -1,7 +1,8 @@
 import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, trap } from "grafast";
 import { GraphQLError, GraphQLString, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -3254,6 +3256,7 @@ const mutation_out_table_setofFunctionIdentifer = sql.identifier("c", "mutation_
 const table_set_mutationFunctionIdentifer = sql.identifier("c", "table_set_mutation");
 const table_set_queryFunctionIdentifer = sql.identifier("c", "table_set_query");
 const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_query_plpgsql");
+const table_set_query_volatileFunctionIdentifer = sql.identifier("c", "table_set_query_volatile");
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
 const types_resourceOptionsConfig = {
@@ -7456,6 +7459,28 @@ const registry = makeRegistry({
       },
       hasImplicitOrder: true
     }),
+    table_set_query_volatile: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
+      name: "table_set_query_volatile",
+      identifier: "main.c.table_set_query_volatile()",
+      from(...args) {
+        return sql`${table_set_query_volatileFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "table_set_query_volatile"
+        },
+        tags: {
+          behavior: "+sort +filter +queryField -mutationField +list +connection"
+        },
+        canExecute: false
+      },
+      isMutation: true,
+      hasImplicitOrder: true
+    }),
     person_computed_first_arg_inout: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "person_computed_first_arg_inout",
       identifier: "main.c.person_computed_first_arg_inout(c.person)",
@@ -7910,6 +7935,33 @@ const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_current_user_id = () => EMPTY_ARRAY;
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
+const resource_table_set_query_volatilePgResource = registry.pgResources["table_set_query_volatile"];
+const table_set_query_volatile_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_current_user_id(args);
+  return resource_table_set_query_volatilePgResource.execute(selectArgs);
+};
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -8010,28 +8062,6 @@ const nodeIdHandler_Person = makeTableNodeIdHandler({
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
   return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
-};
-function applyFirstArg(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function applyLastArg(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function applyOffsetArg(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function applyBeforeArg(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function applyAfterArg(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function qbWhereBuilder(qb) {
-  return qb.whereBuilder();
-}
-const applyConditionArgToConnection = (_condition, $connection, arg) => {
-  const $select = $connection.getSubplan();
-  arg.apply($select, qbWhereBuilder);
 };
 function applyOrderByArgToConnection(parent, $connection, value) {
   const $select = $connection.getSubplan();
@@ -8157,6 +8187,7 @@ const PostsOrderBy_ID_DESCApply = queryBuilder => {
   queryBuilder.setOrderIsUnique();
 };
 const resource_compound_keyPgResource = registry.pgResources["compound_key"];
+const pgFieldSource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const PersonSecretCondition_personIdApply = ($condition, val) => applyAttributeCondition("person_id", TYPES.int, $condition, val);
 const PersonSecretsOrderBy_PERSON_ID_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
@@ -8172,7 +8203,6 @@ const PersonSecretsOrderBy_PERSON_ID_DESCApply = queryBuilder => {
   });
   queryBuilder.setOrderIsUnique();
 };
-const pgFieldSource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const pgFieldSource_person_first_namePgResource = registry.pgResources["person_first_name"];
 const argDetailsSimple_left_arm_identity = [{
   graphqlArgName: "leftArm",
@@ -8226,8 +8256,9 @@ const specFromArgs_PersonSecret = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
 };
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -8333,6 +8364,44 @@ type Query implements Node {
   personByEmail(email: Email!): Person
   currentUserId: Int
   returnTableWithoutGrants: CompoundKey
+
+  """Reads and enables pagination through a set of \`Person\`."""
+  tableSetQueryVolatile(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+  ): PeopleConnection
+  tableSetQueryVolatileList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+  ): [Person]
 
   """Reads a single \`PersonSecret\` using its globally unique \`ID\`."""
   personSecret(
@@ -8705,6 +8774,78 @@ type CompoundKey {
   personByPersonId2: Person
 }
 
+"""A connection to a list of \`Person\` values."""
+type PeopleConnection {
+  """A list of \`Person\` objects."""
+  nodes: [Person]!
+
+  """
+  A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Person\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Person\` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Person\` at the end of the edge."""
+  node: Person
+}
+
+"""
+A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+
+  """Checks for equality with the object’s \`aliases\` field."""
+  aliases: [String]
+
+  """Checks for equality with the object’s \`about\` field."""
+  about: String
+
+  """Checks for equality with the object’s \`email\` field."""
+  email: Email
+
+  """Checks for equality with the object’s \`site\` field."""
+  site: WrappedUrlInput
+
+  """Checks for equality with the object’s \`config\` field."""
+  config: KeyValueHash
+
+  """Checks for equality with the object’s \`lastLoginFromIp\` field."""
+  lastLoginFromIp: InternetAddress
+
+  """Checks for equality with the object’s \`lastLoginFromSubnet\` field."""
+  lastLoginFromSubnet: String
+
+  """Checks for equality with the object’s \`userMac\` field."""
+  userMac: String
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s \`computedOut\` field."""
+  computedOut: String
+}
+
+"""An input for mutations affecting \`WrappedUrl\`"""
+input WrappedUrlInput {
+  url: NotNullUrl!
+}
+
 """A connection to a list of \`PersonSecret\` values."""
 type PersonSecretsConnection {
   """A list of \`PersonSecret\` objects."""
@@ -8810,78 +8951,6 @@ enum LeftArmsOrderBy {
   LENGTH_IN_METRES_DESC
   MOOD_ASC
   MOOD_DESC
-}
-
-"""A connection to a list of \`Person\` values."""
-type PeopleConnection {
-  """A list of \`Person\` objects."""
-  nodes: [Person]!
-
-  """
-  A list of edges which contains the \`Person\` and cursor to aid in pagination.
-  """
-  edges: [PeopleEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Person\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Person\` edge in the connection."""
-type PeopleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Person\` at the end of the edge."""
-  node: Person
-}
-
-"""
-A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PersonCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
-
-  """Checks for equality with the object’s \`aliases\` field."""
-  aliases: [String]
-
-  """Checks for equality with the object’s \`about\` field."""
-  about: String
-
-  """Checks for equality with the object’s \`email\` field."""
-  email: Email
-
-  """Checks for equality with the object’s \`site\` field."""
-  site: WrappedUrlInput
-
-  """Checks for equality with the object’s \`config\` field."""
-  config: KeyValueHash
-
-  """Checks for equality with the object’s \`lastLoginFromIp\` field."""
-  lastLoginFromIp: InternetAddress
-
-  """Checks for equality with the object’s \`lastLoginFromSubnet\` field."""
-  lastLoginFromSubnet: String
-
-  """Checks for equality with the object’s \`userMac\` field."""
-  userMac: String
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`computedOut\` field."""
-  computedOut: String
-}
-
-"""An input for mutations affecting \`WrappedUrl\`"""
-input WrappedUrlInput {
-  url: NotNullUrl!
 }
 
 """Methods to use when ordering \`Person\`."""
@@ -9708,11 +9777,35 @@ export const objects = {
         });
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       returnTableWithoutGrants($root, args, _info) {
         const selectArgs = makeArgs_current_user_id(args);
         return resource_return_table_without_grantsPgResource.execute(selectArgs);
+      },
+      tableSetQueryVolatile: {
+        plan($parent, args, info) {
+          const $select = table_set_query_volatile_getSelectPlanFromParentAndArgs($parent, args, info);
+          return connection($select);
+        },
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection
+        }
+      },
+      tableSetQueryVolatileList: {
+        plan: table_set_query_volatile_getSelectPlanFromParentAndArgs,
+        args: {
+          first: applyFirstArg,
+          offset: applyOffsetArg,
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          }
+        }
       }
     }
   },

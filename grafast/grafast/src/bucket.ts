@@ -2,11 +2,12 @@
 
 import type { LayerPlan } from "./engine/LayerPlan.ts";
 import type { MetaByMetaKey } from "./engine/OperationPlan.ts";
-import type { ErrorBehavior, GrafastExecutionArgs, Step } from "./index.ts";
+import type { ErrorBehavior, Step } from "./index.ts";
 import type {
   ExecutionEntryFlags,
   ExecutionEventEmitter,
   ExecutionValue,
+  GrafastInternalExecutionArgs,
 } from "./interfaces.ts";
 
 /**
@@ -14,7 +15,7 @@ import type {
  */
 export interface RequestTools {
   /** @internal */
-  args: GrafastExecutionArgs;
+  args: GrafastInternalExecutionArgs;
   /** @internal */
   onError: ErrorBehavior;
   /** The `timeSource.now()` at which the request started executing */
@@ -39,12 +40,6 @@ export interface RequestTools {
    * Called when the request either completes or is aborted.
    */
   readonly abortSignal: AbortSignal;
-
-  /**
-   * If we're running inside GraphQL then we should not serialize scalars,
-   * otherwise we'll face the double-serialization problem.
-   */
-  insideGraphQL: false;
 }
 
 /** @internal */

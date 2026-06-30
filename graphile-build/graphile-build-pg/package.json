@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "5.0.0",
+  "version": "5.0.2",
   "description": "PostgreSQL plugins for Graphile Build - build a supercharged GraphQL schema by reflection over a PostgreSQL database and executed by Grafast.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -108,7 +108,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "chalk": "^4.1.2",
     "express": "^4.21.2",
-    "fastify": "^5.8.1",
+    "fastify": "^5.8.3",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-export": "workspace:^",

@@ -1,5 +1,14 @@
 # graphile-export
 
+## 1.0.1
+
+### Patch Changes
+
+- [#2970](https://github.com/graphile/crystal/pull/2970)
+  [`3e71bd0`](https://github.com/graphile/crystal/commit/3e71bd08c551fc355e82c7ed129857a8d3ce94dd)
+  Thanks [@benjie](https://github.com/benjie)! - Fallback to `require('eslint')`
+  if `import('eslint')` fails for compat with non-ESM Jest usage
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.6.

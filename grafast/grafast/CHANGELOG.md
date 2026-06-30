@@ -1,5 +1,41 @@
 # grafast
 
+## 1.0.2
+
+### Patch Changes
+
+- [#3049](https://github.com/graphile/crystal/pull/3049)
+  [`0c7ec9d`](https://github.com/graphile/crystal/commit/0c7ec9d512c847b96952fd6864babbe8be2f1d3b)
+  Thanks [@benjie](https://github.com/benjie)! - Add `setParams` helper to
+  loadOne/loadMany to save having to call `setParam` multiple times.
+
+- [#3049](https://github.com/graphile/crystal/pull/3049)
+  [`ac376ca`](https://github.com/graphile/crystal/commit/ac376ca8d5fa76c0654b9256e049519bfd34172d)
+  Thanks [@benjie](https://github.com/benjie)! - Fix type mistake in
+  loadManyLoader
+
+- [#3053](https://github.com/graphile/crystal/pull/3053)
+  [`9600dfa`](https://github.com/graphile/crystal/commit/9600dfa0aa67a215695ad522df09580dac061de8)
+  Thanks [@benjie](https://github.com/benjie)! - LoadManyStep now only invokes
+  cloneStream if necessary, rather than defaulting on.
+
+## 1.0.1
+
+### Patch Changes
+
+- [#3025](https://github.com/graphile/crystal/pull/3025)
+  [`86fa95c`](https://github.com/graphile/crystal/commit/86fa95c93937e5483cceb16b5afaafb0fdec5397)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where `@skip` and
+  `@include` on fragment spreads were not honoured in abstract positions.
+
+- [#3023](https://github.com/graphile/crystal/pull/3023)
+  [`647ed8b`](https://github.com/graphile/crystal/commit/647ed8b5993f1e676fbce8e9c6e9dfec7b99ed10)
+  Thanks [@benjie](https://github.com/benjie)! - Allow `extensions` to be passed
+  to `makeGrafastSchema` to become schema extensions.
+- Updated dependencies
+  [[`92106c3`](https://github.com/graphile/crystal/commit/92106c3b8e8ef34e68c52503dc22d13d30d85a9e)]:
+  - graphile-config@1.0.1
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.9.
