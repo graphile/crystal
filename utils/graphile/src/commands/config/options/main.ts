@@ -308,25 +308,26 @@ modules).\
         ) {
           outLater("```ts");
           outLater(`{`);
+          const indent = (str: string) => "  " + str.replace(/\n/g, "\n  ");
           for (const entry of subentries) {
-            outLater("  " + entry);
+            outLater(indent(entry));
           }
           if (subentries.length && advancedSubentries.length) {
             outLater("");
-            outLater("  // Advanced");
+            outLater(indent("// Advanced"));
           }
           for (const entry of advancedSubentries) {
-            outLater("  " + entry);
+            outLater(indent(entry));
           }
           if (
             (subentries.length || advancedSubentries.length) &&
             deprecatedSubentries.length
           ) {
             outLater("");
-            outLater("  // Deprecated");
+            outLater(indent("// Deprecated"));
           }
           for (const entry of deprecatedSubentries) {
-            outLater("  " + entry);
+            outLater(indent(entry));
           }
           outLater("}");
           outLater("```");
@@ -360,8 +361,9 @@ modules).\
   if (!scope && entries.length) {
     out("```ts");
     out(`{`);
+    const indent = (str: string) => "  " + str.replace(/\n/g, "\n  ");
     for (const entry of entries) {
-      out("  " + entry);
+      out(indent(entry));
     }
     out("}");
     out("```");
