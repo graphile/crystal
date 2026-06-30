@@ -15,6 +15,14 @@ const FORBIDDEN = [
   "skipPlugins",
 ];
 
+function code(string: string, lang = "") {
+  if (string.includes("\n") || string.includes("`")) {
+    return `\n\`\`\`${lang}\n${string.trimEnd()}\n\`\`\`\n`;
+  } else {
+    return `\`${string}\``;
+  }
+}
+
 export function main(options: { filename?: string; scope?: string }) {
   const { filename, scope } = options;
   const { getCompletions, getQuickInfo } = configVfs({
@@ -274,11 +282,12 @@ modules).\
           const displayParts = prettyDisplayParts(info?.displayParts, ":");
           const hasDefaultValue = defaultValueTag?.text;
           outLaterStill(
-            `${chalk.greenBright.bold("Type")}: \`${
+            `${chalk.greenBright.bold("Type")}: ${code(
               displayParts
                 ? chalk.whiteBright(displayParts)
-                : chalk.gray("unknown")
-            }\`${hasDefaultValue ? "  " : ""}`,
+                : chalk.gray("unknown"),
+              "ts",
+            )}${hasDefaultValue ? "  " : ""}`,
           );
           if (hasDefaultValue) {
             outLaterStill(
