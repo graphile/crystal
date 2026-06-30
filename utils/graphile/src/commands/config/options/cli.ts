@@ -1,7 +1,5 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 
-import { main } from "./main.ts";
-
 export const command = "options [scope]";
 
 export const description = "Output the options your config may contain";
@@ -29,7 +27,8 @@ export function options(yargs: Argv) {
       type: "string",
     });
 }
-export function run(args: ArgsFromOptions<typeof options>) {
+export async function run(args: ArgsFromOptions<typeof options>) {
+  const { main } = await import("./main.ts");
   const text = main({ filename: args.config, scope: args.scope });
   console.log(text);
 }
