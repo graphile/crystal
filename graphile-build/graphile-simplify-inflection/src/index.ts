@@ -334,7 +334,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         ).find((u) => u.isPrimary);
         if (
           foreignPk &&
-          arraysMatch(foreignPk.attributes, relation.remoteAttributes)
+          arraysMatch(foreignPk.attributes, relation.localAttributes)
         ) {
           return this.camelCase(
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
@@ -387,7 +387,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const uniques = (possibleResources[0]?.uniques ??
           []) as PgResourceUnique[];
         const pk = uniques.find((u) => u.isPrimary);
-        if (pk && arraysMatch(pk.attributes, relation.localAttributes)) {
+        if (pk && arraysMatch(pk.attributes, relation.remoteAttributes)) {
           return this.camelCase(
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
           );
