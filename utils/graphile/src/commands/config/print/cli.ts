@@ -141,7 +141,7 @@ function printAPB(
   opts: Opts,
   strs: string[] | undefined,
   type: "after" | "provides" | "before",
-  plugins: GraphileConfig.Plugin[],
+  plugins: ReadonlyArray<GraphileConfig.Plugin>,
   index: number,
 ): string {
   if (!strs || strs.length === 0) {
@@ -185,7 +185,7 @@ function printAPB(
 
 function printPlugins(
   opts: Opts,
-  plugins: GraphileConfig.Plugin[] | undefined,
+  plugins: ReadonlyArray<GraphileConfig.Plugin> | undefined,
 ): string {
   if (!plugins || plugins.length === 0) {
     return "";
@@ -197,7 +197,7 @@ ${plugins.map((p, i) => printPlugin(opts, p, plugins, i)).join("\n")}`;
 function printPlugin(
   opts: Opts,
   plugin: GraphileConfig.Plugin,
-  plugins: GraphileConfig.Plugin[],
+  plugins: ReadonlyArray<GraphileConfig.Plugin>,
   index: number,
 ): string {
   const { full, debugOrder } = opts;
