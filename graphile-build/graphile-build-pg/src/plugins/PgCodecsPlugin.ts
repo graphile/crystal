@@ -521,13 +521,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             });
             return codec;
           } else {
-            console.dir(event);
             console.warn(
               `Could not build PgCodec for '${
                 type.getNamespace()?.nspname ?? "??"
               }.${
                 type.typname
               }'; maybe you need a plugin implementing gather.hooks.pgCodecs_findPgCodec to add support.`,
+              event,
             );
             return null;
           }
