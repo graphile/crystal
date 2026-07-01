@@ -52,7 +52,7 @@ export type LoadManyCallback<
   (
     lookups: ReadonlyArray<TLookup>,
     info: LoadManyInfo<TItem, TParams, TShared>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
