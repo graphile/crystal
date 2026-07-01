@@ -994,6 +994,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             boolean: "Boolean",
             int2: "Int",
             int: "Int",
+            oid: "Int",
             bigint: inflection.builtin("BigInt"),
             float: "Float",
             float4: "Float",
