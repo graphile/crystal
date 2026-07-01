@@ -255,7 +255,7 @@ alter table a.unique_foreign_key add constraint second_fkey
   foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2) on delete cascade;
 
 -- We're just testing the relations work as expected, we don't need everything else.
-comment on table a.unique_foreign_key is E'@omit create,update,delete,all,order,filter';
+comment on table a.unique_foreign_key is E'@omit create, update, delete, all, order, filter';
 
 create table c.edge_case (
   not_null_has_default boolean not null default false,

@@ -187,7 +187,7 @@ function expandOmit(omit: string) {
       }
     });
   }
-  const parts = omit.split(",");
+  const parts = omit.split(",").map((p) => p.trim());
   return parts;
 }
 
