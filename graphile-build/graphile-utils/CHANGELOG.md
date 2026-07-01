@@ -1,5 +1,15 @@
 # graphile-utils
 
+## 5.0.2
+
+### Patch Changes
+
+- [#3078](https://github.com/graphile/crystal/pull/3078)
+  [`00bb2ba`](https://github.com/graphile/crystal/commit/00bb2babf1900d396d064f88de520f524f67c94f)
+  Thanks [@evolkmann](https://github.com/evolkmann)! - Export types related to
+  the `pgSmartTags`/etc utils (`PgSmartTagRule`, `PgSmartTagTags`,
+  `PgSmartTagFilterFunction`, `JSONPgSmartTags`, etc.).
+
 ## 5.0.1
 
 ### Patch Changes

@@ -1,5 +1,25 @@
 # graphile-build-pg
 
+## 5.0.3
+
+### Patch Changes
+
+- [#3065](https://github.com/graphile/crystal/pull/3065)
+  [`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947)
+  Thanks [@benjie](https://github.com/benjie)! - `fieldArgs` are now created in
+  the root plan and applied in the layer plan of the target step; this fixes an
+  issue where fieldArgs could not be applied to step with side effects.
+
+- [#3063](https://github.com/graphile/crystal/pull/3063)
+  [`d3156df`](https://github.com/graphile/crystal/commit/d3156df8cd95c517f329ffa904bb2fec9db2b370)
+  Thanks [@benjie](https://github.com/benjie)! - Improve scopes around
+  PgMutationCreatePlugin
+
+- Updated dependencies
+  [[`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)]:
+  - graphile-config@1.1.0
+
 ## 5.0.2
 
 ### Patch Changes

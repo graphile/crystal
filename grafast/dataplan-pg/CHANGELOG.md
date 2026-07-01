@@ -1,5 +1,24 @@
 # @dataplan/pg
 
+## 1.0.4
+
+### Patch Changes
+
+- [#3071](https://github.com/graphile/crystal/pull/3071)
+  [`3dff681`](https://github.com/graphile/crystal/commit/3dff681c8da4c66c37ac2f82896dc869b54d0c21)
+  Thanks [@benjie](https://github.com/benjie)! - Previously we used
+  `rootValue()` to represent the Query type; but in GraphQL.js rootValue can be
+  null/undefined. Typically you just need a truthy value, so we now use an empty
+  object.
+- Updated dependencies
+  [[`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947),
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537),
+  [`1a9b835`](https://github.com/graphile/crystal/commit/1a9b835d0b8bc8adb22a864a23eff0c521e2309f),
+  [`3b56a51`](https://github.com/graphile/crystal/commit/3b56a51ad751ce14b0c8c167df09bc9c3fbc11c3),
+  [`f0d1f48`](https://github.com/graphile/crystal/commit/f0d1f487ecd12299cd5e416aa5c7282dfd7c9992),
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1)]:
+  - grafast@1.0.3
+
 ## 1.0.3
 
 ### Patch Changes

@@ -1,5 +1,39 @@
 # graphile
 
+## 5.0.1
+
+### Patch Changes
+
+- [#3075](https://github.com/graphile/crystal/pull/3075)
+  [`e1a6f37`](https://github.com/graphile/crystal/commit/e1a6f37fd403ee4c4deda0b3de6801fdc7c27f5e)
+  Thanks [@benjie](https://github.com/benjie)! - Don't throw error for
+  `graphile --help` when certain libraries are not installed.
+
+- [#3080](https://github.com/graphile/crystal/pull/3080)
+  [`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `GraphileConfig.Preset::plugins` is now marked readonly - we do not require a
+  mutable array.
+
+- [#3077](https://github.com/graphile/crystal/pull/3077)
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)
+  Thanks [@benjie](https://github.com/benjie)! - CLIs will now correctly
+  auto-import `graphile.config.mts` files (previously `graphile.config.ts` files
+  worked, but `graphile.config.mts` files would be ignored). With all major
+  versions of Node.js now having native support for type stripping and
+  require(esm), we recommend moving your configuration files to TypeScript
+  (using ESM and erasable syntax only).
+
+- [#3076](https://github.com/graphile/crystal/pull/3076)
+  [`e91e92c`](https://github.com/graphile/crystal/commit/e91e92cd752eb7fa7370bae468346c40fdfeb3e2)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes formatting of multi-line
+  types in options output
+
+- Updated dependencies
+  [[`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)]:
+  - graphile-config@1.1.0
+
 ## 5.0.0
 
 Identical to 5.0.0-rc.6.
