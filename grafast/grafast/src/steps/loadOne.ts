@@ -42,7 +42,7 @@ export type LoadOneCallback<
   (
     specs: ReadonlyArray<TSpec>,
     info: LoadOneInfo<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
