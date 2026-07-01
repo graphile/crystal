@@ -1,5 +1,25 @@
 # graphile-build
 
+## 5.0.3
+
+### Patch Changes
+
+- [#3071](https://github.com/graphile/crystal/pull/3071)
+  [`3dff681`](https://github.com/graphile/crystal/commit/3dff681c8da4c66c37ac2f82896dc869b54d0c21)
+  Thanks [@benjie](https://github.com/benjie)! - Previously we used
+  `rootValue()` to represent the Query type; but in GraphQL.js rootValue can be
+  null/undefined. Typically you just need a truthy value, so we now use an empty
+  object.
+
+- [#3060](https://github.com/graphile/crystal/pull/3060)
+  [`c21f24c`](https://github.com/graphile/crystal/commit/c21f24c2f34dac34f7c264b66ce56721bb155ae5)
+  Thanks [@benjie](https://github.com/benjie)! - `makeSchema` now awaits the
+  writing of the SDL if enabled by `exportSchemaSDLPath`
+- Updated dependencies
+  [[`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)]:
+  - graphile-config@1.1.0
+
 ## 5.0.2
 
 ### Patch Changes

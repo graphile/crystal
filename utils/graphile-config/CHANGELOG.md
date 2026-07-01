@@ -1,5 +1,26 @@
 # graphile-config
 
+## 1.1.0
+
+### Minor Changes
+
+- [#3077](https://github.com/graphile/crystal/pull/3077)
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)
+  Thanks [@benjie](https://github.com/benjie)! - CLIs will now correctly
+  auto-import `graphile.config.mts` files (previously `graphile.config.ts` files
+  worked, but `graphile.config.mts` files would be ignored). With all major
+  versions of Node.js now having native support for type stripping and
+  require(esm), we recommend moving your configuration files to TypeScript
+  (using ESM and erasable syntax only).
+
+### Patch Changes
+
+- [#3080](https://github.com/graphile/crystal/pull/3080)
+  [`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `GraphileConfig.Preset::plugins` is now marked readonly - we do not require a
+  mutable array.
+
 ## 1.0.1
 
 ### Patch Changes

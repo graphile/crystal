@@ -1,5 +1,48 @@
 # grafast
 
+## 1.0.3
+
+### Patch Changes
+
+- [#3065](https://github.com/graphile/crystal/pull/3065)
+  [`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947)
+  Thanks [@benjie](https://github.com/benjie)! - `fieldArgs` are now created in
+  the root plan and applied in the layer plan of the target step; this fixes an
+  issue where fieldArgs could not be applied to step with side effects.
+
+- [#3061](https://github.com/graphile/crystal/pull/3061)
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537)
+  Thanks [@benjie](https://github.com/benjie)! - Exposes rootValueStep on
+  OperationPlan and removes some transient values from being stored. Adds new
+  global `variableValues()` step retriever, useful for helping produce
+  GraphQLResolveInfo and similar.
+
+- [#3070](https://github.com/graphile/crystal/pull/3070)
+  [`1a9b835`](https://github.com/graphile/crystal/commit/1a9b835d0b8bc8adb22a864a23eff0c521e2309f)
+  Thanks [@benjie](https://github.com/benjie)! - Stop using deprecated
+  GraphQLError signature
+
+- [#3072](https://github.com/graphile/crystal/pull/3072)
+  [`3b56a51`](https://github.com/graphile/crystal/commit/3b56a51ad751ce14b0c8c167df09bc9c3fbc11c3)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast no longer coerces
+  `rootValue` to a mutable object, increasing compatibility with legacy
+  resolvers.
+
+- [#3069](https://github.com/graphile/crystal/pull/3069)
+  [`f0d1f48`](https://github.com/graphile/crystal/commit/f0d1f487ecd12299cd5e416aa5c7282dfd7c9992)
+  Thanks [@benjie](https://github.com/benjie)! - Remove vestigial
+  `insideGraphQL` code.
+
+- [#3062](https://github.com/graphile/crystal/pull/3062)
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1)
+  Thanks [@benjie](https://github.com/benjie)! - Internals: clear
+  \_\_TrackedValueStep initialValue on finalize.
+
+- Updated dependencies
+  [[`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)]:
+  - graphile-config@1.1.0
+
 ## 1.0.2
 
 ### Patch Changes

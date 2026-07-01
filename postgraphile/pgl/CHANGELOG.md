@@ -1,5 +1,40 @@
 # pgl
 
+## 5.0.1
+
+### Patch Changes
+
+- [#3077](https://github.com/graphile/crystal/pull/3077)
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)
+  Thanks [@benjie](https://github.com/benjie)! - CLIs will now correctly
+  auto-import `graphile.config.mts` files (previously `graphile.config.ts` files
+  worked, but `graphile.config.mts` files would be ignored). With all major
+  versions of Node.js now having native support for type stripping and
+  require(esm), we recommend moving your configuration files to TypeScript
+  (using ESM and erasable syntax only).
+- Updated dependencies
+  [[`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947),
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537),
+  [`1a9b835`](https://github.com/graphile/crystal/commit/1a9b835d0b8bc8adb22a864a23eff0c521e2309f),
+  [`3b56a51`](https://github.com/graphile/crystal/commit/3b56a51ad751ce14b0c8c167df09bc9c3fbc11c3),
+  [`f0d1f48`](https://github.com/graphile/crystal/commit/f0d1f487ecd12299cd5e416aa5c7282dfd7c9992),
+  [`557791f`](https://github.com/graphile/crystal/commit/557791f9c4760cc384a1de142faf487ae557115e),
+  [`3dff681`](https://github.com/graphile/crystal/commit/3dff681c8da4c66c37ac2f82896dc869b54d0c21),
+  [`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1),
+  [`d3156df`](https://github.com/graphile/crystal/commit/d3156df8cd95c517f329ffa904bb2fec9db2b370),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d),
+  [`00bb2ba`](https://github.com/graphile/crystal/commit/00bb2babf1900d396d064f88de520f524f67c94f),
+  [`c21f24c`](https://github.com/graphile/crystal/commit/c21f24c2f34dac34f7c264b66ce56721bb155ae5),
+  [`3cbbd88`](https://github.com/graphile/crystal/commit/3cbbd88f8be499796ef2604a15f157094f0caa29)]:
+  - graphile-build-pg@5.0.3
+  - postgraphile@5.0.4
+  - grafast@1.0.3
+  - grafserv@1.0.1
+  - graphile-build@5.0.3
+  - @dataplan/pg@1.0.4
+  - graphile-config@1.1.0
+
 ## 5.0.0
 
 Identical to 5.0.0-rc.6.
