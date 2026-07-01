@@ -265,10 +265,11 @@ function processOmit(
         default: {
           // ENHANCE: we should give plugin authors the option of adding other
           // omits here, e.g. `@omit manyToMany`
+          const assumption = `-${part.replace(/[^a-zA-Z0-9]/g, "")}`;
           console.warn(
-            `Option '${part}' in '@omit' string '${omit}' not recognized; assuming -${part} behavior`,
+            `Option '${part}' in '@omit' string '${omit}' not recognized; assuming ${assumption} behavior`,
           );
-          behavior.push(`-${part}`);
+          behavior.push(assumption);
           break;
         }
       }
