@@ -7,7 +7,7 @@ export function sortWithBeforeAfterProvides<
   } & {
     [id in TIdKey]: string;
   },
->(rawList: TSortable[], idKey: TIdKey): TSortable[] {
+>(rawList: ReadonlyArray<TSortable>, idKey: TIdKey): TSortable[] {
   const list: Array<{
     thing: TSortable | symbol;
     before: string[];
