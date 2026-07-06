@@ -147,15 +147,6 @@ declare global {
          */
         // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
-        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-        /**
-         * - r = ordinary table (not output if persistence === "p")
-         * - v = view,
-         * - m = materialized view,
-         * - f = foreign table,
-         * - p = partitioned table,
-         */
-        kind?: "r" | "v" | "m" | "f" | "p" | (string & {}) | null;
       };
     }
 

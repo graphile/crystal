@@ -226,6 +226,12 @@ declare global {
       isDeletable?: boolean;
       /** Is this a partitioned table (i.e. doesn't store data locally) */
       hasPartitions?: boolean;
+      /** True if this is a simple view (see also: isMaterializedView) */
+      isView?: true;
+      /** True if this is a materialized view (see also: isView) */
+      isMaterializedView?: true;
+      /** True if this is a foreign table (postgres_fdw) */
+      isForeignTable?: true;
       /** If this table _is_ a partition, details of its parent */
       partitionParent?: {
         schemaName: string;
@@ -519,20 +525,26 @@ select * from a where id = 1;
             );
           }
           const hasPartitions = pgClass.relkind === "p";
+          const isView = pgClass.relkind === "v";
+          const isMaterializedView = pgClass.relkind === "m";
+          const isForeignTable = pgClass.relkind === "f";
 
           const extensions: DataplanPg.PgResourceExtensions = {
             pg: {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
-              ...(pgClass.relpersistence !== "p" || pgClass.relkind !== "r"
-                ? { persistence: pgClass.relpersistence, kind: pgClass.relkind }
+              ...(pgClass.relpersistence !== "p"
+                ? { persistence: pgClass.relpersistence }
                 : null),
             },
             ...(isInsertable === false ? { isInsertable } : null),
             ...(isUpdatable === false ? { isUpdatable } : null),
             ...(isDeletable === false ? { isDeletable } : null),
             ...(hasPartitions ? { hasPartitions } : null),
+            ...(isView ? { isView } : null),
+            ...(isMaterializedView ? { isMaterializedView } : null),
+            ...(isForeignTable ? { isForeignTable } : null),
             ...(partitionParent
               ? {
                   partitionParent: {
