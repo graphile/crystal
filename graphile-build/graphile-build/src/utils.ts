@@ -295,15 +295,19 @@ export const stringTypeSpec = (
 const intMax = 2 ** 31 - 1;
 const intMin = -(2 ** 31);
 
-function toInt(expr: unknown): number {
-  const int =
-    typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
-  if (isNaN(int) || int > intMax || int < intMin) {
-    throw new Error("Invalid integer");
-  }
-  return int;
-}
-exportNameHint(toInt, "toInt");
+const toInt = EXPORTABLE(
+  (intMax, intMin) =>
+    function toInt(expr: unknown): number {
+      const int =
+        typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
+      if (isNaN(int) || int > intMax || int < intMin) {
+        throw new Error("Invalid integer");
+      }
+      return int;
+    },
+  [intMax, intMin],
+  "toInt",
+);
 
 /**
  * Generates the spec for a GraphQLScalar (except the name) with the
