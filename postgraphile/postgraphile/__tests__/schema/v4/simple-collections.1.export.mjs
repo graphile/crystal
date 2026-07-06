@@ -1411,6 +1411,9 @@ const typesCodec = recordCodec({
     macaddr: {
       codec: TYPES.macaddr
     },
+    oid: {
+      codec: TYPES.oid
+    },
     regproc: {
       codec: TYPES.regproc
     },
@@ -1797,6 +1800,7 @@ const registry = makeRegistry({
     money: TYPES.money,
     nestedCompoundType: nestedCompoundTypeCodec,
     point: TYPES.point,
+    oid: TYPES.oid,
     regproc: TYPES.regproc,
     regprocedure: TYPES.regprocedure,
     regoper: TYPES.regoper,
@@ -4906,6 +4910,13 @@ const PeopleOrderBy_ID_DESCApply = queryBuilder => {
   queryBuilder.setOrderIsUnique();
 };
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
+const toInt = ((intMax, intMin) => function toInt(expr) {
+  const int = typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
+  if (isNaN(int) || int > intMax || int < intMin) {
+    throw new Error("Invalid integer");
+  }
+  return int;
+})(2147483647, -2147483648);
 function LTreeParseValue(value) {
   return value;
 }
@@ -6739,6 +6750,7 @@ type Type {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -6856,6 +6868,9 @@ type Point {
 
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
+
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
 
 """A builtin object identifier type for a function name"""
 scalar RegProc
@@ -13807,6 +13822,18 @@ export const scalars = {
     serialize: GraphQLString.serialize,
     parseValue: GraphQLString.parseValue,
     parseLiteral: GraphQLString.parseLiteral
+  },
+  Oid: {
+    serialize: toInt,
+    parseValue: toInt,
+    parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) {
+        return toInt(ast.value);
+      } else if (ast.kind === Kind.INT) {
+        return toInt(ast.value);
+      }
+      throw new GraphQLError(`Oid can only parse string/integer values (kind='${ast.kind}')`);
+    }
   },
   RegClass: {
     serialize: toString,

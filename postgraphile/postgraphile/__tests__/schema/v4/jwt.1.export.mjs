@@ -601,6 +601,9 @@ const typesCodec = recordCodec({
     macaddr: {
       codec: TYPES.macaddr
     },
+    oid: {
+      codec: TYPES.oid
+    },
     regproc: {
       codec: TYPES.regproc
     },
@@ -813,6 +816,7 @@ const registry = makeRegistry({
     inet: TYPES.inet,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr,
+    oid: TYPES.oid,
     regproc: TYPES.regproc,
     regprocedure: TYPES.regprocedure,
     regoper: TYPES.regoper,
@@ -1917,6 +1921,13 @@ const coerce = string => {
   return string;
 };
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
+const toInt = ((intMax, intMin) => function toInt(expr) {
+  const int = typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
+  if (isNaN(int) || int > intMax || int < intMin) {
+    throw new Error("Invalid integer");
+  }
+  return int;
+})(2147483647, -2147483648);
 function LTreeParseValue(value) {
   return value;
 }
@@ -2308,6 +2319,9 @@ function TypeInput_cidrApply(obj, val, info) {
 function TypeInput_macaddrApply(obj, val, info) {
   obj.set("macaddr", bakedInputRuntime(info.schema, info.field.type, val));
 }
+function TypeInput_oidApply(obj, val, info) {
+  obj.set("oid", bakedInputRuntime(info.schema, info.field.type, val));
+}
 function TypeInput_regprocApply(obj, val, info) {
   obj.set("regproc", bakedInputRuntime(info.schema, info.field.type, val));
 }
@@ -2649,6 +2663,7 @@ type Type implements Node {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -2768,6 +2783,9 @@ type Point {
 
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
+
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
 
 """A builtin object identifier type for a function name"""
 scalar RegProc
@@ -3135,6 +3153,9 @@ input TypeCondition {
   """Checks for equality with the object’s \`macaddr\` field."""
   macaddr: String
 
+  """Checks for equality with the object’s \`oid\` field."""
+  oid: Oid
+
   """Checks for equality with the object’s \`regproc\` field."""
   regproc: RegProc
 
@@ -3308,6 +3329,8 @@ enum TypesOrderBy {
   CIDR_DESC
   MACADDR_ASC
   MACADDR_DESC
+  OID_ASC
+  OID_DESC
   REGPROC_ASC
   REGPROC_DESC
   REGPROCEDURE_ASC
@@ -4111,6 +4134,7 @@ input TypeInput {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -4281,6 +4305,7 @@ input TypePatch {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -5564,6 +5589,9 @@ export const inputObjects = {
       numrange($condition, val) {
         return applyAttributeCondition("numrange", numrangeCodec, $condition, val);
       },
+      oid($condition, val) {
+        return applyAttributeCondition("oid", TYPES.oid, $condition, val);
+      },
       point($condition, val) {
         return applyAttributeCondition("point", TYPES.point, $condition, val);
       },
@@ -5668,6 +5696,7 @@ export const inputObjects = {
       nullableRange: TypeInput_nullableRangeApply,
       numeric: TypeInput_numericApply,
       numrange: TypeInput_numrangeApply,
+      oid: TypeInput_oidApply,
       point: TypeInput_pointApply,
       regclass: TypeInput_regclassApply,
       regconfig: TypeInput_regconfigApply,
@@ -5723,6 +5752,7 @@ export const inputObjects = {
       nullableRange: TypeInput_nullableRangeApply,
       numeric: TypeInput_numericApply,
       numrange: TypeInput_numrangeApply,
+      oid: TypeInput_oidApply,
       point: TypeInput_pointApply,
       regclass: TypeInput_regclassApply,
       regconfig: TypeInput_regconfigApply,
@@ -5954,6 +5984,18 @@ export const scalars = {
     },
     parseValue: LTreeParseValue,
     parseLiteral: LTreeParseLiteral
+  },
+  Oid: {
+    serialize: toInt,
+    parseValue: toInt,
+    parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) {
+        return toInt(ast.value);
+      } else if (ast.kind === Kind.INT) {
+        return toInt(ast.value);
+      }
+      throw new GraphQLError(`Oid can only parse string/integer values (kind='${ast.kind}')`);
+    }
   },
   RegClass: {
     serialize: toString,
@@ -6381,6 +6423,18 @@ export const enums = {
       NUMERIC_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "numeric",
+          direction: "DESC"
+        });
+      },
+      OID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "oid",
+          direction: "ASC"
+        });
+      },
+      OID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "oid",
           direction: "DESC"
         });
       },
