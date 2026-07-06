@@ -141,12 +141,21 @@ declare global {
         schemaName: string;
         name: string;
         /**
-         * - p = permanent table/sequence
+         * - p = permanent table/sequence (not output if kind === "r")
          * - u = unlogged table/sequence
          * - t = temporary table/sequence
          */
         // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
+        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+        /**
+         * - r = ordinary table (not output if persistence === "p")
+         * - v = view,
+         * - m = materialized view,
+         * - f = foreign table,
+         * - p = partitioned table,
+         */
+        kind?: "r" | "v" | "m" | "f" | "p" | (string & {}) | null;
       };
     }
 

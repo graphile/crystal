@@ -525,8 +525,8 @@ select * from a where id = 1;
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
-              ...(pgClass.relpersistence !== "p"
-                ? { persistence: pgClass.relpersistence }
+              ...(pgClass.relpersistence !== "p" || pgClass.relkind !== "r"
+                ? { persistence: pgClass.relpersistence, kind: pgClass.relkind }
                 : null),
             },
             ...(isInsertable === false ? { isInsertable } : null),
