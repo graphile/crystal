@@ -1921,13 +1921,13 @@ const coerce = string => {
   return string;
 };
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
-const toInt = ((intMax, intMin) => function toInt(expr) {
+function toInt(expr) {
   const int = typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
-  if (isNaN(int) || int > intMax || int < intMin) {
+  if (isNaN(int) || int > 2147483647 || int < -2147483648) {
     throw new Error("Invalid integer");
   }
   return int;
-})(2147483647, -2147483648);
+}
 function LTreeParseValue(value) {
   return value;
 }
