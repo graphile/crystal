@@ -726,6 +726,7 @@ type BType {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
 
   """Reads a single `Post` that is related to this `BType`."""
@@ -800,6 +801,9 @@ input BTypeCondition {
 
   """Checks for equality with the object’s `numeric` field."""
   numeric: BigFloat
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: Oid
 
   """Checks for equality with the object’s `point` field."""
   point: PointInput
@@ -989,6 +993,7 @@ input BTypeInput {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  oid: Oid
   point: PointInput!
   regclass: RegClass
   regconfig: RegConfig
@@ -1038,6 +1043,8 @@ enum BTypeOrderBy {
   NATURAL
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ROW_ID_ASC
@@ -1092,6 +1099,7 @@ input BTypePatch {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -6292,6 +6300,9 @@ enum NonUpdatableViewOrderBy {
   COLUMN_DESC
   NATURAL
 }
+
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
 
 """Information about pagination in a connection."""
 type PageInfo {
