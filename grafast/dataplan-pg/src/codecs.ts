@@ -1312,6 +1312,7 @@ export const LIST_TYPES = {
       'boolean',
       'int2',
       'int',
+      'oid'
       'bigint',
       'float4',
       'float',
@@ -1628,6 +1629,11 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.interval;
     case "_interval":
       return LIST_TYPES.interval;
+
+    case "oid":
+      return TYPES.oid;
+    case "_oid":
+      return LIST_TYPES.oid;
 
     case "regclass":
       return TYPES.regclass;
