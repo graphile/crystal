@@ -316,6 +316,7 @@ create table b.types (
   "inet" inet,
   "cidr" cidr,
   "macaddr" macaddr,
+  "oid" oid,
   "regproc" regproc,
   "regprocedure" regprocedure,
   "regoper" regoper,
