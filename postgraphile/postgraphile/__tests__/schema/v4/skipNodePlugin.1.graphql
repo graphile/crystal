@@ -5252,6 +5252,9 @@ enum NullTestRecordsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
+
 """Information about pagination in a connection."""
 type PageInfo {
   """When paginating forwards, the cursor to continue."""
@@ -7867,6 +7870,7 @@ type Type {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
 
   """Reads a single `Post` that is related to this `Type`."""
@@ -7990,6 +7994,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s `numrange` field."""
   numrange: BigFloatRangeInput
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: Oid
 
   """Checks for equality with the object’s `point` field."""
   point: PointInput
@@ -8163,6 +8170,7 @@ input TypeInput {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  oid: Oid
   point: PointInput!
   regclass: RegClass
   regconfig: RegConfig
@@ -8217,6 +8225,7 @@ input TypePatch {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -8343,6 +8352,8 @@ enum TypesOrderBy {
   NULLABLE_POINT_DESC
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   POINT_ASC
   POINT_DESC
   PRIMARY_KEY_ASC

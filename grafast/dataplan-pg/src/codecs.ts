@@ -1164,6 +1164,7 @@ export const TYPES = {
   }),
   int2: s<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
   int: s<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
+  oid: s<number>()("26", "oid", { fromPg: parseAsTrustedInt }),
   bigint: s<string>()("20", "int8"),
   float4: s<number>()("700", "float4", { fromPg: parseFloat }),
   float: s<number>()("701", "float8", { fromPg: parseFloat }),
@@ -1311,6 +1312,7 @@ export const LIST_TYPES = {
       'boolean',
       'int2',
       'int',
+      'oid'
       'bigint',
       'float4',
       'float',
@@ -1370,6 +1372,7 @@ export const LIST_TYPES = {
   boolean: builtinListOfCodec("1000", TYPES.boolean),
   int2: builtinListOfCodec("1005", TYPES.int2),
   int: builtinListOfCodec("1007", TYPES.int),
+  oid: builtinListOfCodec("1028", TYPES.oid),
   bigint: builtinListOfCodec("1016", TYPES.bigint),
   float4: builtinListOfCodec("1021", TYPES.float4),
   float: builtinListOfCodec("1022", TYPES.float),
@@ -1626,6 +1629,11 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.interval;
     case "_interval":
       return LIST_TYPES.interval;
+
+    case "oid":
+      return TYPES.oid;
+    case "_oid":
+      return LIST_TYPES.oid;
 
     case "regclass":
       return TYPES.regclass;

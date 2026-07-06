@@ -2324,6 +2324,8 @@ enum NullTestRecordsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+scalar Oid
+
 type PageInfo {
   endCursor: Cursor
   hasNextPage: Boolean!
@@ -3181,6 +3183,7 @@ type Type implements Node {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
   postById: Post
   postBySmallint: Post
@@ -3234,6 +3237,7 @@ input TypeCondition {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -3321,6 +3325,7 @@ input TypeInput {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  oid: Oid
   point: PointInput!
   regclass: RegClass
   regconfig: RegConfig
@@ -3374,6 +3379,7 @@ input TypePatch {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -3469,6 +3475,8 @@ enum TypesOrderBy {
   NULLABLE_POINT_DESC
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   POINT_ASC
   POINT_DESC
   PRIMARY_KEY_ASC

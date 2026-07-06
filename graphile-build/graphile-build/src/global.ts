@@ -40,7 +40,7 @@ import type {
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.ts";
 import type { InflectionBase } from "./inflection.ts";
-import type { stringTypeSpec, wrapDescription } from "./utils.ts";
+import type { intTypeSpec, stringTypeSpec, wrapDescription } from "./utils.ts";
 
 /*
  * To make it easier for plugins to extend our builtin types we put them all in
@@ -427,9 +427,15 @@ declare global {
 
       /**
        * Generates the spec for a GraphQLScalar (except the name) with the
-       * given description/coercion.
+       * given description/coercion that represents a string.
        */
       stringTypeSpec: typeof stringTypeSpec;
+
+      /**
+       * Generates the spec for a GraphQLScalar (except the name) with the
+       * given description/coercion that represents an int.
+       */
+      intTypeSpec: typeof intTypeSpec;
 
       /**
        * Register a type by name with the system; names must be unique. It's

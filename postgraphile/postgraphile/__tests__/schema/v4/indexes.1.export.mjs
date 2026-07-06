@@ -620,7 +620,7 @@ const uniqueForeignKeyCodec = recordCodec({
     },
     tags: {
       __proto__: null,
-      omit: "create,update,delete,all,order,filter",
+      omit: "create, update, delete, all, order, filter",
       behavior: ["-insert -update -delete -query:resource:list -query:resource:connection -order -orderBy -filter -filterBy"]
     }
   },
@@ -2404,6 +2404,13 @@ const typesCodec = recordCodec({
         isIndexed: false
       }
     },
+    oid: {
+      codec: TYPES.oid,
+      extensions: {
+        __proto__: null,
+        isIndexed: false
+      }
+    },
     regproc: {
       codec: TYPES.regproc,
       extensions: {
@@ -2685,7 +2692,7 @@ const unique_foreign_key_resourceOptionsConfig = {
       name: "unique_foreign_key"
     },
     tags: {
-      omit: "create,update,delete,all,order,filter",
+      omit: "create, update, delete, all, order, filter",
       behavior: ["-insert -update -delete -query:resource:list -query:resource:connection -order -orderBy -filter -filterBy"]
     }
   },
@@ -3098,6 +3105,7 @@ const registry = makeRegistry({
     money: TYPES.money,
     nestedCompoundType: nestedCompoundTypeCodec,
     point: TYPES.point,
+    oid: TYPES.oid,
     regproc: TYPES.regproc,
     regprocedure: TYPES.regprocedure,
     regoper: TYPES.regoper,
@@ -8480,6 +8488,13 @@ const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcd
 const Type_byteaArrayPlan = $record => {
   return $record.get("bytea_array");
 };
+function toInt(expr) {
+  const int = typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
+  if (isNaN(int) || int > 2147483647 || int < -2147483648) {
+    throw new Error("Invalid integer");
+  }
+  return int;
+}
 function LTreeParseValue(value) {
   return value;
 }
@@ -9418,6 +9433,9 @@ function TypeInput_cidrApply(obj, val, info) {
 }
 function TypeInput_macaddrApply(obj, val, info) {
   obj.set("macaddr", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function TypeInput_oidApply(obj, val, info) {
+  obj.set("oid", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function TypeInput_regprocApply(obj, val, info) {
   obj.set("regproc", bakedInputRuntime(info.schema, info.field.type, val));
@@ -11426,6 +11444,7 @@ type Type implements Node {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -11554,6 +11573,9 @@ type Point {
 
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
+
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
 
 """A builtin object identifier type for a function name"""
 scalar RegProc
@@ -17011,6 +17033,7 @@ input TypeInput {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -18474,6 +18497,7 @@ input TypePatch {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -26074,6 +26098,7 @@ export const inputObjects = {
       nullableRange: TypeInput_nullableRangeApply,
       numeric: TypeInput_numericApply,
       numrange: TypeInput_numrangeApply,
+      oid: TypeInput_oidApply,
       point: TypeInput_pointApply,
       regclass: TypeInput_regclassApply,
       regconfig: TypeInput_regconfigApply,
@@ -26129,6 +26154,7 @@ export const inputObjects = {
       nullableRange: TypeInput_nullableRangeApply,
       numeric: TypeInput_numericApply,
       numrange: TypeInput_numrangeApply,
+      oid: TypeInput_oidApply,
       point: TypeInput_pointApply,
       regclass: TypeInput_regclassApply,
       regconfig: TypeInput_regconfigApply,
@@ -26641,6 +26667,18 @@ export const scalars = {
     serialize: GraphQLString.serialize,
     parseValue: GraphQLString.parseValue,
     parseLiteral: GraphQLString.parseLiteral
+  },
+  Oid: {
+    serialize: toInt,
+    parseValue: toInt,
+    parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) {
+        return toInt(ast.value);
+      } else if (ast.kind === Kind.INT) {
+        return toInt(ast.value);
+      }
+      throw new GraphQLError(`Oid can only parse string/integer values (kind='${ast.kind}')`);
+    }
   },
   RegClass: {
     serialize: toString,

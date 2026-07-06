@@ -2030,6 +2030,7 @@ type Type implements Node {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -2158,6 +2159,9 @@ type Point {
 
 """An IPv4 or IPv6 host address, and optionally its subnet."""
 scalar InternetAddress
+
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
 
 """A builtin object identifier type for a function name"""
 scalar RegProc
@@ -2313,6 +2317,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s `macaddr` field."""
   macaddr: String
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: Oid
 
   """Checks for equality with the object’s `regproc` field."""
   regproc: RegProc
@@ -2487,6 +2494,8 @@ enum TypesOrderBy {
   CIDR_DESC
   MACADDR_ASC
   MACADDR_DESC
+  OID_ASC
+  OID_DESC
   REGPROC_ASC
   REGPROC_DESC
   REGPROCEDURE_ASC
@@ -8131,6 +8140,7 @@ input TypeInput {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -9521,6 +9531,7 @@ input TypePatch {
   inet: InternetAddress
   cidr: String
   macaddr: String
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper

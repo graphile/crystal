@@ -548,7 +548,7 @@ const uniqueForeignKeyCodec = recordCodec({
     },
     tags: {
       __proto__: null,
-      omit: "create,update,delete,all,order,filter"
+      omit: "create, update, delete, all, order, filter"
     }
   },
   executor: executor
@@ -1911,6 +1911,9 @@ const bTypesCodec = recordCodec({
     macaddr: {
       codec: TYPES.macaddr
     },
+    oid: {
+      codec: TYPES.oid
+    },
     regproc: {
       codec: TYPES.regproc
     },
@@ -2120,7 +2123,7 @@ const unique_foreign_key_resourceOptionsConfig = {
       name: "unique_foreign_key"
     },
     tags: {
-      omit: "create,update,delete,all,order,filter"
+      omit: "create, update, delete, all, order, filter"
     }
   },
   uniques: unique_foreign_keyUniques
@@ -2523,6 +2526,7 @@ const registry = makeRegistry({
     money: TYPES.money,
     bNestedCompoundType: bNestedCompoundTypeCodec,
     point: TYPES.point,
+    oid: TYPES.oid,
     regproc: TYPES.regproc,
     regprocedure: TYPES.regprocedure,
     regoper: TYPES.regoper,
@@ -7552,6 +7556,13 @@ const BType_byteaArrayPlan = $record => {
   return $record.get("bytea_array");
 };
 const JSONSerialize = value => value;
+function toInt(expr) {
+  const int = typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
+  if (isNaN(int) || int > 2147483647 || int < -2147483648) {
+    throw new Error("Invalid integer");
+  }
+  return int;
+}
 function LTreeParseValue(value) {
   return value;
 }
@@ -8433,6 +8444,9 @@ function BTypeInput_cidrApply(obj, val, info) {
 }
 function BTypeInput_macaddrApply(obj, val, info) {
   obj.set("macaddr", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function BTypeInput_oidApply(obj, val, info) {
+  obj.set("oid", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function BTypeInput_regprocApply(obj, val, info) {
   obj.set("regproc", bakedInputRuntime(info.schema, info.field.type, val));
@@ -10246,6 +10260,7 @@ type BType {
   inet: InternetAddress
   cidr: CidrAddress
   macaddr: MacAddress
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -10381,6 +10396,9 @@ scalar CidrAddress
 """A 6-byte MAC address."""
 scalar MacAddress
 
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
+
 """A builtin object identifier type for a function name"""
 scalar RegProc
 
@@ -10492,6 +10510,9 @@ input BTypeCondition {
   """Checks for equality with the object’s \`macaddr\` field."""
   macaddr: MacAddress
 
+  """Checks for equality with the object’s \`oid\` field."""
+  oid: Oid
+
   """Checks for equality with the object’s \`regproc\` field."""
   regproc: RegProc
 
@@ -10569,6 +10590,8 @@ enum BTypeOrderBy {
   CIDR_DESC
   MACADDR_ASC
   MACADDR_DESC
+  OID_ASC
+  OID_DESC
   LTREE_ASC
   LTREE_DESC
 }
@@ -15868,6 +15891,7 @@ input BTypeInput {
   inet: InternetAddress
   cidr: CidrAddress
   macaddr: MacAddress
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -17007,6 +17031,7 @@ input BTypePatch {
   inet: InternetAddress
   cidr: CidrAddress
   macaddr: MacAddress
+  oid: Oid
   regproc: RegProc
   regprocedure: RegProcedure
   regoper: RegOper
@@ -22633,6 +22658,9 @@ export const inputObjects = {
       numeric($condition, val) {
         return applyAttributeCondition("numeric", TYPES.numeric, $condition, val);
       },
+      oid($condition, val) {
+        return applyAttributeCondition("oid", TYPES.oid, $condition, val);
+      },
       point($condition, val) {
         return applyAttributeCondition("point", TYPES.point, $condition, val);
       },
@@ -22731,6 +22759,7 @@ export const inputObjects = {
       nullableRange: BTypeInput_nullableRangeApply,
       numeric: BTypeInput_numericApply,
       numrange: BTypeInput_numrangeApply,
+      oid: BTypeInput_oidApply,
       point: BTypeInput_pointApply,
       regclass: BTypeInput_regclassApply,
       regconfig: BTypeInput_regconfigApply,
@@ -22786,6 +22815,7 @@ export const inputObjects = {
       nullableRange: BTypeInput_nullableRangeApply,
       numeric: BTypeInput_numericApply,
       numrange: BTypeInput_numrangeApply,
+      oid: BTypeInput_oidApply,
       point: BTypeInput_pointApply,
       regclass: BTypeInput_regclassApply,
       regconfig: BTypeInput_regconfigApply,
@@ -24239,6 +24269,18 @@ export const scalars = {
       throw new GraphQLError(`MacAddress can only parse string values (kind='${ast.kind}')`);
     }
   },
+  Oid: {
+    serialize: toInt,
+    parseValue: toInt,
+    parseLiteral(ast) {
+      if (ast.kind === Kind.STRING) {
+        return toInt(ast.value);
+      } else if (ast.kind === Kind.INT) {
+        return toInt(ast.value);
+      }
+      throw new GraphQLError(`Oid can only parse string/integer values (kind='${ast.kind}')`);
+    }
+  },
   RegClass: {
     serialize: toString,
     parseValue: toString,
@@ -24585,6 +24627,18 @@ export const enums = {
       NUMERIC_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "numeric",
+          direction: "DESC"
+        });
+      },
+      OID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "oid",
+          direction: "ASC"
+        });
+      },
+      OID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "oid",
           direction: "DESC"
         });
       },

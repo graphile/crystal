@@ -620,7 +620,7 @@ const uniqueForeignKeyCodec = recordCodec({
     },
     tags: {
       __proto__: null,
-      omit: "create,update,delete,all,order,filter",
+      omit: "create, update, delete, all, order, filter",
       behavior: ["-insert -update -delete -query:resource:list -query:resource:connection -order -orderBy -filter -filterBy"]
     }
   },
@@ -2706,6 +2706,15 @@ const typesCodec = recordCodec({
         canUpdate: false
       }
     },
+    oid: {
+      codec: TYPES.oid,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
     regproc: {
       codec: TYPES.regproc,
       extensions: {
@@ -2979,7 +2988,7 @@ const unique_foreign_key_resourceOptionsConfig = {
       name: "unique_foreign_key"
     },
     tags: {
-      omit: "create,update,delete,all,order,filter",
+      omit: "create, update, delete, all, order, filter",
       behavior: ["-insert -update -delete -query:resource:list -query:resource:connection -order -orderBy -filter -filterBy"]
     },
     canSelect: false,
@@ -3409,6 +3418,7 @@ const registry = makeRegistry({
     money: TYPES.money,
     nestedCompoundType: nestedCompoundTypeCodec,
     point: TYPES.point,
+    oid: TYPES.oid,
     regproc: TYPES.regproc,
     regprocedure: TYPES.regprocedure,
     regoper: TYPES.regoper,

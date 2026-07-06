@@ -2867,6 +2867,9 @@ enum NullTestRecordsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
+
 """Information about pagination in a connection."""
 type PageInfo {
   """When paginating forwards, the cursor to continue."""
@@ -4058,6 +4061,7 @@ type Type {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
   regclass: RegClass
   regconfig: RegConfig

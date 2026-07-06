@@ -183,7 +183,7 @@ export function isValidObjectType(
   );
 }
 
-function toString(value: any) {
+function toString(value: unknown): string {
   return "" + value;
 }
 exportNameHint(toString, "toString");
@@ -284,6 +284,79 @@ export const stringTypeSpec = (
           );
         },
         [GraphQLError, Kind, name],
+      ),
+  extensions: {
+    grafast: {
+      idempotent: !coerce || (coerce as any)[$$idempotent] ? true : false,
+    },
+  },
+});
+
+const intMax = 2 ** 31 - 1;
+const intMin = -(2 ** 31);
+
+const toInt = EXPORTABLE(
+  (intMax, intMin) =>
+    function toInt(expr: unknown): number {
+      const int =
+        typeof expr === "number" ? Math.floor(expr) : parseInt("" + expr, 10);
+      if (isNaN(int) || int > intMax || int < intMin) {
+        throw new Error("Invalid integer");
+      }
+      return int;
+    },
+  [intMax, intMin],
+  "toInt",
+);
+
+/**
+ * Generates the spec for a GraphQLScalar (except the name) with the
+ * given description/coercion.
+ */
+export const intTypeSpec = (
+  description: string | null,
+  coerce?: (input: string | number) => number,
+  name?: string,
+): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
+  description,
+  serialize: toInt,
+  parseValue: coerce
+    ? EXPORTABLE(
+        (coerce, toInt) => (value) =>
+          toInt(typeof value === "number" ? coerce(value) : coerce("" + value)),
+        [coerce, toInt],
+      )
+    : toInt,
+  parseLiteral: coerce
+    ? EXPORTABLE(
+        (GraphQLError, Kind, coerce, name, toInt) => (ast) => {
+          if (ast.kind === Kind.STRING) {
+            return toInt(coerce(ast.value));
+          } else if (ast.kind === Kind.INT) {
+            return toInt(coerce(ast.value));
+          }
+          throw new GraphQLError(
+            `${name ?? "This scalar"} can only parse string/integer values (kind = '${
+              ast.kind
+            }')`,
+          );
+        },
+        [GraphQLError, Kind, coerce, name, toInt],
+      )
+    : EXPORTABLE(
+        (GraphQLError, Kind, name, toInt) => (ast) => {
+          if (ast.kind === Kind.STRING) {
+            return toInt(ast.value);
+          } else if (ast.kind === Kind.INT) {
+            return toInt(ast.value);
+          }
+          throw new GraphQLError(
+            `${name ?? "This scalar"} can only parse string/integer values (kind='${
+              ast.kind
+            }')`,
+          );
+        },
+        [GraphQLError, Kind, name, toInt],
       ),
   extensions: {
     grafast: {

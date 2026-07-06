@@ -5900,6 +5900,7 @@ type Type implements node {
   nullableRange: bigfloatRange
   numeric: bigfloat!
   numrange: bigfloatRange!
+  oid: oid
   point: point!
 
   """Reads a single `Post` that is related to this `Type`."""
@@ -6023,6 +6024,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s `numrange` field."""
   numrange: bigfloatRangeInput
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: oid
 
   """Checks for equality with the object’s `point` field."""
   point: pointInput
@@ -6196,6 +6200,7 @@ input TypeInput {
   nullableRange: bigfloatRangeInput
   numeric: bigfloat!
   numrange: bigfloatRangeInput!
+  oid: oid
   point: pointInput!
   regclass: regclass
   regconfig: regconfig
@@ -6250,6 +6255,7 @@ input TypePatch {
   nullableRange: bigfloatRangeInput
   numeric: bigfloat
   numrange: bigfloatRangeInput
+  oid: oid
   point: pointInput
   regclass: regclass
   regconfig: regconfig
@@ -6375,6 +6381,8 @@ enum TypesOrderBy {
   NULLABLE_POINT_DESC
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   POINT_ASC
   POINT_DESC
   REGCLASS_ASC
@@ -9165,6 +9173,9 @@ interface node {
   """
   nodeId: ID!
 }
+
+"""PostgreSQL identifier for a database entity"""
+scalar oid
 
 """Information about pagination in a connection."""
 type pageinfo {
