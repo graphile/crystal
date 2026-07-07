@@ -226,7 +226,8 @@ const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMul
   isAnonymous: true
 });
 const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid"), {
-  extensions: {}
+  extensions: {},
+  hasDefault: true
 });
 const nonUpdatableViewIdentifier = sql.identifier("a", "non_updatable_view");
 const nonUpdatableViewCodec = recordCodec({
@@ -662,7 +663,8 @@ const jwtTokenCodec = recordCodec({
 const issue756Identifier = sql.identifier("c", "issue756");
 const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sql.identifier("c", "not_null_timestamp"), {
   extensions: {},
-  notNull: true
+  notNull: true,
+  hasDefault: true
 });
 const issue756Codec = recordCodec({
   name: "issue756",

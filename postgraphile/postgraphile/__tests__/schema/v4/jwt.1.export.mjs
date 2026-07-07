@@ -73,7 +73,8 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
       schemaName: "b",
       name: "guid"
     }
-  }
+  },
+  hasDefault: true
 });
 const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const updatableViewCodec = recordCodec({

@@ -551,7 +551,8 @@ const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp
       name: "not_null_timestamp"
     }
   },
-  notNull: true
+  notNull: true,
+  hasDefault: true
 });
 const issue756Codec = recordCodec({
   name: "issue756",
