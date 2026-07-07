@@ -287,7 +287,8 @@ const bGuidCodec = domainOfCodec(TYPES.varchar, "bGuid", sql.identifier("b", "gu
       schemaName: "b",
       name: "guid"
     }
-  }
+  },
+  hasDefault: true
 });
 const nonUpdatableViewIdentifier = sql.identifier("a", "non_updatable_view");
 const nonUpdatableViewCodec = recordCodec({
@@ -930,7 +931,8 @@ const cNotNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "cNotNullTimesta
       name: "not_null_timestamp"
     }
   },
-  notNull: true
+  notNull: true,
+  hasDefault: true
 });
 const cIssue756Codec = recordCodec({
   name: "cIssue756",
