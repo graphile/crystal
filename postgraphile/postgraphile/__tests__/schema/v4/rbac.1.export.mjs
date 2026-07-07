@@ -5465,6 +5465,7 @@ const registry = makeRegistry({
         isInsertable: false,
         isUpdatable: false,
         isDeletable: false,
+        isView: true,
         canSelect: false,
         canInsert: false,
         canUpdate: false,
@@ -5688,6 +5689,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "testview"
         },
+        isView: true,
         canSelect: false,
         canInsert: false,
         canUpdate: false,
@@ -5800,6 +5802,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "updatable_view"
         },
+        isView: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"

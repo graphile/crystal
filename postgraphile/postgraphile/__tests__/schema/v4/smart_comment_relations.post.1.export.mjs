@@ -435,6 +435,7 @@ const offers_resourceOptionsConfig = {
       schemaName: "smart_comment_relations",
       name: "offer_view"
     },
+    isView: true,
     tags: {
       name: "offers",
       primaryKey: "id",
@@ -524,6 +525,7 @@ const houses_resourceOptionsConfig = {
     isInsertable: false,
     isUpdatable: false,
     isDeletable: false,
+    isView: true,
     tags: {
       primaryKey: "street_id,property_id",
       foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
@@ -911,6 +913,7 @@ const registry = makeRegistry({
           schemaName: "smart_comment_relations",
           name: "post_view"
         },
+        isView: true,
         tags: {
           name: "posts",
           primaryKey: "id"
