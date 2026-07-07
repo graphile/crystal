@@ -4573,7 +4573,8 @@ const registry = makeRegistry({
         },
         isInsertable: false,
         isUpdatable: false,
-        isDeletable: false
+        isDeletable: false,
+        isView: true
       }
     },
     inputs: {
@@ -4697,7 +4698,8 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "a",
           name: "testview"
-        }
+        },
+        isView: true
       }
     },
     unique_foreign_key: unique_foreign_key_resourceOptionsConfig,
@@ -4820,6 +4822,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "updatable_view"
         },
+        isView: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"

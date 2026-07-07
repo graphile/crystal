@@ -3264,7 +3264,9 @@ const registry = makeRegistry({
       identifier: "main.a.non_updatable_view",
       from: nonUpdatableViewIdentifier,
       codec: nonUpdatableViewCodec,
-      extensions: {}
+      extensions: {
+        isView: true
+      }
     },
     inputs: {
       executor: executor,
@@ -3340,7 +3342,9 @@ const registry = makeRegistry({
       identifier: "main.a.testview",
       from: testviewIdentifier,
       codec: testviewCodec,
-      extensions: {}
+      extensions: {
+        isView: true
+      }
     },
     unique_foreign_key: unique_foreign_key_resourceOptionsConfig,
     my_table: {
@@ -3415,7 +3419,9 @@ const registry = makeRegistry({
       identifier: "main.b.updatable_view",
       from: updatableViewIdentifier,
       codec: updatableViewCodec,
-      extensions: {},
+      extensions: {
+        isView: true
+      },
       uniques: updatable_viewUniques,
       description: "YOYOYO!!"
     },

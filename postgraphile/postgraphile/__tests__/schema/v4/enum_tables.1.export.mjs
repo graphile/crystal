@@ -484,6 +484,7 @@ const abcd_view_resourceOptionsConfig = {
       schemaName: "enum_tables",
       name: "abcd_view"
     },
+    isView: true,
     tags: {
       primaryKey: "letter",
       enum: true,

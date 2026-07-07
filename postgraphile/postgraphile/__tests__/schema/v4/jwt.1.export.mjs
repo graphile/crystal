@@ -1368,6 +1368,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "updatable_view"
         },
+        isView: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"
