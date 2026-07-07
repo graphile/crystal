@@ -380,19 +380,30 @@ export default function makeNewBuild(
     },
 
     getTypeByName(typeName) {
-      if (currentTypeDetails && !BUILTINS.includes(typeName)) {
-        throw new Error(
-          `Error in spec callback for ${currentTypeDetails.klass.name} '${
-            currentTypeDetails.typeName
-          }'; the callback made a call to \`build.getTypeByName(${JSON.stringify(
-            typeName,
-          )})\` (directly or indirectly) - this is the wrong time for such a call \
+      if (
+        currentTypeDetails &&
+        currentTypeDetails.klass !== GraphQLScalarType &&
+        !BUILTINS.includes(typeName)
+      ) {
+        const details = typeRegistry[typeName];
+        if (
+          !details ||
+          (details.klass !== GraphQLScalarType &&
+            details.klass !== GraphQLEnumType)
+        ) {
+          throw new Error(
+            `Error in spec callback for ${currentTypeDetails.klass.name} '${
+              currentTypeDetails.typeName
+            }'; the callback made a call to \`build.getTypeByName(${JSON.stringify(
+              typeName,
+            )})\` (directly or indirectly) - this is the wrong time for such a call \
 to occur since it can lead to circular dependence. To fix this, ensure that any \
 calls to \`getTypeByName\` can only occur inside of the callbacks, such as \
-\`fields()\`, \`interfaces()\`, \`types()\` or similar. Be sure to use the callback \
+\`fields()\`, \`interfaces()\`, \`types()\`, \`values()\` or similar. Be sure to use the callback \
 style for these configuration options (e.g. change \`interfaces: \
 [getTypeByName('Foo')]\` to \`interfaces: () => [getTypeByName('Foo')]\``,
-        );
+          );
+        }
       }
       if (!this.status.isInitPhaseComplete) {
         throw new Error(mustUseThunkMessage("build.getTypeByName"));
