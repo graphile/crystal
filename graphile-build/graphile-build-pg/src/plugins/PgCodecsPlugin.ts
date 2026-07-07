@@ -429,7 +429,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
-              ...(pgClass.relpersistence !== "p"
+              ...(pgClass.relpersistence != null &&
+              pgClass.relpersistence !== "p"
                 ? { persistence: pgClass.relpersistence }
                 : null),
             },

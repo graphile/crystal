@@ -3,5 +3,5 @@
 "postgraphile": patch
 ---
 
-Add `pgResource.extensions.pg.kind` so we can determine which resources came
-from views/materialized views
+Add `pgResource.extensions.isView` and `.isMaterializedView` so we can determine
+which resources came from views/materialized views.

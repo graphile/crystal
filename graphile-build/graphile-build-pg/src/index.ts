@@ -141,7 +141,6 @@ declare global {
         schemaName: string;
         name: string;
         /**
-         * - p = permanent table/sequence (not output if kind === "r")
          * - u = unlogged table/sequence
          * - t = temporary table/sequence
          */
