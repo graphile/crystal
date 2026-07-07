@@ -728,6 +728,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             typcollation: _domainCollation,
             typdefaultbin: _defaultValueNodeTree,
           } = type;
+          const hasDefault = type.typdefault != null;
           const innerCodec = baseTypeOid
             ? await info.helpers.pgCodecs.getCodecFromType(
                 serviceName,
@@ -766,6 +767,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             const spec = {
               extensions,
               ...(notNull ? { notNull } : null),
+              ...(hasDefault ? { hasDefault } : null),
               ...(description ? { description } : null),
             };
             event.pgCodec = EXPORTABLE(

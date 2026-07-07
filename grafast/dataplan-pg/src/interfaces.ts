@@ -303,6 +303,10 @@ export interface PgCodec<
    * If this is a domain, does it add a non-null constraint?
    */
   notNull?: boolean;
+  /**
+   * If this is a domain, does it add a default value?
+   */
+  hasDefault?: boolean;
 
   /**
    * The underlying codec that this type is a range over.

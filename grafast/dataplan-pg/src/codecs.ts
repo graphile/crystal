@@ -824,6 +824,8 @@ export function domainOfCodec<
     extensions?: Partial<DataplanPg.PgCodecExtensions>;
     /** Whether this domain is not nullable. */
     notNull?: boolean | null;
+    /** Whether this domain has a default. */
+    hasDefault?: boolean | null;
   } = {},
 ): PgCodec<
   TName,
@@ -833,7 +835,7 @@ export function domainOfCodec<
   TInnerCodec,
   undefined
 > {
-  const { description, extensions, notNull } = config;
+  const { description, extensions, notNull, hasDefault } = config;
   return {
     // Generally same as underlying type:
     ...innerCodec,
@@ -845,6 +847,7 @@ export function domainOfCodec<
     extensions,
     domainOfCodec: innerCodec.arrayOfCodec ? undefined : innerCodec,
     notNull: Boolean(notNull),
+    hasDefault: Boolean(hasDefault),
     [inspect.custom]: codecInspect,
   };
 }
