@@ -286,6 +286,12 @@ function processOmit(
           );
           break;
         }
+        case "insert": {
+          console.warn(
+            `WARNING: an existing smart tag for ${source} includes 'insert' in the list of @omit's. This would be ignored by V4 (likely you meant to \`@omit create\` instead), so we are ignoring it to match the V4 behavior.`,
+          );
+          break;
+        }
         case "": {
           // ignore
           break;
