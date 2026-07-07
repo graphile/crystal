@@ -306,7 +306,7 @@ export interface PgCodec<
   /**
    * If this is a domain, does it add a default value?
    */
-  hasDefault?: true;
+  hasDefault?: boolean;
 
   /**
    * The underlying codec that this type is a range over.
