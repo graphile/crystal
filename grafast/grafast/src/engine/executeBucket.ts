@@ -20,6 +20,7 @@ import type {
   ExecuteStepEvent,
   ExecutionDetails,
   ExecutionDetailsStream,
+  ExecutionDetailsValues,
   ExecutionEntryFlags,
   ExecutionExtra,
   ExecutionResults,
@@ -830,7 +831,7 @@ export function executeBucket(
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
       count,
-      values,
+      values: values as ExecutionDetailsValues<readonly any[]>,
       extra,
       stream: evaluateStream(bucket, step, distributorOptions),
     };
