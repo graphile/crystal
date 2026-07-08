@@ -48,21 +48,24 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         for (const pgClass of introspection.classes) {
           processTags(
             pgClass.getTags(),
-            `pg_class ${pgClass.getNamespace()?.nspname}.${pgClass.relname}`,
+            "pg_class",
+            `${pgClass.getNamespace()?.nspname}.${pgClass.relname}`,
           );
         }
         for (const pgAttr of introspection.attributes) {
           const pgClass = pgAttr.getClass();
           processTags(
             pgAttr.getTags(),
-            `pg_attribute ${pgClass?.getNamespace()?.nspname}.${pgClass?.relname}.${pgAttr.attname}`,
+            "pg_attribute",
+            `${pgClass?.getNamespace()?.nspname}.${pgClass?.relname}.${pgAttr.attname}`,
           );
         }
         for (const pgConstraint of introspection.constraints) {
           const pgClass = pgConstraint.getClass();
           processTags(
             pgConstraint.getTags(),
-            `pg_constraint ${pgClass?.getNamespace()?.nspname}.${pgClass?.relname}.${pgConstraint.conname}`,
+            "pg_constraint",
+            `${pgClass?.getNamespace()?.nspname}.${pgClass?.relname}.${pgConstraint.conname}`,
           );
 
           // In V4, if a attribute has `@omit read` then any constraint that uses that attribute also has `@omit read`
@@ -86,13 +89,15 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         for (const pgProc of introspection.procs) {
           processTags(
             pgProc.getTags(),
-            `pg_proc ${pgProc.getNamespace()?.nspname}.${pgProc.proname}`,
+            "pg_proc",
+            `${pgProc.getNamespace()?.nspname}.${pgProc.proname}`,
           );
         }
         for (const pgType of introspection.types) {
           processTags(
             pgType.getTags(),
-            `pg_type ${pgType.getNamespace()?.nspname}.${pgType.typname}`,
+            "pg_type",
+            `${pgType.getNamespace()?.nspname}.${pgType.typname}`,
           );
         }
       },
@@ -100,7 +105,8 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         const { entity } = event;
         processTags(
           entity.getTags(),
-          `fake pg_constraint ${entity.getNamespace()?.nspname}.${entity.conname}`,
+          "pg_constraint",
+          `(fake) ${entity.getNamespace()?.nspname}.${entity.conname}`,
         );
       },
     },
@@ -111,16 +117,17 @@ export default PgV4SmartTagsPlugin;
 
 function processTags(
   tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+  sourceType: string,
   source: string,
 ): void {
   processUniqueKey(tags);
-  processOmit(tags, source);
+  processOmit(tags, sourceType + " " + source);
   convertBoolean(
     tags,
     "sortable",
     "orderBy order resource:connection:backwards",
   );
-  convertBoolean(tags, "filterable", "filter filterBy");
+  convertBoolean(tags, "filterable", `filter filterProc filterBy`);
   // convertBoolean(tags, "enum", "enum");
   processSimpleCollections(tags);
 }
