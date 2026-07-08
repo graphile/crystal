@@ -24,6 +24,7 @@ import type {
   ExecutionExtra,
   ExecutionResults,
   ExecutionValue,
+  ExecutionValues,
   ForcedValues,
   GrafastInternalResultsOrStream,
   IndexForEach,
@@ -830,7 +831,7 @@ export function executeBucket(
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
       count,
-      values,
+      values: values as ExecutionValues,
       extra,
       stream: evaluateStream(bucket, step, distributorOptions),
     };
