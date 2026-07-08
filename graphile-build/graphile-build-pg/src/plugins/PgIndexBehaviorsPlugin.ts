@@ -67,7 +67,7 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             );
           });
           if (!isIndexed) {
-            relation.extensions ??= Object.create(null) as {};
+            relation.extensions ??= Object.create(null) as object;
             if (!("isIndexed" in relation.extensions)) {
               relation.extensions.isIndexed = false;
             }
@@ -96,7 +96,7 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           );
         });
         if (!isIndexed) {
-          attribute.extensions ??= Object.create(null) as {};
+          attribute.extensions ??= Object.create(null) as object;
           if (!("isIndexed" in attribute.extensions)) {
             attribute.extensions.isIndexed = false;
           }
