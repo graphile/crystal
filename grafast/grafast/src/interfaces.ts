@@ -726,7 +726,9 @@ type TupleIndicies<T extends readonly [...any[]]> = {
 export type ExecutionDetailsValues<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > = { [TKey in keyof TDeps]: ExecutionValue<TDeps[TKey]> } & {
-  at<TKey extends TupleIndicies<TDeps>>(idx: TKey): ExecutionValue<TDeps[TKey]>;
+  get<const TKey extends TupleIndicies<TDeps>>(
+    idx: TKey,
+  ): ExecutionValue<TDeps[TKey]>;
 };
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],

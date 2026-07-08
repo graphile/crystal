@@ -831,7 +831,9 @@ export function executeBucket(
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
       count,
-      values: values as ExecutionDetailsValues<readonly any[]>,
+      values: Object.assign(values, {
+        get: values.at as ExecutionDetailsValues["get"],
+      }),
       extra,
       stream: evaluateStream(bucket, step, distributorOptions),
     };
