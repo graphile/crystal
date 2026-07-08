@@ -720,6 +720,9 @@ export interface ExecutionDetailsStream {
   initialCount: number;
 }
 
+type TupleIndicies<T extends readonly [...any[]]> = {
+  [K in keyof T]: K extends `${infer N extends number}` ? N : never;
+}[keyof T];
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
@@ -728,10 +731,11 @@ export interface ExecutionDetails<
 
   /** An "execution value" for each dependency of the step */
   values: {
-    [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
+    [DepIdx in TupleIndicies<TDeps>]: ExecutionValue<TDeps[DepIdx]>;
   } & {
     length: TDeps["length"];
     map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
+    [Symbol.iterator](): IterableIterator<ExecutionValue<TDeps[number]>>;
   };
 
   /** Helper; makes array from `callback(batchIndex)` for each `0 <= batchIndex < count` */
