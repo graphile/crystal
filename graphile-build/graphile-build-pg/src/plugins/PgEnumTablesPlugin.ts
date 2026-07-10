@@ -239,6 +239,7 @@ Original error: ${e.message}
             throw new Error(message);
           } else {
             console.warn(message);
+            return [];
           }
         }
       },
