@@ -1,3 +1,4 @@
+import type { PgClass } from "pg-introspection";
 declare global {
   namespace GraphileConfig {
     interface Plugins {
@@ -17,6 +18,10 @@ declare global {
       manyToMany: true;
     }
   }
+}
+
+function canHaveIndexes(tbl: PgClass) {
+  return tbl.relkind === "r" || tbl.relkind === "m" || tbl.relkind === "f";
 }
 
 export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
@@ -43,8 +48,8 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             .getAttributes()!
             .map((att) => att.attname);
           const remoteTable = pgConstraint.getClass()!;
-          if (remoteTable.relkind === "v") {
-            // Views can't have indexes; give them the benefit of the doubt
+          if (!canHaveIndexes(remoteTable)) {
+            // Views, composite types, etc. can't have indexes; give them the benefit of the doubt
             return;
           }
           const remoteIndexes = remoteTable
@@ -62,8 +67,10 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             );
           });
           if (!isIndexed) {
-            relation.extensions ??= Object.create(null);
-            relation.extensions!.isIndexed = false;
+            relation.extensions ??= Object.create(null) as object;
+            if (!("isIndexed" in relation.extensions)) {
+              relation.extensions.isIndexed = false;
+            }
           }
         }
       },
@@ -73,8 +80,8 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
 
         // If this attribute isn't indexed, remove the filter and order behaviors
         const tbl = pgAttribute.getClass()!;
-        if (tbl.relkind === "v") {
-          // Views can't have indexes; so stop
+        if (!canHaveIndexes(tbl)) {
+          // Views, composite types, etc. can't have indexes; so stop
           return;
         }
         const isIndexed = tbl.getIndexes().some((idx) => {
@@ -89,8 +96,10 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           );
         });
         if (!isIndexed) {
-          attribute.extensions ??= Object.create(null);
-          attribute.extensions!.isIndexed = false;
+          attribute.extensions ??= Object.create(null) as object;
+          if (!("isIndexed" in attribute.extensions)) {
+            attribute.extensions.isIndexed = false;
+          }
         }
       },
     },
