@@ -223,7 +223,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
              * error caused by the statement above failing.
              */
           }
-          throw new Error(`Introspection could not read from enum table "${
+          const message = `Introspection could not read from enum table "${
             pgClass.getNamespace()!.nspname
           }"."${pgClass.relname}", perhaps you need to grant access:
   GRANT USAGE ON SCHEMA "${pgClass.getNamespace()!.nspname}" TO "${role}";
@@ -231,7 +231,15 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     pgClass.relname
   }" TO "${role}";
 Original error: ${e.message}
-`);
+`;
+          // Throw error if this enum table is in an exposed schema, otherwise just warn.
+          if (
+            pgService?.schemas?.includes(pgClass.getNamespace()?.nspname ?? "")
+          ) {
+            throw new Error(message);
+          } else {
+            console.warn(message);
+          }
         }
       },
       async processIntrospection(info, event) {
