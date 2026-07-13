@@ -5237,7 +5237,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       isUnique: true
@@ -5269,7 +5269,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       isUnique: true
@@ -5626,7 +5626,7 @@ const registry = makeRegistry({
           notNull: true,
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         },
         singleOutputParameterName: "o1"
       },
@@ -6386,7 +6386,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       hasImplicitOrder: true
