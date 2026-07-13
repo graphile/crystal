@@ -1,6 +1,6 @@
 ---
-"graphile-build-pg": patch
-"postgraphile": patch
+"graphile-build-pg": minor
+"postgraphile": minor
 ---
 
 Fix: index behaviors plugin updated so that only attributes (columns) on tables,

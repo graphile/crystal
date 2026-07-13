@@ -1,6 +1,7 @@
 ---
-"graphile-build-pg": patch
-"@dataplan/pg": patch
+"graphile-build-pg": minor
+"@dataplan/pg": minor
+"postgraphile": minor
 ---
 
 Add 'oid' as a builtin type.
