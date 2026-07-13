@@ -44,6 +44,8 @@ export class CoalesceStep<T> extends UnbatchedStep<T | null> {
     else {
       // Keep default
     }
+
+    super.finalize();
   }
 
   unbatchedExecute(
