@@ -1,5 +1,39 @@
 # @dataplan/pg
 
+## 1.1.0
+
+### Minor Changes
+
+- [#3084](https://github.com/graphile/crystal/pull/3084)
+  [`dd3db66`](https://github.com/graphile/crystal/commit/dd3db664c1315ee594e190e9723a667da7806cfa)
+  Thanks [@benjie](https://github.com/benjie)! - Add 'oid' as a builtin type.
+
+### Patch Changes
+
+- [#3089](https://github.com/graphile/crystal/pull/3089)
+  [`24a9481`](https://github.com/graphile/crystal/commit/24a94819ec9d35fb147c5228d6803f455109eda7)
+  Thanks [@benjie](https://github.com/benjie)! - Domain codecs can now indicate
+  if they have a default value.
+
+- [#3071](https://github.com/graphile/crystal/pull/3071)
+  [`3dff681`](https://github.com/graphile/crystal/commit/3dff681c8da4c66c37ac2f82896dc869b54d0c21)
+  Thanks [@benjie](https://github.com/benjie)! - Previously we used
+  `rootValue()` to represent the Query type; but in GraphQL.js rootValue can be
+  null/undefined. Typically you just need a truthy value, so we now use an empty
+  object.
+- Updated dependencies
+  [[`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947),
+  [`d5fa38b`](https://github.com/graphile/crystal/commit/d5fa38bf6fadea8d71be9372b10e814e07dccb1a),
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537),
+  [`1a9b835`](https://github.com/graphile/crystal/commit/1a9b835d0b8bc8adb22a864a23eff0c521e2309f),
+  [`ccbbd7c`](https://github.com/graphile/crystal/commit/ccbbd7c6d4245ab5f0f1a2e6a5f2f8611241ea3c),
+  [`3b56a51`](https://github.com/graphile/crystal/commit/3b56a51ad751ce14b0c8c167df09bc9c3fbc11c3),
+  [`e60e2ed`](https://github.com/graphile/crystal/commit/e60e2ed455068a1d745af99fe6f9f779a8ce8088),
+  [`f0d1f48`](https://github.com/graphile/crystal/commit/f0d1f487ecd12299cd5e416aa5c7282dfd7c9992),
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1)]:
+  - grafast@1.1.0
+  - @dataplan/json@1.0.1
+
 ## 1.0.3
 
 ### Patch Changes

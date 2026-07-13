@@ -1,5 +1,65 @@
 # graphile-build-pg
 
+## 5.1.0
+
+### Minor Changes
+
+- [#3084](https://github.com/graphile/crystal/pull/3084)
+  [`dd3db66`](https://github.com/graphile/crystal/commit/dd3db664c1315ee594e190e9723a667da7806cfa)
+  Thanks [@benjie](https://github.com/benjie)! - Add 'oid' as a builtin type.
+
+- [#3098](https://github.com/graphile/crystal/pull/3098)
+  [`75444ac`](https://github.com/graphile/crystal/commit/75444ac72b03f8479fb4e007795be247ad5e8115)
+  Thanks [@benjie](https://github.com/benjie)! - Fix: index behaviors plugin
+  updated so that only attributes (columns) on tables, materialized views and
+  foreign tables are scanned for indexes; all other types (including composite
+  types, views, ...) are given the benefit of the doubt.
+
+  This might result in more fields showing up in your schema.
+
+### Patch Changes
+
+- [#3065](https://github.com/graphile/crystal/pull/3065)
+  [`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947)
+  Thanks [@benjie](https://github.com/benjie)! - `fieldArgs` are now created in
+  the root plan and applied in the layer plan of the target step; this fixes an
+  issue where fieldArgs could not be applied to step with side effects.
+
+- [#3088](https://github.com/graphile/crystal/pull/3088)
+  [`d3d4376`](https://github.com/graphile/crystal/commit/d3d4376dbf900b53f87e85574839939b85a31dbb)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `pgResource.extensions.isView`, `.isMaterializedView`, `.isForeignTable` so
+  plugins can determine which resources came from views/materialized
+  views/foreign tables.
+
+- [#3086](https://github.com/graphile/crystal/pull/3086)
+  [`65527f8`](https://github.com/graphile/crystal/commit/65527f86826757e1c92a7e8b4e74fc2a299b740c)
+  Thanks [@benjie](https://github.com/benjie)! - Add `build.dataplanJson`
+  property - a copy of `@dataplan/json`
+
+- [#3099](https://github.com/graphile/crystal/pull/3099)
+  [`4b5b673`](https://github.com/graphile/crystal/commit/4b5b6730748c75a9a94502d933eeb2eae6c8504c)
+  Thanks [@benjie](https://github.com/benjie)! - PostGraphile will only throw an
+  error when it fails to read enum table values from a table in a published
+  schema (one in the `schemas` list in your pgServices); enum tables in other
+  schemas will result in a warning instead (since during the gather phase we
+  don't know whether or not they will be needed come schema build time).
+
+- [#3089](https://github.com/graphile/crystal/pull/3089)
+  [`24a9481`](https://github.com/graphile/crystal/commit/24a94819ec9d35fb147c5228d6803f455109eda7)
+  Thanks [@benjie](https://github.com/benjie)! - Domain codecs can now indicate
+  if they have a default value.
+
+- [#3063](https://github.com/graphile/crystal/pull/3063)
+  [`d3156df`](https://github.com/graphile/crystal/commit/d3156df8cd95c517f329ffa904bb2fec9db2b370)
+  Thanks [@benjie](https://github.com/benjie)! - Improve scopes around
+  PgMutationCreatePlugin
+
+- Updated dependencies
+  [[`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)]:
+  - graphile-config@1.1.0
+
 ## 5.0.2
 
 ### Patch Changes
