@@ -1048,39 +1048,19 @@ const jwtTokenCodec = recordCodec({
   attributes: {
     __proto__: null,
     role: {
-      codec: TYPES.text,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.text
     },
     exp: {
-      codec: TYPES.bigint,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.bigint
     },
     a: {
-      codec: TYPES.int,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.int
     },
     b: {
-      codec: TYPES.numeric,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.numeric
     },
     c: {
-      codec: TYPES.bigint,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.bigint
     }
   },
   extensions: {
@@ -1142,25 +1122,13 @@ const authPayloadCodec = recordCodec({
   attributes: {
     __proto__: null,
     jwt: {
-      codec: jwtTokenCodec,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: jwtTokenCodec
     },
     id: {
-      codec: TYPES.int,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.int
     },
     admin: {
-      codec: TYPES.boolean,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.boolean
     }
   },
   extensions: {
@@ -1207,18 +1175,10 @@ const comptypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     schedule: {
-      codec: TYPES.timestamptz,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.timestamptz
     },
     is_optimised: {
-      codec: TYPES.boolean,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.boolean
     }
   },
   extensions: {
@@ -1371,60 +1331,28 @@ const compoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      codec: TYPES.int,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.int
     },
     b: {
-      codec: TYPES.text,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.text
     },
     c: {
-      codec: colorCodec,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: colorCodec
     },
     d: {
-      codec: TYPES.uuid,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.uuid
     },
     e: {
-      codec: enumCapsCodec,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: enumCapsCodec
     },
     f: {
-      codec: enumWithEmptyStringCodec,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: enumWithEmptyStringCodec
     },
     g: {
-      codec: TYPES.interval,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.interval
     },
     foo_bar: {
-      codec: TYPES.int,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.int
     }
   },
   extensions: {
@@ -1557,11 +1485,7 @@ const wrappedUrlCodec = recordCodec({
     __proto__: null,
     url: {
       codec: notNullUrlCodec,
-      notNull: true,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      notNull: true
     }
   },
   extensions: {
@@ -2062,25 +1986,13 @@ const nestedCompoundTypeCodec = recordCodec({
   attributes: {
     __proto__: null,
     a: {
-      codec: compoundTypeCodec,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: compoundTypeCodec
     },
     b: {
-      codec: compoundTypeCodec,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: compoundTypeCodec
     },
     baz_buz: {
-      codec: TYPES.int,
-      extensions: {
-        __proto__: null,
-        isIndexed: false
-      }
+      codec: TYPES.int
     }
   },
   extensions: {
@@ -3150,25 +3062,13 @@ const registry = makeRegistry({
       attributes: {
         __proto__: null,
         row_name: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_1: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_2: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         }
       },
       extensions: {
@@ -3187,32 +3087,16 @@ const registry = makeRegistry({
       attributes: {
         __proto__: null,
         row_name: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_1: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_2: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_3: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         }
       },
       extensions: {
@@ -3231,39 +3115,19 @@ const registry = makeRegistry({
       attributes: {
         __proto__: null,
         row_name: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_1: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_2: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_3: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         },
         category_4: {
-          codec: TYPES.text,
-          extensions: {
-            __proto__: null,
-            isIndexed: false
-          }
+          codec: TYPES.text
         }
       },
       extensions: {
@@ -5800,7 +5664,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       isUnique: true
@@ -5832,7 +5696,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       isUnique: true
@@ -6189,7 +6053,7 @@ const registry = makeRegistry({
           notNull: true,
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         },
         singleOutputParameterName: "o1"
       },
@@ -6949,7 +6813,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterProc filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       hasImplicitOrder: true
