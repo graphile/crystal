@@ -610,6 +610,7 @@ export /* abstract */ class Step<TData = any> {
     rawStep: Step,
     allowIndirectReason: string | null = null,
   ): number | null {
+    assertStep(rawStep, () => `${this}.addRef`);
     const step = this.operationPlan.stepTracker.getStepById(rawStep.id);
     if (isDev && !allowIndirectReason && !stepADependsOnStepB(this, step)) {
       const allRefs = (
@@ -672,10 +673,12 @@ ${printDeps(step, 1)}
   }
 
   protected canAddDependency(step: Step): boolean {
+    assertStep(step, () => `${this}.canAddDependency`);
     return stepAMayDependOnStepB(this, step);
   }
 
   protected _addDependency(options: AddDependencyOptions): number {
+    assertStep(options.step, () => `${this}._addDependency`);
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
         `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (${options.step.layerPlan} deeper than ${this.layerPlan}; creates a catch-22)`,
@@ -691,30 +694,34 @@ ${printDeps(step, 1)}
         ? { step: stepOrOptions }
         : stepOrOptions),
     };
+    assertStep(options.step, () => `${this}.addDependency`);
     return this._addDependency(options);
   }
   protected addDataDependency(
     stepOrOptions: Step | AddDependencyOptions,
   ): number {
-    const opts =
+    const options =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    assertStep(options.step, () => `${this}.addDataDependency`);
     return this._addDependency({
       dataOnly: true,
       skipDeduplication: false,
-      ...opts,
+      ...options,
     });
   }
   // Currently identical to addDependency
   protected addStrongDependency(
     stepOrOptions: Step | AddDependencyOptions,
   ): number {
-    return this._addDependency({
+    const options = {
       dataOnly: false,
       skipDeduplication: false,
       ...(stepOrOptions instanceof Step
         ? { step: stepOrOptions }
         : stepOrOptions),
-    });
+    };
+    assertStep(options.step, () => `${this}.addStrongDependency`);
+    return this._addDependency(options);
   }
 
   /**
@@ -728,6 +735,7 @@ ${printDeps(step, 1)}
   ): number {
     const options: AddUnaryDependencyOptions =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    assertStep(options.step, () => `${this}.addUnaryDependency`);
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
         `Cannot add a unary dependency on ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
@@ -892,10 +900,14 @@ export function isStep<TData = any>(step: unknown): step is Step<TData> {
   return step instanceof Step;
 }
 
-export function assertStep<TData>(step: unknown): asserts step is Step<TData> {
+export function assertStep<TData>(
+  step: unknown,
+  source?: string | (() => string),
+): asserts step is Step<TData> {
   if (!isStep(step)) {
+    const src = typeof source === "function" ? source() : source;
     throw new Error(
-      `Expected a step, but received something else: ${inspect(step)}`,
+      `${src ? `[${src}]: ` : ""}Expected a step, but received something else: ${inspect(step)}`,
     );
   }
 }
