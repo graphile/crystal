@@ -1,5 +1,5 @@
 ---
-"postgraphile": patch
+"postgraphile": minor
 ---
 
 V4 preset now also grants `+filterProc` behavior when `@filterable` is present.
