@@ -8,8 +8,8 @@ const setupSql = readFileSync(
   "utf8",
 );
 
-// Override functionResourceNameShouldPrefixCompositeType to allow cross-schema
-// computed columns (the default only allows same-schema).
+// Override functionResourceNameCompositeTypePrefix to allow cross-schema
+// computed columns (the default only prefixes same-schema functions).
 const CrossSchemaComputedColumnsPreset: GraphileConfig.Preset = {
   plugins: [
     {
@@ -17,8 +17,16 @@ const CrossSchemaComputedColumnsPreset: GraphileConfig.Preset = {
       version: "0.0.0",
       inflection: {
         replace: {
-          functionResourceNameShouldPrefixCompositeType() {
-            return true;
+          functionResourceNameCompositeTypePrefix(_prev, _options, { pgProc }) {
+            if (pgProc.provolatile === "v") {
+              return "";
+            }
+            const firstArg = pgProc.getArguments().find((a) => a.isIn);
+            if (!firstArg || firstArg.type.typtype !== "c") {
+              return "";
+            }
+            const prefix = firstArg.type.typname + "_";
+            return pgProc.proname.startsWith(prefix) ? "" : prefix;
           },
         },
       },
