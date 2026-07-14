@@ -63,6 +63,12 @@ declare global {
 
     interface Build {
       allPgCodecs: Set<PgCodec>;
+      /** Throws if not found */
+      getPgCodecByDatabaseName(
+        serviceName: string,
+        schemaName: string,
+        typeName: string,
+      ): PgCodec;
     }
 
     interface ScopeObject {
@@ -874,11 +880,37 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
     hooks: {
       build(build) {
         build.allPgCodecs = new Set<PgCodec>();
+        const lookup: {
+          [serviceName: string]: {
+            [schemaName: string]: { [typeName: string]: PgCodec };
+          };
+        } = Object.create(null);
+        build.getPgCodecByDatabaseName = (
+          serviceName,
+          schemaName,
+          typeName,
+        ) => {
+          const codec = lookup[serviceName]?.[schemaName]?.[typeName];
+          if (codec == null) {
+            throw new Error(
+              `Failed to find codec for type ${schemaName}.${typeName} in service ${serviceName}`,
+            );
+          }
+          return codec;
+        };
         function walkCodec(codec: PgCodec): void {
           if (build.allPgCodecs!.has(codec)) {
             return;
           }
           build.allPgCodecs!.add(codec);
+          const pg = codec.extensions?.pg;
+          if (pg) {
+            const serviceName = pg.serviceName ?? "main";
+            const { schemaName, name } = pg;
+            lookup[serviceName] ??= Object.create(null);
+            lookup[serviceName][schemaName] ??= Object.create(null);
+            lookup[serviceName][schemaName][name] = codec;
+          }
 
           if (codec.arrayOfCodec) {
             walkCodec(codec.arrayOfCodec);
