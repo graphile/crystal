@@ -24,6 +24,7 @@ import {
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
   first,
+  inspect,
   isAsyncIterable,
   isDev,
   isPromiseLike,
@@ -660,6 +661,11 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
+    if (!options.resource) {
+      throw new Error(
+        `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,
+      );
+    }
     const {
       resource,
       parameters = resource.parameters,
@@ -995,7 +1001,7 @@ export class PgSelectStep<
     order: PgSQLCallbackOrDirect<PgOrderSpec, this | PlantimeEmbeddable>,
   ): void {
     this.locker.assertParameterUnlocked("orderBy");
-    this.orders.push(this.scopedSQL(order));
+    this.orders.push(validateOrderSpec(this.scopedSQL(order)));
   }
 
   setOrderIsUnique(): void {
@@ -2882,7 +2888,7 @@ function buildTheQueryCore<
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
-        info.orders.push(runtimeScopedSQL(spec));
+        info.orders.push(validateOrderSpec(runtimeScopedSQL(spec)));
       } else {
         // Throw it away?
         // Maybe later we can use it in the aggregates themself - e.g. `array_agg(... order by <blah>)`
@@ -4231,3 +4237,32 @@ function hasPreviousPageCb(
     return false;
   }
 }
+
+const validateOrderSpec: (orderSpec: PgOrderSpec) => PgOrderSpec = isDev
+  ? (orderSpec) => {
+      if (orderSpec.attribute != null) {
+        if (orderSpec.fragment != null) {
+          throw new Error(
+            `When specifying 'attribute' to orderBy, 'fragment' must not be specified`,
+          );
+        }
+        if (orderSpec.codec != null) {
+          throw new Error(
+            `When specifying 'attribute' to orderBy, 'codec' must not be specified`,
+          );
+        }
+      } else {
+        if (orderSpec.fragment == null) {
+          throw new Error(
+            `Either 'attribute' or 'fragment' must be specified for orderBy.`,
+          );
+        }
+        if (orderSpec.codec == null) {
+          throw new Error(
+            `When ordering by a 'fragment' you must also specify the 'codec' that best represents the result of the ordering. This is necessary so we can correctly parse and stringify cursors.`,
+          );
+        }
+      }
+      return orderSpec;
+    }
+  : (orderSpec) => orderSpec;

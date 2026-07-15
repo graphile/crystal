@@ -145,9 +145,9 @@ export function orderByAscDesc(
             ) {
               queryBuilder.orderBy({
                 nulls: ascendingNulls,
+                nullable,
                 attribute: attributeOrSqlFragment,
                 direction: "ASC",
-                nullable,
               });
               if (unique) {
                 queryBuilder.setOrderIsUnique();
@@ -164,9 +164,9 @@ export function orderByAscDesc(
               ) {
                 queryBuilder.orderBy({
                   nulls: ascendingNulls,
+                  nullable,
                   ...attributeOrSqlFragment(queryBuilder, info),
                   direction: "ASC",
-                  nullable,
                 } as PgOrderSpec);
                 if (unique) {
                   queryBuilder.setOrderIsUnique();
@@ -176,9 +176,9 @@ export function orderByAscDesc(
           )
         : ((spec = {
             nulls: ascendingNulls,
+            nullable,
             ...attributeOrSqlFragment,
             direction: "ASC",
-            nullable,
           } as PgOrderSpec),
           EXPORTABLE(
             (spec, unique) =>
@@ -199,9 +199,9 @@ export function orderByAscDesc(
             ) {
               queryBuilder.orderBy({
                 nulls: descendingNulls,
+                nullable,
                 attribute: attributeOrSqlFragment,
                 direction: "DESC",
-                nullable,
               });
               if (unique) {
                 queryBuilder.setOrderIsUnique();
@@ -218,9 +218,9 @@ export function orderByAscDesc(
               ) {
                 queryBuilder.orderBy({
                   nulls: descendingNulls,
+                  nullable,
                   ...attributeOrSqlFragment(queryBuilder, info),
                   direction: "DESC",
-                  nullable,
                 } as PgOrderSpec);
                 if (unique) {
                   queryBuilder.setOrderIsUnique();
@@ -230,9 +230,9 @@ export function orderByAscDesc(
           )
         : ((spec = {
             nulls: descendingNulls,
+            nullable,
             ...attributeOrSqlFragment,
             direction: "DESC",
-            nullable,
           } as PgOrderSpec),
           EXPORTABLE(
             (spec, unique) =>
