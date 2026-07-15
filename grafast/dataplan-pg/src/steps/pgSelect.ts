@@ -4238,29 +4238,31 @@ function hasPreviousPageCb(
   }
 }
 
-function validateOrderSpec(orderSpec: PgOrderSpec) {
-  if (orderSpec.attribute != null) {
-    if (orderSpec.fragment != null) {
-      throw new Error(
-        `When specifying 'attribute' to orderBy, 'fragment' must not be specified`,
-      );
+const validateOrderSpec: (orderSpec: PgOrderSpec) => PgOrderSpec = isDev
+  ? (orderSpec) => {
+      if (orderSpec.attribute != null) {
+        if (orderSpec.fragment != null) {
+          throw new Error(
+            `When specifying 'attribute' to orderBy, 'fragment' must not be specified`,
+          );
+        }
+        if (orderSpec.codec != null) {
+          throw new Error(
+            `When specifying 'attribute' to orderBy, 'codec' must not be specified`,
+          );
+        }
+      } else {
+        if (orderSpec.fragment == null) {
+          throw new Error(
+            `Either 'attribute' or 'fragment' must be specified for orderBy.`,
+          );
+        }
+        if (orderSpec.codec == null) {
+          throw new Error(
+            `When ordering by a 'fragment' you must also specify the 'codec' that best represents the result of the ordering. This is necessary so we can correctly parse and stringify cursors.`,
+          );
+        }
+      }
+      return orderSpec;
     }
-    if (orderSpec.codec != null) {
-      throw new Error(
-        `When specifying 'attribute' to orderBy, 'codec' must not be specified`,
-      );
-    }
-  } else {
-    if (orderSpec.fragment == null) {
-      throw new Error(
-        `Either 'attribute' or 'fragment' must be specified for orderBy.`,
-      );
-    }
-    if (orderSpec.codec == null) {
-      throw new Error(
-        `When ordering by a 'fragment' you must also specify the 'codec' that best represents the result of the ordering. This is necessary so we can correctly parse and stringify cursors.`,
-      );
-    }
-  }
-  return orderSpec;
-}
+  : (orderSpec) => orderSpec;
