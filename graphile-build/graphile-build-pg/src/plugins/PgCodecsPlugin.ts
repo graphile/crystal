@@ -547,6 +547,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             });
             return codec;
           } else {
+            if (typeModifier != null) {
+              return info.helpers.pgCodecs.getCodecFromType(
+                serviceName,
+                typeId,
+                null,
+              );
+            }
             console.warn(
               `Could not build PgCodec for '${
                 type.getNamespace()?.nspname ?? "??"
