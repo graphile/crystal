@@ -8,12 +8,13 @@ from "issue_2210"."some_messages"($1::"uuid") as __some_messages__
 limit 51;
 
 select __test_user_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __test_user_identifiers__,
+from rows from (json_to_recordset($1::json) as ("0" "uuid"))
+with ordinality as __test_user_identifiers__ ("id0", ord),
 lateral (
   select
     __test_user__."id" as "0",
     __test_user__."name" as "1",
-    __test_user_identifiers__.idx as "2"
+    (__test_user_identifiers__.ord - 1) as "2"
   from "issue_2210"."test_user" as __test_user__
   where (
     __test_user__."id" = __test_user_identifiers__."id0"
