@@ -456,9 +456,9 @@ const codecInspect: CustomInspectFunction = function (this: PgCodec) {
         ? `RangeCodec<${this.rangeOfCodec.name}>`
         : this.baseCodec
           ? `ModifiedCodec<${this.baseCodec.name}>`
-        : this.attributes
-          ? `RecordCodec`
-          : "Codec";
+          : this.attributes
+            ? `RecordCodec`
+            : "Codec";
   return `${type}(${this.name})`;
 };
 
