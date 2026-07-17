@@ -23,6 +23,10 @@ import { version } from "../version.ts";
 
 declare global {
   namespace GraphileBuild {
+    interface PgCodecTypeSituations {
+      patch: true;
+      base: true;
+    }
     interface BehaviorStrings {
       table: true;
       "resource:select": true;

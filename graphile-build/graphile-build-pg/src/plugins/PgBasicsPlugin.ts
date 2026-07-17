@@ -31,6 +31,11 @@ declare global {
       "graphile-build-pg": string;
       "@dataplan/pg": string;
     }
+    type PgCodecTypeSituation = keyof GraphileBuild.PgCodecTypeSituations;
+    interface PgCodecTypeSituations {
+      input: true;
+      output: true;
+    }
     interface BehaviorStrings {
       select: true;
       insert: true;
@@ -48,19 +53,19 @@ declare global {
     }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation?: string,
+      situation?: PgCodecTypeSituation,
     ) => boolean;
     type GetGraphQLTypeByPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation: string,
+      situation: PgCodecTypeSituation,
     ) => GraphQLType | null;
     type GetGraphQLTypeNameByPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation: string,
+      situation: PgCodecTypeSituation,
     ) => string | null;
     type SetGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situations: string | string[],
+      situations: PgCodecTypeSituation | PgCodecTypeSituation[],
       typeName: string,
     ) => void;
 
