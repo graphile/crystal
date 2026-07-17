@@ -42,7 +42,11 @@ declare global {
         serviceName: string;
       }): string;
 
-      typeCodecName(details: { pgType: PgType; serviceName: string }): string;
+      typeCodecName(details: {
+        pgType: PgType;
+        serviceName: string;
+        typeModifier?: string | number | null;
+      }): string;
 
       scalarCodecTypeName(this: Inflection, codec: PgCodecAnyScalar): string;
       enumType(this: Inflection, codec: PgEnumCodec<string, any>): string;
@@ -196,14 +200,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
         return this.camelCase(`${schemaPrefix}${pgClass.relname}`);
       },
-      typeCodecName(options, { pgType, serviceName }) {
+      typeCodecName(options, { pgType, serviceName, typeModifier }) {
         const pgNamespace = pgType.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
         const name =
           pgType.typcategory === "A" && pgType.typname.startsWith("_")
             ? pgType.typname.substring(1) + "_array"
             : pgType.typname;
-        return this.camelCase(`${schemaPrefix}${name}`);
+        const modifierName = typeModifier == null ? "" : `__${typeModifier}`;
+        return this.camelCase(`${schemaPrefix}${name}${modifierName}`);
       },
       scalarCodecTypeName(options, codec) {
         return this.upperCamelCase(
@@ -613,6 +618,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const codecName = info.inflection.typeCodecName({
             pgType: type,
             serviceName,
+            typeModifier,
           });
           const enumLabels = enumValues.map((e) => e.enumlabel);
           const { tags, description } = type.getTagsAndDescription();
@@ -692,6 +698,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const codecName = info.inflection.typeCodecName({
             pgType: type,
             serviceName,
+            typeModifier,
           });
 
           const { tags, description } = type.getTagsAndDescription();
@@ -771,6 +778,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             const codecName = info.inflection.typeCodecName({
               pgType: type,
               serviceName,
+              typeModifier,
             });
             const sqlIdent = info.helpers.pgBasics.identifier(
               namespaceName,
@@ -830,6 +838,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const name = info.inflection.typeCodecName({
                 pgType: type,
                 serviceName,
+                typeModifier,
               });
               exportNameHint(extensions, `${name}CodecExtensions`);
               const spec = {
