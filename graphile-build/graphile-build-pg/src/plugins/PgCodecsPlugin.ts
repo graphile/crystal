@@ -111,15 +111,22 @@ declare global {
     }
     interface GatherHooks {
       pgCodecs_findPgCodec(event: {
-        serviceName: string;
+        readonly serviceName: string;
+        readonly pgType: PgType;
+
+        /** The resulting codec to use... overwrite this! */
         pgCodec: PgCodec | null;
-        pgType: PgType;
       }): Promise<void> | void;
       pgCodecs_findModifiedPgCodec(event: {
-        serviceName: string;
+        readonly serviceName: string;
+        readonly pgType: PgType;
+        /** If you don't use this, you're doing it wrong: use the pgCodecs_findPgCodec hook instead. */
+        readonly typeModifier: string | number;
+        /** The codec that your pgCodec should be based on, since it's modified */
+        readonly baseCodec: PgCodec;
+
+        /** The resulting codec to use... overwrite this! */
         pgCodec: PgCodec | null;
-        pgType: PgType;
-        typeModifier: string | number;
       }): Promise<void> | void;
       pgCodecs_PgCodec(event: {
         serviceName: string;
@@ -534,35 +541,56 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
 
           if (typeModifier != null) {
-            const event: Parameters<
-              GraphileConfig.GatherHooks["pgCodecs_findModifiedPgCodec"]
-            >[0] = { pgCodec: null, pgType, typeModifier, serviceName };
-            await info.process("pgCodecs_findModifiedPgCodec", event);
-            if (event.pgCodec) {
-              return success(pgType, event.pgCodec);
-            }
-            return info.helpers.pgCodecs.getCodecFromType(
+            const baseCodec = await info.helpers.pgCodecs.getCodecFromType(
               serviceName,
               typeId,
               null,
             );
+            if (baseCodec == null) {
+              // Already logged
+              return null;
+            }
+            const event: Parameters<
+              GraphileConfig.GatherHooks["pgCodecs_findModifiedPgCodec"]
+            >[0] = {
+              serviceName,
+              pgType,
+              typeModifier,
+              baseCodec,
+              pgCodec: null,
+            };
+            await info.process("pgCodecs_findModifiedPgCodec", event);
+            if (event.pgCodec) {
+              if (event.pgCodec.baseCodec !== baseCodec) {
+                throw new Error(
+                  `pgCodecs_findModifiedPgCodec must return a codec that's modified from ${baseCodec.name} - be sure to set 'baseCodec: event.baseCodec'`,
+                );
+              }
+              return success(pgType, event.pgCodec);
+            } else {
+              // It's okay, just use the unmodified one. It's probably not
+              // special anyway - `char(3)` is essentially the same as `char`
+              // at the end of the day...
+              return baseCodec;
+            }
           } else {
             const event: Parameters<
               GraphileConfig.GatherHooks["pgCodecs_findPgCodec"]
-            >[0] = { pgCodec: null, pgType, serviceName };
+            >[0] = { serviceName, pgType, pgCodec: null };
             await info.process("pgCodecs_findPgCodec", event);
             if (event.pgCodec) {
               return success(pgType, event.pgCodec);
+            } else {
+              console.warn(
+                `Could not build PgCodec for '${
+                  pgType.getNamespace()?.nspname ?? "??"
+                }.${
+                  pgType.typname
+                }'; maybe you need a plugin implementing gather.hooks.pgCodecs_findPgCodec to add support.`,
+                event,
+              );
+              return null;
             }
-            console.warn(
-              `Could not build PgCodec for '${
-                pgType.getNamespace()?.nspname ?? "??"
-              }.${
-                pgType.typname
-              }'; maybe you need a plugin implementing gather.hooks.pgCodecs_findPgCodec to add support.`,
-              event,
-            );
-            return null;
           }
         })();
 
