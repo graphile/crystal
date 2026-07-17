@@ -60,7 +60,7 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         // If another plugin has already supplied a codec; skip
         if (event.pgCodec) return;
 
-        const { serviceName, pgType, typeModifier: _ignored } = event;
+        const { serviceName, pgType } = event;
         const typname = pgType.typname;
         if (typname !== "ltree" && typname !== "_ltree") return;
 

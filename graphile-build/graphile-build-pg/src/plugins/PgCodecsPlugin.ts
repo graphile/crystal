@@ -114,7 +114,12 @@ declare global {
         serviceName: string;
         pgCodec: PgCodec | null;
         pgType: PgType;
-        typeModifier: string | number | null | undefined;
+      }): Promise<void> | void;
+      pgCodecs_findModifiedPgCodec(event: {
+        serviceName: string;
+        pgCodec: PgCodec | null;
+        pgType: PgType;
+        typeModifier: string | number;
       }): Promise<void> | void;
       pgCodecs_PgCodec(event: {
         serviceName: string;
@@ -500,55 +505,60 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           return map.get(cacheKey)!;
         }
 
+        async function success(pgType: PgType, pgCodec: PgCodec) {
+          // Be careful not to call this for class codecs!
+          await info.process("pgCodecs_PgCodec", {
+            pgCodec,
+            pgType,
+            serviceName,
+            typeModifier,
+          });
+          return pgCodec;
+        }
+
         const promise = (async (): Promise<PgCodec | null> => {
-          const type = await info.helpers.pgIntrospection.getType(
+          const pgType = await info.helpers.pgIntrospection.getType(
             serviceName,
             typeId,
           );
-          if (!type) {
+          if (!pgType) {
             return null;
           }
 
           // Class types are handled via getCodecFromClass (they have to add attributes)
-          if (type.typtype === "c") {
+          if (pgType.typtype === "c") {
             return info.helpers.pgCodecs.getCodecFromClass(
               serviceName,
-              type.typrelid!,
+              pgType.typrelid!,
             );
           }
 
-          const event: Parameters<
-            GraphileConfig.GatherHooks["pgCodecs_findPgCodec"]
-          >[0] = {
-            pgCodec: null,
-            pgType: type,
-            typeModifier,
-            serviceName,
-          };
-          await info.process("pgCodecs_findPgCodec", event);
-          if (event.pgCodec) {
-            const codec = event.pgCodec;
-            // Be careful not to call this for class codecs!
-            await info.process("pgCodecs_PgCodec", {
-              pgCodec: codec,
-              pgType: type,
+          if (typeModifier != null) {
+            const event: Parameters<
+              GraphileConfig.GatherHooks["pgCodecs_findModifiedPgCodec"]
+            >[0] = { pgCodec: null, pgType, typeModifier, serviceName };
+            await info.process("pgCodecs_findModifiedPgCodec", event);
+            if (event.pgCodec) {
+              return success(pgType, event.pgCodec);
+            }
+            return info.helpers.pgCodecs.getCodecFromType(
               serviceName,
-              typeModifier,
-            });
-            return codec;
+              typeId,
+              null,
+            );
           } else {
-            if (typeModifier != null) {
-              return info.helpers.pgCodecs.getCodecFromType(
-                serviceName,
-                typeId,
-                null,
-              );
+            const event: Parameters<
+              GraphileConfig.GatherHooks["pgCodecs_findPgCodec"]
+            >[0] = { pgCodec: null, pgType, serviceName };
+            await info.process("pgCodecs_findPgCodec", event);
+            if (event.pgCodec) {
+              return success(pgType, event.pgCodec);
             }
             console.warn(
               `Could not build PgCodec for '${
-                type.getNamespace()?.nspname ?? "??"
+                pgType.getNamespace()?.nspname ?? "??"
               }.${
-                type.typname
+                pgType.typname
               }'; maybe you need a plugin implementing gather.hooks.pgCodecs_findPgCodec to add support.`,
               event,
             );
@@ -567,14 +577,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           // Another plugin has already supplied a codec; skip
           return;
         }
-        const { serviceName, pgType: type, typeModifier } = event;
-
-        // The built-in codec mappings in this plugin are not modifier-aware.
-        // Leave modifier handling to dedicated plugins; if none supply a codec
-        // then getCodecFromType will canonicalize to the unmodified path.
-        if (typeModifier != null) {
-          return;
-        }
+        const { serviceName, pgType: type } = event;
 
         const namespace = type.getNamespace();
         if (!namespace) {
@@ -633,7 +636,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const codecName = info.inflection.typeCodecName({
             pgType: type,
             serviceName,
-            typeModifier,
           });
           const enumLabels = enumValues.map((e) => e.enumlabel);
           const { tags, description } = type.getTagsAndDescription();
@@ -643,7 +645,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: type.getNamespace()!.nspname,
               name: type.typname,
-              ...(typeModifier != null ? { typeModifier } : null),
             },
             ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
@@ -713,7 +714,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const codecName = info.inflection.typeCodecName({
             pgType: type,
             serviceName,
-            typeModifier,
           });
 
           const { tags, description } = type.getTagsAndDescription();
@@ -724,7 +724,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: type.getNamespace()!.nspname,
               name: type.typname,
-              ...(typeModifier != null ? { typeModifier } : null),
             },
             ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
@@ -780,7 +779,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 serviceName,
                 schemaName: type.getNamespace()!.nspname,
                 name: type.typname,
-                ...(typeModifier != null ? { typeModifier } : null),
               },
               ...(Object.keys(tags).length > 0 ? { tags } : null),
             };
@@ -793,7 +791,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             const codecName = info.inflection.typeCodecName({
               pgType: type,
               serviceName,
-              typeModifier,
             });
             const sqlIdent = info.helpers.pgBasics.identifier(
               namespaceName,
@@ -827,7 +824,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             const innerCodec = (await info.helpers.pgCodecs.getCodecFromType(
               serviceName,
               innerType._id,
-              typeModifier, // TODO: is it correct to pass this through?
+              null,
             )) as
               | PgCodec<string, any, any, any, undefined, any, any>
               | undefined;
@@ -840,7 +837,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   serviceName,
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
-                  ...(typeModifier != null ? { typeModifier } : null),
                 },
                 ...(Object.keys(tags).length > 0 ? { tags } : null),
               };
@@ -853,7 +849,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               const name = info.inflection.typeCodecName({
                 pgType: type,
                 serviceName,
-                typeModifier,
               });
               exportNameHint(extensions, `${name}CodecExtensions`);
               const spec = {
