@@ -313,6 +313,13 @@ export interface PgCodec<
    */
   rangeOfCodec?: TRangeItemCodec;
 
+  /**
+   * If this codec is a modified form of a broader PostgreSQL type (for
+   * example via typmod or additional constraints), this references the base
+   * codec that owns the underlying SQL representation.
+   */
+  baseCodec?: PgCodec<string, any, any, any, any, any, any>;
+
   polymorphism?: PgCodecPolymorphism<any>;
 
   /**
