@@ -568,6 +568,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           return;
         }
         const { serviceName, pgType: type, typeModifier } = event;
+
+        // The built-in codec mappings in this plugin are not modifier-aware.
+        // Leave modifier handling to dedicated plugins; if none supply a codec
+        // then getCodecFromType will canonicalize to the unmodified path.
+        if (typeModifier != null) {
+          return;
+        }
+
         const namespace = type.getNamespace();
         if (!namespace) {
           throw new Error(`Could not get namespace '${type.typnamespace}'`);
