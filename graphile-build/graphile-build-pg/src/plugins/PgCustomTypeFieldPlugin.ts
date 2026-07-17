@@ -2,9 +2,6 @@
 // Postgres' own computed columns, and they're not necessarily column-like
 // (e.g. they can be relations to other tables), so we've renamed them.
 
-import "./PgProceduresPlugin.ts";
-import "graphile-config";
-
 import type {
   PgClassExpressionStep,
   PgClassSingleStep,
@@ -58,9 +55,12 @@ import type {
   GraphQLSchema,
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
+import type {} from "graphile-config";
 
 import { exportNameHint, forbidRequired, tagToString } from "../utils.ts";
 import { version } from "../version.ts";
+import type {} from "./PgBasicsPlugin.ts";
+import type {} from "./PgProceduresPlugin.ts";
 
 const EMPTY_ARRAY = Object.freeze([]);
 const makeEmptyArray = EXPORTABLE(
@@ -557,14 +557,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 index,
               });
               const paramBaseCodec = param.codec.arrayOfCodec ?? param.codec;
-              const variant =
-                param.extensions?.variant ??
+              const variant = (param.extensions?.variant ??
                 (pgFunctionsPreferNodeId &&
                 !resource.isMutation &&
                 param.codec.attributes &&
                 finalBuild.behavior.pgCodecMatches(param.codec, "type:node")
                   ? "nodeId"
-                  : "input");
+                  : "input")) as "nodeId" | GraphileBuild.PgCodecTypeSituation;
               if (variant === "nodeId" && !param.codec.attributes) {
                 throw new Error(
                   `Argument is marked as nodeId, but it doesn't seem to be a record type. Lists of nodeIds are not yet supported.`,
