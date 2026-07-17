@@ -24,7 +24,7 @@ import { exportNameHint } from "../utils.ts";
 import { version } from "../version.ts";
 
 interface State {
-  codecByTypeIdByDatabaseName: Map<
+  codecByTypeAndModifierByDatabaseName: Map<
     string,
     Map<string, Promise<PgCodec | null>>
   >;
@@ -117,6 +117,7 @@ declare global {
         pgCodec: PgCodec;
         pgClass?: PgClass;
         pgType: PgType;
+        typeModifier?: string | number | null;
       }): Promise<void> | void;
 
       pgCodecs_attribute(event: {
@@ -305,7 +306,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
   gather: gatherConfig({
     namespace: "pgCodecs",
     initialState: (): State => ({
-      codecByTypeIdByDatabaseName: new Map(),
+      codecByTypeAndModifierByDatabaseName: new Map(),
       codecByClassIdByDatabaseName: new Map(),
     }),
     helpers: {
@@ -483,13 +484,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
       },
 
       getCodecFromType(info, serviceName, typeId, typeModifier) {
-        let map = info.state.codecByTypeIdByDatabaseName.get(serviceName);
+        let map =
+          info.state.codecByTypeAndModifierByDatabaseName.get(serviceName);
         if (!map) {
           map = new Map();
-          info.state.codecByTypeIdByDatabaseName.set(serviceName, map);
+          info.state.codecByTypeAndModifierByDatabaseName.set(serviceName, map);
         }
-        if (map.has(typeId)) {
-          return map.get(typeId)!;
+        const cacheKey = `${typeId}|${typeModifier ?? ""}`;
+        if (map.has(cacheKey)) {
+          return map.get(cacheKey)!;
         }
 
         const promise = (async (): Promise<PgCodec | null> => {
@@ -525,6 +528,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               pgCodec: codec,
               pgType: type,
               serviceName,
+              typeModifier,
             });
             return codec;
           } else {
@@ -540,7 +544,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
         })();
 
-        map.set(typeId, promise);
+        map.set(cacheKey, promise);
 
         return promise;
       },
@@ -618,6 +622,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: type.getNamespace()!.nspname,
               name: type.typname,
+              ...(typeModifier != null ? { typeModifier } : null),
             },
             ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
@@ -697,6 +702,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: type.getNamespace()!.nspname,
               name: type.typname,
+              ...(typeModifier != null ? { typeModifier } : null),
             },
             ...(Object.keys(tags).length > 0 ? { tags } : null),
           };
@@ -752,6 +758,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 serviceName,
                 schemaName: type.getNamespace()!.nspname,
                 name: type.typname,
+                ...(typeModifier != null ? { typeModifier } : null),
               },
               ...(Object.keys(tags).length > 0 ? { tags } : null),
             };
@@ -810,6 +817,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   serviceName,
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
+                  ...(typeModifier != null ? { typeModifier } : null),
                 },
                 ...(Object.keys(tags).length > 0 ? { tags } : null),
               };
@@ -849,7 +857,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // If we get errors from the frozen object then clearly we need to
         // ensure more work has completed before continuing - call other plugin
         // helpers and wait for their events.
-        for (const codecByTypeId of info.state.codecByTypeIdByDatabaseName.values()) {
+        for (const codecByTypeId of info.state.codecByTypeAndModifierByDatabaseName.values()) {
           for (const codecPromise of codecByTypeId.values()) {
             const codec = await codecPromise;
             if (codec) {
@@ -906,10 +914,17 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const pg = codec.extensions?.pg;
           if (pg) {
             const serviceName = pg.serviceName ?? "main";
-            const { schemaName, name } = pg;
+            const { schemaName, name, typeModifier } = pg;
             lookup[serviceName] ??= Object.create(null);
             lookup[serviceName][schemaName] ??= Object.create(null);
-            lookup[serviceName][schemaName][name] = codec;
+            const existing = lookup[serviceName][schemaName][name];
+            if (
+              !existing ||
+              (existing.extensions?.pg?.typeModifier != null &&
+                typeModifier == null)
+            ) {
+              lookup[serviceName][schemaName][name] = codec;
+            }
           }
 
           if (codec.arrayOfCodec) {
@@ -931,6 +946,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
           if (codec.rangeOfCodec) {
             walkCodec(codec.rangeOfCodec);
+          }
+
+          if (codec.baseCodec) {
+            walkCodec(codec.baseCodec);
           }
         }
 
@@ -1176,6 +1195,12 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             // Process the underlying type for ranges (if any)
             if (codec.rangeOfCodec) {
               prepareTypeForCodec(codec.rangeOfCodec, visited);
+            }
+
+            // Process the broader type that this modified codec is based on
+            // (if any)
+            if (codec.baseCodec) {
+              prepareTypeForCodec(codec.baseCodec, visited);
             }
 
             if (build.hasGraphQLTypeForPgCodec(codec)) {

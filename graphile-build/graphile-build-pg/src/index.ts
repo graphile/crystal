@@ -188,6 +188,7 @@ declare global {
          */
         // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
+        typeModifier?: string | number | null;
       };
     }
   }
