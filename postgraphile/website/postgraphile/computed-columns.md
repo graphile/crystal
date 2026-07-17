@@ -165,6 +165,49 @@ which can be queried like:
 }
 ```
 
+### Overloaded functions
+
+PostgreSQL allows functions to be overloaded (multiple functions with the same
+name but different argument types). Computed column functions may be
+overloaded so long as each overload targets a different table; for example
+`my_schema.code(my_schema.pets)` and `my_schema.code(my_schema.buildings)` can
+coexist and will each create a `code` field on their respective table type.
+Internally, function names that don't follow the `${tableName}_${fieldName}`
+naming convention are treated as if they did (the table name is prepended when
+determining the resource name), which is what keeps the overloads distinct.
+
+Note that since these functions don't follow the naming convention, they won't
+be _detected_ as computed columns automatically; you'll need to mark them
+explicitly with a [smart tag](./smart-tags):
+
+```sql
+comment on function my_schema.code(my_schema.pets)
+  is E'@behavior +typeField -queryField';
+```
+
+By default this only applies to functions defined in the same schema as the
+table they apply to. If you keep your computed column functions in a separate
+schema, you can relax this restriction by replacing the
+`functionResourceNameCompositeTypePrefix` inflector via a plugin:
+
+```ts
+const CrossSchemaComputedColumnsPlugin: GraphileConfig.Plugin = {
+  name: "CrossSchemaComputedColumnsPlugin",
+  version: "0.0.0",
+  inflection: {
+    replace: {
+      functionResourceNameCompositeTypePrefix(prev, options, { pgProc }) {
+        if (pgProc.provolatile === "v") return "";
+        const firstArg = pgProc.getArguments().find((a) => a.isIn);
+        if (!firstArg || firstArg.type.typtype !== "c") return "";
+        const prefix = firstArg.type.typname + "_";
+        return pgProc.proname.startsWith(prefix) ? "" : prefix;
+      },
+    },
+  },
+};
+```
+
 ### Advice
 
 See the advice in [the Custom Queries article](./custom-queries#advice).

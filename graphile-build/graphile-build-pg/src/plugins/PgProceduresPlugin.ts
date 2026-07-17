@@ -41,6 +41,23 @@ declare global {
           pgProc: PgProc;
         },
       ): string;
+      /**
+       * The prefix (if any) to add to the resource name of a "computed
+       * column function" (a stable/immutable function whose first argument
+       * is a composite type) such that it follows the
+       * `${tableName}_${fieldName}` naming convention. Returns the empty
+       * string when no prefix should be added, e.g. when the function name
+       * already starts with the composite type's name. By default only
+       * functions in the same schema as their composite type are prefixed;
+       * override this inflector to support cross-schema computed columns.
+       */
+      functionResourceNameCompositeTypePrefix(
+        this: Inflection,
+        details: {
+          serviceName: string;
+          pgProc: PgProc;
+        },
+      ): string;
       functionRecordReturnCodecName(
         this: Inflection,
         details: {
@@ -123,14 +140,38 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
   inflection: {
     add: {
-      functionResourceName(options, { serviceName, pgProc }) {
+      functionResourceName(options, details) {
+        const { serviceName, pgProc } = details;
         const { tags } = pgProc.getTagsAndDescription();
         if (typeof tags.name === "string") {
           return tags.name;
         }
         const pgNamespace = pgProc.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ serviceName, pgNamespace });
-        return `${schemaPrefix}${pgProc.proname}`;
+        const computedPrefix =
+          this.functionResourceNameCompositeTypePrefix(details);
+        return `${schemaPrefix}${computedPrefix}${pgProc.proname}`;
+      },
+      functionResourceNameCompositeTypePrefix(_options, { pgProc }) {
+        // Computed column functions are conventionally named
+        // `${tableName}_${fieldName}`; enforcing this convention ensures
+        // overloaded functions like code(a.pets) and code(a.buildings)
+        // produce distinct resource names (pets_code, buildings_code).
+        if (pgProc.provolatile === "v") {
+          return "";
+        }
+        const firstArg = pgProc.getArguments().find((a) => a.isIn);
+        if (!firstArg || firstArg.type.typtype !== "c") {
+          return "";
+        }
+        // By default, only consider a function as a computed column if it
+        // belongs to the same schema as the composite type. Override this
+        // inflector to support cross-schema computed columns.
+        if (firstArg.type.typnamespace !== pgProc.pronamespace) {
+          return "";
+        }
+        const prefix = firstArg.type.typname + "_";
+        return pgProc.proname.startsWith(prefix) ? "" : prefix;
       },
       functionRecordReturnCodecName(options, details) {
         return this.upperCamelCase(
@@ -606,7 +647,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       resourceOptionsByPgProcByService: new Map(),
     }),
     hooks: {
-      async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
+      async pgIntrospection_proc(
+        { helpers, resolvedPreset, inflection },
+        event,
+      ) {
         const { entity: pgProc, serviceName } = event;
 
         const pgService = resolvedPreset.pgServices?.find(
@@ -648,17 +692,39 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        // We also don’t want procedures that have been defined in our namespace
-        // twice. This leads to duplicate fields in the API which throws an
-        // error. In the future we may support this case. For now though, it is
-        // too complex.
+        // We don’t want procedures whose inflected resource name clashes
+        // with another overload — this would produce duplicate fields.
+        // Overloads targeting distinct composite types get unique names
+        // from the inflector (e.g. pets_code vs buildings_code).
         const overload = introspection.procs.find(
           (p) =>
             p.pronamespace === pgProc.pronamespace &&
             p.proname === pgProc.proname &&
-            p._id !== pgProc._id,
+            p._id !== pgProc._id &&
+            inflection.functionResourceName({
+              serviceName,
+              pgProc: p,
+            }) ===
+              inflection.functionResourceName({
+                serviceName,
+                pgProc,
+              }),
         );
         if (overload) {
+          // Warn if both functions target composite types — the user likely
+          // intended these as computed columns on different tables, but the
+          // inflector produced the same name (e.g. cross-schema overloads).
+          const thisFirstArg = pgProc.getArguments().find((a) => a.isIn);
+          const otherFirstArg = overload.getArguments().find((a) => a.isIn);
+          if (
+            thisFirstArg?.type.typtype === "c" &&
+            otherFirstArg?.type.typtype === "c" &&
+            thisFirstArg.type._id !== otherFirstArg.type._id
+          ) {
+            console.warn(
+              `Skipping function '${namespace!.nspname}.${pgProc.proname}' because its resource name clashes with an overload. Consider overriding the 'functionResourceNameCompositeTypePrefix' inflector to support cross-schema computed columns.`,
+            );
+          }
           return;
         }
 
