@@ -1,3 +1,4 @@
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import { library } from "@fortawesome/fontawesome-svg-core"; // Import the library component.
 import { fab } from "@fortawesome/free-brands-svg-icons"; // Import all brands icons.
 import { fas } from "@fortawesome/free-solid-svg-icons"; // Import all solid icons.
