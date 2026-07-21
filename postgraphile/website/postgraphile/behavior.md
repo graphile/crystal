@@ -213,6 +213,8 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilize:
 - `sum:attribute:aggregate:orderBy` - can we order by ‘sum’ aggregates of this attribute (column, property)?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
 - `proc:filterBy` - can we filter by the result of this proc (function resource)
+- `condition:proc:filterBy` - can we create a 'condition' filter by the result of this proc (function resource)
+- `filter:proc:filterBy` (postgraphile-plugin-connection-filter) - can we create a 'filter' filter by the result of this proc (function resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)?
 - `condition:attribute:filterBy` - can we filter by this attribute (column, property) in the `condition` argument?
 - `attribute:aggregate:filterBy` - can we filter by the aggregate of this attribute (column, property)?
