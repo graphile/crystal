@@ -1,3 +1,4 @@
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import Link from "@docusaurus/Link";
 import styles from "@site/src/components/ReleaseBanner/styles.module.css";
 import V5Image from "@site/static/img/celebration.svg";
