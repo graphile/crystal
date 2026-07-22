@@ -1,5 +1,14 @@
 # graphile-utils
 
+## 5.0.3
+
+### Patch Changes
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`dca7492`](https://github.com/graphile/crystal/commit/dca74929c1813119cb5d729a4cc18912e12cdd26)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in `addPgTableOrderBy`
+  that meant that an override for the `nullable` parameter would be ignored.
+
 ## 5.0.2
 
 ### Patch Changes

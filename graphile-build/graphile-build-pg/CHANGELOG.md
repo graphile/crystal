@@ -1,5 +1,33 @@
 # graphile-build-pg
 
+## 5.1.1
+
+### Patch Changes
+
+- [#3110](https://github.com/graphile/crystal/pull/3110)
+  [`d228173`](https://github.com/graphile/crystal/commit/d228173ba16a09c0a599a56ed77f607de75be166)
+  Thanks [@benjie](https://github.com/benjie)! - Changes `proc:filterBy`
+  behavior to `condition:proc:filterBy` so that
+  postgraphile-plugin-connection-filter can use `filter:proc:filterBy` and they
+  can be controlled independently
+
+- [#3105](https://github.com/graphile/crystal/pull/3105)
+  [`0b00895`](https://github.com/graphile/crystal/commit/0b00895e7fcbb905e8232235e7883b9cc8c12548)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce
+  build.getPgCodecByDatabaseName helper.
+
+- [#3108](https://github.com/graphile/crystal/pull/3108)
+  [`c67c6ef`](https://github.com/graphile/crystal/commit/c67c6ef8a5312f6a217322dc0c013dc4b9c0dd30)
+  Thanks [@benjaie](https://github.com/benjaie)! - Turn getGraphQLTypeByPgCodec
+  situations into a string union with central registry so it can be
+  autocompleted.
+
+- [#3112](https://github.com/graphile/crystal/pull/3112)
+  [`cc61adc`](https://github.com/graphile/crystal/commit/cc61adc5c10afdd5530d6170e96ae009e47a8866)
+  Thanks [@benjie](https://github.com/benjie)! - Add `@isIndexed` smart tag so
+  columns and foreign key constraints can be treated as if they are indexed even
+  if they aren't (for the purposes of the default index behavior plugin)
+
 ## 5.1.0
 
 ### Minor Changes

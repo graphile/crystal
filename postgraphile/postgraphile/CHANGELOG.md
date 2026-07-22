@@ -1,5 +1,48 @@
 # postgraphile
 
+## 5.1.1
+
+### Patch Changes
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`a56df3a`](https://github.com/graphile/crystal/commit/a56df3ae4abe5b79b7f81f641f9a75eda3c288a0)
+  Thanks [@benjie](https://github.com/benjie)! - In development,
+  `$pgSelect.orderBy(...)` now has some runtime validation rather than relying
+  solely on types.
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`dca7492`](https://github.com/graphile/crystal/commit/dca74929c1813119cb5d729a4cc18912e12cdd26)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in `addPgTableOrderBy`
+  that meant that an override for the `nullable` parameter would be ignored.
+
+- [#3105](https://github.com/graphile/crystal/pull/3105)
+  [`0b00895`](https://github.com/graphile/crystal/commit/0b00895e7fcbb905e8232235e7883b9cc8c12548)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce
+  build.getPgCodecByDatabaseName helper.
+
+- [#3108](https://github.com/graphile/crystal/pull/3108)
+  [`c67c6ef`](https://github.com/graphile/crystal/commit/c67c6ef8a5312f6a217322dc0c013dc4b9c0dd30)
+  Thanks [@benjaie](https://github.com/benjaie)! - Turn getGraphQLTypeByPgCodec
+  situations into a string union with central registry so it can be
+  autocompleted.
+
+- [#3112](https://github.com/graphile/crystal/pull/3112)
+  [`cc61adc`](https://github.com/graphile/crystal/commit/cc61adc5c10afdd5530d6170e96ae009e47a8866)
+  Thanks [@benjie](https://github.com/benjie)! - Add `@isIndexed` smart tag so
+  columns and foreign key constraints can be treated as if they are indexed even
+  if they aren't (for the purposes of the default index behavior plugin)
+- Updated dependencies
+  [[`a56df3a`](https://github.com/graphile/crystal/commit/a56df3ae4abe5b79b7f81f641f9a75eda3c288a0),
+  [`dca7492`](https://github.com/graphile/crystal/commit/dca74929c1813119cb5d729a4cc18912e12cdd26),
+  [`d228173`](https://github.com/graphile/crystal/commit/d228173ba16a09c0a599a56ed77f607de75be166),
+  [`0b00895`](https://github.com/graphile/crystal/commit/0b00895e7fcbb905e8232235e7883b9cc8c12548),
+  [`c67c6ef`](https://github.com/graphile/crystal/commit/c67c6ef8a5312f6a217322dc0c013dc4b9c0dd30),
+  [`cc61adc`](https://github.com/graphile/crystal/commit/cc61adc5c10afdd5530d6170e96ae009e47a8866),
+  [`5d0f9bc`](https://github.com/graphile/crystal/commit/5d0f9bc3a0e0dcfb05c5377e29973c5a0d253c7e)]:
+  - @dataplan/pg@1.1.1
+  - graphile-utils@5.0.3
+  - graphile-build-pg@5.1.1
+
 ## 5.1.0
 
 ### Minor Changes
