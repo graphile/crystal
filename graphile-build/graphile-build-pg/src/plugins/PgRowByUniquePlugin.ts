@@ -34,6 +34,7 @@ declare global {
       ): string;
     }
     interface ScopeObjectFieldsField {
+      pgFieldResourceUnique?: PgResourceUnique;
       isPgRowByUniqueConstraintField?: boolean;
     }
   }
@@ -214,6 +215,9 @@ return function (resource) {
                       [fieldName]: fieldWithHooks(
                         {
                           fieldName,
+                          isPgRowByUniqueConstraintField: true,
+                          pgFieldResource: resource,
+                          pgFieldResourceUnique: unique,
                           fieldBehaviorScope,
                         },
                         () => ({
