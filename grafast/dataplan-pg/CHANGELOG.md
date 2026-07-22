@@ -1,5 +1,20 @@
 # @dataplan/pg
 
+## 1.1.1
+
+### Patch Changes
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`a56df3a`](https://github.com/graphile/crystal/commit/a56df3ae4abe5b79b7f81f641f9a75eda3c288a0)
+  Thanks [@benjie](https://github.com/benjie)! - In development,
+  `$pgSelect.orderBy(...)` now has some runtime validation rather than relying
+  solely on types.
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`5d0f9bc`](https://github.com/graphile/crystal/commit/5d0f9bc3a0e0dcfb05c5377e29973c5a0d253c7e)
+  Thanks [@benjie](https://github.com/benjie)! - Throw an error when you don't
+  pass a resource to pgSelect
+
 ## 1.1.0
 
 ### Minor Changes
