@@ -1,5 +1,14 @@
 # graphile-build
 
+## 5.1.1
+
+### Patch Changes
+
+- [#3114](https://github.com/graphile/crystal/pull/3114)
+  [`10cab4a`](https://github.com/graphile/crystal/commit/10cab4ab16311f156e40a7df10fd0471f19e6378)
+  Thanks [@benjie](https://github.com/benjie)! - Node accessor fields now get
+  additional scopes (for better plugin hooking).
+
 ## 5.1.0
 
 ### Minor Changes
