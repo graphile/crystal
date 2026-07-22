@@ -454,9 +454,11 @@ const codecInspect: CustomInspectFunction = function (this: PgCodec) {
       ? `ListCodec<${this.arrayOfCodec.name}[]>`
       : this.rangeOfCodec
         ? `RangeCodec<${this.rangeOfCodec.name}>`
-        : this.attributes
-          ? `RecordCodec`
-          : "Codec";
+        : this.baseCodec
+          ? `ModifiedCodec<${this.baseCodec.name}>`
+          : this.attributes
+            ? `RecordCodec`
+            : "Codec";
   return `${type}(${this.name})`;
 };
 
@@ -1704,6 +1706,9 @@ export function getInnerCodec<
   }
   if (codec.rangeOfCodec) {
     return getInnerCodec(codec.rangeOfCodec) as any;
+  }
+  if (codec.baseCodec) {
+    return getInnerCodec(codec.baseCodec) as any;
   }
   return codec as any;
 }
