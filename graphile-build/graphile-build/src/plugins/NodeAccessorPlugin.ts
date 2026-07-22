@@ -27,6 +27,10 @@ declare global {
     }
     interface ScopeObjectFieldsField {
       isPgNodeQuery?: boolean;
+      /** For the node accessor fields, what type name is being accessed */
+      nodeAccessorTypeName?: string;
+      /** For the node accessor fields, what the fetcher that is used to fetch the record by id */
+      nodeAccessorFetcher?: GraphileBuild.NodeFetcher;
     }
   }
 }
@@ -147,6 +151,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
         } = build;
         const {
           scope: { isRootQuery },
+          fieldWithHooks,
         } = context;
         if (!isRootQuery) {
           return fields;
@@ -176,32 +181,40 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
           if (!fetcher) {
             return fields;
           }
+          const fieldName = build.inflection.nodeById(typeName);
           return build.extend(
             fields,
             {
-              [build.inflection.nodeById(typeName)]: {
-                args: {
-                  [nodeIdFieldName]: {
-                    description: `The globally unique \`ID\` to be used in selecting a single \`${typeName}\`.`,
-                    type: new GraphQLNonNull(GraphQLID),
-                  },
+              [fieldName]: fieldWithHooks(
+                {
+                  fieldName,
+                  nodeAccessorTypeName: typeName,
+                  nodeAccessorFetcher: fetcher,
                 },
-                type: build.getOutputTypeByName(typeName),
-                description: `Reads a single \`${typeName}\` using its globally unique \`ID\`.`,
-                plan: EXPORTABLE(
-                  (fetcher, nodeIdFieldName) =>
-                    function plan(_$parent: ExecutableStep, args: FieldArgs) {
-                      const $nodeId = args.getRaw(
-                        nodeIdFieldName,
-                      ) as ExecutableStep<string>;
-                      return fetcher($nodeId);
+                {
+                  args: {
+                    [nodeIdFieldName]: {
+                      description: `The globally unique \`ID\` to be used in selecting a single \`${typeName}\`.`,
+                      type: new GraphQLNonNull(GraphQLID),
                     },
-                  [fetcher, nodeIdFieldName],
-                ),
-                ...(fetcher.deprecationReason
-                  ? { deprecationReason: fetcher.deprecationReason }
-                  : null),
-              },
+                  },
+                  type: build.getOutputTypeByName(typeName),
+                  description: `Reads a single \`${typeName}\` using its globally unique \`ID\`.`,
+                  plan: EXPORTABLE(
+                    (fetcher, nodeIdFieldName) =>
+                      function plan(_$parent: ExecutableStep, args: FieldArgs) {
+                        const $nodeId = args.getRaw(
+                          nodeIdFieldName,
+                        ) as ExecutableStep<string>;
+                        return fetcher($nodeId);
+                      },
+                    [fetcher, nodeIdFieldName],
+                  ),
+                  ...(fetcher.deprecationReason
+                    ? { deprecationReason: fetcher.deprecationReason }
+                    : null),
+                },
+              ),
             },
             `Adding ${typeName} by NodeId field`,
           );
