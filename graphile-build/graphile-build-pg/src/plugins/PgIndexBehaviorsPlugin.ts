@@ -17,6 +17,12 @@ declare global {
     interface BehaviorStrings {
       manyToMany: true;
     }
+    interface PgCodecAttributeTags {
+      isIndexed: true;
+    }
+    interface PgCodecRelationTags {
+      isIndexed: true;
+    }
   }
 }
 
@@ -122,7 +128,10 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           callback(behavior, [codec, attributeName]) {
             const newBehavior = [behavior];
             const attr = codec.attributes[attributeName];
-            if (attr.extensions?.isIndexed === false) {
+            if (
+              attr.extensions?.isIndexed === false &&
+              !attr.extensions.tags?.isIndexed
+            ) {
               newBehavior.push("-filterBy", "-orderBy");
             }
             return newBehavior;
@@ -135,7 +144,10 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           provides: ["postInferred"],
           callback(behavior, relation) {
             const newBehavior = [behavior];
-            if (relation.extensions?.isIndexed === false) {
+            if (
+              relation.extensions?.isIndexed === false &&
+              !relation.extensions.tags?.isIndexed
+            ) {
               newBehavior.push(
                 "-select",
                 "-list",
