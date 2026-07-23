@@ -98,7 +98,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
   };
 
   isSyncAndSafe = false;
-  private ifDep: number | null = null;
+  private ifDep;
   private forbiddenFlags: ExecutionEntryFlags;
   private onRejectReturnValue: FlaggedValue<Error> | FlaggedValue<null>;
   private valueForInhibited: ResolvedTrapValue;
@@ -146,8 +146,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     const rej = this.onRejectReturnValue
       ? trim(String(this.onRejectReturnValue))
       : inspect(this.onRejectReturnValue);
-    const $if =
-      this.ifDep !== null ? this.getDepOptions(this.ifDep).step : null;
+    const $if = this.ifDep != null ? this.getDepOptions(this.ifDep).step : null;
     return `${this.dependencies[0].id}, ${
       $if ? `if(${$if.id}), ` : ``
     }${digestAcceptFlags(acceptFlags)}, onReject: ${rej}`;
@@ -229,8 +228,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     details: ExecutionDetails<[data: DataFromStep<TStep>, cond?: boolean]>,
   ): any {
     const dataEv = details.values[0]!;
-    const condEv =
-      this.ifDep === null ? null : details.values[this.ifDep as 1]!;
+    const condEv = this.ifDep == null ? null : details.values.at(this.ifDep);
     const {
       forbiddenFlags: thisForbiddenFlags,
       onRejectReturnValue,

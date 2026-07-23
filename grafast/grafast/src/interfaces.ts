@@ -41,7 +41,7 @@ import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.ts";
 import type { OperationPlan } from "./engine/OperationPlan.ts";
 import type { FlaggedValue, SafeError } from "./error.ts";
 import type { GrafastOperationOptions } from "./prepare.ts";
-import type { Step } from "./step.ts";
+import type { DepId, Step, StepData } from "./step.ts";
 import type { __InputDefaultStep } from "./steps/__inputDefault.ts";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.ts";
 import type { ApplyableStep } from "./steps/applyInput.ts";
@@ -720,6 +720,11 @@ export interface ExecutionDetailsStream {
   initialCount: number;
 }
 
+type TupleIndicies<T extends readonly [...any[]], K = keyof T> = K extends K
+  ? K extends `${infer N extends number}`
+    ? N
+    : never
+  : never;
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
@@ -727,12 +732,7 @@ export interface ExecutionDetails<
   count: number;
 
   /** An "execution value" for each dependency of the step */
-  values: {
-    [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
-  } & {
-    length: TDeps["length"];
-    map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
-  };
+  values: ExecutionValues<TDeps>;
 
   /** Helper; makes array from `callback(batchIndex)` for each `0 <= batchIndex < count` */
   indexMap: IndexMap;
@@ -751,6 +751,19 @@ export interface ExecutionDetails<
   /** Currently experimental, use it at your own risk (and see the source for docs) */
   extra: ExecutionExtra;
 }
+export type ExecutionValues<
+  TDeps extends readonly [...any[]] = readonly [...any[]],
+> = {
+  [DepIdx in TupleIndicies<TDeps>]: ExecutionValue<TDeps[DepIdx]>;
+} & Omit<ExecutionValue<TDeps[number]>[], "at"> & {
+    at<TDepId extends DepId<Step>>(
+      id: TDepId,
+    ): ExecutionValue<
+      NonNullable<TDepId["__step"]> extends Step
+        ? StepData<NonNullable<TDepId["__step"]>>
+        : TDeps[TDepId]
+    >;
+  };
 
 export interface LocationDetails {
   node: ASTNode | readonly ASTNode[];

@@ -135,7 +135,12 @@ import { getGrafastMiddleware } from "./middleware.ts";
 import type { Multistep, UnwrapMultistep } from "./multistep.ts";
 import { multistep } from "./multistep.ts";
 import { getNullableInputTypeAtPath } from "./operationPlan-input.ts";
-import type { ListCapableStep, ListLikeStep, ObjectLikeStep } from "./step.ts";
+import type {
+  DepId,
+  ListCapableStep,
+  ListLikeStep,
+  ObjectLikeStep,
+} from "./step.ts";
 import {
   assertExecutableStep,
   assertListCapableStep,
@@ -313,6 +318,7 @@ export type {
   ConnectionOptimizedStep,
   DataFromObjectSteps,
   DataFromStep,
+  DepId,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   EnumPlan,
