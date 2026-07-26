@@ -513,14 +513,17 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await abortable(iteratorAbortSignal, stream.next());
-          if (next === undefined || next.done) {
+          const rawNext = stream.next();
+          const next = isPromiseLike(rawNext)
+            ? await abortable(iteratorAbortSignal, undefined, rawNext)
+            : rawNext;
+          if (next === undefined || next.done || iteratorAbortSignal.aborted) {
             break;
           }
-          const payload = await abortable(
-            iteratorAbortSignal,
-            executeStreamPayload(next.value, i),
-          );
+          const rawPayload = executeStreamPayload(next.value, i);
+          const payload = isPromiseLike(rawPayload)
+            ? await abortable(iteratorAbortSignal, undefined, rawPayload)
+            : rawPayload;
           if (payload === undefined) {
             break;
           }
@@ -529,6 +532,7 @@ function executePreemptive(
             while (true) {
               const next = await abortable(
                 iteratorAbortSignal,
+                undefined,
                 payloadIterator.next(),
               );
               if (next === undefined || next.done) {

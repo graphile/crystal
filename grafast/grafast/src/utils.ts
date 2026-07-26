@@ -1553,23 +1553,21 @@ export function markSyncAndSafe<
 }
 
 /**
- * If `signal` is aborted, returns undefined. Otherwise returns equivalent to
- * `promiseOrValue` except if the signal is aborted first it will resolve with
- * `undefined` immediately.
+ * If `signal` is aborted, returns `valueForAbort`. Otherwise returns
+ * equivalent to `promiseOrValue` except if the signal is aborted first it will
+ * resolve with `valueForAbort` immediately.
  */
-export function abortable<T extends {}>(
+export function abortable<T, F>(
   signal: AbortSignal,
-  promiseOrValue: PromiseLike<T> | T,
-): T | undefined | Promise<T | undefined> {
+  valueForAbort: F,
+  promiseOrValue: PromiseLike<T>,
+): Promise<T | F> {
   if (signal.aborted) {
-    return undefined;
-  }
-  if (!isPromiseLike(promiseOrValue)) {
-    return promiseOrValue;
+    return Promise.resolve(valueForAbort);
   }
   const promise = promiseOrValue;
-  return new Promise((resolve, reject) => {
-    const resolveWithoutArgs = () => resolve(undefined);
+  return new Promise<T | F>((resolve, reject) => {
+    const resolveWithoutArgs = () => resolve(valueForAbort);
     signal.addEventListener("abort", resolveWithoutArgs, { once: true });
     return promise.then(
       (val) => {
