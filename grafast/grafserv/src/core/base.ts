@@ -572,7 +572,7 @@ function defaultMakeGetExecutionConfig(): (
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
-  let schemaPrepare: Promise<boolean> | null = null;
+  let schemaPrepareWaiters: Set<PromiseWithResolvers<boolean>> | null = null;
 
   return function getExecutionConfig(this: GrafservBase) {
     // Get up to date schema, in case we're in watch mode
@@ -581,16 +581,40 @@ function defaultMakeGetExecutionConfig(): (
     if (schemaOrPromise !== latestSchemaOrPromise) {
       latestSchemaOrPromise = schemaOrPromise;
       if ("then" in schemaOrPromise) {
-        schemaPrepare = (async () => {
-          latestSchema = await schemaOrPromise;
-          latestSchemaOrPromise = schemaOrPromise;
-          latestParseAndValidate = makeParseAndValidateFunction(
-            latestSchema,
-            resolvedPreset,
-            dynamicOptions,
-          );
-          schemaPrepare = null;
-          return true;
+        const prepareWaiters = new Set<PromiseWithResolvers<boolean>>();
+        schemaPrepareWaiters = prepareWaiters;
+        const releaseWaiters = (error?: Error) => {
+          // Make sure new waiters have their own batch
+          if (schemaPrepareWaiters === prepareWaiters) {
+            schemaPrepareWaiters = null;
+          }
+          if (error) {
+            for (const waiter of prepareWaiters) {
+              waiter.reject(error);
+            }
+          } else {
+            for (const waiter of prepareWaiters) {
+              waiter.resolve(true);
+            }
+          }
+          prepareWaiters.clear();
+        };
+
+        // Kick off an async task that waits for the schema to be ready,
+        // completes setup, then informs all waiters of the result.
+        (async () => {
+          try {
+            latestSchema = await schemaOrPromise;
+            latestSchemaOrPromise = schemaOrPromise;
+            latestParseAndValidate = makeParseAndValidateFunction(
+              latestSchema,
+              resolvedPreset,
+              dynamicOptions,
+            );
+            releaseWaiters();
+          } catch (error) {
+            releaseWaiters(error);
+          }
         })();
       } else {
         if (latestSchema === schemaOrPromise) {
@@ -605,10 +629,16 @@ function defaultMakeGetExecutionConfig(): (
         }
       }
     }
-    if (schemaPrepare !== null) {
+    if (schemaPrepareWaiters !== null) {
+      const prepareWaiters = schemaPrepareWaiters;
       const sleeper = sleep(dynamicOptions.schemaWaitTime);
-      const schemaReadyPromise = Promise.race([schemaPrepare, sleeper.promise]);
-      return schemaReadyPromise.then((schemaReady) => {
+      const waiter = Promise.withResolvers<boolean>();
+      prepareWaiters.add(waiter);
+      sleeper.promise.then(() => {
+        prepareWaiters.delete(waiter);
+        waiter.resolve(false);
+      }, waiter.reject);
+      return waiter.promise.then((schemaReady) => {
         sleeper.release();
         if (schemaReady !== true) {
           // Handle missing schema
