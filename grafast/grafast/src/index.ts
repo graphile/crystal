@@ -268,6 +268,7 @@ import type {
   ObjectTypeSpec,
 } from "./utils.ts";
 import {
+  abortable,
   arrayOfLength,
   arraysMatch,
   asyncIteratorWithCleanup,
@@ -414,6 +415,7 @@ export {
   $$idempotent,
   $$inhibit,
   $$verbatim,
+  abortable,
   access,
   AccessStep,
   applyInput,
@@ -586,6 +588,7 @@ exportAsMany("grafast", {
   __TrackedValueStep,
   __ValueStep,
   inspect,
+  abortable,
   access,
   get,
   AccessStep,
