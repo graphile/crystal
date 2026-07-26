@@ -27,10 +27,12 @@ export function isDistributor<TData = any>(
 }
 
 // Save on garbage collection by just using this promise for everything
-const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
-  done: true,
-  value: undefined,
-});
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve(
+  Object.freeze({
+    done: true,
+    value: undefined,
+  }),
+);
 
 /**
  * Creates a "distributor" for the sourceIterable such that the dependent steps

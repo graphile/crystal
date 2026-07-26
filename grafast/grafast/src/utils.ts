@@ -1460,10 +1460,12 @@ export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 // Save on garbage collection by just using this promise for everything
-const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
-  done: true,
-  value: undefined,
-});
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve(
+  Object.freeze({
+    done: true,
+    value: undefined,
+  }),
+);
 
 /**
  * Returns a new version of `iterable` that calls `callback()` on termination,
