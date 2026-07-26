@@ -434,6 +434,11 @@ const preset: GraphileConfig.Preset = {
           sub(topic: String!): Int
           gql(max: Int! = 10): Int
           slow: String
+          fast: FastSubscriptionPayload
+        }
+        type FastSubscriptionPayload {
+          datetime: String
+          count: Int
         }
       `,
       objects: {
@@ -494,6 +499,27 @@ const preset: GraphileConfig.Preset = {
                       yield new Date().toISOString();
                       // Wait two minutes between ticks
                       await sleep(120000);
+                    }
+                  },
+                [sleep],
+              ),
+            },
+            fast: {
+              resolve: EXPORTABLE(
+                () =>
+                  function resolve(e) {
+                    return e;
+                  },
+                [],
+              ),
+              subscribe: EXPORTABLE(
+                (sleep) =>
+                  async function* subscribe() {
+                    let count = 0;
+                    while (true) {
+                      ++count;
+                      yield { datetime: new Date().toISOString(), count };
+                      await sleep(5);
                     }
                   },
                 [sleep],

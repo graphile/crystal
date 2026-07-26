@@ -49,9 +49,9 @@ import type {
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.ts";
-import { promiseWithResolve } from "./promiseWithResolve.ts";
 import { timeSource } from "./timeSource.ts";
 import {
+  abortable,
   arrayOfLength,
   asyncIteratorWithCleanup,
   isPromiseLike,
@@ -325,7 +325,7 @@ function executePreemptive(
   onError: ErrorBehavior,
   outputDataAsString: boolean,
   executionTimeout: number | null,
-  abortSignal: AbortSignal,
+  requestAbortSignal: AbortSignal,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -368,7 +368,7 @@ function executePreemptive(
     stopTime,
     // toSerialize: [],
     eventEmitter: args[$$eventEmitter],
-    abortSignal,
+    abortSignal: requestAbortSignal,
   };
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
@@ -480,13 +480,15 @@ function executePreemptive(
       // `releaseUnusedIterators(rootBucket, rootBucketIndex, null)` here.
       const arr = bucketRootValue as StreamMoreableArray;
       const stream = arr[$$streamMore];
-      // Do the async iterable
-      let stopped = false;
-      const { promise: abortPromise, resolve: resolveAbort } =
-        promiseWithResolve<void>();
+      const iteratorAbortController = new AbortController();
+      requestAbortSignal.addEventListener(
+        "abort",
+        () => iteratorAbortController.abort(),
+        { once: true },
+      );
+      const iteratorAbortSignal = iteratorAbortController.signal;
       const iterator = newIterator((e) => {
-        stopped = true;
-        resolveAbort();
+        iteratorAbortController.abort();
         if (e != null) {
           try {
             const result = stream.throw?.(e);
@@ -511,33 +513,28 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await Promise.race([abortPromise, stream.next()]);
-          if (stopped || !next) {
+          const next = await abortable(iteratorAbortSignal, stream.next());
+          if (next === undefined || next.done) {
             break;
           }
-          if (!next) {
-            iterator.throw(new Error("Invalid iteration")).then(null, noop);
-            break;
-          }
-          const { done, value } = next;
-          if (done) {
-            break;
-          }
-          const payload = await Promise.race([
-            abortPromise,
-            executeStreamPayload(value, i),
-          ]);
+          const payload = await abortable(
+            iteratorAbortSignal,
+            executeStreamPayload(next.value, i),
+          );
           if (payload === undefined) {
             break;
           }
           if (isAsyncIterable(payload)) {
-            // FIXME: do we need to avoid 'for await' because it can cause the
-            // stream to exit late if we're waiting on a promise and the stream
-            // exits in the interrim? We're assuming that no promises will be
-            // sufficiently long-lived for this to be an issue right now.
-            // TODO: should probably tie all this into an AbortController/signal too
-            for await (const entry of payload) {
-              iterator.push(entry);
+            const payloadIterator = payload[Symbol.asyncIterator]();
+            while (true) {
+              const next = await abortable(
+                iteratorAbortSignal,
+                payloadIterator.next(),
+              );
+              if (next === undefined || next.done) {
+                break;
+              }
+              iterator.push(next.value);
             }
           } else {
             iterator.push(payload);
