@@ -1,5 +1,25 @@
 # postgraphile
 
+## 5.1.2
+
+### Patch Changes
+
+- [#3113](https://github.com/graphile/crystal/pull/3113)
+  [`fce4f8c`](https://github.com/graphile/crystal/commit/fce4f8c6417d5f6d7cca7227264d60a17dbb2157)
+  Thanks [@benjie](https://github.com/benjie)! - Add more details to `scope` of
+  row-by-unique accessor fields
+
+- [#3114](https://github.com/graphile/crystal/pull/3114)
+  [`10cab4a`](https://github.com/graphile/crystal/commit/10cab4ab16311f156e40a7df10fd0471f19e6378)
+  Thanks [@benjie](https://github.com/benjie)! - Node accessor fields now get
+  additional scopes (for better plugin hooking).
+
+- Updated dependencies
+  [[`fce4f8c`](https://github.com/graphile/crystal/commit/fce4f8c6417d5f6d7cca7227264d60a17dbb2157),
+  [`10cab4a`](https://github.com/graphile/crystal/commit/10cab4ab16311f156e40a7df10fd0471f19e6378)]:
+  - graphile-build-pg@5.1.2
+  - graphile-build@5.1.1
+
 ## 5.1.1
 
 ### Patch Changes
