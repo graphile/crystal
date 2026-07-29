@@ -602,7 +602,7 @@ function defaultMakeGetExecutionConfig(): (
 
         // Kick off an async task that waits for the schema to be ready,
         // completes setup, then informs all waiters of the result.
-        (async () => {
+        void (async () => {
           try {
             latestSchema = await schemaOrPromise;
             latestSchemaOrPromise = schemaOrPromise;
