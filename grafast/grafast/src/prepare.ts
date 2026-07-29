@@ -525,35 +525,40 @@ function executePreemptive(
             stream.return?.();
             break;
           }
-          const rawPayload = executeStreamPayload(next.value, i);
-          const payload = isPromiseLike(rawPayload)
-            ? await abortable(iteratorAbortSignal, undefined, rawPayload)
-            : rawPayload;
-          if (payload === undefined) {
-            break;
-          }
-          if (isAsyncIterable(payload)) {
-            const payloadIterator = payload[Symbol.asyncIterator]();
-            while (true) {
-              const next = await abortable(
-                iteratorAbortSignal,
-                undefined,
-                payloadIterator.next(),
-              );
-              if (next?.done) {
-                // Iterator already exited
-                break;
-              }
-              if (next === undefined || iteratorAbortSignal.aborted) {
-                payloadIterator.return?.(undefined);
-                break;
-              }
-              iterator.push(next.value);
+          try {
+            const rawPayload = executeStreamPayload(next.value, i);
+            const payload = isPromiseLike(rawPayload)
+              ? await abortable(iteratorAbortSignal, undefined, rawPayload)
+              : rawPayload;
+            if (payload === undefined) {
+              break;
             }
-          } else {
-            iterator.push(payload);
+            if (isAsyncIterable(payload)) {
+              const payloadIterator = payload[Symbol.asyncIterator]();
+              while (true) {
+                const next = await abortable(
+                  iteratorAbortSignal,
+                  undefined,
+                  payloadIterator.next(),
+                );
+                if (next?.done) {
+                  // Iterator already exited
+                  break;
+                }
+                if (next === undefined || iteratorAbortSignal.aborted) {
+                  payloadIterator.return?.(undefined);
+                  break;
+                }
+                iterator.push(next.value);
+              }
+            } else {
+              iterator.push(payload);
+            }
+            i++;
+          } catch (error) {
+            iterator.return?.();
+            throw error;
           }
-          i++;
         }
       })()
         .then(
