@@ -517,7 +517,12 @@ function executePreemptive(
           const next = isPromiseLike(rawNext)
             ? await abortable(iteratorAbortSignal, undefined, rawNext)
             : rawNext;
-          if (next === undefined || next.done || iteratorAbortSignal.aborted) {
+          if (next?.done) {
+            // Stream already exited
+            break;
+          }
+          if (next === undefined || iteratorAbortSignal.aborted) {
+            stream.return?.();
             break;
           }
           const rawPayload = executeStreamPayload(next.value, i);
@@ -535,7 +540,12 @@ function executePreemptive(
                 undefined,
                 payloadIterator.next(),
               );
-              if (next === undefined || next.done) {
+              if (next?.done) {
+                // Iterator already exited
+                break;
+              }
+              if (next === undefined || iteratorAbortSignal.aborted) {
+                payloadIterator.return?.(undefined);
                 break;
               }
               iterator.push(next.value);
