@@ -65,7 +65,13 @@ import {
 import { OperationPlan } from "./engine/OperationPlan.ts";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.ts";
 import { execute } from "./execute.ts";
-import { context, debugPlans, operationPlan, rootValue } from "./global.ts";
+import {
+  context,
+  debugPlans,
+  operationPlan,
+  rootValue,
+  variableValues,
+} from "./global.ts";
 import { grafast, grafastSync } from "./grafastGraphql.ts";
 import { inspect } from "./inspect.ts";
 import type {
@@ -553,6 +559,7 @@ export {
   TRAP_INHIBITED,
   UnbatchedStep as UnbatchedExecutableStep,
   UnbatchedStep,
+  variableValues,
 };
 export type { PromiseWithResolve } from "./promiseWithResolve.ts";
 
@@ -604,6 +611,7 @@ exportAsMany("grafast", {
   ConstantStep,
   context,
   rootValue,
+  variableValues,
   inhibitOnNull,
   assertNotNull,
   trap,
