@@ -284,9 +284,10 @@ export type AnyInputStepDollars = {
 };
 
 export interface FieldInfo {
+  schema: GraphQLSchema;
   fieldName: string;
   field: GraphQLField<any, any, any>;
-  schema: GraphQLSchema;
+  parentType: GraphQLObjectType;
 }
 
 /**
