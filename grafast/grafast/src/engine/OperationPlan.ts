@@ -3062,9 +3062,10 @@ export class OperationPlan {
         coordinate,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
+            schema: this.schema,
             fieldName,
             field,
-            schema: this.schema,
+            parentType: assertObjectType(this.schema.getType(typeName)),
           }),
       );
       let haltTree = false;
