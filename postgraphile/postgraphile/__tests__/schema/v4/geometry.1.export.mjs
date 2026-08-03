@@ -225,6 +225,24 @@ const resource_geomPgResource = makeRegistry({
         }
       }
     }),
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
+        }
+      }
+    }),
     EnumTheFirstEnum: enumCodec({
       name: "EnumTheFirstEnum",
       identifier: TYPES.text.sqlType,

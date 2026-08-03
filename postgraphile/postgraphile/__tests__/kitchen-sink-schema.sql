@@ -1272,6 +1272,16 @@ comment on constraint enum_2 on enum_tables.lots_of_enums is E'@enum\n@enumName 
 comment on constraint enum_3 on enum_tables.lots_of_enums is E'@enum';
 comment on constraint enum_4 on enum_tables.lots_of_enums is E'@enum';
 
+create table enum_tables.empty_enum (
+  value text primary key,
+  description text
+);
+comment on table enum_tables.empty_enum is E'@enum';
+
+create function enum_tables.empty_enum_query() returns enum_tables.empty_enum as $$
+  select null::text as value, null::text as description;
+$$ language sql stable;
+
 -- Enum table needs values added as part of the migration, not as part of the
 -- data.
 insert into enum_tables.simple_enum (value, description) values
