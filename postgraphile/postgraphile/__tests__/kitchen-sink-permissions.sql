@@ -35,6 +35,8 @@ grant select on enum_tables.simple_enum to postgraphile_test_authenticator;
 grant select on enum_tables.abcd to postgraphile_test_authenticator;
 grant select on enum_tables.abcd_view to postgraphile_test_authenticator;
 grant select on enum_tables.lots_of_enums to postgraphile_test_authenticator;
+grant select on enum_tables.empty_enum to postgraphile_test_authenticator;
+grant execute on function enum_tables.empty_enum_query() to postgraphile_test_visitor;
 
 grant usage on schema issue_2334 to postgraphile_test_visitor;
 grant select, insert (id, col), update (col), delete on issue_2334.foo to postgraphile_test_visitor;
