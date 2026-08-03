@@ -314,7 +314,7 @@ Original error: ${e.message}
                 (row) => row[pgAttribute.attname] != null,
               );
               if (data.length < 1) {
-                throw new Error(
+                console.warn(
                   `Enum table "${pgNamespace.nspname}"."${pgClass.relname}" contains no visible entries for enum constraint '${pgConstraint.conname}'. Check that the table contains at least one row and that the rows are not hidden by row-level security policies.`,
                 );
               }
