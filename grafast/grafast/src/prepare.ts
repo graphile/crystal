@@ -481,14 +481,20 @@ function executePreemptive(
       const arr = bucketRootValue as StreamMoreableArray;
       const stream = arr[$$streamMore];
       const iteratorAbortController = new AbortController();
+      const abortIteratorWhenRequestAborts = () =>
+        iteratorAbortController.abort();
       requestAbortSignal.addEventListener(
         "abort",
-        () => iteratorAbortController.abort(),
+        abortIteratorWhenRequestAborts,
         { once: true },
       );
       const iteratorAbortSignal = iteratorAbortController.signal;
       const iterator = newIterator((e) => {
         iteratorAbortController.abort();
+        requestAbortSignal.removeEventListener(
+          "abort",
+          abortIteratorWhenRequestAborts,
+        );
         if (e != null) {
           try {
             const result = stream.throw?.(e);
