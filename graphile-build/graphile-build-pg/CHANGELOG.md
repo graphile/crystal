@@ -1,5 +1,14 @@
 # graphile-build-pg
 
+## 5.1.3
+
+### Patch Changes
+
+- [#3121](https://github.com/graphile/crystal/pull/3121)
+  [`4b6f5bf`](https://github.com/graphile/crystal/commit/4b6f5bf91ce1ddcddc498319ebaf48b94b50d755)
+  Thanks [@benjie](https://github.com/benjie)! - Allow PostgreSQL enum table
+  with no values... catch at GraphQL layer.
+
 ## 5.1.2
 
 ### Patch Changes

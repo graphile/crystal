@@ -1,5 +1,27 @@
 # grafast
 
+## 1.1.1
+
+### Patch Changes
+
+- [#3119](https://github.com/graphile/crystal/pull/3119)
+  [`53ffec5`](https://github.com/graphile/crystal/commit/53ffec58685ad8881664990a8f93d095a36a8413)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast now exports
+  `variableValues()` helper to make moving from GraphQL.js resolvers to Grafast
+  plan resolvers easier.
+
+- [#3085](https://github.com/graphile/crystal/pull/3085)
+  [`711f932`](https://github.com/graphile/crystal/commit/711f93271f7d3c4eb74ef884e6f07f7591329d85)
+  Thanks [@benjie](https://github.com/benjie)! - Fix types in
+  `loadOne`/`loadMany` that were allowing steps to become `Step<Promise<TData>>`
+  rather than `Step<TData>`. Steps will never represent a promise.
+
+- [#3118](https://github.com/graphile/crystal/pull/3118)
+  [`1ad8bce`](https://github.com/graphile/crystal/commit/1ad8bced55e11f0144d458f62c67a840de858d71)
+  Thanks [@benjie](https://github.com/benjie)! - Adds `parentType` to
+  `FieldInfo` so it's easier to emulate GraphQLResolveInfo when migrating to
+  Grafast.
+
 ## 1.1.0
 
 ### Minor Changes
