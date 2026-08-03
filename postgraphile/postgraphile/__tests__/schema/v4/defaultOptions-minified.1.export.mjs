@@ -1986,6 +1986,12 @@ const registry = makeRegistry({
       }],
       extensions: {}
     }),
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {}
+    }),
     EnumTheFirstEnum: enumCodec({
       name: "EnumTheFirstEnum",
       identifier: TYPES.text.sqlType,

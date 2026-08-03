@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -125,6 +125,34 @@ const abcdViewCodec = recordCodec({
       primaryKey: "letter",
       enum: true,
       enumName: "LetterAToDViaView"
+    }
+  },
+  executor: executor
+});
+const emptyEnumIdentifier = sql.identifier("enum_tables", "empty_enum");
+const emptyEnumCodec = recordCodec({
+  name: "emptyEnum",
+  identifier: emptyEnumIdentifier,
+  attributes: {
+    __proto__: null,
+    value: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "empty_enum"
+    },
+    tags: {
+      __proto__: null,
+      enum: true
     }
   },
   executor: executor
@@ -496,6 +524,27 @@ const abcd_view_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
+const empty_enum_resourceOptionsConfig = {
+  executor: executor,
+  name: "empty_enum",
+  identifier: "main.enum_tables.empty_enum",
+  from: emptyEnumIdentifier,
+  codec: emptyEnumCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "empty_enum"
+    },
+    tags: {
+      enum: true
+    }
+  },
+  uniques: [{
+    attributes: ["value"],
+    isPrimary: true
+  }]
+};
 const simple_enum_resourceOptionsConfig = {
   executor: executor,
   name: "simple_enum",
@@ -518,6 +567,7 @@ const simple_enum_resourceOptionsConfig = {
   }]
 };
 const referencing_table_mutationFunctionIdentifer = sql.identifier("enum_tables", "referencing_table_mutation");
+const empty_enum_queryFunctionIdentifer = sql.identifier("enum_tables", "empty_enum_query");
 const letter_descriptionsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -629,6 +679,7 @@ const registry = makeRegistry({
     abcd: abcdCodec,
     text: TYPES.text,
     abcdView: abcdViewCodec,
+    emptyEnum: emptyEnumCodec,
     simpleEnum: simpleEnumCodec,
     int4: TYPES.int,
     letterDescriptions: letterDescriptionsCodec,
@@ -642,6 +693,24 @@ const registry = makeRegistry({
     lotsOfEnums: lotsOfEnumsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
+        }
+      }
+    }),
     LotsOfEnumsEnum4Enum: enumCodec({
       name: "LotsOfEnumsEnum4Enum",
       identifier: TYPES.text.sqlType,
@@ -788,6 +857,7 @@ const registry = makeRegistry({
     __proto__: null,
     abcd: abcd_resourceOptionsConfig,
     abcd_view: abcd_view_resourceOptionsConfig,
+    empty_enum: empty_enum_resourceOptionsConfig,
     simple_enum: simple_enum_resourceOptionsConfig,
     referencing_table_mutation: {
       executor: executor,
@@ -812,6 +882,22 @@ const registry = makeRegistry({
       isUnique: true,
       isMutation: true
     },
+    empty_enum_query: PgResource.functionResourceOptions(empty_enum_resourceOptionsConfig, {
+      name: "empty_enum_query",
+      identifier: "main.enum_tables.empty_enum_query()",
+      from(...args) {
+        return sql`${empty_enum_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          name: "empty_enum_query"
+        }
+      }
+    }),
     letter_descriptions: letter_descriptions_resourceOptionsConfig,
     referencing_table: referencing_table_resourceOptionsConfig,
     lots_of_enums: lots_of_enums_resourceOptionsConfig

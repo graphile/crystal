@@ -2709,6 +2709,24 @@ const registry = makeRegistry({
         }
       }
     }),
+    EnumTablesEmptyEnumEnum: enumCodec({
+      name: "EnumTablesEmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EnumTablesEmptyEnum"
+        }
+      }
+    }),
     EnumTheFirstEnum: enumCodec({
       name: "EnumTheFirstEnum",
       identifier: TYPES.text.sqlType,
