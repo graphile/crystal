@@ -528,7 +528,10 @@ function executePreemptive(
             break;
           }
           if (next === undefined || iteratorAbortSignal.aborted) {
-            stream.return?.();
+            const result = stream.return?.();
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
             break;
           }
           try {
@@ -552,7 +555,10 @@ function executePreemptive(
                   break;
                 }
                 if (next === undefined || iteratorAbortSignal.aborted) {
-                  payloadIterator.return?.(undefined);
+                  const result = payloadIterator.return?.(undefined);
+                  if (isPromiseLike(result)) {
+                    result.then(null, noop);
+                  }
                   break;
                 }
                 iterator.push(next.value);
@@ -562,7 +568,10 @@ function executePreemptive(
             }
             i++;
           } catch (error) {
-            iterator.return?.();
+            const result = iterator.return?.();
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
             throw error;
           }
         }
