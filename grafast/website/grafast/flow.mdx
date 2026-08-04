@@ -283,7 +283,7 @@ Most readers can safely skim this section; only dive in when you encounter an
 advanced requirement. When you do, the helper docs provide the details:
 
 - [Flow control steps](./standard-steps/index.mdx#flow-control)
-  documents the APIs (`inhibitOnNull`, `assertNotNull`, `trap`).
+  documents the APIs (`inhibitOnNull`, `inhibitIf`, `assertNotNull`, `trap`).
 - [Plan diagrams](./plan-diagrams.mdx) gives an overview of the way different
   types of steps — and the relationships between them — appear.
 
@@ -295,6 +295,20 @@ through as `null`, and errors thrown inside `execute()` already halt work for
 the affected entry. Reach for the helpers only when you need tighter control,
 for example when validating decoded Node IDs or when a nullable foreign key
 should prevent a related fetch from executing.
+
+When the early-exit condition is not simply "this value is null", use
+`inhibitIf` instead. For example, if an empty list should skip downstream work,
+derive a boolean condition step and inhibit on that:
+
+```ts
+const $myList = fieldArgs.getRaw("myList");
+const $isEmpty = lambda($myList, (list) => list.length === 0, true);
+const $guardedList = inhibitIf($myList, $isEmpty);
+const $result = doSomethingWith($guardedList);
+return trap($result, TRAP_INHIBITED, {
+  valueForInhibited: "EMPTY_LIST",
+});
+```
 
 The pattern usually looks like this:
 
@@ -318,6 +332,8 @@ normal. Other helpers build on the same idea:
 
 - [`inhibitOnNull`](./standard-steps/inhibitOnNull.mdx) skips
   dependent work for `null` inputs while still returning `null` to the caller.
+- [`inhibitIf`](./standard-steps/inhibitIf.mdx) skips dependent work
+  when a separate condition step yields `true`.
 - [`assertNotNull`](./standard-steps/assertNotNull.mdx) upgrades a
   `null` into a `SafeError`, making the failure visible to clients.
 - [`trap`](./standard-steps/trap.mdx) recovers an inhibited or

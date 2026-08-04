@@ -1,0 +1,45 @@
+import Mermaid from "@theme/Mermaid";
+
+# inhibitIf
+
+Returns a step that yields the same values as the passed in step, but
+downstream work is inhibited whenever the condition step yields `true`.
+
+Unlike [`inhibitOnNull`](./inhibitOnNull.mdx), `inhibitIf` is an explicit step
+in the plan, so it will typically appear in plan diagrams as its own node.
+
+:::note[Declarative flow]
+
+The inhibition only affects steps that depend on the wrapper step (and those
+that depend on those, and so on); steps depending on the original (unwrapped)
+step are not otherwise impacted.
+
+:::
+
+## Example
+
+```ts
+const $myList = fieldArgs.getRaw("myList");
+const $isEmpty = lambda($myList, (list) => list.length === 0, true);
+const $guardedList = inhibitIf($myList, $isEmpty);
+const $result = doSomethingWith($guardedList);
+return trap($result, TRAP_INHIBITED, {
+  valueForInhibited: "EMPTY_LIST",
+});
+```
+
+In the example above, when `$isEmpty` yields `true`, the dependent work is
+inhibited and Gra*fast* omits the affected entries from downstream execution.
+When the condition yields `false`, the wrapped step behaves as a pass-through.
+
+## Plan diagrams
+
+`inhibitIf` is a regular step, so plan diagrams will generally show it
+explicitly:
+
+<Mermaid chart={`
+graph TD
+  A["Access"] --> B["inhibitIf"]
+  C["Condition"] --> B
+  B --> D["LoadMany"]
+`} />
