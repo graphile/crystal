@@ -259,6 +259,23 @@ it("enables trapping an error to error", async () => {
   });
 });
 
+it("preserves errors", async () => {
+  const schema = makeSchema();
+  const source = /* GraphQL */ `
+    query Q {
+      preservedError: inhibitIfPreservesErrors(setNullToError: null)
+    }
+  `;
+  const result = (await grafast({ source, schema })) as ExecutionResult;
+  expect(result.errors).to.have.length(1);
+  const firstError = result.errors![0];
+  expect(firstError.path).to.deep.equal(["preservedError"]);
+  expect(firstError.message).to.equal("Null!");
+  expect(result.data).to.deep.equal({
+    preservedError: null, // Also check `errors`
+  });
+});
+
 it("supports inhibitIf and inhibitOnEmpty", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
@@ -275,15 +292,11 @@ it("supports inhibitIf and inhibitOnEmpty", async () => {
       zeroValue: inhibitOnEmptyInt(value: 0)
       inhibitEmptyList: inhibitIfList(value: [])
       inhibitNonEmptyList: inhibitIfList(value: [3, 4])
-      preservedError: inhibitIfPreservesErrors(setNullToError: null)
       preservedInhibition: inhibitIfPreservesInhibition(setNullToNull: null)
     }
   `;
   const result = (await grafast({ source, schema })) as ExecutionResult;
-  expect(result.errors).to.have.length(1);
-  const firstError = result.errors![0];
-  expect(firstError.path).to.deep.equal(["preservedError"]);
-  expect(firstError.message).to.equal("Null!");
+  expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({
     emptyString: null,
     nonEmptyString: "hi",
@@ -297,7 +310,6 @@ it("supports inhibitIf and inhibitOnEmpty", async () => {
     zeroValue: 0, // 0 is not "empty"
     inhibitEmptyList: [], // No `0` prefixed, so inhibited
     inhibitNonEmptyList: [0, 4, 5],
-    preservedError: null, // Also check `errors`
     preservedInhibition: null, // If inhibition was lost, this would be 42
   });
 });
