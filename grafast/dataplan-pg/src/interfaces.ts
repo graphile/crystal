@@ -464,7 +464,7 @@ export type PlanByUniques<
 > = TAttributes extends PgCodecAttributes
   ? TuplePlanMap<
       TAttributes,
-      TUniqueAttributes[number]["attributes"] & string[]
+      TUniqueAttributes[number]["attributes"]
     >[number]
   : undefined;
 
