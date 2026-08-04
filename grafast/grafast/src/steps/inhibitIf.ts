@@ -1,5 +1,4 @@
-import { FLAG_ERROR, FLAG_INHIBITED, TRAPPABLE_FLAGS } from "../constants.ts";
-import { $$inhibit, flagError } from "../error.ts";
+import { $$inhibit } from "../error.ts";
 import type {
   DataFromStep,
   ExecutionDetails,
