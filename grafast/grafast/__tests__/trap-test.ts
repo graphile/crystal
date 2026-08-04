@@ -128,7 +128,7 @@ const makeSchema = () => {
           inhibitIfPreservesErrors(_, { $setNullToError }) {
             const $a = assertNotNull($setNullToError, "Null!");
             const $guarded = inhibitIf($a, constant(false));
-            return trap($guarded, TRAP_ERROR, { valueForError: "NULL" });
+            return $guarded;
           },
           inhibitIfPreservesInhibition(_, { $setNullToNull }) {
             const $a = inhibitOnNull($setNullToNull);
@@ -269,7 +269,9 @@ it("supports inhibitIf and inhibitOnEmpty", async () => {
       nonEmptyList: inhibitOnEmptyList(value: [1, 2])
       emptyInput: inhibitOnEmptyInput(input: {})
       nonEmptyInput: inhibitOnEmptyInput(input: { a: 1 })
-      falseValue: inhibitOnEmptyBoolean(value: false)
+      falseBoolean: inhibitOnEmptyBoolean(value: false)
+      trueBoolean: inhibitOnEmptyBoolean(value: true)
+      nullBoolean: inhibitOnEmptyBoolean(value: null)
       zeroValue: inhibitOnEmptyInt(value: 0)
       inhibitEmptyList: inhibitIfList(value: [])
       inhibitNonEmptyList: inhibitIfList(value: [3, 4])
@@ -278,20 +280,25 @@ it("supports inhibitIf and inhibitOnEmpty", async () => {
     }
   `;
   const result = (await grafast({ source, schema })) as ExecutionResult;
-  expect(result.errors).to.not.exist;
+  expect(result.errors).to.have.length(1);
+  const firstError = result.errors![0];
+  expect(firstError.path).to.deep.equal(["preservedError"]);
+  expect(firstError.message).to.equal("Null!");
   expect(result.data).to.deep.equal({
     emptyString: null,
     nonEmptyString: "hi",
-    emptyList: [],
+    emptyList: [], // No `0` prefixed, was inhibited
     nonEmptyList: [0, 2, 3],
     emptyInput: null,
     nonEmptyInput: "NOT_EMPTY",
-    falseValue: false,
-    zeroValue: 0,
-    inhibitEmptyList: [],
+    falseBoolean: false, // False is not "empty"
+    trueBoolean: true,
+    nullBoolean: null, // Can't really tell :D
+    zeroValue: 0, // 0 is not "empty"
+    inhibitEmptyList: [], // No `0` prefixed, so inhibited
     inhibitNonEmptyList: [0, 4, 5],
-    preservedError: null,
-    preservedInhibition: null,
+    preservedError: null, // Also check `errors`
+    preservedInhibition: null, // If inhibition was lost, this would be 42
   });
 });
 
