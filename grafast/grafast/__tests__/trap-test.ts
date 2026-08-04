@@ -9,7 +9,7 @@ import {
   constant,
   grafast,
   inhibitIf,
-  inhibitIfEmpty,
+  inhibitOnEmpty,
   inhibitOnNull,
   lambda,
   list,
@@ -34,11 +34,11 @@ const makeSchema = () => {
         errorToNull(setNullToError: Int): Int
         errorToEmptyList(setNullToError: Int): [Int]
         errorToError(setNullToError: Int): Error
-        inhibitIfEmptyString(value: String): String
-        inhibitIfEmptyList(value: [Int!]): [Int]!
-        inhibitIfEmptyInput(input: EmptyableInput): String
-        inhibitIfEmptyBoolean(value: Boolean): Boolean
-        inhibitIfEmptyInt(value: Int): Int
+        inhibitOnEmptyString(value: String): String
+        inhibitOnEmptyList(value: [Int!]): [Int]!
+        inhibitOnEmptyInput(input: EmptyableInput): String
+        inhibitOnEmptyBoolean(value: Boolean): Boolean
+        inhibitOnEmptyInt(value: Int): Int
         inhibitIfList(value: [Int!]): [Int]!
         inhibitIfPreservesErrors(setNullToError: Int): Int
         inhibitIfPreservesInhibition(setNullToNull: Int): Int
@@ -77,14 +77,14 @@ const makeSchema = () => {
               valueForError: "PASS_THROUGH",
             });
           },
-          inhibitIfEmptyString(_, { $value }) {
-            const $guarded = inhibitIfEmpty($value);
+          inhibitOnEmptyString(_, { $value }) {
+            const $guarded = inhibitOnEmpty($value);
             return trap($guarded, TRAP_INHIBITED, {
               valueForInhibited: "NULL",
             });
           },
-          inhibitIfEmptyList(_, { $value }) {
-            const $guarded = inhibitIfEmpty($value);
+          inhibitOnEmptyList(_, { $value }) {
+            const $guarded = inhibitOnEmpty($value);
             const $result = lambda(
               $guarded,
               (list) => [0, ...list.map((n: number) => n + 1)],
@@ -94,21 +94,21 @@ const makeSchema = () => {
               valueForInhibited: "EMPTY_LIST",
             });
           },
-          inhibitIfEmptyInput(_, { $input }) {
-            const $guarded = inhibitIfEmpty($input);
+          inhibitOnEmptyInput(_, { $input }) {
+            const $guarded = inhibitOnEmpty($input);
             const $result = lambda($guarded, () => "NOT_EMPTY", true);
             return trap($result, TRAP_INHIBITED, {
               valueForInhibited: "NULL",
             });
           },
-          inhibitIfEmptyBoolean(_, { $value }) {
-            const $guarded = inhibitIfEmpty($value);
+          inhibitOnEmptyBoolean(_, { $value }) {
+            const $guarded = inhibitOnEmpty($value);
             return trap($guarded, TRAP_INHIBITED, {
               valueForInhibited: "NULL",
             });
           },
-          inhibitIfEmptyInt(_, { $value }) {
-            const $guarded = inhibitIfEmpty($value);
+          inhibitOnEmptyInt(_, { $value }) {
+            const $guarded = inhibitOnEmpty($value);
             return trap($guarded, TRAP_INHIBITED, {
               valueForInhibited: "NULL",
             });
@@ -259,18 +259,18 @@ it("enables trapping an error to error", async () => {
   });
 });
 
-it("supports inhibitIf and inhibitIfEmpty", async () => {
+it("supports inhibitIf and inhibitOnEmpty", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
     query Q {
-      emptyString: inhibitIfEmptyString(value: "")
-      nonEmptyString: inhibitIfEmptyString(value: "hi")
-      emptyList: inhibitIfEmptyList(value: [])
-      nonEmptyList: inhibitIfEmptyList(value: [1, 2])
-      emptyInput: inhibitIfEmptyInput(input: {})
-      nonEmptyInput: inhibitIfEmptyInput(input: { a: 1 })
-      falseValue: inhibitIfEmptyBoolean(value: false)
-      zeroValue: inhibitIfEmptyInt(value: 0)
+      emptyString: inhibitOnEmptyString(value: "")
+      nonEmptyString: inhibitOnEmptyString(value: "hi")
+      emptyList: inhibitOnEmptyList(value: [])
+      nonEmptyList: inhibitOnEmptyList(value: [1, 2])
+      emptyInput: inhibitOnEmptyInput(input: {})
+      nonEmptyInput: inhibitOnEmptyInput(input: { a: 1 })
+      falseValue: inhibitOnEmptyBoolean(value: false)
+      zeroValue: inhibitOnEmptyInt(value: 0)
       inhibitEmptyList: inhibitIfList(value: [])
       inhibitNonEmptyList: inhibitIfList(value: [3, 4])
       preservedError: inhibitIfPreservesErrors(setNullToError: null)

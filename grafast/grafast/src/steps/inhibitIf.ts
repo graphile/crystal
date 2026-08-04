@@ -87,7 +87,7 @@ export function inhibitIf<TStep extends Step>(
   >;
 }
 
-export function inhibitIfEmpty<TStep extends Step>($step: TStep) {
+export function inhibitOnEmpty<TStep extends Step>($step: TStep) {
   const $isEmpty = lambda($step, isEmpty, true);
   return inhibitIf($step, $isEmpty);
 }

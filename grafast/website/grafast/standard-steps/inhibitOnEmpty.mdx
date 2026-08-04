@@ -1,4 +1,4 @@
-# inhibitIfEmpty
+# inhibitOnEmpty
 
 Returns a step that yields the same values as the passed in step, but
 downstream work is inhibited when the yielded value is considered empty.
@@ -17,12 +17,12 @@ Gra*fast* currently considers a value empty if it is:
 
 ```ts
 const $myList = fieldArgs.getRaw("myList");
-const $guardedList = inhibitIfEmpty($myList);
+const $guardedList = inhibitOnEmpty($myList);
 const $result = doSomethingWith($guardedList);
 return trap($result, TRAP_INHIBITED, {
   valueForInhibited: "EMPTY_LIST",
 });
 ```
 
-`inhibitIfEmpty` is a convenience helper built on top of
+`inhibitOnEmpty` is a convenience helper built on top of
 [`inhibitIf`](./inhibitIf.mdx).
