@@ -1,0 +1,28 @@
+{
+  noArgsNoOutput: {
+    __typename: "NoArgsNoOutputPayload",
+  },
+  noArgsNoOutputWithId: {
+    clientMutationId: "abc",
+  },
+  inArgsNoOutput: {
+    __typename: "InArgsNoOutputPayload",
+  },
+  singleOutput: {
+    doubled: {
+      doubled: 10,
+    },
+  },
+  multipleOutputs: {
+    result: {
+      total: 10,
+      product: 25,
+    },
+  },
+  inoutArg: {
+    clientMutationId: "xyz",
+    counter: {
+      counter: 11,
+    },
+  },
+}

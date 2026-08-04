@@ -28,8 +28,45 @@ create domain pg11.domain_constrained_compound_type as
 
 create table pg11.types (
   id serial primary key,
-  "regrole" regrole, 
+  "regrole" regrole,
   "regnamespace" regnamespace,
   "bigint_domain_array_domain" c.bigint_domain_array_domain,
   "domain_constrained_compound_type" pg11.domain_constrained_compound_type
 );
+
+drop schema if exists procedures cascade;
+create schema procedures;
+
+create procedure procedures.no_args_no_output()
+language plpgsql as $$
+begin
+end;
+$$;
+
+create procedure procedures.in_args_no_output(a int, b int)
+language plpgsql as $$
+begin
+end;
+$$;
+
+create procedure procedures.single_output(a int, out doubled int)
+language plpgsql as $$
+begin
+  doubled := a * 2;
+end;
+$$;
+
+create procedure procedures.multiple_outputs(a int, out total int, out product int)
+language plpgsql as $$
+begin
+  total := a + a;
+  product := a * a;
+end;
+$$;
+
+create procedure procedures.inout_arg(inout counter int)
+language plpgsql as $$
+begin
+  counter := counter + 1;
+end;
+$$;
