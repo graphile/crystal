@@ -34,7 +34,7 @@ export class InhibitIfStep<TStep extends Step> extends Step<
 
   constructor(step: TStep, condition: Step<boolean>) {
     super();
-    this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
+    this.addDependency(step);
     this.addDependency(condition);
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
