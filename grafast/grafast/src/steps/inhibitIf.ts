@@ -6,7 +6,6 @@ import type {
   GrafastResultsList,
 } from "../interfaces.ts";
 import { isListCapableStep, Step } from "../step.ts";
-import { sudo } from "../utils.ts";
 import type { __ItemStep } from "./__item.ts";
 import { lambda } from "./lambda.ts";
 
@@ -40,8 +39,6 @@ export class InhibitIfStep<TStep extends Step> extends Step<
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
     }
-    sudo(this).implicitSideEffectStep = null;
-    this.layerPlan.latestSideEffectStep = null;
   }
 
   public toStringMeta(): string | null {
@@ -62,19 +59,9 @@ export class InhibitIfStep<TStep extends Step> extends Step<
   ): GrafastResultsList<DataFromStep<TStep>> {
     const dataEv = details.values[0]!;
     const conditionEv = details.values[1]!;
-    return details.indexMap((i) => {
-      const flags = dataEv._flagsAt(i);
-      if (flags & FLAG_ERROR) {
-        return flagError(dataEv.at(i) as Error);
-      }
-      if (flags & FLAG_INHIBITED) {
-        return $$inhibit;
-      }
-      if (conditionEv.at(i)) {
-        return $$inhibit;
-      }
-      return dataEv.at(i);
-    });
+    return details.indexMap((i) =>
+      conditionEv.at(i) ? $$inhibit : dataEv.at(i),
+    );
   }
 }
 
