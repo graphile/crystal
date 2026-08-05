@@ -9,7 +9,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release_main:
+  release:
     if: github.event_name == 'push' && github.ref_name == 'main'
     name: Release
     runs-on: ubuntu-latest
@@ -50,8 +50,8 @@ jobs:
           version: yarn changeset-version
           publish: yarn changeset-publish
 
-  release_next:
-    if: github.event_name == 'workflow_dispatch'
+  snapshot:
+    if: github.event_name == 'workflow_dispatch' && ( github.ref_name == 'main' || github.ref_name == 'next' )
     name: Publish next snapshot
     runs-on: ubuntu-latest
 
@@ -76,7 +76,7 @@ jobs:
 
       - name: Calculate snapshot versions
         run: |
-          yarn changeset version --snapshot next
+          yarn changeset version --snapshot "${{ github.ref_name }}"
           node scripts/postversion.mjs
         env:
           CHANGESETS_NO_COMMIT: "1"
