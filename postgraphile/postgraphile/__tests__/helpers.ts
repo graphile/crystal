@@ -783,8 +783,7 @@ export const assertSnapshotsMatch = async (
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
   }
 
-  const { data, payloads, queries, errors, extensions, skipped } =
-    await result;
+  const { data, payloads, queries, errors, extensions, skipped } = await result;
   if (skipped) {
     return;
   }
