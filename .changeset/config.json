@@ -9,10 +9,9 @@
       "repo": "graphile/crystal"
     }
   ],
-  "//": {
-    "snapshot": {
-      "useCalculatedVersion": true
-    }
+  "snapshot": {
+    "useCalculatedVersion": true,
+    "prereleaseTemplate": "aardvark.{tag}-{datetime}"
   },
   "commit": [
     "./commit.js",

@@ -3,6 +3,8 @@ import "zx/globals";
 
 import { existsSync } from "node:fs";
 
+const CHANGESETS_NO_COMMIT = process.env.CHANGESETS_NO_COMMIT === "1";
+
 // 1. Determine packages updated
 const gitStatus = await $`git status --porcelain`;
 const changedFiles = gitStatus.stdout
@@ -59,17 +61,25 @@ releasedPackages.sort();
 
 // 3. Run yarn (on CI, force mutation)
 await $`yarn install --mode=update-lockfile --no-immutable`;
-await $`git add yarn.lock`;
+toCommit.push("yarn.lock");
 
 // 4. Run `postversion` scripts
 await $`yarn workspaces foreach --topological-dev --all run postversion`;
 
 // 5. Commit changes (including `.changeset/pre.json`) with helpful commit message
-await $`git add ${toCommit}`;
 const commitMessage = `\
 RELEASING: Releasing ${releasedPackages.length} package(s)
 
 Releases:
 ${releasedPackages.map((p) => `  ${p}`).join("\n")}
 `;
-await $`git commit -m ${commitMessage}`;
+
+if (CHANGESETS_NO_COMMIT) {
+  console.log(
+    `CHANGESETS_NO_COMMIT is set; so not committing. Message would have been:`,
+  );
+  console.log(commitMessage);
+} else {
+  await $`git add ${toCommit}`;
+  await $`git commit -m ${commitMessage}`;
+}

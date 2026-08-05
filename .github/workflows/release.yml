@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
+    if: github.event_name == 'push' && github.ref_name == 'main'
     name: Release
     runs-on: ubuntu-latest
 
@@ -47,3 +49,40 @@ jobs:
         with:
           version: yarn changeset-version
           publish: yarn changeset-publish
+
+  snapshot:
+    if: github.event_name == 'workflow_dispatch' && ( github.ref_name == 'main' || github.ref_name == 'next' )
+    name: Publish snapshot
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Calculate snapshot versions
+        run: |
+          yarn changeset version --snapshot "${{ github.ref_name }}"
+          node scripts/postversion.mjs
+        env:
+          CHANGESETS_NO_COMMIT: "1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish snapshots
+        run: |
+          yarn workspaces-prepack
+          yarn changeset publish --tag "snapshot-${{ github.ref_name }}" --no-git-tag
