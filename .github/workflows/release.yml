@@ -84,4 +84,4 @@ jobs:
       - name: Publish snapshots
         run: |
           yarn workspaces-prepack
-          yarn changeset publish --tag next
+          yarn changeset publish --tag next --no-git-tag
