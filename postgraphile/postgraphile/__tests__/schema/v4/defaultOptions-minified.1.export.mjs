@@ -7442,6 +7442,7 @@ scalar JSON
 scalar JSONPath
 
 type BigFloatRange {
+  empty: Boolean!
   start: BigFloatRangeBound
   end: BigFloatRangeBound
 }
@@ -7452,6 +7453,7 @@ type BigFloatRangeBound {
 }
 
 type DateRange {
+  empty: Boolean!
   start: DateRangeBound
   end: DateRangeBound
 }
@@ -7464,6 +7466,7 @@ type DateRangeBound {
 scalar Date
 
 type AnIntRange {
+  empty: Boolean!
   start: AnIntRangeBound
   end: AnIntRangeBound
 }
@@ -7568,6 +7571,7 @@ input TypeCondition {
 }
 
 input BigFloatRangeInput {
+  empty: Boolean! = false
   start: BigFloatRangeBoundInput
   end: BigFloatRangeBoundInput
 }
@@ -7578,6 +7582,7 @@ input BigFloatRangeBoundInput {
 }
 
 input DateRangeInput {
+  empty: Boolean! = false
   start: DateRangeBoundInput
   end: DateRangeBoundInput
 }
@@ -7588,6 +7593,7 @@ input DateRangeBoundInput {
 }
 
 input AnIntRangeInput {
+  empty: Boolean! = false
   start: AnIntRangeBoundInput
   end: AnIntRangeBoundInput
 }
@@ -8045,6 +8051,7 @@ type FuncReturnsTableMultiColEdge {
 }
 
 input FloatRangeInput {
+  empty: Boolean! = false
   start: FloatRangeBoundInput
   end: FloatRangeBoundInput
 }
