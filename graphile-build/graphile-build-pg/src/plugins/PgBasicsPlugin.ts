@@ -143,7 +143,7 @@ declare global {
        * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
        * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
        */
-      pgExecutor: PgExecutor;
+      pgExecutor: GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"][keyof GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"]];
       /** Shortcut to the resources in the registry */
       pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
       /** Shortcut to the codecs in the registry */

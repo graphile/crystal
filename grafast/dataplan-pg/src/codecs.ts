@@ -961,8 +961,7 @@ export function rangeOfCodec<
       : null),
     fromPg: needsCast
       ? function (value) {
-          const json = JSON.parse(value);
-          const [lowerInc, lower, upper, upperInc, empty] = json;
+          const [lowerInc, lower, upper, upperInc, empty] = JSON.parse(value);
           return empty
             ? { empty: true }
             : {

@@ -236,6 +236,8 @@ export type {
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
   PgCodecExtensions,
+  PgCodecFromJavaScriptType,
+  PgCodecFromPostgresType,
   PgCodecList,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
@@ -281,6 +283,7 @@ export type {
   PgPath,
   PgPoint,
   PgPolygon,
+  PgRangeValue,
   PgRecordTypeCodecSpec,
   PgRefDefinition,
   PgRefDefinitionExtensions,
@@ -317,11 +320,6 @@ export type {
   SideEffectWithPgClientStepCallback,
   TuplePlanMap,
   WithPgClient,
-};
-export type {
-  PgCodecFromJavaScriptType,
-  PgCodecFromPostgresType,
-  PgRangeValue,
 };
 export {
   assertPgClassSingleStep,

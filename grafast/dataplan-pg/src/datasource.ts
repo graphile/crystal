@@ -137,8 +137,9 @@ export interface PgResourceParameter<
  */
 export interface PgResourceUnique<
   TAttributes extends PgCodecAttributes = PgCodecAttributes,
-  TUniqueAttributes extends ReadonlyArray<keyof TAttributes & string> =
-    ReadonlyArray<keyof TAttributes & string>,
+  TUniqueAttributes extends ReadonlyArray<
+    keyof TAttributes & string
+  > = ReadonlyArray<keyof TAttributes & string>,
 > {
   /**
    * The attributes that are unique
