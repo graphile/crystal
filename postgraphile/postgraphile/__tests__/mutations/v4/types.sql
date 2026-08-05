@@ -20,7 +20,8 @@ select
     lower_inc(__type_function_mutation__."daterange"),
     to_char(lower(__type_function_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_mutation__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_mutation__."daterange")
+    upper_inc(__type_function_mutation__."daterange"),
+    isempty(__type_function_mutation__."daterange")
   )::text as "17",
   __type_function_mutation__."an_int_range"::text as "18",
   to_char(__type_function_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -231,7 +232,8 @@ select
     lower_inc(__type_function_list_mutation__."daterange"),
     to_char(lower(__type_function_list_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_list_mutation__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_list_mutation__."daterange")
+    upper_inc(__type_function_list_mutation__."daterange"),
+    isempty(__type_function_list_mutation__."daterange")
   )::text as "17",
   __type_function_list_mutation__."an_int_range"::text as "18",
   to_char(__type_function_list_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -472,7 +474,8 @@ select
     lower_inc(__type_function_connection_mutation__."daterange"),
     to_char(lower(__type_function_connection_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_connection_mutation__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_connection_mutation__."daterange")
+    upper_inc(__type_function_connection_mutation__."daterange"),
+    isempty(__type_function_connection_mutation__."daterange")
   )::text as "17",
   __type_function_connection_mutation__."an_int_range"::text as "18",
   to_char(__type_function_connection_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -713,7 +716,8 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "17",
   __types__."an_int_range"::text as "18",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -923,7 +927,8 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "17",
   __types__."an_int_range"::text as "18",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
