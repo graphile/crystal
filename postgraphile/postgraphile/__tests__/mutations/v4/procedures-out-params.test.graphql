@@ -1,0 +1,16 @@
+## expect(errors).toBeFalsy();
+#> schema: ["procedures"]
+#> requiresPg: 140000
+mutation {
+  singleOutput(input: { a: 5 }) {
+    doubled {
+      doubled
+    }
+  }
+  multipleOutputs(input: { a: 5 }) {
+    result {
+      total
+      product
+    }
+  }
+}

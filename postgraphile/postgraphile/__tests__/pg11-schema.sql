@@ -49,20 +49,33 @@ begin
 end;
 $$;
 
-create procedure procedures.single_output(a int, out doubled int)
-language plpgsql as $$
+-- PostgreSQL only allowed `inout` parameters for procedures until PG14,
+-- which added support for `out` parameters too - so these two are guarded
+-- to only run on PG14+.
+do $guard$
 begin
-  doubled := a * 2;
-end;
-$$;
+  if current_setting('server_version_num')::int >= 140000 then
+    execute $ddl$
+      create procedure procedures.single_output(a int, out doubled int)
+      language plpgsql as $body$
+      begin
+        doubled := a * 2;
+      end;
+      $body$;
+    $ddl$;
 
-create procedure procedures.multiple_outputs(a int, out total int, out product int)
-language plpgsql as $$
-begin
-  total := a + a;
-  product := a * a;
+    execute $ddl$
+      create procedure procedures.multiple_outputs(a int, out total int, out product int)
+      language plpgsql as $body$
+      begin
+        total := a + a;
+        product := a * a;
+      end;
+      $body$;
+    $ddl$;
+  end if;
 end;
-$$;
+$guard$;
 
 create procedure procedures.inout_arg(inout counter int)
 language plpgsql as $$

@@ -11,17 +11,6 @@ mutation {
   inArgsNoOutput(input: { a: 1, b: 2 }) {
     __typename
   }
-  singleOutput(input: { a: 5 }) {
-    doubled {
-      doubled
-    }
-  }
-  multipleOutputs(input: { a: 5 }) {
-    result {
-      total
-      product
-    }
-  }
   inoutArg(input: { counter: 10, clientMutationId: "xyz" }) {
     clientMutationId
     counter {
