@@ -871,9 +871,9 @@ function escapeRangeValue<
 
 /** The value of a 'range' type from Postgres */
 export type PgRangeValue<T> =
-  | { isEmpty: true }
+  | { empty: true }
   | {
-      isEmpty?: undefined; // Never set, but useful for TS discrimination
+      empty?: undefined; // Never set, but useful for TS discrimination
       /** The lower bound; inclusive or exclusive. If null, there is no lower bound */
       start: { value: T; inclusive: boolean } | null;
       /** The upper bound; inclusive or exclusive. If null, there is no upper bound */
@@ -962,9 +962,9 @@ export function rangeOfCodec<
     fromPg: needsCast
       ? function (value) {
           const json = JSON.parse(value);
-          const [lowerInc, lower, upper, upperInc, isEmpty] = json;
-          return isEmpty
-            ? { isEmpty: true }
+          const [lowerInc, lower, upper, upperInc, empty] = json;
+          return empty
+            ? { empty: true }
             : {
                 start:
                   lower != null
@@ -978,8 +978,8 @@ export function rangeOfCodec<
         }
       : function (value) {
           const parsed = rangeParse(value);
-          return parsed.isEmpty()
-            ? { isEmpty: true }
+          return parsed.empty()
+            ? { empty: true }
             : {
                 start:
                   parsed.lower != null
@@ -998,7 +998,7 @@ export function rangeOfCodec<
               };
         },
     toPg(value) {
-      if (value.isEmpty) {
+      if (value.empty) {
         return "empty";
       }
       let str = "";
