@@ -1,4 +1,8 @@
-import type { ExecutionDetails, GrafastResultsList, PromiseOrDirect } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  PromiseOrDirect,
+} from "grafast";
 import { access, exportAs, Step } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -9,7 +13,10 @@ import type { PgResource } from "../datasource.ts";
 import type { PgCodec } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
-import type { PgSelectArgumentDigest, PgSelectArgumentSpec } from "./pgSelect.ts";
+import type {
+  PgSelectArgumentDigest,
+  PgSelectArgumentSpec,
+} from "./pgSelect.ts";
 
 /**
  * Invokes a PostgreSQL PROCEDURE via a `call` statement.
@@ -120,7 +127,9 @@ export class PgCallStep<
   }
 
   __inferGet?: {
-    [TAttr in keyof NonNullable<TResource["codec"]["attributes"]>]: PgClassExpressionStep<
+    [TAttr in keyof NonNullable<
+      TResource["codec"]["attributes"]
+    >]: PgClassExpressionStep<
       NonNullable<TResource["codec"]["attributes"]>[TAttr]["codec"],
       TResource
     >;
@@ -210,9 +219,7 @@ export class PgCallStep<
         callback?.(queryBuilder);
       }
 
-      const from = resource.from as (
-        ...args: PgSelectArgumentDigest[]
-      ) => SQL;
+      const from = resource.from as (...args: PgSelectArgumentDigest[]) => SQL;
       const query = sql`call ${from(...digests)};`;
       const { text, values: stmtValues } = sql.compile(query);
 
@@ -248,9 +255,12 @@ export interface PgCallQueryBuilder {
 /**
  * Invokes a PostgreSQL PROCEDURE via `call proc(...)`.
  */
-export function pgCall<TResource extends PgResource<any, any, any, any, any>>(
-  options: { resource: TResource; args?: ReadonlyArray<PgSelectArgumentSpec> },
-): PgCallStep<TResource> {
+export function pgCall<
+  TResource extends PgResource<any, any, any, any, any>,
+>(options: {
+  resource: TResource;
+  args?: ReadonlyArray<PgSelectArgumentSpec>;
+}): PgCallStep<TResource> {
   return new PgCallStep(options.resource, options.args ?? []);
 }
 exportAs("@dataplan/pg", pgCall, "pgCall");
