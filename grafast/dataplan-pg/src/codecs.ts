@@ -869,10 +869,25 @@ function escapeRangeValue<
   return `"${encoded.replace(/"/g, '""')}"`;
 }
 
-interface PgRange<T> {
-  start: { value: T; inclusive: boolean } | null;
-  end: { value: T; inclusive: boolean } | null;
-}
+/** The value of a 'range' type from Postgres */
+export type PgRangeValue<T> =
+  | { isEmpty: true }
+  | {
+      isEmpty?: undefined; // Never set, but useful for TS discrimination
+      /** The lower bound; inclusive or exclusive. If null, there is no lower bound */
+      start: { value: T; inclusive: boolean } | null;
+      /** The upper bound; inclusive or exclusive. If null, there is no upper bound */
+      end: { value: T; inclusive: boolean } | null;
+    };
+
+export type PgCodecFromPostgresType<TCodec extends PgCodec> =
+  TCodec extends PgCodec<any, any, infer TValue, any, any, any, any>
+    ? TValue
+    : never;
+export type PgCodecFromJavaScriptType<TCodec extends PgCodec> =
+  TCodec extends PgCodec<any, any, any, infer TValue, any, any, any>
+    ? TValue
+    : never;
 
 /**
  * Returns a PgCodec that represents a range of the given inner PgCodec
@@ -908,7 +923,7 @@ export function rangeOfCodec<
   TName,
   undefined,
   string,
-  PgRange<unknown>,
+  PgRangeValue<PgCodecFromJavaScriptType<TInnerCodec>>,
   undefined,
   undefined,
   TInnerCodec
@@ -925,7 +940,7 @@ export function rangeOfCodec<
           )},\n${innerCodec.castFromPg!(
             sql`upper(${frag})`,
             innerCodec.notNull,
-          )},\nupper_inc(${frag})`,
+          )},\nupper_inc(${frag}),\nisempty(${frag})`,
         )})::text`;
       }
     : null;
@@ -947,43 +962,51 @@ export function rangeOfCodec<
     fromPg: needsCast
       ? function (value) {
           const json = JSON.parse(value);
-          return {
-            start:
-              json[1] != null
-                ? {
-                    value: innerCodec.fromPg(json[1]),
-                    inclusive: !!json[0],
-                  }
-                : null,
-            end:
-              json[2] != null
-                ? {
-                    value: innerCodec.fromPg(json[2]),
-                    inclusive: !!json[3],
-                  }
-                : null,
-          };
+          const [lowerInc, lower, upper, upperInc, isEmpty] = json;
+          return isEmpty
+            ? { isEmpty }
+            : {
+                start:
+                  lower != null
+                    ? {
+                        value: innerCodec.fromPg(lower),
+                        inclusive: !!lowerInc,
+                      }
+                    : null,
+                end:
+                  upper != null
+                    ? {
+                        value: innerCodec.fromPg(upper),
+                        inclusive: !!upperInc,
+                      }
+                    : null,
+              };
         }
       : function (value) {
           const parsed = rangeParse(value);
-          return {
-            start:
-              parsed.lower != null
-                ? {
-                    value: innerCodec.fromPg(parsed.lower),
-                    inclusive: parsed.isLowerBoundClosed(),
-                  }
-                : null,
-            end:
-              parsed.upper != null
-                ? {
-                    value: innerCodec.fromPg(parsed.upper),
-                    inclusive: parsed.isUpperBoundClosed(),
-                  }
-                : null,
-          };
+          return parsed.isEmpty()
+            ? { isEmpty: true }
+            : {
+                start:
+                  parsed.lower != null
+                    ? {
+                        value: innerCodec.fromPg(parsed.lower),
+                        inclusive: parsed.isLowerBoundClosed(),
+                      }
+                    : null,
+                end:
+                  parsed.upper != null
+                    ? {
+                        value: innerCodec.fromPg(parsed.upper),
+                        inclusive: parsed.isUpperBoundClosed(),
+                      }
+                    : null,
+              };
         },
     toPg(value) {
+      if (value.isEmpty) {
+        return "empty";
+      }
       let str = "";
       if (value.start == null) {
         str += "(";

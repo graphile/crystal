@@ -9,7 +9,10 @@ import type {
   PgCodecAttributes,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
+  PgCodecFromJavaScriptType,
+  PgCodecFromPostgresType,
   PgEnumCodecSpec,
+  PgRangeValue,
   PgRecordTypeCodecSpec,
 } from "./codecs.ts";
 import {
@@ -314,6 +317,11 @@ export type {
   SideEffectWithPgClientStepCallback,
   TuplePlanMap,
   WithPgClient,
+};
+export type {
+  PgCodecFromJavaScriptType,
+  PgCodecFromPostgresType,
+  PgRangeValue,
 };
 export {
   assertPgClassSingleStep,
