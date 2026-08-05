@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - main
+      - next
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
+  release_main:
+    if: github.ref_name == 'main'
     name: Release
     runs-on: ubuntu-latest
 
@@ -47,3 +49,39 @@ jobs:
         with:
           version: yarn changeset-version
           publish: yarn changeset-publish
+
+  release_next:
+    if: github.ref_name == 'next'
+    name: Publish next snapshot
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Calculate snapshot versions
+        run: |
+          yarn changeset version --snapshot next
+          node scripts/postversion.mjs
+        env:
+          CHANGESETS_NO_COMMIT: "1"
+
+      - name: Publish snapshots
+        run: |
+          yarn workspaces-prepack
+          yarn changeset publish --tag next
