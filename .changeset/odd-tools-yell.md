@@ -1,5 +1,6 @@
 ---
-"@dataplan/pg": patch
+"@dataplan/pg": minor
+"postgraphile": minor
 ---
 
-Export `PgRangeValue` and represent empty ranges.
+Empty ranges are now recognized and represented both on input and output.
