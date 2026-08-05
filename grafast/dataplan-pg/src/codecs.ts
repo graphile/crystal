@@ -873,7 +873,7 @@ function escapeRangeValue<
 export type PgRangeValue<T> =
   | { empty: true }
   | {
-      empty?: undefined; // Never set, but useful for TS discrimination
+      empty: false;
       /** The lower bound; inclusive or exclusive. If null, there is no lower bound */
       start: { value: T; inclusive: boolean } | null;
       /** The upper bound; inclusive or exclusive. If null, there is no upper bound */
@@ -966,6 +966,7 @@ export function rangeOfCodec<
           return empty
             ? { empty: true }
             : {
+                empty: false,
                 start:
                   lower != null
                     ? { value: innerCodec.fromPg(lower), inclusive: !!lowerInc }
@@ -978,9 +979,10 @@ export function rangeOfCodec<
         }
       : function (value) {
           const parsed = rangeParse(value);
-          return parsed.empty()
+          return parsed.isEmpty()
             ? { empty: true }
             : {
+                empty: false,
                 start:
                   parsed.lower != null
                     ? {
