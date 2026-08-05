@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - main
-      - next
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release_main:
-    if: github.ref_name == 'main'
+    if: github.event_name == 'push' && github.ref_name == 'main'
     name: Release
     runs-on: ubuntu-latest
 
@@ -51,7 +51,7 @@ jobs:
           publish: yarn changeset-publish
 
   release_next:
-    if: github.ref_name == 'next'
+    if: github.event_name == 'workflow_dispatch'
     name: Publish next snapshot
     runs-on: ubuntu-latest
 
