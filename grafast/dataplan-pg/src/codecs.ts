@@ -964,21 +964,15 @@ export function rangeOfCodec<
           const json = JSON.parse(value);
           const [lowerInc, lower, upper, upperInc, isEmpty] = json;
           return isEmpty
-            ? { isEmpty }
+            ? { isEmpty: true }
             : {
                 start:
                   lower != null
-                    ? {
-                        value: innerCodec.fromPg(lower),
-                        inclusive: !!lowerInc,
-                      }
+                    ? { value: innerCodec.fromPg(lower), inclusive: !!lowerInc }
                     : null,
                 end:
                   upper != null
-                    ? {
-                        value: innerCodec.fromPg(upper),
-                        inclusive: !!upperInc,
-                      }
+                    ? { value: innerCodec.fromPg(upper), inclusive: !!upperInc }
                     : null,
               };
         }
