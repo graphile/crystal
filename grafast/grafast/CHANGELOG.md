@@ -1,5 +1,14 @@
 # grafast
 
+## 1.1.2
+
+### Patch Changes
+
+- [#3038](https://github.com/graphile/crystal/pull/3038)
+  [`c90768b`](https://github.com/graphile/crystal/commit/c90768bdf13589708674ae82ced3e33e74283bcf)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add new `inhibitOnEmpty` and
+  `inhibitIf` early exit helpers to Grafast.
+
 ## 1.1.1
 
 ### Patch Changes
