@@ -43,14 +43,14 @@ to a function that `returns void`). Procedures with `INOUT` parameters accept
 the parameter as input _and_ include it on the result, since the same
 parameter serves both roles.
 
-We also have solid support for functions, which are generally more flexible;
+PostGraphile also has solid support for functions, which are more flexible;
 see [Functions](./functions) for more details.
 
 ## Limitations
 
-- Procedures cannot be used as computed columns, custom queries, or return
+- Procedures can't be used as computed columns, custom queries, or return
   connections. They're always mutations.
-- `SETOF`/`RETURNS TABLE` are not available for procedures in PostgreSQL, so
+- `SETOF`/`RETURNS TABLE` aren't available for procedures in PostgreSQL, so
   neither is supported here.
-- Variadic parameters are not currently supported (same restriction as
+- Variadic parameters aren't currently supported (same restriction as
   functions).
