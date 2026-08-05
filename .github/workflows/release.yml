@@ -52,7 +52,7 @@ jobs:
 
   snapshot:
     if: github.event_name == 'workflow_dispatch' && ( github.ref_name == 'main' || github.ref_name == 'next' )
-    name: Publish next snapshot
+    name: Publish snapshot
     runs-on: ubuntu-latest
 
     permissions:
@@ -80,8 +80,9 @@ jobs:
           node scripts/postversion.mjs
         env:
           CHANGESETS_NO_COMMIT: "1"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish snapshots
         run: |
           yarn workspaces-prepack
-          yarn changeset publish --tag snapshot --no-git-tag
+          yarn changeset publish --tag "snapshot-${{ github.ref_name }}" --no-git-tag
