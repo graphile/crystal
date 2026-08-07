@@ -1560,12 +1560,11 @@ export function markSyncAndSafe<
 export function abortable<T, F>(
   signal: AbortSignal,
   valueForAbort: F,
-  promiseOrValue: PromiseLike<T>,
+  promise: PromiseLike<T>,
 ): Promise<T | F> {
   if (signal.aborted) {
     return Promise.resolve(valueForAbort);
   }
-  const promise = promiseOrValue;
   return new Promise<T | F>((resolve, reject) => {
     const resolveWithoutArgs = () => resolve(valueForAbort);
     signal.addEventListener("abort", resolveWithoutArgs, { once: true });
