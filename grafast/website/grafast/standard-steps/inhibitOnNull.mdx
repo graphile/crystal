@@ -37,9 +37,7 @@ adjusted downwards to match. Once the step has executed, the result has these
 indices re-populated (with an inhibited value) such that the batch size remains
 consistent with other steps in the same _layer plan_.
 
-With the current implementation, if all indices are inhibited then the step
-does not execute. This is an implementation detail, not a guarantee on which
-security or correctness may depend.
+Should all indices be inhibited, the step will not execute at all.
 
 :::
 
