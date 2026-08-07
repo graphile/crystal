@@ -1,5 +1,15 @@
 # grafast
 
+## 1.1.3
+
+### Patch Changes
+
+- [#3128](https://github.com/graphile/crystal/pull/3128)
+  [`56e8708`](https://github.com/graphile/crystal/commit/56e8708a7467f3902ca68b1b745b688f06bbd800)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where `trap()` would
+  prevent connection-capable list steps from resolving correctly (often
+  replacing them with `null`).
+
 ## 1.1.2
 
 ### Patch Changes
