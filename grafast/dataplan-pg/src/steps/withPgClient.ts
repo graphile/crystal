@@ -172,7 +172,7 @@ export type LoadOneWithPgClientCallback<
     pgClient: PgClient,
     lookups: ReadonlyArray<TSpec>,
     info: LoadOneInfo<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
@@ -328,7 +328,7 @@ export type LoadManyWithPgClientCallback<
     pgClient: PgClient,
     lookups: ReadonlyArray<TSpec>,
     info: LoadManyInfo<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
