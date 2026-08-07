@@ -5,37 +5,6 @@
       id: "ca70ca70-0000-0000-0000-a11ce000ca70",
     },
   ],
-  emptyConnection: {
-    edges: [],
-    nodes: [],
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false,
-      startCursor: null,
-      endCursor: null,
-    },
-    totalCount: 0,
-  },
-  connection: {
-    edges: [
-      {
-        cursor: "MA==",
-        node: {
-          id: "ca70ca70-0000-0000-0000-a11ce000ca70",
-        },
-      },
-    ],
-    nodes: [
-      {
-        id: "ca70ca70-0000-0000-0000-a11ce000ca70",
-      },
-    ],
-    pageInfo: {
-      hasNextPage: true,
-      hasPreviousPage: false,
-      startCursor: "MA==",
-      endCursor: "MA==",
-    },
-    totalCount: 2,
-  },
+  emptyConnection: null,
+  connection: null,
 }
