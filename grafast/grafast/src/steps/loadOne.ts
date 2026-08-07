@@ -309,13 +309,25 @@ export function loadOne<
   loader:
     | LoadOneCallback<
         UnwrapMultistep<TLookup>,
-        TItem,
-        TData,
+        Awaited<TItem>,
+        Awaited<TData>,
         TParams,
         never // If you want context, you must use the loader object
       >
-    | LoadOneLoader<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>,
-): LoadOneStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+    | LoadOneLoader<
+        UnwrapMultistep<TLookup>,
+        Awaited<TItem>,
+        Awaited<TData>,
+        TParams,
+        TShared
+      >,
+): LoadOneStep<
+  UnwrapMultistep<TLookup>,
+  Awaited<TItem>,
+  Awaited<TData>,
+  TParams,
+  TShared
+> {
   if (arguments.length > 2) {
     throw new Error(
       "The signature of loadOne has changed, additional arguments should now be passed via a 'loader' object: `loadOne(lookup, loader)` where `loader` is either a `load` function or object containing it `{ load, shared?, ioEquivalence?, paginationSupport? }`",
@@ -326,8 +338,8 @@ export function loadOne<
     typeof loader === "function"
       ? ({ load: loader } as LoadOneLoader<
           UnwrapMultistep<TLookup>,
-          TItem,
-          TData,
+          Awaited<TItem>,
+          Awaited<TData>,
           TParams,
           TShared
         >)
