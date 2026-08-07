@@ -5,7 +5,7 @@ import {
   withSuperuserPgClientFromPgService,
 } from "@dataplan/pg";
 import type { PromiseOrDirect, Step } from "grafast";
-import { constant, context, noop, object, promiseWithResolve } from "grafast";
+import { abortable, constant, context, noop, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
@@ -35,7 +35,8 @@ import {
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /** Someone else created */
 const CLASH_CODES = ["23505", "42P06", "42P07", "42710"];
@@ -685,9 +686,11 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           let eventStream =
             await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
-          const { resolve, promise: abort } =
-            promiseWithResolve<typeof $$stop>();
-          unlistens.push(() => resolve($$stop));
+
+          const controller = new AbortController();
+          const signal = controller.signal;
+          unlistens.push(() => void controller.abort());
+
           const regather = () => {
             // Delete the introspection results
             info.cache.introspectionResultsPromise = null;
@@ -697,7 +700,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             callback();
           };
           const waitNext = () => {
-            const next = Promise.race([abort, eventStream.next()]);
+            const next = abortable(signal, $$stop, eventStream.next());
             next.then(
               (event) => {
                 if (event === $$stop) {
@@ -739,7 +742,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             console.error(
               `postgraphile_watch subscription failed (${e}); waiting ${delay.toFixed(0)}ms then re-establishing`,
             );
-            const result = await Promise.race([sleep(delay), abort]);
+            const result = await abortable(signal, $$stop, sleep(delay));
             if (result === $$stop) {
               return;
             }

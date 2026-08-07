@@ -49,9 +49,9 @@ import type {
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.ts";
-import { promiseWithResolve } from "./promiseWithResolve.ts";
 import { timeSource } from "./timeSource.ts";
 import {
+  abortable,
   arrayOfLength,
   asyncIteratorWithCleanup,
   isPromiseLike,
@@ -325,7 +325,7 @@ function executePreemptive(
   onError: ErrorBehavior,
   outputDataAsString: boolean,
   executionTimeout: number | null,
-  abortSignal: AbortSignal,
+  requestAbortSignal: AbortSignal,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -368,7 +368,7 @@ function executePreemptive(
     stopTime,
     // toSerialize: [],
     eventEmitter: args[$$eventEmitter],
-    abortSignal,
+    abortSignal: requestAbortSignal,
   };
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
@@ -480,13 +480,21 @@ function executePreemptive(
       // `releaseUnusedIterators(rootBucket, rootBucketIndex, null)` here.
       const arr = bucketRootValue as StreamMoreableArray;
       const stream = arr[$$streamMore];
-      // Do the async iterable
-      let stopped = false;
-      const { promise: abortPromise, resolve: resolveAbort } =
-        promiseWithResolve<void>();
+      const iteratorAbortController = new AbortController();
+      const abortIteratorWhenRequestAborts = () =>
+        iteratorAbortController.abort();
+      requestAbortSignal.addEventListener(
+        "abort",
+        abortIteratorWhenRequestAborts,
+        { once: true },
+      );
+      const iteratorAbortSignal = iteratorAbortController.signal;
       const iterator = newIterator((e) => {
-        stopped = true;
-        resolveAbort();
+        iteratorAbortController.abort();
+        requestAbortSignal.removeEventListener(
+          "abort",
+          abortIteratorWhenRequestAborts,
+        );
         if (e != null) {
           try {
             const result = stream.throw?.(e);
@@ -511,38 +519,61 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await Promise.race([abortPromise, stream.next()]);
-          if (stopped || !next) {
+          const rawNext = stream.next();
+          const next = isPromiseLike(rawNext)
+            ? await abortable(iteratorAbortSignal, undefined, rawNext)
+            : rawNext;
+          if (next?.done) {
+            // Stream already exited
             break;
           }
-          if (!next) {
-            iterator.throw(new Error("Invalid iteration")).then(null, noop);
-            break;
-          }
-          const { done, value } = next;
-          if (done) {
-            break;
-          }
-          const payload = await Promise.race([
-            abortPromise,
-            executeStreamPayload(value, i),
-          ]);
-          if (payload === undefined) {
-            break;
-          }
-          if (isAsyncIterable(payload)) {
-            // FIXME: do we need to avoid 'for await' because it can cause the
-            // stream to exit late if we're waiting on a promise and the stream
-            // exits in the interrim? We're assuming that no promises will be
-            // sufficiently long-lived for this to be an issue right now.
-            // TODO: should probably tie all this into an AbortController/signal too
-            for await (const entry of payload) {
-              iterator.push(entry);
+          if (next === undefined || iteratorAbortSignal.aborted) {
+            const result = stream.return?.();
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
             }
-          } else {
-            iterator.push(payload);
+            break;
           }
-          i++;
+          try {
+            const rawPayload = executeStreamPayload(next.value, i);
+            const payload = isPromiseLike(rawPayload)
+              ? await abortable(iteratorAbortSignal, undefined, rawPayload)
+              : rawPayload;
+            if (payload === undefined) {
+              break;
+            }
+            if (isAsyncIterable(payload)) {
+              const payloadIterator = payload[Symbol.asyncIterator]();
+              while (true) {
+                const next = await abortable(
+                  iteratorAbortSignal,
+                  undefined,
+                  payloadIterator.next(),
+                );
+                if (next?.done) {
+                  // Iterator already exited
+                  break;
+                }
+                if (next === undefined || iteratorAbortSignal.aborted) {
+                  const result = payloadIterator.return?.(undefined);
+                  if (isPromiseLike(result)) {
+                    result.then(null, noop);
+                  }
+                  break;
+                }
+                iterator.push(next.value);
+              }
+            } else {
+              iterator.push(payload);
+            }
+            i++;
+          } catch (error) {
+            const result = iterator.return?.();
+            if (isPromiseLike(result)) {
+              result.then(null, noop);
+            }
+            throw error;
+          }
         }
       })()
         .then(

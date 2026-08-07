@@ -1458,10 +1458,12 @@ export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 // Save on garbage collection by just using this promise for everything
-const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
-  done: true,
-  value: undefined,
-});
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve(
+  Object.freeze({
+    done: true,
+    value: undefined,
+  }),
+);
 
 /**
  * Returns a new version of `iterable` that calls `callback()` on termination,
@@ -1548,4 +1550,33 @@ export function markSyncAndSafe<
     fn.displayName = displayName;
   }
   return fn;
+}
+
+/**
+ * If `signal` is aborted, returns `valueForAbort`. Otherwise returns
+ * equivalent to `promiseOrValue` except if the signal is aborted first it will
+ * resolve with `valueForAbort` immediately.
+ */
+export function abortable<T, F>(
+  signal: AbortSignal,
+  valueForAbort: F,
+  promise: PromiseLike<T>,
+): Promise<T | F> {
+  if (signal.aborted) {
+    return Promise.resolve(valueForAbort);
+  }
+  return new Promise<T | F>((resolve, reject) => {
+    const resolveWithoutArgs = () => resolve(valueForAbort);
+    signal.addEventListener("abort", resolveWithoutArgs, { once: true });
+    return promise.then(
+      (val) => {
+        signal.removeEventListener("abort", resolveWithoutArgs);
+        resolve(val);
+      },
+      (e) => {
+        signal.removeEventListener("abort", resolveWithoutArgs);
+        reject(e);
+      },
+    );
+  });
 }

@@ -1,12 +1,8 @@
 import * as assert from "../assert.ts";
 import { isDev, noop } from "../dev.ts";
 import type { Maybe } from "../interfaces.ts";
-import {
-  type PromiseWithResolve,
-  promiseWithResolve,
-} from "../promiseWithResolve.ts";
 import type { Step } from "../step.ts";
-import { arrayOfLength, isPromiseLike, sleep } from "../utils.ts";
+import { arrayOfLength, isPromiseLike } from "../utils.ts";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
@@ -27,10 +23,12 @@ export function isDistributor<TData = any>(
 }
 
 // Save on garbage collection by just using this promise for everything
-const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
-  done: true,
-  value: undefined,
-});
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve(
+  Object.freeze({
+    done: true,
+    value: undefined,
+  }),
+);
 
 /**
  * Creates a "distributor" for the sourceIterable such that the dependent steps
@@ -99,13 +97,19 @@ export function distributor<TData>(
    */
   const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 
-  // Easy way to resolve a promise for slowing down the fastest consumer
-  let wmi: PromiseWithResolve<void> | null = null;
-  function lowWaterMarkIncreased(): PromiseLike<void> {
-    if (wmi === null) {
-      wmi = promiseWithResolve<void>();
-    }
-    return wmi.promise;
+  // Consumers waiting for the low-water mark to advance.
+  let lowWaterMarkWaiters: Set<() => void> | null = null;
+  function waitForLowWaterMarkOrPause(): Promise<void> {
+    return new Promise((resolve) => {
+      const waiters = (lowWaterMarkWaiters ??= new Set());
+      const done = () => {
+        clearTimeout(timeout);
+        waiters.delete(done);
+        resolve();
+      };
+      const timeout = setTimeout(done, pauseDuration);
+      waiters.add(done);
+    });
   }
 
   /**
@@ -185,11 +189,14 @@ export function distributor<TData>(
       }
 
       // Announce that the lowWaterMark advanced
-      if (advanced && wmi !== null) {
+      if (advanced && lowWaterMarkWaiters !== null) {
         // Avoid race condition
-        const deferred = wmi;
-        wmi = null;
-        deferred.resolve();
+        const waiters = lowWaterMarkWaiters;
+        lowWaterMarkWaiters = null;
+
+        for (const resolve of waiters) {
+          resolve();
+        }
       }
     }
   }
@@ -286,10 +293,7 @@ export function distributor<TData>(
           // Whoa there! Getting a little ahead of ourselves! Wait for the slowest
           // consumer to advance (or for it to time out), before resolving.
           // const oldLowWaterMark = lowWaterMark;
-          const next = Promise.race([
-            lowWaterMarkIncreased(),
-            sleep(pauseDuration),
-          ]).then(
+          const next = waitForLowWaterMarkOrPause().then(
             // const advanced = lowWaterMark > oldLowWaterMark;
             // TODO: should we wait a little longer if we did advance so we're
             // not creating a new timer for each and every low watermark
