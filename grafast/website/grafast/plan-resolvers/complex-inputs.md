@@ -241,8 +241,10 @@ may apply to the same step, you should expect multiple calls to `.apply()`
 and thus store all dependency IDs in an array:
 
 ```ts
+import { Step, type DepId } from "grafast";
+
 class MyRequestStep extends Step {
-  applyDepIds: number[] = [];
+  applyDepIds: DepId<Step<(parent: any) => void>>[] = [];
 
   apply($cb: Step<(parent: any) => void>) {
     this.applyDepIds.push(this.addUnaryDependency($cb));
@@ -273,7 +275,7 @@ class MyRequestStep extends Step {
 
     // Apply the changes from all the `.apply($cb)` calls
     for (const applyDepId of this.applyDepIds) {
-      const applyCallback = values[applyDepId].unaryValue();
+      const applyCallback = values.at(applyDepId).unaryValue();
       applyCallback(builder);
     }
 

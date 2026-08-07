@@ -79,6 +79,10 @@ function reallyAssertFinalized(plan: Step): void {
 // Optimise this away in production.
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 
+export type DepId<TStep extends Step> = number & { __step?: TStep };
+export type StepData<TStep extends Step> =
+  TStep extends Step<infer Data> ? Data : never;
+
 /**
  * Executable plans are the plans associated with leaves on the GraphQL tree,
  * they must be able to execute to return values.
@@ -448,7 +452,7 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected getDepOptions<TStep extends Step = Step>(
-    depId: number,
+    depId: DepId<TStep>,
   ): DependencyOptions<TStep> {
     this._assertAccessAllowed(depId);
     return this._getDepOptions(depId);
@@ -480,14 +484,14 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected getDep<TStep extends Step = Step>(
-    _depId: number,
+    _depId: DepId<TStep>,
   ): TStep | __FlagStep<TStep>;
   protected getDep<TStep extends Step = Step>(
-    _depId: number,
+    _depId: DepId<TStep>,
     throwOnFlagged: true,
   ): TStep;
   protected getDep<TStep extends Step = Step>(
-    _depId: number,
+    _depId: DepId<TStep>,
     _throwOnFlagged = false,
   ): TStep | __FlagStep<TStep> {
     // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
@@ -497,14 +501,14 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected maybeGetDep<TStep extends Step = Step>(
-    depId: number | null | undefined,
+    depId: DepId<TStep> | null | undefined,
   ): TStep | __FlagStep<TStep> | null;
   protected maybeGetDep<TStep extends Step = Step>(
-    depId: number | null | undefined,
+    depId: DepId<TStep> | null | undefined,
     throwOnFlagged: true,
   ): TStep | null;
   protected maybeGetDep<TStep extends Step = Step>(
-    depId: number | null | undefined,
+    depId: DepId<TStep> | null | undefined,
     throwOnFlagged = false,
   ): TStep | __FlagStep<TStep> | null {
     return depId == null
@@ -515,7 +519,7 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected getDepOrConstant<TData = any>(
-    _depId: number | null,
+    _depId: DepId<Step<TData>> | null,
     _fallback: TData,
   ): Step<TData> {
     // This gets replaced when `constant` is loaded. Were we on ESM we could
@@ -686,8 +690,10 @@ ${printDeps(step, 1)}
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
-  protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
-    const options: AddDependencyOptions = {
+  protected addDependency<TStep extends Step>(
+    stepOrOptions: TStep | AddDependencyOptions<TStep>,
+  ): DepId<TStep> {
+    const options: AddDependencyOptions<TStep> = {
       dataOnly: false,
       skipDeduplication: false,
       ...(stepOrOptions instanceof Step
@@ -697,9 +703,9 @@ ${printDeps(step, 1)}
     assertStep(options.step, () => `${this}.addDependency`);
     return this._addDependency(options);
   }
-  protected addDataDependency(
-    stepOrOptions: Step | AddDependencyOptions,
-  ): number {
+  protected addDataDependency<TStep extends Step>(
+    stepOrOptions: TStep | AddDependencyOptions<TStep>,
+  ): DepId<TStep> {
     const options =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     assertStep(options.step, () => `${this}.addDataDependency`);
@@ -710,9 +716,9 @@ ${printDeps(step, 1)}
     });
   }
   // Currently identical to addDependency
-  protected addStrongDependency(
-    stepOrOptions: Step | AddDependencyOptions,
-  ): number {
+  protected addStrongDependency<TStep extends Step>(
+    stepOrOptions: TStep | AddDependencyOptions<TStep>,
+  ): DepId<TStep> {
     const options = {
       dataOnly: false,
       skipDeduplication: false,
@@ -730,10 +736,10 @@ ${printDeps(step, 1)}
    * `isBatch = false` so you can use the `values[index].value` property
    * directly.
    */
-  protected addUnaryDependency(
-    stepOrOptions: Step | AddUnaryDependencyOptions,
-  ): number {
-    const options: AddUnaryDependencyOptions =
+  protected addUnaryDependency<TStep extends Step>(
+    stepOrOptions: TStep | AddUnaryDependencyOptions<TStep>,
+  ): DepId<TStep> {
+    const options: AddUnaryDependencyOptions<TStep> =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     assertStep(options.step, () => `${this}.addUnaryDependency`);
     if (options.step.layerPlan.id > this.layerPlan.id) {

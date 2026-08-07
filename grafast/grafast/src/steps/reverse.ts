@@ -34,15 +34,15 @@ export class ReverseStep<TData> extends UnbatchedStep<readonly TData[]> {
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
+  private depId;
+
   constructor(plan: Step<readonly TData[]>) {
     super();
-    this.addDependency(plan);
+    this.depId = this.addDependency(plan);
   }
 
-  execute({
-    indexMap,
-    values: [values0],
-  }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData[]> {
+  execute({ indexMap, values }: ExecutionDetails): GrafastResultsList<TData[]> {
+    const values0 = values.at(this.depId);
     return indexMap((i) => {
       const arr = values0.at(i);
       return arr == null ? arr : reverseArray(arr);
