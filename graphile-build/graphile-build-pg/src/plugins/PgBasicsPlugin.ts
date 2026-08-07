@@ -5,7 +5,6 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgCodecWithAttributes,
-  PgExecutor,
   PgRefDefinition,
   PgResource,
   PgResourceUnique,
