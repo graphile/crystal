@@ -26,6 +26,7 @@ import { each } from "./each.ts";
 import { first } from "./first.ts";
 import { lambda } from "./lambda.ts";
 import { last } from "./last.ts";
+import { __FlagStep } from "./__flag.ts";
 
 /**
  * Indicates which features are supported for pagination; support for `limit`
@@ -1205,6 +1206,11 @@ export function connection<
   TCursorValue,
   TCollectionStep
 > {
+  if (step instanceof __FlagStep) {
+    throw new Error(
+      "connection() cannot be used with trap() or inhibit...() at this time.",
+    );
+  }
   if (typeof params === "function" || params?.nodePlan || params?.cursorPlan) {
     throw new Error(
       `connection() was completely overhauled during the beta; this usage is no longer supported. Usage is much more straightforward now.`,
