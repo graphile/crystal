@@ -1,9 +1,7 @@
-## expect(errors).toBeFalsy()
-## expect(data.emptyConnection.pageInfo.startCursor).toBeNull()
-## expect(data.emptyConnection.pageInfo.endCursor).toBeNull()
-## expect(data.emptyConnection.totalCount).toBe(0)
-## expect(data.connection.pageInfo.hasNextPage).toBe(true)
-## expect(data.connection.totalCount).toBe(2)
+## expect(errors).toHaveLength(2)
+## expect(data.emptyList).toEqual([])
+## expect(data.list).toEqual([{ id: "ca70ca70-0000-0000-0000-a11ce000ca70" }])
+#> dontLogErrors: true
 {
   emptyList: trappedMessages(ids: []) {
     id
