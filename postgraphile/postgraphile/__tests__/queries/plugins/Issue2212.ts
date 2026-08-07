@@ -1,6 +1,7 @@
 import "graphile-config";
 
 import type { PgSelectSingleStep } from "@dataplan/pg";
+import type { LoadOneStep } from "grafast";
 import { EXPORTABLE, extendSchema } from "graphile-utils";
 
 const plugin = extendSchema((build) => {
@@ -28,7 +29,6 @@ const plugin = extendSchema((build) => {
             loadManyWithPgClient,
             normalizePhone,
             orders,
-            sql,
           ) =>
             ($user: PgSelectSingleStep) => {
               const $id = $user.get("id");
@@ -83,7 +83,6 @@ const plugin = extendSchema((build) => {
             loadManyWithPgClient,
             normalizePhone,
             orders,
-            sql,
           ],
         ),
         lifetimeOrderTotal: EXPORTABLE(
@@ -149,7 +148,15 @@ const plugin = extendSchema((build) => {
                 },
               );
               // The type of `$loaded` should NOT involve `Promise<...>`
-              return $loaded;
+              const $assertion: LoadOneStep<
+                any,
+                // TODO: we should be able to assert this is a `number` too... but that is going to need a type overhaul
+                any,
+                number,
+                any,
+                any
+              > = $loaded;
+              return $assertion;
             },
           [executor, loadOneWithPgClient, normalizePhone],
         ),
