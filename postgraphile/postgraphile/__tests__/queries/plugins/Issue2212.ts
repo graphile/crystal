@@ -89,7 +89,7 @@ const plugin = extendSchema((build) => {
           (executor, loadOneWithPgClient, normalizePhone) =>
             ($user: PgSelectSingleStep) => {
               const $id = $user.get("id");
-              return loadOneWithPgClient(
+              const $loaded = loadOneWithPgClient(
                 executor,
                 $id,
                 async (pgClient, userIds) => {
@@ -131,7 +131,7 @@ const plugin = extendSchema((build) => {
                   });
 
                   // Finally - match the inputs to the outputs
-                  return userIds.map((userId) => {
+                  return userIds.map(async (userId) => {
                     const phoneNumbers =
                       phoneNumbersByUserId[userId] ?? new Set();
                     let total = 0;
@@ -147,6 +147,8 @@ const plugin = extendSchema((build) => {
                   });
                 },
               );
+              // The type of `$loaded` should NOT involve `Promise<...>`
+              return $loaded;
             },
           [executor, loadOneWithPgClient, normalizePhone],
         ),
