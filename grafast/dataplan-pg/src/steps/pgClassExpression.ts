@@ -10,6 +10,7 @@ import type {
   PgCodec,
   PgTypedStep,
 } from "../interfaces.ts";
+import { PgCallStep } from "./pgCall.ts";
 import { PgDeleteSingleStep } from "./pgDeleteSingle.ts";
 import { PgInsertSingleStep } from "./pgInsertSingle.ts";
 import { PgSelectSingleStep } from "./pgSelectSingle.ts";
@@ -78,7 +79,8 @@ export class PgClassExpressionStep<
     this.needsTupleAccess =
       $table instanceof PgInsertSingleStep ||
       $table instanceof PgUpdateSingleStep ||
-      $table instanceof PgDeleteSingleStep;
+      $table instanceof PgDeleteSingleStep ||
+      $table instanceof PgCallStep;
     const $row = this.needsTupleAccess ? access($table, "t") : $table;
     this.rowDependencyId = this.addDependency($row);
     if (strings.length !== dependencies.length + 1) {
@@ -244,10 +246,11 @@ export class PgClassExpressionStep<
       !(step instanceof PgInsertSingleStep) &&
       !(step instanceof PgUpdateSingleStep) &&
       !(step instanceof PgDeleteSingleStep) &&
-      !(step instanceof PgUnionAllSingleStep)
+      !(step instanceof PgUnionAllSingleStep) &&
+      !(step instanceof PgCallStep)
     ) {
       throw new Error(
-        `Expected ${step} to be a PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep | PgDeleteSingleStep | PgUnionAllSingleStep`,
+        `Expected ${step} to be a PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep | PgDeleteSingleStep | PgUnionAllSingleStep | PgCallStep`,
       );
     }
     return step;

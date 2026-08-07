@@ -13,6 +13,7 @@ import type {
   PgSQLCallbackOrDirect,
   PgTypedStep,
 } from "./interfaces.ts";
+import { PgCallStep } from "./steps/pgCall.ts";
 import { PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
 import { PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
 import { PgSelectSingleStep } from "./steps/pgSelectSingle.ts";
@@ -28,11 +29,12 @@ export function assertPgClassSingleStep<
       step instanceof PgSelectSingleStep ||
       step instanceof PgInsertSingleStep ||
       step instanceof PgUpdateSingleStep ||
-      step instanceof PgDeleteSingleStep
+      step instanceof PgDeleteSingleStep ||
+      step instanceof PgCallStep
     )
   ) {
     throw new Error(
-      `Expected a PgSelectSingleStep, PgInsertSingleStep, PgUpdateSingleStep or PgDeleteSingleStep, however we received '${step}'.`,
+      `Expected a PgSelectSingleStep, PgInsertSingleStep, PgUpdateSingleStep, PgDeleteSingleStep or PgCallStep, however we received '${step}'.`,
     );
   }
 }

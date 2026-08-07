@@ -1,0 +1,20 @@
+## expect(errors).toBeFalsy();
+#> schema: ["procedures"]
+#> requiresPg: 110000
+mutation {
+  noArgsNoOutput(input: {}) {
+    __typename
+  }
+  noArgsNoOutputWithId: noArgsNoOutput(input: { clientMutationId: "abc" }) {
+    clientMutationId
+  }
+  inArgsNoOutput(input: { a: 1, b: 2 }) {
+    __typename
+  }
+  inoutArg(input: { counter: 10, clientMutationId: "xyz" }) {
+    clientMutationId
+    counter {
+      counter
+    }
+  }
+}

@@ -41,6 +41,7 @@ import type {
   PgRegistryConfig,
   PlanByUniques,
 } from "./interfaces.ts";
+import { pgCall } from "./steps/pgCall.ts";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.ts";
 import type {
   PgSelectArgumentDigest,
@@ -221,6 +222,25 @@ export interface PgResourceOptions<
   isUnique?: boolean;
   sqlPartitionByIndex?: SQL;
   isMutation?: boolean;
+  /**
+   * If true, this resource represents a PostgreSQL PROCEDURE (as opposed to
+   * a FUNCTION) and must be invoked via a `CALL` statement rather than being
+   * embedded in a `SELECT ... FROM`. Implies `isMutation`.
+   */
+  isProcedure?: boolean;
+  /**
+   * For procedure resources only: describes *every* positional argument the
+   * underlying PostgreSQL procedure accepts, including OUT-only arguments -
+   * in declaration order. PostgreSQL's `CALL` statement (unlike a function
+   * call) requires a value to be supplied for every positional argument,
+   * including those that are OUT-only (where the value is ignored), so we
+   * need this to build a valid `CALL` statement even though OUT-only
+   * arguments aren't exposed to GraphQL via `parameters`.
+   */
+  procedureArguments?: ReadonlyArray<{
+    mode: "i" | "o" | "b";
+    codec: PgCodec;
+  }>;
   hasImplicitOrder?: boolean;
   /**
    * If true, this indicates that this was originally a list (array) and thus
@@ -255,6 +275,11 @@ export interface PgFunctionResourceOptions<
   uniques?: TUniques;
   extensions?: DataplanPg.PgResourceExtensions;
   isMutation?: boolean;
+  isProcedure?: boolean;
+  procedureArguments?: ReadonlyArray<{
+    mode: "i" | "o" | "b";
+    codec: PgCodec;
+  }>;
   hasImplicitOrder?: boolean;
   selectAuth?:
     | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
@@ -307,6 +332,10 @@ export class PgResource<
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
   public readonly isMutation: boolean;
+  public readonly isProcedure: boolean;
+  public readonly procedureArguments:
+    | ReadonlyArray<{ mode: "i" | "o" | "b"; codec: PgCodec }>
+    | undefined;
   public readonly hasImplicitOrder: boolean;
   /**
    * If true, this indicates that this was originally a list (array) and thus
@@ -345,6 +374,8 @@ export class PgResource<
       isUnique,
       sqlPartitionByIndex,
       isMutation,
+      isProcedure,
+      procedureArguments,
       hasImplicitOrder,
       selectAuth,
       isList,
@@ -362,7 +393,9 @@ export class PgResource<
     this.description = description;
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
-    this.isMutation = !!isMutation;
+    this.isProcedure = !!isProcedure;
+    this.isMutation = !!isMutation || this.isProcedure;
+    this.procedureArguments = procedureArguments;
     this.hasImplicitOrder = hasImplicitOrder ?? false;
     this.isList = !!isList;
     this.isVirtual = isVirtual ?? false;
@@ -466,6 +499,8 @@ export class PgResource<
       uniques,
       extensions,
       isMutation,
+      isProcedure,
+      procedureArguments,
       hasImplicitOrder,
       selectAuth: overrideSelectAuth,
       description,
@@ -487,6 +522,8 @@ export class PgResource<
         extensions,
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
+        isProcedure: Boolean(isProcedure),
+        procedureArguments,
         hasImplicitOrder,
         selectAuth,
         description,
@@ -756,6 +793,9 @@ export class PgResource<
     args: ReadonlyArray<PgSelectArgumentSpec> = [],
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ): ExecutableStep<unknown> {
+    if (this.isProcedure) {
+      return pgCall({ resource: this, args });
+    }
     const $select = pgSelect({
       resource: this,
       identifiers: [],
