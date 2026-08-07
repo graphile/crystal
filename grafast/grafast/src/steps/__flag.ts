@@ -22,7 +22,11 @@ import type {
 import { isListCapableStep, Step } from "../step.ts";
 import { sudo } from "../utils.ts";
 import type { __ItemStep } from "./__item.ts";
-import type { StepWithItems } from "./connection.ts";
+import type {
+  ConnectionOptimizedStep,
+  PaginationFeatures,
+  StepWithItems,
+} from "./connection.ts";
 import { itemsOrStep } from "./connection.ts";
 
 // PUBLIC FLAGS
@@ -149,33 +153,47 @@ export class __FlagStep<TStep extends Step>
     } else {
       this.addDependency({ step, acceptFlags, onReject, dataOnly });
     }
-    if (isListCapableStep(step)) {
-      this.listItem = this._listItem;
+
+    if ("paginationSupport" in step) {
+      this.paginationSupport = step.paginationSupport as any;
     }
+
+    for (const method of [
+      "applyPagination",
+      "parseCursor",
+      "nodeForItem",
+      "edgeForItem",
+      "listItem",
+      "cursorForItem",
+    ] as const) {
+      if (
+        method in step &&
+        typeof (step as unknown as StepWithMethods)[method] === "function"
+      ) {
+        this[method] = ($step) => {
+          const $dep = this.dependencies[0] as StepWithMethods;
+          return $dep[method]($step);
+        };
+      }
+    }
+
     if (
       "connectionClone" in step &&
       typeof step.connectionClone === "function"
     ) {
-      const $connectionStep = step as any;
-      Object.assign(this, {
-        connectionClone: $connectionStep.connectionClone.bind($connectionStep),
-        ...(typeof $connectionStep.parseCursor === "function"
-          ? { parseCursor: $connectionStep.parseCursor.bind($connectionStep) }
-          : null),
-        ...(typeof $connectionStep.nodeForItem === "function"
-          ? { nodeForItem: $connectionStep.nodeForItem.bind($connectionStep) }
-          : null),
-        ...(typeof $connectionStep.edgeForItem === "function"
-          ? { edgeForItem: $connectionStep.edgeForItem.bind($connectionStep) }
-          : null),
-        ...(typeof $connectionStep.cursorForItem === "function"
-          ? {
-              cursorForItem:
-                $connectionStep.cursorForItem.bind($connectionStep),
-            }
-          : null),
-      });
+      this.connectionClone = (...args: any[]) => {
+        const $dep = this.dependencies[0] as StepWithMethods;
+        if (args.length === 0) {
+          return this.copyFlags(
+            $dep.connectionClone(),
+          ) as ConnectionOptimizedStep<any, any, any, any>;
+        } else {
+          // Cannot reliably optimize, just use the underlying method without flags
+          return $dep.connectionClone(...args);
+        }
+      };
     }
+
     sudo(this).implicitSideEffectStep = null;
     this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
   }
@@ -206,19 +224,9 @@ export class __FlagStep<TStep extends Step>
       // re-wrap, avoid creating more steps and just return ourself.
       return this;
     }
-    const $if = this.ifDep != null ? this.getDepOptions(0).step : undefined;
+    const $if =
+      this.ifDep != null ? this.getDepOptions(this.ifDep).step : undefined;
     return new __FlagStep($items, { ...this.baseOptions, if: $if });
-  }
-
-  listItem?: ($item: __ItemStep<unknown>) => Step;
-  /**
-   * Copied over `this.listItem` if the dependent step is a list capable step.
-   * Does **NOT** copy flagging over to the derived step, since `$item` already
-   * handles that.
-   */
-  private _listItem($item: __ItemStep<unknown>) {
-    const $dep = this.dependencies[0];
-    return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
 
   /** Return inlining instructions if we can be inlined. @internal */
@@ -342,6 +350,21 @@ export class __FlagStep<TStep extends Step>
       return details.indexMap(() => val);
     }
   }
+
+  private copyFlags<TStep extends Step>($step: TStep) {
+    const $if =
+      this.ifDep != null ? this.getDepOptions(this.ifDep).step : undefined;
+    return new __FlagStep($step, { ...this.baseOptions, if: $if });
+  }
+
+  paginationSupport?: PaginationFeatures;
+  applyPagination?($params: Step<any>): void;
+  connectionClone?(...args: any[]): ConnectionOptimizedStep<any, any, any, any>;
+  parseCursor?($cursor: Step<any>): Step<any>;
+  nodeForItem?($item: Step<any>): Step<any>;
+  edgeForItem?($item: Step<any>): Step<any>;
+  listItem?($item: Step<any>): Step<any>;
+  cursorForItem?($item: Step<any>): Step<string>;
 }
 
 /**
@@ -414,3 +437,5 @@ export function trap<TStep extends Step>(
     return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
   }
 };
+type StepWithMethods = Step &
+  Required<ConnectionOptimizedStep<any, any, any, any>>;
