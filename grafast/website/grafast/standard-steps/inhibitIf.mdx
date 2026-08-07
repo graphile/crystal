@@ -5,6 +5,15 @@ import Mermaid from "@theme/Mermaid";
 Returns a step that yields the same values as the passed in step, but
 downstream work is inhibited whenever the condition step yields `true`.
 
+:::danger[Not a security boundary]
+
+`inhibitIf` enables Gra*fast* to optimize away unnecessary downstream work; it
+does not guarantee that the work will not execute. Do not use it for
+authorization or to prevent security-sensitive operations. Enforce those
+requirements inside the protected operation or data source.
+
+:::
+
 Unlike [`inhibitOnNull`](./inhibitOnNull.mdx), `inhibitIf` is an explicit step
 in the plan, so it will typically appear in plan diagrams as its own node.
 
@@ -29,8 +38,9 @@ return trap($result, TRAP_INHIBITED, {
 ```
 
 In the example above, when `$isEmpty` yields `true`, the dependent work is
-inhibited and Gra*fast* omits the affected entries from downstream execution.
-When the condition yields `false`, the wrapped step behaves as a pass-through.
+inhibited and Gra*fast* can omit the affected entries from downstream
+execution. When the condition yields `false`, the wrapped step behaves as a
+pass-through.
 
 ## Plan diagrams
 

@@ -265,6 +265,15 @@ object identifiers ("Node IDs"), optional foreign keys, or other advanced
 scenarios where you need to suppress downstream work or turn those suppressions
 back into useful data.
 
+:::danger[Inhibition is not a security boundary]
+
+Inhibition enables Gra*fast* to optimize away work that is unnecessary for a
+particular result. It does not guarantee that the work will not execute. Never
+use inhibition for authorization or to prevent security-sensitive operations;
+enforce those requirements inside the protected operation or data source.
+
+:::
+
 If you do reach for them, a common sequence is to guard an input, inhibit
 downstream work when that guard fails, and optionally trap the inhibition later
 so the field can return a benign value:
@@ -327,8 +336,8 @@ flowchart TD
 />
 
 Here `inhibitOnNull` marks only the `null` entries as inhibited, so `loadOne`
-never attempts to fetch those users while the rest of the batch proceeds as
-normal. Other helpers build on the same idea:
+can avoid fetching those users while the rest of the batch proceeds as normal.
+Other helpers build on the same idea:
 
 - [`inhibitOnNull`](./standard-steps/inhibitOnNull.mdx) skips
   dependent work for `null` inputs while still returning `null` to the caller.
@@ -346,5 +355,6 @@ should not depend on the specific step class. In plan diagrams the step is
 usually absorbed into the dependency edge, so you will see labels such as
 `rejectNull`, `trapError`, or `onReject="…"` rather than a dedicated node.
 Crucially, Gra*fast* applies these flags per entry: if one item in a batch is
-inhibited or errored it is simply omitted from the `execute()` call while the
-rest of the items carry on unhindered.
+inhibited or errored, Gra*fast* can omit it from the `execute()` call while the
+rest of the items carry on unhindered. This is an optimization and must not be
+relied on for correctness or security.

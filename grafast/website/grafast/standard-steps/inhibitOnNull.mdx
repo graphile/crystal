@@ -5,6 +5,15 @@ import Mermaid from "@theme/Mermaid";
 Returns a step that yields the same values as the passed in step, but downstream
 work is inhibited when a yielded value is `null` or `undefined`.
 
+:::danger[Not a security boundary]
+
+`inhibitOnNull` enables Gra*fast* to optimize away unnecessary downstream work;
+it does not guarantee that the work will not execute. Do not use it for
+authorization or to prevent security-sensitive operations. Enforce those
+requirements inside the protected operation or data source.
+
+:::
+
 :::note[Declarative flow]
 
 The inhibition only affects steps that depend on the wrapper step (and those
@@ -36,16 +45,14 @@ Should all indices be inhibited, the step will not execute at all.
 
 ```ts
 const $parentId = get($post, "parentId");
-// If $parentId is null, the `loadOne` will be inhibited (will not execute)
+// If $parentId is null, Gra*fast* can avoid executing `loadOne`
 const $parent = loadOne(inhibitOnNull($parentId), batchGetPostById);
 ```
 
 In the example above, when the `$parentId` step yields `null`, the associated
 value for the `loadOne` step will automatically yield `null` (and be inhibited)
-without needing to execute. Only the uninhibited non-null values pass through to
-the `loadOne` step for execution. If all values for a step are inhibited then the
-step will not execute at all. When a value for `$parentId` is not nullish,
-execution for that value proceeds as normal.
+and Gra*fast* can avoid executing the load for that entry. When a value for
+`$parentId` is not nullish, execution for that value proceeds as normal.
 
 ## Trapping
 
