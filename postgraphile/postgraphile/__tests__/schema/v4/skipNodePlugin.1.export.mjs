@@ -10436,6 +10436,11 @@ scalar JSONPath
 
 """A range of \`BigFloat\`."""
 type BigFloatRange {
+  """
+  If the range has no start or end, it is either unbounded (\`false\`) or empty (\`true\`).
+  """
+  empty: Boolean!
+
   """The starting bound of our range."""
   start: BigFloatRangeBound
 
@@ -10456,6 +10461,11 @@ type BigFloatRangeBound {
 
 """A range of \`Date\`."""
 type DateRange {
+  """
+  If the range has no start or end, it is either unbounded (\`false\`) or empty (\`true\`).
+  """
+  empty: Boolean!
+
   """The starting bound of our range."""
   start: DateRangeBound
 
@@ -10479,6 +10489,11 @@ scalar Date
 
 """A range of \`AnInt\`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (\`false\`) or empty (\`true\`).
+  """
+  empty: Boolean!
+
   """The starting bound of our range."""
   start: AnIntRangeBound
 
@@ -10717,6 +10732,13 @@ input TypeCondition {
 
 """A range of \`BigFloat\`."""
 input BigFloatRangeInput {
+  """
+  If \`true\`, the range is seen as empty and \`start\`/\`end\` are ignored. If
+  \`false\` (default), setting \`start\` and \`end\` to \`null\` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The starting bound of our range."""
   start: BigFloatRangeBoundInput
 
@@ -10737,6 +10759,13 @@ input BigFloatRangeBoundInput {
 
 """A range of \`Date\`."""
 input DateRangeInput {
+  """
+  If \`true\`, the range is seen as empty and \`start\`/\`end\` are ignored. If
+  \`false\` (default), setting \`start\` and \`end\` to \`null\` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The starting bound of our range."""
   start: DateRangeBoundInput
 
@@ -10757,6 +10786,13 @@ input DateRangeBoundInput {
 
 """A range of \`AnInt\`."""
 input AnIntRangeInput {
+  """
+  If \`true\`, the range is seen as empty and \`start\`/\`end\` are ignored. If
+  \`false\` (default), setting \`start\` and \`end\` to \`null\` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The starting bound of our range."""
   start: AnIntRangeBoundInput
 
@@ -11430,6 +11466,13 @@ type FuncReturnsTableMultiColEdge {
 
 """A range of \`Float\`."""
 input FloatRangeInput {
+  """
+  If \`true\`, the range is seen as empty and \`start\`/\`end\` are ignored. If
+  \`false\` (default), setting \`start\` and \`end\` to \`null\` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The starting bound of our range."""
   start: FloatRangeBoundInput
 

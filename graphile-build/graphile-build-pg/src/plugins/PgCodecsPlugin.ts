@@ -1342,6 +1342,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         "type",
                       ),
                       fields: () => ({
+                        // We should have done this as a union type but a)
+                        // object types require at least one field, and what
+                        // field would an empty range have? b) we already
+                        // shipped the other fields...
+                        empty: {
+                          description: build.wrapDescription(
+                            "If the range has no start or end, it is either unbounded (`false`) or empty (`true`).",
+                            "field",
+                          ),
+                          type: new build.graphql.GraphQLNonNull(
+                            build.graphql.GraphQLBoolean,
+                          ),
+                        },
                         start: {
                           description: build.wrapDescription(
                             "The starting bound of our range.",
@@ -1374,7 +1387,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                         `A range of \`${underlyingInputTypeName}\`.`,
                         "type",
                       ),
+
                       fields: () => ({
+                        // This should have been a `@oneOf` input type, with `empty` as one type... but too late now.
+                        empty: {
+                          description: build.wrapDescription(
+                            "If `true`, the range is seen as empty and `start`/`end` are ignored. If `false` (default), setting `start` and `end` to `null` (or omitting them) indicates an unbounded range.",
+                            "field",
+                          ),
+                          type: new build.graphql.GraphQLNonNull(
+                            build.graphql.GraphQLBoolean,
+                          ),
+                          defaultValue: false,
+                        },
                         start: {
                           description: build.wrapDescription(
                             "The starting bound of our range.",

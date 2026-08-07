@@ -2,6 +2,11 @@ scalar AnInt
 
 """A range of `AnInt`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: AnIntRangeBound
 
@@ -33,6 +38,13 @@ input AnIntRangeBoundInput {
 
 """A range of `AnInt`."""
 input AnIntRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: AnIntRangeBoundInput
 
@@ -167,6 +179,11 @@ scalar BigFloat
 
 """A range of `BigFloat`."""
 type BigFloatRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: BigFloatRangeBound
 
@@ -198,6 +215,13 @@ input BigFloatRangeBoundInput {
 
 """A range of `BigFloat`."""
 input BigFloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: BigFloatRangeBoundInput
 
@@ -425,6 +449,11 @@ scalar Date
 
 """A range of `Date`."""
 type DateRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: DateRangeBound
 
@@ -456,6 +485,13 @@ input DateRangeBoundInput {
 
 """A range of `Date`."""
 input DateRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: DateRangeBoundInput
 

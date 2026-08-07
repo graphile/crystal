@@ -9,7 +9,10 @@ import type {
   PgCodecAttributes,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
+  PgCodecFromJavaScriptType,
+  PgCodecFromPostgresType,
   PgEnumCodecSpec,
+  PgRangeValue,
   PgRecordTypeCodecSpec,
 } from "./codecs.ts";
 import {
@@ -233,6 +236,8 @@ export type {
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
   PgCodecExtensions,
+  PgCodecFromJavaScriptType,
+  PgCodecFromPostgresType,
   PgCodecList,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
@@ -278,6 +283,7 @@ export type {
   PgPath,
   PgPoint,
   PgPolygon,
+  PgRangeValue,
   PgRecordTypeCodecSpec,
   PgRefDefinition,
   PgRefDefinitionExtensions,

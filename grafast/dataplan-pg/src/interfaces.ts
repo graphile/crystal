@@ -462,10 +462,7 @@ export type PlanByUniques<
   TAttributes extends PgCodecAttributes,
   TUniqueAttributes extends ReadonlyArray<PgResourceUnique<TAttributes>>,
 > = TAttributes extends PgCodecAttributes
-  ? TuplePlanMap<
-      TAttributes,
-      TUniqueAttributes[number]["attributes"] & string[]
-    >[number]
+  ? TuplePlanMap<TAttributes, TUniqueAttributes[number]["attributes"]>[number]
   : undefined;
 
 export type PgConditionLike = Modifier<any> & {
@@ -652,12 +649,7 @@ export interface PgRegistry<
     PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
   >,
   TResourceOptions extends {
-    [name in string]: PgResourceOptions<
-      name,
-      PgCodec, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >;
+    [name in string]: PgResourceOptions<any, any, any, any>;
   } = Record<
     string,
     PgResourceOptions<
@@ -670,18 +662,7 @@ export interface PgRegistry<
   >,
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelationConfig<
-        // TCodecs[keyof TCodecs] &
-        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        // TResourceOptions[keyof TResourceOptions] &
-        PgResourceOptions<
-          any,
-          // TCodecs[keyof TCodecs] &
-          PgCodecWithAttributes,
-          any,
-          any
-        >
-      >;
+      [relationName in string]: PgCodecRelationConfig<any, any>;
     };
   } = Record<
     string,
