@@ -15,7 +15,6 @@ import type {
   AddDependencyOptions,
   DataFromStep,
   ExecutionDetails,
-  ExecutionDetailsStream,
   ExecutionEntryFlags,
   GrafastResultsList,
   Maybe,
@@ -23,12 +22,7 @@ import type {
 import { isListCapableStep, Step } from "../step.ts";
 import { sudo } from "../utils.ts";
 import type { __ItemStep } from "./__item.ts";
-import type {
-  ConnectionHandlingStep,
-  ConnectionOptimizedStep,
-  PaginationFeatures,
-  StepWithItems,
-} from "./connection.ts";
+import type { StepWithItems } from "./connection.ts";
 import { itemsOrStep } from "./connection.ts";
 
 // PUBLIC FLAGS

@@ -20,13 +20,13 @@ import {
   maybeArraysMatch,
   terminateIterable,
 } from "../utils.ts";
+import { __FlagStep } from "./__flag.ts";
 import { access } from "./access.ts";
 import { constant, ConstantStep } from "./constant.ts";
 import { each } from "./each.ts";
 import { first } from "./first.ts";
 import { lambda } from "./lambda.ts";
 import { last } from "./last.ts";
-import { __FlagStep } from "./__flag.ts";
 
 /**
  * Indicates which features are supported for pagination; support for `limit`
