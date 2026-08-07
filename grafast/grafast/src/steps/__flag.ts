@@ -15,6 +15,7 @@ import type {
   AddDependencyOptions,
   DataFromStep,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEntryFlags,
   GrafastResultsList,
   Maybe,
@@ -23,6 +24,7 @@ import { isListCapableStep, Step } from "../step.ts";
 import { sudo } from "../utils.ts";
 import type { __ItemStep } from "./__item.ts";
 import type {
+  ConnectionHandlingStep,
   ConnectionOptimizedStep,
   PaginationFeatures,
   StepWithItems,
@@ -165,14 +167,21 @@ export class __FlagStep<TStep extends Step>
       "edgeForItem",
       "listItem",
       "cursorForItem",
+      "setFirst",
+      "setLast",
+      "setOffset",
+      "setBefore",
+      "setAfter",
+      "setNeedsHasMore",
+      "addStreamDetails",
     ] as const) {
       if (
         method in step &&
-        typeof (step as unknown as StepWithMethods)[method] === "function"
+        typeof (step as unknown as AllTheMethodsStep)[method] === "function"
       ) {
-        this[method] = ($step) => {
-          const $dep = this.dependencies[0] as StepWithMethods;
-          return $dep[method]($step);
+        this[method] = (...args: [...any[]]) => {
+          const $dep = this.dependencies[0] as AllTheMethodsStep;
+          return ($dep[method] as Function)(...args);
         };
       }
     }
@@ -182,7 +191,7 @@ export class __FlagStep<TStep extends Step>
       typeof step.connectionClone === "function"
     ) {
       this.connectionClone = (...args: any[]) => {
-        const $dep = this.dependencies[0] as StepWithMethods;
+        const $dep = this.dependencies[0] as AllTheMethodsStep;
         if (args.length === 0) {
           return this.copyFlags(
             $dep.connectionClone(),
@@ -365,6 +374,13 @@ export class __FlagStep<TStep extends Step>
   edgeForItem?($item: Step<any>): Step<any>;
   listItem?($item: Step<any>): Step<any>;
   cursorForItem?($item: Step<any>): Step<string>;
+  setFirst?($first: Step<any>): void;
+  setLast?($last: Step<any>): void;
+  setOffset?($offset: Step<any>): void;
+  setBefore?($before: Step<any>): void;
+  setAfter?($after: Step<any>): void;
+  setNeedsHasMore?(): void;
+  addStreamDetails?($streamDetails: Step<any> | null): void;
 }
 
 /**
@@ -437,5 +453,8 @@ export function trap<TStep extends Step>(
     return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
   }
 };
-type StepWithMethods = Step &
-  Required<ConnectionOptimizedStep<any, any, any, any>>;
+
+/** This type is not real, it's just so we don't have to do so much casting. @internal */
+type AllTheMethodsStep = Step &
+  Required<ConnectionOptimizedStep<any, any, any, any>> &
+  Required<ConnectionHandlingStep<any, any, any, any>>;
