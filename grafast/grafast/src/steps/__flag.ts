@@ -155,54 +155,9 @@ export class __FlagStep<TStep extends Step>
     } else {
       this.addDependency({ step, acceptFlags, onReject, dataOnly });
     }
-
-    if ("paginationSupport" in step) {
-      this.paginationSupport = step.paginationSupport as any;
+    if (isListCapableStep(step)) {
+      this.listItem = this._listItem;
     }
-
-    for (const method of [
-      "applyPagination",
-      "parseCursor",
-      "nodeForItem",
-      "edgeForItem",
-      "listItem",
-      "cursorForItem",
-      "setFirst",
-      "setLast",
-      "setOffset",
-      "setBefore",
-      "setAfter",
-      "setNeedsHasMore",
-      "addStreamDetails",
-    ] as const) {
-      if (
-        method in step &&
-        typeof (step as unknown as AllTheMethodsStep)[method] === "function"
-      ) {
-        this[method] = (...args: [...any[]]) => {
-          const $dep = this.dependencies[0] as AllTheMethodsStep;
-          return ($dep[method] as Function)(...args);
-        };
-      }
-    }
-
-    if (
-      "connectionClone" in step &&
-      typeof step.connectionClone === "function"
-    ) {
-      this.connectionClone = (...args: any[]) => {
-        const $dep = this.dependencies[0] as AllTheMethodsStep;
-        if (args.length === 0) {
-          return this.copyFlags(
-            $dep.connectionClone(),
-          ) as ConnectionOptimizedStep<any, any, any, any>;
-        } else {
-          // Cannot reliably optimize, just use the underlying method without flags
-          return $dep.connectionClone(...args);
-        }
-      };
-    }
-
     sudo(this).implicitSideEffectStep = null;
     this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
   }
@@ -219,6 +174,13 @@ export class __FlagStep<TStep extends Step>
   }
   [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
+  }
+
+  listItem?: ($item: __ItemStep<unknown>) => Step;
+  // Copied over listItem if the dependent step is a list capable step
+  _listItem($item: __ItemStep<unknown>) {
+    const $dep = this.dependencies[0];
+    return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
 
   /**
@@ -359,28 +321,6 @@ export class __FlagStep<TStep extends Step>
       return details.indexMap(() => val);
     }
   }
-
-  private copyFlags<TStep extends Step>($step: TStep) {
-    const $if =
-      this.ifDep != null ? this.getDepOptions(this.ifDep).step : undefined;
-    return new __FlagStep($step, { ...this.baseOptions, if: $if });
-  }
-
-  paginationSupport?: PaginationFeatures;
-  applyPagination?($params: Step<any>): void;
-  connectionClone?(...args: any[]): ConnectionOptimizedStep<any, any, any, any>;
-  parseCursor?($cursor: Step<any>): Step<any>;
-  nodeForItem?($item: Step<any>): Step<any>;
-  edgeForItem?($item: Step<any>): Step<any>;
-  listItem?($item: Step<any>): Step<any>;
-  cursorForItem?($item: Step<any>): Step<string>;
-  setFirst?($first: Step<any>): void;
-  setLast?($last: Step<any>): void;
-  setOffset?($offset: Step<any>): void;
-  setBefore?($before: Step<any>): void;
-  setAfter?($after: Step<any>): void;
-  setNeedsHasMore?(): void;
-  addStreamDetails?($streamDetails: Step<any> | null): void;
 }
 
 /**
@@ -453,8 +393,3 @@ export function trap<TStep extends Step>(
     return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
   }
 };
-
-/** This type is not real, it's just so we don't have to do so much casting. @internal */
-type AllTheMethodsStep = Step &
-  Required<ConnectionOptimizedStep<any, any, any, any>> &
-  Required<ConnectionHandlingStep<any, any, any, any>>;
