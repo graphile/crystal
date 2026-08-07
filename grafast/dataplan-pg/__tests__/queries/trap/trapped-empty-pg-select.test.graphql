@@ -1,4 +1,9 @@
 ## expect(errors).toBeFalsy()
+## expect(data.emptyConnection.pageInfo.startCursor).toBeNull()
+## expect(data.emptyConnection.pageInfo.endCursor).toBeNull()
+## expect(data.emptyConnection.totalCount).toBe(0)
+## expect(data.connection.pageInfo.hasNextPage).toBe(true)
+## expect(data.connection.totalCount).toBe(2)
 {
   emptyList: trappedMessages(ids: []) {
     id
@@ -6,24 +11,46 @@
   list: trappedMessages(ids: ["ca70ca70-0000-0000-0000-a11ce000ca70"]) {
     id
   }
-  emptyConnection: trappedMessagesConnection(ids: []) {
+  emptyConnection: trappedMessagesConnection(ids: [], first: 1) {
+    edges {
+      cursor
+      node {
+        id
+      }
+    }
     nodes {
       id
     }
     pageInfo {
       hasNextPage
       hasPreviousPage
+      startCursor
+      endCursor
     }
+    totalCount
   }
   connection: trappedMessagesConnection(
-    ids: ["ca70ca70-0000-0000-0000-a11ce000ca70"]
+    ids: [
+      "ca70ca70-0000-0000-0000-a11ce000ca70"
+      "ca70ca70-0000-0000-0000-b0b00000ca70"
+    ]
+    first: 1
   ) {
+    edges {
+      cursor
+      node {
+        id
+      }
+    }
     nodes {
       id
     }
     pageInfo {
       hasNextPage
       hasPreviousPage
+      startCursor
+      endCursor
     }
+    totalCount
   }
 }

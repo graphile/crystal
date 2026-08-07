@@ -2190,12 +2190,17 @@ export function makeExampleSchema(
       totalCount: {
         type: new GraphQLNonNull(GraphQLInt),
         plan: EXPORTABLE(
-          (TYPES, sql) => ($connection) =>
-            $connection
+          (TYPES, lambda, sql, trap, TRAP_INHIBITED) => ($connection) => {
+            const $count = $connection
               .cloneSubplanWithoutPagination("aggregate")
               .single()
-              .select(sql`count(*)`, TYPES.bigint, false),
-          [TYPES, sql],
+              .select(sql`count(*)`, TYPES.bigint, false);
+            const $trappedCount = trap($count, TRAP_INHIBITED, {
+              valueForInhibited: "NULL",
+            });
+            return lambda($trappedCount, (count) => count ?? 0);
+          },
+          [TYPES, lambda, sql, trap, TRAP_INHIBITED],
         ),
       },
     },
@@ -4096,6 +4101,16 @@ export function makeExampleSchema(
           ids: {
             type: new GraphQLNonNull(
               new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            ),
+          },
+          first: {
+            type: GraphQLInt,
+            applyPlan: EXPORTABLE(
+              () =>
+                function plan(_$root, $connection: MessageConnectionStep, arg) {
+                  $connection.setFirst(arg.getRaw());
+                },
+              [],
             ),
           },
         },

@@ -152,6 +152,30 @@ export class __FlagStep<TStep extends Step>
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
     }
+    if (
+      "connectionClone" in step &&
+      typeof step.connectionClone === "function"
+    ) {
+      const $connectionStep = step as any;
+      Object.assign(this, {
+        connectionClone: $connectionStep.connectionClone.bind($connectionStep),
+        ...(typeof $connectionStep.parseCursor === "function"
+          ? { parseCursor: $connectionStep.parseCursor.bind($connectionStep) }
+          : null),
+        ...(typeof $connectionStep.nodeForItem === "function"
+          ? { nodeForItem: $connectionStep.nodeForItem.bind($connectionStep) }
+          : null),
+        ...(typeof $connectionStep.edgeForItem === "function"
+          ? { edgeForItem: $connectionStep.edgeForItem.bind($connectionStep) }
+          : null),
+        ...(typeof $connectionStep.cursorForItem === "function"
+          ? {
+              cursorForItem:
+                $connectionStep.cursorForItem.bind($connectionStep),
+            }
+          : null),
+      });
+    }
     sudo(this).implicitSideEffectStep = null;
     this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
   }

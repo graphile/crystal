@@ -762,7 +762,10 @@ export class ConnectionStep<
       const $leftPad = access(this.paginationParams(), "__skipOver");
       const $offset = access(this.paginationParams(), "offset", 0);
       const $index = access($indexed, "index") as Step<number>;
-      return lambda([$leftPad, $offset, $index], encodeNumericCursor);
+      return lambda(
+        [$leftPad, $offset, $index],
+        encodeNumericCursor,
+      ) as Step<string>;
     }
   }
 
@@ -1245,9 +1248,16 @@ export function itemsOrStep<
     : $step;
 }
 
-function encodeNumericCursor(index: number | readonly number[]): string {
-  const cursor =
-    typeof index === "number" ? index : index.reduce((memo, n) => memo + n, 0);
+function encodeNumericCursor(
+  index: number | readonly (number | null | undefined)[],
+): string | null {
+  if (typeof index === "number") {
+    return Buffer.from(String(index), "utf8").toString("base64");
+  }
+  if (index.some((n) => n == null)) {
+    return null;
+  }
+  const cursor = index.reduce<number>((memo, n) => memo + n!, 0);
   return Buffer.from(String(cursor), "utf8").toString("base64");
 }
 function decodeNumericCursor(cursor: string): number {
