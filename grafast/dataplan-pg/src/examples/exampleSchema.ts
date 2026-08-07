@@ -2190,17 +2190,12 @@ export function makeExampleSchema(
       totalCount: {
         type: new GraphQLNonNull(GraphQLInt),
         plan: EXPORTABLE(
-          (TYPES, lambda, sql, trap, TRAP_INHIBITED) => ($connection) => {
-            const $count = $connection
+          (TYPES, sql) => ($connection) =>
+            $connection
               .cloneSubplanWithoutPagination("aggregate")
               .single()
-              .select(sql`count(*)`, TYPES.bigint, false);
-            const $trappedCount = trap($count, TRAP_INHIBITED, {
-              valueForInhibited: "NULL",
-            });
-            return lambda($trappedCount, (count) => count ?? 0);
-          },
-          [TYPES, lambda, sql, trap, TRAP_INHIBITED],
+              .select(sql`count(*)`, TYPES.bigint, false),
+          [TYPES, sql],
         ),
       },
     },
