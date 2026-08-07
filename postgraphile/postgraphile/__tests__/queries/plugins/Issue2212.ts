@@ -70,7 +70,8 @@ const plugin = extendSchema((build) => {
               );
               const $orders = orders.find();
               $orders.where(
-                sql`${$orders}.phone_e164 = any(${$orders.placeholder($phoneNumbers, listOfCodec(TYPES.text))})`,
+                (sql) =>
+                  sql`${$orders}.phone_e164 = any(${$orders.placeholder($phoneNumbers, listOfCodec(TYPES.text))})`,
               );
               return connection($orders);
             },
