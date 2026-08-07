@@ -17,10 +17,13 @@ import type {
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
+  Maybe,
 } from "../interfaces.ts";
 import { isListCapableStep, Step } from "../step.ts";
 import { sudo } from "../utils.ts";
 import type { __ItemStep } from "./__item.ts";
+import type { StepWithItems } from "./connection.ts";
+import { itemsOrStep } from "./connection.ts";
 
 // PUBLIC FLAGS
 export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;
@@ -91,7 +94,10 @@ function resolveTrapValue(tv: TrapValue): ResolvedTrapValue {
   }
 }
 
-export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
+export class __FlagStep<TStep extends Step>
+  extends Step<DataFromStep<TStep>>
+  implements StepWithItems<unknown>
+{
   static $$export = {
     moduleName: "grafast",
     exportName: "__FlagStep",
@@ -104,16 +110,24 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
   private valueForInhibited: ResolvedTrapValue;
   private valueForError: ResolvedTrapValue;
   private canBeInlined: boolean;
+  private baseOptions: Omit<FlagStepOptions, "if">;
   constructor(step: TStep, options: FlagStepOptions) {
     super();
     const {
       acceptFlags = DEFAULT_ACCEPT_FLAGS,
       onReject,
       dataOnly,
-      if: $cond,
       valueForInhibited = "PASS_THROUGH",
       valueForError = "PASS_THROUGH",
+      if: $cond,
     } = options;
+    this.baseOptions = {
+      acceptFlags,
+      onReject,
+      dataOnly,
+      valueForInhibited,
+      valueForError,
+    };
     this.forbiddenFlags = ALL_FLAGS & ~acceptFlags;
     this.onRejectReturnValue =
       onReject == null ? $$inhibit : flagError(onReject, step.id);
@@ -155,12 +169,34 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
   [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
+
+  /**
+   * Makes `__FlagStep` compatible with `ConnectionStep`; importantly, this
+   * copies our flagging over to the derived step.
+   */
+  public items(): Step<Maybe<readonly any[]>> {
+    const $dep = this.getDepOptions(0).step;
+    const $items = itemsOrStep($dep);
+    if ($dep === $items) {
+      // If the underlying step didn't use `.items()` then we don't need to
+      // re-wrap, avoid creating more steps and just return ourself.
+      return this;
+    }
+    const $if = this.ifDep != null ? this.getDepOptions(0).step : undefined;
+    return new __FlagStep($items, { ...this.baseOptions, if: $if });
+  }
+
   listItem?: ($item: __ItemStep<unknown>) => Step;
-  // Copied over listItem if the dependent step is a list capable step
-  _listItem($item: __ItemStep<unknown>) {
+  /**
+   * Copied over `this.listItem` if the dependent step is a list capable step.
+   * Does **NOT** copy flagging over to the derived step, since `$item` already
+   * handles that.
+   */
+  private _listItem($item: __ItemStep<unknown>) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
+
   /** Return inlining instructions if we can be inlined. @internal */
   inline(
     options: Omit<AddDependencyOptions, "step">,

@@ -1231,7 +1231,7 @@ export function connection<
   return $connection;
 }
 
-interface StepWithItems<TItem = any> extends Step {
+export interface StepWithItems<TItem = any> extends Step {
   items(): Step<Maybe<ReadonlyArray<TItem>>>;
 }
 export type ItemsStep<TStep extends StepRepresentingList<any>> =

@@ -4121,7 +4121,7 @@ export function makeExampleSchema(
               const $trappedMessages = trap($messages, TRAP_INHIBITED, {
                 valueForInhibited: "EMPTY_LIST",
               });
-              return connection($trappedMessages as any);
+              return connection($trappedMessages);
             },
           [
             connection,
