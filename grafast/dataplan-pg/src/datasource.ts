@@ -1130,6 +1130,9 @@ export function makeRegistry<
       if (codec.rangeOfCodec) {
         addCodec(codec.rangeOfCodec);
       }
+      if (codec.baseCodec) {
+        addCodec(codec.baseCodec);
+      }
 
       // Tell the system to read the built codec from the registry
       Object.defineProperties(codec, {
@@ -1256,6 +1259,9 @@ export function makeRegistry<
     }
     if (codec.domainOfCodec) {
       walkCodec(codec.domainOfCodec, isAccessibleViaAttribute, seen);
+    }
+    if (codec.baseCodec) {
+      walkCodec(codec.baseCodec, isAccessibleViaAttribute, seen);
     }
   };
 
@@ -1461,6 +1467,9 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}, {}> {
       }
       if (codec.rangeOfCodec) {
         this.addCodec(codec.rangeOfCodec);
+      }
+      if (codec.baseCodec) {
+        this.addCodec(codec.baseCodec);
       }
       if (codec.attributes) {
         for (const col of Object.values(codec.attributes)) {
