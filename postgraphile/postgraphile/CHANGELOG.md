@@ -1,5 +1,20 @@
 # postgraphile
 
+## 5.1.5
+
+### Patch Changes
+
+- [#3128](https://github.com/graphile/crystal/pull/3128)
+  [`56e8708`](https://github.com/graphile/crystal/commit/56e8708a7467f3902ca68b1b745b688f06bbd800)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where `trap()` would
+  prevent connection-capable list steps from resolving correctly (often
+  replacing them with `null`).
+- Updated dependencies
+  [[`56e8708`](https://github.com/graphile/crystal/commit/56e8708a7467f3902ca68b1b745b688f06bbd800),
+  [`ddf58fa`](https://github.com/graphile/crystal/commit/ddf58faafdbb194da11f0bca429285c25747c964)]:
+  - @dataplan/pg@1.1.2
+  - grafast@1.1.3
+
 ## 5.1.4
 
 ### Patch Changes
