@@ -1,6 +1,7 @@
 import "graphile-config";
 
 import type { PgSelectSingleStep } from "@dataplan/pg";
+import type { LoadOneStep } from "grafast";
 import { EXPORTABLE, extendSchema } from "graphile-utils";
 
 const plugin = extendSchema((build) => {
@@ -28,7 +29,6 @@ const plugin = extendSchema((build) => {
             loadManyWithPgClient,
             normalizePhone,
             orders,
-            sql,
           ) =>
             ($user: PgSelectSingleStep) => {
               const $id = $user.get("id");
@@ -70,7 +70,8 @@ const plugin = extendSchema((build) => {
               );
               const $orders = orders.find();
               $orders.where(
-                sql`${$orders}.phone_e164 = any(${$orders.placeholder($phoneNumbers, listOfCodec(TYPES.text))})`,
+                (sql) =>
+                  sql`${$orders}.phone_e164 = any(${$orders.placeholder($phoneNumbers, listOfCodec(TYPES.text))})`,
               );
               return connection($orders);
             },
@@ -82,14 +83,13 @@ const plugin = extendSchema((build) => {
             loadManyWithPgClient,
             normalizePhone,
             orders,
-            sql,
           ],
         ),
         lifetimeOrderTotal: EXPORTABLE(
           (executor, loadOneWithPgClient, normalizePhone) =>
             ($user: PgSelectSingleStep) => {
               const $id = $user.get("id");
-              return loadOneWithPgClient(
+              const $loaded = loadOneWithPgClient(
                 executor,
                 $id,
                 async (pgClient, userIds) => {
@@ -131,7 +131,7 @@ const plugin = extendSchema((build) => {
                   });
 
                   // Finally - match the inputs to the outputs
-                  return userIds.map((userId) => {
+                  return userIds.map(async (userId) => {
                     const phoneNumbers =
                       phoneNumbersByUserId[userId] ?? new Set();
                     let total = 0;
@@ -147,6 +147,16 @@ const plugin = extendSchema((build) => {
                   });
                 },
               );
+              // The type of `$loaded` should NOT involve `Promise<...>`
+              const $assertion: LoadOneStep<
+                any,
+                // TODO: we should be able to assert this is a `number` too... but that is going to need a type overhaul
+                any,
+                number,
+                any,
+                any
+              > = $loaded;
+              return $assertion;
             },
           [executor, loadOneWithPgClient, normalizePhone],
         ),

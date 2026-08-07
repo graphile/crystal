@@ -1,0 +1,54 @@
+## expect(errors).toHaveLength(2)
+## expect(data.emptyList).toEqual([])
+## expect(data.list).toEqual([{ id: "ca70ca70-0000-0000-0000-a11ce000ca70" }])
+#> dontLogErrors: true
+{
+  emptyList: trappedMessages(ids: []) {
+    id
+  }
+  list: trappedMessages(ids: ["ca70ca70-0000-0000-0000-a11ce000ca70"]) {
+    id
+  }
+  emptyConnection: trappedMessagesConnection(ids: [], first: 1) {
+    edges {
+      cursor
+      node {
+        id
+      }
+    }
+    nodes {
+      id
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+  connection: trappedMessagesConnection(
+    ids: [
+      "ca70ca70-0000-0000-0000-a11ce000ca70"
+      "ca70ca70-0000-0000-0000-b0b00000ca70"
+    ]
+    first: 1
+  ) {
+    edges {
+      cursor
+      node {
+        id
+      }
+    }
+    nodes {
+      id
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
