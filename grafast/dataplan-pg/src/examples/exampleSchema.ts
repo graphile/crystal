@@ -45,6 +45,7 @@ import {
   graphqlHasStreamDefer,
   GraphQLStreamDirective,
   groupBy,
+  inhibitOnEmpty,
   inhibitOnNull,
   lambda,
   listen,
@@ -53,6 +54,8 @@ import {
   newObjectTypeBuilder,
   object,
   Step,
+  trap,
+  TRAP_INHIBITED,
 } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import {
@@ -4044,6 +4047,91 @@ export function makeExampleSchema(
               return $connectionPlan;
             },
           [connection, deoptimizeIfAppropriate, messageResource],
+        ),
+      },
+
+      trappedMessages: {
+        type: new GraphQLList(Message),
+        args: {
+          ids: {
+            type: new GraphQLNonNull(
+              new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            ),
+          },
+        },
+        plan: EXPORTABLE(
+          (
+            inhibitOnEmpty,
+            listOfCodec,
+            messageResource,
+            trap,
+            TRAP_INHIBITED,
+            TYPES,
+          ) =>
+            function plan(_$root, { $ids }) {
+              const $nonEmptyIds = inhibitOnEmpty($ids);
+              const $messages = messageResource.find();
+              $messages.where(
+                (sql) =>
+                  sql`${$messages.alias}.id = any(${$messages.placeholder($nonEmptyIds, listOfCodec(TYPES.uuid))})`,
+              );
+              return trap($messages, TRAP_INHIBITED, {
+                valueForInhibited: "EMPTY_LIST",
+              });
+            },
+          [
+            inhibitOnEmpty,
+            listOfCodec,
+            messageResource,
+            trap,
+            TRAP_INHIBITED,
+            TYPES,
+          ],
+        ),
+      },
+
+      trappedMessagesConnection: {
+        type: MessagesConnection,
+        args: {
+          ids: {
+            type: new GraphQLNonNull(
+              new GraphQLList(new GraphQLNonNull(GraphQLString)),
+            ),
+          },
+        },
+        plan: EXPORTABLE(
+          (
+            connection,
+            inhibitOnEmpty,
+            listOfCodec,
+            messageResource,
+            trap,
+            TRAP_INHIBITED,
+            TYPES,
+          ) =>
+            function plan(_$root, { $ids }) {
+              const $nonEmptyIds = inhibitOnEmpty($ids);
+              const $messages = messageResource.find();
+              // Prevent deduplication with trappedMessages
+              $messages.where(sql`true /* connection */`);
+              $messages.where(
+                (sql) =>
+                  sql`${$messages}.id = any(${$messages.placeholder($nonEmptyIds, listOfCodec(TYPES.uuid))})`,
+              );
+              const $trappedMessages = trap($messages, TRAP_INHIBITED, {
+                valueForInhibited: "EMPTY_LIST",
+              });
+              return connection($trappedMessages as any);
+            },
+          [
+            connection,
+            inhibitOnEmpty,
+            listOfCodec,
+            messageResource,
+            trap,
+            TRAP_INHIBITED,
+            TYPES,
+          ],
         ),
       },
 

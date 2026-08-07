@@ -1,0 +1,29 @@
+## expect(errors).toBeFalsy()
+{
+  emptyList: trappedMessages(ids: []) {
+    id
+  }
+  list: trappedMessages(ids: ["ca70ca70-0000-0000-0000-a11ce000ca70"]) {
+    id
+  }
+  emptyConnection: trappedMessagesConnection(ids: []) {
+    nodes {
+      id
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+  connection: trappedMessagesConnection(
+    ids: ["ca70ca70-0000-0000-0000-a11ce000ca70"]
+  ) {
+    nodes {
+      id
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
