@@ -1,6 +1,7 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  LoadManyAwaitedData,
   LoadManyInfo,
   LoadManyLoader,
   LoadManyStep,
@@ -156,7 +157,13 @@ export function loadOneWithPgClient<
     TParams,
     TShared
   >,
-): LoadOneStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+): LoadOneStep<
+  UnwrapMultistep<TLookup>,
+  Awaited<TItem>,
+  Awaited<TData>,
+  TParams,
+  TShared
+> {
   const newLoader = transformLoadOneLoader(executor, loader);
   return loadOne(lookup, newLoader);
 }
@@ -368,7 +375,13 @@ export function loadManyWithPgClient<
     TParams,
     TShared
   >,
-): LoadManyStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+): LoadManyStep<
+  UnwrapMultistep<TLookup>,
+  Awaited<TItem>,
+  LoadManyAwaitedData<TData>,
+  TParams,
+  TShared
+> {
   const newLoader = transformLoadManyLoader(executor, loader);
   return loadMany(lookup, newLoader);
 }

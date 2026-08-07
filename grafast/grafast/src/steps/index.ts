@@ -79,6 +79,7 @@ export { condition, ConditionStep } from "./condition.ts";
 export { graphqlResolver, GraphQLResolverStep } from "./graphqlResolver.ts";
 export { LoadedRecordStep } from "./loadedRecord.ts";
 export type {
+  LoadManyAwaitedData,
   LoadManyCallback,
   LoadManyInfo,
   LoadManyLoader,
