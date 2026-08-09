@@ -822,6 +822,31 @@ export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {
+    /**
+     * Input to the 'schema build' phase, this is typically the output of the
+     * gather phase.
+     */
+    interface BuildInput<TScope extends string = "default"> {
+      // Expand this interface with declaration merging
+    }
+
+    interface ScopedStepByObjectType {
+      // [codegenScope: string]: {[typeName: string]: ExpectedStepType}
+    }
+
+    /**
+     * Looks up the expected Step type for the given object type in
+     * the given codegen scope
+     */
+    type StepForObjectType<
+      TTypeName extends string,
+      TCodegenScope extends string = "default",
+    > = TCodegenScope extends keyof ScopedStepByObjectType
+      ? TTypeName extends keyof ScopedStepByObjectType[TCodegenScope]
+        ? ScopedStepByObjectType[TCodegenScope][TTypeName]
+        : grafast.Step
+      : grafast.Step;
+
     type EntityBehaviorHook<
       entityType extends keyof GraphileBuild.BehaviorEntities,
     > = PluginHook<

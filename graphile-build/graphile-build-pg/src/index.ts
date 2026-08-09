@@ -47,6 +47,16 @@ export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {
+    /** Augment this interface to provide generated build-time types. */
+    interface ScopedPgRegistry {
+      // [codegenScope: string]: TypedPgRegistry
+    }
+
+    type TypedPgRegistry<TScope extends string = "default"> =
+      TScope extends keyof ScopedPgRegistry
+        ? ScopedPgRegistry[TScope]
+        : PgRegistry;
+
     interface PgResourceTags extends PgSmartTagsDict {
       name: string;
 
@@ -108,14 +118,9 @@ declare global {
       [tagName: string]: null | true | string | (string | true)[];
     }
 
-    /** Augment this interface to provide generated build-time types. */
-    interface GeneratedTypes {}
-
-    interface BuildInput {
-      pgRegistry: GeneratedTypes extends {
-        pgRegistry: infer TRegistry extends PgRegistry;
-      }
-        ? TRegistry
+    interface BuildInput<TScope extends string = "default"> {
+      pgRegistry: TScope extends keyof ScopedPgRegistry
+        ? ScopedPgRegistry[TScope]
         : PgRegistry;
     }
 
