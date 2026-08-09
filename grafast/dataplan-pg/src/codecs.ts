@@ -880,11 +880,11 @@ export type PgRangeValue<T> =
       end: { value: T; inclusive: boolean } | null;
     };
 
-export type PgCodecFromPostgresType<TCodec extends PgCodec> =
+export type PgCodecPGDatatype<TCodec extends PgCodec> =
   TCodec extends PgCodec<any, any, infer TValue, any, any, any, any>
     ? TValue
     : never;
-export type PgCodecFromJavaScriptType<TCodec extends PgCodec> =
+export type PgCodecJSDatatype<TCodec extends PgCodec> =
   TCodec extends PgCodec<any, any, any, infer TValue, any, any, any>
     ? TValue
     : never;
@@ -923,7 +923,7 @@ export function rangeOfCodec<
   TName,
   undefined,
   string,
-  PgRangeValue<PgCodecFromJavaScriptType<TInnerCodec>>,
+  PgRangeValue<PgCodecJSDatatype<TInnerCodec>>,
   undefined,
   undefined,
   TInnerCodec
