@@ -108,13 +108,17 @@ declare global {
       [tagName: string]: null | true | string | (string | true)[];
     }
 
-    /** Augment this interface to provide generated build-time types. */
-    interface GeneratedTypes {
-      // pgRegistry: TypedPgRegistry
+    interface ScopedGeneratedTypes {
+      // [scopeName: string]: {
+      //   pgRegistry: TypedPgRegistry
+      // }
     }
 
-    interface BuildInput {
-      pgRegistry: GeneratedTypes extends {
+    interface BuildInput<
+      TScope extends
+        keyof GraphileBuild.ScopedGeneratedTypes = keyof GraphileBuild.ScopedGeneratedTypes,
+    > {
+      pgRegistry: GeneratedTypesForScope<TScope> extends {
         pgRegistry: infer TRegistry extends PgRegistry<any, any, any, any>;
       }
         ? TRegistry

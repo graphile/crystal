@@ -822,29 +822,52 @@ export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {
-    /** Augment this interface to provide generated build-time types. */
-    interface GeneratedTypes {
-      // schema: {
-      //   objects: {
-      //     [typeName: string]: {
-      //       Step: ExepectedStepTypes
+    /**
+     * Augment this interface to provide generated build-time types. Scope the
+     * generated types to a given name to allow for multiple runtime schemas.
+     */
+    interface ScopedGeneratedTypes {
+      // [scopeName: string]: {
+      //   schema: {
+      //     objects: {
+      //       [typeName: string]: {
+      //         Step: ExepectedStepTypes
+      //       }
       //     }
       //   }
       // }
     }
 
-    /** The source step for a GraphQL object type, when known. */
-    type StepForObjectType<TTypeName extends string> = GeneratedTypes extends {
-      schema: {
-        objects: infer TObjects;
-      };
+    /**
+     * Input to the 'schema build' phase, this is typically the output of the
+     * gather phase.
+     */
+    interface BuildInput<
+      TScope extends
+        keyof GraphileBuild.ScopedGeneratedTypes = keyof GraphileBuild.ScopedGeneratedTypes,
+    > {
+      // Expand this interface with declaration merging
     }
-      ? TTypeName extends keyof TObjects
-        ? TObjects[TTypeName] extends { Step: infer TStep }
-          ? TStep
+
+    type GeneratedTypesForScope<TScopeName extends keyof ScopedGeneratedTypes> =
+      ScopedGeneratedTypes[TScopeName];
+
+    /** The source step for a GraphQL object type, when known. */
+    type StepForObjectType<
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+      TTypeName extends string,
+    > =
+      GeneratedTypesForScope<TScope> extends {
+        schema: {
+          objects: infer TObjects;
+        };
+      }
+        ? TTypeName extends keyof TObjects
+          ? TObjects[TTypeName] extends { Step: infer TStep }
+            ? TStep
+            : grafast.Step
           : grafast.Step
-        : grafast.Step
-      : grafast.Step;
+        : grafast.Step;
 
     type EntityBehaviorHook<
       entityType extends keyof GraphileBuild.BehaviorEntities,

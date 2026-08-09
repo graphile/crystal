@@ -102,14 +102,6 @@ declare global {
         })
       | `${"" | "-"}${keyof GraphileBuild.BehaviorStrings}`;
 
-    /**
-     * Input to the 'schema build' phase, this is typically the output of the
-     * gather phase.
-     */
-    interface BuildInput {
-      // Expand this interface with declaration merging
-    }
-
     interface BehaviorStrings {
       "*": true;
       // Expand me through declaration merging
