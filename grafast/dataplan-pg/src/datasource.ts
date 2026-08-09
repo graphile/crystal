@@ -138,7 +138,9 @@ export interface PgResourceParameter<
 
 // For the .execute method
 export type PgResourceExecuteArguments<
-  TParameters extends readonly PgResourceParameter[] | undefined,
+  TParameters extends readonly PgResourceParameter[] | undefined =
+    | readonly PgResourceParameter[]
+    | undefined,
 > = TParameters extends undefined
   ? never
   : {
