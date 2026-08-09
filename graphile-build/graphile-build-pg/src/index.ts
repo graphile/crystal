@@ -109,11 +109,13 @@ declare global {
     }
 
     /** Augment this interface to provide generated build-time types. */
-    interface GeneratedTypes {}
+    interface GeneratedTypes {
+      // pgRegistry: TypedPgRegistry
+    }
 
     interface BuildInput {
       pgRegistry: GeneratedTypes extends {
-        pgRegistry: infer TRegistry extends PgRegistry;
+        pgRegistry: infer TRegistry extends PgRegistry<any, any, any, any>;
       }
         ? TRegistry
         : PgRegistry;

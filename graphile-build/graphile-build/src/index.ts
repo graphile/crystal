@@ -822,6 +822,30 @@ export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {
+    /** Augment this interface to provide generated build-time types. */
+    interface GeneratedTypes {
+      // schema: {
+      //   objects: {
+      //     [typeName: string]: {
+      //       Step: ExepectedStepTypes
+      //     }
+      //   }
+      // }
+    }
+
+    /** The source step for a GraphQL object type, when known. */
+    type StepForObjectType<TTypeName extends string> = GeneratedTypes extends {
+      schema: {
+        objects: infer TObjects;
+      };
+    }
+      ? TTypeName extends keyof TObjects
+        ? TObjects[TTypeName] extends { Step: infer TStep }
+          ? TStep
+          : grafast.Step
+        : grafast.Step
+      : grafast.Step;
+
     type EntityBehaviorHook<
       entityType extends keyof GraphileBuild.BehaviorEntities,
     > = PluginHook<
