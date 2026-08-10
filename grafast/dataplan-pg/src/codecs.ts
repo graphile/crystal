@@ -855,6 +855,79 @@ export function domainOfCodec<
 }
 exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
 
+export type PgModifiedCodecSpec<
+  TName extends string,
+  TBaseCodec extends PgCodec,
+> = {
+  /** Unique name to identify this codec. */
+  name: TName;
+  /** How to decode values returned by PostgreSQL. */
+  fromPg?: TBaseCodec["fromPg"];
+  /** How to encode values sent to PostgreSQL. */
+  toPg?: TBaseCodec["toPg"];
+  /** How to cast a value from PostgreSQL before decoding it. */
+  castFromPg?: TBaseCodec["castFromPg"];
+  /** How to cast a list of values from PostgreSQL before decoding it. */
+  listCastFromPg?: TBaseCodec["listCastFromPg"];
+  /** Whether this type uses PostgreSQL's binary format. */
+  isBinary?: boolean;
+  /** Whether equality comparisons have intuitive results for humans. */
+  hasNaturalEquality?: boolean;
+  /** Whether ordering comparisons have intuitive results for humans. */
+  hasNaturalOrdering?: boolean;
+  /** Documentation for this modified type. */
+  description?: string;
+  /** Metadata to associate with this modified type. */
+  extensions?: Partial<DataplanPg.PgCodecExtensions>;
+};
+
+/**
+ * Returns a PgCodec for a modified form of `baseCodec`, such as a PostgreSQL
+ * type with a type modifier.
+ *
+ * The modified codec retains the base codec's SQL representation and
+ * structural metadata, but can override its scalar conversion and descriptive
+ * metadata. A modified codec cannot itself be further modified.
+ */
+export function modifiedCodec<
+  TName extends string,
+  TBaseCodec extends PgCodec,
+>(
+  baseCodec: TBaseCodec,
+  config: PgModifiedCodecSpec<TName, TBaseCodec>,
+): PgCodec<
+  TName,
+  TBaseCodec extends PgCodec<any, infer U, any, any, any, any, any>
+    ? U
+    : never,
+  TBaseCodec extends PgCodec<any, any, infer U, any, any, any, any>
+    ? U
+    : never,
+  TBaseCodec extends PgCodec<any, any, any, infer U, any, any, any>
+    ? U
+    : never,
+  TBaseCodec extends PgCodec<any, any, any, any, infer U, any, any>
+    ? U
+    : never,
+  TBaseCodec extends PgCodec<any, any, any, any, any, infer U, any>
+    ? U
+    : never,
+  TBaseCodec extends PgCodec<any, any, any, any, any, any, infer U>
+    ? U
+    : never
+> {
+  if (baseCodec.baseCodec) {
+    throw new Error("Cannot modify a codec that has already been modified");
+  }
+  return {
+    ...baseCodec,
+    ...config,
+    baseCodec,
+    [inspect.custom]: codecInspect,
+  } as any;
+}
+exportAs("@dataplan/pg", modifiedCodec, "modifiedCodec");
+
 /**
  * @see {@link https://www.postgresql.org/docs/14/rangetypes.html#RANGETYPES-IO}
  *
