@@ -2549,9 +2549,9 @@ const relational_posts_resourceOptionsConfig = {
   },
   uniques: relational_postsUniques
 };
+const relational_topic_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topic_by_id_fn");
 const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
 const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
-const relational_topic_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topic_by_id_fn");
 const first_party_vulnerabilitiesUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -3136,6 +3136,25 @@ const registryConfig = {
     single_table_item_relations: single_table_item_relations_resourceOptionsConfig,
     log_entries: log_entries_resourceOptionsConfig,
     relational_posts: relational_posts_resourceOptionsConfig,
+    relational_topic_by_id_fn: PgResource.functionResourceOptions(relational_topics_resourceOptionsConfig, {
+      name: "relational_topic_by_id_fn",
+      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
+      from(...args) {
+        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        codec: TYPES.int
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_topic_by_id_fn"
+        }
+      }
+    }),
     first_party_vulnerabilities_cvss_score_int: {
       executor: executor,
       name: "first_party_vulnerabilities_cvss_score_int",
@@ -3180,25 +3199,6 @@ const registryConfig = {
       },
       isUnique: true
     },
-    relational_topic_by_id_fn: PgResource.functionResourceOptions(relational_topics_resourceOptionsConfig, {
-      name: "relational_topic_by_id_fn",
-      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
-      from(...args) {
-        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "id",
-        codec: TYPES.int
-      }],
-      returnsSetof: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "relational_topic_by_id_fn"
-        }
-      }
-    }),
     first_party_vulnerabilities: first_party_vulnerabilities_resourceOptionsConfig,
     third_party_vulnerabilities: third_party_vulnerabilities_resourceOptionsConfig,
     favorite_application: PgResource.functionResourceOptions(Application_resourceOptionsConfig, {

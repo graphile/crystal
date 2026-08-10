@@ -65,6 +65,30 @@ const executor = new PgExecutor({
     });
   }
 });
+const flambleIdentifier = sql.identifier("d", "flibble");
+const flambleCodec = recordCodec({
+  name: "flamble",
+  identifier: flambleIdentifier,
+  attributes: {
+    __proto__: null,
+    f: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "flibble"
+    },
+    tags: {
+      __proto__: null,
+      name: "flamble"
+    }
+  },
+  executor: executor
+});
 const renamed_tableIdentifier = sql.identifier("d", "original_table");
 const renamed_tableCodec = recordCodec({
   name: "renamed_table",
@@ -90,59 +114,6 @@ const renamed_tableCodec = recordCodec({
     tags: {
       __proto__: null,
       name: "renamed_table"
-    }
-  },
-  executor: executor
-});
-const flambleIdentifier = sql.identifier("d", "flibble");
-const flambleCodec = recordCodec({
-  name: "flamble",
-  identifier: flambleIdentifier,
-  attributes: {
-    __proto__: null,
-    f: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "flibble"
-    },
-    tags: {
-      __proto__: null,
-      name: "flamble"
-    }
-  },
-  executor: executor
-});
-const filmsIdentifier = sql.identifier("d", "films");
-const filmsCodec = recordCodec({
-  name: "films",
-  identifier: filmsIdentifier,
-  attributes: {
-    __proto__: null,
-    code: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.varchar
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "films"
-    },
-    tags: {
-      __proto__: null,
-      omit: "*",
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     }
   },
   executor: executor
@@ -195,6 +166,61 @@ const postCodec = recordCodec({
       serviceName: "main",
       schemaName: "d",
       name: "post"
+    }
+  },
+  executor: executor
+});
+const jwtTokenIdentifier = sql.identifier("d", "jwt_token");
+const jwtTokenCodec = recordCodec({
+  name: "jwtToken",
+  identifier: jwtTokenIdentifier,
+  attributes: {
+    __proto__: null,
+    role: {
+      codec: TYPES.text
+    },
+    exp: {
+      codec: TYPES.int
+    },
+    a: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "jwt_token"
+    }
+  },
+  executor: executor
+});
+const filmsIdentifier = sql.identifier("d", "films");
+const filmsCodec = recordCodec({
+  name: "films",
+  identifier: filmsIdentifier,
+  attributes: {
+    __proto__: null,
+    code: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.varchar
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "films"
+    },
+    tags: {
+      __proto__: null,
+      omit: "*",
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     }
   },
   executor: executor
@@ -254,32 +280,6 @@ const tvShowsCodec = recordCodec({
       __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    }
-  },
-  executor: executor
-});
-const jwtTokenIdentifier = sql.identifier("d", "jwt_token");
-const jwtTokenCodec = recordCodec({
-  name: "jwtToken",
-  identifier: jwtTokenIdentifier,
-  attributes: {
-    __proto__: null,
-    role: {
-      codec: TYPES.text
-    },
-    exp: {
-      codec: TYPES.int
-    },
-    a: {
-      codec: TYPES.int
-    }
-  },
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "jwt_token"
     }
   },
   executor: executor
@@ -422,6 +422,7 @@ const post_resourceOptionsConfig = {
   },
   uniques: postUniques
 };
+const authenticateFunctionIdentifer = sql.identifier("d", "authenticate");
 const tv_episodesUniques = [{
   attributes: ["code"],
   isPrimary: true
@@ -463,9 +464,8 @@ const tv_shows_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
-const authenticateFunctionIdentifer = sql.identifier("d", "authenticate");
-const person_full_nameFunctionIdentifer = sql.identifier("d", "person_full_name");
 const search_postsFunctionIdentifer = sql.identifier("d", "search_posts");
+const person_full_nameFunctionIdentifer = sql.identifier("d", "person_full_name");
 const personUniques = [{
   attributes: ["id"],
   isPrimary: true,
@@ -499,16 +499,16 @@ const registry = makeRegistry({
   pgCodecs: {
     __proto__: null,
     int4: TYPES.int,
-    renamed_table: renamed_tableCodec,
     flamble: flambleCodec,
     text: TYPES.text,
-    films: filmsCodec,
-    varchar: TYPES.varchar,
+    renamed_table: renamed_tableCodec,
     studios: studiosCodec,
     post: postCodec,
+    jwtToken: jwtTokenCodec,
+    films: filmsCodec,
+    varchar: TYPES.varchar,
     tvEpisodes: tvEpisodesCodec,
     tvShows: tvShowsCodec,
-    jwtToken: jwtTokenCodec,
     person: personCodec,
     bpchar: TYPES.bpchar,
     LetterAToDEnum: enumCodec({
@@ -875,23 +875,6 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
-    renamed_table: {
-      executor: executor,
-      name: "renamed_table",
-      identifier: "main.d.original_table",
-      from: renamed_tableIdentifier,
-      codec: renamed_tableCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "d",
-          name: "original_table"
-        },
-        tags: {
-          name: "renamed_table"
-        }
-      }
-    },
     getflamble: PgResource.functionResourceOptions({
       executor: executor,
       name: "flamble",
@@ -930,32 +913,25 @@ const registry = makeRegistry({
       isMutation: true,
       hasImplicitOrder: true
     }),
-    films: {
+    renamed_table: {
       executor: executor,
-      name: "films",
-      identifier: "main.d.films",
-      from: filmsIdentifier,
-      codec: filmsCodec,
+      name: "renamed_table",
+      identifier: "main.d.original_table",
+      from: renamed_tableIdentifier,
+      codec: renamed_tableCodec,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "d",
-          name: "films"
+          name: "original_table"
         },
         tags: {
-          omit: "*",
-          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+          name: "renamed_table"
         }
-      },
-      uniques: [{
-        attributes: ["code"],
-        isPrimary: true
-      }]
+      }
     },
     studios: studios_resourceOptionsConfig,
     post: post_resourceOptionsConfig,
-    tv_episodes: tv_episodes_resourceOptionsConfig,
-    tv_shows: tv_shows_resourceOptionsConfig,
     login: PgResource.functionResourceOptions({
       executor: executor,
       name: "jwt_token",
@@ -997,6 +973,53 @@ const registry = makeRegistry({
       },
       isMutation: true
     }),
+    films: {
+      executor: executor,
+      name: "films",
+      identifier: "main.d.films",
+      from: filmsIdentifier,
+      codec: filmsCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "films"
+        },
+        tags: {
+          omit: "*",
+          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+        }
+      },
+      uniques: [{
+        attributes: ["code"],
+        isPrimary: true
+      }]
+    },
+    tv_episodes: tv_episodes_resourceOptionsConfig,
+    tv_shows: tv_shows_resourceOptionsConfig,
+    returnPostsMatching: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
+      name: "returnPostsMatching",
+      identifier: "main.d.search_posts(text)",
+      from(...args) {
+        return sql`${search_postsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "search",
+        codec: TYPES.text
+      }],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "search_posts"
+        },
+        tags: {
+          name: "returnPostsMatching"
+        }
+      },
+      hasImplicitOrder: true
+    }),
     person_full_name: {
       executor: executor,
       name: "person_full_name",
@@ -1027,29 +1050,6 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
-    returnPostsMatching: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
-      name: "returnPostsMatching",
-      identifier: "main.d.search_posts(text)",
-      from(...args) {
-        return sql`${search_postsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "search",
-        codec: TYPES.text
-      }],
-      returnsSetof: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "d",
-          name: "search_posts"
-        },
-        tags: {
-          name: "returnPostsMatching"
-        }
-      },
-      hasImplicitOrder: true
-    }),
     person: person_resourceOptionsConfig
   },
   pgRelations: {
@@ -1132,6 +1132,49 @@ const resource_personPgResource = registry.pgResources["person"];
 const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_person_full_name = () => EMPTY_ARRAY;
 const resource_renamed_functionPgResource = registry.pgResources["renamed_function"];
+const argDetailsSimple_returnPostsMatching = [{
+  graphqlArgName: "search",
+  pgCodec: TYPES.text,
+  postgresArgName: "search"
+}];
+function makeArg(path, args, details) {
+  const {
+    graphqlArgName,
+    postgresArgName,
+    pgCodec,
+    fetcher
+  } = details;
+  const fullPath = [...path, graphqlArgName];
+  const $raw = args.getRaw(fullPath);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
+  return {
+    step,
+    pgCodec,
+    name: postgresArgName ?? undefined
+  };
+}
+const makeArgs_returnPostsMatching = (args, path = []) => argDetailsSimple_returnPostsMatching.map(details => makeArg(path, args, details));
+const resource_returnPostsMatchingPgResource = registry.pgResources["returnPostsMatching"];
+const returnPostsMatching_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_returnPostsMatching(args);
+  return resource_returnPostsMatchingPgResource.execute(selectArgs);
+};
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -1205,51 +1248,8 @@ const argDetailsSimple_person_full_name = [{
     return resource_personPgResource.get(getSpec($nodeId));
   }
 }];
-function makeArg(path, args, details) {
-  const {
-    graphqlArgName,
-    postgresArgName,
-    pgCodec,
-    fetcher
-  } = details;
-  const fullPath = [...path, graphqlArgName];
-  const $raw = args.getRaw(fullPath);
-  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
-  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
-  return {
-    step,
-    pgCodec,
-    name: postgresArgName ?? undefined
-  };
-}
 const makeArgs_person_full_name2 = (args, path = []) => argDetailsSimple_person_full_name.map(details => makeArg(path, args, details));
 const resource_person_full_namePgResource = registry.pgResources["person_full_name"];
-const argDetailsSimple_returnPostsMatching = [{
-  graphqlArgName: "search",
-  pgCodec: TYPES.text,
-  postgresArgName: "search"
-}];
-const makeArgs_returnPostsMatching = (args, path = []) => argDetailsSimple_returnPostsMatching.map(details => makeArg(path, args, details));
-const resource_returnPostsMatchingPgResource = registry.pgResources["returnPostsMatching"];
-const returnPostsMatching_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_returnPostsMatching(args);
-  return resource_returnPostsMatchingPgResource.execute(selectArgs);
-};
-function applyFirstArg(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function applyLastArg(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function applyOffsetArg(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function applyBeforeArg(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function applyAfterArg(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const nodeIdHandler_Studio = makeTableNodeIdHandler({
   typeName: "Studio",
   identifier: "studios",
@@ -1567,7 +1567,6 @@ type Query implements Node {
   """Get a single \`Person\`."""
   findPersonById(id: Int!): Person
   renamedFunction: Int
-  personFullName(n: ID): String
 
   """Reads and enables pagination through a set of \`Post\`."""
   returnPostsMatching(
@@ -1591,6 +1590,7 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): PostsConnection
+  personFullName(n: ID): String
 
   """Reads a single \`Studio\` using its globally unique \`ID\`."""
   studio(

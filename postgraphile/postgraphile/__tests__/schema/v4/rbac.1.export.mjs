@@ -627,43 +627,6 @@ const uniqueForeignKeyCodec = recordCodec({
   },
   executor: executor
 });
-const myTableIdentifier = sql.identifier("c", "my_table");
-const myTableCodec = recordCodec({
-  name: "myTable",
-  identifier: myTableIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    },
-    json_data: {
-      codec: TYPES.jsonb,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "my_table"
-    }
-  },
-  executor: executor
-});
 const personSecretIdentifier = sql.identifier("c", "person_secret");
 const personSecretCodec = recordCodec({
   name: "personSecret",
@@ -926,6 +889,43 @@ const compoundKeyCodec = recordCodec({
   },
   executor: executor
 });
+const myTableIdentifier = sql.identifier("c", "my_table");
+const myTableCodec = recordCodec({
+  name: "myTable",
+  identifier: myTableIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    json_data: {
+      codec: TYPES.jsonb,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "my_table"
+    }
+  },
+  executor: executor
+});
 const similarTable1Identifier = sql.identifier("a", "similar_table_1");
 const similarTable1Codec = recordCodec({
   name: "similarTable1",
@@ -1038,6 +1038,62 @@ const similarTable2Codec = recordCodec({
   },
   executor: executor
 });
+const nullTestRecordIdentifier = sql.identifier("c", "null_test_record");
+const nullTestRecordCodec = recordCodec({
+  name: "nullTestRecord",
+  identifier: nullTestRecordIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    nullable_text: {
+      codec: TYPES.text,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    nullable_int: {
+      codec: TYPES.int,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
+    non_null_text: {
+      codec: TYPES.text,
+      notNull: true,
+      extensions: {
+        __proto__: null,
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "null_test_record"
+    }
+  },
+  executor: executor
+});
 const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const updatableViewCodec = recordCodec({
   name: "updatableView",
@@ -1097,62 +1153,6 @@ const updatableViewCodec = recordCodec({
   },
   executor: executor,
   description: "YOYOYO!!"
-});
-const nullTestRecordIdentifier = sql.identifier("c", "null_test_record");
-const nullTestRecordCodec = recordCodec({
-  name: "nullTestRecord",
-  identifier: nullTestRecordIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    },
-    nullable_text: {
-      codec: TYPES.text,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    },
-    nullable_int: {
-      codec: TYPES.int,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    },
-    non_null_text: {
-      codec: TYPES.text,
-      notNull: true,
-      extensions: {
-        __proto__: null,
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false
-      }
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "null_test_record"
-    }
-  },
-  executor: executor
 });
 const edgeCaseIdentifier = sql.identifier("c", "edge_case");
 const edgeCaseCodec = recordCodec({
@@ -1371,133 +1371,6 @@ const authPayloadCodec = recordCodec({
   },
   executor: executor
 });
-const compoundTypeIdentifier = sql.identifier("c", "compound_type");
-const colorCodec = enumCodec({
-  name: "color",
-  identifier: sql.identifier("b", "color"),
-  values: ["red", "green", "blue"],
-  description: "Represents the colours red, green and blue.",
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "color"
-    }
-  }
-});
-const enumCapsCodec = enumCodec({
-  name: "enumCaps",
-  identifier: sql.identifier("b", "enum_caps"),
-  values: ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"],
-  description: undefined,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "enum_caps"
-    }
-  }
-});
-const enumWithEmptyStringCodec = enumCodec({
-  name: "enumWithEmptyString",
-  identifier: sql.identifier("b", "enum_with_empty_string"),
-  values: ["", "one", "two"],
-  description: undefined,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "enum_with_empty_string"
-    }
-  }
-});
-const compoundTypeCodec = recordCodec({
-  name: "compoundType",
-  identifier: compoundTypeIdentifier,
-  attributes: {
-    __proto__: null,
-    a: {
-      codec: TYPES.int
-    },
-    b: {
-      codec: TYPES.text
-    },
-    c: {
-      codec: colorCodec
-    },
-    d: {
-      codec: TYPES.uuid
-    },
-    e: {
-      codec: enumCapsCodec
-    },
-    f: {
-      codec: enumWithEmptyStringCodec
-    },
-    g: {
-      codec: TYPES.interval
-    },
-    foo_bar: {
-      codec: TYPES.int
-    }
-  },
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "compound_type"
-    }
-  },
-  executor: executor,
-  description: "Awesome feature!"
-});
-const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord = recordCodec({
-  name: "FuncOutOutCompoundTypeRecord",
-  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: {
-    __proto__: null,
-    o1: {
-      codec: TYPES.int,
-      extensions: {
-        argIndex: 1,
-        argName: "o1"
-      }
-    },
-    o2: {
-      codec: compoundTypeCodec,
-      extensions: {
-        argIndex: 2,
-        argName: "o2"
-      }
-    }
-  },
-  executor,
-  isAnonymous: true
-});
-const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord = recordCodec({
-  name: "MutationOutOutCompoundTypeRecord",
-  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: {
-    __proto__: null,
-    o1: {
-      codec: TYPES.int,
-      extensions: {
-        argIndex: 1,
-        argName: "o1"
-      }
-    },
-    o2: {
-      codec: compoundTypeCodec,
-      extensions: {
-        argIndex: 2,
-        argName: "o2"
-      }
-    }
-  },
-  executor,
-  isAnonymous: true
-});
 const postIdentifier = sql.identifier("a", "post");
 const anEnumCodec = enumCodec({
   name: "anEnum",
@@ -1652,6 +1525,133 @@ const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord 
       extensions: {
         argIndex: 4,
         argName: "post"
+      }
+    }
+  },
+  executor,
+  isAnonymous: true
+});
+const compoundTypeIdentifier = sql.identifier("c", "compound_type");
+const colorCodec = enumCodec({
+  name: "color",
+  identifier: sql.identifier("b", "color"),
+  values: ["red", "green", "blue"],
+  description: "Represents the colours red, green and blue.",
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "color"
+    }
+  }
+});
+const enumCapsCodec = enumCodec({
+  name: "enumCaps",
+  identifier: sql.identifier("b", "enum_caps"),
+  values: ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "enum_caps"
+    }
+  }
+});
+const enumWithEmptyStringCodec = enumCodec({
+  name: "enumWithEmptyString",
+  identifier: sql.identifier("b", "enum_with_empty_string"),
+  values: ["", "one", "two"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "enum_with_empty_string"
+    }
+  }
+});
+const compoundTypeCodec = recordCodec({
+  name: "compoundType",
+  identifier: compoundTypeIdentifier,
+  attributes: {
+    __proto__: null,
+    a: {
+      codec: TYPES.int
+    },
+    b: {
+      codec: TYPES.text
+    },
+    c: {
+      codec: colorCodec
+    },
+    d: {
+      codec: TYPES.uuid
+    },
+    e: {
+      codec: enumCapsCodec
+    },
+    f: {
+      codec: enumWithEmptyStringCodec
+    },
+    g: {
+      codec: TYPES.interval
+    },
+    foo_bar: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "compound_type"
+    }
+  },
+  executor: executor,
+  description: "Awesome feature!"
+});
+const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord = recordCodec({
+  name: "FuncOutOutCompoundTypeRecord",
+  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+  attributes: {
+    __proto__: null,
+    o1: {
+      codec: TYPES.int,
+      extensions: {
+        argIndex: 1,
+        argName: "o1"
+      }
+    },
+    o2: {
+      codec: compoundTypeCodec,
+      extensions: {
+        argIndex: 2,
+        argName: "o2"
+      }
+    }
+  },
+  executor,
+  isAnonymous: true
+});
+const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord = recordCodec({
+  name: "MutationOutOutCompoundTypeRecord",
+  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+  attributes: {
+    __proto__: null,
+    o1: {
+      codec: TYPES.int,
+      extensions: {
+        argIndex: 1,
+        argName: "o1"
+      }
+    },
+    o2: {
+      codec: compoundTypeCodec,
+      extensions: {
+        argIndex: 2,
+        argName: "o2"
       }
     }
   },
@@ -3150,14 +3150,11 @@ const authenticate_payloadFunctionIdentifer = sql.identifier("b", "authenticate_
 const post_computed_interval_arrayFunctionIdentifer = sql.identifier("a", "post_computed_interval_array");
 const post_computed_interval_setFunctionIdentifer = sql.identifier("a", "post_computed_interval_set");
 const post_computed_text_arrayFunctionIdentifer = sql.identifier("a", "post_computed_text_array");
-const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
 const post_computed_with_optional_argFunctionIdentifer = sql.identifier("a", "post_computed_with_optional_arg");
 const post_computed_with_required_argFunctionIdentifer = sql.identifier("a", "post_computed_with_required_arg");
 const post_headline_trimmedFunctionIdentifer = sql.identifier("a", "post_headline_trimmed");
 const post_headline_trimmed_no_defaultsFunctionIdentifer = sql.identifier("a", "post_headline_trimmed_no_defaults");
 const post_headline_trimmed_strictFunctionIdentifer = sql.identifier("a", "post_headline_trimmed_strict");
-const func_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "func_out_out_compound_type");
-const mutation_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "mutation_out_out_compound_type");
 const query_output_two_rowsFunctionIdentifer = sql.identifier("c", "query_output_two_rows");
 const postUniques = [{
   attributes: ["id"],
@@ -3182,6 +3179,12 @@ const post_resourceOptionsConfig = {
   },
   uniques: postUniques
 };
+const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
+const func_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "func_out_out_compound_type");
+const mutation_out_out_compound_typeFunctionIdentifer = sql.identifier("c", "mutation_out_out_compound_type");
+const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
+const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
+const post_with_suffixFunctionIdentifer = sql.identifier("a", "post_with_suffix");
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
 const compound_type_resourceOptionsConfig = {
   executor: executor,
@@ -3206,15 +3209,12 @@ const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_ty
 const compound_type_queryFunctionIdentifer = sql.identifier("b", "compound_type_query");
 const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compound_type_set_mutation");
 const list_of_compound_types_mutationFunctionIdentifer = sql.identifier("c", "list_of_compound_types_mutation");
-const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
-const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
-const post_with_suffixFunctionIdentifer = sql.identifier("a", "post_with_suffix");
+const post_manyFunctionIdentifer = sql.identifier("a", "post_many");
 const mutation_compound_type_arrayFunctionIdentifer = sql.identifier("a", "mutation_compound_type_array");
 const query_compound_type_arrayFunctionIdentifer = sql.identifier("a", "query_compound_type_array");
 const compound_type_array_mutationFunctionIdentifer = sql.identifier("b", "compound_type_array_mutation");
 const compound_type_array_queryFunctionIdentifer = sql.identifier("b", "compound_type_array_query");
 const post_computed_compound_type_arrayFunctionIdentifer = sql.identifier("a", "post_computed_compound_type_array");
-const post_manyFunctionIdentifer = sql.identifier("a", "post_many");
 const person_computed_outFunctionIdentifer = sql.identifier("c", "person_computed_out");
 const person_first_nameFunctionIdentifer = sql.identifier("c", "person_first_name");
 const person_computed_out_outFunctionIdentifer = sql.identifier("c", "person_computed_out_out");
@@ -3344,7 +3344,6 @@ const registry = makeRegistry({
     defaultValue: defaultValueCodec,
     noPrimaryKey: noPrimaryKeyCodec,
     uniqueForeignKey: uniqueForeignKeyCodec,
-    myTable: myTableCodec,
     personSecret: personSecretCodec,
     unlogged: unloggedCodec,
     foreignKey: foreignKeyCodec,
@@ -3352,10 +3351,11 @@ const registry = makeRegistry({
     viewTable: viewTableCodec,
     compoundKey: compoundKeyCodec,
     bool: TYPES.boolean,
+    myTable: myTableCodec,
     similarTable1: similarTable1Codec,
     similarTable2: similarTable2Codec,
-    updatableView: updatableViewCodec,
     nullTestRecord: nullTestRecordCodec,
+    updatableView: updatableViewCodec,
     edgeCase: edgeCaseCodec,
     int2: TYPES.int2,
     issue756: issue756Codec,
@@ -3366,18 +3366,18 @@ const registry = makeRegistry({
     leftArm: leftArmCodec,
     float8: TYPES.float,
     authPayload: authPayloadCodec,
-    FuncOutOutCompoundTypeRecord: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
-    compoundType: compoundTypeCodec,
-    color: colorCodec,
-    enumCaps: enumCapsCodec,
-    enumWithEmptyString: enumWithEmptyStringCodec,
-    MutationOutOutCompoundTypeRecord: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
     QueryOutputTwoRowsRecord: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
     post: postCodec,
     anEnumArray: anEnumArrayCodec,
     anEnum: anEnumCodec,
     comptypeArray: comptypeArrayCodec,
     comptype: comptypeCodec,
+    FuncOutOutCompoundTypeRecord: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
+    compoundType: compoundTypeCodec,
+    color: colorCodec,
+    enumCaps: enumCapsCodec,
+    enumWithEmptyString: enumWithEmptyStringCodec,
+    MutationOutOutCompoundTypeRecord: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
     PersonComputedOutOutRecord: registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
     PersonComputedInoutOutRecord: registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
     PersonComputedFirstArgInoutOutRecord: registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
@@ -5650,28 +5650,6 @@ const registry = makeRegistry({
       }]
     },
     unique_foreign_key: unique_foreign_key_resourceOptionsConfig,
-    my_table: {
-      executor: executor,
-      name: "my_table",
-      identifier: "main.c.my_table",
-      from: myTableIdentifier,
-      codec: myTableCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "my_table"
-        },
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      },
-      uniques: [{
-        attributes: ["id"],
-        isPrimary: true
-      }]
-    },
     person_secret: person_secret_resourceOptionsConfig,
     unlogged: {
       executor: executor,
@@ -5739,32 +5717,27 @@ const registry = makeRegistry({
       }]
     },
     compound_key: compound_key_resourceOptionsConfig,
-    edge_case_computed: {
+    my_table: {
       executor: executor,
-      name: "edge_case_computed",
-      identifier: "main.c.edge_case_computed(c.edge_case)",
-      from(...args) {
-        return sql`${edge_case_computedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "edge_case",
-        codec: edgeCaseCodec
-      }],
-      codec: TYPES.text,
-      hasImplicitOrder: false,
+      name: "my_table",
+      identifier: "main.c.my_table",
+      from: myTableIdentifier,
+      codec: myTableCodec,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
-          name: "edge_case_computed"
+          name: "my_table"
         },
-        tags: {
-          sortable: true,
-          behavior: ["orderBy order resource:connection:backwards"]
-        },
-        canExecute: false
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
       },
-      isUnique: true
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
     },
     similar_table_1: {
       executor: executor,
@@ -5810,6 +5783,72 @@ const registry = makeRegistry({
         isPrimary: true
       }]
     },
+    null_test_record: {
+      executor: executor,
+      name: "null_test_record",
+      identifier: "main.c.null_test_record",
+      from: nullTestRecordIdentifier,
+      codec: nullTestRecordCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "null_test_record"
+        },
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
+      },
+      uniques: [{
+        attributes: ["id"],
+        isPrimary: true
+      }]
+    },
+    edge_case_computed: {
+      executor: executor,
+      name: "edge_case_computed",
+      identifier: "main.c.edge_case_computed(c.edge_case)",
+      from(...args) {
+        return sql`${edge_case_computedFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "edge_case",
+        codec: edgeCaseCodec
+      }],
+      codec: TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "edge_case_computed"
+        },
+        tags: {
+          sortable: true,
+          behavior: ["orderBy order resource:connection:backwards"]
+        },
+        canExecute: false
+      },
+      isUnique: true
+    },
+    return_table_without_grants: PgResource.functionResourceOptions(compound_key_resourceOptionsConfig, {
+      name: "return_table_without_grants",
+      identifier: "main.c.return_table_without_grants()",
+      from(...args) {
+        return sql`${return_table_without_grantsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "return_table_without_grants"
+        },
+        canExecute: true
+      }
+    }),
     updatable_view: {
       executor: executor,
       name: "updatable_view",
@@ -5843,63 +5882,6 @@ const registry = makeRegistry({
       }],
       description: "YOYOYO!!"
     },
-    null_test_record: {
-      executor: executor,
-      name: "null_test_record",
-      identifier: "main.c.null_test_record",
-      from: nullTestRecordIdentifier,
-      codec: nullTestRecordCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "null_test_record"
-        },
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      },
-      uniques: [{
-        attributes: ["id"],
-        isPrimary: true
-      }]
-    },
-    edge_case: {
-      executor: executor,
-      name: "edge_case",
-      identifier: "main.c.edge_case",
-      from: edgeCaseIdentifier,
-      codec: edgeCaseCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "edge_case"
-        },
-        canSelect: false,
-        canInsert: false,
-        canUpdate: false,
-        canDelete: false
-      }
-    },
-    return_table_without_grants: PgResource.functionResourceOptions(compound_key_resourceOptionsConfig, {
-      name: "return_table_without_grants",
-      identifier: "main.c.return_table_without_grants()",
-      from(...args) {
-        return sql`${return_table_without_grantsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsSetof: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "return_table_without_grants"
-        },
-        canExecute: true
-      }
-    }),
     types_mutation: {
       executor: executor,
       name: "types_mutation",
@@ -5988,6 +5970,24 @@ const registry = makeRegistry({
         canExecute: false
       },
       isUnique: true
+    },
+    edge_case: {
+      executor: executor,
+      name: "edge_case",
+      identifier: "main.c.edge_case",
+      from: edgeCaseIdentifier,
+      codec: edgeCaseCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "edge_case"
+        },
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false,
+        canDelete: false
+      }
     },
     issue756: issue756_resourceOptionsConfig,
     authenticate_fail: PgResource.functionResourceOptions(jwt_token_resourceOptionsConfig, {
@@ -6244,29 +6244,6 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
-    compound_type_computed_field: {
-      executor: executor,
-      name: "compound_type_computed_field",
-      identifier: "main.c.compound_type_computed_field(c.compound_type)",
-      from(...args) {
-        return sql`${compound_type_computed_fieldFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "compound_type",
-        codec: compoundTypeCodec
-      }],
-      codec: TYPES.int,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "compound_type_computed_field"
-        },
-        canExecute: false
-      },
-      isUnique: true
-    },
     post_computed_with_optional_arg: {
       executor: executor,
       name: "post_computed_with_optional_arg",
@@ -6428,6 +6405,59 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
+    query_output_two_rows: {
+      executor: executor,
+      name: "query_output_two_rows",
+      identifier: "main.c.query_output_two_rows(int4,int4,text,c.left_arm,a.post)",
+      from(...args) {
+        return sql`${query_output_two_rowsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "left_arm_id",
+        codec: TYPES.int
+      }, {
+        name: "post_id",
+        codec: TYPES.int
+      }, {
+        name: "txt",
+        codec: TYPES.text
+      }],
+      codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "query_output_two_rows"
+        },
+        canExecute: false
+      },
+      isUnique: true
+    },
+    post: post_resourceOptionsConfig,
+    compound_type_computed_field: {
+      executor: executor,
+      name: "compound_type_computed_field",
+      identifier: "main.c.compound_type_computed_field(c.compound_type)",
+      from(...args) {
+        return sql`${compound_type_computed_fieldFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "compound_type",
+        codec: compoundTypeCodec
+      }],
+      codec: TYPES.int,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "compound_type_computed_field"
+        },
+        canExecute: false
+      },
+      isUnique: true
+    },
     func_out_out_compound_type: {
       executor: executor,
       name: "func_out_out_compound_type",
@@ -6475,36 +6505,74 @@ const registry = makeRegistry({
       isUnique: true,
       isMutation: true
     },
-    query_output_two_rows: {
-      executor: executor,
-      name: "query_output_two_rows",
-      identifier: "main.c.query_output_two_rows(int4,int4,text,c.left_arm,a.post)",
+    table_mutation: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
+      name: "table_mutation",
+      identifier: "main.c.table_mutation(int4)",
       from(...args) {
-        return sql`${query_output_two_rowsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+        return sql`${table_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
-        name: "left_arm_id",
+        name: "id",
         codec: TYPES.int
-      }, {
-        name: "post_id",
-        codec: TYPES.int
-      }, {
-        name: "txt",
-        codec: TYPES.text
       }],
-      codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
-      hasImplicitOrder: false,
+      returnsSetof: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "c",
-          name: "query_output_two_rows"
+          name: "table_mutation"
         },
         canExecute: false
       },
-      isUnique: true
-    },
-    post: post_resourceOptionsConfig,
+      isMutation: true
+    }),
+    table_query: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
+      name: "table_query",
+      identifier: "main.c.table_query(int4)",
+      from(...args) {
+        return sql`${table_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        codec: TYPES.int
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "table_query"
+        },
+        canExecute: false
+      }
+    }),
+    post_with_suffix: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
+      name: "post_with_suffix",
+      identifier: "main.a.post_with_suffix(a.post,text)",
+      from(...args) {
+        return sql`${post_with_suffixFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "post",
+        codec: postCodec
+      }, {
+        name: "suffix",
+        codec: TYPES.text
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "a",
+          name: "post_with_suffix"
+        },
+        tags: {
+          deprecated: "This is deprecated (comment on function a.post_with_suffix)."
+        },
+        canExecute: true
+      },
+      isMutation: true
+    }),
     compound_type_set_query: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "compound_type_set_query",
       identifier: "main.c.compound_type_set_query()",
@@ -6608,73 +6676,27 @@ const registry = makeRegistry({
       isMutation: true,
       hasImplicitOrder: true
     }),
-    table_mutation: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
-      name: "table_mutation",
-      identifier: "main.c.table_mutation(int4)",
+    post_many: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
+      name: "post_many",
+      identifier: "main.a.post_many(a._post)",
       from(...args) {
-        return sql`${table_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+        return sql`${post_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
-        name: "id",
-        codec: TYPES.int
+        name: "posts",
+        codec: postArrayCodec
       }],
-      returnsSetof: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "table_mutation"
-        },
-        canExecute: false
-      },
-      isMutation: true
-    }),
-    table_query: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
-      name: "table_query",
-      identifier: "main.c.table_query(int4)",
-      from(...args) {
-        return sql`${table_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "id",
-        codec: TYPES.int
-      }],
-      returnsSetof: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "table_query"
-        },
-        canExecute: false
-      }
-    }),
-    post_with_suffix: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
-      name: "post_with_suffix",
-      identifier: "main.a.post_with_suffix(a.post,text)",
-      from(...args) {
-        return sql`${post_with_suffixFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "post",
-        codec: postCodec
-      }, {
-        name: "suffix",
-        codec: TYPES.text
-      }],
-      returnsSetof: false,
+      returnsSetof: true,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "a",
-          name: "post_with_suffix"
+          name: "post_many"
         },
-        tags: {
-          deprecated: "This is deprecated (comment on function a.post_with_suffix)."
-        },
-        canExecute: true
+        canExecute: false
       },
-      isMutation: true
+      isMutation: true,
+      hasImplicitOrder: true
     }),
     mutation_compound_type_array: PgResource.functionResourceOptions(compound_type_resourceOptionsConfig, {
       name: "mutation_compound_type_array",
@@ -6785,28 +6807,6 @@ const registry = makeRegistry({
         canExecute: false
       },
       returnsArray: true
-    }),
-    post_many: PgResource.functionResourceOptions(post_resourceOptionsConfig, {
-      name: "post_many",
-      identifier: "main.a.post_many(a._post)",
-      from(...args) {
-        return sql`${post_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "posts",
-        codec: postArrayCodec
-      }],
-      returnsSetof: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "post_many"
-        },
-        canExecute: false
-      },
-      isMutation: true,
-      hasImplicitOrder: true
     }),
     person_computed_out: {
       executor: executor,
