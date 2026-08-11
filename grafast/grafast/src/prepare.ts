@@ -54,6 +54,7 @@ import {
   abortable,
   arrayOfLength,
   asyncIteratorWithCleanup,
+  consume,
   isPromiseLike,
 } from "./utils.ts";
 
@@ -170,19 +171,19 @@ function releaseUnusedIterators(
     for (const stream of allStreams) {
       if (stream.return) {
         try {
-          const result = stream.return();
-          if (isPromiseLike(result)) result.then(null, noop);
+          consume(stream.return());
         } catch {
           /*noop*/
         }
       } else if (stream.throw) {
         try {
-          const result = stream.throw(
-            new Error(
-              `Iterator no longer needed (due to OutputPlan branch being skipped)`,
+          consume(
+            stream.throw(
+              new Error(
+                `Iterator no longer needed (due to OutputPlan branch being skipped)`,
+              ),
             ),
           );
-          if (isPromiseLike(result)) result.then(null, noop);
         } catch {
           /*noop*/
         }
@@ -497,19 +498,13 @@ function executePreemptive(
         );
         if (e != null) {
           try {
-            const result = stream.throw?.(e);
-            if (isPromiseLike(result)) {
-              result.then(null, noop);
-            }
+            consume(stream.throw?.(e));
           } catch {
             /*noop*/
           }
         } else {
           try {
-            const result = stream.return?.();
-            if (isPromiseLike(result)) {
-              result.then(null, noop);
-            }
+            consume(stream.return?.());
           } catch {
             /*noop*/
           }
@@ -525,10 +520,7 @@ function executePreemptive(
             stream.next(),
           );
           if (next === undefined) {
-            const result = stream.return?.();
-            if (isPromiseLike(result)) {
-              result.then(null, noop);
-            }
+            consume(stream.return?.());
             break;
           }
           if (next.done) {
@@ -553,10 +545,7 @@ function executePreemptive(
                   payloadIterator.next(),
                 );
                 if (next === undefined) {
-                  const result = payloadIterator.return?.(undefined);
-                  if (isPromiseLike(result)) {
-                    result.then(null, noop);
-                  }
+                  consume(payloadIterator.return?.(undefined));
                   break;
                 }
                 if (next.done) {
@@ -570,10 +559,7 @@ function executePreemptive(
             }
             i++;
           } catch (error) {
-            const result = iterator.return?.();
-            if (isPromiseLike(result)) {
-              result.then(null, noop);
-            }
+            consume(iterator.return?.());
             throw error;
           }
         }
@@ -776,10 +762,7 @@ function newIterator<T = any>(
             (v) => cbs[0]({ done: false, value: v }),
             (e) => {
               try {
-                const r = cbs[1](e);
-                if (isPromiseLike(r)) {
-                  r.then(null, noop);
-                }
+                consume(cbs[1](e));
               } catch (e) {
                 // ignore
               }

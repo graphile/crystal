@@ -1527,8 +1527,7 @@ export function terminateIterable(
 ) {
   if ("return" in iterable && typeof iterable.return === "function") {
     try {
-      const result = iterable.return();
-      if (isPromiseLike(result)) result.then(null, noop);
+      consume(iterable.return());
     } catch {
       /*noop*/
     }
@@ -1588,4 +1587,13 @@ export function abortable<T, F>(
       },
     );
   });
+}
+
+/**
+ * If `value` is a promise, consumes any errors that it yields.
+ */
+export function consume(value: unknown): void {
+  if (isPromiseLike(value)) {
+    void value.then(undefined, noop);
+  }
 }

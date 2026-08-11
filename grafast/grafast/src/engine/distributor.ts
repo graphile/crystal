@@ -2,7 +2,7 @@ import * as assert from "../assert.ts";
 import { isDev, noop } from "../dev.ts";
 import type { Maybe } from "../interfaces.ts";
 import type { Step } from "../step.ts";
-import { arrayOfLength, isPromiseLike } from "../utils.ts";
+import { arrayOfLength, consume, isPromiseLike } from "../utils.ts";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
@@ -158,19 +158,13 @@ export function distributor<TData>(
 
       if (iterator.return) {
         try {
-          const r = iterator.return();
-          if (isPromiseLike(r)) {
-            r.then(null, noop);
-          }
+          consume(iterator.return());
         } catch {
           /*noop*/
         }
       } else if (iterator?.throw) {
         try {
-          const r = iterator.throw(new Error("Stop"));
-          if (isPromiseLike(r)) {
-            r.then(null, noop);
-          }
+          consume(iterator.throw(new Error("Stop")));
         } catch {
           /*noop*/
         }
@@ -354,7 +348,7 @@ export function distributor<TData>(
       if (error) {
         const p = Promise.reject(error);
         // Catch this error so it doesn't cause premature termination
-        p.then(null, noop);
+        void p.then(undefined, noop);
         terminalResult[stepIndex] = p;
       } else {
         terminalResult[stepIndex] = DONE_PROMISE;
@@ -386,9 +380,7 @@ export function distributor<TData>(
           : sourceIterable[Symbol.iterator]();
     }
 
-    const onAbort = () => {
-      iterator.return().then(null, noop);
-    };
+    const onAbort = () => void iterator.return().then(undefined, noop);
     const iterator = {
       [Symbol.asyncIterator]() {
         return this;
