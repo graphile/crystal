@@ -11,3 +11,4 @@ jobs:
         with:
           files: '["postgraphile/website", "grafast/website",
             "graphile-build/website", "utils/website"]'
+          vale_flags: --glob=!**/__tests__/**
