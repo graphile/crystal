@@ -584,17 +584,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [options, pgResourceOptions],
             );
           }
-        })().then((resourceOptions) => {
-          if (resourceOptions) {
-            registryBuilder.addResource(resourceOptions);
-          }
-          return resourceOptions;
-        });
+        })();
 
         resourceOptionsByPgProc.set(pgProc, resourceOptionsPromise!);
-
-        const registryBuilder =
-          await info.helpers.pgRegistry.getRegistryBuilder();
 
         return resourceOptionsPromise;
       },
@@ -663,6 +655,20 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         }
 
         await helpers.pgProcedures.getResourceOptions(serviceName, pgProc);
+      },
+      pgRegistry_PgRegistryBuilder_pgResources: {
+        after: ["PgTablesPlugin"],
+        async callback(info, event) {
+          const { registryBuilder } = event;
+          for (const resourceOptionsByPgProc of info.state.resourceOptionsByPgProcByService.values()) {
+            for (const resourceOptionsPromise of resourceOptionsByPgProc.values()) {
+              const resourceOptions = await resourceOptionsPromise;
+              if (resourceOptions != null) {
+                registryBuilder.addResource(resourceOptions);
+              }
+            }
+          }
+        },
       },
     },
   }),
