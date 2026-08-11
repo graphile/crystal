@@ -36,6 +36,7 @@ import type {
   GrafastFieldConfig,
   GrafastInputFieldConfig,
   Maybe,
+  PromiseOrDirect,
 } from "./interfaces.ts";
 import type { Step } from "./step.ts";
 import { constant } from "./steps/constant.ts";
@@ -1460,10 +1461,12 @@ export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 // Save on garbage collection by just using this promise for everything
-const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
-  done: true,
-  value: undefined,
-});
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve(
+  Object.freeze({
+    done: true,
+    value: undefined,
+  }),
+);
 
 /**
  * Returns a new version of `iterable` that calls `callback()` on termination,
@@ -1524,8 +1527,7 @@ export function terminateIterable(
 ) {
   if ("return" in iterable && typeof iterable.return === "function") {
     try {
-      const result = iterable.return();
-      if (isPromiseLike(result)) result.then(null, noop);
+      consume(iterable.return());
     } catch {
       /*noop*/
     }
@@ -1550,4 +1552,51 @@ export function markSyncAndSafe<
     fn.displayName = displayName;
   }
   return fn;
+}
+
+/**
+ * If `signal` is aborted, returns `valueForAbort`. Otherwise returns
+ * equivalent to `promiseOrValue` except if the signal is aborted first it will
+ * resolve with `valueForAbort` immediately.
+ *
+ * @experimental
+ */
+export function abortable<T, F>(
+  signal: AbortSignal,
+  valueForAbort: F,
+  promiseOrValue: PromiseOrDirect<T>,
+): PromiseOrDirect<T | F> {
+  if (signal.aborted) {
+    consume(promiseOrValue);
+    return valueForAbort;
+  }
+  if (!isPromiseLike(promiseOrValue)) {
+    return promiseOrValue;
+  }
+  const promise = promiseOrValue;
+  return new Promise<T | F>((resolve, reject) => {
+    const resolveWithoutArgs = () => resolve(valueForAbort);
+    signal.addEventListener("abort", resolveWithoutArgs, { once: true });
+    void promise.then(
+      (val) => {
+        signal.removeEventListener("abort", resolveWithoutArgs);
+        resolve(val);
+      },
+      (e) => {
+        signal.removeEventListener("abort", resolveWithoutArgs);
+        reject(e);
+      },
+    );
+  });
+}
+
+/**
+ * If `value` is a promise, consumes any errors that it yields.
+ *
+ * @experimental
+ */
+export function consume(value: unknown): void {
+  if (isPromiseLike(value)) {
+    void value.then(undefined, noop);
+  }
 }
