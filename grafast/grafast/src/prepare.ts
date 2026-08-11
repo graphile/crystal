@@ -524,15 +524,15 @@ function executePreemptive(
             undefined,
             stream.next(),
           );
-          if (next?.done) {
-            // Stream already exited
-            break;
-          }
-          if (next === undefined || iteratorAbortSignal.aborted) {
+          if (next === undefined) {
             const result = stream.return?.();
             if (isPromiseLike(result)) {
               result.then(null, noop);
             }
+            break;
+          }
+          if (next.done) {
+            // Stream already exited
             break;
           }
           try {
@@ -552,15 +552,15 @@ function executePreemptive(
                   undefined,
                   payloadIterator.next(),
                 );
-                if (next?.done) {
-                  // Iterator already exited
-                  break;
-                }
-                if (next === undefined || iteratorAbortSignal.aborted) {
+                if (next === undefined) {
                   const result = payloadIterator.return?.(undefined);
                   if (isPromiseLike(result)) {
                     result.then(null, noop);
                   }
+                  break;
+                }
+                if (next.done) {
+                  // Iterator already exited
                   break;
                 }
                 iterator.push(next.value);
