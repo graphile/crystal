@@ -1939,7 +1939,9 @@ export function makeExampleSchema(
     }),
   });
 
-  const User = newObjectTypeBuilder<UserStep>(PgSelectSingleStep)({
+  const User: GraphQLObjectType = newObjectTypeBuilder<UserStep>(
+    PgSelectSingleStep,
+  )({
     name: "User",
     planType: EXPORTABLE(
       (get, userResource) =>
@@ -2170,55 +2172,54 @@ export function makeExampleSchema(
     },
   });
 
-  const MessagesConnection = newObjectTypeBuilder<MessageConnectionStep>(
-    ConnectionStep,
-  )({
-    name: "MessagesConnection",
-    fields: {
-      edges: {
-        type: new GraphQLList(MessageEdge),
-        plan: EXPORTABLE(
-          () =>
-            function plan($connection) {
-              return $connection.edges();
-            },
-          [],
-        ),
+  const MessagesConnection: GraphQLObjectType =
+    newObjectTypeBuilder<MessageConnectionStep>(ConnectionStep)({
+      name: "MessagesConnection",
+      fields: {
+        edges: {
+          type: new GraphQLList(MessageEdge),
+          plan: EXPORTABLE(
+            () =>
+              function plan($connection) {
+                return $connection.edges();
+              },
+            [],
+          ),
+        },
+        nodes: newGrafastFieldConfigBuilder<MessageConnectionStep>()({
+          type: new GraphQLList(Message),
+          plan: EXPORTABLE(
+            () =>
+              function plan($connection) {
+                return $connection.nodes() as any;
+              },
+            [],
+          ),
+        }),
+        pageInfo: newGrafastFieldConfigBuilder<MessageConnectionStep>()({
+          type: new GraphQLNonNull(PageInfo),
+          plan: EXPORTABLE(
+            () =>
+              function plan($connection) {
+                // return context();
+                return $connection.pageInfo() as any;
+              },
+            [],
+          ),
+        }),
+        totalCount: {
+          type: new GraphQLNonNull(GraphQLInt),
+          plan: EXPORTABLE(
+            (TYPES, sql) => ($connection) =>
+              $connection
+                .cloneSubplanWithoutPagination("aggregate")
+                .single()
+                .select(sql`count(*)`, TYPES.bigint, false),
+            [TYPES, sql],
+          ),
+        },
       },
-      nodes: newGrafastFieldConfigBuilder<MessageConnectionStep>()({
-        type: new GraphQLList(Message),
-        plan: EXPORTABLE(
-          () =>
-            function plan($connection) {
-              return $connection.nodes() as any;
-            },
-          [],
-        ),
-      }),
-      pageInfo: newGrafastFieldConfigBuilder<MessageConnectionStep>()({
-        type: new GraphQLNonNull(PageInfo),
-        plan: EXPORTABLE(
-          () =>
-            function plan($connection) {
-              // return context();
-              return $connection.pageInfo() as any;
-            },
-          [],
-        ),
-      }),
-      totalCount: {
-        type: new GraphQLNonNull(GraphQLInt),
-        plan: EXPORTABLE(
-          (TYPES, sql) => ($connection) =>
-            $connection
-              .cloneSubplanWithoutPagination("aggregate")
-              .single()
-              .select(sql`count(*)`, TYPES.bigint, false),
-          [TYPES, sql],
-        ),
-      },
-    },
-  });
+    });
 
   const IncludeArchived = new GraphQLEnumType({
     name: "IncludeArchived",
