@@ -1559,6 +1559,8 @@ export function markSyncAndSafe<
  * If `signal` is aborted, returns `valueForAbort`. Otherwise returns
  * equivalent to `promiseOrValue` except if the signal is aborted first it will
  * resolve with `valueForAbort` immediately.
+ *
+ * @experimental
  */
 export function abortable<T, F>(
   signal: AbortSignal,
