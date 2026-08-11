@@ -544,6 +544,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         void baseCodecPromise?.then(null, noop);
 
         const promise = (async (): Promise<PgCodec | null> => {
+          const baseCodec = baseCodecPromise ? await baseCodecPromise : null;
           const pgType = await info.helpers.pgIntrospection.getType(
             serviceName,
             typeId,
@@ -561,10 +562,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
 
           if (typeModifier != null) {
-            if (!baseCodecPromise) {
-              throw new Error(`baseCodecPromise/typeModifier mismatch`);
-            }
-            const baseCodec = await baseCodecPromise;
             if (baseCodec == null) {
               // Already logged
               return null;
