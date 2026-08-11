@@ -488,8 +488,9 @@ export class StepTracker {
         }`,
       );
     }
-    sudo($step)._isUnary = false;
-    sudo($step)._isUnaryLocked = true;
+    const ss = sudo($step);
+    ss._isUnary = false;
+    ss._isUnaryLocked = true;
     for (const dep of $step.dependents) {
       this.setNonUnary(dep.step, [$step, ...stack]);
     }

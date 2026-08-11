@@ -28,10 +28,9 @@ export class BakedInputStep<TData = any> extends UnbatchedStep<TData> {
     super();
     this.inputType = inputType;
     this.valueDepId = this.addUnaryDependency($value) as 0;
-    if (!this._isUnary) {
+    if (!this.getAndFreezeIsUnary()) {
       throw new Error(`bakedInput() must be unary`);
     }
-    this._isUnaryLocked = true;
   }
 
   public deduplicate(peers: readonly BakedInputStep[]) {
