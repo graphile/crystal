@@ -2,7 +2,7 @@ import * as assert from "../assert.ts";
 import { isDev, noop } from "../dev.ts";
 import type { Maybe } from "../interfaces.ts";
 import type { Step } from "../step.ts";
-import { arrayOfLength, consume, isPromiseLike } from "../utils.ts";
+import { arrayOfLength, consume } from "../utils.ts";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
