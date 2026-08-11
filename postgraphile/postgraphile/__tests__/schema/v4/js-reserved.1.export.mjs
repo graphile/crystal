@@ -13,6 +13,19 @@ const executor = new PgExecutor({
     });
   }
 });
+const itemTypeCodec = enumCodec({
+  name: "itemType",
+  identifier: sql.identifier("js_reserved", "item_type"),
+  values: ["TOPIC", "STATUS"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "item_type"
+    }
+  }
+});
 const nullIdentifier = sql.identifier("js_reserved", "null");
 const nullCodec = recordCodec({
   name: "null",
@@ -40,19 +53,6 @@ const nullCodec = recordCodec({
     }
   },
   executor: executor
-});
-const itemTypeCodec = enumCodec({
-  name: "itemType",
-  identifier: sql.identifier("js_reserved", "item_type"),
-  values: ["TOPIC", "STATUS"],
-  description: undefined,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "item_type"
-    }
-  }
 });
 const __proto__Identifier = sql.identifier("js_reserved", "__proto__");
 const __proto__Codec = recordCodec({
@@ -617,7 +617,7 @@ const registryConfig = {
     __proto__: null,
     main: executor
   },
-  pgCodecs: Object.fromEntries([["text", TYPES.text], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar], ["int4", TYPES.int], ["null", nullCodec], ["itemType", itemTypeCodec], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["project", projectCodec], ["relationalItems", relationalItemsCodec], ["relationalStatus", relationalStatusCodec], ["relationalTopics", relationalTopicsCodec], ["reserved", reservedCodec], ["yield", yieldCodec], ["LetterAToDEnum", enumCodec({
+  pgCodecs: Object.fromEntries([["text", TYPES.text], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar], ["int4", TYPES.int], ["itemType", itemTypeCodec], ["null", nullCodec], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["project", projectCodec], ["relationalItems", relationalItemsCodec], ["relationalStatus", relationalStatusCodec], ["relationalTopics", relationalTopicsCodec], ["reserved", reservedCodec], ["yield", yieldCodec], ["LetterAToDEnum", enumCodec({
     name: "LetterAToDEnum",
     identifier: TYPES.text.sqlType,
     values: [{

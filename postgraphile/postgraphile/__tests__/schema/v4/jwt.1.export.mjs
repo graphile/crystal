@@ -846,10 +846,10 @@ const registry = makeRegistry({
         }
       }
     }),
-    notNullUrl: notNullUrlCodec,
     int4Array: LIST_TYPES.int,
     dateArray: LIST_TYPES.date,
     timestamptzArray: LIST_TYPES.timestamptz,
+    notNullUrl: notNullUrlCodec,
     int8Array: LIST_TYPES.bigint,
     lists: listsCodec,
     updatableView: updatableViewCodec,
