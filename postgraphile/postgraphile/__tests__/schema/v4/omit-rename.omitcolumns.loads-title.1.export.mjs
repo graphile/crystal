@@ -65,31 +65,28 @@ const executor = new PgExecutor({
     });
   }
 });
-const renamed_tableIdentifier = sql.identifier("d", "original_table");
-const renamed_tableCodec = recordCodec({
-  name: "renamed_table",
-  identifier: renamed_tableIdentifier,
+const jwtTokenIdentifier = sql.identifier("d", "jwt_token");
+const jwtTokenCodec = recordCodec({
+  name: "jwtToken",
+  identifier: jwtTokenIdentifier,
   attributes: {
     __proto__: null,
-    col1: {
-      codec: TYPES.int,
-      extensions: {
-        tags: {
-          name: "colA"
-        }
-      }
+    role: {
+      codec: TYPES.text
+    },
+    exp: {
+      codec: TYPES.int
+    },
+    a: {
+      codec: TYPES.int
     }
   },
   extensions: {
-    isTableLike: true,
+    isTableLike: false,
     pg: {
       serviceName: "main",
       schemaName: "d",
-      name: "original_table"
-    },
-    tags: {
-      __proto__: null,
-      name: "renamed_table"
+      name: "jwt_token"
     }
   },
   executor: executor
@@ -118,54 +115,6 @@ const flambleCodec = recordCodec({
   },
   executor: executor
 });
-const filmsIdentifier = sql.identifier("d", "films");
-const filmsCodec = recordCodec({
-  name: "films",
-  identifier: filmsIdentifier,
-  attributes: {
-    __proto__: null,
-    code: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.varchar
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "films"
-    }
-  },
-  executor: executor
-});
-const studiosIdentifier = sql.identifier("d", "studios");
-const studiosCodec = recordCodec({
-  name: "studios",
-  identifier: studiosIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    name: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "studios"
-    }
-  },
-  executor: executor
-});
 const postIdentifier = sql.identifier("d", "post");
 const postCodec = recordCodec({
   name: "post",
@@ -190,92 +139,6 @@ const postCodec = recordCodec({
       serviceName: "main",
       schemaName: "d",
       name: "post"
-    }
-  },
-  executor: executor
-});
-const tvEpisodesIdentifier = sql.identifier("d", "tv_episodes");
-const tvEpisodesCodec = recordCodec({
-  name: "tvEpisodes",
-  identifier: tvEpisodesIdentifier,
-  attributes: {
-    __proto__: null,
-    code: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.varchar
-    },
-    show_id: {
-      codec: TYPES.int
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "tv_episodes"
-    }
-  },
-  executor: executor
-});
-const tvShowsIdentifier = sql.identifier("d", "tv_shows");
-const tvShowsCodec = recordCodec({
-  name: "tvShows",
-  identifier: tvShowsIdentifier,
-  attributes: {
-    __proto__: null,
-    code: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.varchar,
-      extensions: {
-        tags: {
-          omit: "read,create,update,delete,all,many",
-          behavior: ["-select -node -connection -list -array -single -insert -update -delete -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection"]
-        }
-      }
-    },
-    studio_id: {
-      codec: TYPES.int
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "tv_shows"
-    }
-  },
-  executor: executor
-});
-const jwtTokenIdentifier = sql.identifier("d", "jwt_token");
-const jwtTokenCodec = recordCodec({
-  name: "jwtToken",
-  identifier: jwtTokenIdentifier,
-  attributes: {
-    __proto__: null,
-    role: {
-      codec: TYPES.text
-    },
-    exp: {
-      codec: TYPES.int
-    },
-    a: {
-      codec: TYPES.int
-    }
-  },
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "jwt_token"
     }
   },
   executor: executor
@@ -378,30 +241,171 @@ const personCodec = recordCodec({
   },
   executor: executor
 });
-const original_functionFunctionIdentifer = sql.identifier("d", "original_function");
-const getflambleFunctionIdentifer = sql.identifier("d", "getflamble");
-const filmsUniques = [{
-  attributes: ["code"],
-  isPrimary: true
-}];
-const studiosUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const studios_resourceOptionsConfig = {
-  executor: executor,
-  name: "studios",
-  identifier: "main.d.studios",
-  from: studiosIdentifier,
-  codec: studiosCodec,
+const filmsIdentifier = sql.identifier("d", "films");
+const filmsCodec = recordCodec({
+  name: "films",
+  identifier: filmsIdentifier,
+  attributes: {
+    __proto__: null,
+    code: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.varchar
+    }
+  },
   extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "films"
+    }
+  },
+  executor: executor
+});
+const renamed_tableIdentifier = sql.identifier("d", "original_table");
+const renamed_tableCodec = recordCodec({
+  name: "renamed_table",
+  identifier: renamed_tableIdentifier,
+  attributes: {
+    __proto__: null,
+    col1: {
+      codec: TYPES.int,
+      extensions: {
+        tags: {
+          name: "colA"
+        }
+      }
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "original_table"
+    },
+    tags: {
+      __proto__: null,
+      name: "renamed_table"
+    }
+  },
+  executor: executor
+});
+const studiosIdentifier = sql.identifier("d", "studios");
+const studiosCodec = recordCodec({
+  name: "studios",
+  identifier: studiosIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
       name: "studios"
     }
   },
-  uniques: studiosUniques
+  executor: executor
+});
+const tvEpisodesIdentifier = sql.identifier("d", "tv_episodes");
+const tvEpisodesCodec = recordCodec({
+  name: "tvEpisodes",
+  identifier: tvEpisodesIdentifier,
+  attributes: {
+    __proto__: null,
+    code: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.varchar
+    },
+    show_id: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "tv_episodes"
+    }
+  },
+  executor: executor
+});
+const tvShowsIdentifier = sql.identifier("d", "tv_shows");
+const tvShowsCodec = recordCodec({
+  name: "tvShows",
+  identifier: tvShowsIdentifier,
+  attributes: {
+    __proto__: null,
+    code: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.varchar,
+      extensions: {
+        tags: {
+          omit: "read,create,update,delete,all,many",
+          behavior: ["-select -node -connection -list -array -single -insert -update -delete -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection"]
+        }
+      }
+    },
+    studio_id: {
+      codec: TYPES.int
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "tv_shows"
+    }
+  },
+  executor: executor
+});
+const filmsUniques = [{
+  attributes: ["code"],
+  isPrimary: true
+}];
+const personUniques = [{
+  attributes: ["id"],
+  isPrimary: true,
+  extensions: {
+    tags: {
+      __proto__: null,
+      fieldName: "findPersonById"
+    }
+  }
+}];
+const person_resourceOptionsConfig = {
+  executor: executor,
+  name: "person",
+  identifier: "main.d.person",
+  from: personIdentifier,
+  codec: personCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "person"
+    }
+  },
+  uniques: personUniques
 };
 const postUniques = [{
   attributes: ["id"],
@@ -421,6 +425,25 @@ const post_resourceOptionsConfig = {
     }
   },
   uniques: postUniques
+};
+const studiosUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const studios_resourceOptionsConfig = {
+  executor: executor,
+  name: "studios",
+  identifier: "main.d.studios",
+  from: studiosIdentifier,
+  codec: studiosCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "studios"
+    }
+  },
+  uniques: studiosUniques
 };
 const tv_episodesUniques = [{
   attributes: ["code"],
@@ -461,33 +484,10 @@ const tv_shows_resourceOptionsConfig = {
   uniques: tv_showsUniques
 };
 const authenticateFunctionIdentifer = sql.identifier("d", "authenticate");
+const getflambleFunctionIdentifer = sql.identifier("d", "getflamble");
+const original_functionFunctionIdentifer = sql.identifier("d", "original_function");
 const person_full_nameFunctionIdentifer = sql.identifier("d", "person_full_name");
 const search_postsFunctionIdentifer = sql.identifier("d", "search_posts");
-const personUniques = [{
-  attributes: ["id"],
-  isPrimary: true,
-  extensions: {
-    tags: {
-      __proto__: null,
-      fieldName: "findPersonById"
-    }
-  }
-}];
-const person_resourceOptionsConfig = {
-  executor: executor,
-  name: "person",
-  identifier: "main.d.person",
-  from: personIdentifier,
-  codec: personCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "person"
-    }
-  },
-  uniques: personUniques
-};
 const registry = makeRegistry({
   pgExecutors: {
     __proto__: null,
@@ -495,19 +495,19 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    int4: TYPES.int,
-    renamed_table: renamed_tableCodec,
-    flamble: flambleCodec,
     text: TYPES.text,
-    films: filmsCodec,
     varchar: TYPES.varchar,
-    studios: studiosCodec,
+    bpchar: TYPES.bpchar,
+    jwtToken: jwtTokenCodec,
+    int4: TYPES.int,
+    flamble: flambleCodec,
     post: postCodec,
+    person: personCodec,
+    films: filmsCodec,
+    renamed_table: renamed_tableCodec,
+    studios: studiosCodec,
     tvEpisodes: tvEpisodesCodec,
     tvShows: tvShowsCodec,
-    jwtToken: jwtTokenCodec,
-    person: personCodec,
-    bpchar: TYPES.bpchar,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -850,27 +850,20 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    renamed_function: {
+    films: {
       executor: executor,
-      name: "renamed_function",
-      identifier: "main.d.original_function()",
-      from(...args) {
-        return sql`${original_functionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      codec: TYPES.int,
-      hasImplicitOrder: false,
+      name: "films",
+      identifier: "main.d.films",
+      from: filmsIdentifier,
+      codec: filmsCodec,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "d",
-          name: "original_function"
-        },
-        tags: {
-          name: "renamed_function"
+          name: "films"
         }
       },
-      isUnique: true
+      uniques: filmsUniques
     },
     renamed_table: {
       executor: executor,
@@ -889,61 +882,9 @@ const registry = makeRegistry({
         }
       }
     },
-    getflamble: PgResource.functionResourceOptions({
-      executor: executor,
-      name: "flamble",
-      identifier: "main.d.flibble",
-      from: flambleIdentifier,
-      codec: flambleCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "d",
-          name: "flibble"
-        },
-        isInsertable: false,
-        isUpdatable: false,
-        isDeletable: false,
-        tags: {
-          name: "flamble"
-        }
-      },
-      isVirtual: true
-    }, {
-      name: "getflamble",
-      identifier: "main.d.getflamble()",
-      from(...args) {
-        return sql`${getflambleFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsSetof: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "d",
-          name: "getflamble"
-        }
-      },
-      isMutation: true,
-      hasImplicitOrder: true
-    }),
-    films: {
-      executor: executor,
-      name: "films",
-      identifier: "main.d.films",
-      from: filmsIdentifier,
-      codec: filmsCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "d",
-          name: "films"
-        }
-      },
-      uniques: filmsUniques
-    },
-    studios: studios_resourceOptionsConfig,
+    person: person_resourceOptionsConfig,
     post: post_resourceOptionsConfig,
+    studios: studios_resourceOptionsConfig,
     tv_episodes: tv_episodes_resourceOptionsConfig,
     tv_shows: tv_shows_resourceOptionsConfig,
     login: PgResource.functionResourceOptions({
@@ -987,6 +928,66 @@ const registry = makeRegistry({
       },
       isMutation: true
     }),
+    getflamble: PgResource.functionResourceOptions({
+      executor: executor,
+      name: "flamble",
+      identifier: "main.d.flibble",
+      from: flambleIdentifier,
+      codec: flambleCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "flibble"
+        },
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
+        tags: {
+          name: "flamble"
+        }
+      },
+      isVirtual: true
+    }, {
+      name: "getflamble",
+      identifier: "main.d.getflamble()",
+      from(...args) {
+        return sql`${getflambleFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "getflamble"
+        }
+      },
+      isMutation: true,
+      hasImplicitOrder: true
+    }),
+    renamed_function: {
+      executor: executor,
+      name: "renamed_function",
+      identifier: "main.d.original_function()",
+      from(...args) {
+        return sql`${original_functionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: TYPES.int,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "original_function"
+        },
+        tags: {
+          name: "renamed_function"
+        }
+      },
+      isUnique: true
+    },
     person_full_name: {
       executor: executor,
       name: "person_full_name",
@@ -1039,8 +1040,7 @@ const registry = makeRegistry({
         }
       },
       hasImplicitOrder: true
-    }),
-    person: person_resourceOptionsConfig
+    })
   },
   pgRelations: {
     __proto__: null,
@@ -1116,11 +1116,11 @@ const registry = makeRegistry({
   }
 });
 const resource_filmsPgResource = registry.pgResources["films"];
-const resource_studiosPgResource = registry.pgResources["studios"];
+const resource_personPgResource = registry.pgResources["person"];
 const resource_postPgResource = registry.pgResources["post"];
+const resource_studiosPgResource = registry.pgResources["studios"];
 const resource_tv_episodesPgResource = registry.pgResources["tv_episodes"];
 const resource_tv_showsPgResource = registry.pgResources["tv_shows"];
-const resource_personPgResource = registry.pgResources["person"];
 const EMPTY_ARRAY = Object.freeze([]);
 const makeArgs_person_full_name = () => EMPTY_ARRAY;
 const resource_renamed_functionPgResource = registry.pgResources["renamed_function"];
@@ -1253,16 +1253,9 @@ const nodeFetcher_Film = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Film));
   return nodeIdHandler_Film.get(nodeIdHandler_Film.getSpec($decoded));
 };
-const nodeIdHandler_Studio = makeTableNodeIdHandler({
-  typeName: "Studio",
-  identifier: "studios",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_studiosPgResource,
-  pk: studiosUniques[0].attributes
-});
-const nodeFetcher_Studio = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Studio));
-  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec($decoded));
+const nodeFetcher_Person = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
 const nodeIdHandler_Post = makeTableNodeIdHandler({
   typeName: "Post",
@@ -1274,6 +1267,17 @@ const nodeIdHandler_Post = makeTableNodeIdHandler({
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
   return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+};
+const nodeIdHandler_Studio = makeTableNodeIdHandler({
+  typeName: "Studio",
+  identifier: "studios",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_studiosPgResource,
+  pk: studiosUniques[0].attributes
+});
+const nodeFetcher_Studio = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Studio));
+  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec($decoded));
 };
 const nodeIdHandler_TvEpisode = makeTableNodeIdHandler({
   typeName: "TvEpisode",
@@ -1297,11 +1301,6 @@ const nodeFetcher_TvShow = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvShow));
   return nodeIdHandler_TvShow.get(nodeIdHandler_TvShow.getSpec($decoded));
 };
-const nodeFetcher_Person = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
-};
-const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
 }
@@ -1313,15 +1312,16 @@ function applyOrderByArgToConnection(parent, $connection, value) {
   const $select = $connection.getSubplan();
   value.apply($select);
 }
+const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: nodeIdHandler_Query,
   Film: nodeIdHandler_Film,
-  Studio: nodeIdHandler_Studio,
+  Person: nodeIdHandler_Person,
   Post: nodeIdHandler_Post,
+  Studio: nodeIdHandler_Studio,
   TvEpisode: nodeIdHandler_TvEpisode,
-  TvShow: nodeIdHandler_TvShow,
-  Person: nodeIdHandler_Person
+  TvShow: nodeIdHandler_TvShow
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -1334,47 +1334,6 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-function toString(value) {
-  return "" + value;
-}
-function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
-  $condition.where({
-    type: "attribute",
-    attribute: attributeName,
-    callback(expression) {
-      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
-    }
-  });
-}
-const TvEpisodeCondition_codeApply = ($condition, val) => applyAttributeCondition("code", TYPES.int, $condition, val);
-const TvEpisodeCondition_titleApply = ($condition, val) => applyAttributeCondition("title", TYPES.varchar, $condition, val);
-const TvEpisodesOrderBy_CODE_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "code",
-    direction: "ASC"
-  });
-  queryBuilder.setOrderIsUnique();
-};
-const TvEpisodesOrderBy_CODE_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "code",
-    direction: "DESC"
-  });
-  queryBuilder.setOrderIsUnique();
-};
-const TvEpisodesOrderBy_TITLE_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "title",
-    direction: "ASC"
-  });
-};
-const TvEpisodesOrderBy_TITLE_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "title",
-    direction: "DESC"
-  });
-};
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -1431,6 +1390,19 @@ const scalarComputed = ($in, args) => {
   const from = pgFromExpression($row, resource_person_full_namePgResource.from, resource_person_full_namePgResource.parameters, selectArgs);
   return pgClassExpression($row, resource_person_full_namePgResource.codec, undefined)`${from}`;
 };
+const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+function toString(value) {
+  return "" + value;
+}
+function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
+  $condition.where({
+    type: "attribute",
+    attribute: attributeName,
+    callback(expression) {
+      return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, attributeCodec)}`;
+    }
+  });
+}
 const PostCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
 const PostsOrderBy_ID_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
@@ -1446,7 +1418,41 @@ const PostsOrderBy_ID_DESCApply = queryBuilder => {
   });
   queryBuilder.setOrderIsUnique();
 };
-const resource_getflamblePgResource = registry.pgResources["getflamble"];
+const TvEpisodeCondition_codeApply = ($condition, val) => applyAttributeCondition("code", TYPES.int, $condition, val);
+const TvEpisodeCondition_titleApply = ($condition, val) => applyAttributeCondition("title", TYPES.varchar, $condition, val);
+const TvEpisodesOrderBy_CODE_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "code",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const TvEpisodesOrderBy_CODE_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "code",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const TvEpisodesOrderBy_TITLE_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "title",
+    direction: "ASC"
+  });
+};
+const TvEpisodesOrderBy_TITLE_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "title",
+    direction: "DESC"
+  });
+};
+const argDetailsSimple_login = [{
+  graphqlArgName: "a",
+  pgCodec: TYPES.int,
+  postgresArgName: "a"
+}];
+const makeArgs_login = (args, path = []) => argDetailsSimple_login.map(details => makeArg(path, args, details));
+const resource_loginPgResource = registry.pgResources["login"];
 function pgSelectFromPayload($payload) {
   const $result = $payload.getStepForKey("result");
   const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
@@ -1461,13 +1467,7 @@ function applyInputArgViaPgSelect(_, $payload, arg) {
   const $pgSelect = pgSelectFromPayload($payload);
   arg.apply($pgSelect);
 }
-const argDetailsSimple_login = [{
-  graphqlArgName: "a",
-  pgCodec: TYPES.int,
-  postgresArgName: "a"
-}];
-const makeArgs_login = (args, path = []) => argDetailsSimple_login.map(details => makeArg(path, args, details));
-const resource_loginPgResource = registry.pgResources["login"];
+const resource_getflamblePgResource = registry.pgResources["getflamble"];
 function applyInputToInsert(_, $object) {
   return $object;
 }
@@ -1478,13 +1478,17 @@ const specFromArgs_Film = args => {
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
-const specFromArgs_Studio = args => {
+const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Post, $nodeId);
+};
+const specFromArgs_Studio = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
 };
 const specFromArgs_TvEpisode = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -1493,10 +1497,6 @@ const specFromArgs_TvEpisode = args => {
 const specFromArgs_TvShow = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_TvShow, $nodeId);
-};
-const specFromArgs_Person = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
 function getClientMutationIdForCustomMutationPlan($object) {
   const $result = $object.getStepForKey("result");
@@ -1519,11 +1519,6 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
-function applyCreateFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
-}
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
   if (!$result) return null;
@@ -1545,18 +1540,32 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   return new EdgeStep($connection, first($connection));
 };
 const CreateFilmPayload_filmEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_filmsPgResource, filmsUniques[0].attributes, $mutation, fieldArgs);
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
 function FilmInput_codeApply(obj, val, info) {
   obj.set("code", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function FilmInput_titleApply(obj, val, info) {
   obj.set("title", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const CreateStudioPayload_studioEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
-function StudioInput_idApply(obj, val, info) {
+const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
+function PersonInput_idApply(obj, val, info) {
   obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-function StudioInput_nameApply(obj, val, info) {
-  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
+function PersonInput_firstNameApply(obj, val, info) {
+  obj.set("first_name", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function PersonInput_lastNameApply(obj, val, info) {
+  obj.set("last_name", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function PersonInput_colNoOrderApply(obj, val, info) {
+  obj.set("col_no_order", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function PersonInput_colNoFilterApply(obj, val, info) {
+  obj.set("col_no_filter", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePostPayload_postEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_postPgResource, postUniques[0].attributes, $mutation, fieldArgs);
 const CreatePostPayload_authorPlan = $record => resource_personPgResource.get({
@@ -1567,6 +1576,10 @@ function PostInput_bodyApply(obj, val, info) {
 }
 function PostInput_authorIdApply(obj, val, info) {
   obj.set("author_id", bakedInputRuntime(info.schema, info.field.type, val));
+}
+const CreateStudioPayload_studioEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_studiosPgResource, studiosUniques[0].attributes, $mutation, fieldArgs);
+function StudioInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateTvEpisodePayload_tvEpisodeEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_tv_episodesPgResource, tv_episodesUniques[0].attributes, $mutation, fieldArgs);
 const CreateTvEpisodePayload_tvShowByShowIdPlan = $record => resource_tv_showsPgResource.get({
@@ -1581,19 +1594,6 @@ const CreateTvShowPayload_studioByStudioIdPlan = $record => resource_studiosPgRe
 });
 function TvShowInput_studioIdApply(obj, val, info) {
   obj.set("studio_id", bakedInputRuntime(info.schema, info.field.type, val));
-}
-const CreatePersonPayload_personEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
-function PersonInput_firstNameApply(obj, val, info) {
-  obj.set("first_name", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function PersonInput_lastNameApply(obj, val, info) {
-  obj.set("last_name", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function PersonInput_colNoOrderApply(obj, val, info) {
-  obj.set("col_no_order", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function PersonInput_colNoFilterApply(obj, val, info) {
-  obj.set("col_no_filter", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
@@ -1621,20 +1621,20 @@ type Query implements Node {
   """Get a single \`Film\`."""
   filmByCode(code: Int!): Film
 
-  """Get a single \`Studio\`."""
-  studioById(id: Int!): Studio
+  """Get a single \`Person\`."""
+  findPersonById(id: Int!): Person
 
   """Get a single \`Post\`."""
   postById(id: Int!): Post
+
+  """Get a single \`Studio\`."""
+  studioById(id: Int!): Studio
 
   """Get a single \`TvEpisode\`."""
   tvEpisodeByCode(code: Int!): TvEpisode
 
   """Get a single \`TvShow\`."""
   tvShowByCode(code: Int!): TvShow
-
-  """Get a single \`Person\`."""
-  findPersonById(id: Int!): Person
   renamedFunction: Int
   personFullName(n: ID): String
 
@@ -1667,17 +1667,23 @@ type Query implements Node {
     nodeId: ID!
   ): Film
 
-  """Reads a single \`Studio\` using its globally unique \`ID\`."""
-  studio(
-    """The globally unique \`ID\` to be used in selecting a single \`Studio\`."""
+  """Reads a single \`Person\` using its globally unique \`ID\`."""
+  person(
+    """The globally unique \`ID\` to be used in selecting a single \`Person\`."""
     nodeId: ID!
-  ): Studio
+  ): Person
 
   """Reads a single \`Post\` using its globally unique \`ID\`."""
   post(
     """The globally unique \`ID\` to be used in selecting a single \`Post\`."""
     nodeId: ID!
   ): Post
+
+  """Reads a single \`Studio\` using its globally unique \`ID\`."""
+  studio(
+    """The globally unique \`ID\` to be used in selecting a single \`Studio\`."""
+    nodeId: ID!
+  ): Studio
 
   """Reads a single \`TvEpisode\` using its globally unique \`ID\`."""
   tvEpisode(
@@ -1690,41 +1696,6 @@ type Query implements Node {
     """The globally unique \`ID\` to be used in selecting a single \`TvShow\`."""
     nodeId: ID!
   ): TvShow
-
-  """Reads a single \`Person\` using its globally unique \`ID\`."""
-  person(
-    """The globally unique \`ID\` to be used in selecting a single \`Person\`."""
-    nodeId: ID!
-  ): Person
-
-  """Reads and enables pagination through a set of \`RenamedTable\`."""
-  allRenamedTables(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RenamedTableCondition
-
-    """The method to use when ordering \`RenamedTable\`."""
-    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
-  ): RenamedTablesConnection
 
   """Reads and enables pagination through a set of \`Film\`."""
   allFilms(
@@ -1755,8 +1726,8 @@ type Query implements Node {
     orderBy: [FilmsOrderBy!] = [PRIMARY_KEY_ASC]
   ): FilmsConnection
 
-  """Reads and enables pagination through a set of \`Studio\`."""
-  allStudios(
+  """Reads and enables pagination through a set of \`RenamedTable\`."""
+  allRenamedTables(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1778,11 +1749,40 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: StudioCondition
+    condition: RenamedTableCondition
 
-    """The method to use when ordering \`Studio\`."""
-    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
-  ): StudiosConnection
+    """The method to use when ordering \`RenamedTable\`."""
+    orderBy: [RenamedTablesOrderBy!] = [NATURAL]
+  ): RenamedTablesConnection
+
+  """Reads and enables pagination through a set of \`Person\`."""
+  allPeople(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Post\`."""
   allPosts(
@@ -1812,6 +1812,35 @@ type Query implements Node {
     """The method to use when ordering \`Post\`."""
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
+
+  """Reads and enables pagination through a set of \`Studio\`."""
+  allStudios(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StudioCondition
+
+    """The method to use when ordering \`Studio\`."""
+    orderBy: [StudiosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StudiosConnection
 
   """Reads and enables pagination through a set of \`TvEpisode\`."""
   allTvEpisodes(
@@ -1870,9 +1899,43 @@ type Query implements Node {
     """The method to use when ordering \`TvShow\`."""
     orderBy: [TvShowsOrderBy!] = [PRIMARY_KEY_ASC]
   ): TvShowsConnection
+}
 
-  """Reads and enables pagination through a set of \`Person\`."""
-  allPeople(
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+type Film implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  code: Int!
+  title: String
+}
+
+type Person implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  name: String
+  id: Int!
+  firstName: String
+  lastName: String
+  colNoCreate: String
+  colNoUpdate: String
+  colNoOrder: String
+  colNoFilter: String
+  colNoCreateUpdate: String
+  colNoCreateUpdateOrderFilter: String
+
+  """Reads and enables pagination through a set of \`Post\`."""
+  posts(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1894,28 +1957,95 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: PersonCondition
+    condition: PostCondition
 
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PeopleConnection
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection!
 }
 
-"""An object with a globally unique \`ID\`."""
-interface Node {
+"""A connection to a list of \`Post\` values."""
+type PostsConnection {
+  """A list of \`Post\` objects."""
+  nodes: [Post]!
+
+  """
+  A list of edges which contains the \`Post\` and cursor to aid in pagination.
+  """
+  edges: [PostsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Post\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Post implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  id: Int!
+  body: String
+  authorId: Int
+
+  """Reads a single \`Person\` that is related to this \`Post\`."""
+  author: Person
 }
 
-type Film implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  code: Int!
-  title: String
+"""A \`Post\` edge in the connection."""
+type PostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Post\` at the end of the edge."""
+  node: Post
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""
+A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PostCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`body\` field."""
+  body: String
+
+  """Checks for equality with the object’s \`authorId\` field."""
+  authorId: Int
+}
+
+"""Methods to use when ordering \`Post\`."""
+enum PostsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  BODY_ASC
+  BODY_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
 }
 
 type Studio implements Node {
@@ -2053,24 +2183,6 @@ type TvEpisodesEdge {
   node: TvEpisode
 }
 
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
 """
 A condition to be used against \`TvEpisode\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
@@ -2135,164 +2247,6 @@ enum TvShowsOrderBy {
   STUDIO_ID_DESC
 }
 
-type Post implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  body: String
-  authorId: Int
-
-  """Reads a single \`Person\` that is related to this \`Post\`."""
-  author: Person
-}
-
-type Person implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  name: String
-  id: Int!
-  firstName: String
-  lastName: String
-  colNoCreate: String
-  colNoUpdate: String
-  colNoOrder: String
-  colNoFilter: String
-  colNoCreateUpdate: String
-  colNoCreateUpdateOrderFilter: String
-
-  """Reads and enables pagination through a set of \`Post\`."""
-  posts(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostCondition
-
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostsConnection!
-}
-
-"""A connection to a list of \`Post\` values."""
-type PostsConnection {
-  """A list of \`Post\` objects."""
-  nodes: [Post]!
-
-  """
-  A list of edges which contains the \`Post\` and cursor to aid in pagination.
-  """
-  edges: [PostsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Post\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Post\` edge in the connection."""
-type PostsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Post\` at the end of the edge."""
-  node: Post
-}
-
-"""
-A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PostCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`body\` field."""
-  body: String
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: Int
-}
-
-"""Methods to use when ordering \`Post\`."""
-enum PostsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  BODY_ASC
-  BODY_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-}
-
-"""A connection to a list of \`RenamedTable\` values."""
-type RenamedTablesConnection {
-  """A list of \`RenamedTable\` objects."""
-  nodes: [RenamedTable]!
-
-  """
-  A list of edges which contains the \`RenamedTable\` and cursor to aid in pagination.
-  """
-  edges: [RenamedTablesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`RenamedTable\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type RenamedTable {
-  colA: Int
-}
-
-"""A \`RenamedTable\` edge in the connection."""
-type RenamedTablesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RenamedTable\` at the end of the edge."""
-  node: RenamedTable
-}
-
-"""
-A condition to be used against \`RenamedTable\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input RenamedTableCondition {
-  """Checks for equality with the object’s \`colA\` field."""
-  colA: Int
-}
-
-"""Methods to use when ordering \`RenamedTable\`."""
-enum RenamedTablesOrderBy {
-  NATURAL
-  COL_A_ASC
-  COL_A_DESC
-}
-
 """A connection to a list of \`Film\` values."""
 type FilmsConnection {
   """A list of \`Film\` objects."""
@@ -2341,52 +2295,50 @@ enum FilmsOrderBy {
   TITLE_DESC
 }
 
-"""A connection to a list of \`Studio\` values."""
-type StudiosConnection {
-  """A list of \`Studio\` objects."""
-  nodes: [Studio]!
+"""A connection to a list of \`RenamedTable\` values."""
+type RenamedTablesConnection {
+  """A list of \`RenamedTable\` objects."""
+  nodes: [RenamedTable]!
 
   """
-  A list of edges which contains the \`Studio\` and cursor to aid in pagination.
+  A list of edges which contains the \`RenamedTable\` and cursor to aid in pagination.
   """
-  edges: [StudiosEdge]!
+  edges: [RenamedTablesEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* \`Studio\` you could get from the connection."""
+  """The count of *all* \`RenamedTable\` you could get from the connection."""
   totalCount: Int!
 }
 
-"""A \`Studio\` edge in the connection."""
-type StudiosEdge {
+type RenamedTable {
+  colA: Int
+}
+
+"""A \`RenamedTable\` edge in the connection."""
+type RenamedTablesEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The \`Studio\` at the end of the edge."""
-  node: Studio
+  """The \`RenamedTable\` at the end of the edge."""
+  node: RenamedTable
 }
 
 """
-A condition to be used against \`Studio\` object types. All fields are tested for equality and combined with a logical ‘and.’
+A condition to be used against \`RenamedTable\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
 """
-input StudioCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
+input RenamedTableCondition {
+  """Checks for equality with the object’s \`colA\` field."""
+  colA: Int
 }
 
-"""Methods to use when ordering \`Studio\`."""
-enum StudiosOrderBy {
+"""Methods to use when ordering \`RenamedTable\`."""
+enum RenamedTablesOrderBy {
   NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
+  COL_A_ASC
+  COL_A_DESC
 }
 
 """A connection to a list of \`Person\` values."""
@@ -2462,30 +2414,70 @@ enum PeopleOrderBy {
   COL_NO_CREATE_UPDATE_DESC
 }
 
+"""A connection to a list of \`Studio\` values."""
+type StudiosConnection {
+  """A list of \`Studio\` objects."""
+  nodes: [Studio]!
+
+  """
+  A list of edges which contains the \`Studio\` and cursor to aid in pagination.
+  """
+  edges: [StudiosEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Studio\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Studio\` edge in the connection."""
+type StudiosEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Studio\` at the end of the edge."""
+  node: Studio
+}
+
+"""
+A condition to be used against \`Studio\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input StudioCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+}
+
+"""Methods to use when ordering \`Studio\`."""
+enum StudiosOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+}
+
 """
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  getflamble(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: GetflambleInput!
-  ): GetflamblePayload
   login(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
     input: LoginInput!
   ): LoginPayload
-
-  """Creates a single \`RenamedTable\`."""
-  createRenamedTable(
+  getflamble(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateRenamedTableInput!
-  ): CreateRenamedTablePayload
+    input: GetflambleInput!
+  ): GetflamblePayload
 
   """Creates a single \`Film\`."""
   createFilm(
@@ -2495,13 +2487,21 @@ type Mutation {
     input: CreateFilmInput!
   ): CreateFilmPayload
 
-  """Creates a single \`Studio\`."""
-  createStudio(
+  """Creates a single \`RenamedTable\`."""
+  createRenamedTable(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateStudioInput!
-  ): CreateStudioPayload
+    input: CreateRenamedTableInput!
+  ): CreateRenamedTablePayload
+
+  """Creates a single \`Person\`."""
+  createPerson(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePersonInput!
+  ): CreatePersonPayload
 
   """Creates a single \`Post\`."""
   createPost(
@@ -2510,6 +2510,14 @@ type Mutation {
     """
     input: CreatePostInput!
   ): CreatePostPayload
+
+  """Creates a single \`Studio\`."""
+  createStudio(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateStudioInput!
+  ): CreateStudioPayload
 
   """Creates a single \`TvEpisode\`."""
   createTvEpisode(
@@ -2527,14 +2535,6 @@ type Mutation {
     input: CreateTvShowInput!
   ): CreateTvShowPayload
 
-  """Creates a single \`Person\`."""
-  createPerson(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePersonInput!
-  ): CreatePersonPayload
-
   """Updates a single \`Film\` using its globally unique id and a patch."""
   updateFilm(
     """
@@ -2551,21 +2551,21 @@ type Mutation {
     input: UpdateFilmByCodeInput!
   ): UpdateFilmPayload
 
-  """Updates a single \`Studio\` using its globally unique id and a patch."""
-  updateStudio(
+  """Updates a single \`Person\` using its globally unique id and a patch."""
+  updatePerson(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateStudioInput!
-  ): UpdateStudioPayload
+    input: UpdatePersonInput!
+  ): UpdatePersonPayload
 
-  """Updates a single \`Studio\` using a unique key and a patch."""
-  updateStudioById(
+  """Updates a single \`Person\` using a unique key and a patch."""
+  updatePersonById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateStudioByIdInput!
-  ): UpdateStudioPayload
+    input: UpdatePersonByIdInput!
+  ): UpdatePersonPayload
 
   """Updates a single \`Post\` using its globally unique id and a patch."""
   updatePost(
@@ -2582,6 +2582,22 @@ type Mutation {
     """
     input: UpdatePostByIdInput!
   ): UpdatePostPayload
+
+  """Updates a single \`Studio\` using its globally unique id and a patch."""
+  updateStudio(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateStudioInput!
+  ): UpdateStudioPayload
+
+  """Updates a single \`Studio\` using a unique key and a patch."""
+  updateStudioById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateStudioByIdInput!
+  ): UpdateStudioPayload
 
   """Updates a single \`TvEpisode\` using its globally unique id and a patch."""
   updateTvEpisode(
@@ -2615,22 +2631,6 @@ type Mutation {
     input: UpdateTvShowByCodeInput!
   ): UpdateTvShowPayload
 
-  """Updates a single \`Person\` using its globally unique id and a patch."""
-  updatePerson(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePersonInput!
-  ): UpdatePersonPayload
-
-  """Updates a single \`Person\` using a unique key and a patch."""
-  updatePersonById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePersonByIdInput!
-  ): UpdatePersonPayload
-
   """Deletes a single \`Film\` using its globally unique id."""
   deleteFilm(
     """
@@ -2647,21 +2647,21 @@ type Mutation {
     input: DeleteFilmByCodeInput!
   ): DeleteFilmPayload
 
-  """Deletes a single \`Studio\` using its globally unique id."""
-  deleteStudio(
+  """Deletes a single \`Person\` using its globally unique id."""
+  deletePerson(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteStudioInput!
-  ): DeleteStudioPayload
+    input: DeletePersonInput!
+  ): DeletePersonPayload
 
-  """Deletes a single \`Studio\` using a unique key."""
-  deleteStudioById(
+  """Deletes a single \`Person\` using a unique key."""
+  deletePersonById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteStudioByIdInput!
-  ): DeleteStudioPayload
+    input: DeletePersonByIdInput!
+  ): DeletePersonPayload
 
   """Deletes a single \`Post\` using its globally unique id."""
   deletePost(
@@ -2678,6 +2678,22 @@ type Mutation {
     """
     input: DeletePostByIdInput!
   ): DeletePostPayload
+
+  """Deletes a single \`Studio\` using its globally unique id."""
+  deleteStudio(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStudioInput!
+  ): DeleteStudioPayload
+
+  """Deletes a single \`Studio\` using a unique key."""
+  deleteStudioById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStudioByIdInput!
+  ): DeleteStudioPayload
 
   """Deletes a single \`TvEpisode\` using its globally unique id."""
   deleteTvEpisode(
@@ -2710,50 +2726,6 @@ type Mutation {
     """
     input: DeleteTvShowByCodeInput!
   ): DeleteTvShowPayload
-
-  """Deletes a single \`Person\` using its globally unique id."""
-  deletePerson(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePersonInput!
-  ): DeletePersonPayload
-
-  """Deletes a single \`Person\` using a unique key."""
-  deletePersonById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePersonByIdInput!
-  ): DeletePersonPayload
-}
-
-"""The output of our \`getflamble\` mutation."""
-type GetflamblePayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  flambles: [Flamble]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-type Flamble {
-  f: String
-}
-
-"""All input for the \`getflamble\` mutation."""
-input GetflambleInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
 }
 
 """The output of our \`login\` mutation."""
@@ -2787,16 +2759,14 @@ input LoginInput {
   a: Int
 }
 
-"""The output of our create \`RenamedTable\` mutation."""
-type CreateRenamedTablePayload {
+"""The output of our \`getflamble\` mutation."""
+type GetflamblePayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-
-  """The \`RenamedTable\` that was created by this mutation."""
-  renamedTable: RenamedTable
+  flambles: [Flamble]
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -2804,21 +2774,17 @@ type CreateRenamedTablePayload {
   query: Query
 }
 
-"""All input for the create \`RenamedTable\` mutation."""
-input CreateRenamedTableInput {
+type Flamble {
+  f: String
+}
+
+"""All input for the \`getflamble\` mutation."""
+input GetflambleInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """The \`RenamedTable\` to be created by this mutation."""
-  renamedTable: RenamedTableInput!
-}
-
-"""An input for mutations affecting \`RenamedTable\`"""
-input RenamedTableInput {
-  colA: Int
 }
 
 """The output of our create \`Film\` mutation."""
@@ -2862,45 +2828,83 @@ input FilmInput {
   title: String
 }
 
-"""The output of our create \`Studio\` mutation."""
-type CreateStudioPayload {
+"""The output of our create \`RenamedTable\` mutation."""
+type CreateRenamedTablePayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Studio\` that was created by this mutation."""
-  studio: Studio
+  """The \`RenamedTable\` that was created by this mutation."""
+  renamedTable: RenamedTable
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our \`Studio\`. May be used by Relay 1."""
-  studioEdge(
-    """The method to use when ordering \`Studio\`."""
-    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StudiosEdge
 }
 
-"""All input for the create \`Studio\` mutation."""
-input CreateStudioInput {
+"""All input for the create \`RenamedTable\` mutation."""
+input CreateRenamedTableInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The \`Studio\` to be created by this mutation."""
-  studio: StudioInput!
+  """The \`RenamedTable\` to be created by this mutation."""
+  renamedTable: RenamedTableInput!
 }
 
-"""An input for mutations affecting \`Studio\`"""
-input StudioInput {
-  id: Int!
-  name: String
+"""An input for mutations affecting \`RenamedTable\`"""
+input RenamedTableInput {
+  colA: Int
+}
+
+"""The output of our create \`Person\` mutation."""
+type CreatePersonPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Person\` that was created by this mutation."""
+  person: Person
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Person\`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
+}
+
+"""All input for the create \`Person\` mutation."""
+input CreatePersonInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Person\` to be created by this mutation."""
+  person: PersonInput!
+}
+
+"""An input for mutations affecting \`Person\`"""
+input PersonInput {
+  id: Int
+  firstName: String
+  lastName: String
+  colNoUpdate: String
+  colNoOrder: String
+  colNoFilter: String
 }
 
 """The output of our create \`Post\` mutation."""
@@ -2946,6 +2950,47 @@ input PostInput {
   id: Int
   body: String
   authorId: Int
+}
+
+"""The output of our create \`Studio\` mutation."""
+type CreateStudioPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Studio\` that was created by this mutation."""
+  studio: Studio
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Studio\`. May be used by Relay 1."""
+  studioEdge(
+    """The method to use when ordering \`Studio\`."""
+    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StudiosEdge
+}
+
+"""All input for the create \`Studio\` mutation."""
+input CreateStudioInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Studio\` to be created by this mutation."""
+  studio: StudioInput!
+}
+
+"""An input for mutations affecting \`Studio\`"""
+input StudioInput {
+  id: Int!
+  name: String
 }
 
 """The output of our create \`TvEpisode\` mutation."""
@@ -3037,51 +3082,6 @@ input TvShowInput {
   studioId: Int
 }
 
-"""The output of our create \`Person\` mutation."""
-type CreatePersonPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Person\` that was created by this mutation."""
-  person: Person
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Person\`. May be used by Relay 1."""
-  personEdge(
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
-}
-
-"""All input for the create \`Person\` mutation."""
-input CreatePersonInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`Person\` to be created by this mutation."""
-  person: PersonInput!
-}
-
-"""An input for mutations affecting \`Person\`"""
-input PersonInput {
-  id: Int
-  firstName: String
-  lastName: String
-  colNoUpdate: String
-  colNoOrder: String
-  colNoFilter: String
-}
-
 """The output of our update \`Film\` mutation."""
 type UpdateFilmPayload {
   """
@@ -3145,31 +3145,31 @@ input UpdateFilmByCodeInput {
   filmPatch: FilmPatch!
 }
 
-"""The output of our update \`Studio\` mutation."""
-type UpdateStudioPayload {
+"""The output of our update \`Person\` mutation."""
+type UpdatePersonPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Studio\` that was updated by this mutation."""
-  studio: Studio
+  """The \`Person\` that was updated by this mutation."""
+  person: Person
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our \`Studio\`. May be used by Relay 1."""
-  studioEdge(
-    """The method to use when ordering \`Studio\`."""
-    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StudiosEdge
+  """An edge for our \`Person\`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
 }
 
-"""All input for the \`updateStudio\` mutation."""
-input UpdateStudioInput {
+"""All input for the \`updatePerson\` mutation."""
+input UpdatePersonInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3177,26 +3177,30 @@ input UpdateStudioInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Studio\` to be updated.
+  The globally unique \`ID\` which will identify a single \`Person\` to be updated.
   """
   nodeId: ID!
 
   """
-  An object where the defined keys will be set on the \`Studio\` being updated.
+  An object where the defined keys will be set on the \`Person\` being updated.
   """
-  studioPatch: StudioPatch!
+  personPatch: PersonPatch!
 }
 
 """
-Represents an update to a \`Studio\`. Fields that are set will be updated.
+Represents an update to a \`Person\`. Fields that are set will be updated.
 """
-input StudioPatch {
+input PersonPatch {
   id: Int
-  name: String
+  firstName: String
+  lastName: String
+  colNoCreate: String
+  colNoOrder: String
+  colNoFilter: String
 }
 
-"""All input for the \`updateStudioById\` mutation."""
-input UpdateStudioByIdInput {
+"""All input for the \`updatePersonById\` mutation."""
+input UpdatePersonByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3205,9 +3209,9 @@ input UpdateStudioByIdInput {
   id: Int!
 
   """
-  An object where the defined keys will be set on the \`Studio\` being updated.
+  An object where the defined keys will be set on the \`Person\` being updated.
   """
-  studioPatch: StudioPatch!
+  personPatch: PersonPatch!
 }
 
 """The output of our update \`Post\` mutation."""
@@ -3275,6 +3279,71 @@ input UpdatePostByIdInput {
   An object where the defined keys will be set on the \`Post\` being updated.
   """
   postPatch: PostPatch!
+}
+
+"""The output of our update \`Studio\` mutation."""
+type UpdateStudioPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Studio\` that was updated by this mutation."""
+  studio: Studio
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Studio\`. May be used by Relay 1."""
+  studioEdge(
+    """The method to use when ordering \`Studio\`."""
+    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StudiosEdge
+}
+
+"""All input for the \`updateStudio\` mutation."""
+input UpdateStudioInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Studio\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`Studio\` being updated.
+  """
+  studioPatch: StudioPatch!
+}
+
+"""
+Represents an update to a \`Studio\`. Fields that are set will be updated.
+"""
+input StudioPatch {
+  id: Int
+  name: String
+}
+
+"""All input for the \`updateStudioById\` mutation."""
+input UpdateStudioByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the \`Studio\` being updated.
+  """
+  studioPatch: StudioPatch!
 }
 
 """The output of our update \`TvEpisode\` mutation."""
@@ -3414,75 +3483,6 @@ input UpdateTvShowByCodeInput {
   tvShowPatch: TvShowPatch!
 }
 
-"""The output of our update \`Person\` mutation."""
-type UpdatePersonPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Person\` that was updated by this mutation."""
-  person: Person
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Person\`. May be used by Relay 1."""
-  personEdge(
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
-}
-
-"""All input for the \`updatePerson\` mutation."""
-input UpdatePersonInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Person\` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Person\` being updated.
-  """
-  personPatch: PersonPatch!
-}
-
-"""
-Represents an update to a \`Person\`. Fields that are set will be updated.
-"""
-input PersonPatch {
-  id: Int
-  firstName: String
-  lastName: String
-  colNoCreate: String
-  colNoOrder: String
-  colNoFilter: String
-}
-
-"""All input for the \`updatePersonById\` mutation."""
-input UpdatePersonByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the \`Person\` being updated.
-  """
-  personPatch: PersonPatch!
-}
-
 """The output of our delete \`Film\` mutation."""
 type DeleteFilmPayload {
   """
@@ -3531,32 +3531,32 @@ input DeleteFilmByCodeInput {
   code: Int!
 }
 
-"""The output of our delete \`Studio\` mutation."""
-type DeleteStudioPayload {
+"""The output of our delete \`Person\` mutation."""
+type DeletePersonPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Studio\` that was deleted by this mutation."""
-  studio: Studio
-  deletedStudioId: ID
+  """The \`Person\` that was deleted by this mutation."""
+  person: Person
+  deletedPersonId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our \`Studio\`. May be used by Relay 1."""
-  studioEdge(
-    """The method to use when ordering \`Studio\`."""
-    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StudiosEdge
+  """An edge for our \`Person\`. May be used by Relay 1."""
+  personEdge(
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PeopleEdge
 }
 
-"""All input for the \`deleteStudio\` mutation."""
-input DeleteStudioInput {
+"""All input for the \`deletePerson\` mutation."""
+input DeletePersonInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3564,13 +3564,13 @@ input DeleteStudioInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Studio\` to be deleted.
+  The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
   """
   nodeId: ID!
 }
 
-"""All input for the \`deleteStudioById\` mutation."""
-input DeleteStudioByIdInput {
+"""All input for the \`deletePersonById\` mutation."""
+input DeletePersonByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3622,6 +3622,54 @@ input DeletePostInput {
 
 """All input for the \`deletePostById\` mutation."""
 input DeletePostByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""The output of our delete \`Studio\` mutation."""
+type DeleteStudioPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Studio\` that was deleted by this mutation."""
+  studio: Studio
+  deletedStudioId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Studio\`. May be used by Relay 1."""
+  studioEdge(
+    """The method to use when ordering \`Studio\`."""
+    orderBy: [StudiosOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StudiosEdge
+}
+
+"""All input for the \`deleteStudio\` mutation."""
+input DeleteStudioInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Studio\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the \`deleteStudioById\` mutation."""
+input DeleteStudioByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3730,54 +3778,6 @@ input DeleteTvShowByCodeInput {
   """
   clientMutationId: String
   code: Int!
-}
-
-"""The output of our delete \`Person\` mutation."""
-type DeletePersonPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Person\` that was deleted by this mutation."""
-  person: Person
-  deletedPersonId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Person\`. May be used by Relay 1."""
-  personEdge(
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PeopleEdge
-}
-
-"""All input for the \`deletePerson\` mutation."""
-input DeletePersonInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Person\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the \`deletePersonById\` mutation."""
-input DeletePersonByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
 }`;
 export const objects = {
   Query: {
@@ -5071,7 +5071,7 @@ export const inputObjects = {
         obj.set("col_no_update", bakedInputRuntime(info.schema, info.field.type, val));
       },
       firstName: PersonInput_firstNameApply,
-      id: StudioInput_idApply,
+      id: PersonInput_idApply,
       lastName: PersonInput_lastNameApply
     }
   },
@@ -5084,7 +5084,7 @@ export const inputObjects = {
       colNoFilter: PersonInput_colNoFilterApply,
       colNoOrder: PersonInput_colNoOrderApply,
       firstName: PersonInput_firstNameApply,
-      id: StudioInput_idApply,
+      id: PersonInput_idApply,
       lastName: PersonInput_lastNameApply
     }
   },
@@ -5104,7 +5104,7 @@ export const inputObjects = {
     plans: {
       authorId: PostInput_authorIdApply,
       body: PostInput_bodyApply,
-      id: StudioInput_idApply
+      id: PersonInput_idApply
     }
   },
   PostPatch: {
@@ -5112,7 +5112,7 @@ export const inputObjects = {
     plans: {
       authorId: PostInput_authorIdApply,
       body: PostInput_bodyApply,
-      id: StudioInput_idApply
+      id: PersonInput_idApply
     }
   },
   RenamedTableCondition: {
@@ -5141,14 +5141,14 @@ export const inputObjects = {
   StudioInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: StudioInput_idApply,
+      id: PersonInput_idApply,
       name: StudioInput_nameApply
     }
   },
   StudioPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: StudioInput_idApply,
+      id: PersonInput_idApply,
       name: StudioInput_nameApply
     }
   },

@@ -65,94 +65,6 @@ const executor = new PgExecutor({
     });
   }
 });
-const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
-const alwaysAsIdentityCodec = recordCodec({
-  name: "alwaysAsIdentity",
-  identifier: alwaysAsIdentityIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      extensions: {
-        isInsertable: false,
-        isUpdatable: false
-      }
-    },
-    t: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "pg11",
-      name: "always_as_identity"
-    }
-  },
-  executor: executor
-});
-const byDefaultAsIdentityIdentifier = sql.identifier("pg11", "by_default_as_identity");
-const byDefaultAsIdentityCodec = recordCodec({
-  name: "byDefaultAsIdentity",
-  identifier: byDefaultAsIdentityIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    t: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "pg11",
-      name: "by_default_as_identity"
-    }
-  },
-  executor: executor
-});
-const networkIdentifier = sql.identifier("pg11", "network");
-const networkCodec = recordCodec({
-  name: "network",
-  identifier: networkIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    inet: {
-      codec: TYPES.inet
-    },
-    cidr: {
-      codec: TYPES.cidr
-    },
-    macaddr: {
-      codec: TYPES.macaddr
-    },
-    macaddr8: {
-      codec: TYPES.macaddr8
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "pg11",
-      name: "network"
-    }
-  },
-  executor: executor
-});
 const bigintDomainCodec = domainOfCodec(TYPES.bigint, "bigintDomain", sql.identifier("c", "bigint_domain"), {
   extensions: {
     pg: {
@@ -270,6 +182,94 @@ const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "dom
     }
   }
 });
+const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
+const alwaysAsIdentityCodec = recordCodec({
+  name: "alwaysAsIdentity",
+  identifier: alwaysAsIdentityIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        isInsertable: false,
+        isUpdatable: false
+      }
+    },
+    t: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "pg11",
+      name: "always_as_identity"
+    }
+  },
+  executor: executor
+});
+const byDefaultAsIdentityIdentifier = sql.identifier("pg11", "by_default_as_identity");
+const byDefaultAsIdentityCodec = recordCodec({
+  name: "byDefaultAsIdentity",
+  identifier: byDefaultAsIdentityIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    t: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "pg11",
+      name: "by_default_as_identity"
+    }
+  },
+  executor: executor
+});
+const networkIdentifier = sql.identifier("pg11", "network");
+const networkCodec = recordCodec({
+  name: "network",
+  identifier: networkIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    inet: {
+      codec: TYPES.inet
+    },
+    cidr: {
+      codec: TYPES.cidr
+    },
+    macaddr: {
+      codec: TYPES.macaddr
+    },
+    macaddr8: {
+      codec: TYPES.macaddr8
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "pg11",
+      name: "network"
+    }
+  },
+  executor: executor
+});
 const typesIdentifier = sql.identifier("pg11", "types");
 const typesCodec = recordCodec({
   name: "types",
@@ -327,22 +327,19 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    alwaysAsIdentity: alwaysAsIdentityCodec,
-    int4: TYPES.int,
     text: TYPES.text,
-    byDefaultAsIdentity: byDefaultAsIdentityCodec,
-    network: networkCodec,
-    inet: TYPES.inet,
-    cidr: TYPES.cidr,
-    macaddr: TYPES.macaddr,
-    macaddr8: TYPES.macaddr8,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
+    int4: TYPES.int,
+    inet: TYPES.inet,
     regrole: TYPES.regrole,
+    cidr: TYPES.cidr,
     regnamespace: TYPES.regnamespace,
+    macaddr: TYPES.macaddr,
     bigintDomainArrayDomain: bigintDomainArrayDomainCodec,
     bigintDomain: bigintDomainCodec,
     int8: TYPES.bigint,
+    macaddr8: TYPES.macaddr8,
     bigintDomainArray: bigintDomainArrayCodec,
     domainConstrainedCompoundType: domainConstrainedCompoundTypeCodec,
     compoundType: compoundTypeCodec,
@@ -351,6 +348,9 @@ const registry = makeRegistry({
     enumCaps: enumCapsCodec,
     enumWithEmptyString: enumWithEmptyStringCodec,
     interval: TYPES.interval,
+    alwaysAsIdentity: alwaysAsIdentityCodec,
+    byDefaultAsIdentity: byDefaultAsIdentityCodec,
+    network: networkCodec,
     types: typesCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",

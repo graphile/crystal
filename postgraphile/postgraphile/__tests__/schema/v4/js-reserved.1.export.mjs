@@ -13,7 +13,34 @@ const executor = new PgExecutor({
     });
   }
 });
-const relationalTopicsIdentifier = sql.identifier("js_reserved", "relational_topics");
+const nullIdentifier = sql.identifier("js_reserved", "null");
+const nullCodec = recordCodec({
+  name: "null",
+  identifier: nullIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    hasOwnProperty: {
+      codec: TYPES.text
+    },
+    break: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "null"
+    }
+  },
+  executor: executor
+});
 const itemTypeCodec = enumCodec({
   name: "itemType",
   identifier: sql.identifier("js_reserved", "item_type"),
@@ -26,50 +53,6 @@ const itemTypeCodec = enumCodec({
       name: "item_type"
     }
   }
-});
-const relationalTopicsCodec = recordCodec({
-  name: "relationalTopics",
-  identifier: relationalTopicsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: "relationalItemsByMyId"
-    },
-    title: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    constructor: {
-      codec: TYPES.text,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "relational_topics"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
 });
 const __proto__Identifier = sql.identifier("js_reserved", "__proto__");
 const __proto__Codec = recordCodec({
@@ -239,34 +222,6 @@ const materialCodec = recordCodec({
   },
   executor: executor
 });
-const nullIdentifier = sql.identifier("js_reserved", "null");
-const nullCodec = recordCodec({
-  name: "null",
-  identifier: nullIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    hasOwnProperty: {
-      codec: TYPES.text
-    },
-    break: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "null"
-    }
-  },
-  executor: executor
-});
 const projectIdentifier = sql.identifier("js_reserved", "project");
 const projectCodec = recordCodec({
   name: "project",
@@ -286,113 +241,6 @@ const projectCodec = recordCodec({
       serviceName: "main",
       schemaName: "js_reserved",
       name: "project"
-    }
-  },
-  executor: executor
-});
-const relationalStatusIdentifier = sql.identifier("js_reserved", "relational_status");
-const relationalStatusCodec = recordCodec({
-  name: "relationalStatus",
-  identifier: relationalStatusIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      identicalVia: "relationalItemsByMyId"
-    },
-    description: {
-      codec: TYPES.text,
-      hasDefault: true
-    },
-    note: {
-      codec: TYPES.text
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    constructor: {
-      codec: TYPES.text,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "relational_status"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
-});
-const yieldIdentifier = sql.identifier("js_reserved", "yield");
-const yieldCodec = recordCodec({
-  name: "yield",
-  identifier: yieldIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    crop: {
-      codec: TYPES.text
-    },
-    export: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "yield"
-    }
-  },
-  executor: executor
-});
-const reservedIdentifier = sql.identifier("js_reserved", "reserved");
-const reservedCodec = recordCodec({
-  name: "reserved",
-  identifier: reservedIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    null: {
-      codec: TYPES.text
-    },
-    case: {
-      codec: TYPES.text
-    },
-    do: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "reserved"
     }
   },
   executor: executor
@@ -450,28 +298,158 @@ const spec_relationalItems = {
   }
 };
 const relationalItemsCodec = recordCodec(spec_relationalItems);
-const awaitFunctionIdentifer = sql.identifier("js_reserved", "await");
-const caseFunctionIdentifer = sql.identifier("js_reserved", "case");
-const valueOfFunctionIdentifer = sql.identifier("js_reserved", "valueOf");
-const null_yieldFunctionIdentifer = sql.identifier("js_reserved", "null_yield");
-const relational_topics_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_topics",
-  identifier: "main.js_reserved.relational_topics",
-  from: relationalTopicsIdentifier,
-  codec: relationalTopicsCodec,
+const relationalStatusIdentifier = sql.identifier("js_reserved", "relational_status");
+const relationalStatusCodec = recordCodec({
+  name: "relationalStatus",
+  identifier: relationalStatusIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: "relationalItemsByMyId"
+    },
+    description: {
+      codec: TYPES.text,
+      hasDefault: true
+    },
+    note: {
+      codec: TYPES.text
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    constructor: {
+      codec: TYPES.text,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    }
+  },
   extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "relational_status"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const relationalTopicsIdentifier = sql.identifier("js_reserved", "relational_topics");
+const relationalTopicsCodec = recordCodec({
+  name: "relationalTopics",
+  identifier: relationalTopicsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      identicalVia: "relationalItemsByMyId"
+    },
+    title: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    constructor: {
+      codec: TYPES.text,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    }
+  },
+  extensions: {
+    isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
       name: "relational_topics"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const reservedIdentifier = sql.identifier("js_reserved", "reserved");
+const reservedCodec = recordCodec({
+  name: "reserved",
+  identifier: reservedIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    null: {
+      codec: TYPES.text
+    },
+    case: {
+      codec: TYPES.text
+    },
+    do: {
+      codec: TYPES.text
     }
   },
-  uniques: [{
-    attributes: pkCols,
-    isPrimary: true
-  }]
-};
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "reserved"
+    }
+  },
+  executor: executor
+});
+const yieldIdentifier = sql.identifier("js_reserved", "yield");
+const yieldCodec = recordCodec({
+  name: "yield",
+  identifier: yieldIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    crop: {
+      codec: TYPES.text
+    },
+    export: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "yield"
+    }
+  },
+  executor: executor
+});
 const __proto__Uniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -554,41 +532,6 @@ const projectUniques = [{
 }, {
   attributes: ["__proto__"]
 }];
-const relational_statusUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const relational_status_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_status",
-  identifier: "main.js_reserved.relational_status",
-  from: relationalStatusIdentifier,
-  codec: relationalStatusCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "js_reserved",
-      name: "relational_status"
-    }
-  },
-  uniques: relational_statusUniques
-};
-const yieldUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}, {
-  attributes: ["export"]
-}];
-const reservedUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}, {
-  attributes: ["case"]
-}, {
-  attributes: ["do"]
-}, {
-  attributes: ["null"]
-}];
 const relational_itemsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -612,12 +555,69 @@ const relational_items_resourceOptionsConfig = {
   },
   uniques: relational_itemsUniques
 };
+const relational_statusUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const relational_status_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_status",
+  identifier: "main.js_reserved.relational_status",
+  from: relationalStatusIdentifier,
+  codec: relationalStatusCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "relational_status"
+    }
+  },
+  uniques: relational_statusUniques
+};
+const relational_topics_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_topics",
+  identifier: "main.js_reserved.relational_topics",
+  from: relationalTopicsIdentifier,
+  codec: relationalTopicsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "relational_topics"
+    }
+  },
+  uniques: [{
+    attributes: pkCols,
+    isPrimary: true
+  }]
+};
+const reservedUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}, {
+  attributes: ["case"]
+}, {
+  attributes: ["do"]
+}, {
+  attributes: ["null"]
+}];
+const yieldUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}, {
+  attributes: ["export"]
+}];
+const awaitFunctionIdentifer = sql.identifier("js_reserved", "await");
+const caseFunctionIdentifer = sql.identifier("js_reserved", "case");
+const null_yieldFunctionIdentifer = sql.identifier("js_reserved", "null_yield");
+const valueOfFunctionIdentifer = sql.identifier("js_reserved", "valueOf");
 const registryConfig = {
   pgExecutors: {
     __proto__: null,
     main: executor
   },
-  pgCodecs: Object.fromEntries([["int4", TYPES.int], ["relationalTopics", relationalTopicsCodec], ["text", TYPES.text], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["null", nullCodec], ["project", projectCodec], ["relationalStatus", relationalStatusCodec], ["yield", yieldCodec], ["reserved", reservedCodec], ["relationalItems", relationalItemsCodec], ["itemType", itemTypeCodec], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar], ["LetterAToDEnum", enumCodec({
+  pgCodecs: Object.fromEntries([["text", TYPES.text], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar], ["int4", TYPES.int], ["null", nullCodec], ["itemType", itemTypeCodec], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["project", projectCodec], ["relationalItems", relationalItemsCodec], ["relationalStatus", relationalStatusCodec], ["relationalTopics", relationalTopicsCodec], ["reserved", reservedCodec], ["yield", yieldCodec], ["LetterAToDEnum", enumCodec({
     name: "LetterAToDEnum",
     identifier: TYPES.text.sqlType,
     values: [{
@@ -945,130 +945,7 @@ const registryConfig = {
       }
     }
   })]]),
-  pgResources: Object.fromEntries([["await", {
-    executor: executor,
-    name: "await",
-    identifier: "main.js_reserved.await(int4,int4,int4,int4)",
-    from(...args) {
-      return sql`${awaitFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-    },
-    parameters: [{
-      name: "yield",
-      codec: TYPES.int
-    }, {
-      name: "__proto__",
-      codec: TYPES.int
-    }, {
-      name: "constructor",
-      codec: TYPES.int
-    }, {
-      name: "hasOwnProperty",
-      codec: TYPES.int
-    }],
-    codec: TYPES.int,
-    hasImplicitOrder: false,
-    extensions: {
-      pg: {
-        serviceName: "main",
-        schemaName: "js_reserved",
-        name: "await"
-      }
-    },
-    isUnique: true
-  }], ["case", {
-    executor: executor,
-    name: "case",
-    identifier: "main.js_reserved.case(int4,int4,int4,int4)",
-    from(...args) {
-      return sql`${caseFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-    },
-    parameters: [{
-      name: "yield",
-      codec: TYPES.int
-    }, {
-      name: "__proto__",
-      codec: TYPES.int
-    }, {
-      name: "constructor",
-      codec: TYPES.int
-    }, {
-      name: "hasOwnProperty",
-      codec: TYPES.int
-    }],
-    codec: TYPES.int,
-    hasImplicitOrder: false,
-    extensions: {
-      pg: {
-        serviceName: "main",
-        schemaName: "js_reserved",
-        name: "case"
-      }
-    },
-    isUnique: true
-  }], ["valueOf", {
-    executor: executor,
-    name: "valueOf",
-    identifier: "main.js_reserved.valueOf(int4,int4,int4,int4)",
-    from(...args) {
-      return sql`${valueOfFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-    },
-    parameters: [{
-      name: "yield",
-      codec: TYPES.int
-    }, {
-      name: "__proto__",
-      codec: TYPES.int
-    }, {
-      name: "constructor",
-      codec: TYPES.int
-    }, {
-      name: "hasOwnProperty",
-      codec: TYPES.int
-    }],
-    codec: TYPES.int,
-    hasImplicitOrder: false,
-    extensions: {
-      pg: {
-        serviceName: "main",
-        schemaName: "js_reserved",
-        name: "valueOf"
-      }
-    },
-    isUnique: true
-  }], ["null_yield", {
-    executor: executor,
-    name: "null_yield",
-    identifier: "main.js_reserved.null_yield(js_reserved.null,int4,int4,int4,int4)",
-    from(...args) {
-      return sql`${null_yieldFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-    },
-    parameters: [{
-      name: "n",
-      codec: nullCodec
-    }, {
-      name: "yield",
-      codec: TYPES.int
-    }, {
-      name: "__proto__",
-      codec: TYPES.int
-    }, {
-      name: "constructor",
-      codec: TYPES.int
-    }, {
-      name: "valueOf",
-      codec: TYPES.int
-    }],
-    codec: TYPES.int,
-    hasImplicitOrder: false,
-    extensions: {
-      pg: {
-        serviceName: "main",
-        schemaName: "js_reserved",
-        name: "null_yield"
-      }
-    },
-    isUnique: true
-  }], ["relational_topics", relational_topics_resourceOptionsConfig], ["__proto__", {
+  pgResources: Object.fromEntries([["__proto__", {
     executor: executor,
     name: "__proto__",
     identifier: "main.js_reserved.__proto__",
@@ -1152,21 +1029,7 @@ const registryConfig = {
       }
     },
     uniques: projectUniques
-  }], ["relational_status", relational_status_resourceOptionsConfig], ["yield", {
-    executor: executor,
-    name: "yield",
-    identifier: "main.js_reserved.yield",
-    from: yieldIdentifier,
-    codec: yieldCodec,
-    extensions: {
-      pg: {
-        serviceName: "main",
-        schemaName: "js_reserved",
-        name: "yield"
-      }
-    },
-    uniques: yieldUniques
-  }], ["reserved", {
+  }], ["relational_items", relational_items_resourceOptionsConfig], ["relational_status", relational_status_resourceOptionsConfig], ["relational_topics", relational_topics_resourceOptionsConfig], ["reserved", {
     executor: executor,
     name: "reserved",
     identifier: "main.js_reserved.reserved",
@@ -1180,7 +1043,144 @@ const registryConfig = {
       }
     },
     uniques: reservedUniques
-  }], ["relational_items", relational_items_resourceOptionsConfig]]),
+  }], ["yield", {
+    executor: executor,
+    name: "yield",
+    identifier: "main.js_reserved.yield",
+    from: yieldIdentifier,
+    codec: yieldCodec,
+    extensions: {
+      pg: {
+        serviceName: "main",
+        schemaName: "js_reserved",
+        name: "yield"
+      }
+    },
+    uniques: yieldUniques
+  }], ["await", {
+    executor: executor,
+    name: "await",
+    identifier: "main.js_reserved.await(int4,int4,int4,int4)",
+    from(...args) {
+      return sql`${awaitFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+    },
+    parameters: [{
+      name: "yield",
+      codec: TYPES.int
+    }, {
+      name: "__proto__",
+      codec: TYPES.int
+    }, {
+      name: "constructor",
+      codec: TYPES.int
+    }, {
+      name: "hasOwnProperty",
+      codec: TYPES.int
+    }],
+    codec: TYPES.int,
+    hasImplicitOrder: false,
+    extensions: {
+      pg: {
+        serviceName: "main",
+        schemaName: "js_reserved",
+        name: "await"
+      }
+    },
+    isUnique: true
+  }], ["case", {
+    executor: executor,
+    name: "case",
+    identifier: "main.js_reserved.case(int4,int4,int4,int4)",
+    from(...args) {
+      return sql`${caseFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+    },
+    parameters: [{
+      name: "yield",
+      codec: TYPES.int
+    }, {
+      name: "__proto__",
+      codec: TYPES.int
+    }, {
+      name: "constructor",
+      codec: TYPES.int
+    }, {
+      name: "hasOwnProperty",
+      codec: TYPES.int
+    }],
+    codec: TYPES.int,
+    hasImplicitOrder: false,
+    extensions: {
+      pg: {
+        serviceName: "main",
+        schemaName: "js_reserved",
+        name: "case"
+      }
+    },
+    isUnique: true
+  }], ["null_yield", {
+    executor: executor,
+    name: "null_yield",
+    identifier: "main.js_reserved.null_yield(js_reserved.null,int4,int4,int4,int4)",
+    from(...args) {
+      return sql`${null_yieldFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+    },
+    parameters: [{
+      name: "n",
+      codec: nullCodec
+    }, {
+      name: "yield",
+      codec: TYPES.int
+    }, {
+      name: "__proto__",
+      codec: TYPES.int
+    }, {
+      name: "constructor",
+      codec: TYPES.int
+    }, {
+      name: "valueOf",
+      codec: TYPES.int
+    }],
+    codec: TYPES.int,
+    hasImplicitOrder: false,
+    extensions: {
+      pg: {
+        serviceName: "main",
+        schemaName: "js_reserved",
+        name: "null_yield"
+      }
+    },
+    isUnique: true
+  }], ["valueOf", {
+    executor: executor,
+    name: "valueOf",
+    identifier: "main.js_reserved.valueOf(int4,int4,int4,int4)",
+    from(...args) {
+      return sql`${valueOfFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+    },
+    parameters: [{
+      name: "yield",
+      codec: TYPES.int
+    }, {
+      name: "__proto__",
+      codec: TYPES.int
+    }, {
+      name: "constructor",
+      codec: TYPES.int
+    }, {
+      name: "hasOwnProperty",
+      codec: TYPES.int
+    }],
+    codec: TYPES.int,
+    hasImplicitOrder: false,
+    extensions: {
+      pg: {
+        serviceName: "main",
+        schemaName: "js_reserved",
+        name: "valueOf"
+      }
+    },
+    isUnique: true
+  }]]),
   pgRelations: {
     __proto__: null,
     building: {
@@ -1416,14 +1416,6 @@ const nodeIdHandler_RelationalStatus = makeTableNodeIdHandler({
   resource: spec_resource_relational_statusPgResource,
   pk: relational_statusUniques[0].attributes
 });
-const spec_resource_yieldPgResource = registry.pgResources["yield"];
-const nodeIdHandler_Yield = makeTableNodeIdHandler({
-  typeName: "Yield",
-  identifier: "yields",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: spec_resource_yieldPgResource,
-  pk: yieldUniques[0].attributes
-});
 const spec_resource_reservedPgResource = registry.pgResources["reserved"];
 const nodeIdHandler_Reserved = makeTableNodeIdHandler({
   typeName: "Reserved",
@@ -1431,6 +1423,14 @@ const nodeIdHandler_Reserved = makeTableNodeIdHandler({
   nodeIdCodec: base64JSONNodeIdCodec,
   resource: spec_resource_reservedPgResource,
   pk: reservedUniques[0].attributes
+});
+const spec_resource_yieldPgResource = registry.pgResources["yield"];
+const nodeIdHandler_Yield = makeTableNodeIdHandler({
+  typeName: "Yield",
+  identifier: "yields",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: spec_resource_yieldPgResource,
+  pk: yieldUniques[0].attributes
 });
 const nodeIdHandlerByTypeName = {
   __proto__: null,
@@ -1453,7 +1453,6 @@ const nodeIdHandlerByTypeName = {
       return constant`query`;
     }
   },
-  RelationalTopic: nodeIdHandler_RelationalTopic,
   _Proto__: nodeIdHandler__Proto__,
   Building: nodeIdHandler_Building,
   Constructor: nodeIdHandler_Constructor,
@@ -1463,8 +1462,9 @@ const nodeIdHandlerByTypeName = {
   Null: nodeIdHandler_Null,
   Project: nodeIdHandler_Project,
   RelationalStatus: nodeIdHandler_RelationalStatus,
-  Yield: nodeIdHandler_Yield,
-  Reserved: nodeIdHandler_Reserved
+  RelationalTopic: nodeIdHandler_RelationalTopic,
+  Reserved: nodeIdHandler_Reserved,
+  Yield: nodeIdHandler_Yield
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -1706,10 +1706,6 @@ function specForHandler(handler) {
   specForHandlerCache.set(handler, spec);
   return spec;
 }
-const nodeFetcher_RelationalTopic = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_RelationalTopic));
-  return nodeIdHandler_RelationalTopic.get(nodeIdHandler_RelationalTopic.getSpec($decoded));
-};
 const nodeFetcher__Proto__ = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler__Proto__));
   return nodeIdHandler__Proto__.get(nodeIdHandler__Proto__.getSpec($decoded));
@@ -1746,13 +1742,17 @@ const nodeFetcher_RelationalStatus = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_RelationalStatus));
   return nodeIdHandler_RelationalStatus.get(nodeIdHandler_RelationalStatus.getSpec($decoded));
 };
-const nodeFetcher_Yield = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Yield));
-  return nodeIdHandler_Yield.get(nodeIdHandler_Yield.getSpec($decoded));
+const nodeFetcher_RelationalTopic = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_RelationalTopic));
+  return nodeIdHandler_RelationalTopic.get(nodeIdHandler_RelationalTopic.getSpec($decoded));
 };
 const nodeFetcher_Reserved = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Reserved));
   return nodeIdHandler_Reserved.get(nodeIdHandler_Reserved.getSpec($decoded));
+};
+const nodeFetcher_Yield = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Yield));
+  return nodeIdHandler_Yield.get(nodeIdHandler_Yield.getSpec($decoded));
 };
 const argDetailsSimple_null_yield = [{
   graphqlArgName: "yield",
@@ -1829,36 +1829,6 @@ const scalarComputed = ($in, args) => {
   const from = pgFromExpression($row, resource_null_yieldPgResource.from, resource_null_yieldPgResource.parameters, selectArgs);
   return pgClassExpression($row, resource_null_yieldPgResource.codec, undefined)`${from}`;
 };
-function RelationalTopicCondition_typeApply($condition, val) {
-  const queryBuilder = $condition.dangerouslyGetParent();
-  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-  const expression = sql`${alias}.${sql.identifier("type")}`;
-  const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-  $condition.where(condition);
-}
-function RelationalTopicCondition_constructorApply($condition, val) {
-  const queryBuilder = $condition.dangerouslyGetParent();
-  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-  const expression = sql`${alias}.${sql.identifier("constructor")}`;
-  const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-  $condition.where(condition);
-}
-const RelationalTopicsOrderBy_TYPE_ASCApply = queryBuilder => {
-  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-  queryBuilder.orderBy({
-    fragment: sql`${alias}.${sql.identifier("type")}`,
-    codec: itemTypeCodec,
-    direction: "ASC"
-  });
-};
-const RelationalTopicsOrderBy_CONSTRUCTOR_ASCApply = queryBuilder => {
-  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
-  queryBuilder.orderBy({
-    fragment: sql`${alias}.${sql.identifier("constructor")}`,
-    codec: TYPES.text,
-    direction: "ASC"
-  });
-};
 const _ProtoCondition_nameApply = ($condition, val) => applyAttributeCondition("name", TYPES.text, $condition, val);
 const _ProtoCondition_brandApply = ($condition, val) => applyAttributeCondition("brand", TYPES.text, $condition, val);
 const _ProtoSOrderBy_NAME_ASCApply = queryBuilder => {
@@ -1901,6 +1871,36 @@ const ConstructorsOrderBy_EXPORT_DESCApply = queryBuilder => {
     direction: "DESC"
   });
   queryBuilder.setOrderIsUnique();
+};
+function RelationalStatusCondition_typeApply($condition, val) {
+  const queryBuilder = $condition.dangerouslyGetParent();
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  const expression = sql`${alias}.${sql.identifier("type")}`;
+  const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+  $condition.where(condition);
+}
+function RelationalStatusCondition_constructorApply($condition, val) {
+  const queryBuilder = $condition.dangerouslyGetParent();
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  const expression = sql`${alias}.${sql.identifier("constructor")}`;
+  const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+  $condition.where(condition);
+}
+const RelationalStatusesOrderBy_TYPE_ASCApply = queryBuilder => {
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  queryBuilder.orderBy({
+    fragment: sql`${alias}.${sql.identifier("type")}`,
+    codec: itemTypeCodec,
+    direction: "ASC"
+  });
+};
+const RelationalStatusesOrderBy_CONSTRUCTOR_ASCApply = queryBuilder => {
+  const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+  queryBuilder.orderBy({
+    fragment: sql`${alias}.${sql.identifier("constructor")}`,
+    codec: TYPES.text,
+    direction: "ASC"
+  });
 };
 function applyInputToInsert(_, $object) {
   return $object;
@@ -1968,13 +1968,13 @@ const specFromArgs_Project2 = args => {
     return memo;
   }, Object.create(null));
 };
-const specFromArgs_Yield = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Yield, $nodeId);
-};
 const specFromArgs_Reserved = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
+};
+const specFromArgs_Yield = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Yield, $nodeId);
 };
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs_Building4 = args => {
@@ -2094,10 +2094,6 @@ const CreateProjectPayload_projectEdgePlan = ($mutation, fieldArgs) => pgMutatio
 function ProjectInput__proto__Apply(obj, val, info) {
   obj.set("__proto__", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const CreateYieldPayload_yieldEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
-function YieldInput_cropApply(obj, val, info) {
-  obj.set("crop", bakedInputRuntime(info.schema, info.field.type, val));
-}
 const CreateReservedPayload_reservedEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_reservedPgResource, reservedUniques[0].attributes, $mutation, fieldArgs);
 function ReservedInput_nullApply(obj, val, info) {
   obj.set("null", bakedInputRuntime(info.schema, info.field.type, val));
@@ -2107,6 +2103,10 @@ function ReservedInput_caseApply(obj, val, info) {
 }
 function ReservedInput_doApply(obj, val, info) {
   obj.set("do", bakedInputRuntime(info.schema, info.field.type, val));
+}
+const CreateYieldPayload_yieldEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(spec_resource_yieldPgResource, yieldUniques[0].attributes, $mutation, fieldArgs);
+function YieldInput_cropApply(obj, val, info) {
+  obj.set("crop", bakedInputRuntime(info.schema, info.field.type, val));
 }
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
@@ -2426,9 +2426,6 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  """Get a single \`RelationalTopic\`."""
-  relationalTopicById(id: Int!): RelationalTopic
-
   """Get a single \`_Proto__\`."""
   _protoById(id: Int!): _Proto__
 
@@ -2486,11 +2483,8 @@ type Query implements Node {
   """Get a single \`RelationalStatus\`."""
   relationalStatusById(id: Int!): RelationalStatus
 
-  """Get a single \`Yield\`."""
-  yieldById(id: Int!): Yield
-
-  """Get a single \`Yield\`."""
-  yieldByExport(export: String!): Yield
+  """Get a single \`RelationalTopic\`."""
+  relationalTopicById(id: Int!): RelationalTopic
 
   """Get a single \`Reserved\`."""
   reservedById(id: Int!): Reserved
@@ -2503,17 +2497,15 @@ type Query implements Node {
 
   """Get a single \`Reserved\`."""
   reservedByNull(null: String!): Reserved
+
+  """Get a single \`Yield\`."""
+  yieldById(id: Int!): Yield
+
+  """Get a single \`Yield\`."""
+  yieldByExport(export: String!): Yield
   await(yield: Int, _proto__: Int, constructor: Int, hasOwnProperty: Int): Int
   case(yield: Int, _proto__: Int, constructor: Int, hasOwnProperty: Int): Int
   valueOf(yield: Int, _proto__: Int, constructor: Int, hasOwnProperty: Int): Int
-
-  """Reads a single \`RelationalTopic\` using its globally unique \`ID\`."""
-  relationalTopic(
-    """
-    The globally unique \`ID\` to be used in selecting a single \`RelationalTopic\`.
-    """
-    nodeId: ID!
-  ): RelationalTopic
 
   """Reads a single \`_Proto__\` using its globally unique \`ID\`."""
   _proto__(
@@ -2573,11 +2565,13 @@ type Query implements Node {
     nodeId: ID!
   ): RelationalStatus
 
-  """Reads a single \`Yield\` using its globally unique \`ID\`."""
-  yield(
-    """The globally unique \`ID\` to be used in selecting a single \`Yield\`."""
+  """Reads a single \`RelationalTopic\` using its globally unique \`ID\`."""
+  relationalTopic(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`RelationalTopic\`.
+    """
     nodeId: ID!
-  ): Yield
+  ): RelationalTopic
 
   """Reads a single \`Reserved\` using its globally unique \`ID\`."""
   reserved(
@@ -2585,51 +2579,11 @@ type Query implements Node {
     nodeId: ID!
   ): Reserved
 
-  """Reads a set of \`RelationalTopic\`."""
-  allRelationalTopicsList(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Skip the first \`n\` values."""
-    offset: Int
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalTopicCondition
-
-    """The method to use when ordering \`RelationalTopic\`."""
-    orderBy: [RelationalTopicsOrderBy!]
-  ): [RelationalTopic!]
-
-  """Reads and enables pagination through a set of \`RelationalTopic\`."""
-  allRelationalTopics(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalTopicCondition
-
-    """The method to use when ordering \`RelationalTopic\`."""
-    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalTopicsConnection
+  """Reads a single \`Yield\` using its globally unique \`ID\`."""
+  yield(
+    """The globally unique \`ID\` to be used in selecting a single \`Yield\`."""
+    nodeId: ID!
+  ): Yield
 
   """Reads a set of \`_Proto__\`."""
   allProtoSList(
@@ -2999,6 +2953,52 @@ type Query implements Node {
     orderBy: [ProjectsOrderBy!] = [PRIMARY_KEY_ASC]
   ): ProjectsConnection
 
+  """Reads a set of \`RelationalItem\`."""
+  allRelationalItemsList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!]
+  ): [RelationalItem!]
+
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  allRelationalItems(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection
+
   """Reads a set of \`RelationalStatus\`."""
   allRelationalStatusesList(
     """Only read the first \`n\` values of the set."""
@@ -3045,8 +3045,8 @@ type Query implements Node {
     orderBy: [RelationalStatusesOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalStatusesConnection
 
-  """Reads a set of \`Yield\`."""
-  allYieldsList(
+  """Reads a set of \`RelationalTopic\`."""
+  allRelationalTopicsList(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -3056,14 +3056,14 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: YieldCondition
+    condition: RelationalTopicCondition
 
-    """The method to use when ordering \`Yield\`."""
-    orderBy: [YieldsOrderBy!]
-  ): [Yield!]
+    """The method to use when ordering \`RelationalTopic\`."""
+    orderBy: [RelationalTopicsOrderBy!]
+  ): [RelationalTopic!]
 
-  """Reads and enables pagination through a set of \`Yield\`."""
-  allYields(
+  """Reads and enables pagination through a set of \`RelationalTopic\`."""
+  allRelationalTopics(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -3085,11 +3085,11 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: YieldCondition
+    condition: RelationalTopicCondition
 
-    """The method to use when ordering \`Yield\`."""
-    orderBy: [YieldsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): YieldsConnection
+    """The method to use when ordering \`RelationalTopic\`."""
+    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsConnection
 
   """Reads a set of \`Reserved\`."""
   allReservedsList(
@@ -3137,8 +3137,8 @@ type Query implements Node {
     orderBy: [ReservedsOrderBy!] = [PRIMARY_KEY_ASC]
   ): ReservedsConnection
 
-  """Reads a set of \`RelationalItem\`."""
-  allRelationalItemsList(
+  """Reads a set of \`Yield\`."""
+  allYieldsList(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -3148,14 +3148,14 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: RelationalItemCondition
+    condition: YieldCondition
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!]
-  ): [RelationalItem!]
+    """The method to use when ordering \`Yield\`."""
+    orderBy: [YieldsOrderBy!]
+  ): [Yield!]
 
-  """Reads and enables pagination through a set of \`RelationalItem\`."""
-  allRelationalItems(
+  """Reads and enables pagination through a set of \`Yield\`."""
+  allYields(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -3177,11 +3177,11 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: RelationalItemCondition
+    condition: YieldCondition
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalItemsConnection
+    """The method to use when ordering \`Yield\`."""
+    orderBy: [YieldsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): YieldsConnection
 }
 
 type _Proto__ implements Node {
@@ -3245,16 +3245,6 @@ type Project implements Node {
   _proto__: String
 }
 
-type Yield implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  crop: String
-  export: String
-}
-
 type Reserved implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -3266,65 +3256,14 @@ type Reserved implements Node {
   do: String
 }
 
-"""
-A condition to be used against \`RelationalTopic\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input RelationalTopicCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`constructor\` field."""
-  constructor: String
-}
-
-"""Methods to use when ordering \`RelationalTopic\`."""
-enum RelationalTopicsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  TITLE_ASC
-  TITLE_DESC
-  TYPE_ASC
-  TYPE_DESC
-  CONSTRUCTOR_ASC
-  CONSTRUCTOR_DESC
-}
-
-"""A connection to a list of \`RelationalTopic\` values."""
-type RelationalTopicsConnection {
-  """A list of \`RelationalTopic\` objects."""
-  nodes: [RelationalTopic]!
-
+type Yield implements Node {
   """
-  A list of edges which contains the \`RelationalTopic\` and cursor to aid in pagination.
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  edges: [RelationalTopicsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalTopic\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A \`RelationalTopic\` edge in the connection."""
-type RelationalTopicsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalTopic\` at the end of the edge."""
-  node: RelationalTopic
+  nodeId: ID!
+  id: Int!
+  crop: String
+  export: String
 }
 
 """
@@ -3769,56 +3708,64 @@ type RelationalStatusesEdge {
 }
 
 """
-A condition to be used against \`Yield\` object types. All fields are tested for equality and combined with a logical ‘and.’
+A condition to be used against \`RelationalTopic\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
 """
-input YieldCondition {
+input RelationalTopicCondition {
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
-  """Checks for equality with the object’s \`crop\` field."""
-  crop: String
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
 
-  """Checks for equality with the object’s \`export\` field."""
-  export: String
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`constructor\` field."""
+  constructor: String
 }
 
-"""Methods to use when ordering \`Yield\`."""
-enum YieldsOrderBy {
+"""Methods to use when ordering \`RelationalTopic\`."""
+enum RelationalTopicsOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  CROP_ASC
-  CROP_DESC
-  EXPORT_ASC
-  EXPORT_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
 }
 
-"""A connection to a list of \`Yield\` values."""
-type YieldsConnection {
-  """A list of \`Yield\` objects."""
-  nodes: [Yield]!
+"""A connection to a list of \`RelationalTopic\` values."""
+type RelationalTopicsConnection {
+  """A list of \`RelationalTopic\` objects."""
+  nodes: [RelationalTopic]!
 
   """
-  A list of edges which contains the \`Yield\` and cursor to aid in pagination.
+  A list of edges which contains the \`RelationalTopic\` and cursor to aid in pagination.
   """
-  edges: [YieldsEdge]!
+  edges: [RelationalTopicsEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* \`Yield\` you could get from the connection."""
+  """
+  The count of *all* \`RelationalTopic\` you could get from the connection.
+  """
   totalCount: Int!
 }
 
-"""A \`Yield\` edge in the connection."""
-type YieldsEdge {
+"""A \`RelationalTopic\` edge in the connection."""
+type RelationalTopicsEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The \`Yield\` at the end of the edge."""
-  node: Yield
+  """The \`RelationalTopic\` at the end of the edge."""
+  node: RelationalTopic
 }
 
 """
@@ -3878,6 +3825,59 @@ type ReservedsEdge {
 
   """The \`Reserved\` at the end of the edge."""
   node: Reserved
+}
+
+"""
+A condition to be used against \`Yield\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input YieldCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`crop\` field."""
+  crop: String
+
+  """Checks for equality with the object’s \`export\` field."""
+  export: String
+}
+
+"""Methods to use when ordering \`Yield\`."""
+enum YieldsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  CROP_ASC
+  CROP_DESC
+  EXPORT_ASC
+  EXPORT_DESC
+}
+
+"""A connection to a list of \`Yield\` values."""
+type YieldsConnection {
+  """A list of \`Yield\` objects."""
+  nodes: [Yield]!
+
+  """
+  A list of edges which contains the \`Yield\` and cursor to aid in pagination.
+  """
+  edges: [YieldsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Yield\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Yield\` edge in the connection."""
+type YieldsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Yield\` at the end of the edge."""
+  node: Yield
 }
 
 """
@@ -3948,14 +3948,6 @@ type Mutation {
     input: CreateProjectInput!
   ): CreateProjectPayload
 
-  """Creates a single \`Yield\`."""
-  createYield(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateYieldInput!
-  ): CreateYieldPayload
-
   """Creates a single \`Reserved\`."""
   createReserved(
     """
@@ -3963,6 +3955,14 @@ type Mutation {
     """
     input: CreateReservedInput!
   ): CreateReservedPayload
+
+  """Creates a single \`Yield\`."""
+  createYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateYieldInput!
+  ): CreateYieldPayload
 
   """Updates a single \`_Proto__\` using its globally unique id and a patch."""
   updateProto__(
@@ -4174,30 +4174,6 @@ type Mutation {
     input: UpdateProjectByProtoInput!
   ): UpdateProjectPayload
 
-  """Updates a single \`Yield\` using its globally unique id and a patch."""
-  updateYield(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateYieldInput!
-  ): UpdateYieldPayload
-
-  """Updates a single \`Yield\` using a unique key and a patch."""
-  updateYieldById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateYieldByIdInput!
-  ): UpdateYieldPayload
-
-  """Updates a single \`Yield\` using a unique key and a patch."""
-  updateYieldByExport(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateYieldByExportInput!
-  ): UpdateYieldPayload
-
   """Updates a single \`Reserved\` using its globally unique id and a patch."""
   updateReserved(
     """
@@ -4237,6 +4213,30 @@ type Mutation {
     """
     input: UpdateReservedByNullInput!
   ): UpdateReservedPayload
+
+  """Updates a single \`Yield\` using its globally unique id and a patch."""
+  updateYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateYieldInput!
+  ): UpdateYieldPayload
+
+  """Updates a single \`Yield\` using a unique key and a patch."""
+  updateYieldById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateYieldByIdInput!
+  ): UpdateYieldPayload
+
+  """Updates a single \`Yield\` using a unique key and a patch."""
+  updateYieldByExport(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateYieldByExportInput!
+  ): UpdateYieldPayload
 
   """Deletes a single \`_Proto__\` using its globally unique id."""
   deleteProto__(
@@ -4446,30 +4446,6 @@ type Mutation {
     input: DeleteProjectByProtoInput!
   ): DeleteProjectPayload
 
-  """Deletes a single \`Yield\` using its globally unique id."""
-  deleteYield(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteYieldInput!
-  ): DeleteYieldPayload
-
-  """Deletes a single \`Yield\` using a unique key."""
-  deleteYieldById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteYieldByIdInput!
-  ): DeleteYieldPayload
-
-  """Deletes a single \`Yield\` using a unique key."""
-  deleteYieldByExport(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteYieldByExportInput!
-  ): DeleteYieldPayload
-
   """Deletes a single \`Reserved\` using its globally unique id."""
   deleteReserved(
     """
@@ -4509,6 +4485,30 @@ type Mutation {
     """
     input: DeleteReservedByNullInput!
   ): DeleteReservedPayload
+
+  """Deletes a single \`Yield\` using its globally unique id."""
+  deleteYield(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteYieldInput!
+  ): DeleteYieldPayload
+
+  """Deletes a single \`Yield\` using a unique key."""
+  deleteYieldById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteYieldByIdInput!
+  ): DeleteYieldPayload
+
+  """Deletes a single \`Yield\` using a unique key."""
+  deleteYieldByExport(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteYieldByExportInput!
+  ): DeleteYieldPayload
 }
 
 """The output of our create \`_Proto__\` mutation."""
@@ -4850,48 +4850,6 @@ input ProjectInput {
   _proto__: String
 }
 
-"""The output of our create \`Yield\` mutation."""
-type CreateYieldPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Yield\` that was created by this mutation."""
-  yield: Yield
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Yield\`. May be used by Relay 1."""
-  yieldEdge(
-    """The method to use when ordering \`Yield\`."""
-    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): YieldsEdge
-}
-
-"""All input for the create \`Yield\` mutation."""
-input CreateYieldInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`Yield\` to be created by this mutation."""
-  yield: YieldInput!
-}
-
-"""An input for mutations affecting \`Yield\`"""
-input YieldInput {
-  id: Int
-  crop: String
-  export: String
-}
-
 """The output of our create \`Reserved\` mutation."""
 type CreateReservedPayload {
   """
@@ -4933,6 +4891,48 @@ input ReservedInput {
   null: String
   case: String
   do: String
+}
+
+"""The output of our create \`Yield\` mutation."""
+type CreateYieldPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Yield\` that was created by this mutation."""
+  yield: Yield
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Yield\`. May be used by Relay 1."""
+  yieldEdge(
+    """The method to use when ordering \`Yield\`."""
+    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): YieldsEdge
+}
+
+"""All input for the create \`Yield\` mutation."""
+input CreateYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Yield\` to be created by this mutation."""
+  yield: YieldInput!
+}
+
+"""An input for mutations affecting \`Yield\`"""
+input YieldInput {
+  id: Int
+  crop: String
+  export: String
 }
 
 """The output of our update \`_Proto__\` mutation."""
@@ -5612,87 +5612,6 @@ input UpdateProjectByProtoInput {
   projectPatch: ProjectPatch!
 }
 
-"""The output of our update \`Yield\` mutation."""
-type UpdateYieldPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Yield\` that was updated by this mutation."""
-  yield: Yield
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Yield\`. May be used by Relay 1."""
-  yieldEdge(
-    """The method to use when ordering \`Yield\`."""
-    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): YieldsEdge
-}
-
-"""All input for the \`updateYield\` mutation."""
-input UpdateYieldInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Yield\` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Yield\` being updated.
-  """
-  yieldPatch: YieldPatch!
-}
-
-"""
-Represents an update to a \`Yield\`. Fields that are set will be updated.
-"""
-input YieldPatch {
-  id: Int
-  crop: String
-  export: String
-}
-
-"""All input for the \`updateYieldById\` mutation."""
-input UpdateYieldByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the \`Yield\` being updated.
-  """
-  yieldPatch: YieldPatch!
-}
-
-"""All input for the \`updateYieldByExport\` mutation."""
-input UpdateYieldByExportInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  export: String!
-
-  """
-  An object where the defined keys will be set on the \`Yield\` being updated.
-  """
-  yieldPatch: YieldPatch!
-}
-
 """The output of our update \`Reserved\` mutation."""
 type UpdateReservedPayload {
   """
@@ -5803,6 +5722,87 @@ input UpdateReservedByNullInput {
   An object where the defined keys will be set on the \`Reserved\` being updated.
   """
   reservedPatch: ReservedPatch!
+}
+
+"""The output of our update \`Yield\` mutation."""
+type UpdateYieldPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Yield\` that was updated by this mutation."""
+  yield: Yield
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Yield\`. May be used by Relay 1."""
+  yieldEdge(
+    """The method to use when ordering \`Yield\`."""
+    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): YieldsEdge
+}
+
+"""All input for the \`updateYield\` mutation."""
+input UpdateYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Yield\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`Yield\` being updated.
+  """
+  yieldPatch: YieldPatch!
+}
+
+"""
+Represents an update to a \`Yield\`. Fields that are set will be updated.
+"""
+input YieldPatch {
+  id: Int
+  crop: String
+  export: String
+}
+
+"""All input for the \`updateYieldById\` mutation."""
+input UpdateYieldByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the \`Yield\` being updated.
+  """
+  yieldPatch: YieldPatch!
+}
+
+"""All input for the \`updateYieldByExport\` mutation."""
+input UpdateYieldByExportInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  export: String!
+
+  """
+  An object where the defined keys will be set on the \`Yield\` being updated.
+  """
+  yieldPatch: YieldPatch!
 }
 
 """The output of our delete \`_Proto__\` mutation."""
@@ -6292,64 +6292,6 @@ input DeleteProjectByProtoInput {
   _proto__: String!
 }
 
-"""The output of our delete \`Yield\` mutation."""
-type DeleteYieldPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Yield\` that was deleted by this mutation."""
-  yield: Yield
-  deletedYieldId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Yield\`. May be used by Relay 1."""
-  yieldEdge(
-    """The method to use when ordering \`Yield\`."""
-    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): YieldsEdge
-}
-
-"""All input for the \`deleteYield\` mutation."""
-input DeleteYieldInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Yield\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the \`deleteYieldById\` mutation."""
-input DeleteYieldByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
-"""All input for the \`deleteYieldByExport\` mutation."""
-input DeleteYieldByExportInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  export: String!
-}
-
 """The output of our delete \`Reserved\` mutation."""
 type DeleteReservedPayload {
   """
@@ -6426,6 +6368,64 @@ input DeleteReservedByNullInput {
   """
   clientMutationId: String
   null: String!
+}
+
+"""The output of our delete \`Yield\` mutation."""
+type DeleteYieldPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Yield\` that was deleted by this mutation."""
+  yield: Yield
+  deletedYieldId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Yield\`. May be used by Relay 1."""
+  yieldEdge(
+    """The method to use when ordering \`Yield\`."""
+    orderBy: [YieldsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): YieldsEdge
+}
+
+"""All input for the \`deleteYield\` mutation."""
+input DeleteYieldInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Yield\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the \`deleteYieldById\` mutation."""
+input DeleteYieldByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""All input for the \`deleteYieldByExport\` mutation."""
+input DeleteYieldByExportInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  export: String!
 }`;
 export const objects = {
   Query: {
@@ -9209,7 +9209,7 @@ export const inputObjects = {
   },
   RelationalStatusCondition: {
     plans: {
-      constructor: RelationalTopicCondition_constructorApply,
+      constructor: RelationalStatusCondition_constructorApply,
       description($condition, val) {
         return applyAttributeCondition("description", TYPES.text, $condition, val);
       },
@@ -9217,17 +9217,17 @@ export const inputObjects = {
       note($condition, val) {
         return applyAttributeCondition("note", TYPES.text, $condition, val);
       },
-      type: RelationalTopicCondition_typeApply
+      type: RelationalStatusCondition_typeApply
     }
   },
   RelationalTopicCondition: {
     plans: {
-      constructor: RelationalTopicCondition_constructorApply,
+      constructor: RelationalStatusCondition_constructorApply,
       id: MachineCondition_idApply,
       title($condition, val) {
         return applyAttributeCondition("title", TYPES.text, $condition, val);
       },
-      type: RelationalTopicCondition_typeApply
+      type: RelationalStatusCondition_typeApply
     }
   },
   ReservedCondition: {
@@ -9878,7 +9878,7 @@ export const enums = {
   },
   RelationalStatusesOrderBy: {
     values: {
-      CONSTRUCTOR_ASC: RelationalTopicsOrderBy_CONSTRUCTOR_ASCApply,
+      CONSTRUCTOR_ASC: RelationalStatusesOrderBy_CONSTRUCTOR_ASCApply,
       CONSTRUCTOR_DESC: MachinesOrderBy_CONSTRUCTOR_DESCApply,
       DESCRIPTION_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -9924,13 +9924,13 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      TYPE_ASC: RelationalTopicsOrderBy_TYPE_ASCApply,
+      TYPE_ASC: RelationalStatusesOrderBy_TYPE_ASCApply,
       TYPE_DESC: RelationalItemsOrderBy_TYPE_DESCApply
     }
   },
   RelationalTopicsOrderBy: {
     values: {
-      CONSTRUCTOR_ASC: RelationalTopicsOrderBy_CONSTRUCTOR_ASCApply,
+      CONSTRUCTOR_ASC: RelationalStatusesOrderBy_CONSTRUCTOR_ASCApply,
       CONSTRUCTOR_DESC: MachinesOrderBy_CONSTRUCTOR_DESCApply,
       ID_ASC: MachinesOrderBy_ID_ASCApply,
       ID_DESC: MachinesOrderBy_ID_DESCApply,
@@ -9964,7 +9964,7 @@ export const enums = {
           direction: "DESC"
         });
       },
-      TYPE_ASC: RelationalTopicsOrderBy_TYPE_ASCApply,
+      TYPE_ASC: RelationalStatusesOrderBy_TYPE_ASCApply,
       TYPE_DESC: RelationalItemsOrderBy_TYPE_DESCApply
     }
   },

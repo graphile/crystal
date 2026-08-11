@@ -14,234 +14,7 @@ const executor = new PgExecutor({
     });
   }
 });
-const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities");
-const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
-  name: "awsApplicationFirstPartyVulnerabilities",
-  identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
-  attributes: {
-    __proto__: null,
-    aws_application_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    first_party_vulnerability_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "aws_application_first_party_vulnerabilities"
-    },
-    tags: {
-      __proto__: null,
-      omit: true,
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    }
-  },
-  executor: executor
-});
-const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities");
-const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
-  name: "awsApplicationThirdPartyVulnerabilities",
-  identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
-  attributes: {
-    __proto__: null,
-    aws_application_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    third_party_vulnerability_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "aws_application_third_party_vulnerabilities"
-    },
-    tags: {
-      __proto__: null,
-      omit: true,
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    }
-  },
-  executor: executor
-});
-const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities");
-const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
-  name: "gcpApplicationFirstPartyVulnerabilities",
-  identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
-  attributes: {
-    __proto__: null,
-    gcp_application_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    first_party_vulnerability_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "gcp_application_first_party_vulnerabilities"
-    },
-    tags: {
-      __proto__: null,
-      omit: true,
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    }
-  },
-  executor: executor
-});
-const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities");
-const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
-  name: "gcpApplicationThirdPartyVulnerabilities",
-  identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
-  attributes: {
-    __proto__: null,
-    gcp_application_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    third_party_vulnerability_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "gcp_application_third_party_vulnerabilities"
-    },
-    tags: {
-      __proto__: null,
-      omit: true,
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    }
-  },
-  executor: executor
-});
-const organizationsIdentifier = sql.identifier("polymorphic", "organizations");
-const organizationsCodec = recordCodec({
-  name: "organizations",
-  identifier: organizationsIdentifier,
-  attributes: {
-    __proto__: null,
-    organization_id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "organizations"
-    },
-    tags: {
-      __proto__: null,
-      unionMember: "PersonOrOrganization"
-    }
-  },
-  executor: executor
-});
-const peopleIdentifier = sql.identifier("polymorphic", "people");
-const peopleCodec = recordCodec({
-  name: "people",
-  identifier: peopleIdentifier,
-  attributes: {
-    __proto__: null,
-    person_id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    username: {
-      codec: TYPES.text,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "people"
-    },
-    tags: {
-      __proto__: null,
-      unionMember: "PersonOrOrganization",
-      ref: "applications to:Application",
-      refVia: ["applications via:aws_applications", "applications via:gcp_applications"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      applications: {
-        singular: false,
-        graphqlType: "Application",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor
-});
-const prioritiesIdentifier = sql.identifier("polymorphic", "priorities");
-const prioritiesCodec = recordCodec({
-  name: "priorities",
-  identifier: prioritiesIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    title: {
-      codec: TYPES.text,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "priorities"
-    },
-    tags: {
-      __proto__: null,
-      omit: "create,update,delete,filter,order",
-      behavior: ["-insert -update -delete -filter -filterBy -order -orderBy"]
-    }
-  },
-  executor: executor
-});
-const relationalChecklistsIdentifier = sql.identifier("polymorphic", "relational_checklists");
+const relationalItemsIdentifier = sql.identifier("polymorphic", "relational_items");
 const itemTypeCodec = enumCodec({
   name: "itemType",
   identifier: sql.identifier("polymorphic", "item_type"),
@@ -255,528 +28,9 @@ const itemTypeCodec = enumCodec({
     }
   }
 });
-const relationalChecklistsCodec = recordCodec({
-  name: "relationalChecklists",
-  identifier: relationalChecklistsIdentifier,
-  attributes: {
-    __proto__: null,
-    checklist_item_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    parent_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    root_topic_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    author_id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    position: {
-      codec: TYPES.bigint,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    created_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    updated_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    is_explicitly_archived: {
-      codec: TYPES.boolean,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    archived_at: {
-      codec: TYPES.timestamptz,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_checklists"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
-});
-const relationalItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "relational_item_relation_composite_pks");
-const relationalItemRelationCompositePksCodec = recordCodec({
-  name: "relationalItemRelationCompositePks",
-  identifier: relationalItemRelationCompositePksIdentifier,
-  attributes: {
-    __proto__: null,
-    parent_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    child_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_item_relation_composite_pks"
-    }
-  },
-  executor: executor
-});
-const relationalTopicsIdentifier = sql.identifier("polymorphic", "relational_topics");
-const relationalTopicsCodec = recordCodec({
-  name: "relationalTopics",
-  identifier: relationalTopicsIdentifier,
-  attributes: {
-    __proto__: null,
-    topic_item_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    parent_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    root_topic_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    author_id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: undefined,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    position: {
-      codec: TYPES.bigint,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    created_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    updated_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    is_explicitly_archived: {
-      codec: TYPES.boolean,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    archived_at: {
-      codec: TYPES.timestamptz,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyTopicItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_topics"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
-});
-const singleTableItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "single_table_item_relation_composite_pks");
-const singleTableItemRelationCompositePksCodec = recordCodec({
-  name: "singleTableItemRelationCompositePks",
-  identifier: singleTableItemRelationCompositePksIdentifier,
-  attributes: {
-    __proto__: null,
-    parent_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    child_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "single_table_item_relation_composite_pks"
-    }
-  },
-  executor: executor
-});
-const relationalChecklistItemsIdentifier = sql.identifier("polymorphic", "relational_checklist_items");
-const relationalChecklistItemsCodec = recordCodec({
-  name: "relationalChecklistItems",
-  identifier: relationalChecklistItemsIdentifier,
-  attributes: {
-    __proto__: null,
-    checklist_item_item_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    description: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    note: {
-      codec: TYPES.text
-    },
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    parent_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    root_topic_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    author_id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    position: {
-      codec: TYPES.bigint,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    created_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    updated_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    is_explicitly_archived: {
-      codec: TYPES.boolean,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    archived_at: {
-      codec: TYPES.timestamptz,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyChecklistItemItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_checklist_items"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
-});
-const relationalDividersIdentifier = sql.identifier("polymorphic", "relational_dividers");
-const relationalDividersCodec = recordCodec({
-  name: "relationalDividers",
-  identifier: relationalDividersIdentifier,
-  attributes: {
-    __proto__: null,
-    divider_item_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.text
-    },
-    color: {
-      codec: TYPES.text
-    },
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    parent_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    root_topic_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    author_id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: undefined,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    position: {
-      codec: TYPES.bigint,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    created_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    updated_at: {
-      codec: TYPES.timestamptz,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    is_explicitly_archived: {
-      codec: TYPES.boolean,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    archived_at: {
-      codec: TYPES.timestamptz,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyDividerItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_dividers"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
-});
-const relationalItemRelationsIdentifier = sql.identifier("polymorphic", "relational_item_relations");
-const relationalItemRelationsCodec = recordCodec({
-  name: "relationalItemRelations",
-  identifier: relationalItemRelationsIdentifier,
+const spec_relationalItems = {
+  name: "relationalItems",
+  identifier: relationalItemsIdentifier,
   attributes: {
     __proto__: null,
     id: {
@@ -784,565 +38,93 @@ const relationalItemRelationsCodec = recordCodec({
       notNull: true,
       hasDefault: true
     },
-    parent_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    child_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_item_relations"
-    }
-  },
-  executor: executor
-});
-const singleTableItemRelationsIdentifier = sql.identifier("polymorphic", "single_table_item_relations");
-const singleTableItemRelationsCodec = recordCodec({
-  name: "singleTableItemRelations",
-  identifier: singleTableItemRelationsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
+    type: {
+      codec: itemTypeCodec,
       notNull: true,
       hasDefault: true
     },
     parent_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    child_id: {
-      codec: TYPES.int,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "single_table_item_relations"
-    }
-  },
-  executor: executor
-});
-const logEntriesIdentifier = sql.identifier("polymorphic", "log_entries");
-const logEntriesCodec = recordCodec({
-  name: "logEntries",
-  identifier: logEntriesIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    person_id: {
       codec: TYPES.int
     },
-    organization_id: {
-      codec: TYPES.int
-    },
-    text: {
-      codec: TYPES.text,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "log_entries"
-    },
-    tags: {
-      __proto__: null,
-      ref: "author to:PersonOrOrganization singular",
-      refVia: ["author via:people", "author via:organizations"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      author: {
-        singular: true,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor
-});
-const relationalPostsIdentifier = sql.identifier("polymorphic", "relational_posts");
-const relationalPostsCodec = recordCodec({
-  name: "relationalPosts",
-  identifier: relationalPostsIdentifier,
-  attributes: {
-    __proto__: null,
-    post_item_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    title: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    description: {
-      codec: TYPES.text,
-      hasDefault: true
-    },
-    note: {
-      codec: TYPES.text
-    },
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    type: {
-      codec: itemTypeCodec,
-      notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
-    parent_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    },
     root_topic_id: {
-      codec: TYPES.int,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
+      codec: TYPES.int
     },
     author_id: {
       codec: TYPES.int,
-      notNull: true,
-      hasDefault: undefined,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
+      notNull: true
     },
     position: {
       codec: TYPES.bigint,
       notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
+      hasDefault: true
     },
     created_at: {
       codec: TYPES.timestamptz,
       notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
+      hasDefault: true
     },
     updated_at: {
       codec: TYPES.timestamptz,
       notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
+      hasDefault: true
     },
     is_explicitly_archived: {
       codec: TYPES.boolean,
       notNull: true,
-      hasDefault: true,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
+      hasDefault: true
     },
     archived_at: {
-      codec: TYPES.timestamptz,
-      notNull: undefined,
-      hasDefault: undefined,
-      via: "relationalItemsByMyPostItemId",
-      restrictedAccess: undefined,
-      description: undefined,
-      extensions: {}
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_posts"
-    },
-    relationalInterfaceCodecName: "relationalItems"
-  },
-  executor: executor
-});
-const firstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "first_party_vulnerabilities");
-const firstPartyVulnerabilitiesCodec = recordCodec({
-  name: "firstPartyVulnerabilities",
-  identifier: firstPartyVulnerabilitiesIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    cvss_score: {
-      codec: TYPES.float,
-      notNull: true
-    },
-    team_name: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "first_party_vulnerabilities"
-    },
-    tags: {
-      __proto__: null,
-      implements: "Vulnerability",
-      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
-      refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      applications: {
-        singular: false,
-        graphqlType: "Application",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owners: {
-        singular: false,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor
-});
-const thirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "third_party_vulnerabilities");
-const thirdPartyVulnerabilitiesCodec = recordCodec({
-  name: "thirdPartyVulnerabilities",
-  identifier: thirdPartyVulnerabilitiesIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    cvss_score: {
-      codec: TYPES.float,
-      notNull: true
-    },
-    vendor_name: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "third_party_vulnerabilities"
-    },
-    tags: {
-      __proto__: null,
-      implements: "Vulnerability",
-      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
-      refVia: ["applications via:aws_application_third_party_vulnerabilities;aws_applications", "applications via:gcp_application_third_party_vulnerabilities;gcp_applications", "owners via:aws_application_third_party_vulnerabilities;aws_applications;people", "owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      applications: {
-        singular: false,
-        graphqlType: "Application",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owners: {
-        singular: false,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor
-});
-const ApplicationIdentifier = sql.identifier("polymorphic", "applications");
-const spec_Application = {
-  name: "Application",
-  identifier: ApplicationIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    last_deployed: {
       codec: TYPES.timestamptz
     }
   },
   extensions: {
-    isTableLike: false,
+    isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "polymorphic",
-      name: "applications"
+      name: "relational_items"
     },
     tags: {
       __proto__: null,
-      interface: "mode:union",
-      name: "Application",
-      behavior: "node",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      vulnerabilities: {
-        singular: false,
-        graphqlType: "Vulnerability",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owner: {
-        singular: true,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
+      interface: "mode:relational",
+      type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
     }
   },
   executor: executor,
   polymorphism: {
-    mode: "union"
+    mode: "relational",
+    typeAttributes: ["type"],
+    types: {
+      __proto__: null,
+      TOPIC: {
+        name: "RelationalTopic",
+        references: "relational_topics",
+        relationName: "relationalTopicsByTheirTopicItemId"
+      },
+      POST: {
+        name: "RelationalPost",
+        references: "relational_posts",
+        relationName: "relationalPostsByTheirPostItemId"
+      },
+      DIVIDER: {
+        name: "RelationalDivider",
+        references: "relational_dividers",
+        relationName: "relationalDividersByTheirDividerItemId"
+      },
+      CHECKLIST: {
+        name: "RelationalChecklist",
+        references: "relational_checklists",
+        relationName: "relationalChecklistsByTheirChecklistItemId"
+      },
+      CHECKLIST_ITEM: {
+        name: "RelationalChecklistItem",
+        references: "relational_checklist_items",
+        relationName: "relationalChecklistItemsByTheirChecklistItemItemId"
+      }
+    }
   }
 };
-const ApplicationCodec = recordCodec(spec_Application);
-const awsApplicationsIdentifier = sql.identifier("polymorphic", "aws_applications");
-const awsApplicationsCodec = recordCodec({
-  name: "awsApplications",
-  identifier: awsApplicationsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    last_deployed: {
-      codec: TYPES.timestamptz
-    },
-    person_id: {
-      codec: TYPES.int
-    },
-    organization_id: {
-      codec: TYPES.int
-    },
-    aws_id: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "aws_applications"
-    },
-    tags: {
-      __proto__: null,
-      implements: "Application",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
-      refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      vulnerabilities: {
-        singular: false,
-        graphqlType: "Vulnerability",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owner: {
-        singular: true,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor
-});
-const gcpApplicationsIdentifier = sql.identifier("polymorphic", "gcp_applications");
-const gcpApplicationsCodec = recordCodec({
-  name: "gcpApplications",
-  identifier: gcpApplicationsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    last_deployed: {
-      codec: TYPES.timestamptz
-    },
-    person_id: {
-      codec: TYPES.int
-    },
-    organization_id: {
-      codec: TYPES.int
-    },
-    gcp_id: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "gcp_applications"
-    },
-    tags: {
-      __proto__: null,
-      implements: "Application",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
-      refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      vulnerabilities: {
-        singular: false,
-        graphqlType: "Vulnerability",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owner: {
-        singular: true,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor
-});
+const relationalItemsCodec = recordCodec(spec_relationalItems);
 const singleTableItemsIdentifier = sql.identifier("polymorphic", "single_table_items");
 const spec_singleTableItems = {
   name: "singleTableItems",
@@ -1522,54 +304,183 @@ const spec_singleTableItems = {
   }
 };
 const singleTableItemsCodec = recordCodec(spec_singleTableItems);
-const relationalItemsIdentifier = sql.identifier("polymorphic", "relational_items");
-const spec_relationalItems = {
-  name: "relationalItems",
-  identifier: relationalItemsIdentifier,
+const ApplicationIdentifier = sql.identifier("polymorphic", "applications");
+const spec_Application = {
+  name: "Application",
+  identifier: ApplicationIdentifier,
   attributes: {
     __proto__: null,
     id: {
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    last_deployed: {
+      codec: TYPES.timestamptz
+    }
+  },
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "applications"
+    },
+    tags: {
+      __proto__: null,
+      interface: "mode:union",
+      name: "Application",
+      behavior: "node",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "union"
+  }
+};
+const ApplicationCodec = recordCodec(spec_Application);
+const relationalTopicsIdentifier = sql.identifier("polymorphic", "relational_topics");
+const relationalTopicsCodec = recordCodec({
+  name: "relationalTopics",
+  identifier: relationalTopicsIdentifier,
+  attributes: {
+    __proto__: null,
+    topic_item_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     type: {
       codec: itemTypeCodec,
       notNull: true,
-      hasDefault: true
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     parent_id: {
-      codec: TYPES.int
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     root_topic_id: {
-      codec: TYPES.int
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     author_id: {
       codec: TYPES.int,
-      notNull: true
+      notNull: true,
+      hasDefault: undefined,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     position: {
       codec: TYPES.bigint,
       notNull: true,
-      hasDefault: true
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     created_at: {
       codec: TYPES.timestamptz,
       notNull: true,
-      hasDefault: true
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     updated_at: {
       codec: TYPES.timestamptz,
       notNull: true,
-      hasDefault: true
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     is_explicitly_archived: {
       codec: TYPES.boolean,
       notNull: true,
-      hasDefault: true
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     },
     archived_at: {
-      codec: TYPES.timestamptz
+      codec: TYPES.timestamptz,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
     }
   },
   extensions: {
@@ -1577,49 +488,266 @@ const spec_relationalItems = {
     pg: {
       serviceName: "main",
       schemaName: "polymorphic",
-      name: "relational_items"
+      name: "relational_topics"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const firstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "first_party_vulnerabilities");
+const firstPartyVulnerabilitiesCodec = recordCodec({
+  name: "firstPartyVulnerabilities",
+  identifier: firstPartyVulnerabilitiesIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    cvss_score: {
+      codec: TYPES.float,
+      notNull: true
+    },
+    team_name: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "first_party_vulnerabilities"
     },
     tags: {
       __proto__: null,
-      interface: "mode:relational",
-      type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
-    }
-  },
-  executor: executor,
-  polymorphism: {
-    mode: "relational",
-    typeAttributes: ["type"],
-    types: {
+      implements: "Vulnerability",
+      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
+      refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
+    },
+    refDefinitions: {
       __proto__: null,
-      TOPIC: {
-        name: "RelationalTopic",
-        references: "relational_topics",
-        relationName: "relationalTopicsByTheirTopicItemId"
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
       },
-      POST: {
-        name: "RelationalPost",
-        references: "relational_posts",
-        relationName: "relationalPostsByTheirPostItemId"
-      },
-      DIVIDER: {
-        name: "RelationalDivider",
-        references: "relational_dividers",
-        relationName: "relationalDividersByTheirDividerItemId"
-      },
-      CHECKLIST: {
-        name: "RelationalChecklist",
-        references: "relational_checklists",
-        relationName: "relationalChecklistsByTheirChecklistItemId"
-      },
-      CHECKLIST_ITEM: {
-        name: "RelationalChecklistItem",
-        references: "relational_checklist_items",
-        relationName: "relationalChecklistItemsByTheirChecklistItemItemId"
+      owners: {
+        singular: false,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
       }
     }
-  }
-};
-const relationalItemsCodec = recordCodec(spec_relationalItems);
+  },
+  executor: executor
+});
+const thirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "third_party_vulnerabilities");
+const thirdPartyVulnerabilitiesCodec = recordCodec({
+  name: "thirdPartyVulnerabilities",
+  identifier: thirdPartyVulnerabilitiesIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    cvss_score: {
+      codec: TYPES.float,
+      notNull: true
+    },
+    vendor_name: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "third_party_vulnerabilities"
+    },
+    tags: {
+      __proto__: null,
+      implements: "Vulnerability",
+      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
+      refVia: ["applications via:aws_application_third_party_vulnerabilities;aws_applications", "applications via:gcp_application_third_party_vulnerabilities;gcp_applications", "owners via:aws_application_third_party_vulnerabilities;aws_applications;people", "owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owners: {
+        singular: false,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor
+});
+const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities");
+const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
+  name: "awsApplicationFirstPartyVulnerabilities",
+  identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
+  attributes: {
+    __proto__: null,
+    aws_application_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    first_party_vulnerability_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_application_first_party_vulnerabilities"
+    },
+    tags: {
+      __proto__: null,
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+    }
+  },
+  executor: executor
+});
+const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities");
+const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
+  name: "awsApplicationThirdPartyVulnerabilities",
+  identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
+  attributes: {
+    __proto__: null,
+    aws_application_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    third_party_vulnerability_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_application_third_party_vulnerabilities"
+    },
+    tags: {
+      __proto__: null,
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+    }
+  },
+  executor: executor
+});
+const awsApplicationsIdentifier = sql.identifier("polymorphic", "aws_applications");
+const awsApplicationsCodec = recordCodec({
+  name: "awsApplications",
+  identifier: awsApplicationsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    last_deployed: {
+      codec: TYPES.timestamptz
+    },
+    person_id: {
+      codec: TYPES.int
+    },
+    organization_id: {
+      codec: TYPES.int
+    },
+    aws_id: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_applications"
+    },
+    tags: {
+      __proto__: null,
+      implements: "Application",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
+      refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor
+});
 const collectionsIdentifier = sql.identifier("polymorphic", "collections");
 const spec_collections = {
   name: "collections",
@@ -2081,6 +1209,878 @@ const spec_collections = {
   }
 };
 const collectionsCodec = recordCodec(spec_collections);
+const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities");
+const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
+  name: "gcpApplicationFirstPartyVulnerabilities",
+  identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
+  attributes: {
+    __proto__: null,
+    gcp_application_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    first_party_vulnerability_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_application_first_party_vulnerabilities"
+    },
+    tags: {
+      __proto__: null,
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+    }
+  },
+  executor: executor
+});
+const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities");
+const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
+  name: "gcpApplicationThirdPartyVulnerabilities",
+  identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
+  attributes: {
+    __proto__: null,
+    gcp_application_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    third_party_vulnerability_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_application_third_party_vulnerabilities"
+    },
+    tags: {
+      __proto__: null,
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+    }
+  },
+  executor: executor
+});
+const gcpApplicationsIdentifier = sql.identifier("polymorphic", "gcp_applications");
+const gcpApplicationsCodec = recordCodec({
+  name: "gcpApplications",
+  identifier: gcpApplicationsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    last_deployed: {
+      codec: TYPES.timestamptz
+    },
+    person_id: {
+      codec: TYPES.int
+    },
+    organization_id: {
+      codec: TYPES.int
+    },
+    gcp_id: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_applications"
+    },
+    tags: {
+      __proto__: null,
+      implements: "Application",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
+      refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor
+});
+const logEntriesIdentifier = sql.identifier("polymorphic", "log_entries");
+const logEntriesCodec = recordCodec({
+  name: "logEntries",
+  identifier: logEntriesIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    person_id: {
+      codec: TYPES.int
+    },
+    organization_id: {
+      codec: TYPES.int
+    },
+    text: {
+      codec: TYPES.text,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "log_entries"
+    },
+    tags: {
+      __proto__: null,
+      ref: "author to:PersonOrOrganization singular",
+      refVia: ["author via:people", "author via:organizations"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      author: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor
+});
+const organizationsIdentifier = sql.identifier("polymorphic", "organizations");
+const organizationsCodec = recordCodec({
+  name: "organizations",
+  identifier: organizationsIdentifier,
+  attributes: {
+    __proto__: null,
+    organization_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "organizations"
+    },
+    tags: {
+      __proto__: null,
+      unionMember: "PersonOrOrganization"
+    }
+  },
+  executor: executor
+});
+const peopleIdentifier = sql.identifier("polymorphic", "people");
+const peopleCodec = recordCodec({
+  name: "people",
+  identifier: peopleIdentifier,
+  attributes: {
+    __proto__: null,
+    person_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    username: {
+      codec: TYPES.text,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "people"
+    },
+    tags: {
+      __proto__: null,
+      unionMember: "PersonOrOrganization",
+      ref: "applications to:Application",
+      refVia: ["applications via:aws_applications", "applications via:gcp_applications"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor
+});
+const prioritiesIdentifier = sql.identifier("polymorphic", "priorities");
+const prioritiesCodec = recordCodec({
+  name: "priorities",
+  identifier: prioritiesIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    title: {
+      codec: TYPES.text,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "priorities"
+    },
+    tags: {
+      __proto__: null,
+      omit: "create,update,delete,filter,order",
+      behavior: ["-insert -update -delete -filter -filterBy -order -orderBy"]
+    }
+  },
+  executor: executor
+});
+const relationalChecklistItemsIdentifier = sql.identifier("polymorphic", "relational_checklist_items");
+const relationalChecklistItemsCodec = recordCodec({
+  name: "relationalChecklistItems",
+  identifier: relationalChecklistItemsIdentifier,
+  attributes: {
+    __proto__: null,
+    checklist_item_item_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    note: {
+      codec: TYPES.text
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklist_items"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const relationalChecklistsIdentifier = sql.identifier("polymorphic", "relational_checklists");
+const relationalChecklistsCodec = recordCodec({
+  name: "relationalChecklists",
+  identifier: relationalChecklistsIdentifier,
+  attributes: {
+    __proto__: null,
+    checklist_item_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklists"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const relationalDividersIdentifier = sql.identifier("polymorphic", "relational_dividers");
+const relationalDividersCodec = recordCodec({
+  name: "relationalDividers",
+  identifier: relationalDividersIdentifier,
+  attributes: {
+    __proto__: null,
+    divider_item_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.text
+    },
+    color: {
+      codec: TYPES.text
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: undefined,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_dividers"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const relationalItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "relational_item_relation_composite_pks");
+const relationalItemRelationCompositePksCodec = recordCodec({
+  name: "relationalItemRelationCompositePks",
+  identifier: relationalItemRelationCompositePksIdentifier,
+  attributes: {
+    __proto__: null,
+    parent_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    child_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relation_composite_pks"
+    }
+  },
+  executor: executor
+});
+const relationalItemRelationsIdentifier = sql.identifier("polymorphic", "relational_item_relations");
+const relationalItemRelationsCodec = recordCodec({
+  name: "relationalItemRelations",
+  identifier: relationalItemRelationsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    child_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relations"
+    }
+  },
+  executor: executor
+});
+const relationalPostsIdentifier = sql.identifier("polymorphic", "relational_posts");
+const relationalPostsCodec = recordCodec({
+  name: "relationalPosts",
+  identifier: relationalPostsIdentifier,
+  attributes: {
+    __proto__: null,
+    post_item_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    title: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text,
+      hasDefault: true
+    },
+    note: {
+      codec: TYPES.text
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: undefined,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: undefined,
+      hasDefault: undefined,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {}
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_posts"
+    },
+    relationalInterfaceCodecName: "relationalItems"
+  },
+  executor: executor
+});
+const singleTableItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "single_table_item_relation_composite_pks");
+const singleTableItemRelationCompositePksCodec = recordCodec({
+  name: "singleTableItemRelationCompositePks",
+  identifier: singleTableItemRelationCompositePksIdentifier,
+  attributes: {
+    __proto__: null,
+    parent_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    child_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_item_relation_composite_pks"
+    }
+  },
+  executor: executor
+});
+const singleTableItemRelationsIdentifier = sql.identifier("polymorphic", "single_table_item_relations");
+const singleTableItemRelationsCodec = recordCodec({
+  name: "singleTableItemRelations",
+  identifier: singleTableItemRelationsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    child_id: {
+      codec: TYPES.int,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_item_relations"
+    }
+  },
+  executor: executor
+});
 const spec_Vulnerability = {
   name: "Vulnerability",
   identifier: sql.identifier("polymorphic", "vulnerabilities"),
@@ -2234,6 +2234,58 @@ const aws_application_third_party_vulnerabilities_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
+const aws_applicationsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const aws_applications_resourceOptionsConfig = {
+  executor: executor,
+  name: "aws_applications",
+  identifier: "main.polymorphic.aws_applications",
+  from: awsApplicationsIdentifier,
+  codec: awsApplicationsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_applications"
+    },
+    tags: {
+      implements: "Application",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
+      refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
+    }
+  },
+  uniques: aws_applicationsUniques
+};
+const collectionsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const first_party_vulnerabilitiesUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const first_party_vulnerabilities_resourceOptionsConfig = {
+  executor: executor,
+  name: "first_party_vulnerabilities",
+  identifier: "main.polymorphic.first_party_vulnerabilities",
+  from: firstPartyVulnerabilitiesIdentifier,
+  codec: firstPartyVulnerabilitiesCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "first_party_vulnerabilities"
+    },
+    tags: {
+      implements: "Vulnerability",
+      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
+      refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
+    }
+  },
+  uniques: first_party_vulnerabilitiesUniques
+};
 const gcp_application_first_party_vulnerabilities_resourceOptionsConfig = {
   executor: executor,
   name: "gcp_application_first_party_vulnerabilities",
@@ -2277,6 +2329,53 @@ const gcp_application_third_party_vulnerabilities_resourceOptionsConfig = {
     attributes: ["gcp_application_id", "third_party_vulnerability_id"],
     isPrimary: true
   }]
+};
+const gcp_applicationsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const gcp_applications_resourceOptionsConfig = {
+  executor: executor,
+  name: "gcp_applications",
+  identifier: "main.polymorphic.gcp_applications",
+  from: gcpApplicationsIdentifier,
+  codec: gcpApplicationsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_applications"
+    },
+    tags: {
+      implements: "Application",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
+      refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
+    }
+  },
+  uniques: gcp_applicationsUniques
+};
+const log_entriesUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const log_entries_resourceOptionsConfig = {
+  executor: executor,
+  name: "log_entries",
+  identifier: "main.polymorphic.log_entries",
+  from: logEntriesIdentifier,
+  codec: logEntriesCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "log_entries"
+    },
+    tags: {
+      ref: "author to:PersonOrOrganization singular",
+      refVia: ["author via:people", "author via:organizations"]
+    }
+  },
+  uniques: log_entriesUniques
 };
 const organizationsUniques = [{
   attributes: ["organization_id"],
@@ -2351,6 +2450,25 @@ const priorities_resourceOptionsConfig = {
   },
   uniques: prioritiesUniques
 };
+const relational_checklist_itemsUniques = [{
+  attributes: ["checklist_item_item_id"],
+  isPrimary: true
+}];
+const relational_checklist_items_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_checklist_items",
+  identifier: "main.polymorphic.relational_checklist_items",
+  from: relationalChecklistItemsIdentifier,
+  codec: relationalChecklistItemsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklist_items"
+    }
+  },
+  uniques: relational_checklist_itemsUniques
+};
 const relational_checklistsUniques = [{
   attributes: ["checklist_item_id"],
   isPrimary: true
@@ -2370,6 +2488,25 @@ const relational_checklists_resourceOptionsConfig = {
   },
   uniques: relational_checklistsUniques
 };
+const relational_dividersUniques = [{
+  attributes: ["divider_item_id"],
+  isPrimary: true
+}];
+const relational_dividers_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_dividers",
+  identifier: "main.polymorphic.relational_dividers",
+  from: relationalDividersIdentifier,
+  codec: relationalDividersCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_dividers"
+    }
+  },
+  uniques: relational_dividersUniques
+};
 const relational_item_relation_composite_pksUniques = [{
   attributes: ["parent_id", "child_id"],
   isPrimary: true
@@ -2388,6 +2525,69 @@ const relational_item_relation_composite_pks_resourceOptionsConfig = {
     }
   },
   uniques: relational_item_relation_composite_pksUniques
+};
+const relational_item_relationsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}, {
+  attributes: ["parent_id", "child_id"]
+}];
+const relational_item_relations_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_item_relations",
+  identifier: "main.polymorphic.relational_item_relations",
+  from: relationalItemRelationsIdentifier,
+  codec: relationalItemRelationsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relations"
+    }
+  },
+  uniques: relational_item_relationsUniques
+};
+const relational_itemsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const relational_items_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_items",
+  identifier: "main.polymorphic.relational_items",
+  from: relationalItemsIdentifier,
+  codec: relationalItemsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_items"
+    },
+    tags: {
+      interface: "mode:relational",
+      type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
+    }
+  },
+  uniques: relational_itemsUniques
+};
+const relational_postsUniques = [{
+  attributes: ["post_item_id"],
+  isPrimary: true
+}];
+const relational_posts_resourceOptionsConfig = {
+  executor: executor,
+  name: "relational_posts",
+  identifier: "main.polymorphic.relational_posts",
+  from: relationalPostsIdentifier,
+  codec: relationalPostsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_posts"
+    }
+  },
+  uniques: relational_postsUniques
 };
 const relational_topicsUniques = [{
   attributes: ["topic_item_id"],
@@ -2427,65 +2627,6 @@ const single_table_item_relation_composite_pks_resourceOptionsConfig = {
   },
   uniques: single_table_item_relation_composite_pksUniques
 };
-const relational_checklist_itemsUniques = [{
-  attributes: ["checklist_item_item_id"],
-  isPrimary: true
-}];
-const relational_checklist_items_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_checklist_items",
-  identifier: "main.polymorphic.relational_checklist_items",
-  from: relationalChecklistItemsIdentifier,
-  codec: relationalChecklistItemsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_checklist_items"
-    }
-  },
-  uniques: relational_checklist_itemsUniques
-};
-const relational_dividersUniques = [{
-  attributes: ["divider_item_id"],
-  isPrimary: true
-}];
-const relational_dividers_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_dividers",
-  identifier: "main.polymorphic.relational_dividers",
-  from: relationalDividersIdentifier,
-  codec: relationalDividersCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_dividers"
-    }
-  },
-  uniques: relational_dividersUniques
-};
-const relational_item_relationsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}, {
-  attributes: ["parent_id", "child_id"]
-}];
-const relational_item_relations_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_item_relations",
-  identifier: "main.polymorphic.relational_item_relations",
-  from: relationalItemRelationsIdentifier,
-  codec: relationalItemRelationsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_item_relations"
-    }
-  },
-  uniques: relational_item_relationsUniques
-};
 const single_table_item_relationsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -2507,74 +2648,29 @@ const single_table_item_relations_resourceOptionsConfig = {
   },
   uniques: single_table_item_relationsUniques
 };
-const log_entriesUniques = [{
+const single_table_itemsUniques = [{
   attributes: ["id"],
   isPrimary: true
 }];
-const log_entries_resourceOptionsConfig = {
+const single_table_items_resourceOptionsConfig = {
   executor: executor,
-  name: "log_entries",
-  identifier: "main.polymorphic.log_entries",
-  from: logEntriesIdentifier,
-  codec: logEntriesCodec,
+  name: "single_table_items",
+  identifier: "main.polymorphic.single_table_items",
+  from: singleTableItemsIdentifier,
+  codec: singleTableItemsCodec,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "polymorphic",
-      name: "log_entries"
+      name: "single_table_items"
     },
     tags: {
-      ref: "author to:PersonOrOrganization singular",
-      refVia: ["author via:people", "author via:organizations"]
+      interface: "mode:single type:type",
+      type: ["TOPIC name:SingleTableTopic attributes:title!", "POST name:SingleTablePost attributes:title>subject,description,note,priority_id", "DIVIDER name:SingleTableDivider attributes:title,color", "CHECKLIST name:SingleTableChecklist attributes:title", "CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id"],
+      ref: ["rootTopic to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)", "rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)"]
     }
   },
-  uniques: log_entriesUniques
-};
-const relational_postsUniques = [{
-  attributes: ["post_item_id"],
-  isPrimary: true
-}];
-const relational_posts_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_posts",
-  identifier: "main.polymorphic.relational_posts",
-  from: relationalPostsIdentifier,
-  codec: relationalPostsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_posts"
-    }
-  },
-  uniques: relational_postsUniques
-};
-const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
-const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
-const relational_topic_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topic_by_id_fn");
-const first_party_vulnerabilitiesUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const first_party_vulnerabilities_resourceOptionsConfig = {
-  executor: executor,
-  name: "first_party_vulnerabilities",
-  identifier: "main.polymorphic.first_party_vulnerabilities",
-  from: firstPartyVulnerabilitiesIdentifier,
-  codec: firstPartyVulnerabilitiesCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "first_party_vulnerabilities"
-    },
-    tags: {
-      implements: "Vulnerability",
-      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
-      refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
-    }
-  },
-  uniques: first_party_vulnerabilitiesUniques
+  uniques: single_table_itemsUniques
 };
 const third_party_vulnerabilitiesUniques = [{
   attributes: ["id"],
@@ -2600,6 +2696,9 @@ const third_party_vulnerabilities_resourceOptionsConfig = {
   },
   uniques: third_party_vulnerabilitiesUniques
 };
+const all_relational_items_fnFunctionIdentifer = sql.identifier("polymorphic", "all_relational_items_fn");
+const all_single_tablesFunctionIdentifer = sql.identifier("polymorphic", "all_single_tables");
+const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
 const favorite_applicationFunctionIdentifer = sql.identifier("polymorphic", "favorite_application");
 const Application_resourceOptionsConfig = {
   executor: executor,
@@ -2626,113 +2725,14 @@ const Application_resourceOptionsConfig = {
   isVirtual: true
 };
 const favorite_applicationsFunctionIdentifer = sql.identifier("polymorphic", "favorite_applications");
-const aws_applicationsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const aws_applications_resourceOptionsConfig = {
-  executor: executor,
-  name: "aws_applications",
-  identifier: "main.polymorphic.aws_applications",
-  from: awsApplicationsIdentifier,
-  codec: awsApplicationsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "aws_applications"
-    },
-    tags: {
-      implements: "Application",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
-      refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-    }
-  },
-  uniques: aws_applicationsUniques
-};
-const gcp_applicationsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const gcp_applications_resourceOptionsConfig = {
-  executor: executor,
-  name: "gcp_applications",
-  identifier: "main.polymorphic.gcp_applications",
-  from: gcpApplicationsIdentifier,
-  codec: gcpApplicationsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "gcp_applications"
-    },
-    tags: {
-      implements: "Application",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
-      refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-    }
-  },
-  uniques: gcp_applicationsUniques
-};
-const single_table_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_meaning_of_life");
-const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
-const relational_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "relational_items_meaning_of_life");
-const single_table_itemsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const single_table_items_resourceOptionsConfig = {
-  executor: executor,
-  name: "single_table_items",
-  identifier: "main.polymorphic.single_table_items",
-  from: singleTableItemsIdentifier,
-  codec: singleTableItemsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "single_table_items"
-    },
-    tags: {
-      interface: "mode:single type:type",
-      type: ["TOPIC name:SingleTableTopic attributes:title!", "POST name:SingleTablePost attributes:title>subject,description,note,priority_id", "DIVIDER name:SingleTableDivider attributes:title,color", "CHECKLIST name:SingleTableChecklist attributes:title", "CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id"],
-      ref: ["rootTopic to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)", "rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)"]
-    }
-  },
-  uniques: single_table_itemsUniques
-};
-const all_single_tablesFunctionIdentifer = sql.identifier("polymorphic", "all_single_tables");
+const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
 const get_single_table_topic_by_idFunctionIdentifer = sql.identifier("polymorphic", "get_single_table_topic_by_id");
-const relational_itemsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const relational_items_resourceOptionsConfig = {
-  executor: executor,
-  name: "relational_items",
-  identifier: "main.polymorphic.relational_items",
-  from: relationalItemsIdentifier,
-  codec: relationalItemsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "relational_items"
-    },
-    tags: {
-      interface: "mode:relational",
-      type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
-    }
-  },
-  uniques: relational_itemsUniques
-};
-const all_relational_items_fnFunctionIdentifer = sql.identifier("polymorphic", "all_relational_items_fn");
 const relational_item_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_item_by_id_fn");
+const relational_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "relational_items_meaning_of_life");
+const relational_topic_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topic_by_id_fn");
 const relational_topics_parent_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topics_parent_fn");
-const collectionsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
+const single_table_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_meaning_of_life");
+const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
 const registryConfig = {
   pgExecutors: {
     __proto__: null,
@@ -2740,41 +2740,41 @@ const registryConfig = {
   },
   pgCodecs: {
     __proto__: null,
-    awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
-    int4: TYPES.int,
-    awsApplicationThirdPartyVulnerabilities: awsApplicationThirdPartyVulnerabilitiesCodec,
-    gcpApplicationFirstPartyVulnerabilities: gcpApplicationFirstPartyVulnerabilitiesCodec,
-    gcpApplicationThirdPartyVulnerabilities: gcpApplicationThirdPartyVulnerabilitiesCodec,
-    organizations: organizationsCodec,
     text: TYPES.text,
-    people: peopleCodec,
-    priorities: prioritiesCodec,
-    relationalChecklists: relationalChecklistsCodec,
-    relationalItemRelationCompositePks: relationalItemRelationCompositePksCodec,
+    varchar: TYPES.varchar,
+    bpchar: TYPES.bpchar,
+    relationalItems: relationalItemsCodec,
+    int4: TYPES.int,
+    itemType: itemTypeCodec,
+    int8: TYPES.bigint,
+    timestamptz: TYPES.timestamptz,
+    bool: TYPES.boolean,
+    singleTableItems: singleTableItemsCodec,
+    Application: ApplicationCodec,
     relationalTopics: relationalTopicsCodec,
-    singleTableItemRelationCompositePks: singleTableItemRelationCompositePksCodec,
-    relationalChecklistItems: relationalChecklistItemsCodec,
-    relationalDividers: relationalDividersCodec,
-    relationalItemRelations: relationalItemRelationsCodec,
-    singleTableItemRelations: singleTableItemRelationsCodec,
-    logEntries: logEntriesCodec,
-    relationalPosts: relationalPostsCodec,
     firstPartyVulnerabilities: firstPartyVulnerabilitiesCodec,
     float8: TYPES.float,
     thirdPartyVulnerabilities: thirdPartyVulnerabilitiesCodec,
-    Application: ApplicationCodec,
-    timestamptz: TYPES.timestamptz,
-    awsApplications: awsApplicationsCodec,
-    gcpApplications: gcpApplicationsCodec,
-    bool: TYPES.boolean,
-    singleTableItems: singleTableItemsCodec,
-    itemType: itemTypeCodec,
-    int8: TYPES.bigint,
-    relationalItems: relationalItemsCodec,
-    collections: collectionsCodec,
     jsonb: TYPES.jsonb,
-    varchar: TYPES.varchar,
-    bpchar: TYPES.bpchar,
+    awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
+    awsApplicationThirdPartyVulnerabilities: awsApplicationThirdPartyVulnerabilitiesCodec,
+    awsApplications: awsApplicationsCodec,
+    collections: collectionsCodec,
+    gcpApplicationFirstPartyVulnerabilities: gcpApplicationFirstPartyVulnerabilitiesCodec,
+    gcpApplicationThirdPartyVulnerabilities: gcpApplicationThirdPartyVulnerabilitiesCodec,
+    gcpApplications: gcpApplicationsCodec,
+    logEntries: logEntriesCodec,
+    organizations: organizationsCodec,
+    people: peopleCodec,
+    priorities: prioritiesCodec,
+    relationalChecklistItems: relationalChecklistItemsCodec,
+    relationalChecklists: relationalChecklistsCodec,
+    relationalDividers: relationalDividersCodec,
+    relationalItemRelationCompositePks: relationalItemRelationCompositePksCodec,
+    relationalItemRelations: relationalItemRelationsCodec,
+    relationalPosts: relationalPostsCodec,
+    singleTableItemRelationCompositePks: singleTableItemRelationCompositePksCodec,
+    singleTableItemRelations: singleTableItemRelationsCodec,
     Vulnerability: recordCodec(spec_Vulnerability),
     ZeroImplementation: recordCodec(spec_ZeroImplementation),
     LetterAToDEnum: enumCodec({
@@ -3121,86 +3121,109 @@ const registryConfig = {
     __proto__: null,
     aws_application_first_party_vulnerabilities: aws_application_first_party_vulnerabilities_resourceOptionsConfig,
     aws_application_third_party_vulnerabilities: aws_application_third_party_vulnerabilities_resourceOptionsConfig,
+    aws_applications: aws_applications_resourceOptionsConfig,
+    collections: {
+      executor: executor,
+      name: "collections",
+      identifier: "main.polymorphic.collections",
+      from: collectionsIdentifier,
+      codec: collectionsCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "collections"
+        },
+        tags: {
+          interface: "mode:single type:type",
+          type: ["movie name:MovieCollection", "series name:SeriesCollection"]
+        }
+      },
+      uniques: collectionsUniques
+    },
+    first_party_vulnerabilities: first_party_vulnerabilities_resourceOptionsConfig,
     gcp_application_first_party_vulnerabilities: gcp_application_first_party_vulnerabilities_resourceOptionsConfig,
     gcp_application_third_party_vulnerabilities: gcp_application_third_party_vulnerabilities_resourceOptionsConfig,
+    gcp_applications: gcp_applications_resourceOptionsConfig,
+    log_entries: log_entries_resourceOptionsConfig,
     organizations: organizations_resourceOptionsConfig,
     people: people_resourceOptionsConfig,
     priorities: priorities_resourceOptionsConfig,
+    relational_checklist_items: relational_checklist_items_resourceOptionsConfig,
     relational_checklists: relational_checklists_resourceOptionsConfig,
+    relational_dividers: relational_dividers_resourceOptionsConfig,
     relational_item_relation_composite_pks: relational_item_relation_composite_pks_resourceOptionsConfig,
+    relational_item_relations: relational_item_relations_resourceOptionsConfig,
+    relational_items: relational_items_resourceOptionsConfig,
+    relational_posts: relational_posts_resourceOptionsConfig,
     relational_topics: relational_topics_resourceOptionsConfig,
     single_table_item_relation_composite_pks: single_table_item_relation_composite_pks_resourceOptionsConfig,
-    relational_checklist_items: relational_checklist_items_resourceOptionsConfig,
-    relational_dividers: relational_dividers_resourceOptionsConfig,
-    relational_item_relations: relational_item_relations_resourceOptionsConfig,
     single_table_item_relations: single_table_item_relations_resourceOptionsConfig,
-    log_entries: log_entries_resourceOptionsConfig,
-    relational_posts: relational_posts_resourceOptionsConfig,
-    first_party_vulnerabilities_cvss_score_int: {
-      executor: executor,
-      name: "first_party_vulnerabilities_cvss_score_int",
-      identifier: "main.polymorphic.first_party_vulnerabilities_cvss_score_int(polymorphic.first_party_vulnerabilities)",
-      from(...args) {
-        return sql`${first_party_vulnerabilities_cvss_score_intFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "r",
-        codec: firstPartyVulnerabilitiesCodec
-      }],
-      codec: TYPES.int,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "first_party_vulnerabilities_cvss_score_int"
-        }
-      },
-      isUnique: true
-    },
-    third_party_vulnerabilities_cvss_score_int: {
-      executor: executor,
-      name: "third_party_vulnerabilities_cvss_score_int",
-      identifier: "main.polymorphic.third_party_vulnerabilities_cvss_score_int(polymorphic.third_party_vulnerabilities)",
-      from(...args) {
-        return sql`${third_party_vulnerabilities_cvss_score_intFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "r",
-        codec: thirdPartyVulnerabilitiesCodec
-      }],
-      codec: TYPES.int,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "third_party_vulnerabilities_cvss_score_int"
-        }
-      },
-      isUnique: true
-    },
-    relational_topic_by_id_fn: PgResource.functionResourceOptions(relational_topics_resourceOptionsConfig, {
-      name: "relational_topic_by_id_fn",
-      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
-      from(...args) {
-        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "id",
-        codec: TYPES.int
-      }],
-      returnsSetof: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "relational_topic_by_id_fn"
-        }
-      }
-    }),
-    first_party_vulnerabilities: first_party_vulnerabilities_resourceOptionsConfig,
+    single_table_items: single_table_items_resourceOptionsConfig,
     third_party_vulnerabilities: third_party_vulnerabilities_resourceOptionsConfig,
+    all_relational_items_fn: PgResource.functionResourceOptions(relational_items_resourceOptionsConfig, {
+      name: "all_relational_items_fn",
+      identifier: "main.polymorphic.all_relational_items_fn()",
+      from(...args) {
+        return sql`${all_relational_items_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "all_relational_items_fn"
+        }
+      },
+      hasImplicitOrder: true
+    }),
+    all_single_tables: PgResource.functionResourceOptions(single_table_items_resourceOptionsConfig, {
+      name: "all_single_tables",
+      identifier: "main.polymorphic.all_single_tables()",
+      from(...args) {
+        return sql`${all_single_tablesFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "all_single_tables"
+        }
+      },
+      hasImplicitOrder: true
+    }),
+    custom_delete_relational_item: {
+      executor: executor,
+      name: "custom_delete_relational_item",
+      identifier: "main.polymorphic.custom_delete_relational_item(polymorphic.relational_items)",
+      from(...args) {
+        return sql`${custom_delete_relational_itemFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "nodeId",
+        codec: relationalItemsCodec,
+        extensions: {
+          variant: "nodeId"
+        }
+      }],
+      codec: TYPES.boolean,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "custom_delete_relational_item"
+        },
+        tags: {
+          arg0variant: "nodeId"
+        }
+      },
+      isUnique: true,
+      isMutation: true
+    },
     favorite_application: PgResource.functionResourceOptions(Application_resourceOptionsConfig, {
       name: "favorite_application",
       identifier: "main.polymorphic.favorite_application()",
@@ -3234,18 +3257,16 @@ const registryConfig = {
       },
       hasImplicitOrder: true
     }),
-    aws_applications: aws_applications_resourceOptionsConfig,
-    gcp_applications: gcp_applications_resourceOptionsConfig,
-    single_table_items_meaning_of_life: {
+    first_party_vulnerabilities_cvss_score_int: {
       executor: executor,
-      name: "single_table_items_meaning_of_life",
-      identifier: "main.polymorphic.single_table_items_meaning_of_life(polymorphic.single_table_items)",
+      name: "first_party_vulnerabilities_cvss_score_int",
+      identifier: "main.polymorphic.first_party_vulnerabilities_cvss_score_int(polymorphic.first_party_vulnerabilities)",
       from(...args) {
-        return sql`${single_table_items_meaning_of_lifeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+        return sql`${first_party_vulnerabilities_cvss_score_intFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
-        name: "sti",
-        codec: singleTableItemsCodec
+        name: "r",
+        codec: firstPartyVulnerabilitiesCodec
       }],
       codec: TYPES.int,
       hasImplicitOrder: false,
@@ -3253,80 +3274,11 @@ const registryConfig = {
         pg: {
           serviceName: "main",
           schemaName: "polymorphic",
-          name: "single_table_items_meaning_of_life"
+          name: "first_party_vulnerabilities_cvss_score_int"
         }
       },
       isUnique: true
     },
-    custom_delete_relational_item: {
-      executor: executor,
-      name: "custom_delete_relational_item",
-      identifier: "main.polymorphic.custom_delete_relational_item(polymorphic.relational_items)",
-      from(...args) {
-        return sql`${custom_delete_relational_itemFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "nodeId",
-        codec: relationalItemsCodec,
-        extensions: {
-          variant: "nodeId"
-        }
-      }],
-      codec: TYPES.boolean,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "custom_delete_relational_item"
-        },
-        tags: {
-          arg0variant: "nodeId"
-        }
-      },
-      isUnique: true,
-      isMutation: true
-    },
-    relational_items_meaning_of_life: {
-      executor: executor,
-      name: "relational_items_meaning_of_life",
-      identifier: "main.polymorphic.relational_items_meaning_of_life(polymorphic.relational_items)",
-      from(...args) {
-        return sql`${relational_items_meaning_of_lifeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "ri",
-        codec: relationalItemsCodec
-      }],
-      codec: TYPES.int,
-      hasImplicitOrder: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "relational_items_meaning_of_life"
-        }
-      },
-      isUnique: true
-    },
-    single_table_items: single_table_items_resourceOptionsConfig,
-    all_single_tables: PgResource.functionResourceOptions(single_table_items_resourceOptionsConfig, {
-      name: "all_single_tables",
-      identifier: "main.polymorphic.all_single_tables()",
-      from(...args) {
-        return sql`${all_single_tablesFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsSetof: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "all_single_tables"
-        }
-      },
-      hasImplicitOrder: true
-    }),
     get_single_table_topic_by_id: PgResource.functionResourceOptions(single_table_items_resourceOptionsConfig, {
       name: "get_single_table_topic_by_id",
       identifier: "main.polymorphic.get_single_table_topic_by_id(int4)",
@@ -3349,24 +3301,6 @@ const registryConfig = {
         }
       }
     }),
-    relational_items: relational_items_resourceOptionsConfig,
-    all_relational_items_fn: PgResource.functionResourceOptions(relational_items_resourceOptionsConfig, {
-      name: "all_relational_items_fn",
-      identifier: "main.polymorphic.all_relational_items_fn()",
-      from(...args) {
-        return sql`${all_relational_items_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [],
-      returnsSetof: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "all_relational_items_fn"
-        }
-      },
-      hasImplicitOrder: true
-    }),
     relational_item_by_id_fn: PgResource.functionResourceOptions(relational_items_resourceOptionsConfig, {
       name: "relational_item_by_id_fn",
       identifier: "main.polymorphic.relational_item_by_id_fn(int4)",
@@ -3383,6 +3317,47 @@ const registryConfig = {
           serviceName: "main",
           schemaName: "polymorphic",
           name: "relational_item_by_id_fn"
+        }
+      }
+    }),
+    relational_items_meaning_of_life: {
+      executor: executor,
+      name: "relational_items_meaning_of_life",
+      identifier: "main.polymorphic.relational_items_meaning_of_life(polymorphic.relational_items)",
+      from(...args) {
+        return sql`${relational_items_meaning_of_lifeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "ri",
+        codec: relationalItemsCodec
+      }],
+      codec: TYPES.int,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_items_meaning_of_life"
+        }
+      },
+      isUnique: true
+    },
+    relational_topic_by_id_fn: PgResource.functionResourceOptions(relational_topics_resourceOptionsConfig, {
+      name: "relational_topic_by_id_fn",
+      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
+      from(...args) {
+        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        codec: TYPES.int
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_topic_by_id_fn"
         }
       }
     }),
@@ -3405,24 +3380,49 @@ const registryConfig = {
         }
       }
     }),
-    collections: {
+    single_table_items_meaning_of_life: {
       executor: executor,
-      name: "collections",
-      identifier: "main.polymorphic.collections",
-      from: collectionsIdentifier,
-      codec: collectionsCodec,
+      name: "single_table_items_meaning_of_life",
+      identifier: "main.polymorphic.single_table_items_meaning_of_life(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_meaning_of_lifeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        codec: singleTableItemsCodec
+      }],
+      codec: TYPES.int,
+      hasImplicitOrder: false,
       extensions: {
         pg: {
           serviceName: "main",
           schemaName: "polymorphic",
-          name: "collections"
-        },
-        tags: {
-          interface: "mode:single type:type",
-          type: ["movie name:MovieCollection", "series name:SeriesCollection"]
+          name: "single_table_items_meaning_of_life"
         }
       },
-      uniques: collectionsUniques
+      isUnique: true
+    },
+    third_party_vulnerabilities_cvss_score_int: {
+      executor: executor,
+      name: "third_party_vulnerabilities_cvss_score_int",
+      identifier: "main.polymorphic.third_party_vulnerabilities_cvss_score_int(polymorphic.third_party_vulnerabilities)",
+      from(...args) {
+        return sql`${third_party_vulnerabilities_cvss_score_intFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "r",
+        codec: thirdPartyVulnerabilitiesCodec
+      }],
+      codec: TYPES.int,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "third_party_vulnerabilities_cvss_score_int"
+        }
+      },
+      isUnique: true
     }
   },
   pgRelations: {
@@ -4826,7 +4826,17 @@ const Collection_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   return typeNameFromType;
 })("Collection", spec_collections.polymorphism);
 const EMPTY_OBJECT = Object.freeze({});
-const argDetailsSimple_relational_topic_by_id_fn = [{
+const resource_all_relational_items_fnPgResource = registry.pgResources["all_relational_items_fn"];
+const all_relational_items_fn_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
+  return resource_all_relational_items_fnPgResource.execute(selectArgs);
+};
+const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
+const all_single_tables_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
+  return resource_all_single_tablesPgResource.execute(selectArgs);
+};
+const argDetailsSimple_get_single_table_topic_by_id = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
   postgresArgName: "id"
@@ -4848,25 +4858,8 @@ function makeArg(path, args, details) {
     name: postgresArgName ?? undefined
   };
 }
-const makeArgs_relational_topic_by_id_fn = (args, path = []) => argDetailsSimple_relational_topic_by_id_fn.map(details => makeArg(path, args, details));
-const resource_relational_topic_by_id_fnPgResource = registry.pgResources["relational_topic_by_id_fn"];
-const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
-const all_single_tables_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
-  return resource_all_single_tablesPgResource.execute(selectArgs);
-};
-const argDetailsSimple_get_single_table_topic_by_id = [{
-  graphqlArgName: "id",
-  pgCodec: TYPES.int,
-  postgresArgName: "id"
-}];
 const makeArgs_get_single_table_topic_by_id = (args, path = []) => argDetailsSimple_get_single_table_topic_by_id.map(details => makeArg(path, args, details));
 const resource_get_single_table_topic_by_idPgResource = registry.pgResources["get_single_table_topic_by_id"];
-const resource_all_relational_items_fnPgResource = registry.pgResources["all_relational_items_fn"];
-const all_relational_items_fn_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
-  return resource_all_relational_items_fnPgResource.execute(selectArgs);
-};
 const argDetailsSimple_relational_item_by_id_fn = [{
   graphqlArgName: "id",
   pgCodec: TYPES.int,
@@ -4874,29 +4867,36 @@ const argDetailsSimple_relational_item_by_id_fn = [{
 }];
 const makeArgs_relational_item_by_id_fn = (args, path = []) => argDetailsSimple_relational_item_by_id_fn.map(details => makeArg(path, args, details));
 const resource_relational_item_by_id_fnPgResource = registry.pgResources["relational_item_by_id_fn"];
-const members3 = [{
-  resource: resourceByTypeName_FirstPartyVulnerability_first_party_vulnerabilitiesPgResource,
-  typeName: "FirstPartyVulnerability"
-}, {
-  resource: resourceByTypeName_ThirdPartyVulnerability_third_party_vulnerabilitiesPgResource,
-  typeName: "ThirdPartyVulnerability"
+const argDetailsSimple_relational_topic_by_id_fn = [{
+  graphqlArgName: "id",
+  pgCodec: TYPES.int,
+  postgresArgName: "id"
 }];
-const resourceByTypeName6 = {
-  __proto__: null,
-  FirstPartyVulnerability: resourceByTypeName_FirstPartyVulnerability_first_party_vulnerabilitiesPgResource,
-  ThirdPartyVulnerability: resourceByTypeName_ThirdPartyVulnerability_third_party_vulnerabilitiesPgResource
-};
-const members4 = [{
+const makeArgs_relational_topic_by_id_fn = (args, path = []) => argDetailsSimple_relational_topic_by_id_fn.map(details => makeArg(path, args, details));
+const resource_relational_topic_by_id_fnPgResource = registry.pgResources["relational_topic_by_id_fn"];
+const members3 = [{
   resource: members_0_resource_aws_applicationsPgResource,
   typeName: "AwsApplication"
 }, {
   resource: members_1_resource_gcp_applicationsPgResource,
   typeName: "GcpApplication"
 }];
-const resourceByTypeName7 = {
+const resourceByTypeName6 = {
   __proto__: null,
   AwsApplication: members_0_resource_aws_applicationsPgResource,
   GcpApplication: members_1_resource_gcp_applicationsPgResource
+};
+const members4 = [{
+  resource: resourceByTypeName_FirstPartyVulnerability_first_party_vulnerabilitiesPgResource,
+  typeName: "FirstPartyVulnerability"
+}, {
+  resource: resourceByTypeName_ThirdPartyVulnerability_third_party_vulnerabilitiesPgResource,
+  typeName: "ThirdPartyVulnerability"
+}];
+const resourceByTypeName7 = {
+  __proto__: null,
+  FirstPartyVulnerability: resourceByTypeName_FirstPartyVulnerability_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: resourceByTypeName_ThirdPartyVulnerability_third_party_vulnerabilitiesPgResource
 };
 const members5 = [];
 const resourceByTypeName8 = {
@@ -4904,19 +4904,6 @@ const resourceByTypeName8 = {
 };
 const resourceByTypeName9 = {
   __proto__: null
-};
-const RelationalChecklistCondition_titleApply = ($condition, val) => applyAttributeCondition("title", TYPES.text, $condition, val);
-const RelationalChecklistsOrderBy_TITLE_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "title",
-    direction: "ASC"
-  });
-};
-const RelationalChecklistsOrderBy_TITLE_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "title",
-    direction: "DESC"
-  });
 };
 const RelationalChecklistItemCondition_descriptionApply = ($condition, val) => applyAttributeCondition("description", TYPES.text, $condition, val);
 const RelationalChecklistItemCondition_noteApply = ($condition, val) => applyAttributeCondition("note", TYPES.text, $condition, val);
@@ -4941,6 +4928,19 @@ const RelationalChecklistItemsOrderBy_NOTE_ASCApply = queryBuilder => {
 const RelationalChecklistItemsOrderBy_NOTE_DESCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "note",
+    direction: "DESC"
+  });
+};
+const RelationalChecklistCondition_titleApply = ($condition, val) => applyAttributeCondition("title", TYPES.text, $condition, val);
+const RelationalChecklistsOrderBy_TITLE_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "title",
+    direction: "ASC"
+  });
+};
+const RelationalChecklistsOrderBy_TITLE_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "title",
     direction: "DESC"
   });
 };
@@ -8932,6 +8932,9 @@ type Query {
   """
   query: Query!
 
+  """Get a single \`LogEntry\`."""
+  logEntryById(id: Int!): LogEntry
+
   """Get a single \`Organization\`."""
   organizationByOrganizationId(organizationId: Int!): Organization
 
@@ -8947,23 +8950,17 @@ type Query {
   """Get a single \`Priority\`."""
   priorityById(id: Int!): Priority
 
-  """Get a single \`RelationalChecklist\`."""
-  relationalChecklistByChecklistItemId(checklistItemId: Int!): RelationalChecklist
-
-  """Get a single \`RelationalItemRelationCompositePk\`."""
-  relationalItemRelationCompositePkByParentIdAndChildId(parentId: Int!, childId: Int!): RelationalItemRelationCompositePk
-
-  """Get a single \`RelationalTopic\`."""
-  relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
-
-  """Get a single \`SingleTableItemRelationCompositePk\`."""
-  singleTableItemRelationCompositePkByParentIdAndChildId(parentId: Int!, childId: Int!): SingleTableItemRelationCompositePk
-
   """Get a single \`RelationalChecklistItem\`."""
   relationalChecklistItemByChecklistItemItemId(checklistItemItemId: Int!): RelationalChecklistItem
 
+  """Get a single \`RelationalChecklist\`."""
+  relationalChecklistByChecklistItemId(checklistItemId: Int!): RelationalChecklist
+
   """Get a single \`RelationalDivider\`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+
+  """Get a single \`RelationalItemRelationCompositePk\`."""
+  relationalItemRelationCompositePkByParentIdAndChildId(parentId: Int!, childId: Int!): RelationalItemRelationCompositePk
 
   """Get a single \`RelationalItemRelation\`."""
   relationalItemRelationById(id: Int!): RelationalItemRelation
@@ -8971,18 +8968,41 @@ type Query {
   """Get a single \`RelationalItemRelation\`."""
   relationalItemRelationByParentIdAndChildId(parentId: Int!, childId: Int!): RelationalItemRelation
 
+  """Get a single \`RelationalPost\`."""
+  relationalPostByPostItemId(postItemId: Int!): RelationalPost
+
+  """Get a single \`RelationalTopic\`."""
+  relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Get a single \`SingleTableItemRelationCompositePk\`."""
+  singleTableItemRelationCompositePkByParentIdAndChildId(parentId: Int!, childId: Int!): SingleTableItemRelationCompositePk
+
   """Get a single \`SingleTableItemRelation\`."""
   singleTableItemRelationById(id: Int!): SingleTableItemRelation
 
   """Get a single \`SingleTableItemRelation\`."""
   singleTableItemRelationByParentIdAndChildId(parentId: Int!, childId: Int!): SingleTableItemRelation
 
-  """Get a single \`LogEntry\`."""
-  logEntryById(id: Int!): LogEntry
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  allRelationalItemsFn(
+    """Only read the first \`n\` values of the set."""
+    first: Int
 
-  """Get a single \`RelationalPost\`."""
-  relationalPostByPostItemId(postItemId: Int!): RelationalPost
-  relationalTopicByIdFn(id: Int): RelationalTopic
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): RelationalItemsConnection
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
   allSingleTables(
@@ -9005,58 +9025,8 @@ type Query {
     after: Cursor
   ): SingleTableItemsConnection
   getSingleTableTopicById(id: Int): SingleTableTopic
-
-  """Reads and enables pagination through a set of \`RelationalItem\`."""
-  allRelationalItemsFn(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): RelationalItemsConnection
   relationalItemByIdFn(id: Int): RelationalItem
-  allVulnerabilities(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: VulnerabilityCondition
-
-    """Filter results to only those of the given types"""
-    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
-
-    """The method to use when ordering \`Vulnerability\`."""
-    orderBy: [VulnerabilitiesOrderBy!]
-  ): VulnerabilitiesConnection
+  relationalTopicByIdFn(id: Int): RelationalTopic
   allApplications(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9087,6 +9057,36 @@ type Query {
     """The method to use when ordering \`Application\`."""
     orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection
+  allVulnerabilities(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection
   allZeroImplementations(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9114,6 +9114,64 @@ type Query {
     """The method to use when ordering \`ZeroImplementation\`."""
     orderBy: [ZeroImplementationsOrderBy!]
   ): ZeroImplementationsConnection
+
+  """Reads and enables pagination through a set of \`Collection\`."""
+  allCollections(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CollectionCondition
+
+    """The method to use when ordering \`Collection\`."""
+    orderBy: [CollectionsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CollectionsConnection
+
+  """Reads and enables pagination through a set of \`LogEntry\`."""
+  allLogEntries(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """The method to use when ordering \`LogEntry\`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection
 
   """Reads and enables pagination through a set of \`Organization\`."""
   allOrganizations(
@@ -9194,6 +9252,37 @@ type Query {
     after: Cursor
   ): PrioritiesConnection
 
+  """
+  Reads and enables pagination through a set of \`RelationalChecklistItem\`.
+  """
+  allRelationalChecklistItems(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalChecklistItemCondition
+
+    """The method to use when ordering \`RelationalChecklistItem\`."""
+    orderBy: [RelationalChecklistItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistItemsConnection
+
   """Reads and enables pagination through a set of \`RelationalChecklist\`."""
   allRelationalChecklists(
     """Only read the first \`n\` values of the set."""
@@ -9222,6 +9311,35 @@ type Query {
     """The method to use when ordering \`RelationalChecklist\`."""
     orderBy: [RelationalChecklistsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalChecklistsConnection
+
+  """Reads and enables pagination through a set of \`RelationalDivider\`."""
+  allRelationalDividers(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalDividerCondition
+
+    """The method to use when ordering \`RelationalDivider\`."""
+    orderBy: [RelationalDividersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalDividersConnection
 
   """
   Reads and enables pagination through a set of \`RelationalItemRelationCompositePk\`.
@@ -9253,6 +9371,95 @@ type Query {
     """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
     orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection
+
+  """
+  Reads and enables pagination through a set of \`RelationalItemRelation\`.
+  """
+  allRelationalItemRelations(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection
+
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  allRelationalItems(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection
+
+  """Reads and enables pagination through a set of \`RelationalPost\`."""
+  allRelationalPosts(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalPostCondition
+
+    """The method to use when ordering \`RelationalPost\`."""
+    orderBy: [RelationalPostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalPostsConnection
 
   """Reads and enables pagination through a set of \`RelationalTopic\`."""
   allRelationalTopics(
@@ -9315,97 +9522,6 @@ type Query {
   ): SingleTableItemRelationCompositePksConnection
 
   """
-  Reads and enables pagination through a set of \`RelationalChecklistItem\`.
-  """
-  allRelationalChecklistItems(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalChecklistItemCondition
-
-    """The method to use when ordering \`RelationalChecklistItem\`."""
-    orderBy: [RelationalChecklistItemsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalChecklistItemsConnection
-
-  """Reads and enables pagination through a set of \`RelationalDivider\`."""
-  allRelationalDividers(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalDividerCondition
-
-    """The method to use when ordering \`RelationalDivider\`."""
-    orderBy: [RelationalDividersOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalDividersConnection
-
-  """
-  Reads and enables pagination through a set of \`RelationalItemRelation\`.
-  """
-  allRelationalItemRelations(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalItemRelationCondition
-
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalItemRelationsConnection
-
-  """
   Reads and enables pagination through a set of \`SingleTableItemRelation\`.
   """
   allSingleTableItemRelations(
@@ -9436,64 +9552,6 @@ type Query {
     orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection
 
-  """Reads and enables pagination through a set of \`LogEntry\`."""
-  allLogEntries(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: LogEntryCondition
-
-    """The method to use when ordering \`LogEntry\`."""
-    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): LogEntriesConnection
-
-  """Reads and enables pagination through a set of \`RelationalPost\`."""
-  allRelationalPosts(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalPostCondition
-
-    """The method to use when ordering \`RelationalPost\`."""
-    orderBy: [RelationalPostsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalPostsConnection
-
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
   allSingleTableItems(
     """Only read the first \`n\` values of the set."""
@@ -9522,64 +9580,6 @@ type Query {
     """The method to use when ordering \`SingleTableItem\`."""
     orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection
-
-  """Reads and enables pagination through a set of \`RelationalItem\`."""
-  allRelationalItems(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalItemCondition
-
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): RelationalItemsConnection
-
-  """Reads and enables pagination through a set of \`Collection\`."""
-  allCollections(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CollectionCondition
-
-    """The method to use when ordering \`Collection\`."""
-    orderBy: [CollectionsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): CollectionsConnection
 }
 
 """
@@ -9660,627 +9660,6 @@ enum ZeroImplementationsOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
-}
-
-"""A connection to a list of \`Organization\` values."""
-type OrganizationsConnection {
-  """A list of \`Organization\` objects."""
-  nodes: [Organization]!
-
-  """
-  A list of edges which contains the \`Organization\` and cursor to aid in pagination.
-  """
-  edges: [OrganizationsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Organization\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Organization\` edge in the connection."""
-type OrganizationsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Organization\` at the end of the edge."""
-  node: Organization
-}
-
-"""
-A condition to be used against \`Organization\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input OrganizationCondition {
-  """Checks for equality with the object’s \`organizationId\` field."""
-  organizationId: Int
-
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
-}
-
-"""Methods to use when ordering \`Organization\`."""
-enum OrganizationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ORGANIZATION_ID_ASC
-  ORGANIZATION_ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
-"""A connection to a list of \`Person\` values."""
-type PeopleConnection {
-  """A list of \`Person\` objects."""
-  nodes: [Person]!
-
-  """
-  A list of edges which contains the \`Person\` and cursor to aid in pagination.
-  """
-  edges: [PeopleEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Person\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Person\` edge in the connection."""
-type PeopleEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Person\` at the end of the edge."""
-  node: Person
-}
-
-"""
-A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PersonCondition {
-  """Checks for equality with the object’s \`personId\` field."""
-  personId: Int
-
-  """Checks for equality with the object’s \`username\` field."""
-  username: String
-}
-
-"""Methods to use when ordering \`Person\`."""
-enum PeopleOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  USERNAME_ASC
-  USERNAME_DESC
-}
-
-"""A connection to a list of \`Priority\` values."""
-type PrioritiesConnection {
-  """A list of \`Priority\` objects."""
-  nodes: [Priority]!
-
-  """
-  A list of edges which contains the \`Priority\` and cursor to aid in pagination.
-  """
-  edges: [PrioritiesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Priority\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Priority\` edge in the connection."""
-type PrioritiesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Priority\` at the end of the edge."""
-  node: Priority
-}
-
-"""A connection to a list of \`RelationalChecklist\` values."""
-type RelationalChecklistsConnection {
-  """A list of \`RelationalChecklist\` objects."""
-  nodes: [RelationalChecklist]!
-
-  """
-  A list of edges which contains the \`RelationalChecklist\` and cursor to aid in pagination.
-  """
-  edges: [RelationalChecklistsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalChecklist\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A \`RelationalChecklist\` edge in the connection."""
-type RelationalChecklistsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalChecklist\` at the end of the edge."""
-  node: RelationalChecklist
-}
-
-"""
-A condition to be used against \`RelationalChecklist\` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input RelationalChecklistCondition {
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
-
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`rootTopicId\` field."""
-  rootTopicId: Int
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: Int
-
-  """Checks for equality with the object’s \`position\` field."""
-  position: BigInt
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
-  isExplicitlyArchived: Boolean
-
-  """Checks for equality with the object’s \`archivedAt\` field."""
-  archivedAt: Datetime
-}
-
-"""Methods to use when ordering \`RelationalChecklist\`."""
-enum RelationalChecklistsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
-"""A connection to a list of \`RelationalTopic\` values."""
-type RelationalTopicsConnection {
-  """A list of \`RelationalTopic\` objects."""
-  nodes: [RelationalTopic]!
-
-  """
-  A list of edges which contains the \`RelationalTopic\` and cursor to aid in pagination.
-  """
-  edges: [RelationalTopicsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalTopic\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A \`RelationalTopic\` edge in the connection."""
-type RelationalTopicsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalTopic\` at the end of the edge."""
-  node: RelationalTopic
-}
-
-"""
-A condition to be used against \`RelationalTopic\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input RelationalTopicCondition {
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
-
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`rootTopicId\` field."""
-  rootTopicId: Int
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: Int
-
-  """Checks for equality with the object’s \`position\` field."""
-  position: BigInt
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
-  isExplicitlyArchived: Boolean
-
-  """Checks for equality with the object’s \`archivedAt\` field."""
-  archivedAt: Datetime
-}
-
-"""Methods to use when ordering \`RelationalTopic\`."""
-enum RelationalTopicsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
-"""A connection to a list of \`RelationalChecklistItem\` values."""
-type RelationalChecklistItemsConnection {
-  """A list of \`RelationalChecklistItem\` objects."""
-  nodes: [RelationalChecklistItem]!
-
-  """
-  A list of edges which contains the \`RelationalChecklistItem\` and cursor to aid in pagination.
-  """
-  edges: [RelationalChecklistItemsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalChecklistItem\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A \`RelationalChecklistItem\` edge in the connection."""
-type RelationalChecklistItemsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalChecklistItem\` at the end of the edge."""
-  node: RelationalChecklistItem
-}
-
-"""
-A condition to be used against \`RelationalChecklistItem\` object types. All
-fields are tested for equality and combined with a logical ‘and.’
-"""
-input RelationalChecklistItemCondition {
-  """Checks for equality with the object’s \`description\` field."""
-  description: String
-
-  """Checks for equality with the object’s \`note\` field."""
-  note: String
-
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`rootTopicId\` field."""
-  rootTopicId: Int
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: Int
-
-  """Checks for equality with the object’s \`position\` field."""
-  position: BigInt
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
-  isExplicitlyArchived: Boolean
-
-  """Checks for equality with the object’s \`archivedAt\` field."""
-  archivedAt: Datetime
-}
-
-"""Methods to use when ordering \`RelationalChecklistItem\`."""
-enum RelationalChecklistItemsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  NOTE_ASC
-  NOTE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
-"""A connection to a list of \`RelationalDivider\` values."""
-type RelationalDividersConnection {
-  """A list of \`RelationalDivider\` objects."""
-  nodes: [RelationalDivider]!
-
-  """
-  A list of edges which contains the \`RelationalDivider\` and cursor to aid in pagination.
-  """
-  edges: [RelationalDividersEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalDivider\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-"""A \`RelationalDivider\` edge in the connection."""
-type RelationalDividersEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalDivider\` at the end of the edge."""
-  node: RelationalDivider
-}
-
-"""
-A condition to be used against \`RelationalDivider\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input RelationalDividerCondition {
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
-
-  """Checks for equality with the object’s \`color\` field."""
-  color: String
-
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`rootTopicId\` field."""
-  rootTopicId: Int
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: Int
-
-  """Checks for equality with the object’s \`position\` field."""
-  position: BigInt
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
-  isExplicitlyArchived: Boolean
-
-  """Checks for equality with the object’s \`archivedAt\` field."""
-  archivedAt: Datetime
-}
-
-"""Methods to use when ordering \`RelationalDivider\`."""
-enum RelationalDividersOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  COLOR_ASC
-  COLOR_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
-"""A connection to a list of \`RelationalPost\` values."""
-type RelationalPostsConnection {
-  """A list of \`RelationalPost\` objects."""
-  nodes: [RelationalPost]!
-
-  """
-  A list of edges which contains the \`RelationalPost\` and cursor to aid in pagination.
-  """
-  edges: [RelationalPostsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`RelationalPost\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`RelationalPost\` edge in the connection."""
-type RelationalPostsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalPost\` at the end of the edge."""
-  node: RelationalPost
-}
-
-"""
-A condition to be used against \`RelationalPost\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input RelationalPostCondition {
-  """Checks for equality with the object’s \`title\` field."""
-  title: String
-
-  """Checks for equality with the object’s \`description\` field."""
-  description: String
-
-  """Checks for equality with the object’s \`note\` field."""
-  note: String
-
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`rootTopicId\` field."""
-  rootTopicId: Int
-
-  """Checks for equality with the object’s \`authorId\` field."""
-  authorId: Int
-
-  """Checks for equality with the object’s \`position\` field."""
-  position: BigInt
-
-  """Checks for equality with the object’s \`createdAt\` field."""
-  createdAt: Datetime
-
-  """Checks for equality with the object’s \`updatedAt\` field."""
-  updatedAt: Datetime
-
-  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
-  isExplicitlyArchived: Boolean
-
-  """Checks for equality with the object’s \`archivedAt\` field."""
-  archivedAt: Datetime
-}
-
-"""Methods to use when ordering \`RelationalPost\`."""
-enum RelationalPostsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  NOTE_ASC
-  NOTE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
 }
 
 """A connection to a list of \`Collection\` values."""
@@ -10852,6 +10231,627 @@ enum CollectionsOrderBy {
   CREATED_AT_DESC
 }
 
+"""A connection to a list of \`Organization\` values."""
+type OrganizationsConnection {
+  """A list of \`Organization\` objects."""
+  nodes: [Organization]!
+
+  """
+  A list of edges which contains the \`Organization\` and cursor to aid in pagination.
+  """
+  edges: [OrganizationsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Organization\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Organization\` edge in the connection."""
+type OrganizationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Organization\` at the end of the edge."""
+  node: Organization
+}
+
+"""
+A condition to be used against \`Organization\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input OrganizationCondition {
+  """Checks for equality with the object’s \`organizationId\` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+}
+
+"""Methods to use when ordering \`Organization\`."""
+enum OrganizationsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  NAME_ASC
+  NAME_DESC
+}
+
+"""A connection to a list of \`Person\` values."""
+type PeopleConnection {
+  """A list of \`Person\` objects."""
+  nodes: [Person]!
+
+  """
+  A list of edges which contains the \`Person\` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Person\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Person\` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Person\` at the end of the edge."""
+  node: Person
+}
+
+"""
+A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s \`personId\` field."""
+  personId: Int
+
+  """Checks for equality with the object’s \`username\` field."""
+  username: String
+}
+
+"""Methods to use when ordering \`Person\`."""
+enum PeopleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  USERNAME_ASC
+  USERNAME_DESC
+}
+
+"""A connection to a list of \`Priority\` values."""
+type PrioritiesConnection {
+  """A list of \`Priority\` objects."""
+  nodes: [Priority]!
+
+  """
+  A list of edges which contains the \`Priority\` and cursor to aid in pagination.
+  """
+  edges: [PrioritiesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Priority\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Priority\` edge in the connection."""
+type PrioritiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Priority\` at the end of the edge."""
+  node: Priority
+}
+
+"""A connection to a list of \`RelationalChecklistItem\` values."""
+type RelationalChecklistItemsConnection {
+  """A list of \`RelationalChecklistItem\` objects."""
+  nodes: [RelationalChecklistItem]!
+
+  """
+  A list of edges which contains the \`RelationalChecklistItem\` and cursor to aid in pagination.
+  """
+  edges: [RelationalChecklistItemsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`RelationalChecklistItem\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`RelationalChecklistItem\` edge in the connection."""
+type RelationalChecklistItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalChecklistItem\` at the end of the edge."""
+  node: RelationalChecklistItem
+}
+
+"""
+A condition to be used against \`RelationalChecklistItem\` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalChecklistItemCondition {
+  """Checks for equality with the object’s \`description\` field."""
+  description: String
+
+  """Checks for equality with the object’s \`note\` field."""
+  note: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`rootTopicId\` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s \`authorId\` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s \`position\` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s \`updatedAt\` field."""
+  updatedAt: Datetime
+
+  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s \`archivedAt\` field."""
+  archivedAt: Datetime
+}
+
+"""Methods to use when ordering \`RelationalChecklistItem\`."""
+enum RelationalChecklistItemsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  NOTE_ASC
+  NOTE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
+"""A connection to a list of \`RelationalChecklist\` values."""
+type RelationalChecklistsConnection {
+  """A list of \`RelationalChecklist\` objects."""
+  nodes: [RelationalChecklist]!
+
+  """
+  A list of edges which contains the \`RelationalChecklist\` and cursor to aid in pagination.
+  """
+  edges: [RelationalChecklistsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`RelationalChecklist\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`RelationalChecklist\` edge in the connection."""
+type RelationalChecklistsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalChecklist\` at the end of the edge."""
+  node: RelationalChecklist
+}
+
+"""
+A condition to be used against \`RelationalChecklist\` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalChecklistCondition {
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`rootTopicId\` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s \`authorId\` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s \`position\` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s \`updatedAt\` field."""
+  updatedAt: Datetime
+
+  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s \`archivedAt\` field."""
+  archivedAt: Datetime
+}
+
+"""Methods to use when ordering \`RelationalChecklist\`."""
+enum RelationalChecklistsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
+"""A connection to a list of \`RelationalDivider\` values."""
+type RelationalDividersConnection {
+  """A list of \`RelationalDivider\` objects."""
+  nodes: [RelationalDivider]!
+
+  """
+  A list of edges which contains the \`RelationalDivider\` and cursor to aid in pagination.
+  """
+  edges: [RelationalDividersEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`RelationalDivider\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`RelationalDivider\` edge in the connection."""
+type RelationalDividersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalDivider\` at the end of the edge."""
+  node: RelationalDivider
+}
+
+"""
+A condition to be used against \`RelationalDivider\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalDividerCondition {
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
+
+  """Checks for equality with the object’s \`color\` field."""
+  color: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`rootTopicId\` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s \`authorId\` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s \`position\` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s \`updatedAt\` field."""
+  updatedAt: Datetime
+
+  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s \`archivedAt\` field."""
+  archivedAt: Datetime
+}
+
+"""Methods to use when ordering \`RelationalDivider\`."""
+enum RelationalDividersOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  COLOR_ASC
+  COLOR_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
+"""A connection to a list of \`RelationalPost\` values."""
+type RelationalPostsConnection {
+  """A list of \`RelationalPost\` objects."""
+  nodes: [RelationalPost]!
+
+  """
+  A list of edges which contains the \`RelationalPost\` and cursor to aid in pagination.
+  """
+  edges: [RelationalPostsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`RelationalPost\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`RelationalPost\` edge in the connection."""
+type RelationalPostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalPost\` at the end of the edge."""
+  node: RelationalPost
+}
+
+"""
+A condition to be used against \`RelationalPost\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalPostCondition {
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
+
+  """Checks for equality with the object’s \`description\` field."""
+  description: String
+
+  """Checks for equality with the object’s \`note\` field."""
+  note: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`rootTopicId\` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s \`authorId\` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s \`position\` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s \`updatedAt\` field."""
+  updatedAt: Datetime
+
+  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s \`archivedAt\` field."""
+  archivedAt: Datetime
+}
+
+"""Methods to use when ordering \`RelationalPost\`."""
+enum RelationalPostsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  NOTE_ASC
+  NOTE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
+"""A connection to a list of \`RelationalTopic\` values."""
+type RelationalTopicsConnection {
+  """A list of \`RelationalTopic\` objects."""
+  nodes: [RelationalTopic]!
+
+  """
+  A list of edges which contains the \`RelationalTopic\` and cursor to aid in pagination.
+  """
+  edges: [RelationalTopicsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`RelationalTopic\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A \`RelationalTopic\` edge in the connection."""
+type RelationalTopicsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalTopic\` at the end of the edge."""
+  node: RelationalTopic
+}
+
+"""
+A condition to be used against \`RelationalTopic\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalTopicCondition {
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
+
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`rootTopicId\` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s \`authorId\` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s \`position\` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s \`createdAt\` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s \`updatedAt\` field."""
+  updatedAt: Datetime
+
+  """Checks for equality with the object’s \`isExplicitlyArchived\` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s \`archivedAt\` field."""
+  archivedAt: Datetime
+}
+
+"""Methods to use when ordering \`RelationalTopic\`."""
+enum RelationalTopicsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
 type FirstPartyVulnerability implements Vulnerability {
   cvssScoreInt: Int
   id: Int!
@@ -11055,8 +11055,8 @@ export const objects = {
         plan() {
           const $list = pgUnionAll({
             attributes: spec_Application.attributes,
-            resourceByTypeName: resourceByTypeName7,
-            members: members4,
+            resourceByTypeName: resourceByTypeName6,
+            members: members3,
             name: "Application"
           });
           return connection($list);
@@ -11324,8 +11324,8 @@ export const objects = {
         plan() {
           const $list = pgUnionAll({
             attributes: spec_Vulnerability.attributes,
-            resourceByTypeName: resourceByTypeName6,
-            members: members3,
+            resourceByTypeName: resourceByTypeName7,
+            members: members4,
             name: "Vulnerability"
           });
           return connection($list);
