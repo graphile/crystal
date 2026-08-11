@@ -300,16 +300,34 @@ Original error: ${e.message}
                 attributes,
               );
 
-            for (const pgConstraint of enumConstraints) {
-              const pgAttribute = enumTableAttributes.find(
-                (pgAttribute) => pgAttribute.attnum === pgConstraint.conkey![0],
-              );
-              if (!pgAttribute) {
-                // Should never happen
-                throw new Error(
-                  "GraphileInternalError<89c93c93-7e94-406c-a822-736e2ff1e466>: could not find attribute for enum constraint",
+            // Async work in parallel up front for schema stability
+            const details = await Promise.all(
+              enumConstraints.map(async (pgConstraint) => {
+                const pgAttribute = enumTableAttributes.find(
+                  (pgAttribute) =>
+                    pgAttribute.attnum === pgConstraint.conkey![0],
                 );
-              }
+                if (!pgAttribute) {
+                  // Should never happen
+                  throw new Error(
+                    "GraphileInternalError<89c93c93-7e94-406c-a822-736e2ff1e466>: could not find attribute for enum constraint",
+                  );
+                }
+                const originalCodec =
+                  await info.helpers.pgCodecs.getCodecFromType(
+                    serviceName,
+                    pgAttribute.atttypid,
+                    pgAttribute.atttypmod,
+                  );
+                return { pgConstraint, pgAttribute, originalCodec };
+              }),
+            );
+
+            for (const {
+              pgConstraint,
+              pgAttribute,
+              originalCodec,
+            } of details) {
               const data = allData.filter(
                 (row) => row[pgAttribute.attname] != null,
               );
@@ -319,12 +337,6 @@ Original error: ${e.message}
                 );
               }
 
-              const originalCodec =
-                await info.helpers.pgCodecs.getCodecFromType(
-                  serviceName,
-                  pgAttribute.atttypid,
-                  pgAttribute.atttypmod,
-                );
               if (!originalCodec) {
                 // LOGGING: inform user of this (or throw?)
                 continue;
@@ -339,7 +351,7 @@ Original error: ${e.message}
                 }),
               );
 
-              const extensions: PgCodecExtensions = {
+              const extensions: DataplanPg.PgCodecExtensions = {
                 // ENHANCE: more extensions/tags?
                 isEnumTableEnum: true,
                 enumTableEnumDetails: {
@@ -421,11 +433,15 @@ Original error: ${e.message}
       },
       // Make sure all our codecs are registered, even if they're not
       // referenced via relations
-      async pgRegistry_PgRegistryBuilder_pgCodecs(info, event) {
-        const { registryBuilder } = event;
-        for (const enumCodec of info.state.codecByPgConstraint.values()) {
-          registryBuilder.addCodec(enumCodec);
-        }
+      pgRegistry_PgRegistryBuilder_pgCodecs: {
+        after: ["PgCodecsPlugin"],
+        before: ["PgTablesPlugin"],
+        async callback(info, event) {
+          const { registryBuilder } = event;
+          for (const enumCodec of info.state.codecByPgConstraint.values()) {
+            registryBuilder.addCodec(enumCodec);
+          }
+        },
       },
     },
   }),

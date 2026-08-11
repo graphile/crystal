@@ -346,16 +346,26 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const attributeAttributes = allAttributes
             .filter((attr) => attr.attnum >= 1 && attr.attisdropped != true)
             .sort((a, z) => a.attnum - z.attnum);
+
+          // Do async work up parallel in front for schema stability
+          const attrsAndCodecs = await Promise.all(
+            attributeAttributes.map(async (attributeAttribute) => {
+              return {
+                attributeAttribute,
+                attributeCodec: await info.helpers.pgCodecs.getCodecFromType(
+                  serviceName,
+                  attributeAttribute.atttypid,
+                  attributeAttribute.atttypmod,
+                ),
+              };
+            }),
+          );
+
           let hasAtLeastOneAttribute = false;
-          for (const attributeAttribute of attributeAttributes) {
-            const attributeCodec = await info.helpers.pgCodecs.getCodecFromType(
-              serviceName,
-              attributeAttribute.atttypid,
-              attributeAttribute.atttypmod,
-            );
-            const { tags: rawTags, description } =
-              attributeAttribute.getTagsAndDescription();
+          for (const { attributeAttribute, attributeCodec } of attrsAndCodecs) {
             if (attributeCodec) {
+              const { tags: rawTags, description } =
+                attributeAttribute.getTagsAndDescription();
               hasAtLeastOneAttribute = true;
 
               const tags =
