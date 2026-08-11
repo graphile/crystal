@@ -538,10 +538,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // the order of the generated schema
         const baseCodecPromise =
           typeModifier != null
-            ? info.helpers.pgCodecs.getCodecFromType(serviceName, typeId, null)
+            ? info.helpers.pgCodecs
+                .getCodecFromType(serviceName, typeId, null)
+                .then(undefined, noop)
             : null;
-        // This promise will be handled shortly (and if not, errors are irrelevant), ignore errors.
-        void baseCodecPromise?.then(null, noop);
 
         const promise = (async (): Promise<PgCodec | null> => {
           const baseCodec = baseCodecPromise ? await baseCodecPromise : null;
