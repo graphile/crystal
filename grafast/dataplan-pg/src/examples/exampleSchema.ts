@@ -1956,6 +1956,25 @@ export function makeExampleSchema(
         type: GraphQLString,
       },
       gravatarUrl: attrField("gravatar_url", GraphQLString),
+      visibleMessages: {
+        type: MessagesConnection,
+        plan: EXPORTABLE(
+          (connection, messageResource, sql) =>
+            function plan($user) {
+              const $messages = messageResource.find();
+              // NOTE: `connection` being called **BEFORE** `$messages.where` is significant for this test.
+              const $connection = connection($messages);
+
+              $messages.where(
+                sql`${$messages.alias}.author_id = ${$messages.placeholder($user.get("id"))}`,
+              );
+              $messages.orderBy({ attribute: "id", direction: "ASC" });
+
+              return $connection;
+            },
+          [connection, messageResource, sql],
+        ),
+      },
       mostRecentForum: {
         type: Forum,
         plan: EXPORTABLE(
