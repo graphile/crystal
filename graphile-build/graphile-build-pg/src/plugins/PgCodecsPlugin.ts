@@ -17,6 +17,7 @@ import {
   recordCodec,
   TYPES,
 } from "@dataplan/pg";
+import { noop } from "grafast";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 
@@ -533,6 +534,15 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           return pgCodec;
         }
 
+        // Ensure this promise starts and is cached first, to avoid changing
+        // the order of the generated schema
+        const baseCodecPromise =
+          typeModifier != null
+            ? info.helpers.pgCodecs.getCodecFromType(serviceName, typeId, null)
+            : null;
+        // This promise will be handled shortly (and if not, errors are irrelevant), ignore errors.
+        void baseCodecPromise?.then(null, noop);
+
         const promise = (async (): Promise<PgCodec | null> => {
           const pgType = await info.helpers.pgIntrospection.getType(
             serviceName,
@@ -551,11 +561,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
 
           if (typeModifier != null) {
-            const baseCodec = await info.helpers.pgCodecs.getCodecFromType(
-              serviceName,
-              typeId,
-              null,
-            );
+            if (!baseCodecPromise) {
+              throw new Error(`baseCodecPromise/typeModifier mismatch`);
+            }
+            const baseCodec = await baseCodecPromise;
             if (baseCodec == null) {
               // Already logged
               return null;
