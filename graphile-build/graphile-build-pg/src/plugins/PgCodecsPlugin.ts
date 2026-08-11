@@ -553,14 +553,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          // Class types are handled via getCodecFromClass (they have to add attributes)
-          if (pgType.typtype === "c") {
-            return info.helpers.pgCodecs.getCodecFromClass(
-              serviceName,
-              pgType.typrelid!,
-            );
-          }
-
           if (typeModifier != null) {
             if (baseCodec == null) {
               // Already logged
@@ -590,6 +582,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               return baseCodec;
             }
           } else {
+            // Class types are handled via getCodecFromClass (they have to add attributes)
+            if (pgType.typtype === "c") {
+              return info.helpers.pgCodecs.getCodecFromClass(
+                serviceName,
+                pgType.typrelid!,
+              );
+            }
+
             const event: Parameters<
               GraphileConfig.GatherHooks["pgCodecs_findPgCodec"]
             >[0] = { serviceName, pgType, pgCodec: null };
