@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy()
+{
+  randomUser {
+    visibleMessages {
+      edges {
+        node {
+          id
+        }
+      }
+    }
+  }
+}

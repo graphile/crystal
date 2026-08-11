@@ -3,6 +3,15 @@
 Returns a step that yields the same values as the passed in step, but
 downstream work is inhibited when the yielded value is considered empty.
 
+:::danger[Not a security boundary]
+
+`inhibitOnEmpty` enables Gra*fast* to optimize away unnecessary downstream
+work; it does not guarantee that the work will not execute. Do not use it for
+authorization or to prevent security-sensitive operations. Enforce those
+requirements inside the protected operation or data source.
+
+:::
+
 Gra*fast* currently considers a value empty if it is:
 
 - `undefined`

@@ -299,12 +299,11 @@ ${
 
 # DURATION
 ${duration}
-%s
-
 
 # EXPLAIN
 %s
 
+%s
 
 `,
         LOOK_DOWN,
@@ -323,13 +322,13 @@ ${duration}
                 )
                 .join("\n- ")
             : `-none-`,
-        LOOK_UP,
         explain ??
           (shouldExplain
             ? `(Explain disabled ${
                 error ? "due to error" : "due to unknown reason"
               })`
             : `(Use 'DEBUG="@dataplan/pg:PgExecutor:explain"' to enable explain)`),
+        LOOK_UP,
       );
     }
     if (publish !== undefined) {

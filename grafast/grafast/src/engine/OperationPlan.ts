@@ -1915,7 +1915,7 @@ export class OperationPlan {
             false,
           );
           if (!isUnary) {
-            $combined._isUnary = false;
+            this.stepTracker.setNonUnary($combined, []);
           }
           // Tell it to populate the __ValuePlan $combined with the combination
           // of all the values from toCombine.
@@ -3891,8 +3891,7 @@ export class OperationPlan {
     if (this.isImmoveable(step)) {
       return step;
     }
-    if (step._isUnary) {
-      step._isUnaryLocked = true;
+    if (step.getAndFreezeIsUnary()) {
       // Don't push unary steps down
       return step;
     }
@@ -4131,9 +4130,7 @@ export class OperationPlan {
     step.isArgumentsFinalized = true;
 
     // If a step is unary at this point, it must always remain unary.
-    if (step._isUnary) {
-      step._isUnaryLocked = true;
-    }
+    void step.getAndFreezeIsUnary();
 
     if (step.deduplicate == null) return step;
     const result = this._deduplicateInnerLogic(step);
@@ -4577,9 +4574,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
             }; step: ${dep}; stepById: ${this.stepTracker.getStepById(dep.id)}`,
           );
         }
-        if (targetStep._isUnary) {
-          targetStep._isUnaryLocked = true;
-        }
+        void targetStep.getAndFreezeIsUnary();
         currentLayerPlan.copyStepIds.push(dep.id);
         if (currentLayerPlan.reason.type === "combined") {
           const prev = currentLayerPlan as LayerPlan<LayerPlanReasonCombined>;
