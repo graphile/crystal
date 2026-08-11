@@ -1567,6 +1567,7 @@ export function abortable<T, F>(
   promiseOrValue: PromiseOrDirect<T>,
 ): PromiseOrDirect<T | F> {
   if (signal.aborted) {
+    consume(promiseOrValue);
     return valueForAbort;
   }
   if (!isPromiseLike(promiseOrValue)) {
