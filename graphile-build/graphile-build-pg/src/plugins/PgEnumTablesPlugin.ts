@@ -1,4 +1,4 @@
-import type { PgCodecExtensions, PgEnumCodec, PgEnumValue } from "@dataplan/pg";
+import type { PgEnumCodec, PgEnumValue } from "@dataplan/pg";
 import { enumCodec, withPgClientFromPgService } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 import type {
