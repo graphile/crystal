@@ -452,7 +452,7 @@ export class StepTracker {
           `Attempted to add non-unary step ${$dependency} as a dependency of ${$dependent}; but the latter is unary, so it cannot depend on batch steps`,
         );
       }
-      $dependent._isUnary = false;
+      this.setNonUnary($dependent, [$dependency]);
     }
 
     const forbiddenFlags =
@@ -473,6 +473,29 @@ export class StepTracker {
     return dependencyIndex;
   }
 
+  /**
+   * Marks a step as non-unary, which also marks everything that depends on
+   * this step as non-unary and so on.
+   */
+  public setNonUnary($step: Step, stack: readonly Step[]) {
+    if ($step._isUnary === false) return;
+    if ($step._isUnaryLocked) {
+      throw new Error(
+        `${$step} is locked as unary, so it cannot be made non-unary${
+          stack.length
+            ? ` which is required to depend on ${stack.join(", which was made non-unary by ")}`
+            : ""
+        }`,
+      );
+    }
+    const ss = sudo($step);
+    ss._isUnary = false;
+    ss._isUnaryLocked = true;
+    for (const dep of $step.dependents) {
+      this.setNonUnary(dep.step, [$step, ...stack]);
+    }
+  }
+
   public addStepUnaryDependency(
     $dependent: Step,
     options: AddUnaryDependencyOptions,
@@ -487,7 +510,7 @@ export class StepTracker {
     if (!$dependency._isUnary) {
       throw new Error(nonUnaryMessage($dependent, $dependency));
     }
-    $dependency._isUnaryLocked = true;
+    sudo($dependency)._isUnaryLocked = true;
     return this.addStepDependency($dependent, { ...rest, dataOnly: false });
   }
 

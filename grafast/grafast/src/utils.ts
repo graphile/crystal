@@ -987,6 +987,8 @@ export type Sudo<T> =
         defaultForbiddenFlags: ExecutionEntryFlags;
         _getDepOptions: Step["_getDepOptions"];
         _refs: Array<number>;
+        _isUnary: boolean;
+        _isUnaryLocked: boolean;
       }
     : T;
 
