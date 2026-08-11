@@ -40,7 +40,7 @@ import type {
 } from "./interfaces.ts";
 import type { __FlagStep, __ItemStep } from "./steps/index.ts";
 import { buildOptimizedExecute } from "./unbatchedStepExecute.ts";
-import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.ts";
+import { stepADependsOnStepB, stepAMayDependOnStepB, sudo } from "./utils.ts";
 
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
@@ -116,9 +116,9 @@ export /* abstract */ class Step<TData = any> {
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   /** @internal */
-  public _isUnary: boolean;
+  public readonly _isUnary: boolean;
   /** @internal */
-  public _isUnaryLocked: boolean;
+  public readonly _isUnaryLocked: boolean;
   /**
    * Set `true` if this step should only run for certain of the polymorphic
    * paths available in its LayerPlan.
@@ -210,7 +210,9 @@ export /* abstract */ class Step<TData = any> {
   protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
-   * Just for mermaid
+   * Originally just for mermaid, do not rely on this as we may break it in a
+   * patch release.
+   *
    * @internal
    */
   public readonly dependents: ReadonlyArray<{
@@ -418,7 +420,7 @@ export /* abstract */ class Step<TData = any> {
    * non-unary dependency later will result in an error.
    */
   public getAndFreezeIsUnary() {
-    this._isUnaryLocked = true;
+    sudo(this)._isUnaryLocked = true;
     return this._isUnary;
   }
 

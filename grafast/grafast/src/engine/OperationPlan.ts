@@ -1915,7 +1915,7 @@ export class OperationPlan {
             false,
           );
           if (!isUnary) {
-            $combined._isUnary = false;
+            this.stepTracker.setNonUnary($combined, []);
           }
           // Tell it to populate the __ValuePlan $combined with the combination
           // of all the values from toCombine.
