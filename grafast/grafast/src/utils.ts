@@ -36,6 +36,7 @@ import type {
   GrafastFieldConfig,
   GrafastInputFieldConfig,
   Maybe,
+  PromiseOrDirect,
 } from "./interfaces.ts";
 import type { Step } from "./step.ts";
 import { constant } from "./steps/constant.ts";
@@ -1562,15 +1563,19 @@ export function markSyncAndSafe<
 export function abortable<T, F>(
   signal: AbortSignal,
   valueForAbort: F,
-  promise: PromiseLike<T>,
-): Promise<T | F> {
+  promiseOrValue: PromiseOrDirect<T>,
+): PromiseOrDirect<T | F> {
   if (signal.aborted) {
-    return Promise.resolve(valueForAbort);
+    return valueForAbort;
   }
+  if (!isPromiseLike(promiseOrValue)) {
+    return promiseOrValue;
+  }
+  const promise = promiseOrValue;
   return new Promise<T | F>((resolve, reject) => {
     const resolveWithoutArgs = () => resolve(valueForAbort);
     signal.addEventListener("abort", resolveWithoutArgs, { once: true });
-    return promise.then(
+    void promise.then(
       (val) => {
         signal.removeEventListener("abort", resolveWithoutArgs);
         resolve(val);

@@ -520,9 +520,7 @@ function executePreemptive(
         // eslint-disable-next-line no-constant-condition
         while (true) {
           const rawNext = stream.next();
-          const next = isPromiseLike(rawNext)
-            ? await abortable(iteratorAbortSignal, undefined, rawNext)
-            : rawNext;
+          const next = await abortable(iteratorAbortSignal, undefined, rawNext);
           if (next?.done) {
             // Stream already exited
             break;
@@ -536,9 +534,11 @@ function executePreemptive(
           }
           try {
             const rawPayload = executeStreamPayload(next.value, i);
-            const payload = isPromiseLike(rawPayload)
-              ? await abortable(iteratorAbortSignal, undefined, rawPayload)
-              : rawPayload;
+            const payload = await abortable(
+              iteratorAbortSignal,
+              undefined,
+              rawPayload,
+            );
             if (payload === undefined) {
               break;
             }

@@ -700,7 +700,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             callback();
           };
           const waitNext = () => {
-            const next = abortable(signal, $$stop, eventStream.next());
+            const next = Promise.resolve(
+              abortable(signal, $$stop, eventStream.next()),
+            );
             next.then(
               (event) => {
                 if (event === $$stop) {
