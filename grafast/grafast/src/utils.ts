@@ -1591,6 +1591,8 @@ export function abortable<T, F>(
 
 /**
  * If `value` is a promise, consumes any errors that it yields.
+ *
+ * @experimental
  */
 export function consume(value: unknown): void {
   if (isPromiseLike(value)) {
