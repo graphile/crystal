@@ -1,5 +1,25 @@
 # graphile-build-pg
 
+## 5.1.4
+
+### Patch Changes
+
+- [#3116](https://github.com/graphile/crystal/pull/3116)
+  [`19af784`](https://github.com/graphile/crystal/commit/19af784de17fc1f6c9e075c3270ce311213537a3)
+  Thanks [@benjie](https://github.com/benjie)! - Address a slow memory leak in
+  GraphQL subscriptions that can cause OOM errors when a single subscription
+  hits many hundreds of thousands of events. The cause was racing an
+  abortPromise with each event, causing the abort promise to build up a large
+  list of callbacks in its internal Promise mechanics when the event always won
+  the race. The fix was to move from using a promise for abort to an
+  AbortController, where the abort task can be released after each event
+  successfully resolves, avoiding memory buildup. Also applied this fix to
+  similar patterns elsewhere in the codebase, albeit places much less sensitive
+  to this issue.
+- Updated dependencies
+  [[`4d113fa`](https://github.com/graphile/crystal/commit/4d113faa99e83efb1780f0972669f3d9c1d1c959)]:
+  - graphile-config@1.1.1
+
 ## 5.1.3
 
 ### Patch Changes

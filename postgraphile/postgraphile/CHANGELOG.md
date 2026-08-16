@@ -1,5 +1,49 @@
 # postgraphile
 
+## 5.1.5
+
+### Patch Changes
+
+- [#3137](https://github.com/graphile/crystal/pull/3137)
+  [`637408c`](https://github.com/graphile/crystal/commit/637408cec8c9c7c6c8f14a0be719d2b128c9834e)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes a planning bug where
+  adding a non-unary dependency A to a unary step B correctly converts B to be
+  non-unary... but didn't _cascade_ that change to unary steps that depend on B.
+  The result was runtime (rather than plantime) exceptions:
+  `GrafastInternalError<58bc38e2-8722-4c19-ba38-fd01a020654b>: unary step SomeStep[17] cannot be made dependent on non-unary step SomeOtherStep[29]!`
+  This is now resolved by cascading the change.
+
+- [#3116](https://github.com/graphile/crystal/pull/3116)
+  [`19af784`](https://github.com/graphile/crystal/commit/19af784de17fc1f6c9e075c3270ce311213537a3)
+  Thanks [@benjie](https://github.com/benjie)! - Address a slow memory leak in
+  GraphQL subscriptions that can cause OOM errors when a single subscription
+  hits many hundreds of thousands of events. The cause was racing an
+  abortPromise with each event, causing the abort promise to build up a large
+  list of callbacks in its internal Promise mechanics when the event always won
+  the race. The fix was to move from using a promise for abort to an
+  AbortController, where the abort task can be released after each event
+  successfully resolves, avoiding memory buildup. Also applied this fix to
+  similar patterns elsewhere in the codebase, albeit places much less sensitive
+  to this issue.
+
+- [#3128](https://github.com/graphile/crystal/pull/3128)
+  [`56e8708`](https://github.com/graphile/crystal/commit/56e8708a7467f3902ca68b1b745b688f06bbd800)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug where `trap()` would
+  prevent connection-capable list steps from resolving correctly (often
+  replacing them with `null`).
+- Updated dependencies
+  [[`637408c`](https://github.com/graphile/crystal/commit/637408cec8c9c7c6c8f14a0be719d2b128c9834e),
+  [`8717725`](https://github.com/graphile/crystal/commit/87177254c2cdaf46a446e60ff7b7e7485523a6c8),
+  [`19af784`](https://github.com/graphile/crystal/commit/19af784de17fc1f6c9e075c3270ce311213537a3),
+  [`4d113fa`](https://github.com/graphile/crystal/commit/4d113faa99e83efb1780f0972669f3d9c1d1c959),
+  [`56e8708`](https://github.com/graphile/crystal/commit/56e8708a7467f3902ca68b1b745b688f06bbd800),
+  [`ddf58fa`](https://github.com/graphile/crystal/commit/ddf58faafdbb194da11f0bca429285c25747c964)]:
+  - @dataplan/pg@1.1.2
+  - grafast@1.1.3
+  - graphile-build-pg@5.1.4
+  - grafserv@1.0.2
+  - graphile-config@1.1.1
+
 ## 5.1.4
 
 ### Patch Changes
