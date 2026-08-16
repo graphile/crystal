@@ -60,6 +60,13 @@ export interface PgClientQuery {
   arrayMode?: boolean;
   /** For prepared statements */
   name?: string;
+  /**
+   * Forces every column of the result to be returned as a raw (undecoded)
+   * string, bypassing the client library's usual type-aware parsing.
+   * Required for statements (e.g. `CALL`) whose result columns cannot be
+   * wrapped in an explicit `::text` cast.
+   */
+  rawText?: boolean;
 }
 
 export type PgRaiseSeverity = "DEBUG" | "LOG" | "INFO" | "NOTICE" | "WARNING";
@@ -164,6 +171,14 @@ export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
   text: string;
   values: ReadonlyArray<SQLRawValue>;
+  /**
+   * Statements such as `CALL` return their columns using Postgres' native
+   * wire-protocol type parsing rather than the `::text` casts we normally
+   * use to get consistent string representations for our codecs to decode.
+   * Setting this forces every column of the result to be returned as a raw
+   * string so it can be fed through the relevant `PgCodec`'s `fromPg`.
+   */
+  rawText?: boolean;
 };
 
 export type PgExecutorSubscribeOptions = {
@@ -209,6 +224,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     name?: string,
     publish?: PublishFunction,
     isMutation = false,
+    rawText = false,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -219,6 +235,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
         values: values as SQLRawValue[],
         arrayMode: true,
         name,
+        ...(rawText ? { rawText: true } : null),
       });
     } catch (e) {
       error = e;
@@ -937,7 +954,7 @@ ${duration}
   public async executeMutation<TData>(
     options: PgExecutorMutationOptions,
   ): Promise<PgClientResult<TData>> {
-    const { context, text, values } = options;
+    const { context, text, values, rawText } = options;
     const { withPgClient, pgSettings } = context;
 
     // We don't explicitly need a transaction for mutations
@@ -949,6 +966,7 @@ ${duration}
         undefined,
         undefined,
         true,
+        rawText,
       ),
     );
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!

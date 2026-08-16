@@ -164,10 +164,17 @@ function newNodePostgresPgClient(
         return doIt();
       }
       function doIt() {
-        const { text, name, values, arrayMode } = opts;
+        const { text, name, values, arrayMode, rawText } = opts;
         const queryObj: QueryConfig | QueryArrayConfig = arrayMode
           ? { text, values, rowMode: "array" }
           : { text, values };
+        if (rawText) {
+          // Some statements (e.g. `CALL`) return columns whose types we
+          // cannot wrap in an explicit `::text` cast; force the driver to
+          // hand back raw strings for every column instead of applying its
+          // own (potentially codec-incompatible) type parsing.
+          queryObj.types = { getTypeParser: () => (raw: string) => raw };
+        }
 
         if (PREPARED_STATEMENT_CACHE_SIZE > 0 && name != null) {
           // Hacking into pgClient internals - this is dangerous, but it's the only way I know to get a prepared statement LRU
