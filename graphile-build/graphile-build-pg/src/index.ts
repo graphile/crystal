@@ -16,6 +16,10 @@ export { PgEnumDomainsPlugin } from "./plugins/PgEnumDomainsPlugin.ts";
 export { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.ts";
 export { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.ts";
 export { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAfterArgsPlugin.ts";
+export {
+  PgFunctionOverloadsPlugin,
+  PgFunctionOverloadsPreset,
+} from "./plugins/PgFunctionOverloadsPlugin.ts";
 export { PgIndexBehaviorsPlugin } from "./plugins/PgIndexBehaviorsPlugin.ts";
 export { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.ts";
 export { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.ts";
