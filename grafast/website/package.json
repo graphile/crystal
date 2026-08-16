@@ -48,7 +48,7 @@
     "@types/react": "^19.2.7",
     "dataloader": "^2.2.3",
     "graphql": "^16.9.0",
-    "mermaid": "^11.12.1",
+    "mermaid": "^11.15.0",
     "sqlite3": "^5.1.7"
   },
   "browserslist": {
