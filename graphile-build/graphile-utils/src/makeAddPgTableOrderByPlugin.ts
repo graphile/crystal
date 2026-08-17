@@ -7,13 +7,15 @@ import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
 
+type ArrayOrDirect<T> = T | Array<T>;
+
 type OrderBySpecIdentity =
   | string // Attribute name
   | Omit<PgOrderSpec, "direction"> // Expression
   | ((
       queryBuilder: PgSelectQueryBuilder,
       info: { scope: unknown }, // The `info` argument to `EnumValueApplyResolver`
-    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+    ) => ArrayOrDirect<Omit<PgOrderSpec, "direction">>); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
@@ -162,12 +164,18 @@ export function orderByAscDesc(
                 queryBuilder: PgSelectQueryBuilder,
                 info: { scope: unknown },
               ) {
-                queryBuilder.orderBy({
-                  nulls: ascendingNulls,
-                  nullable,
-                  ...attributeOrSqlFragment(queryBuilder, info),
-                  direction: "ASC",
-                } as PgOrderSpec);
+                const specOrSpecs = attributeOrSqlFragment(queryBuilder, info);
+                const specs = Array.isArray(specOrSpecs)
+                  ? specOrSpecs
+                  : [specOrSpecs];
+                specs.forEach((spec) => {
+                  queryBuilder.orderBy({
+                    nulls: ascendingNulls,
+                    nullable,
+                    ...spec,
+                    direction: "ASC",
+                  } as PgOrderSpec);
+                });
                 if (unique) {
                   queryBuilder.setOrderIsUnique();
                 }
@@ -216,12 +224,18 @@ export function orderByAscDesc(
                 queryBuilder: PgSelectQueryBuilder,
                 info: { scope: unknown },
               ) {
-                queryBuilder.orderBy({
-                  nulls: descendingNulls,
-                  nullable,
-                  ...attributeOrSqlFragment(queryBuilder, info),
-                  direction: "DESC",
-                } as PgOrderSpec);
+                const specOrSpecs = attributeOrSqlFragment(queryBuilder, info);
+                const specs = Array.isArray(specOrSpecs)
+                  ? specOrSpecs
+                  : [specOrSpecs];
+                specs.forEach((spec) => {
+                  queryBuilder.orderBy({
+                    nulls: descendingNulls,
+                    nullable,
+                    ...spec,
+                    direction: "DESC",
+                  } as PgOrderSpec);
+                });
                 if (unique) {
                   queryBuilder.setOrderIsUnique();
                 }
