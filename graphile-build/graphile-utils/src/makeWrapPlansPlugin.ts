@@ -34,7 +34,7 @@ export interface PlanWrapperRules {
 }
 
 export type PlanWrapperRulesGenerator = (
-  build: Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
+  build: GraphileBuild.Build,
 ) => PlanWrapperRules;
 
 export type PlanWrapperFilter<T> = (
@@ -68,6 +68,11 @@ export interface WrapPlansOptions {
 
 let counter = 0;
 const EMPTY_OPTIONS: WrapPlansOptions = Object.freeze({});
+
+interface PlanWrapperState<T> {
+  rules: PlanWrapperRules | null;
+  filter: PlanWrapperFilter<T> | null;
+}
 
 export function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
@@ -138,6 +143,13 @@ export function wrapPlans<T>(
     schema: {
       hooks: {
         build(build) {
+          (build as any)[symbol] = {
+            rules: null,
+            filter: null,
+          };
+          return build;
+        },
+        init(_, build) {
           // Disambiguate first argument
           const rulesOrGenerator:
             | PlanWrapperRules
@@ -151,20 +163,17 @@ export function wrapPlans<T>(
             typeof rulesOrGenerator === "function"
               ? rulesOrGenerator(build)
               : rulesOrGenerator;
-          (build as any)[symbol] = {
-            rules,
-            filter,
-          };
-          return build;
+          const state: PlanWrapperState<T> = { rules, filter };
+          Object.assign((build as any)[symbol], state);
+          return _;
         },
         GraphQLObjectType_fields_field(field, build, context) {
-          const rules = (build as any)[symbol].rules as PlanWrapperRules | null;
+          const state = (build as any)[symbol] as PlanWrapperState<T>;
+          const { rules, filter } = state;
           const {
             EXPORTABLE,
             grafast: { ExecutableStep, isStep, defaultPlanResolver },
           } = build;
-          const filter = (build as any)[symbol]
-            .filter as PlanWrapperFilter<T> | null;
           const {
             Self,
             scope: { fieldName },

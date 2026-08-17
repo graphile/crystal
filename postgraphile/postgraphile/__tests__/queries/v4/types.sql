@@ -27,7 +27,8 @@ select
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "16",
   __types__."an_int_range"::text as "17",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
@@ -253,7 +254,8 @@ select
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "16",
   __types__."an_int_range"::text as "17",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
@@ -393,7 +395,8 @@ select
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "16",
   __types__."an_int_range"::text as "17",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
@@ -535,7 +538,8 @@ select
     lower_inc(__type_function__."daterange"),
     to_char(lower(__type_function__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function__."daterange")
+    upper_inc(__type_function__."daterange"),
+    isempty(__type_function__."daterange")
   )::text as "16",
   __type_function__."an_int_range"::text as "17",
   to_char(__type_function__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
@@ -674,7 +678,8 @@ select
     lower_inc(__type_function_list__."daterange"),
     to_char(lower(__type_function_list__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_list__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_list__."daterange")
+    upper_inc(__type_function_list__."daterange"),
+    isempty(__type_function_list__."daterange")
   )::text as "16",
   __type_function_list__."an_int_range"::text as "17",
   to_char(__type_function_list__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
@@ -813,7 +818,8 @@ select
     lower_inc(__type_function_connection__."daterange"),
     to_char(lower(__type_function_connection__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_connection__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_connection__."daterange")
+    upper_inc(__type_function_connection__."daterange"),
+    isempty(__type_function_connection__."daterange")
   )::text as "16",
   __type_function_connection__."an_int_range"::text as "17",
   to_char(__type_function_connection__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
@@ -1012,7 +1018,8 @@ select
     lower_inc(__person_type_function__."daterange"),
     to_char(lower(__person_type_function__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__person_type_function__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__person_type_function__."daterange")
+    upper_inc(__person_type_function__."daterange"),
+    isempty(__person_type_function__."daterange")
   )::text as "17",
   __person_type_function__."an_int_range"::text as "18",
   to_char(__person_type_function__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -1124,7 +1131,8 @@ select
         lower_inc(__person_type_function_list__."daterange"),
         to_char(lower(__person_type_function_list__."daterange"), 'YYYY-MM-DD'::text),
         to_char(upper(__person_type_function_list__."daterange"), 'YYYY-MM-DD'::text),
-        upper_inc(__person_type_function_list__."daterange")
+        upper_inc(__person_type_function_list__."daterange"),
+        isempty(__person_type_function_list__."daterange")
       )::text,
       __person_type_function_list__."an_int_range"::text,
       to_char(__person_type_function_list__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text),
@@ -1265,7 +1273,8 @@ select
         lower_inc(__person_type_function_connection__."daterange"),
         to_char(lower(__person_type_function_connection__."daterange"), 'YYYY-MM-DD'::text),
         to_char(upper(__person_type_function_connection__."daterange"), 'YYYY-MM-DD'::text),
-        upper_inc(__person_type_function_connection__."daterange")
+        upper_inc(__person_type_function_connection__."daterange"),
+        isempty(__person_type_function_connection__."daterange")
       )::text,
       __person_type_function_connection__."an_int_range"::text,
       to_char(__person_type_function_connection__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text),
@@ -1508,7 +1517,8 @@ select
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "18",
   __types__."an_int_range"::text as "19",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "20",
@@ -1620,7 +1630,8 @@ select
         lower_inc(__types_2."daterange"),
         to_char(lower(__types_2."daterange"), 'YYYY-MM-DD'::text),
         to_char(upper(__types_2."daterange"), 'YYYY-MM-DD'::text),
-        upper_inc(__types_2."daterange")
+        upper_inc(__types_2."daterange"),
+        isempty(__types_2."daterange")
       )::text,
       __types_2."an_int_range"::text,
       to_char(__types_2."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text),

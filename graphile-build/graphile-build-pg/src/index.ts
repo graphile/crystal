@@ -108,8 +108,15 @@ declare global {
       [tagName: string]: null | true | string | (string | true)[];
     }
 
+    /** Augment this interface to provide generated build-time types. */
+    interface GeneratedTypes {}
+
     interface BuildInput {
-      pgRegistry: PgRegistry;
+      pgRegistry: GeneratedTypes extends {
+        pgRegistry: infer TRegistry extends PgRegistry;
+      }
+        ? TRegistry
+        : PgRegistry;
     }
 
     interface SchemaOptions {
@@ -181,6 +188,7 @@ declare global {
          */
         // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
+        typeModifier?: string | number | null;
       };
     }
   }

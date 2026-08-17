@@ -31,6 +31,7 @@
       json: "{\"x\":1,\"y\":2,\"z\":3}",
       jsonb: "{\"a\":1,\"b\":2,\"c\":3}",
       numrange: {
+        empty: false,
         start: {
           value: "50",
           inclusive: true,
@@ -38,6 +39,7 @@
         end: null,
       },
       daterange: {
+        empty: false,
         start: {
           value: "1927-11-06",
           inclusive: true,
@@ -48,6 +50,7 @@
         },
       },
       anIntRange: {
+        empty: false,
         start: null,
         end: {
           value: 500,

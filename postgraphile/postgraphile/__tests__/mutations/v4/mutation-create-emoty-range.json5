@@ -1,0 +1,30 @@
+{
+  a: {
+    clientMutationId: null,
+    type: {
+      nodeId: "WyJ0eXBlcyIsMjAxXQ==",
+      id: 201,
+      numrange: {
+        empty: true,
+        start: null,
+        end: null,
+      },
+      daterange: {
+        empty: true,
+        start: null,
+        end: null,
+      },
+      anIntRange: {
+        empty: false,
+        start: null,
+        end: {
+          value: 500,
+          inclusive: false,
+        },
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+}
