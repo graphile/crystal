@@ -199,7 +199,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         try {
           const { rows } = await withPgClientFromPgService(
             pgService!,
-            null,
+            pgService?.pgSettingsForIntrospection ?? null,
             (client) => client.query<Record<string, string>>(query),
           );
           return rows;
@@ -208,7 +208,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           try {
             const { rows } = await withPgClientFromPgService(
               pgService!,
-              null,
+              pgService?.pgSettingsForIntrospection ?? null,
               (client) =>
                 client.query<{ user: string }>({
                   text: "select user;",
