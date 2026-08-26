@@ -1,6 +1,6 @@
 import "../index.ts";
 
-import type { PgCodecRelation } from "@dataplan/pg";
+import type { PgCodecRelation, PgResourceUnique } from "@dataplan/pg";
 
 import { version } from "../version.ts";
 
@@ -95,7 +95,9 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
                   if (r.uniques.length === 0) return false;
                   return true;
                 });
-          const pk = resource?.uniques.find((u) => u.isPrimary);
+          const pk = resource?.uniques.find(
+            (u: PgResourceUnique) => u.isPrimary,
+          );
 
           // If the column is a primary key, don't include it (since it will be in the NodeID instead)
           if (pk?.attributes.includes(attributeName)) {
