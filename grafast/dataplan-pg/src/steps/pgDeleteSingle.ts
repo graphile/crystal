@@ -25,6 +25,7 @@ import type {
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
+  PgCodecAttributeNullability,
   GetPgResourceUniques,
   PgCodec,
   PgQueryBuilder,
@@ -179,7 +180,8 @@ export class PgDeleteSingleStep<
   __inferGet?: {
     [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
       GetPgResourceAttributes<TResource>[TAttr]["codec"],
-      TResource
+      TResource,
+      PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
   /**
@@ -190,7 +192,8 @@ export class PgDeleteSingleStep<
     attr: TAttr,
   ): PgClassExpressionStep<
     GetPgResourceAttributes<TResource>[TAttr]["codec"],
-    TResource
+    TResource,
+    PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     const resourceAttribute: PgCodecAttribute =
       this.resource.codec.attributes![attr as string];

@@ -781,8 +781,8 @@ export class PgResource<
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
   ): GetPgCodecAttributes<TCodec> extends PgCodecAttributes
-    ? PgSelectSingleStep<this>
-    : PgClassExpressionStep<TCodec, this> {
+    ? PgSelectSingleStep<this, null>
+    : PgClassExpressionStep<TCodec, this, null> {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional resources; please use .execute()",

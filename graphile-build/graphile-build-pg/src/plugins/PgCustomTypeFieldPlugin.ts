@@ -1580,7 +1580,9 @@ const makeArg = EXPORTABLE(
           | null
           | ((
               $nodeId: Step<Maybe<string>>,
-            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
+            ) =>
+              | PgSelectSingleStep<any, any>
+              | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentSpec {
       const { graphqlArgName, postgresArgName, pgCodec, fetcher } = details;
@@ -1591,7 +1593,10 @@ const makeArg = EXPORTABLE(
         fetcher
           ? trap(
               (
-                fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep
+                fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep<
+                  any,
+                  any
+                >
               ).record(),
               TRAP_INHIBITED,
             )
@@ -1621,7 +1626,9 @@ const makeArgRuntime = EXPORTABLE(
           | null
           | ((
               $nodeId: Step<Maybe<string>>,
-            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
+            ) =>
+              | PgSelectSingleStep<any, any>
+              | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentRuntimeValue {
       const { graphqlArgName, postgresArgName, /*pgCodec,*/ fetcher } = details;
