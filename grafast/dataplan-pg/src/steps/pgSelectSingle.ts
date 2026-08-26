@@ -656,22 +656,27 @@ export function pgSelectFromRecord<
  */
 export function pgSelectSingleFromRecord<
   TResource extends PgResource<any, any, any, any>,
+  TNullability extends null = null,
 >(
   resource: TResource,
   $record:
-    | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
+    | PgClassExpressionStep<
+        GetPgResourceCodec<TResource>,
+        TResource,
+        TNullability
+      >
     | Step,
-): PgSelectSingleStep<TResource, null> {
+): PgSelectSingleStep<TResource, TNullability> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return operationPlan().cacheStep(
     $record,
     "pgSelectSingleFromRecord",
     null,
     () =>
-      pgSelectFromRecord(resource, $record).single() as PgSelectSingleStep<
-        TResource,
-        null
-      >,
+      pgSelectFromRecord(
+        resource,
+        $record,
+      ).single() as unknown as PgSelectSingleStep<TResource, TNullability>,
   );
 }
 
