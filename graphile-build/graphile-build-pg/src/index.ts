@@ -118,11 +118,13 @@ declare global {
       TScope extends
         keyof GraphileBuild.ScopedGeneratedTypes = keyof GraphileBuild.ScopedGeneratedTypes,
     > {
-      pgRegistry: GeneratedTypesForScope<TScope> extends {
-        pgRegistry: infer TRegistry extends PgRegistry<any, any, any, any>;
-      }
-        ? TRegistry
-        : PgRegistry;
+      pgRegistry: [GeneratedTypesForScope<TScope>] extends [never]
+        ? PgRegistry
+        : GeneratedTypesForScope<TScope> extends {
+              pgRegistry: infer TRegistry extends PgRegistry<any, any, any, any>;
+            }
+          ? TRegistry
+          : PgRegistry;
     }
 
     interface SchemaOptions {
