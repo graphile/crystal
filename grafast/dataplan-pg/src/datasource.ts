@@ -878,7 +878,7 @@ export class PgResource<
 
   /** Use `executePositional` or `executeNamed` for stronger types and more ergonomic format */
   execute(
-    args: PgResourceExecuteArguments<TParameters>,
+    args: PgResourceExecuteArguments<TParameters> = [] as unknown as PgResourceExecuteArguments<TParameters>,
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ): ExecutableStep<unknown> {
     if (!this.parameters) {
