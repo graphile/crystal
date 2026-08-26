@@ -822,11 +822,16 @@ export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {
+    /** Extend this interface with generated types for the default schema. */
+    interface ScopedGeneratedTypes_default {}
+
     /**
      * Augment this interface to provide generated build-time types. Scope the
      * generated types to a given name to allow for multiple runtime schemas.
      */
     interface ScopedGeneratedTypes {
+      default: ScopedGeneratedTypes_default;
+
       // [scopeName: string]: {
       //   schema: {
       //     objects: {

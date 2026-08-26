@@ -234,11 +234,10 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   [key in keyof TObj & string as `$${key}`]: Step<TObj[key]> &
     ([unknown] extends [TObj[key]]
       ? { [subkey in string as `$${subkey}`]: Step<any> }
-      : TObj[key] extends Record<string, any>
+      : NonNullable<TObj[key]> extends Record<string, any>
         ? {
-            [subkey in keyof TObj[key] & string as `$${subkey}`]: Step<
-              TObj[key][subkey]
-            >;
+            [subkey in keyof NonNullable<TObj[key]> &
+              string as `$${subkey}`]: Step<NonNullable<TObj[key]>[subkey]>;
           }
         : unknown);
 };

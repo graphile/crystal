@@ -1,8 +1,10 @@
 import type {
   AbstractTypePlanner,
+  BaseGraphQLArguments,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   EnumValueConfig,
+  FieldPlan,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastSchemaConfig,
@@ -133,6 +135,46 @@ export interface ExtensionDefinition
   resolvers?: Resolvers;
 }
 
+type GeneratedFieldPlans<TSource extends Step, TFields> = {
+  [TFieldName in keyof TFields]?: TFields[TFieldName] extends {
+    args: infer TArgs extends BaseGraphQLArguments;
+  }
+    ? FieldPlan<TSource, TArgs>
+    : never;
+};
+
+type GeneratedObjectPlan<TObject> = TObject extends {
+  Step: infer TSource extends Step;
+  fields: infer TFields;
+}
+  ? Omit<ObjectPlan<TSource>, "plans"> & {
+      plans?: GeneratedFieldPlans<TSource, TFields>;
+    }
+  : ObjectPlan;
+
+type GeneratedObjects<TObjects> = {
+  [TObjectName in keyof TObjects]?: GeneratedObjectPlan<TObjects[TObjectName]>;
+};
+
+type GeneratedExtensionDefinitionForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+> = GraphileBuild.ScopedGeneratedTypes[TScope] extends {
+  schema: {
+    objects: infer TObjects;
+  };
+}
+  ? Omit<ExtensionDefinition, "objects"> & {
+      objects?: GeneratedObjects<TObjects>;
+    }
+  : ExtensionDefinition;
+
+export type GeneratedExtensionDefinition<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+> = GeneratedExtensionDefinitionForScope<TScope> & {
+  /** The generated schema scope(s) this extension targets. */
+  scope?: TScope | readonly TScope[];
+};
+
 type ParentConstructors<T> = { new (...args: any[]): T };
 
 type NewTypeDef =
@@ -195,6 +237,14 @@ declare global {
   }
 }
 
+export function extendSchema<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+>(
+  generator:
+    | GeneratedExtensionDefinition<TScope>
+    | ((build: GraphileBuild.Build) => GeneratedExtensionDefinition<TScope>),
+  uniquePluginName?: string,
+): GraphileConfig.Plugin;
 export function extendSchema(
   generator:
     | ExtensionDefinition

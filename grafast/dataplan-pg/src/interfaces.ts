@@ -662,16 +662,7 @@ export interface PgRegistry<
   >,
   TResourceOptions extends {
     [name in string]: PgResourceOptions<any, any, any, any>;
-  } = Record<
-    string,
-    PgResourceOptions<
-      string,
-      // TYPES: This maybe shouldn't be PgCodecWithAttributes, but PgCodec instead?
-      PgCodecWithAttributes, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >
-  >,
+  } = Record<string, PgResourceOptions<string, PgCodec, any, any>>,
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<any, any>;
@@ -681,16 +672,8 @@ export interface PgRegistry<
     Record<
       string,
       PgCodecRelationConfig<
-        // TCodecs[keyof TCodecs] &
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        // TResourceOptions[keyof TResourceOptions] &
-        PgResourceOptions<
-          any,
-          // TCodecs[keyof TCodecs] &
-          PgCodecWithAttributes,
-          any,
-          any
-        >
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >
     >
   >,
