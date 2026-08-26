@@ -116,20 +116,20 @@ declare global {
     }
 
     /** The source step for a generated GraphQL object type, when known. */
-    type GetGraphQLObjectStep<TTypeName extends string> =
-      ScopedGeneratedTypes extends { default: infer TGeneratedTypes }
-        ? TGeneratedTypes extends {
-            schema: {
-              objects: infer TObjects;
-            };
-          }
-          ? TTypeName extends keyof TObjects
-            ? TObjects[TTypeName] extends { Step: infer TStep extends Step }
-              ? TStep
-              : Step
-            : Step
+    type GetGraphQLObjectStep<
+      TTypeName extends string,
+      TScope extends keyof ScopedGeneratedTypes = "default",
+    > = ScopedGeneratedTypes[TScope] extends {
+      schema: {
+        objects: infer TObjects;
+      };
+    }
+      ? TTypeName extends keyof TObjects
+        ? TObjects[TTypeName] extends { Step: infer TStep extends Step }
+          ? TStep
           : Step
-        : Step;
+        : Step
+      : Step;
 
     interface BuildInput<
       TScope extends
