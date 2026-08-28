@@ -1868,19 +1868,9 @@ export class PgSelectStep<
       parentDetails.$pgSelect.mode === "normal"
     ) {
       const { $pgSelect, $pgSelectSingle } = parentDetails;
-      if (
-        this.mode === "normal" &&
-        this.inlineStrategy === "leftJoin" &&
-        this.isUnique &&
-        this.firstStepId == null &&
-        this.lastStepId == null &&
-        this.offsetStepId == null &&
-        // For uniques these should all pass anyway, but pays to be cautious..
-        this.groups.length === 0 &&
-        this.havingConditions.length === 0 &&
-        this.orders.length === 0 &&
-        !this.fetchOneExtra
-      ) {
+      const staticInfo = PgSelectStep.getStaticInfo(this);
+      const { isSimpleUnique } = staticInfo;
+      if (isSimpleUnique === true && this.inlineStrategy === "leftJoin") {
         // Allow, do it via left join
         debugPlanVerbose(
           "Merging %c into %c (via %c)",
@@ -1920,7 +1910,7 @@ export class PgSelectStep<
         $pgSelect.withLayerPlan(() => {
           $pgSelect.apply(
             new PgSelectInlineApplyStep(identifier, false, {
-              staticInfo: PgSelectStep.getStaticInfo(this),
+              staticInfo,
               $first: this.maybeGetDep(this.firstStepId),
               $last: this.maybeGetDep(this.lastStepId),
               $offset: this.maybeGetDep(this.offsetStepId),
@@ -1971,7 +1961,7 @@ export class PgSelectStep<
           $pgSelect.withLayerPlan(() => {
             $pgSelect.apply(
               new PgSelectInlineApplyStep(identifier, true, {
-                staticInfo: PgSelectStep.getStaticInfo(this),
+                staticInfo,
                 $first: this.maybeGetDep(this.firstStepId),
                 $last: this.maybeGetDep(this.lastStepId),
                 $offset: this.maybeGetDep(this.offsetStepId),
@@ -2178,6 +2168,17 @@ export class PgSelectStep<
       fetchOneExtra: $source.fetchOneExtra,
       isOrderUnique: $source.isOrderUnique,
       isUnique: $source.isUnique,
+      isSimpleUnique:
+        $source.mode === "normal" &&
+        $source.isUnique &&
+        $source.firstStepId == null &&
+        $source.lastStepId == null &&
+        $source.offsetStepId == null &&
+        // For uniques these should all pass anyway, but pays to be cautious.
+        $source.groups.length === 0 &&
+        $source.havingConditions.length === 0 &&
+        $source.orders.length === 0 &&
+        !$source.fetchOneExtra,
       conditions: $source.conditions,
       from: $source.from,
       joins: $source.joins,
@@ -2815,6 +2816,12 @@ interface PgSelectQueryInfo<
   readonly mode: PgSelectMode;
   /** Are we fetching just one record? */
   readonly isUnique: boolean;
+  /**
+   * As `isUnique`, but with additional checks: no ordering, pagination, aggregation, etc
+   *
+   * @experimental
+   */
+  readonly isSimpleUnique: boolean;
   readonly joinAsLateral: boolean;
   /** Is the order that was established at planning time unique? */
   readonly isOrderUnique: boolean;
@@ -3506,6 +3513,7 @@ type StaticKeys =
   | "fetchOneExtra"
   | "isOrderUnique"
   | "isUnique"
+  | "isSimpleUnique"
   | "conditions"
   | "from"
   | "joins"
@@ -3623,13 +3631,16 @@ class PgSelectInlineApplyStep<
             fetchOneExtra,
             meta,
             shouldReverseOrder,
+            isSimpleUnique,
           } = info;
           const { sql: baseQuery } = buildQueryFromParts(parts, {
             asArray: true,
           });
           const selectIndex = queryBuilder.selectAndReturnIndex(
             // 's' for 'subquery'
-            sql`array(${sql.indent(baseQuery)})::text`,
+            isSimpleUnique
+              ? sql`(${sql.indent(baseQuery)})::text`
+              : sql`array(${sql.indent(baseQuery)})::text`,
           );
 
           const details: PgSelectInlineViaSubqueryDetails = {
@@ -3641,6 +3652,7 @@ class PgSelectInlineApplyStep<
             first,
             last,
             offset,
+            isSimpleUnique,
             meta,
           };
           queryBuilder.setMeta(this.identifier, details);
@@ -3697,6 +3709,7 @@ interface PgSelectInlineViaSubqueryDetails {
   first: Maybe<number>;
   last: Maybe<number>;
   offset: Maybe<number>;
+  isSimpleUnique: boolean;
   shouldReverseOrder: boolean;
 }
 
@@ -4245,7 +4258,12 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
   any[],
 ]) {
-  const allVals = parseArray(item[details.selectIndex]);
+  const result = item[details.selectIndex];
+  const allVals = details.isSimpleUnique
+    ? result == null
+      ? []
+      : [parseArray(result)]
+    : parseArray(result);
   return createSelectResult(allVals, details);
 }
 
