@@ -221,21 +221,22 @@ export type PgSelectMode = "normal" | "aggregate" | "mutation";
  * The SQL strategy to use when a PgSelectStep is inlined into its
  * parent.
  *
- * - `"leftJoin"` - uses a left join (only appropriate for singular records,
- *   otherwise the number of rows returned could multiply up to unmanageable
- *   levels)
- * - `"subquery"` - uses a subquery within `SELECT`
+ * - `"leftJoinPreferred"` - uses a left join for singular records where
+ *   possible (does not use it for bulk requests, otherwise the number of rows
+ *   returned could multiply up to unmanageable levels)
+ * - `"subqueryPreferred"` - uses a subquery within `SELECT`
  * - `"auto"` - dealers choice (PostGraphile will decide for you - this is the default)
  * - `"forbidden"` - do not inline
  */
 // Future strategies could include:
-// - innerJoin (**unsafe** but potentially faster than leftJoin, only use when
-//   row is guaranteed to exist - not just by FK, but by RLS also)
+// - innerJoinPreferred (**unsafe** but potentially faster than
+//   leftJoinPreferred, only use when row is guaranteed to exist - not just by
+//   FK, but by RLS also)
 export type PgSelectInlineStrategy =
   | "forbidden"
   | "auto"
-  | "leftJoin"
-  | "subquery";
+  | "leftJoinPreferred"
+  | "subqueryPreferred";
 
 /**
  * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
@@ -1870,7 +1871,10 @@ export class PgSelectStep<
       const { $pgSelect, $pgSelectSingle } = parentDetails;
       const staticInfo = PgSelectStep.getStaticInfo(this);
       const { isSimpleUnique } = staticInfo;
-      if (isSimpleUnique === true && this.inlineStrategy === "leftJoin") {
+      if (
+        isSimpleUnique === true &&
+        this.inlineStrategy === "leftJoinPreferred"
+      ) {
         // Allow, do it via left join
         debugPlanVerbose(
           "Merging %c into %c (via %c)",
@@ -1949,11 +1953,7 @@ export class PgSelectStep<
           ALWAYS_ALLOWED ||
           $pgSelectSingle.getAndFreezeIsUnary() ||
           (!$pgSelect.isUnique && relationshipIsBelongsTo);
-        if (allowed && this.inlineStrategy === "leftJoin") {
-          console.warn(
-            `Attempted to force leftJoin strategy in situation where it's not allowed; refusing to inline`,
-          );
-        } else if (allowed) {
+        if (allowed) {
           // Add a nested select expression
           const $__item = $pgSelectSingle.getItemStep();
           this.mergePlaceholdersInto($pgSelect);
