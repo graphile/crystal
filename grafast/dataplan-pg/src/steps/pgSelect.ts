@@ -97,6 +97,11 @@ import {
 } from "./pgStmt.ts";
 import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
 
+// Joins are a combinatorics problem, they're faster in small doses, but as
+// they add up they become more expensive. Let's cap it at something
+// reasonable.
+const AUTO_MAX_INLINE_LEFT_JOINS = 7;
+
 const ALWAYS_ALLOWED = true;
 
 export type PgSelectParsedCursorStep = Step<null | readonly any[]>;
@@ -216,6 +221,27 @@ function assertSensible(step: Step): void {
 }
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
+
+/**
+ * The SQL strategy to use when a PgSelectStep is inlined into its
+ * parent.
+ *
+ * - `"auto"` - dealers choice (PostGraphile will decide for you - this is the default)
+ * - `"forbidden"` - do not inline
+ * - `"preferLeftJoin"` - uses a left join for singular records where
+ *   possible (does not use it for bulk requests, otherwise the number of rows
+ *   returned could multiply up to unmanageable levels)
+ * - `"preferSubquery"` - uses a subquery within `SELECT`
+ */
+// Future strategies could include:
+// - innerJoinPreferred (**unsafe** but potentially faster than
+//   preferLeftJoin, only use when row is guaranteed to exist - not just by
+//   FK, but by RLS also)
+export type PgSelectInliningStrategy =
+  | "auto"
+  | "forbidden"
+  | "preferLeftJoin"
+  | "preferSubquery";
 
 /**
  * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
@@ -503,11 +529,8 @@ export class PgSelectStep<
    */
   private isUnique = false;
 
-  /**
-   * If true, we will not attempt to inline this into the parent query.
-   * Default false.
-   */
-  private isInliningForbidden = false;
+  /** The SQL strategy we'll use when inlining into our parent. */
+  private inliningStrategy: PgSelectInliningStrategy = "auto";
 
   /**
    * If true and this becomes a join during optimisation then it should become
@@ -603,7 +626,7 @@ export class PgSelectStep<
     $clone.isTrusted = cloneFrom.isTrusted;
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
-    $clone.isInliningForbidden = cloneFrom.isInliningForbidden;
+    $clone.inliningStrategy = cloneFrom.inliningStrategy;
 
     for (const [k, v] of cloneFrom._symbolSubstitutes) {
       $clone._symbolSubstitutes.set(k, v);
@@ -758,13 +781,30 @@ export class PgSelectStep<
     this.locker.lock();
   }
 
+  /** @deprecated Use `setInliningStrategy("forbidden")` */
   public setInliningForbidden(newInliningForbidden = true): this {
-    this.isInliningForbidden = newInliningForbidden;
+    if (newInliningForbidden) {
+      this.inliningStrategy = "forbidden";
+    } else if (this.inliningStrategy === "forbidden") {
+      this.inliningStrategy = "auto";
+    }
     return this;
   }
 
+  /** @deprecated Use `getInliningStrategy()` */
   public inliningForbidden(): boolean {
-    return this.isInliningForbidden;
+    return this.inliningStrategy === "forbidden";
+  }
+
+  public setInliningStrategy(
+    newInliningStrategy: PgSelectInliningStrategy,
+  ): this {
+    this.inliningStrategy = newInliningStrategy;
+    return this;
+  }
+
+  public getInliningStrategy(): PgSelectInliningStrategy {
+    return this.inliningStrategy;
   }
 
   public setTrusted(newIsTrusted = true): this {
@@ -1397,12 +1437,12 @@ export class PgSelectStep<
         sql.isEquivalent(a, b, options);
 
       // Check trusted matches
-      if (p.trusted !== this.trusted) {
+      if (p.isTrusted !== this.isTrusted) {
         return false;
       }
 
-      // Check inliningForbidden matches
-      if (p.inliningForbidden !== this.inliningForbidden) {
+      // Check inline strategy matches
+      if (p.inliningStrategy !== this.inliningStrategy) {
         return false;
       }
 
@@ -1828,7 +1868,7 @@ export class PgSelectStep<
     // Inline ourself into our parent if we can.
     let parentDetails: ReturnType<typeof this.getParentForInlining>;
     if (
-      !this.isInliningForbidden &&
+      this.inliningStrategy !== "forbidden" &&
       !this.hasSideEffects &&
       !mightHaveStream &&
       !this.joins.some((j) => j.type !== "left") &&
@@ -1836,17 +1876,15 @@ export class PgSelectStep<
       parentDetails.$pgSelect.mode === "normal"
     ) {
       const { $pgSelect, $pgSelectSingle } = parentDetails;
+      const staticInfo = PgSelectStep.getStaticInfo(this);
+      const { isSimpleUnique } = staticInfo;
       if (
-        this.mode === "normal" &&
-        this.isUnique &&
-        this.firstStepId == null &&
-        this.lastStepId == null &&
-        this.offsetStepId == null &&
-        // For uniques these should all pass anyway, but pays to be cautious..
-        this.groups.length === 0 &&
-        this.havingConditions.length === 0 &&
-        this.orders.length === 0 &&
-        !this.fetchOneExtra
+        isSimpleUnique === true &&
+        (this.inliningStrategy === "preferLeftJoin" ||
+          (this.inliningStrategy === "auto" &&
+            this.joins.length + this.applyDepIds.length === 0 &&
+            $pgSelect.joins.length + $pgSelect.applyDepIds.length <
+              AUTO_MAX_INLINE_LEFT_JOINS))
       ) {
         // Allow, do it via left join
         debugPlanVerbose(
@@ -1887,7 +1925,7 @@ export class PgSelectStep<
         $pgSelect.withLayerPlan(() => {
           $pgSelect.apply(
             new PgSelectInlineApplyStep(identifier, false, {
-              staticInfo: PgSelectStep.getStaticInfo(this),
+              staticInfo,
               $first: this.maybeGetDep(this.firstStepId),
               $last: this.maybeGetDep(this.lastStepId),
               $offset: this.maybeGetDep(this.offsetStepId),
@@ -1934,7 +1972,7 @@ export class PgSelectStep<
           $pgSelect.withLayerPlan(() => {
             $pgSelect.apply(
               new PgSelectInlineApplyStep(identifier, true, {
-                staticInfo: PgSelectStep.getStaticInfo(this),
+                staticInfo,
                 $first: this.maybeGetDep(this.firstStepId),
                 $last: this.maybeGetDep(this.lastStepId),
                 $offset: this.maybeGetDep(this.offsetStepId),
@@ -2141,6 +2179,17 @@ export class PgSelectStep<
       fetchOneExtra: $source.fetchOneExtra,
       isOrderUnique: $source.isOrderUnique,
       isUnique: $source.isUnique,
+      isSimpleUnique:
+        $source.mode === "normal" &&
+        $source.isUnique &&
+        $source.firstStepId == null &&
+        $source.lastStepId == null &&
+        $source.offsetStepId == null &&
+        // For uniques these should all pass anyway, but pays to be cautious.
+        $source.groups.length === 0 &&
+        $source.havingConditions.length === 0 &&
+        $source.orders.length === 0 &&
+        !$source.fetchOneExtra,
       conditions: $source.conditions,
       from: $source.from,
       joins: $source.joins,
@@ -2778,6 +2827,12 @@ interface PgSelectQueryInfo<
   readonly mode: PgSelectMode;
   /** Are we fetching just one record? */
   readonly isUnique: boolean;
+  /**
+   * As `isUnique`, but with additional checks: no ordering, pagination, aggregation, etc
+   *
+   * @experimental
+   */
+  readonly isSimpleUnique: boolean;
   readonly joinAsLateral: boolean;
   /** Is the order that was established at planning time unique? */
   readonly isOrderUnique: boolean;
@@ -3469,6 +3524,7 @@ type StaticKeys =
   | "fetchOneExtra"
   | "isOrderUnique"
   | "isUnique"
+  | "isSimpleUnique"
   | "conditions"
   | "from"
   | "joins"
@@ -3586,13 +3642,16 @@ class PgSelectInlineApplyStep<
             fetchOneExtra,
             meta,
             shouldReverseOrder,
+            isSimpleUnique,
           } = info;
           const { sql: baseQuery } = buildQueryFromParts(parts, {
             asArray: true,
           });
           const selectIndex = queryBuilder.selectAndReturnIndex(
             // 's' for 'subquery'
-            sql`array(${sql.indent(baseQuery)})::text`,
+            isSimpleUnique
+              ? sql`(${sql.indent(baseQuery)})::text`
+              : sql`array(${sql.indent(baseQuery)})::text`,
           );
 
           const details: PgSelectInlineViaSubqueryDetails = {
@@ -3604,6 +3663,7 @@ class PgSelectInlineApplyStep<
             first,
             last,
             offset,
+            isSimpleUnique,
             meta,
           };
           queryBuilder.setMeta(this.identifier, details);
@@ -3660,6 +3720,7 @@ interface PgSelectInlineViaSubqueryDetails {
   first: Maybe<number>;
   last: Maybe<number>;
   offset: Maybe<number>;
+  isSimpleUnique: boolean;
   shouldReverseOrder: boolean;
 }
 
@@ -4208,7 +4269,12 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
   any[],
 ]) {
-  const allVals = parseArray(item[details.selectIndex]);
+  const result = item[details.selectIndex];
+  const allVals = details.isSimpleUnique
+    ? result == null
+      ? []
+      : [parseArray(result)]
+    : parseArray(result);
   return createSelectResult(allVals, details);
 }
 

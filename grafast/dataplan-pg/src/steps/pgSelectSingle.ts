@@ -496,7 +496,8 @@ export class PgSelectSingleStep<
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
     const attributes = this.resource.codec.attributes;
-    if (attributes && this.getClassStep().mode !== "aggregate") {
+    const $class = this.getClassStep();
+    if (attributes && $class.mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
       // nonNullExpression (indirectly).
@@ -533,9 +534,9 @@ export class PgSelectSingleStep<
             : sql`${sql.parens(expression)}::text`;
         });
         this.nullCheckAttributeIndex =
-          this.getClassStep().selectAndReturnIndex(derivedExpression);
+          $class.selectAndReturnIndex(derivedExpression);
       } else {
-        this.nullCheckId = this.getClassStep().getNullCheckIndex();
+        this.nullCheckId = $class.getNullCheckIndex();
       }
     }
     return this;
