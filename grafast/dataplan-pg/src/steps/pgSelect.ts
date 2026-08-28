@@ -226,22 +226,22 @@ export type PgSelectMode = "normal" | "aggregate" | "mutation";
  * The SQL strategy to use when a PgSelectStep is inlined into its
  * parent.
  *
- * - `"leftJoinPreferred"` - uses a left join for singular records where
- *   possible (does not use it for bulk requests, otherwise the number of rows
- *   returned could multiply up to unmanageable levels)
- * - `"subqueryPreferred"` - uses a subquery within `SELECT`
  * - `"auto"` - dealers choice (PostGraphile will decide for you - this is the default)
  * - `"forbidden"` - do not inline
+ * - `"preferLeftJoin"` - uses a left join for singular records where
+ *   possible (does not use it for bulk requests, otherwise the number of rows
+ *   returned could multiply up to unmanageable levels)
+ * - `"preferSubquery"` - uses a subquery within `SELECT`
  */
 // Future strategies could include:
 // - innerJoinPreferred (**unsafe** but potentially faster than
-//   leftJoinPreferred, only use when row is guaranteed to exist - not just by
+//   preferLeftJoin, only use when row is guaranteed to exist - not just by
 //   FK, but by RLS also)
 export type PgSelectInlineStrategy =
-  | "forbidden"
   | "auto"
-  | "leftJoinPreferred"
-  | "subqueryPreferred";
+  | "forbidden"
+  | "preferLeftJoin"
+  | "preferSubquery";
 
 /**
  * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
@@ -1878,7 +1878,7 @@ export class PgSelectStep<
       const { isSimpleUnique } = staticInfo;
       if (
         isSimpleUnique === true &&
-        (this.inlineStrategy === "leftJoinPreferred" ||
+        (this.inlineStrategy === "preferLeftJoin" ||
           (this.inlineStrategy === "auto" &&
             this.joins.length + this.applyDepIds.length === 0)) &&
         $pgSelect.joins.length + $pgSelect.applyDepIds.length <
