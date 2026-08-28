@@ -209,9 +209,9 @@ graph TD
     List223{{"List[223∈8]<br />ᐸ222,47ᐳ"}}:::plan
     Access222{{"Access[222∈8]<br />ᐸ280.m.joinDetailsFor56ᐳ"}}:::plan
     Access222 & PgSelectSingle47 --> List223
-    List267{{"List[267∈8]<br />ᐸ266,47ᐳ"}}:::plan
-    Access266{{"Access[266∈8]<br />ᐸ280.m.joinDetailsFor90ᐳ"}}:::plan
-    Access266 & PgSelectSingle47 --> List267
+    List267{{"List[267∈8]<br />ᐸ266,45ᐳ"}}:::plan
+    Access266{{"Access[266∈8]<br />ᐸ280.m.subqueryDetailsFor90ᐳ"}}:::plan
+    Access266 & First45 --> List267
     List275{{"List[275∈8]<br />ᐸ274,45ᐳ"}}:::plan
     Access274{{"Access[274∈8]<br />ᐸ280.m.subqueryDetailsFor79ᐳ"}}:::plan
     Access274 & First45 --> List275
@@ -234,7 +234,7 @@ graph TD
     First92{{"First[92∈8]"}}:::plan
     PgSelectRows93[["PgSelectRows[93∈8]"]]:::plan
     PgSelectRows93 --> First92
-    Lambda268{{"Lambda[268∈8]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda268{{"Lambda[268∈8]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda268 --> PgSelectRows93
     PgSelectSingle94{{"PgSelectSingle[94∈8]<br />ᐸhousesᐳ"}}:::plan
     First92 --> PgSelectSingle94

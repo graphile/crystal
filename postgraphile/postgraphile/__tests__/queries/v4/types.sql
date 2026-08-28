@@ -142,16 +142,29 @@ select
   )::text as "68",
   __post_3."id"::text as "69",
   __post_3."headline" as "70",
-  __post_4."id"::text as "71",
-  __post_4."headline" as "72",
-  __frmcdc_compound_type_7."a"::text as "73",
-  __frmcdc_compound_type_7."b" as "74",
-  __frmcdc_compound_type_7."c"::text as "75",
-  __frmcdc_compound_type_7."d" as "76",
-  __frmcdc_compound_type_7."e"::text as "77",
-  __frmcdc_compound_type_7."f"::text as "78",
-  __frmcdc_compound_type_7."foo_bar"::text as "79",
-  (not (__frmcdc_compound_type_7 is null))::text as "80",
+  (
+    select array[
+      __post_4."id"::text,
+      __post_4."headline"
+    ]::text[]
+    from "a"."post" as __post_4
+    where (
+      __post_4."id" = __types__."smallint"
+    )
+  )::text as "71",
+  (
+    select array[
+      __frmcdc_compound_type_7."a"::text,
+      __frmcdc_compound_type_7."b",
+      __frmcdc_compound_type_7."c"::text,
+      __frmcdc_compound_type_7."d",
+      __frmcdc_compound_type_7."e"::text,
+      __frmcdc_compound_type_7."f"::text,
+      __frmcdc_compound_type_7."foo_bar"::text,
+      (not (__frmcdc_compound_type_7 is null))::text
+    ]::text[]
+    from (select (__types__."compound_type").*) as __frmcdc_compound_type_7
+  )::text as "72",
   (
     select array[
       __frmcdc_nested_compound_type_3."baz_buz"::text,
@@ -178,7 +191,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
     on TRUE
-  )::text as "81",
+  )::text as "73",
   (
     select array[
       __frmcdc_compound_type_10."a"::text,
@@ -191,7 +204,7 @@ select
       (not (__frmcdc_compound_type_10 is null))::text
     ]::text[]
     from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_10
-  )::text as "82",
+  )::text as "74",
   (
     select array[
       __frmcdc_nested_compound_type_4."baz_buz"::text,
@@ -218,7 +231,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
     on TRUE
-  )::text as "83"
+  )::text as "75"
 from "b"."types" as __types__
 left outer join "a"."post" as __post__
 on (
@@ -239,13 +252,6 @@ on (
 /* WHERE becoming ON */ (
   __post_3."id" = __types__."id"
 ))
-left outer join "a"."post" as __post_4
-on (
-/* WHERE becoming ON */ (
-  __post_4."id" = __types__."smallint"
-))
-left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type_7
-on TRUE
 order by __types__."id" asc;
 
 select
@@ -1863,16 +1869,29 @@ select
       )::text,
       __post_6."id"::text,
       __post_6."headline",
-      __post_7."id"::text,
-      __post_7."headline",
-      __frmcdc_compound_type_13."a"::text,
-      __frmcdc_compound_type_13."b",
-      __frmcdc_compound_type_13."c"::text,
-      __frmcdc_compound_type_13."d",
-      __frmcdc_compound_type_13."e"::text,
-      __frmcdc_compound_type_13."f"::text,
-      __frmcdc_compound_type_13."foo_bar"::text,
-      (not (__frmcdc_compound_type_13 is null))::text,
+      (
+        select array[
+          __post_7."id"::text,
+          __post_7."headline"
+        ]::text[]
+        from "a"."post" as __post_7
+        where (
+          __post_7."id" = __types_2."smallint"
+        )
+      )::text,
+      (
+        select array[
+          __frmcdc_compound_type_13."a"::text,
+          __frmcdc_compound_type_13."b",
+          __frmcdc_compound_type_13."c"::text,
+          __frmcdc_compound_type_13."d",
+          __frmcdc_compound_type_13."e"::text,
+          __frmcdc_compound_type_13."f"::text,
+          __frmcdc_compound_type_13."foo_bar"::text,
+          (not (__frmcdc_compound_type_13 is null))::text
+        ]::text[]
+        from (select (__types_2."compound_type").*) as __frmcdc_compound_type_13
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_5."baz_buz"::text,
@@ -1961,13 +1980,6 @@ select
     /* WHERE becoming ON */ (
       __post_6."id" = __types_2."id"
     ))
-    left outer join "a"."post" as __post_7
-    on (
-    /* WHERE becoming ON */ (
-      __post_7."id" = __types_2."smallint"
-    ))
-    left outer join lateral (select (__types_2."compound_type").*) as __frmcdc_compound_type_13
-    on TRUE
     where (
       __types_2."smallint" = __post__."id"
     )
