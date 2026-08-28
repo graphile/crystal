@@ -100,7 +100,7 @@ import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
 // Joins are a combinatorics problem, they're faster in small doses, but as
 // they add up they become more expensive. Let's cap it at something
 // reasonable.
-const MAX_INLINE_LEFT_JOINS = 7;
+const AUTO_MAX_INLINE_LEFT_JOINS = 7;
 
 const ALWAYS_ALLOWED = true;
 
@@ -1882,9 +1882,9 @@ export class PgSelectStep<
         isSimpleUnique === true &&
         (this.inliningStrategy === "preferLeftJoin" ||
           (this.inliningStrategy === "auto" &&
-            this.joins.length + this.applyDepIds.length === 0)) &&
-        $pgSelect.joins.length + $pgSelect.applyDepIds.length <
-          MAX_INLINE_LEFT_JOINS
+            this.joins.length + this.applyDepIds.length === 0 &&
+            $pgSelect.joins.length + $pgSelect.applyDepIds.length <
+              AUTO_MAX_INLINE_LEFT_JOINS))
       ) {
         // Allow, do it via left join
         debugPlanVerbose(
