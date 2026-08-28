@@ -28,8 +28,58 @@ create domain pg11.domain_constrained_compound_type as
 
 create table pg11.types (
   id serial primary key,
-  "regrole" regrole, 
+  "regrole" regrole,
   "regnamespace" regnamespace,
   "bigint_domain_array_domain" c.bigint_domain_array_domain,
   "domain_constrained_compound_type" pg11.domain_constrained_compound_type
 );
+
+drop schema if exists procedures cascade;
+create schema procedures;
+
+create procedure procedures.no_args_no_output()
+language plpgsql as $$
+begin
+end;
+$$;
+
+create procedure procedures.in_args_no_output(a int, b int)
+language plpgsql as $$
+begin
+end;
+$$;
+
+-- PostgreSQL only allowed `inout` parameters for procedures until PG14,
+-- which added support for `out` parameters too - so these two are guarded
+-- to only run on PG14+.
+do $guard$
+begin
+  if current_setting('server_version_num')::int >= 140000 then
+    execute $ddl$
+      create procedure procedures.single_output(a int, out doubled int)
+      language plpgsql as $body$
+      begin
+        doubled := a * 2;
+      end;
+      $body$;
+    $ddl$;
+
+    execute $ddl$
+      create procedure procedures.multiple_outputs(a int, out total int, out product int)
+      language plpgsql as $body$
+      begin
+        total := a + a;
+        product := a * a;
+      end;
+      $body$;
+    $ddl$;
+  end if;
+end;
+$guard$;
+
+create procedure procedures.inout_arg(inout counter int)
+language plpgsql as $$
+begin
+  counter := counter + 1;
+end;
+$$;
