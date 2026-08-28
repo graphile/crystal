@@ -172,52 +172,58 @@ select
     $1::"text"
   ) as "2",
   "c"."person_computed_out"(__person__) as "3",
-  __person_computed_complex__."x"::text as "4",
-  (not (__person_computed_complex__ is null))::text as "5",
-  __frmcdc_compound_type__."a"::text as "6",
-  __frmcdc_compound_type__."b" as "7",
-  __frmcdc_compound_type__."c"::text as "8",
-  (not (__frmcdc_compound_type__ is null))::text as "9",
-  __person_2."id"::text as "10",
-  __person_2."person_full_name" as "11",
-  array(
+  (
     select array[
-      __post__."id"::text
+      __person_computed_complex__."x"::text,
+      (not (__person_computed_complex__ is null))::text,
+      __frmcdc_compound_type__."a"::text,
+      __frmcdc_compound_type__."b",
+      __frmcdc_compound_type__."c"::text,
+      (not (__frmcdc_compound_type__ is null))::text,
+      __person_2."id"::text,
+      __person_2."person_full_name",
+      array(
+        select array[
+          __post__."id"::text
+        ]::text[]
+        from "a"."post" as __post__
+        where (
+          __post__."author_id" = __person_2."id"
+        )
+        order by __post__."id" asc
+      )::text
     ]::text[]
-    from "a"."post" as __post__
-    where (
-      __post__."author_id" = __person_2."id"
-    )
-    order by __post__."id" asc
-  )::text as "12",
-  __person_computed_first_arg_inout__."id"::text as "13",
-  __person_computed_first_arg_inout__."person_full_name" as "14",
-  __person_computed_first_arg_inout_out__."o"::text as "15",
-  (not (__person_computed_first_arg_inout_out__ is null))::text as "16",
-  __person_3."id"::text as "17",
-  __person_3."person_full_name" as "18",
-  __person_computed_inout_out__."ino" as "19",
-  __person_computed_inout_out__."o" as "20",
-  (not (__person_computed_inout_out__ is null))::text as "21",
-  __person_computed_out_out__."o1" as "22",
-  __person_computed_out_out__."o2" as "23",
-  (not (__person_computed_out_out__ is null))::text as "24"
+    from "c"."person_computed_complex"(
+      __person__,
+      $2::"int4",
+      $3::"text"
+    ) as __person_computed_complex__
+    left outer join lateral (select (__person_computed_complex__."y").*) as __frmcdc_compound_type__
+    on TRUE
+    left outer join lateral (select (__person_computed_complex__."z").*) as __person_2
+    on TRUE
+  )::text as "4",
+  __person_computed_first_arg_inout__."id"::text as "5",
+  __person_computed_first_arg_inout__."person_full_name" as "6",
+  (
+    select array[
+      __person_computed_first_arg_inout_out__."o"::text,
+      (not (__person_computed_first_arg_inout_out__ is null))::text,
+      __person_3."id"::text,
+      __person_3."person_full_name"
+    ]::text[]
+    from "c"."person_computed_first_arg_inout_out"(__person__) as __person_computed_first_arg_inout_out__
+    left outer join lateral (select (__person_computed_first_arg_inout_out__."person").*) as __person_3
+    on TRUE
+  )::text as "7",
+  __person_computed_inout_out__."ino" as "8",
+  __person_computed_inout_out__."o" as "9",
+  (not (__person_computed_inout_out__ is null))::text as "10",
+  __person_computed_out_out__."o1" as "11",
+  __person_computed_out_out__."o2" as "12",
+  (not (__person_computed_out_out__ is null))::text as "13"
 from "c"."person" as __person__
-left outer join "c"."person_computed_complex"(
-  __person__,
-  $2::"int4",
-  $3::"text"
-) as __person_computed_complex__
-on TRUE
-left outer join lateral (select (__person_computed_complex__."y").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__person_computed_complex__."z").*) as __person_2
-on TRUE
 left outer join "c"."person_computed_first_arg_inout"(__person__) as __person_computed_first_arg_inout__
-on TRUE
-left outer join "c"."person_computed_first_arg_inout_out"(__person__) as __person_computed_first_arg_inout_out__
-on TRUE
-left outer join lateral (select (__person_computed_first_arg_inout_out__."person").*) as __person_3
 on TRUE
 left outer join "c"."person_computed_inout_out"(
   __person__,
@@ -237,15 +243,41 @@ select
   __left_arm__."person_id"::text as "3",
   __left_arm__."length_in_metres"::text as "4",
   __left_arm__."mood" as "5",
-  __person__."person_full_name" as "6",
-  __person_secret__."sekrit" as "7",
-  __person_secret__."person_id"::text as "8",
-  __post__."id"::text as "9",
-  __post__."headline" as "10",
-  __post__."author_id"::text as "11",
-  __person_2."person_full_name" as "12",
-  __person_secret_2."sekrit" as "13",
-  __person_secret_2."person_id"::text as "14"
+  (
+    select array[
+      __person__."person_full_name",
+      __person_secret__."sekrit",
+      __person_secret__."person_id"::text
+    ]::text[]
+    from "c"."person" as __person__
+    left outer join "c"."person_secret" as __person_secret__
+    on (
+    /* WHERE becoming ON */ (
+      __person_secret__."person_id" = __person__."id"
+    ))
+    where (
+      __person__."id" = __left_arm__."person_id"
+    )
+  )::text as "6",
+  __post__."id"::text as "7",
+  __post__."headline" as "8",
+  __post__."author_id"::text as "9",
+  (
+    select array[
+      __person_2."person_full_name",
+      __person_secret_2."sekrit",
+      __person_secret_2."person_id"::text
+    ]::text[]
+    from "c"."person" as __person_2
+    left outer join "c"."person_secret" as __person_secret_2
+    on (
+    /* WHERE becoming ON */ (
+      __person_secret_2."person_id" = __person_2."id"
+    ))
+    where (
+      __person_2."id" = __post__."author_id"
+    )
+  )::text as "10"
 from "c"."query_output_two_rows"(
   $1::"int4",
   $2::"int4",
@@ -253,28 +285,8 @@ from "c"."query_output_two_rows"(
 ) as __query_output_two_rows__
 left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
 on TRUE
-left outer join "c"."person" as __person__
-on (
-/* WHERE becoming ON */ (
-  __person__."id" = __left_arm__."person_id"
-))
-left outer join "c"."person_secret" as __person_secret__
-on (
-/* WHERE becoming ON */ (
-  __person_secret__."person_id" = __person__."id"
-))
 left outer join lateral (select (__query_output_two_rows__."post").*) as __post__
-on TRUE
-left outer join "c"."person" as __person_2
-on (
-/* WHERE becoming ON */ (
-  __person_2."id" = __post__."author_id"
-))
-left outer join "c"."person_secret" as __person_secret_2
-on (
-/* WHERE becoming ON */ (
-  __person_secret_2."person_id" = __person_2."id"
-));
+on TRUE;
 
 select
   __query_output_two_rows__."txt" as "0",
@@ -283,15 +295,41 @@ select
   __left_arm__."person_id"::text as "3",
   __left_arm__."length_in_metres"::text as "4",
   __left_arm__."mood" as "5",
-  __person__."person_full_name" as "6",
-  __person_secret__."sekrit" as "7",
-  __person_secret__."person_id"::text as "8",
-  __post__."id"::text as "9",
-  __post__."headline" as "10",
-  __post__."author_id"::text as "11",
-  __person_2."person_full_name" as "12",
-  __person_secret_2."sekrit" as "13",
-  __person_secret_2."person_id"::text as "14"
+  (
+    select array[
+      __person__."person_full_name",
+      __person_secret__."sekrit",
+      __person_secret__."person_id"::text
+    ]::text[]
+    from "c"."person" as __person__
+    left outer join "c"."person_secret" as __person_secret__
+    on (
+    /* WHERE becoming ON */ (
+      __person_secret__."person_id" = __person__."id"
+    ))
+    where (
+      __person__."id" = __left_arm__."person_id"
+    )
+  )::text as "6",
+  __post__."id"::text as "7",
+  __post__."headline" as "8",
+  __post__."author_id"::text as "9",
+  (
+    select array[
+      __person_2."person_full_name",
+      __person_secret_2."sekrit",
+      __person_secret_2."person_id"::text
+    ]::text[]
+    from "c"."person" as __person_2
+    left outer join "c"."person_secret" as __person_secret_2
+    on (
+    /* WHERE becoming ON */ (
+      __person_secret_2."person_id" = __person_2."id"
+    ))
+    where (
+      __person_2."id" = __post__."author_id"
+    )
+  )::text as "10"
 from "c"."query_output_two_rows"(
   $1::"int4",
   $2::"int4",
@@ -299,25 +337,5 @@ from "c"."query_output_two_rows"(
 ) as __query_output_two_rows__
 left outer join lateral (select (__query_output_two_rows__."left_arm").*) as __left_arm__
 on TRUE
-left outer join "c"."person" as __person__
-on (
-/* WHERE becoming ON */ (
-  __person__."id" = __left_arm__."person_id"
-))
-left outer join "c"."person_secret" as __person_secret__
-on (
-/* WHERE becoming ON */ (
-  __person_secret__."person_id" = __person__."id"
-))
 left outer join lateral (select (__query_output_two_rows__."post").*) as __post__
-on TRUE
-left outer join "c"."person" as __person_2
-on (
-/* WHERE becoming ON */ (
-  __person_2."id" = __post__."author_id"
-))
-left outer join "c"."person_secret" as __person_secret_2
-on (
-/* WHERE becoming ON */ (
-  __person_secret_2."person_id" = __person_2."id"
-));
+on TRUE;

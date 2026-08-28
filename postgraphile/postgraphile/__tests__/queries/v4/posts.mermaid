@@ -85,9 +85,9 @@ graph TD
     First75{{"First[75∈6]"}}:::plan
     Access76{{"Access[76∈6]<br />ᐸ97.cursorDetailsᐳ"}}:::plan
     First75 & Access76 --> PgCursor77
-    List92{{"List[92∈6]<br />ᐸ91,34ᐳ"}}:::plan
-    Access91{{"Access[91∈6]<br />ᐸ105.m.joinDetailsFor39ᐳ"}}:::plan
-    Access91 & PgSelectSingle34 --> List92
+    List92{{"List[92∈6]<br />ᐸ91,32ᐳ"}}:::plan
+    Access91{{"Access[91∈6]<br />ᐸ105.m.subqueryDetailsFor39ᐳ"}}:::plan
+    Access91 & First32 --> List92
     List96{{"List[96∈6]<br />ᐸ95,32ᐳ"}}:::plan
     Access95{{"Access[95∈6]<br />ᐸ105.m.subqueryDetailsFor47ᐳ"}}:::plan
     Access95 & First32 --> List96
@@ -103,7 +103,7 @@ graph TD
     First44{{"First[44∈6]"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈6]"]]:::plan
     PgSelectRows45 --> First44
-    Lambda93{{"Lambda[93∈6]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda93{{"Lambda[93∈6]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda93 --> PgSelectRows45
     PgSelectSingle46{{"PgSelectSingle[46∈6]<br />ᐸperson_first_postᐳ"}}:::plan
     First44 --> PgSelectSingle46

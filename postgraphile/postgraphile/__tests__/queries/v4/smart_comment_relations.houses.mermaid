@@ -13,11 +13,11 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 41<br /><br />ROOT PgSelectSingleᐸhousesᐳ[20]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 31, 41<br /><br />ROOT PgSelectSingleᐸhousesᐳ[31]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 41, 280, 304, 316, 340, 82, 86, 90<br /><br />ROOT __Item{5}ᐸ32ᐳ[50]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 41, 280, 304, 316, 340, 82, 86, 90<br /><br />ROOT PgSelectSingle{5}ᐸhousesᐳ[51]<br />1: <br />ᐳ: 52, 53, 56, 57, 58, 59, 281, 305, 317, 341, 54, 55, 282, 306, 318, 342<br />2: 65, 70, 75, 80<br />ᐳ: 64, 66, 69, 71, 74, 76, 79, 81"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 51, 41, 280, 304, 50, 316, 340, 82, 86, 90<br /><br />ROOT PgSelectSingle{5}ᐸhousesᐳ[51]<br />1: <br />ᐳ: 52, 53, 56, 57, 58, 59, 281, 305, 317, 341, 54, 55, 282, 306, 318, 342<br />2: 65, 70, 75, 80<br />ᐳ: 64, 66, 69, 71, 74, 76, 79, 81"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 66, 82, 282, 64, 86<br /><br />ROOT PgSelectSingle{6}ᐸstreetsᐳ[66]<br />1: <br />ᐳ: 83, 96, 276, 84, 85, 277, 278<br />2: Connection[105]<br />3: ConnectionItems[142]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 71, 86, 342, 82, 90<br /><br />ROOT PgSelectSingle{6}ᐸbuildingsᐳ[71]<br />1: <br />ᐳ: 87, 97, 107, 116, 324, 336, 88, 89, 325, 326, 337, 338<br />2: PgSelectRows[134], PgSelectRows[140]<br />ᐳ: 133, 135, 139, 141"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 71, 86, 342, 69, 82, 90<br /><br />ROOT PgSelectSingle{6}ᐸbuildingsᐳ[71]<br />1: <br />ᐳ: 87, 97, 107, 116, 324, 336, 88, 89, 325, 326, 337, 338<br />2: PgSelectRows[134], PgSelectRows[140]<br />ᐳ: 133, 135, 139, 141"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 76, 90, 318, 82, 86<br /><br />ROOT PgSelectSingle{6}ᐸpropertiesᐳ[76]<br />1: <br />ᐳ: 91, 98, 108, 312, 92, 93, 313, 314<br />2: PgSelectRows[122]<br />ᐳ: First[121], PgSelectSingle[123]"):::bucket
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 81, 306, 82, 90, 86<br /><br />ROOT PgSelectSingle{6}ᐸstreet_propertyᐳ[81]<br />1: <br />ᐳ: 94, 95, 99, 288, 300, 289, 290, 301, 302<br />2: PgSelectRows[114], PgSelectRows[127]<br />ᐳ: 113, 115, 126, 128"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 81, 306, 79, 82, 90, 86<br /><br />ROOT PgSelectSingle{6}ᐸstreet_propertyᐳ[81]<br />1: <br />ᐳ: 94, 95, 99, 288, 300, 289, 290, 301, 302<br />2: PgSelectRows[114], PgSelectRows[127]<br />ᐳ: 113, 115, 126, 128"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 115, 82, 290, 113, 86<br /><br />ROOT PgSelectSingle{10}ᐸstreetsᐳ[115]<br />1: <br />ᐳ: 145, 160, 284, 146, 147, 285, 286<br />2: Connection[172]<br />3: ConnectionItems[204]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 123, 82, 314, 121, 86<br /><br />ROOT PgSelectSingle{9}ᐸstreetsᐳ[123]<br />1: <br />ᐳ: 148, 161, 308, 149, 150, 309, 310<br />2: Connection[178]<br />3: ConnectionItems[207]"):::bucket
     Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 128, 90, 302, 82, 86<br /><br />ROOT PgSelectSingle{10}ᐸpropertiesᐳ[128]<br />1: <br />ᐳ: 151, 162, 180, 296, 152, 153, 297, 298<br />2: PgSelectRows[193]<br />ᐳ: First[192], PgSelectSingle[194]"):::bucket
@@ -117,13 +117,13 @@ graph TD
     PgSelectInlineApply291["PgSelectInlineApply[291∈0] ➊"]:::plan
     PgSelectInlineApply291 --> PgSelectInlineApply295
     PgSelectInlineApply295 --> PgSelectInlineApply299
-    Access304{{"Access[304∈0] ➊<br />ᐸ8.m.joinDetailsFor77ᐳ"}}:::plan
+    Access304{{"Access[304∈0] ➊<br />ᐸ8.m.subqueryDetailsFor77ᐳ"}}:::plan
     PgSelect8 --> Access304
     PgSelectInlineApply311["PgSelectInlineApply[311∈0] ➊"]:::plan
     PgSelectInlineApply307["PgSelectInlineApply[307∈0] ➊"]:::plan
     PgSelectInlineApply307 --> PgSelectInlineApply311
     PgSelectInlineApply311 --> PgSelectInlineApply315
-    Access316{{"Access[316∈0] ➊<br />ᐸ8.m.joinDetailsFor72ᐳ"}}:::plan
+    Access316{{"Access[316∈0] ➊<br />ᐸ8.m.subqueryDetailsFor72ᐳ"}}:::plan
     PgSelect8 --> Access316
     PgSelectInlineApply319["PgSelectInlineApply[319∈0] ➊"]:::plan
     PgSelectInlineApply319 --> PgSelectInlineApply323
@@ -131,7 +131,7 @@ graph TD
     PgSelectInlineApply327["PgSelectInlineApply[327∈0] ➊"]:::plan
     PgSelectInlineApply327 --> PgSelectInlineApply331
     PgSelectInlineApply331 --> PgSelectInlineApply335
-    Access340{{"Access[340∈0] ➊<br />ᐸ8.m.joinDetailsFor67ᐳ"}}:::plan
+    Access340{{"Access[340∈0] ➊<br />ᐸ8.m.subqueryDetailsFor67ᐳ"}}:::plan
     PgSelect8 --> Access340
     List44{{"List[44∈2] ➊<br />ᐸ41,42,43ᐳ<br />More deps:<br />- Constantᐸ'houses'ᐳ[41]"}}:::plan
     PgClassExpression42{{"PgClassExpression[42∈2] ➊<br />ᐸ__houses__.”street_id”ᐳ"}}:::plan
@@ -171,12 +171,12 @@ graph TD
     PgClassExpression52 & PgClassExpression53 --> List54
     List281{{"List[281∈6]<br />ᐸ280,51ᐳ"}}:::plan
     Access280 & PgSelectSingle51 --> List281
-    List305{{"List[305∈6]<br />ᐸ304,51ᐳ"}}:::plan
-    Access304 & PgSelectSingle51 --> List305
-    List317{{"List[317∈6]<br />ᐸ316,51ᐳ"}}:::plan
-    Access316 & PgSelectSingle51 --> List317
-    List341{{"List[341∈6]<br />ᐸ340,51ᐳ"}}:::plan
-    Access340 & PgSelectSingle51 --> List341
+    List305{{"List[305∈6]<br />ᐸ304,50ᐳ"}}:::plan
+    Access304 & __Item50 --> List305
+    List317{{"List[317∈6]<br />ᐸ316,50ᐳ"}}:::plan
+    Access316 & __Item50 --> List317
+    List341{{"List[341∈6]<br />ᐸ340,50ᐳ"}}:::plan
+    Access340 & __Item50 --> List341
     PgSelectSingle51 --> PgClassExpression52
     PgSelectSingle51 --> PgClassExpression53
     Lambda55{{"Lambda[55∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
@@ -199,21 +199,21 @@ graph TD
     First69{{"First[69∈6]"}}:::plan
     PgSelectRows70[["PgSelectRows[70∈6]"]]:::plan
     PgSelectRows70 --> First69
-    Lambda342{{"Lambda[342∈6]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda342{{"Lambda[342∈6]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda342 --> PgSelectRows70
     PgSelectSingle71{{"PgSelectSingle[71∈6]<br />ᐸbuildingsᐳ"}}:::plan
     First69 --> PgSelectSingle71
     First74{{"First[74∈6]"}}:::plan
     PgSelectRows75[["PgSelectRows[75∈6]"]]:::plan
     PgSelectRows75 --> First74
-    Lambda318{{"Lambda[318∈6]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda318{{"Lambda[318∈6]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda318 --> PgSelectRows75
     PgSelectSingle76{{"PgSelectSingle[76∈6]<br />ᐸpropertiesᐳ"}}:::plan
     First74 --> PgSelectSingle76
     First79{{"First[79∈6]"}}:::plan
     PgSelectRows80[["PgSelectRows[80∈6]"]]:::plan
     PgSelectRows80 --> First79
-    Lambda306{{"Lambda[306∈6]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda306{{"Lambda[306∈6]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda306 --> PgSelectRows80
     PgSelectSingle81{{"PgSelectSingle[81∈6]<br />ᐸstreet_propertyᐳ"}}:::plan
     First79 --> PgSelectSingle81
@@ -245,9 +245,9 @@ graph TD
     List325{{"List[325∈8]<br />ᐸ324,71ᐳ"}}:::plan
     Access324{{"Access[324∈8]<br />ᐸ342.m.joinDetailsFor129ᐳ"}}:::plan
     Access324 & PgSelectSingle71 --> List325
-    List337{{"List[337∈8]<br />ᐸ336,71ᐳ"}}:::plan
-    Access336{{"Access[336∈8]<br />ᐸ342.m.joinDetailsFor137ᐳ"}}:::plan
-    Access336 & PgSelectSingle71 --> List337
+    List337{{"List[337∈8]<br />ᐸ336,69ᐳ"}}:::plan
+    Access336{{"Access[336∈8]<br />ᐸ342.m.subqueryDetailsFor137ᐳ"}}:::plan
+    Access336 & First69 --> List337
     PgSelectSingle71 --> PgClassExpression87
     Lambda89{{"Lambda[89∈8]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List88 --> Lambda89
@@ -267,7 +267,7 @@ graph TD
     First139{{"First[139∈8]"}}:::plan
     PgSelectRows140[["PgSelectRows[140∈8]"]]:::plan
     PgSelectRows140 --> First139
-    Lambda338{{"Lambda[338∈8]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda338{{"Lambda[338∈8]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda338 --> PgSelectRows140
     PgSelectSingle141{{"PgSelectSingle[141∈8]<br />ᐸpropertiesᐳ"}}:::plan
     First139 --> PgSelectSingle141
@@ -300,9 +300,9 @@ graph TD
     List289{{"List[289∈10]<br />ᐸ288,81ᐳ"}}:::plan
     Access288{{"Access[288∈10]<br />ᐸ306.m.joinDetailsFor109ᐳ"}}:::plan
     Access288 & PgSelectSingle81 --> List289
-    List301{{"List[301∈10]<br />ᐸ300,81ᐳ"}}:::plan
-    Access300{{"Access[300∈10]<br />ᐸ306.m.joinDetailsFor124ᐳ"}}:::plan
-    Access300 & PgSelectSingle81 --> List301
+    List301{{"List[301∈10]<br />ᐸ300,79ᐳ"}}:::plan
+    Access300{{"Access[300∈10]<br />ᐸ306.m.subqueryDetailsFor124ᐳ"}}:::plan
+    Access300 & First79 --> List301
     PgClassExpression94{{"PgClassExpression[94∈10]<br />ᐸ__street_p..._.”str_id”ᐳ"}}:::plan
     PgSelectSingle81 --> PgClassExpression94
     PgClassExpression95{{"PgClassExpression[95∈10]<br />ᐸ__street_p....”prop_id”ᐳ"}}:::plan
@@ -319,7 +319,7 @@ graph TD
     First126{{"First[126∈10]"}}:::plan
     PgSelectRows127[["PgSelectRows[127∈10]"]]:::plan
     PgSelectRows127 --> First126
-    Lambda302{{"Lambda[302∈10]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda302{{"Lambda[302∈10]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda302 --> PgSelectRows127
     PgSelectSingle128{{"PgSelectSingle[128∈10]<br />ᐸpropertiesᐳ"}}:::plan
     First126 --> PgSelectSingle128

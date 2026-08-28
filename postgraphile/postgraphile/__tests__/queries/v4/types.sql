@@ -78,106 +78,147 @@ select
   __frmcdc_compound_type__."f"::text as "56",
   __frmcdc_compound_type__."foo_bar"::text as "57",
   (not (__frmcdc_compound_type__ is null))::text as "58",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "59",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "60",
-  __frmcdc_compound_type_2."a"::text as "61",
-  __frmcdc_compound_type_2."b" as "62",
-  __frmcdc_compound_type_2."c"::text as "63",
-  __frmcdc_compound_type_2."d" as "64",
-  __frmcdc_compound_type_2."e"::text as "65",
-  __frmcdc_compound_type_2."f"::text as "66",
-  __frmcdc_compound_type_2."foo_bar"::text as "67",
-  (not (__frmcdc_compound_type_2 is null))::text as "68",
-  __frmcdc_compound_type_3."a"::text as "69",
-  __frmcdc_compound_type_3."b" as "70",
-  __frmcdc_compound_type_3."c"::text as "71",
-  __frmcdc_compound_type_3."d" as "72",
-  __frmcdc_compound_type_3."e"::text as "73",
-  __frmcdc_compound_type_3."f"::text as "74",
-  __frmcdc_compound_type_3."foo_bar"::text as "75",
-  (not (__frmcdc_compound_type_3 is null))::text as "76",
-  __frmcdc_compound_type_4."a"::text as "77",
-  __frmcdc_compound_type_4."b" as "78",
-  __frmcdc_compound_type_4."c"::text as "79",
-  __frmcdc_compound_type_4."d" as "80",
-  __frmcdc_compound_type_4."e"::text as "81",
-  __frmcdc_compound_type_4."f"::text as "82",
-  __frmcdc_compound_type_4."foo_bar"::text as "83",
-  (not (__frmcdc_compound_type_4 is null))::text as "84",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "85",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "86",
-  __frmcdc_compound_type_5."a"::text as "87",
-  __frmcdc_compound_type_5."b" as "88",
-  __frmcdc_compound_type_5."c"::text as "89",
-  __frmcdc_compound_type_5."d" as "90",
-  __frmcdc_compound_type_5."e"::text as "91",
-  __frmcdc_compound_type_5."f"::text as "92",
-  __frmcdc_compound_type_5."foo_bar"::text as "93",
-  (not (__frmcdc_compound_type_5 is null))::text as "94",
-  __frmcdc_compound_type_6."a"::text as "95",
-  __frmcdc_compound_type_6."b" as "96",
-  __frmcdc_compound_type_6."c"::text as "97",
-  __frmcdc_compound_type_6."d" as "98",
-  __frmcdc_compound_type_6."e"::text as "99",
-  __frmcdc_compound_type_6."f"::text as "100",
-  __frmcdc_compound_type_6."foo_bar"::text as "101",
-  (not (__frmcdc_compound_type_6 is null))::text as "102",
-  __post_3."id"::text as "103",
-  __post_3."headline" as "104",
-  __post_4."id"::text as "105",
-  __post_4."headline" as "106",
-  __frmcdc_compound_type_7."a"::text as "107",
-  __frmcdc_compound_type_7."b" as "108",
-  __frmcdc_compound_type_7."c"::text as "109",
-  __frmcdc_compound_type_7."d" as "110",
-  __frmcdc_compound_type_7."e"::text as "111",
-  __frmcdc_compound_type_7."f"::text as "112",
-  __frmcdc_compound_type_7."foo_bar"::text as "113",
-  (not (__frmcdc_compound_type_7 is null))::text as "114",
-  __frmcdc_nested_compound_type_3."baz_buz"::text as "115",
-  (not (__frmcdc_nested_compound_type_3 is null))::text as "116",
-  __frmcdc_compound_type_8."a"::text as "117",
-  __frmcdc_compound_type_8."b" as "118",
-  __frmcdc_compound_type_8."c"::text as "119",
-  __frmcdc_compound_type_8."d" as "120",
-  __frmcdc_compound_type_8."e"::text as "121",
-  __frmcdc_compound_type_8."f"::text as "122",
-  __frmcdc_compound_type_8."foo_bar"::text as "123",
-  (not (__frmcdc_compound_type_8 is null))::text as "124",
-  __frmcdc_compound_type_9."a"::text as "125",
-  __frmcdc_compound_type_9."b" as "126",
-  __frmcdc_compound_type_9."c"::text as "127",
-  __frmcdc_compound_type_9."d" as "128",
-  __frmcdc_compound_type_9."e"::text as "129",
-  __frmcdc_compound_type_9."f"::text as "130",
-  __frmcdc_compound_type_9."foo_bar"::text as "131",
-  (not (__frmcdc_compound_type_9 is null))::text as "132",
-  __frmcdc_compound_type_10."a"::text as "133",
-  __frmcdc_compound_type_10."b" as "134",
-  __frmcdc_compound_type_10."c"::text as "135",
-  __frmcdc_compound_type_10."d" as "136",
-  __frmcdc_compound_type_10."e"::text as "137",
-  __frmcdc_compound_type_10."f"::text as "138",
-  __frmcdc_compound_type_10."foo_bar"::text as "139",
-  (not (__frmcdc_compound_type_10 is null))::text as "140",
-  __frmcdc_nested_compound_type_4."baz_buz"::text as "141",
-  (not (__frmcdc_nested_compound_type_4 is null))::text as "142",
-  __frmcdc_compound_type_11."a"::text as "143",
-  __frmcdc_compound_type_11."b" as "144",
-  __frmcdc_compound_type_11."c"::text as "145",
-  __frmcdc_compound_type_11."d" as "146",
-  __frmcdc_compound_type_11."e"::text as "147",
-  __frmcdc_compound_type_11."f"::text as "148",
-  __frmcdc_compound_type_11."foo_bar"::text as "149",
-  (not (__frmcdc_compound_type_11 is null))::text as "150",
-  __frmcdc_compound_type_12."a"::text as "151",
-  __frmcdc_compound_type_12."b" as "152",
-  __frmcdc_compound_type_12."c"::text as "153",
-  __frmcdc_compound_type_12."d" as "154",
-  __frmcdc_compound_type_12."e"::text as "155",
-  __frmcdc_compound_type_12."f"::text as "156",
-  __frmcdc_compound_type_12."foo_bar"::text as "157",
-  (not (__frmcdc_compound_type_12 is null))::text as "158"
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "59",
+  __frmcdc_compound_type_4."a"::text as "60",
+  __frmcdc_compound_type_4."b" as "61",
+  __frmcdc_compound_type_4."c"::text as "62",
+  __frmcdc_compound_type_4."d" as "63",
+  __frmcdc_compound_type_4."e"::text as "64",
+  __frmcdc_compound_type_4."f"::text as "65",
+  __frmcdc_compound_type_4."foo_bar"::text as "66",
+  (not (__frmcdc_compound_type_4 is null))::text as "67",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "68",
+  __post_3."id"::text as "69",
+  __post_3."headline" as "70",
+  __post_4."id"::text as "71",
+  __post_4."headline" as "72",
+  __frmcdc_compound_type_7."a"::text as "73",
+  __frmcdc_compound_type_7."b" as "74",
+  __frmcdc_compound_type_7."c"::text as "75",
+  __frmcdc_compound_type_7."d" as "76",
+  __frmcdc_compound_type_7."e"::text as "77",
+  __frmcdc_compound_type_7."f"::text as "78",
+  __frmcdc_compound_type_7."foo_bar"::text as "79",
+  (not (__frmcdc_compound_type_7 is null))::text as "80",
+  (
+    select array[
+      __frmcdc_nested_compound_type_3."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_3 is null))::text,
+      __frmcdc_compound_type_8."a"::text,
+      __frmcdc_compound_type_8."b",
+      __frmcdc_compound_type_8."c"::text,
+      __frmcdc_compound_type_8."d",
+      __frmcdc_compound_type_8."e"::text,
+      __frmcdc_compound_type_8."f"::text,
+      __frmcdc_compound_type_8."foo_bar"::text,
+      (not (__frmcdc_compound_type_8 is null))::text,
+      __frmcdc_compound_type_9."a"::text,
+      __frmcdc_compound_type_9."b",
+      __frmcdc_compound_type_9."c"::text,
+      __frmcdc_compound_type_9."d",
+      __frmcdc_compound_type_9."e"::text,
+      __frmcdc_compound_type_9."f"::text,
+      __frmcdc_compound_type_9."foo_bar"::text,
+      (not (__frmcdc_compound_type_9 is null))::text
+    ]::text[]
+    from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type_3
+    left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
+    on TRUE
+  )::text as "81",
+  (
+    select array[
+      __frmcdc_compound_type_10."a"::text,
+      __frmcdc_compound_type_10."b",
+      __frmcdc_compound_type_10."c"::text,
+      __frmcdc_compound_type_10."d",
+      __frmcdc_compound_type_10."e"::text,
+      __frmcdc_compound_type_10."f"::text,
+      __frmcdc_compound_type_10."foo_bar"::text,
+      (not (__frmcdc_compound_type_10 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_10
+  )::text as "82",
+  (
+    select array[
+      __frmcdc_nested_compound_type_4."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_4 is null))::text,
+      __frmcdc_compound_type_11."a"::text,
+      __frmcdc_compound_type_11."b",
+      __frmcdc_compound_type_11."c"::text,
+      __frmcdc_compound_type_11."d",
+      __frmcdc_compound_type_11."e"::text,
+      __frmcdc_compound_type_11."f"::text,
+      __frmcdc_compound_type_11."foo_bar"::text,
+      (not (__frmcdc_compound_type_11 is null))::text,
+      __frmcdc_compound_type_12."a"::text,
+      __frmcdc_compound_type_12."b",
+      __frmcdc_compound_type_12."c"::text,
+      __frmcdc_compound_type_12."d",
+      __frmcdc_compound_type_12."e"::text,
+      __frmcdc_compound_type_12."f"::text,
+      __frmcdc_compound_type_12."foo_bar"::text,
+      (not (__frmcdc_compound_type_12 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
+    left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
+    on TRUE
+  )::text as "83"
 from "b"."types" as __types__
 left outer join "a"."post" as __post__
 on (
@@ -191,19 +232,7 @@ on (
 ))
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
 left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
 on TRUE
 left outer join "a"."post" as __post_3
 on (
@@ -217,19 +246,152 @@ on (
 ))
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type_7
 on TRUE
-left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type_3
+order by __types__."id" asc;
+
+select
+  __types__."id"::text as "0",
+  __types__."smallint"::text as "1",
+  __types__."bigint"::text as "2",
+  __types__."numeric"::text as "3",
+  __types__."decimal"::text as "4",
+  __types__."boolean"::text as "5",
+  __types__."varchar" as "6",
+  __types__."enum"::text as "7",
+  __types__."enum_array"::text as "8",
+  __types__."domain"::text as "9",
+  __types__."domain2"::text as "10",
+  __types__."text_array"::text as "11",
+  __types__."json"::text as "12",
+  __types__."jsonb"::text as "13",
+  __types__."nullable_range"::text as "14",
+  __types__."numrange"::text as "15",
+  json_build_array(
+    lower_inc(__types__."daterange"),
+    to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
+    to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
+  )::text as "16",
+  __types__."an_int_range"::text as "17",
+  to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
+  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
+  to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
+  to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
+  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
+  to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+    from unnest(__types__."interval_array") __entry__
+  )::text as "24",
+  __types__."money"::numeric::text as "25",
+  __types__."point"::text as "26",
+  __types__."nullablePoint"::text as "27",
+  __types__."inet"::text as "28",
+  __types__."cidr"::text as "29",
+  __types__."macaddr"::text as "30",
+  __types__."oid"::text as "31",
+  __types__."regproc"::text as "32",
+  __types__."regprocedure"::text as "33",
+  __types__."regoper"::text as "34",
+  __types__."regoperator"::text as "35",
+  __types__."regclass"::text as "36",
+  __types__."regtype"::text as "37",
+  __types__."regconfig"::text as "38",
+  __types__."regdictionary"::text as "39",
+  __types__."text_array_domain"::text as "40",
+  __types__."int8_array_domain"::text as "41",
+  __types__."bytea"::text as "42",
+  __types__."bytea_array"::text as "43",
+  __types__."ltree"::text as "44",
+  __types__."ltree_array"::text as "45",
+  __post__."id"::text as "46",
+  __post__."headline" as "47",
+  __post_2."id"::text as "48",
+  __post_2."headline" as "49",
+  __frmcdc_compound_type__."a"::text as "50",
+  __frmcdc_compound_type__."b" as "51",
+  __frmcdc_compound_type__."c"::text as "52",
+  __frmcdc_compound_type__."d" as "53",
+  __frmcdc_compound_type__."e"::text as "54",
+  __frmcdc_compound_type__."f"::text as "55",
+  __frmcdc_compound_type__."foo_bar"::text as "56",
+  (not (__frmcdc_compound_type__ is null))::text as "57",
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "58",
+  __frmcdc_compound_type_4."a"::text as "59",
+  __frmcdc_compound_type_4."b" as "60",
+  __frmcdc_compound_type_4."c"::text as "61",
+  __frmcdc_compound_type_4."d" as "62",
+  __frmcdc_compound_type_4."e"::text as "63",
+  __frmcdc_compound_type_4."f"::text as "64",
+  __frmcdc_compound_type_4."foo_bar"::text as "65",
+  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "67"
+from "b"."types" as __types__
+left outer join "a"."post" as __post__
+on (
+/* WHERE becoming ON */ (
+  __post__."id" = __types__."id"
+))
+left outer join "a"."post" as __post_2
+on (
+/* WHERE becoming ON */ (
+  __post_2."id" = __types__."smallint"
+))
+left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
-on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_10
-on TRUE
-left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
+left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE
 order by __types__."id" asc;
 
@@ -301,50 +463,68 @@ select
   __frmcdc_compound_type__."f"::text as "55",
   __frmcdc_compound_type__."foo_bar"::text as "56",
   (not (__frmcdc_compound_type__ is null))::text as "57",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "58",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "59",
-  __frmcdc_compound_type_2."a"::text as "60",
-  __frmcdc_compound_type_2."b" as "61",
-  __frmcdc_compound_type_2."c"::text as "62",
-  __frmcdc_compound_type_2."d" as "63",
-  __frmcdc_compound_type_2."e"::text as "64",
-  __frmcdc_compound_type_2."f"::text as "65",
-  __frmcdc_compound_type_2."foo_bar"::text as "66",
-  (not (__frmcdc_compound_type_2 is null))::text as "67",
-  __frmcdc_compound_type_3."a"::text as "68",
-  __frmcdc_compound_type_3."b" as "69",
-  __frmcdc_compound_type_3."c"::text as "70",
-  __frmcdc_compound_type_3."d" as "71",
-  __frmcdc_compound_type_3."e"::text as "72",
-  __frmcdc_compound_type_3."f"::text as "73",
-  __frmcdc_compound_type_3."foo_bar"::text as "74",
-  (not (__frmcdc_compound_type_3 is null))::text as "75",
-  __frmcdc_compound_type_4."a"::text as "76",
-  __frmcdc_compound_type_4."b" as "77",
-  __frmcdc_compound_type_4."c"::text as "78",
-  __frmcdc_compound_type_4."d" as "79",
-  __frmcdc_compound_type_4."e"::text as "80",
-  __frmcdc_compound_type_4."f"::text as "81",
-  __frmcdc_compound_type_4."foo_bar"::text as "82",
-  (not (__frmcdc_compound_type_4 is null))::text as "83",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "84",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "85",
-  __frmcdc_compound_type_5."a"::text as "86",
-  __frmcdc_compound_type_5."b" as "87",
-  __frmcdc_compound_type_5."c"::text as "88",
-  __frmcdc_compound_type_5."d" as "89",
-  __frmcdc_compound_type_5."e"::text as "90",
-  __frmcdc_compound_type_5."f"::text as "91",
-  __frmcdc_compound_type_5."foo_bar"::text as "92",
-  (not (__frmcdc_compound_type_5 is null))::text as "93",
-  __frmcdc_compound_type_6."a"::text as "94",
-  __frmcdc_compound_type_6."b" as "95",
-  __frmcdc_compound_type_6."c"::text as "96",
-  __frmcdc_compound_type_6."d" as "97",
-  __frmcdc_compound_type_6."e"::text as "98",
-  __frmcdc_compound_type_6."f"::text as "99",
-  __frmcdc_compound_type_6."foo_bar"::text as "100",
-  (not (__frmcdc_compound_type_6 is null))::text as "101"
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "58",
+  __frmcdc_compound_type_4."a"::text as "59",
+  __frmcdc_compound_type_4."b" as "60",
+  __frmcdc_compound_type_4."c"::text as "61",
+  __frmcdc_compound_type_4."d" as "62",
+  __frmcdc_compound_type_4."e"::text as "63",
+  __frmcdc_compound_type_4."f"::text as "64",
+  __frmcdc_compound_type_4."foo_bar"::text as "65",
+  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "67"
 from "b"."types" as __types__
 left outer join "a"."post" as __post__
 on (
@@ -358,160 +538,7 @@ on (
 ))
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
 left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
-on TRUE
-order by __types__."id" asc;
-
-select
-  __types__."id"::text as "0",
-  __types__."smallint"::text as "1",
-  __types__."bigint"::text as "2",
-  __types__."numeric"::text as "3",
-  __types__."decimal"::text as "4",
-  __types__."boolean"::text as "5",
-  __types__."varchar" as "6",
-  __types__."enum"::text as "7",
-  __types__."enum_array"::text as "8",
-  __types__."domain"::text as "9",
-  __types__."domain2"::text as "10",
-  __types__."text_array"::text as "11",
-  __types__."json"::text as "12",
-  __types__."jsonb"::text as "13",
-  __types__."nullable_range"::text as "14",
-  __types__."numrange"::text as "15",
-  json_build_array(
-    lower_inc(__types__."daterange"),
-    to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
-    to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange"),
-    isempty(__types__."daterange")
-  )::text as "16",
-  __types__."an_int_range"::text as "17",
-  to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
-  to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
-  to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
-  to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__types__."interval_array") __entry__
-  )::text as "24",
-  __types__."money"::numeric::text as "25",
-  __types__."point"::text as "26",
-  __types__."nullablePoint"::text as "27",
-  __types__."inet"::text as "28",
-  __types__."cidr"::text as "29",
-  __types__."macaddr"::text as "30",
-  __types__."oid"::text as "31",
-  __types__."regproc"::text as "32",
-  __types__."regprocedure"::text as "33",
-  __types__."regoper"::text as "34",
-  __types__."regoperator"::text as "35",
-  __types__."regclass"::text as "36",
-  __types__."regtype"::text as "37",
-  __types__."regconfig"::text as "38",
-  __types__."regdictionary"::text as "39",
-  __types__."text_array_domain"::text as "40",
-  __types__."int8_array_domain"::text as "41",
-  __types__."bytea"::text as "42",
-  __types__."bytea_array"::text as "43",
-  __types__."ltree"::text as "44",
-  __types__."ltree_array"::text as "45",
-  __post__."id"::text as "46",
-  __post__."headline" as "47",
-  __post_2."id"::text as "48",
-  __post_2."headline" as "49",
-  __frmcdc_compound_type__."a"::text as "50",
-  __frmcdc_compound_type__."b" as "51",
-  __frmcdc_compound_type__."c"::text as "52",
-  __frmcdc_compound_type__."d" as "53",
-  __frmcdc_compound_type__."e"::text as "54",
-  __frmcdc_compound_type__."f"::text as "55",
-  __frmcdc_compound_type__."foo_bar"::text as "56",
-  (not (__frmcdc_compound_type__ is null))::text as "57",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "58",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "59",
-  __frmcdc_compound_type_2."a"::text as "60",
-  __frmcdc_compound_type_2."b" as "61",
-  __frmcdc_compound_type_2."c"::text as "62",
-  __frmcdc_compound_type_2."d" as "63",
-  __frmcdc_compound_type_2."e"::text as "64",
-  __frmcdc_compound_type_2."f"::text as "65",
-  __frmcdc_compound_type_2."foo_bar"::text as "66",
-  (not (__frmcdc_compound_type_2 is null))::text as "67",
-  __frmcdc_compound_type_3."a"::text as "68",
-  __frmcdc_compound_type_3."b" as "69",
-  __frmcdc_compound_type_3."c"::text as "70",
-  __frmcdc_compound_type_3."d" as "71",
-  __frmcdc_compound_type_3."e"::text as "72",
-  __frmcdc_compound_type_3."f"::text as "73",
-  __frmcdc_compound_type_3."foo_bar"::text as "74",
-  (not (__frmcdc_compound_type_3 is null))::text as "75",
-  __frmcdc_compound_type_4."a"::text as "76",
-  __frmcdc_compound_type_4."b" as "77",
-  __frmcdc_compound_type_4."c"::text as "78",
-  __frmcdc_compound_type_4."d" as "79",
-  __frmcdc_compound_type_4."e"::text as "80",
-  __frmcdc_compound_type_4."f"::text as "81",
-  __frmcdc_compound_type_4."foo_bar"::text as "82",
-  (not (__frmcdc_compound_type_4 is null))::text as "83",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "84",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "85",
-  __frmcdc_compound_type_5."a"::text as "86",
-  __frmcdc_compound_type_5."b" as "87",
-  __frmcdc_compound_type_5."c"::text as "88",
-  __frmcdc_compound_type_5."d" as "89",
-  __frmcdc_compound_type_5."e"::text as "90",
-  __frmcdc_compound_type_5."f"::text as "91",
-  __frmcdc_compound_type_5."foo_bar"::text as "92",
-  (not (__frmcdc_compound_type_5 is null))::text as "93",
-  __frmcdc_compound_type_6."a"::text as "94",
-  __frmcdc_compound_type_6."b" as "95",
-  __frmcdc_compound_type_6."c"::text as "96",
-  __frmcdc_compound_type_6."d" as "97",
-  __frmcdc_compound_type_6."e"::text as "98",
-  __frmcdc_compound_type_6."f"::text as "99",
-  __frmcdc_compound_type_6."foo_bar"::text as "100",
-  (not (__frmcdc_compound_type_6 is null))::text as "101"
-from "b"."types" as __types__
-left outer join "a"."post" as __post__
-on (
-/* WHERE becoming ON */ (
-  __post__."id" = __types__."id"
-))
-left outer join "a"."post" as __post_2
-on (
-/* WHERE becoming ON */ (
-  __post_2."id" = __types__."smallint"
-))
-left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
 on TRUE
 where (
   __types__."id" = $1::"int4"
@@ -585,50 +612,68 @@ select
   __frmcdc_compound_type__."f"::text as "55",
   __frmcdc_compound_type__."foo_bar"::text as "56",
   (not (__frmcdc_compound_type__ is null))::text as "57",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "58",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "59",
-  __frmcdc_compound_type_2."a"::text as "60",
-  __frmcdc_compound_type_2."b" as "61",
-  __frmcdc_compound_type_2."c"::text as "62",
-  __frmcdc_compound_type_2."d" as "63",
-  __frmcdc_compound_type_2."e"::text as "64",
-  __frmcdc_compound_type_2."f"::text as "65",
-  __frmcdc_compound_type_2."foo_bar"::text as "66",
-  (not (__frmcdc_compound_type_2 is null))::text as "67",
-  __frmcdc_compound_type_3."a"::text as "68",
-  __frmcdc_compound_type_3."b" as "69",
-  __frmcdc_compound_type_3."c"::text as "70",
-  __frmcdc_compound_type_3."d" as "71",
-  __frmcdc_compound_type_3."e"::text as "72",
-  __frmcdc_compound_type_3."f"::text as "73",
-  __frmcdc_compound_type_3."foo_bar"::text as "74",
-  (not (__frmcdc_compound_type_3 is null))::text as "75",
-  __frmcdc_compound_type_4."a"::text as "76",
-  __frmcdc_compound_type_4."b" as "77",
-  __frmcdc_compound_type_4."c"::text as "78",
-  __frmcdc_compound_type_4."d" as "79",
-  __frmcdc_compound_type_4."e"::text as "80",
-  __frmcdc_compound_type_4."f"::text as "81",
-  __frmcdc_compound_type_4."foo_bar"::text as "82",
-  (not (__frmcdc_compound_type_4 is null))::text as "83",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "84",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "85",
-  __frmcdc_compound_type_5."a"::text as "86",
-  __frmcdc_compound_type_5."b" as "87",
-  __frmcdc_compound_type_5."c"::text as "88",
-  __frmcdc_compound_type_5."d" as "89",
-  __frmcdc_compound_type_5."e"::text as "90",
-  __frmcdc_compound_type_5."f"::text as "91",
-  __frmcdc_compound_type_5."foo_bar"::text as "92",
-  (not (__frmcdc_compound_type_5 is null))::text as "93",
-  __frmcdc_compound_type_6."a"::text as "94",
-  __frmcdc_compound_type_6."b" as "95",
-  __frmcdc_compound_type_6."c"::text as "96",
-  __frmcdc_compound_type_6."d" as "97",
-  __frmcdc_compound_type_6."e"::text as "98",
-  __frmcdc_compound_type_6."f"::text as "99",
-  __frmcdc_compound_type_6."foo_bar"::text as "100",
-  (not (__frmcdc_compound_type_6 is null))::text as "101"
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__type_function__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "58",
+  __frmcdc_compound_type_4."a"::text as "59",
+  __frmcdc_compound_type_4."b" as "60",
+  __frmcdc_compound_type_4."c"::text as "61",
+  __frmcdc_compound_type_4."d" as "62",
+  __frmcdc_compound_type_4."e"::text as "63",
+  __frmcdc_compound_type_4."f"::text as "64",
+  __frmcdc_compound_type_4."foo_bar"::text as "65",
+  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__type_function__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "67"
 from "b"."type_function"($1::"int4") as __type_function__
 left outer join "a"."post" as __post__
 on (
@@ -642,19 +687,7 @@ on (
 ))
 left outer join lateral (select (__type_function__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__type_function__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
 left outer join lateral (select (__type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__type_function__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
 on TRUE;
 
 select
@@ -725,50 +758,68 @@ select
   __frmcdc_compound_type__."f"::text as "55",
   __frmcdc_compound_type__."foo_bar"::text as "56",
   (not (__frmcdc_compound_type__ is null))::text as "57",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "58",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "59",
-  __frmcdc_compound_type_2."a"::text as "60",
-  __frmcdc_compound_type_2."b" as "61",
-  __frmcdc_compound_type_2."c"::text as "62",
-  __frmcdc_compound_type_2."d" as "63",
-  __frmcdc_compound_type_2."e"::text as "64",
-  __frmcdc_compound_type_2."f"::text as "65",
-  __frmcdc_compound_type_2."foo_bar"::text as "66",
-  (not (__frmcdc_compound_type_2 is null))::text as "67",
-  __frmcdc_compound_type_3."a"::text as "68",
-  __frmcdc_compound_type_3."b" as "69",
-  __frmcdc_compound_type_3."c"::text as "70",
-  __frmcdc_compound_type_3."d" as "71",
-  __frmcdc_compound_type_3."e"::text as "72",
-  __frmcdc_compound_type_3."f"::text as "73",
-  __frmcdc_compound_type_3."foo_bar"::text as "74",
-  (not (__frmcdc_compound_type_3 is null))::text as "75",
-  __frmcdc_compound_type_4."a"::text as "76",
-  __frmcdc_compound_type_4."b" as "77",
-  __frmcdc_compound_type_4."c"::text as "78",
-  __frmcdc_compound_type_4."d" as "79",
-  __frmcdc_compound_type_4."e"::text as "80",
-  __frmcdc_compound_type_4."f"::text as "81",
-  __frmcdc_compound_type_4."foo_bar"::text as "82",
-  (not (__frmcdc_compound_type_4 is null))::text as "83",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "84",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "85",
-  __frmcdc_compound_type_5."a"::text as "86",
-  __frmcdc_compound_type_5."b" as "87",
-  __frmcdc_compound_type_5."c"::text as "88",
-  __frmcdc_compound_type_5."d" as "89",
-  __frmcdc_compound_type_5."e"::text as "90",
-  __frmcdc_compound_type_5."f"::text as "91",
-  __frmcdc_compound_type_5."foo_bar"::text as "92",
-  (not (__frmcdc_compound_type_5 is null))::text as "93",
-  __frmcdc_compound_type_6."a"::text as "94",
-  __frmcdc_compound_type_6."b" as "95",
-  __frmcdc_compound_type_6."c"::text as "96",
-  __frmcdc_compound_type_6."d" as "97",
-  __frmcdc_compound_type_6."e"::text as "98",
-  __frmcdc_compound_type_6."f"::text as "99",
-  __frmcdc_compound_type_6."foo_bar"::text as "100",
-  (not (__frmcdc_compound_type_6 is null))::text as "101"
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__type_function_list__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "58",
+  __frmcdc_compound_type_4."a"::text as "59",
+  __frmcdc_compound_type_4."b" as "60",
+  __frmcdc_compound_type_4."c"::text as "61",
+  __frmcdc_compound_type_4."d" as "62",
+  __frmcdc_compound_type_4."e"::text as "63",
+  __frmcdc_compound_type_4."f"::text as "64",
+  __frmcdc_compound_type_4."foo_bar"::text as "65",
+  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__type_function_list__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "67"
 from unnest("b"."type_function_list"()) as __type_function_list__
 left outer join "a"."post" as __post__
 on (
@@ -782,19 +833,7 @@ on (
 ))
 left outer join lateral (select (__type_function_list__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__type_function_list__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
 left outer join lateral (select (__type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__type_function_list__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
 on TRUE;
 
 select
@@ -865,250 +904,302 @@ select
   __frmcdc_compound_type__."f"::text as "52",
   __frmcdc_compound_type__."foo_bar"::text as "53",
   (not (__frmcdc_compound_type__ is null))::text as "54",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "55",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "56",
-  __frmcdc_compound_type_2."a"::text as "57",
-  __frmcdc_compound_type_2."b" as "58",
-  __frmcdc_compound_type_2."c"::text as "59",
-  __frmcdc_compound_type_2."d" as "60",
-  __frmcdc_compound_type_2."e"::text as "61",
-  __frmcdc_compound_type_2."f"::text as "62",
-  __frmcdc_compound_type_2."foo_bar"::text as "63",
-  (not (__frmcdc_compound_type_2 is null))::text as "64",
-  __frmcdc_compound_type_3."a"::text as "65",
-  __frmcdc_compound_type_3."b" as "66",
-  __frmcdc_compound_type_3."c"::text as "67",
-  __frmcdc_compound_type_3."d" as "68",
-  __frmcdc_compound_type_3."e"::text as "69",
-  __frmcdc_compound_type_3."f"::text as "70",
-  __frmcdc_compound_type_3."foo_bar"::text as "71",
-  (not (__frmcdc_compound_type_3 is null))::text as "72",
-  __frmcdc_compound_type_4."a"::text as "73",
-  __frmcdc_compound_type_4."b" as "74",
-  __frmcdc_compound_type_4."c"::text as "75",
-  __frmcdc_compound_type_4."d" as "76",
-  __frmcdc_compound_type_4."e"::text as "77",
-  __frmcdc_compound_type_4."f"::text as "78",
-  __frmcdc_compound_type_4."foo_bar"::text as "79",
-  (not (__frmcdc_compound_type_4 is null))::text as "80",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "81",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "82",
-  __frmcdc_compound_type_5."a"::text as "83",
-  __frmcdc_compound_type_5."b" as "84",
-  __frmcdc_compound_type_5."c"::text as "85",
-  __frmcdc_compound_type_5."d" as "86",
-  __frmcdc_compound_type_5."e"::text as "87",
-  __frmcdc_compound_type_5."f"::text as "88",
-  __frmcdc_compound_type_5."foo_bar"::text as "89",
-  (not (__frmcdc_compound_type_5 is null))::text as "90",
-  __frmcdc_compound_type_6."a"::text as "91",
-  __frmcdc_compound_type_6."b" as "92",
-  __frmcdc_compound_type_6."c"::text as "93",
-  __frmcdc_compound_type_6."d" as "94",
-  __frmcdc_compound_type_6."e"::text as "95",
-  __frmcdc_compound_type_6."f"::text as "96",
-  __frmcdc_compound_type_6."foo_bar"::text as "97",
-  (not (__frmcdc_compound_type_6 is null))::text as "98",
-  __frmcdc_compound_type_7."a"::text as "99",
-  __frmcdc_compound_type_7."b" as "100",
-  __frmcdc_compound_type_7."c"::text as "101",
-  __frmcdc_compound_type_7."d" as "102",
-  __frmcdc_compound_type_7."e"::text as "103",
-  __frmcdc_compound_type_7."f"::text as "104",
-  __frmcdc_compound_type_7."foo_bar"::text as "105",
-  (not (__frmcdc_compound_type_7 is null))::text as "106",
-  __frmcdc_nested_compound_type_3."baz_buz"::text as "107",
-  (not (__frmcdc_nested_compound_type_3 is null))::text as "108",
-  __frmcdc_compound_type_8."a"::text as "109",
-  __frmcdc_compound_type_8."b" as "110",
-  __frmcdc_compound_type_8."c"::text as "111",
-  __frmcdc_compound_type_8."d" as "112",
-  __frmcdc_compound_type_8."e"::text as "113",
-  __frmcdc_compound_type_8."f"::text as "114",
-  __frmcdc_compound_type_8."foo_bar"::text as "115",
-  (not (__frmcdc_compound_type_8 is null))::text as "116",
-  __frmcdc_compound_type_9."a"::text as "117",
-  __frmcdc_compound_type_9."b" as "118",
-  __frmcdc_compound_type_9."c"::text as "119",
-  __frmcdc_compound_type_9."d" as "120",
-  __frmcdc_compound_type_9."e"::text as "121",
-  __frmcdc_compound_type_9."f"::text as "122",
-  __frmcdc_compound_type_9."foo_bar"::text as "123",
-  (not (__frmcdc_compound_type_9 is null))::text as "124",
-  __frmcdc_compound_type_10."a"::text as "125",
-  __frmcdc_compound_type_10."b" as "126",
-  __frmcdc_compound_type_10."c"::text as "127",
-  __frmcdc_compound_type_10."d" as "128",
-  __frmcdc_compound_type_10."e"::text as "129",
-  __frmcdc_compound_type_10."f"::text as "130",
-  __frmcdc_compound_type_10."foo_bar"::text as "131",
-  (not (__frmcdc_compound_type_10 is null))::text as "132",
-  __frmcdc_nested_compound_type_4."baz_buz"::text as "133",
-  (not (__frmcdc_nested_compound_type_4 is null))::text as "134",
-  __frmcdc_compound_type_11."a"::text as "135",
-  __frmcdc_compound_type_11."b" as "136",
-  __frmcdc_compound_type_11."c"::text as "137",
-  __frmcdc_compound_type_11."d" as "138",
-  __frmcdc_compound_type_11."e"::text as "139",
-  __frmcdc_compound_type_11."f"::text as "140",
-  __frmcdc_compound_type_11."foo_bar"::text as "141",
-  (not (__frmcdc_compound_type_11 is null))::text as "142",
-  __frmcdc_compound_type_12."a"::text as "143",
-  __frmcdc_compound_type_12."b" as "144",
-  __frmcdc_compound_type_12."c"::text as "145",
-  __frmcdc_compound_type_12."d" as "146",
-  __frmcdc_compound_type_12."e"::text as "147",
-  __frmcdc_compound_type_12."f"::text as "148",
-  __frmcdc_compound_type_12."foo_bar"::text as "149",
-  (not (__frmcdc_compound_type_12 is null))::text as "150",
-  (row_number() over (partition by 1))::text as "151"
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "55",
+  __frmcdc_compound_type_4."a"::text as "56",
+  __frmcdc_compound_type_4."b" as "57",
+  __frmcdc_compound_type_4."c"::text as "58",
+  __frmcdc_compound_type_4."d" as "59",
+  __frmcdc_compound_type_4."e"::text as "60",
+  __frmcdc_compound_type_4."f"::text as "61",
+  __frmcdc_compound_type_4."foo_bar"::text as "62",
+  (not (__frmcdc_compound_type_4 is null))::text as "63",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "64",
+  __frmcdc_compound_type_7."a"::text as "65",
+  __frmcdc_compound_type_7."b" as "66",
+  __frmcdc_compound_type_7."c"::text as "67",
+  __frmcdc_compound_type_7."d" as "68",
+  __frmcdc_compound_type_7."e"::text as "69",
+  __frmcdc_compound_type_7."f"::text as "70",
+  __frmcdc_compound_type_7."foo_bar"::text as "71",
+  (not (__frmcdc_compound_type_7 is null))::text as "72",
+  (
+    select array[
+      __frmcdc_nested_compound_type_3."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_3 is null))::text,
+      __frmcdc_compound_type_8."a"::text,
+      __frmcdc_compound_type_8."b",
+      __frmcdc_compound_type_8."c"::text,
+      __frmcdc_compound_type_8."d",
+      __frmcdc_compound_type_8."e"::text,
+      __frmcdc_compound_type_8."f"::text,
+      __frmcdc_compound_type_8."foo_bar"::text,
+      (not (__frmcdc_compound_type_8 is null))::text,
+      __frmcdc_compound_type_9."a"::text,
+      __frmcdc_compound_type_9."b",
+      __frmcdc_compound_type_9."c"::text,
+      __frmcdc_compound_type_9."d",
+      __frmcdc_compound_type_9."e"::text,
+      __frmcdc_compound_type_9."f"::text,
+      __frmcdc_compound_type_9."foo_bar"::text,
+      (not (__frmcdc_compound_type_9 is null))::text
+    ]::text[]
+    from (select (__type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type_3
+    left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
+    on TRUE
+  )::text as "73",
+  __frmcdc_compound_type_10."a"::text as "74",
+  __frmcdc_compound_type_10."b" as "75",
+  __frmcdc_compound_type_10."c"::text as "76",
+  __frmcdc_compound_type_10."d" as "77",
+  __frmcdc_compound_type_10."e"::text as "78",
+  __frmcdc_compound_type_10."f"::text as "79",
+  __frmcdc_compound_type_10."foo_bar"::text as "80",
+  (not (__frmcdc_compound_type_10 is null))::text as "81",
+  (
+    select array[
+      __frmcdc_nested_compound_type_4."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_4 is null))::text,
+      __frmcdc_compound_type_11."a"::text,
+      __frmcdc_compound_type_11."b",
+      __frmcdc_compound_type_11."c"::text,
+      __frmcdc_compound_type_11."d",
+      __frmcdc_compound_type_11."e"::text,
+      __frmcdc_compound_type_11."f"::text,
+      __frmcdc_compound_type_11."foo_bar"::text,
+      (not (__frmcdc_compound_type_11 is null))::text,
+      __frmcdc_compound_type_12."a"::text,
+      __frmcdc_compound_type_12."b",
+      __frmcdc_compound_type_12."c"::text,
+      __frmcdc_compound_type_12."d",
+      __frmcdc_compound_type_12."e"::text,
+      __frmcdc_compound_type_12."f"::text,
+      __frmcdc_compound_type_12."foo_bar"::text,
+      (not (__frmcdc_compound_type_12 is null))::text
+    ]::text[]
+    from (select (__type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
+    left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
+    on TRUE
+  )::text as "82",
+  (row_number() over (partition by 1))::text as "83"
 from "b"."type_function_connection"() as __type_function_connection__
 left outer join lateral (select (__type_function_connection__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
 left outer join lateral (select (__type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
 on TRUE
 left outer join lateral (select (__type_function_connection__."compound_type").*) as __frmcdc_compound_type_7
 on TRUE
-left outer join lateral (select (__type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type_3
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
-on TRUE
 left outer join lateral (select (__type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_10
-on TRUE
-left outer join lateral (select (__type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
 on TRUE;
 
 select
   __person__."id"::text as "0",
-  __person_type_function__."id"::text as "1",
-  __person_type_function__."smallint"::text as "2",
-  __person_type_function__."bigint"::text as "3",
-  __person_type_function__."numeric"::text as "4",
-  __person_type_function__."decimal"::text as "5",
-  __person_type_function__."boolean"::text as "6",
-  __person_type_function__."varchar" as "7",
-  __person_type_function__."enum"::text as "8",
-  __person_type_function__."enum_array"::text as "9",
-  __person_type_function__."domain"::text as "10",
-  __person_type_function__."domain2"::text as "11",
-  __person_type_function__."text_array"::text as "12",
-  __person_type_function__."json"::text as "13",
-  __person_type_function__."jsonb"::text as "14",
-  __person_type_function__."nullable_range"::text as "15",
-  __person_type_function__."numrange"::text as "16",
-  json_build_array(
-    lower_inc(__person_type_function__."daterange"),
-    to_char(lower(__person_type_function__."daterange"), 'YYYY-MM-DD'::text),
-    to_char(upper(__person_type_function__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__person_type_function__."daterange"),
-    isempty(__person_type_function__."daterange")
-  )::text as "17",
-  __person_type_function__."an_int_range"::text as "18",
-  to_char(__person_type_function__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
-  to_char(__person_type_function__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "20",
-  to_char(__person_type_function__."date", 'YYYY-MM-DD'::text) as "21",
-  to_char(date '1970-01-01' + __person_type_function__."time", 'HH24:MI:SS.US'::text) as "22",
-  to_char(date '1970-01-01' + __person_type_function__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "23",
-  to_char(__person_type_function__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "24",
-  array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__person_type_function__."interval_array") __entry__
-  )::text as "25",
-  __person_type_function__."money"::numeric::text as "26",
-  __person_type_function__."point"::text as "27",
-  __person_type_function__."nullablePoint"::text as "28",
-  __person_type_function__."inet"::text as "29",
-  __person_type_function__."cidr"::text as "30",
-  __person_type_function__."macaddr"::text as "31",
-  __person_type_function__."oid"::text as "32",
-  __person_type_function__."regproc"::text as "33",
-  __person_type_function__."regprocedure"::text as "34",
-  __person_type_function__."regoper"::text as "35",
-  __person_type_function__."regoperator"::text as "36",
-  __person_type_function__."regclass"::text as "37",
-  __person_type_function__."regtype"::text as "38",
-  __person_type_function__."regconfig"::text as "39",
-  __person_type_function__."regdictionary"::text as "40",
-  __person_type_function__."text_array_domain"::text as "41",
-  __person_type_function__."int8_array_domain"::text as "42",
-  __person_type_function__."bytea"::text as "43",
-  __person_type_function__."bytea_array"::text as "44",
-  __person_type_function__."ltree"::text as "45",
-  __person_type_function__."ltree_array"::text as "46",
-  __post__."id"::text as "47",
-  __post__."headline" as "48",
-  __post_2."id"::text as "49",
-  __post_2."headline" as "50",
-  __frmcdc_compound_type__."a"::text as "51",
-  __frmcdc_compound_type__."b" as "52",
-  __frmcdc_compound_type__."c"::text as "53",
-  __frmcdc_compound_type__."d" as "54",
-  __frmcdc_compound_type__."e"::text as "55",
-  __frmcdc_compound_type__."f"::text as "56",
-  __frmcdc_compound_type__."foo_bar"::text as "57",
-  (not (__frmcdc_compound_type__ is null))::text as "58",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "59",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "60",
-  __frmcdc_compound_type_2."a"::text as "61",
-  __frmcdc_compound_type_2."b" as "62",
-  __frmcdc_compound_type_2."c"::text as "63",
-  __frmcdc_compound_type_2."d" as "64",
-  __frmcdc_compound_type_2."e"::text as "65",
-  __frmcdc_compound_type_2."f"::text as "66",
-  __frmcdc_compound_type_2."foo_bar"::text as "67",
-  (not (__frmcdc_compound_type_2 is null))::text as "68",
-  __frmcdc_compound_type_3."a"::text as "69",
-  __frmcdc_compound_type_3."b" as "70",
-  __frmcdc_compound_type_3."c"::text as "71",
-  __frmcdc_compound_type_3."d" as "72",
-  __frmcdc_compound_type_3."e"::text as "73",
-  __frmcdc_compound_type_3."f"::text as "74",
-  __frmcdc_compound_type_3."foo_bar"::text as "75",
-  (not (__frmcdc_compound_type_3 is null))::text as "76",
-  __frmcdc_compound_type_4."a"::text as "77",
-  __frmcdc_compound_type_4."b" as "78",
-  __frmcdc_compound_type_4."c"::text as "79",
-  __frmcdc_compound_type_4."d" as "80",
-  __frmcdc_compound_type_4."e"::text as "81",
-  __frmcdc_compound_type_4."f"::text as "82",
-  __frmcdc_compound_type_4."foo_bar"::text as "83",
-  (not (__frmcdc_compound_type_4 is null))::text as "84",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "85",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "86",
-  __frmcdc_compound_type_5."a"::text as "87",
-  __frmcdc_compound_type_5."b" as "88",
-  __frmcdc_compound_type_5."c"::text as "89",
-  __frmcdc_compound_type_5."d" as "90",
-  __frmcdc_compound_type_5."e"::text as "91",
-  __frmcdc_compound_type_5."f"::text as "92",
-  __frmcdc_compound_type_5."foo_bar"::text as "93",
-  (not (__frmcdc_compound_type_5 is null))::text as "94",
-  __frmcdc_compound_type_6."a"::text as "95",
-  __frmcdc_compound_type_6."b" as "96",
-  __frmcdc_compound_type_6."c"::text as "97",
-  __frmcdc_compound_type_6."d" as "98",
-  __frmcdc_compound_type_6."e"::text as "99",
-  __frmcdc_compound_type_6."f"::text as "100",
-  __frmcdc_compound_type_6."foo_bar"::text as "101",
-  (not (__frmcdc_compound_type_6 is null))::text as "102",
+  (
+    select array[
+      __person_type_function__."id"::text,
+      __person_type_function__."smallint"::text,
+      __person_type_function__."bigint"::text,
+      __person_type_function__."numeric"::text,
+      __person_type_function__."decimal"::text,
+      __person_type_function__."boolean"::text,
+      __person_type_function__."varchar",
+      __person_type_function__."enum"::text,
+      __person_type_function__."enum_array"::text,
+      __person_type_function__."domain"::text,
+      __person_type_function__."domain2"::text,
+      __person_type_function__."text_array"::text,
+      __person_type_function__."json"::text,
+      __person_type_function__."jsonb"::text,
+      __person_type_function__."nullable_range"::text,
+      __person_type_function__."numrange"::text,
+      json_build_array(
+        lower_inc(__person_type_function__."daterange"),
+        to_char(lower(__person_type_function__."daterange"), 'YYYY-MM-DD'::text),
+        to_char(upper(__person_type_function__."daterange"), 'YYYY-MM-DD'::text),
+        upper_inc(__person_type_function__."daterange"),
+        isempty(__person_type_function__."daterange")
+      )::text,
+      __person_type_function__."an_int_range"::text,
+      to_char(__person_type_function__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text),
+      to_char(__person_type_function__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      to_char(__person_type_function__."date", 'YYYY-MM-DD'::text),
+      to_char(date '1970-01-01' + __person_type_function__."time", 'HH24:MI:SS.US'::text),
+      to_char(date '1970-01-01' + __person_type_function__."timetz", 'HH24:MI:SS.USTZH:TZM'::text),
+      to_char(__person_type_function__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      array(
+        select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+        from unnest(__person_type_function__."interval_array") __entry__
+      )::text,
+      __person_type_function__."money"::numeric::text,
+      __person_type_function__."point"::text,
+      __person_type_function__."nullablePoint"::text,
+      __person_type_function__."inet"::text,
+      __person_type_function__."cidr"::text,
+      __person_type_function__."macaddr"::text,
+      __person_type_function__."oid"::text,
+      __person_type_function__."regproc"::text,
+      __person_type_function__."regprocedure"::text,
+      __person_type_function__."regoper"::text,
+      __person_type_function__."regoperator"::text,
+      __person_type_function__."regclass"::text,
+      __person_type_function__."regtype"::text,
+      __person_type_function__."regconfig"::text,
+      __person_type_function__."regdictionary"::text,
+      __person_type_function__."text_array_domain"::text,
+      __person_type_function__."int8_array_domain"::text,
+      __person_type_function__."bytea"::text,
+      __person_type_function__."bytea_array"::text,
+      __person_type_function__."ltree"::text,
+      __person_type_function__."ltree_array"::text,
+      __post__."id"::text,
+      __post__."headline",
+      __post_2."id"::text,
+      __post_2."headline",
+      __frmcdc_compound_type__."a"::text,
+      __frmcdc_compound_type__."b",
+      __frmcdc_compound_type__."c"::text,
+      __frmcdc_compound_type__."d",
+      __frmcdc_compound_type__."e"::text,
+      __frmcdc_compound_type__."f"::text,
+      __frmcdc_compound_type__."foo_bar"::text,
+      (not (__frmcdc_compound_type__ is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type__."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type__ is null))::text,
+          __frmcdc_compound_type_2."a"::text,
+          __frmcdc_compound_type_2."b",
+          __frmcdc_compound_type_2."c"::text,
+          __frmcdc_compound_type_2."d",
+          __frmcdc_compound_type_2."e"::text,
+          __frmcdc_compound_type_2."f"::text,
+          __frmcdc_compound_type_2."foo_bar"::text,
+          (not (__frmcdc_compound_type_2 is null))::text,
+          __frmcdc_compound_type_3."a"::text,
+          __frmcdc_compound_type_3."b",
+          __frmcdc_compound_type_3."c"::text,
+          __frmcdc_compound_type_3."d",
+          __frmcdc_compound_type_3."e"::text,
+          __frmcdc_compound_type_3."f"::text,
+          __frmcdc_compound_type_3."foo_bar"::text,
+          (not (__frmcdc_compound_type_3 is null))::text
+        ]::text[]
+        from (select (__person_type_function__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+        left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+        on TRUE
+      )::text,
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_2."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_2 is null))::text,
+          __frmcdc_compound_type_5."a"::text,
+          __frmcdc_compound_type_5."b",
+          __frmcdc_compound_type_5."c"::text,
+          __frmcdc_compound_type_5."d",
+          __frmcdc_compound_type_5."e"::text,
+          __frmcdc_compound_type_5."f"::text,
+          __frmcdc_compound_type_5."foo_bar"::text,
+          (not (__frmcdc_compound_type_5 is null))::text,
+          __frmcdc_compound_type_6."a"::text,
+          __frmcdc_compound_type_6."b",
+          __frmcdc_compound_type_6."c"::text,
+          __frmcdc_compound_type_6."d",
+          __frmcdc_compound_type_6."e"::text,
+          __frmcdc_compound_type_6."f"::text,
+          __frmcdc_compound_type_6."foo_bar"::text,
+          (not (__frmcdc_compound_type_6 is null))::text
+        ]::text[]
+        from (select (__person_type_function__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+        left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+        on TRUE
+      )::text
+    ]::text[]
+    from "c"."person_type_function"(
+      __person__,
+      $1::"int4"
+    ) as __person_type_function__
+    left outer join "a"."post" as __post__
+    on (
+    /* WHERE becoming ON */ (
+      __post__."id" = __person_type_function__."id"
+    ))
+    left outer join "a"."post" as __post_2
+    on (
+    /* WHERE becoming ON */ (
+      __post_2."id" = __person_type_function__."smallint"
+    ))
+    left outer join lateral (select (__person_type_function__."compound_type").*) as __frmcdc_compound_type__
+    on TRUE
+    left outer join lateral (select (__person_type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
+    on TRUE
+  )::text as "1",
   array(
     select array[
       __person_type_function_list__."id"::text,
@@ -1178,24 +1269,33 @@ select
       __frmcdc_compound_type_7."f"::text,
       __frmcdc_compound_type_7."foo_bar"::text,
       (not (__frmcdc_compound_type_7 is null))::text,
-      __frmcdc_nested_compound_type_3."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_3 is null))::text,
-      __frmcdc_compound_type_8."a"::text,
-      __frmcdc_compound_type_8."b",
-      __frmcdc_compound_type_8."c"::text,
-      __frmcdc_compound_type_8."d",
-      __frmcdc_compound_type_8."e"::text,
-      __frmcdc_compound_type_8."f"::text,
-      __frmcdc_compound_type_8."foo_bar"::text,
-      (not (__frmcdc_compound_type_8 is null))::text,
-      __frmcdc_compound_type_9."a"::text,
-      __frmcdc_compound_type_9."b",
-      __frmcdc_compound_type_9."c"::text,
-      __frmcdc_compound_type_9."d",
-      __frmcdc_compound_type_9."e"::text,
-      __frmcdc_compound_type_9."f"::text,
-      __frmcdc_compound_type_9."foo_bar"::text,
-      (not (__frmcdc_compound_type_9 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_3."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_3 is null))::text,
+          __frmcdc_compound_type_8."a"::text,
+          __frmcdc_compound_type_8."b",
+          __frmcdc_compound_type_8."c"::text,
+          __frmcdc_compound_type_8."d",
+          __frmcdc_compound_type_8."e"::text,
+          __frmcdc_compound_type_8."f"::text,
+          __frmcdc_compound_type_8."foo_bar"::text,
+          (not (__frmcdc_compound_type_8 is null))::text,
+          __frmcdc_compound_type_9."a"::text,
+          __frmcdc_compound_type_9."b",
+          __frmcdc_compound_type_9."c"::text,
+          __frmcdc_compound_type_9."d",
+          __frmcdc_compound_type_9."e"::text,
+          __frmcdc_compound_type_9."f"::text,
+          __frmcdc_compound_type_9."foo_bar"::text,
+          (not (__frmcdc_compound_type_9 is null))::text
+        ]::text[]
+        from (select (__person_type_function_list__."nested_compound_type").*) as __frmcdc_nested_compound_type_3
+        left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
+        on TRUE
+      )::text,
       __frmcdc_compound_type_10."a"::text,
       __frmcdc_compound_type_10."b",
       __frmcdc_compound_type_10."c"::text,
@@ -1204,24 +1304,33 @@ select
       __frmcdc_compound_type_10."f"::text,
       __frmcdc_compound_type_10."foo_bar"::text,
       (not (__frmcdc_compound_type_10 is null))::text,
-      __frmcdc_nested_compound_type_4."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_4 is null))::text,
-      __frmcdc_compound_type_11."a"::text,
-      __frmcdc_compound_type_11."b",
-      __frmcdc_compound_type_11."c"::text,
-      __frmcdc_compound_type_11."d",
-      __frmcdc_compound_type_11."e"::text,
-      __frmcdc_compound_type_11."f"::text,
-      __frmcdc_compound_type_11."foo_bar"::text,
-      (not (__frmcdc_compound_type_11 is null))::text,
-      __frmcdc_compound_type_12."a"::text,
-      __frmcdc_compound_type_12."b",
-      __frmcdc_compound_type_12."c"::text,
-      __frmcdc_compound_type_12."d",
-      __frmcdc_compound_type_12."e"::text,
-      __frmcdc_compound_type_12."f"::text,
-      __frmcdc_compound_type_12."foo_bar"::text,
-      (not (__frmcdc_compound_type_12 is null))::text
+      (
+        select array[
+          __frmcdc_nested_compound_type_4."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_4 is null))::text,
+          __frmcdc_compound_type_11."a"::text,
+          __frmcdc_compound_type_11."b",
+          __frmcdc_compound_type_11."c"::text,
+          __frmcdc_compound_type_11."d",
+          __frmcdc_compound_type_11."e"::text,
+          __frmcdc_compound_type_11."f"::text,
+          __frmcdc_compound_type_11."foo_bar"::text,
+          (not (__frmcdc_compound_type_11 is null))::text,
+          __frmcdc_compound_type_12."a"::text,
+          __frmcdc_compound_type_12."b",
+          __frmcdc_compound_type_12."c"::text,
+          __frmcdc_compound_type_12."d",
+          __frmcdc_compound_type_12."e"::text,
+          __frmcdc_compound_type_12."f"::text,
+          __frmcdc_compound_type_12."foo_bar"::text,
+          (not (__frmcdc_compound_type_12 is null))::text
+        ]::text[]
+        from (select (__person_type_function_list__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
+        left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
+        on TRUE
+      )::text
     ]::text[]
     from unnest("c"."person_type_function_list"(__person__)) as __person_type_function_list__
     left outer join "a"."post" as __post_3
@@ -1236,21 +1345,9 @@ select
     ))
     left outer join lateral (select (__person_type_function_list__."compound_type").*) as __frmcdc_compound_type_7
     on TRUE
-    left outer join lateral (select (__person_type_function_list__."nested_compound_type").*) as __frmcdc_nested_compound_type_3
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
-    on TRUE
     left outer join lateral (select (__person_type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_10
     on TRUE
-    left outer join lateral (select (__person_type_function_list__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
-    on TRUE
-  )::text as "103",
+  )::text as "2",
   array(
     select array[
       __person_type_function_connection__."id"::text,
@@ -1320,24 +1417,33 @@ select
       __frmcdc_compound_type_13."f"::text,
       __frmcdc_compound_type_13."foo_bar"::text,
       (not (__frmcdc_compound_type_13 is null))::text,
-      __frmcdc_nested_compound_type_5."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_5 is null))::text,
-      __frmcdc_compound_type_14."a"::text,
-      __frmcdc_compound_type_14."b",
-      __frmcdc_compound_type_14."c"::text,
-      __frmcdc_compound_type_14."d",
-      __frmcdc_compound_type_14."e"::text,
-      __frmcdc_compound_type_14."f"::text,
-      __frmcdc_compound_type_14."foo_bar"::text,
-      (not (__frmcdc_compound_type_14 is null))::text,
-      __frmcdc_compound_type_15."a"::text,
-      __frmcdc_compound_type_15."b",
-      __frmcdc_compound_type_15."c"::text,
-      __frmcdc_compound_type_15."d",
-      __frmcdc_compound_type_15."e"::text,
-      __frmcdc_compound_type_15."f"::text,
-      __frmcdc_compound_type_15."foo_bar"::text,
-      (not (__frmcdc_compound_type_15 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_5."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_5 is null))::text,
+          __frmcdc_compound_type_14."a"::text,
+          __frmcdc_compound_type_14."b",
+          __frmcdc_compound_type_14."c"::text,
+          __frmcdc_compound_type_14."d",
+          __frmcdc_compound_type_14."e"::text,
+          __frmcdc_compound_type_14."f"::text,
+          __frmcdc_compound_type_14."foo_bar"::text,
+          (not (__frmcdc_compound_type_14 is null))::text,
+          __frmcdc_compound_type_15."a"::text,
+          __frmcdc_compound_type_15."b",
+          __frmcdc_compound_type_15."c"::text,
+          __frmcdc_compound_type_15."d",
+          __frmcdc_compound_type_15."e"::text,
+          __frmcdc_compound_type_15."f"::text,
+          __frmcdc_compound_type_15."foo_bar"::text,
+          (not (__frmcdc_compound_type_15 is null))::text
+        ]::text[]
+        from (select (__person_type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type_5
+        left outer join lateral (select (__frmcdc_nested_compound_type_5."a").*) as __frmcdc_compound_type_14
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_5."b").*) as __frmcdc_compound_type_15
+        on TRUE
+      )::text,
       __frmcdc_compound_type_16."a"::text,
       __frmcdc_compound_type_16."b",
       __frmcdc_compound_type_16."c"::text,
@@ -1346,24 +1452,33 @@ select
       __frmcdc_compound_type_16."f"::text,
       __frmcdc_compound_type_16."foo_bar"::text,
       (not (__frmcdc_compound_type_16 is null))::text,
-      __frmcdc_nested_compound_type_6."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_6 is null))::text,
-      __frmcdc_compound_type_17."a"::text,
-      __frmcdc_compound_type_17."b",
-      __frmcdc_compound_type_17."c"::text,
-      __frmcdc_compound_type_17."d",
-      __frmcdc_compound_type_17."e"::text,
-      __frmcdc_compound_type_17."f"::text,
-      __frmcdc_compound_type_17."foo_bar"::text,
-      (not (__frmcdc_compound_type_17 is null))::text,
-      __frmcdc_compound_type_18."a"::text,
-      __frmcdc_compound_type_18."b",
-      __frmcdc_compound_type_18."c"::text,
-      __frmcdc_compound_type_18."d",
-      __frmcdc_compound_type_18."e"::text,
-      __frmcdc_compound_type_18."f"::text,
-      __frmcdc_compound_type_18."foo_bar"::text,
-      (not (__frmcdc_compound_type_18 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_6."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_6 is null))::text,
+          __frmcdc_compound_type_17."a"::text,
+          __frmcdc_compound_type_17."b",
+          __frmcdc_compound_type_17."c"::text,
+          __frmcdc_compound_type_17."d",
+          __frmcdc_compound_type_17."e"::text,
+          __frmcdc_compound_type_17."f"::text,
+          __frmcdc_compound_type_17."foo_bar"::text,
+          (not (__frmcdc_compound_type_17 is null))::text,
+          __frmcdc_compound_type_18."a"::text,
+          __frmcdc_compound_type_18."b",
+          __frmcdc_compound_type_18."c"::text,
+          __frmcdc_compound_type_18."d",
+          __frmcdc_compound_type_18."e"::text,
+          __frmcdc_compound_type_18."f"::text,
+          __frmcdc_compound_type_18."foo_bar"::text,
+          (not (__frmcdc_compound_type_18 is null))::text
+        ]::text[]
+        from (select (__person_type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_6
+        left outer join lateral (select (__frmcdc_nested_compound_type_6."a").*) as __frmcdc_compound_type_17
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_6."b").*) as __frmcdc_compound_type_18
+        on TRUE
+      )::text,
       __frmcdc_compound_type_19."a"::text,
       __frmcdc_compound_type_19."b",
       __frmcdc_compound_type_19."c"::text,
@@ -1372,24 +1487,33 @@ select
       __frmcdc_compound_type_19."f"::text,
       __frmcdc_compound_type_19."foo_bar"::text,
       (not (__frmcdc_compound_type_19 is null))::text,
-      __frmcdc_nested_compound_type_7."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_7 is null))::text,
-      __frmcdc_compound_type_20."a"::text,
-      __frmcdc_compound_type_20."b",
-      __frmcdc_compound_type_20."c"::text,
-      __frmcdc_compound_type_20."d",
-      __frmcdc_compound_type_20."e"::text,
-      __frmcdc_compound_type_20."f"::text,
-      __frmcdc_compound_type_20."foo_bar"::text,
-      (not (__frmcdc_compound_type_20 is null))::text,
-      __frmcdc_compound_type_21."a"::text,
-      __frmcdc_compound_type_21."b",
-      __frmcdc_compound_type_21."c"::text,
-      __frmcdc_compound_type_21."d",
-      __frmcdc_compound_type_21."e"::text,
-      __frmcdc_compound_type_21."f"::text,
-      __frmcdc_compound_type_21."foo_bar"::text,
-      (not (__frmcdc_compound_type_21 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_7."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_7 is null))::text,
+          __frmcdc_compound_type_20."a"::text,
+          __frmcdc_compound_type_20."b",
+          __frmcdc_compound_type_20."c"::text,
+          __frmcdc_compound_type_20."d",
+          __frmcdc_compound_type_20."e"::text,
+          __frmcdc_compound_type_20."f"::text,
+          __frmcdc_compound_type_20."foo_bar"::text,
+          (not (__frmcdc_compound_type_20 is null))::text,
+          __frmcdc_compound_type_21."a"::text,
+          __frmcdc_compound_type_21."b",
+          __frmcdc_compound_type_21."c"::text,
+          __frmcdc_compound_type_21."d",
+          __frmcdc_compound_type_21."e"::text,
+          __frmcdc_compound_type_21."f"::text,
+          __frmcdc_compound_type_21."foo_bar"::text,
+          (not (__frmcdc_compound_type_21 is null))::text
+        ]::text[]
+        from (select (__person_type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type_7
+        left outer join lateral (select (__frmcdc_nested_compound_type_7."a").*) as __frmcdc_compound_type_20
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_7."b").*) as __frmcdc_compound_type_21
+        on TRUE
+      )::text,
       __frmcdc_compound_type_22."a"::text,
       __frmcdc_compound_type_22."b",
       __frmcdc_compound_type_22."c"::text,
@@ -1398,98 +1522,52 @@ select
       __frmcdc_compound_type_22."f"::text,
       __frmcdc_compound_type_22."foo_bar"::text,
       (not (__frmcdc_compound_type_22 is null))::text,
-      __frmcdc_nested_compound_type_8."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_8 is null))::text,
-      __frmcdc_compound_type_23."a"::text,
-      __frmcdc_compound_type_23."b",
-      __frmcdc_compound_type_23."c"::text,
-      __frmcdc_compound_type_23."d",
-      __frmcdc_compound_type_23."e"::text,
-      __frmcdc_compound_type_23."f"::text,
-      __frmcdc_compound_type_23."foo_bar"::text,
-      (not (__frmcdc_compound_type_23 is null))::text,
-      __frmcdc_compound_type_24."a"::text,
-      __frmcdc_compound_type_24."b",
-      __frmcdc_compound_type_24."c"::text,
-      __frmcdc_compound_type_24."d",
-      __frmcdc_compound_type_24."e"::text,
-      __frmcdc_compound_type_24."f"::text,
-      __frmcdc_compound_type_24."foo_bar"::text,
-      (not (__frmcdc_compound_type_24 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_8."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_8 is null))::text,
+          __frmcdc_compound_type_23."a"::text,
+          __frmcdc_compound_type_23."b",
+          __frmcdc_compound_type_23."c"::text,
+          __frmcdc_compound_type_23."d",
+          __frmcdc_compound_type_23."e"::text,
+          __frmcdc_compound_type_23."f"::text,
+          __frmcdc_compound_type_23."foo_bar"::text,
+          (not (__frmcdc_compound_type_23 is null))::text,
+          __frmcdc_compound_type_24."a"::text,
+          __frmcdc_compound_type_24."b",
+          __frmcdc_compound_type_24."c"::text,
+          __frmcdc_compound_type_24."d",
+          __frmcdc_compound_type_24."e"::text,
+          __frmcdc_compound_type_24."f"::text,
+          __frmcdc_compound_type_24."foo_bar"::text,
+          (not (__frmcdc_compound_type_24 is null))::text
+        ]::text[]
+        from (select (__person_type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_8
+        left outer join lateral (select (__frmcdc_nested_compound_type_8."a").*) as __frmcdc_compound_type_23
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_8."b").*) as __frmcdc_compound_type_24
+        on TRUE
+      )::text,
       (row_number() over (partition by 1))::text
     ]::text[]
     from "c"."person_type_function_connection"(__person__) as __person_type_function_connection__
     left outer join lateral (select (__person_type_function_connection__."compound_type").*) as __frmcdc_compound_type_13
     on TRUE
-    left outer join lateral (select (__person_type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type_5
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_5."a").*) as __frmcdc_compound_type_14
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_5."b").*) as __frmcdc_compound_type_15
-    on TRUE
     left outer join lateral (select (__person_type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_16
-    on TRUE
-    left outer join lateral (select (__person_type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_6
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_6."a").*) as __frmcdc_compound_type_17
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_6."b").*) as __frmcdc_compound_type_18
     on TRUE
     left outer join lateral (select (__person_type_function_connection__."compound_type").*) as __frmcdc_compound_type_19
     on TRUE
-    left outer join lateral (select (__person_type_function_connection__."nested_compound_type").*) as __frmcdc_nested_compound_type_7
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_7."a").*) as __frmcdc_compound_type_20
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_7."b").*) as __frmcdc_compound_type_21
-    on TRUE
     left outer join lateral (select (__person_type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_22
     on TRUE
-    left outer join lateral (select (__person_type_function_connection__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_8
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_8."a").*) as __frmcdc_compound_type_23
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_8."b").*) as __frmcdc_compound_type_24
-    on TRUE
-  )::text as "104",
+  )::text as "3",
   array(
     select array[
       (count(*))::text
     ]::text[]
     from "c"."person_type_function_connection"(__person__) as __person_type_function_connection__
-  )::text as "105"
+  )::text as "4"
 from "c"."person" as __person__
-left outer join "c"."person_type_function"(
-  __person__,
-  $1::"int4"
-) as __person_type_function__
-on TRUE
-left outer join "a"."post" as __post__
-on (
-/* WHERE becoming ON */ (
-  __post__."id" = __person_type_function__."id"
-))
-left outer join "a"."post" as __post_2
-on (
-/* WHERE becoming ON */ (
-  __post_2."id" = __person_type_function__."smallint"
-))
-left outer join lateral (select (__person_type_function__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__person_type_function__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
-left outer join lateral (select (__person_type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__person_type_function__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
-on TRUE
 where (
   __person__."id" = $2::"int4"
 );
@@ -1497,117 +1575,157 @@ where (
 select
   __post__."id"::text as "0",
   __post__."headline" as "1",
-  __types__."id"::text as "2",
-  __types__."smallint"::text as "3",
-  __types__."bigint"::text as "4",
-  __types__."numeric"::text as "5",
-  __types__."decimal"::text as "6",
-  __types__."boolean"::text as "7",
-  __types__."varchar" as "8",
-  __types__."enum"::text as "9",
-  __types__."enum_array"::text as "10",
-  __types__."domain"::text as "11",
-  __types__."domain2"::text as "12",
-  __types__."text_array"::text as "13",
-  __types__."json"::text as "14",
-  __types__."jsonb"::text as "15",
-  __types__."nullable_range"::text as "16",
-  __types__."numrange"::text as "17",
-  json_build_array(
-    lower_inc(__types__."daterange"),
-    to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
-    to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange"),
-    isempty(__types__."daterange")
-  )::text as "18",
-  __types__."an_int_range"::text as "19",
-  to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "20",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "21",
-  to_char(__types__."date", 'YYYY-MM-DD'::text) as "22",
-  to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "23",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "24",
-  to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "25",
-  array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__types__."interval_array") __entry__
-  )::text as "26",
-  __types__."money"::numeric::text as "27",
-  __types__."point"::text as "28",
-  __types__."nullablePoint"::text as "29",
-  __types__."inet"::text as "30",
-  __types__."cidr"::text as "31",
-  __types__."macaddr"::text as "32",
-  __types__."oid"::text as "33",
-  __types__."regproc"::text as "34",
-  __types__."regprocedure"::text as "35",
-  __types__."regoper"::text as "36",
-  __types__."regoperator"::text as "37",
-  __types__."regclass"::text as "38",
-  __types__."regtype"::text as "39",
-  __types__."regconfig"::text as "40",
-  __types__."regdictionary"::text as "41",
-  __types__."text_array_domain"::text as "42",
-  __types__."int8_array_domain"::text as "43",
-  __types__."bytea"::text as "44",
-  __types__."bytea_array"::text as "45",
-  __types__."ltree"::text as "46",
-  __types__."ltree_array"::text as "47",
-  __post_2."id"::text as "48",
-  __post_2."headline" as "49",
-  __post_3."id"::text as "50",
-  __post_3."headline" as "51",
-  __frmcdc_compound_type__."a"::text as "52",
-  __frmcdc_compound_type__."b" as "53",
-  __frmcdc_compound_type__."c"::text as "54",
-  __frmcdc_compound_type__."d" as "55",
-  __frmcdc_compound_type__."e"::text as "56",
-  __frmcdc_compound_type__."f"::text as "57",
-  __frmcdc_compound_type__."foo_bar"::text as "58",
-  (not (__frmcdc_compound_type__ is null))::text as "59",
-  __frmcdc_nested_compound_type__."baz_buz"::text as "60",
-  (not (__frmcdc_nested_compound_type__ is null))::text as "61",
-  __frmcdc_compound_type_2."a"::text as "62",
-  __frmcdc_compound_type_2."b" as "63",
-  __frmcdc_compound_type_2."c"::text as "64",
-  __frmcdc_compound_type_2."d" as "65",
-  __frmcdc_compound_type_2."e"::text as "66",
-  __frmcdc_compound_type_2."f"::text as "67",
-  __frmcdc_compound_type_2."foo_bar"::text as "68",
-  (not (__frmcdc_compound_type_2 is null))::text as "69",
-  __frmcdc_compound_type_3."a"::text as "70",
-  __frmcdc_compound_type_3."b" as "71",
-  __frmcdc_compound_type_3."c"::text as "72",
-  __frmcdc_compound_type_3."d" as "73",
-  __frmcdc_compound_type_3."e"::text as "74",
-  __frmcdc_compound_type_3."f"::text as "75",
-  __frmcdc_compound_type_3."foo_bar"::text as "76",
-  (not (__frmcdc_compound_type_3 is null))::text as "77",
-  __frmcdc_compound_type_4."a"::text as "78",
-  __frmcdc_compound_type_4."b" as "79",
-  __frmcdc_compound_type_4."c"::text as "80",
-  __frmcdc_compound_type_4."d" as "81",
-  __frmcdc_compound_type_4."e"::text as "82",
-  __frmcdc_compound_type_4."f"::text as "83",
-  __frmcdc_compound_type_4."foo_bar"::text as "84",
-  (not (__frmcdc_compound_type_4 is null))::text as "85",
-  __frmcdc_nested_compound_type_2."baz_buz"::text as "86",
-  (not (__frmcdc_nested_compound_type_2 is null))::text as "87",
-  __frmcdc_compound_type_5."a"::text as "88",
-  __frmcdc_compound_type_5."b" as "89",
-  __frmcdc_compound_type_5."c"::text as "90",
-  __frmcdc_compound_type_5."d" as "91",
-  __frmcdc_compound_type_5."e"::text as "92",
-  __frmcdc_compound_type_5."f"::text as "93",
-  __frmcdc_compound_type_5."foo_bar"::text as "94",
-  (not (__frmcdc_compound_type_5 is null))::text as "95",
-  __frmcdc_compound_type_6."a"::text as "96",
-  __frmcdc_compound_type_6."b" as "97",
-  __frmcdc_compound_type_6."c"::text as "98",
-  __frmcdc_compound_type_6."d" as "99",
-  __frmcdc_compound_type_6."e"::text as "100",
-  __frmcdc_compound_type_6."f"::text as "101",
-  __frmcdc_compound_type_6."foo_bar"::text as "102",
-  (not (__frmcdc_compound_type_6 is null))::text as "103",
+  (
+    select array[
+      __types__."id"::text,
+      __types__."smallint"::text,
+      __types__."bigint"::text,
+      __types__."numeric"::text,
+      __types__."decimal"::text,
+      __types__."boolean"::text,
+      __types__."varchar",
+      __types__."enum"::text,
+      __types__."enum_array"::text,
+      __types__."domain"::text,
+      __types__."domain2"::text,
+      __types__."text_array"::text,
+      __types__."json"::text,
+      __types__."jsonb"::text,
+      __types__."nullable_range"::text,
+      __types__."numrange"::text,
+      json_build_array(
+        lower_inc(__types__."daterange"),
+        to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
+        to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
+        upper_inc(__types__."daterange"),
+        isempty(__types__."daterange")
+      )::text,
+      __types__."an_int_range"::text,
+      to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text),
+      to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      to_char(__types__."date", 'YYYY-MM-DD'::text),
+      to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text),
+      to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text),
+      to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      array(
+        select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+        from unnest(__types__."interval_array") __entry__
+      )::text,
+      __types__."money"::numeric::text,
+      __types__."point"::text,
+      __types__."nullablePoint"::text,
+      __types__."inet"::text,
+      __types__."cidr"::text,
+      __types__."macaddr"::text,
+      __types__."oid"::text,
+      __types__."regproc"::text,
+      __types__."regprocedure"::text,
+      __types__."regoper"::text,
+      __types__."regoperator"::text,
+      __types__."regclass"::text,
+      __types__."regtype"::text,
+      __types__."regconfig"::text,
+      __types__."regdictionary"::text,
+      __types__."text_array_domain"::text,
+      __types__."int8_array_domain"::text,
+      __types__."bytea"::text,
+      __types__."bytea_array"::text,
+      __types__."ltree"::text,
+      __types__."ltree_array"::text,
+      __post_2."id"::text,
+      __post_2."headline",
+      __post_3."id"::text,
+      __post_3."headline",
+      __frmcdc_compound_type__."a"::text,
+      __frmcdc_compound_type__."b",
+      __frmcdc_compound_type__."c"::text,
+      __frmcdc_compound_type__."d",
+      __frmcdc_compound_type__."e"::text,
+      __frmcdc_compound_type__."f"::text,
+      __frmcdc_compound_type__."foo_bar"::text,
+      (not (__frmcdc_compound_type__ is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type__."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type__ is null))::text,
+          __frmcdc_compound_type_2."a"::text,
+          __frmcdc_compound_type_2."b",
+          __frmcdc_compound_type_2."c"::text,
+          __frmcdc_compound_type_2."d",
+          __frmcdc_compound_type_2."e"::text,
+          __frmcdc_compound_type_2."f"::text,
+          __frmcdc_compound_type_2."foo_bar"::text,
+          (not (__frmcdc_compound_type_2 is null))::text,
+          __frmcdc_compound_type_3."a"::text,
+          __frmcdc_compound_type_3."b",
+          __frmcdc_compound_type_3."c"::text,
+          __frmcdc_compound_type_3."d",
+          __frmcdc_compound_type_3."e"::text,
+          __frmcdc_compound_type_3."f"::text,
+          __frmcdc_compound_type_3."foo_bar"::text,
+          (not (__frmcdc_compound_type_3 is null))::text
+        ]::text[]
+        from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+        left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+        on TRUE
+      )::text,
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_2."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_2 is null))::text,
+          __frmcdc_compound_type_5."a"::text,
+          __frmcdc_compound_type_5."b",
+          __frmcdc_compound_type_5."c"::text,
+          __frmcdc_compound_type_5."d",
+          __frmcdc_compound_type_5."e"::text,
+          __frmcdc_compound_type_5."f"::text,
+          __frmcdc_compound_type_5."foo_bar"::text,
+          (not (__frmcdc_compound_type_5 is null))::text,
+          __frmcdc_compound_type_6."a"::text,
+          __frmcdc_compound_type_6."b",
+          __frmcdc_compound_type_6."c"::text,
+          __frmcdc_compound_type_6."d",
+          __frmcdc_compound_type_6."e"::text,
+          __frmcdc_compound_type_6."f"::text,
+          __frmcdc_compound_type_6."foo_bar"::text,
+          (not (__frmcdc_compound_type_6 is null))::text
+        ]::text[]
+        from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+        left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+        on TRUE
+      )::text
+    ]::text[]
+    from "b"."types" as __types__
+    left outer join "a"."post" as __post_2
+    on (
+    /* WHERE becoming ON */ (
+      __post_2."id" = __types__."id"
+    ))
+    left outer join "a"."post" as __post_3
+    on (
+    /* WHERE becoming ON */ (
+      __post_3."id" = __types__."smallint"
+    ))
+    left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
+    on TRUE
+    left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
+    on TRUE
+    where (
+      __types__."id" = __post__."id"
+    )
+  )::text as "2",
   array(
     select array[
       __types_2."id"::text,
@@ -1681,24 +1799,33 @@ select
       __frmcdc_compound_type_7."f"::text,
       __frmcdc_compound_type_7."foo_bar"::text,
       (not (__frmcdc_compound_type_7 is null))::text,
-      __frmcdc_nested_compound_type_3."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_3 is null))::text,
-      __frmcdc_compound_type_8."a"::text,
-      __frmcdc_compound_type_8."b",
-      __frmcdc_compound_type_8."c"::text,
-      __frmcdc_compound_type_8."d",
-      __frmcdc_compound_type_8."e"::text,
-      __frmcdc_compound_type_8."f"::text,
-      __frmcdc_compound_type_8."foo_bar"::text,
-      (not (__frmcdc_compound_type_8 is null))::text,
-      __frmcdc_compound_type_9."a"::text,
-      __frmcdc_compound_type_9."b",
-      __frmcdc_compound_type_9."c"::text,
-      __frmcdc_compound_type_9."d",
-      __frmcdc_compound_type_9."e"::text,
-      __frmcdc_compound_type_9."f"::text,
-      __frmcdc_compound_type_9."foo_bar"::text,
-      (not (__frmcdc_compound_type_9 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_3."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_3 is null))::text,
+          __frmcdc_compound_type_8."a"::text,
+          __frmcdc_compound_type_8."b",
+          __frmcdc_compound_type_8."c"::text,
+          __frmcdc_compound_type_8."d",
+          __frmcdc_compound_type_8."e"::text,
+          __frmcdc_compound_type_8."f"::text,
+          __frmcdc_compound_type_8."foo_bar"::text,
+          (not (__frmcdc_compound_type_8 is null))::text,
+          __frmcdc_compound_type_9."a"::text,
+          __frmcdc_compound_type_9."b",
+          __frmcdc_compound_type_9."c"::text,
+          __frmcdc_compound_type_9."d",
+          __frmcdc_compound_type_9."e"::text,
+          __frmcdc_compound_type_9."f"::text,
+          __frmcdc_compound_type_9."foo_bar"::text,
+          (not (__frmcdc_compound_type_9 is null))::text
+        ]::text[]
+        from (select (__types_2."nested_compound_type").*) as __frmcdc_nested_compound_type_3
+        left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
+        on TRUE
+      )::text,
       __frmcdc_compound_type_10."a"::text,
       __frmcdc_compound_type_10."b",
       __frmcdc_compound_type_10."c"::text,
@@ -1707,24 +1834,33 @@ select
       __frmcdc_compound_type_10."f"::text,
       __frmcdc_compound_type_10."foo_bar"::text,
       (not (__frmcdc_compound_type_10 is null))::text,
-      __frmcdc_nested_compound_type_4."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_4 is null))::text,
-      __frmcdc_compound_type_11."a"::text,
-      __frmcdc_compound_type_11."b",
-      __frmcdc_compound_type_11."c"::text,
-      __frmcdc_compound_type_11."d",
-      __frmcdc_compound_type_11."e"::text,
-      __frmcdc_compound_type_11."f"::text,
-      __frmcdc_compound_type_11."foo_bar"::text,
-      (not (__frmcdc_compound_type_11 is null))::text,
-      __frmcdc_compound_type_12."a"::text,
-      __frmcdc_compound_type_12."b",
-      __frmcdc_compound_type_12."c"::text,
-      __frmcdc_compound_type_12."d",
-      __frmcdc_compound_type_12."e"::text,
-      __frmcdc_compound_type_12."f"::text,
-      __frmcdc_compound_type_12."foo_bar"::text,
-      (not (__frmcdc_compound_type_12 is null))::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_4."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_4 is null))::text,
+          __frmcdc_compound_type_11."a"::text,
+          __frmcdc_compound_type_11."b",
+          __frmcdc_compound_type_11."c"::text,
+          __frmcdc_compound_type_11."d",
+          __frmcdc_compound_type_11."e"::text,
+          __frmcdc_compound_type_11."f"::text,
+          __frmcdc_compound_type_11."foo_bar"::text,
+          (not (__frmcdc_compound_type_11 is null))::text,
+          __frmcdc_compound_type_12."a"::text,
+          __frmcdc_compound_type_12."b",
+          __frmcdc_compound_type_12."c"::text,
+          __frmcdc_compound_type_12."d",
+          __frmcdc_compound_type_12."e"::text,
+          __frmcdc_compound_type_12."f"::text,
+          __frmcdc_compound_type_12."foo_bar"::text,
+          (not (__frmcdc_compound_type_12 is null))::text
+        ]::text[]
+        from (select (__types_2."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
+        left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
+        on TRUE
+      )::text,
       __post_6."id"::text,
       __post_6."headline",
       __post_7."id"::text,
@@ -1737,50 +1873,73 @@ select
       __frmcdc_compound_type_13."f"::text,
       __frmcdc_compound_type_13."foo_bar"::text,
       (not (__frmcdc_compound_type_13 is null))::text,
-      __frmcdc_nested_compound_type_5."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_5 is null))::text,
-      __frmcdc_compound_type_14."a"::text,
-      __frmcdc_compound_type_14."b",
-      __frmcdc_compound_type_14."c"::text,
-      __frmcdc_compound_type_14."d",
-      __frmcdc_compound_type_14."e"::text,
-      __frmcdc_compound_type_14."f"::text,
-      __frmcdc_compound_type_14."foo_bar"::text,
-      (not (__frmcdc_compound_type_14 is null))::text,
-      __frmcdc_compound_type_15."a"::text,
-      __frmcdc_compound_type_15."b",
-      __frmcdc_compound_type_15."c"::text,
-      __frmcdc_compound_type_15."d",
-      __frmcdc_compound_type_15."e"::text,
-      __frmcdc_compound_type_15."f"::text,
-      __frmcdc_compound_type_15."foo_bar"::text,
-      (not (__frmcdc_compound_type_15 is null))::text,
-      __frmcdc_compound_type_16."a"::text,
-      __frmcdc_compound_type_16."b",
-      __frmcdc_compound_type_16."c"::text,
-      __frmcdc_compound_type_16."d",
-      __frmcdc_compound_type_16."e"::text,
-      __frmcdc_compound_type_16."f"::text,
-      __frmcdc_compound_type_16."foo_bar"::text,
-      (not (__frmcdc_compound_type_16 is null))::text,
-      __frmcdc_nested_compound_type_6."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_6 is null))::text,
-      __frmcdc_compound_type_17."a"::text,
-      __frmcdc_compound_type_17."b",
-      __frmcdc_compound_type_17."c"::text,
-      __frmcdc_compound_type_17."d",
-      __frmcdc_compound_type_17."e"::text,
-      __frmcdc_compound_type_17."f"::text,
-      __frmcdc_compound_type_17."foo_bar"::text,
-      (not (__frmcdc_compound_type_17 is null))::text,
-      __frmcdc_compound_type_18."a"::text,
-      __frmcdc_compound_type_18."b",
-      __frmcdc_compound_type_18."c"::text,
-      __frmcdc_compound_type_18."d",
-      __frmcdc_compound_type_18."e"::text,
-      __frmcdc_compound_type_18."f"::text,
-      __frmcdc_compound_type_18."foo_bar"::text,
-      (not (__frmcdc_compound_type_18 is null))::text
+      (
+        select array[
+          __frmcdc_nested_compound_type_5."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_5 is null))::text,
+          __frmcdc_compound_type_14."a"::text,
+          __frmcdc_compound_type_14."b",
+          __frmcdc_compound_type_14."c"::text,
+          __frmcdc_compound_type_14."d",
+          __frmcdc_compound_type_14."e"::text,
+          __frmcdc_compound_type_14."f"::text,
+          __frmcdc_compound_type_14."foo_bar"::text,
+          (not (__frmcdc_compound_type_14 is null))::text,
+          __frmcdc_compound_type_15."a"::text,
+          __frmcdc_compound_type_15."b",
+          __frmcdc_compound_type_15."c"::text,
+          __frmcdc_compound_type_15."d",
+          __frmcdc_compound_type_15."e"::text,
+          __frmcdc_compound_type_15."f"::text,
+          __frmcdc_compound_type_15."foo_bar"::text,
+          (not (__frmcdc_compound_type_15 is null))::text
+        ]::text[]
+        from (select (__types_2."nested_compound_type").*) as __frmcdc_nested_compound_type_5
+        left outer join lateral (select (__frmcdc_nested_compound_type_5."a").*) as __frmcdc_compound_type_14
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_5."b").*) as __frmcdc_compound_type_15
+        on TRUE
+      )::text,
+      (
+        select array[
+          __frmcdc_compound_type_16."a"::text,
+          __frmcdc_compound_type_16."b",
+          __frmcdc_compound_type_16."c"::text,
+          __frmcdc_compound_type_16."d",
+          __frmcdc_compound_type_16."e"::text,
+          __frmcdc_compound_type_16."f"::text,
+          __frmcdc_compound_type_16."foo_bar"::text,
+          (not (__frmcdc_compound_type_16 is null))::text
+        ]::text[]
+        from (select (__types_2."nullable_compound_type").*) as __frmcdc_compound_type_16
+      )::text,
+      (
+        select array[
+          __frmcdc_nested_compound_type_6."baz_buz"::text,
+          (not (__frmcdc_nested_compound_type_6 is null))::text,
+          __frmcdc_compound_type_17."a"::text,
+          __frmcdc_compound_type_17."b",
+          __frmcdc_compound_type_17."c"::text,
+          __frmcdc_compound_type_17."d",
+          __frmcdc_compound_type_17."e"::text,
+          __frmcdc_compound_type_17."f"::text,
+          __frmcdc_compound_type_17."foo_bar"::text,
+          (not (__frmcdc_compound_type_17 is null))::text,
+          __frmcdc_compound_type_18."a"::text,
+          __frmcdc_compound_type_18."b",
+          __frmcdc_compound_type_18."c"::text,
+          __frmcdc_compound_type_18."d",
+          __frmcdc_compound_type_18."e"::text,
+          __frmcdc_compound_type_18."f"::text,
+          __frmcdc_compound_type_18."foo_bar"::text,
+          (not (__frmcdc_compound_type_18 is null))::text
+        ]::text[]
+        from (select (__types_2."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_6
+        left outer join lateral (select (__frmcdc_nested_compound_type_6."a").*) as __frmcdc_compound_type_17
+        on TRUE
+        left outer join lateral (select (__frmcdc_nested_compound_type_6."b").*) as __frmcdc_compound_type_18
+        on TRUE
+      )::text
     ]::text[]
     from "b"."types" as __types_2
     left outer join "a"."post" as __post_4
@@ -1795,19 +1954,7 @@ select
     ))
     left outer join lateral (select (__types_2."compound_type").*) as __frmcdc_compound_type_7
     on TRUE
-    left outer join lateral (select (__types_2."nested_compound_type").*) as __frmcdc_nested_compound_type_3
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_3."a").*) as __frmcdc_compound_type_8
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
-    on TRUE
     left outer join lateral (select (__types_2."nullable_compound_type").*) as __frmcdc_compound_type_10
-    on TRUE
-    left outer join lateral (select (__types_2."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_4
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_4."a").*) as __frmcdc_compound_type_11
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
     on TRUE
     left outer join "a"."post" as __post_6
     on (
@@ -1821,25 +1968,11 @@ select
     ))
     left outer join lateral (select (__types_2."compound_type").*) as __frmcdc_compound_type_13
     on TRUE
-    left outer join lateral (select (__types_2."nested_compound_type").*) as __frmcdc_nested_compound_type_5
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_5."a").*) as __frmcdc_compound_type_14
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_5."b").*) as __frmcdc_compound_type_15
-    on TRUE
-    left outer join lateral (select (__types_2."nullable_compound_type").*) as __frmcdc_compound_type_16
-    on TRUE
-    left outer join lateral (select (__types_2."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_6
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_6."a").*) as __frmcdc_compound_type_17
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_6."b").*) as __frmcdc_compound_type_18
-    on TRUE
     where (
       __types_2."smallint" = __post__."id"
     )
     order by __types_2."id" asc
-  )::text as "104",
+  )::text as "3",
   array(
     select array[
       (count(*))::text
@@ -1848,39 +1981,8 @@ select
     where (
       __types_2."smallint" = __post__."id"
     )
-  )::text as "105"
+  )::text as "4"
 from "a"."post" as __post__
-left outer join "b"."types" as __types__
-on (
-/* WHERE becoming ON */ (
-  __types__."id" = __post__."id"
-))
-left outer join "a"."post" as __post_2
-on (
-/* WHERE becoming ON */ (
-  __post_2."id" = __types__."id"
-))
-left outer join "a"."post" as __post_3
-on (
-/* WHERE becoming ON */ (
-  __post_3."id" = __types__."smallint"
-))
-left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-on TRUE
-left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
-on TRUE
 where (
   __post__."id" = $1::"int4"
 );
