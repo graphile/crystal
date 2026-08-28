@@ -237,7 +237,7 @@ export type PgSelectMode = "normal" | "aggregate" | "mutation";
 // - innerJoinPreferred (**unsafe** but potentially faster than
 //   preferLeftJoin, only use when row is guaranteed to exist - not just by
 //   FK, but by RLS also)
-export type PgSelectInlineStrategy =
+export type PgSelectInliningStrategy =
   | "auto"
   | "forbidden"
   | "preferLeftJoin"
@@ -530,7 +530,7 @@ export class PgSelectStep<
   private isUnique = false;
 
   /** The SQL strategy we'll use when inlining into our parent. */
-  private inlineStrategy: PgSelectInlineStrategy = "auto";
+  private inliningStrategy: PgSelectInliningStrategy = "auto";
 
   /**
    * If true and this becomes a join during optimisation then it should become
@@ -626,7 +626,7 @@ export class PgSelectStep<
     $clone.isTrusted = cloneFrom.isTrusted;
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
-    $clone.inlineStrategy = cloneFrom.inlineStrategy;
+    $clone.inliningStrategy = cloneFrom.inliningStrategy;
 
     for (const [k, v] of cloneFrom._symbolSubstitutes) {
       $clone._symbolSubstitutes.set(k, v);
@@ -781,28 +781,30 @@ export class PgSelectStep<
     this.locker.lock();
   }
 
-  /** @deprecated Use `setInlineStrategy("forbidden")` */
+  /** @deprecated Use `setInliningStrategy("forbidden")` */
   public setInliningForbidden(newInliningForbidden = true): this {
     if (newInliningForbidden) {
-      this.inlineStrategy = "forbidden";
-    } else if (this.inlineStrategy === "forbidden") {
-      this.inlineStrategy = "auto";
+      this.inliningStrategy = "forbidden";
+    } else if (this.inliningStrategy === "forbidden") {
+      this.inliningStrategy = "auto";
     }
     return this;
   }
 
-  /** @deprecated Use `getInlineStrategy()` */
+  /** @deprecated Use `getInliningStrategy()` */
   public inliningForbidden(): boolean {
-    return this.inlineStrategy === "forbidden";
+    return this.inliningStrategy === "forbidden";
   }
 
-  public setInlineStrategy(newInlineStrategy: PgSelectInlineStrategy): this {
-    this.inlineStrategy = newInlineStrategy;
+  public setInliningStrategy(
+    newInliningStrategy: PgSelectInliningStrategy,
+  ): this {
+    this.inliningStrategy = newInliningStrategy;
     return this;
   }
 
-  public getInlineStrategy(): PgSelectInlineStrategy {
-    return this.inlineStrategy;
+  public getInliningStrategy(): PgSelectInliningStrategy {
+    return this.inliningStrategy;
   }
 
   public setTrusted(newIsTrusted = true): this {
@@ -1440,7 +1442,7 @@ export class PgSelectStep<
       }
 
       // Check inline strategy matches
-      if (p.inlineStrategy !== this.inlineStrategy) {
+      if (p.inliningStrategy !== this.inliningStrategy) {
         return false;
       }
 
@@ -1866,7 +1868,7 @@ export class PgSelectStep<
     // Inline ourself into our parent if we can.
     let parentDetails: ReturnType<typeof this.getParentForInlining>;
     if (
-      this.inlineStrategy !== "forbidden" &&
+      this.inliningStrategy !== "forbidden" &&
       !this.hasSideEffects &&
       !mightHaveStream &&
       !this.joins.some((j) => j.type !== "left") &&
@@ -1878,8 +1880,8 @@ export class PgSelectStep<
       const { isSimpleUnique } = staticInfo;
       if (
         isSimpleUnique === true &&
-        (this.inlineStrategy === "preferLeftJoin" ||
-          (this.inlineStrategy === "auto" &&
+        (this.inliningStrategy === "preferLeftJoin" ||
+          (this.inliningStrategy === "auto" &&
             this.joins.length + this.applyDepIds.length === 0)) &&
         $pgSelect.joins.length + $pgSelect.applyDepIds.length <
           MAX_INLINE_LEFT_JOINS
