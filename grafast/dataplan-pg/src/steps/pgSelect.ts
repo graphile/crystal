@@ -463,6 +463,9 @@ export class PgSelectStep<
   >();
   private joins: Array<PgSelectPlanJoin> = [];
 
+  /** These joins happen later (at `.apply()`) but we need them during optimize() so we manually count them */
+  private inlinedJoinCount = 0;
+
   // WHERE
 
   private conditions: SQL[] = [];
@@ -1879,8 +1882,10 @@ export class PgSelectStep<
       if (
         isSimpleUnique === true &&
         (this.inlineStrategy === "leftJoinPreferred" ||
-          (this.inlineStrategy === "auto" && this.joins.length === 0)) &&
-        $pgSelect.joins.length < MAX_INLINE_LEFT_JOINS
+          (this.inlineStrategy === "auto" &&
+            this.joins.length + this.inlinedJoinCount === 0)) &&
+        $pgSelect.joins.length + $pgSelect.inlinedJoinCount <
+          MAX_INLINE_LEFT_JOINS
       ) {
         // Allow, do it via left join
         debugPlanVerbose(
@@ -1931,6 +1936,7 @@ export class PgSelectStep<
               skipJoin,
             }),
           );
+          $pgSelect.inlinedJoinCount++;
         });
         const $details = $pgSelect.getMeta(
           identifier,
