@@ -1,5 +1,20 @@
 # ruru-components
 
+## 2.0.1
+
+### Patch Changes
+
+- [#3141](https://github.com/graphile/crystal/pull/3141)
+  [`4d113fa`](https://github.com/graphile/crystal/commit/4d113faa99e83efb1780f0972669f3d9c1d1c959)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  README updated to remove outdated PRERELEASE notices; these packages are no
+  longer pre-release.
+- Updated dependencies
+  [[`637408c`](https://github.com/graphile/crystal/commit/637408cec8c9c7c6c8f14a0be719d2b128c9834e),
+  [`19af784`](https://github.com/graphile/crystal/commit/19af784de17fc1f6c9e075c3270ce311213537a3),
+  [`56e8708`](https://github.com/graphile/crystal/commit/56e8708a7467f3902ca68b1b745b688f06bbd800)]:
+  - grafast@1.1.3
+
 ## 2.0.0
 
 Identical to 2.0.0-rc.7.
