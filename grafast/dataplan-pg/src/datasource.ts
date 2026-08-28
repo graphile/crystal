@@ -752,7 +752,7 @@ export class PgResource<
             : sql`${alias}.${sql.identifier(key as string)}`,
       };
     });
-    return pgSelect({ resource: this, identifiers }).skipNullRecordCheck();
+    return pgSelect({ resource: this, identifiers });
   }
 
   execute(

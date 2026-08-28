@@ -497,11 +497,7 @@ export class PgSelectSingleStep<
   optimize() {
     const attributes = this.resource.codec.attributes;
     const $class = this.getClassStep();
-    if (
-      attributes &&
-      $class.mode !== "aggregate" &&
-      !$class.skipsNullRecordCheck()
-    ) {
+    if (attributes && $class.mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
       // nonNullExpression (indirectly).

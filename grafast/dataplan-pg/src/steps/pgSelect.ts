@@ -527,12 +527,6 @@ export class PgSelectStep<
   private inlineStrategy: PgSelectInlineStrategy = "auto";
 
   /**
-   * If true, PgSelectSingleStep doesn't need to select an extra column to prove
-   * that the represented record is non-null.
-   */
-  private shouldSkipNullRecordCheck = false;
-
-  /**
    * If true and this becomes a join during optimisation then it should become
    * a lateral join; e.g. in the following query, the left join must be
    * lateral.
@@ -627,7 +621,6 @@ export class PgSelectStep<
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
     $clone.inlineStrategy = cloneFrom.inlineStrategy;
-    $clone.shouldSkipNullRecordCheck = cloneFrom.shouldSkipNullRecordCheck;
 
     for (const [k, v] of cloneFrom._symbolSubstitutes) {
       $clone._symbolSubstitutes.set(k, v);
@@ -804,15 +797,6 @@ export class PgSelectStep<
 
   public getInlineStrategy(): PgSelectInlineStrategy {
     return this.inlineStrategy;
-  }
-
-  public skipNullRecordCheck(newSkipNullRecordCheck = true): this {
-    this.shouldSkipNullRecordCheck = newSkipNullRecordCheck;
-    return this;
-  }
-
-  public skipsNullRecordCheck(): boolean {
-    return this.shouldSkipNullRecordCheck;
   }
 
   public setTrusted(newIsTrusted = true): this {
@@ -1451,11 +1435,6 @@ export class PgSelectStep<
 
       // Check inline strategy matches
       if (p.inlineStrategy !== this.inlineStrategy) {
-        return false;
-      }
-
-      // Check null record check strategy matches
-      if (p.shouldSkipNullRecordCheck !== this.shouldSkipNullRecordCheck) {
         return false;
       }
 
