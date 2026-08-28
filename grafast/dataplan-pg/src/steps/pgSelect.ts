@@ -218,6 +218,26 @@ function assertSensible(step: Step): void {
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
 /**
+ * The SQL strategy to use when a PgSelectStep is inlined into its
+ * parent.
+ *
+ * - `"leftJoin"` - uses a left join (only appropriate for singular records,
+ *   otherwise the number of rows returned could multiply up to unmanageable
+ *   levels)
+ * - `"subquery"` - uses a subquery within `SELECT`
+ * - `"auto"` - dealers choice (PostGraphile will decide for you - this is the default)
+ * - `"forbidden"` - do not inline
+ */
+// Future strategies could include:
+// - innerJoin (**unsafe** but potentially faster than leftJoin, only use when
+//   row is guaranteed to exist - not just by FK, but by RLS also)
+export type PgSelectInlineStrategy =
+  | "forbidden"
+  | "auto"
+  | "leftJoin"
+  | "subquery";
+
+/**
  * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
  * but not guaranteed.
  */
@@ -503,11 +523,8 @@ export class PgSelectStep<
    */
   private isUnique = false;
 
-  /**
-   * If true, we will not attempt to inline this into the parent query.
-   * Default false.
-   */
-  private isInliningForbidden = false;
+  /** The SQL strategy we'll use when inlining into our parent. */
+  private inlineStrategy: PgSelectInlineStrategy = "auto";
 
   /**
    * If true and this becomes a join during optimisation then it should become
@@ -603,7 +620,7 @@ export class PgSelectStep<
     $clone.isTrusted = cloneFrom.isTrusted;
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
-    $clone.isInliningForbidden = cloneFrom.isInliningForbidden;
+    $clone.inlineStrategy = cloneFrom.inlineStrategy;
 
     for (const [k, v] of cloneFrom._symbolSubstitutes) {
       $clone._symbolSubstitutes.set(k, v);
@@ -758,13 +775,28 @@ export class PgSelectStep<
     this.locker.lock();
   }
 
+  /** @deprecated Use `setInlineStrategy("forbidden")` */
   public setInliningForbidden(newInliningForbidden = true): this {
-    this.isInliningForbidden = newInliningForbidden;
+    if (newInliningForbidden) {
+      this.inlineStrategy = "forbidden";
+    } else if (this.inlineStrategy === "forbidden") {
+      this.inlineStrategy = "auto";
+    }
     return this;
   }
 
+  /** @deprecated Use `getInlineStrategy()` */
   public inliningForbidden(): boolean {
-    return this.isInliningForbidden;
+    return this.inlineStrategy === "forbidden";
+  }
+
+  public setInlineStrategy(newInlineStrategy: PgSelectInlineStrategy): this {
+    this.inlineStrategy = newInlineStrategy;
+    return this;
+  }
+
+  public getInlineStrategy(): PgSelectInlineStrategy {
+    return this.inlineStrategy;
   }
 
   public setTrusted(newIsTrusted = true): this {
@@ -1397,12 +1429,12 @@ export class PgSelectStep<
         sql.isEquivalent(a, b, options);
 
       // Check trusted matches
-      if (p.trusted !== this.trusted) {
+      if (p.isTrusted !== this.isTrusted) {
         return false;
       }
 
-      // Check inliningForbidden matches
-      if (p.inliningForbidden !== this.inliningForbidden) {
+      // Check inline strategy matches
+      if (p.inlineStrategy !== this.inlineStrategy) {
         return false;
       }
 
@@ -1828,7 +1860,7 @@ export class PgSelectStep<
     // Inline ourself into our parent if we can.
     let parentDetails: ReturnType<typeof this.getParentForInlining>;
     if (
-      !this.isInliningForbidden &&
+      this.inlineStrategy !== "forbidden" &&
       !this.hasSideEffects &&
       !mightHaveStream &&
       !this.joins.some((j) => j.type !== "left") &&
@@ -1838,6 +1870,7 @@ export class PgSelectStep<
       const { $pgSelect, $pgSelectSingle } = parentDetails;
       if (
         this.mode === "normal" &&
+        this.inlineStrategy === "leftJoin" &&
         this.isUnique &&
         this.firstStepId == null &&
         this.lastStepId == null &&
@@ -1926,7 +1959,11 @@ export class PgSelectStep<
           ALWAYS_ALLOWED ||
           $pgSelectSingle.getAndFreezeIsUnary() ||
           (!$pgSelect.isUnique && relationshipIsBelongsTo);
-        if (allowed) {
+        if (allowed && this.inlineStrategy === "leftJoin") {
+          console.warn(
+            `Attempted to force leftJoin strategy in situation where it's not allowed; refusing to inline`,
+          );
+        } else if (allowed) {
           // Add a nested select expression
           const $__item = $pgSelectSingle.getItemStep();
           this.mergePlaceholdersInto($pgSelect);
