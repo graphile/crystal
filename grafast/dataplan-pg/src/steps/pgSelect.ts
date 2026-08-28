@@ -1873,7 +1873,8 @@ export class PgSelectStep<
       const { isSimpleUnique } = staticInfo;
       if (
         isSimpleUnique === true &&
-        this.inlineStrategy === "leftJoinPreferred"
+        (this.inlineStrategy === "leftJoinPreferred" ||
+          (this.inlineStrategy === "auto" && this.joins.length === 0))
       ) {
         // Allow, do it via left join
         debugPlanVerbose(
