@@ -500,8 +500,7 @@ export class PgSelectSingleStep<
     if (
       attributes &&
       $class.mode !== "aggregate" &&
-      ($class.getInlineStrategy() === "leftJoin" ||
-        !$class.skipsNullRecordCheck())
+      !$class.skipsNullRecordCheck()
     ) {
       // We need to see if this row is null. The cheapest way is to select a
       // non-null column, but failing that we invoke the codec's
