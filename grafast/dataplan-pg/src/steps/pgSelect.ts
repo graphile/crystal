@@ -97,6 +97,11 @@ import {
 } from "./pgStmt.ts";
 import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
 
+// Joins are a combinatorics problem, they're faster in small doses, but as
+// they add up they become more expensive. Let's cap it at something
+// reasonable.
+const MAX_INLINE_LEFT_JOINS = 7;
+
 const ALWAYS_ALLOWED = true;
 
 export type PgSelectParsedCursorStep = Step<null | readonly any[]>;
@@ -1874,7 +1879,8 @@ export class PgSelectStep<
       if (
         isSimpleUnique === true &&
         (this.inlineStrategy === "leftJoinPreferred" ||
-          (this.inlineStrategy === "auto" && this.joins.length === 0))
+          (this.inlineStrategy === "auto" && this.joins.length === 0)) &&
+        $pgSelect.joins.length < MAX_INLINE_LEFT_JOINS
       ) {
         // Allow, do it via left join
         debugPlanVerbose(
