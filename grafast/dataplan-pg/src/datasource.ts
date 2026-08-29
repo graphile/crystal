@@ -885,11 +885,13 @@ export class PgResource<
       throw new Error(`This resource has no parameters, so cannot execute`);
     }
     const params = this.parameters;
-    let usedName = false;
+    let namedOnly = false;
     const resolvedArgs: PgSelectArgumentSpec[] = args.map((arg, i) => {
       const { name, ...rest } = arg;
       if (name != null) {
-        usedName = true;
+        if (name !== params[i].name) {
+          namedOnly = true;
+        }
         const param = this.parameterByName[name];
         if (!param) {
           throw new Error(`No parameter named '${name}' exists`);
@@ -897,11 +899,12 @@ export class PgResource<
         const pgCodec = param.codec;
         return {
           ...rest,
+          name,
           pgCodec,
         };
       } else {
         const pgCodec = params[i].codec;
-        if (usedName) {
+        if (namedOnly) {
           throw new Error(
             `Argument at index ${i} doesn't use a name, but the previous argument does; positional arguments cannot come after named arguments`,
           );
