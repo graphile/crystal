@@ -4,7 +4,12 @@
 ---
 
 `PgSelectStep` now allows influencing the inlining strategy used to inline one
-query into a parent: `preferLeftJoin`, `preferSubquery`, `auto` or `forbidden`.
+query into a parent with `setInliningStrategy(...)`: `preferLeftJoin`,
+`preferSubquery`, `auto` or `forbidden`. It also allows influencing how child
+queries inline into the current query with `setChildInliningStrategy(...)`; this
+applies when the child uses `auto`, unless set to `forbidden` in which case
+children are not inlined.
+
 The auto behavior (default) is now smarter: rather than always using a left join
 where possible (as before), the system will now aim to have no more than 7 joins
 (to avoid combinatorics pressure in PostgreSQL query planning) and will also not
