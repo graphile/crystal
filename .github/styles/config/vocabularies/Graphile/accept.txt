@@ -22,3 +22,5 @@ autofixed
 inline
 inlined
 inlining
+subquery
+subqueries
