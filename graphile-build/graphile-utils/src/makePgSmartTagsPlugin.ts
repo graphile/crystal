@@ -54,7 +54,46 @@ type PgSmartTagRules = {
 // Form a union of the options
 export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
-> = PgSmartTagRules[keyof PgSmartTagRules] & { kind: TKind };
+> = PgSmartTagRules[TKind];
+
+type GeneratedSmartTagMatches<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+  TMatchKey extends string,
+> = GraphileBuild.GeneratedTypesForScope<TScope> extends {
+  pgSmartTags: infer TPgSmartTags;
+}
+  ? TPgSmartTags extends Record<TMatchKey, infer TMatches extends string>
+    ? TMatches
+    : string
+  : string;
+
+type PgSmartTagRuleWithMatches<
+  TKind extends PgSmartTagSupportedKinds,
+  TMatches extends string,
+> = Omit<PgSmartTagRule<TKind>, "match"> & {
+  match: TMatches | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+};
+
+export type PgSmartTagRuleForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+> =
+  | PgSmartTagRuleWithMatches<
+      "class",
+      GeneratedSmartTagMatches<TScope, "classMatches">
+    >
+  | PgSmartTagRuleWithMatches<
+      "attribute",
+      GeneratedSmartTagMatches<TScope, "attributeMatches">
+    >
+  | PgSmartTagRuleWithMatches<
+      "procedure",
+      GeneratedSmartTagMatches<TScope, "procedureMatches">
+    >
+  | PgSmartTagRuleWithMatches<
+      "namespace",
+      GeneratedSmartTagMatches<TScope, "namespaceMatches">
+    >
+  | PgSmartTagRule<"constraint" | "type">;
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
@@ -214,12 +253,19 @@ function rulesFrom(
   return [rawRules.map(compileRule), rawRules];
 }
 
-export type UpdatePgSmartTagRulesCallback = (
-  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
+export type UpdatePgSmartTagRulesCallback<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+> = (
+  ruleOrRules:
+    | PgSmartTagRuleForScope<TScope>
+    | PgSmartTagRuleForScope<TScope>[]
+    | null,
 ) => void;
 
-export type SubscribeToPgSmartTagUpdatesCallback = (
-  cb: UpdatePgSmartTagRulesCallback | null,
+export type SubscribeToPgSmartTagUpdatesCallback<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+> = (
+  cb: UpdatePgSmartTagRulesCallback<TScope> | null,
 ) => PromiseOrDirect<void>;
 
 interface Cache {
@@ -245,6 +291,19 @@ async function resolveRules(
 }
 
 let counter = 0;
+export function pgSmartTags<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+>(
+  initialRules: ThunkOrDirect<
+    PromiseOrDirect<
+      | PgSmartTagRuleForScope<TScope>
+      | PgSmartTagRuleForScope<TScope>[]
+      | null
+    >
+  >,
+  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback<TScope> | null,
+  details?: { name?: string; description?: string; version?: string },
+): GraphileConfig.Plugin;
 export function pgSmartTags(
   initialRules: ThunkOrDirect<
     PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>

@@ -44,6 +44,7 @@ export type {
   JSONPgSmartTags,
   PgSmartTagFilterFunction,
   PgSmartTagRule,
+  PgSmartTagRuleForScope,
   PgSmartTagTags,
   SubscribeToJSONPgSmartTagsUpdatesCallback,
   SubscribeToPgSmartTagUpdatesCallback,
