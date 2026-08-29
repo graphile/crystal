@@ -1706,9 +1706,9 @@ export function makeExampleSchema(
               ? step.getListStep()
               : (step as PgSelectStep | PgSelectSingleStep);
           if ("getClassStep" in innerPlan) {
-            innerPlan.getClassStep().setInliningForbidden();
-          } else if ("setInliningForbidden" in innerPlan) {
-            innerPlan.setInliningForbidden();
+            innerPlan.getClassStep().setInliningStrategy("forbidden");
+          } else if ("setInliningStrategy" in innerPlan) {
+            innerPlan.setInliningStrategy("forbidden");
           }
         }
         return step;

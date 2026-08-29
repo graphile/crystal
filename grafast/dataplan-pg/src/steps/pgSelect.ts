@@ -223,8 +223,8 @@ function assertSensible(step: Step): void {
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
 /**
- * The SQL strategy to use when a PgSelectStep is inlined into its
- * parent.
+ * The SQL strategy to use when a PgSelectStep is inlined into its parent, or
+ * when a PgSelectStep's children are inlined into it.
  *
  * - `"auto"` - dealers choice (PostGraphile will decide for you - this is the default)
  * - `"forbidden"` - do not inline
@@ -532,6 +532,9 @@ export class PgSelectStep<
   /** The SQL strategy we'll use when inlining into our parent. */
   private inliningStrategy: PgSelectInliningStrategy = "auto";
 
+  /** The SQL strategy we'll suggest when child PgSelectSteps inline into us. */
+  private childInliningStrategy: PgSelectInliningStrategy = "auto";
+
   /**
    * If true and this becomes a join during optimisation then it should become
    * a lateral join; e.g. in the following query, the left join must be
@@ -627,6 +630,7 @@ export class PgSelectStep<
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
     $clone.inliningStrategy = cloneFrom.inliningStrategy;
+    $clone.childInliningStrategy = cloneFrom.childInliningStrategy;
 
     for (const [k, v] of cloneFrom._symbolSubstitutes) {
       $clone._symbolSubstitutes.set(k, v);
@@ -805,6 +809,17 @@ export class PgSelectStep<
 
   public getInliningStrategy(): PgSelectInliningStrategy {
     return this.inliningStrategy;
+  }
+
+  public setChildInliningStrategy(
+    newChildInliningStrategy: PgSelectInliningStrategy,
+  ): this {
+    this.childInliningStrategy = newChildInliningStrategy;
+    return this;
+  }
+
+  public getChildInliningStrategy(): PgSelectInliningStrategy {
+    return this.childInliningStrategy;
   }
 
   public setTrusted(newIsTrusted = true): this {
@@ -1445,6 +1460,9 @@ export class PgSelectStep<
       if (p.inliningStrategy !== this.inliningStrategy) {
         return false;
       }
+      if (p.childInliningStrategy !== this.childInliningStrategy) {
+        return false;
+      }
 
       // Check FROM
       if (!sqlIsEquivalent(p.from, this.from)) {
@@ -1873,15 +1891,23 @@ export class PgSelectStep<
       !mightHaveStream &&
       !this.joins.some((j) => j.type !== "left") &&
       (parentDetails = this.getParentForInlining()) !== null &&
+      parentDetails.$pgSelect.childInliningStrategy !== "forbidden" &&
       parentDetails.$pgSelect.mode === "normal"
     ) {
+      // If we're auto mode, use parent's strategy, otherwise our strategy
+      // wins. Never forbidden (already asserted above).
+      const resolvedInliningStrategy =
+        this.inliningStrategy === "auto"
+          ? parentDetails.$pgSelect.childInliningStrategy
+          : this.inliningStrategy;
+
       const { $pgSelect, $pgSelectSingle } = parentDetails;
       const staticInfo = PgSelectStep.getStaticInfo(this);
       const { isSimpleUnique } = staticInfo;
       if (
         isSimpleUnique === true &&
-        (this.inliningStrategy === "preferLeftJoin" ||
-          (this.inliningStrategy === "auto" &&
+        (resolvedInliningStrategy === "preferLeftJoin" ||
+          (resolvedInliningStrategy === "auto" &&
             this.joins.length + this.applyDepIds.length === 0 &&
             $pgSelect.joins.length + $pgSelect.applyDepIds.length <
               AUTO_MAX_INLINE_LEFT_JOINS))

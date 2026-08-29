@@ -312,11 +312,25 @@ Call this ONLY if there can be at most one matching row. If you set this true
 when this is not the case then you may get unexpected results during inlining;
 if in doubt leave it at the default.
 
-### $pgSelect.setInliningForbidden()
+### $pgSelect.setInliningStrategy()
 
-Call this if you wish to prevent this query from being inlined into its parent.
-You may want to do this to work around a performance issue, or to improve the
-cacheability of the step.
+Influences how this query should be inlined into its parent to help address
+performance issues. Supported strategies:
+
+- `auto`: uses heuristics to choose the inlining strategy.
+- `forbidden`: prevents this query from being inlined into its parent.
+- `preferLeftJoin`: prefers the use of a `left join` when this query can return
+  at most one row for each parent row, falling back to a subquery when that's
+  not suitable.
+- `preferSubquery`: prefers the use of a subquery in the parent query's `select`
+  list.
+
+### $pgSelect.setChildInliningStrategy()
+
+Influences how child queries using the `auto` strategy should be inlined into
+this query. Setting this to `forbidden` prevents children from being inlined.
+Child queries with an explicit `preferLeftJoin` or `preferSubquery` strategy
+override this setting.
 
 ### $pgSelect.setTrusted()
 
