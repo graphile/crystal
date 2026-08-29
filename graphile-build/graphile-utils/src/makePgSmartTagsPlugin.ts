@@ -56,16 +56,119 @@ export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
 > = PgSmartTagRules[TKind];
 
+type GatherPgIntrospectionForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+> = GraphileBuild.GeneratedTypesForScope<TScope> extends {
+  gather: { pgIntrospection: infer TPgIntrospection };
+}
+  ? TPgIntrospection
+  : never;
+
+type SmartTagClassMatches<TIntrospection> = {
+  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends {
+          classes: infer TClasses;
+        }
+          ? {
+              [TClassName in keyof TClasses & string]:
+                | TClassName
+                | `${TSchemaName}.${TClassName}`;
+            }[keyof TClasses & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagAttributeOrConstraintMatches<
+  TIntrospection,
+  TKey extends "attributes" | "constraints",
+> = {
+  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends {
+          classes: infer TClasses;
+        }
+          ? {
+              [TClassName in keyof TClasses & string]: TClasses[TClassName] extends Record<
+                TKey,
+                infer TEntries
+              >
+                ? {
+                    [TEntryName in keyof TEntries & string]:
+                      | TEntryName
+                      | `${TClassName}.${TEntryName}`
+                      | `${TSchemaName}.${TClassName}.${TEntryName}`;
+                  }[keyof TEntries & string]
+                : never;
+            }[keyof TClasses & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagSchemaEntryMatches<
+  TIntrospection,
+  TKey extends "functions" | "types",
+> = {
+  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends Record<
+          TKey,
+          infer TEntries
+        >
+          ? {
+              [TEntryName in keyof TEntries & string]:
+                | TEntryName
+                | `${TSchemaName}.${TEntryName}`;
+            }[keyof TEntries & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagNamespaceMatches<TIntrospection> = {
+  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? keyof TSchemas & string
+    : never;
+}[keyof TIntrospection & string];
+
 type GeneratedSmartTagMatches<
   TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
-  TMatchKey extends string,
-> = GraphileBuild.GeneratedTypesForScope<TScope> extends {
-  pgSmartTags: infer TPgSmartTags;
-}
-  ? TPgSmartTags extends Record<TMatchKey, infer TMatches extends string>
-    ? TMatches
-    : string
-  : string;
+  TKind extends PgSmartTagSupportedKinds,
+> = [GatherPgIntrospectionForScope<TScope>] extends [never]
+  ? string
+  : TKind extends "class"
+    ? SmartTagClassMatches<GatherPgIntrospectionForScope<TScope>>
+    : TKind extends "attribute"
+      ? SmartTagAttributeOrConstraintMatches<
+          GatherPgIntrospectionForScope<TScope>,
+          "attributes"
+        >
+      : TKind extends "constraint"
+        ? SmartTagAttributeOrConstraintMatches<
+            GatherPgIntrospectionForScope<TScope>,
+            "constraints"
+          >
+        : TKind extends "procedure"
+          ? SmartTagSchemaEntryMatches<
+              GatherPgIntrospectionForScope<TScope>,
+              "functions"
+            >
+          : TKind extends "type"
+            ? SmartTagSchemaEntryMatches<
+                GatherPgIntrospectionForScope<TScope>,
+                "types"
+              >
+            : SmartTagNamespaceMatches<GatherPgIntrospectionForScope<TScope>>;
 
 type PgSmartTagRuleWithMatches<
   TKind extends PgSmartTagSupportedKinds,
@@ -79,21 +182,28 @@ export type PgSmartTagRuleForScope<
 > =
   | PgSmartTagRuleWithMatches<
       "class",
-      GeneratedSmartTagMatches<TScope, "classMatches">
+      GeneratedSmartTagMatches<TScope, "class">
     >
   | PgSmartTagRuleWithMatches<
       "attribute",
-      GeneratedSmartTagMatches<TScope, "attributeMatches">
+      GeneratedSmartTagMatches<TScope, "attribute">
     >
   | PgSmartTagRuleWithMatches<
       "procedure",
-      GeneratedSmartTagMatches<TScope, "procedureMatches">
+      GeneratedSmartTagMatches<TScope, "procedure">
     >
   | PgSmartTagRuleWithMatches<
       "namespace",
-      GeneratedSmartTagMatches<TScope, "namespaceMatches">
+      GeneratedSmartTagMatches<TScope, "namespace">
     >
-  | PgSmartTagRule<"constraint" | "type">;
+  | PgSmartTagRuleWithMatches<
+      "constraint",
+      GeneratedSmartTagMatches<TScope, "constraint">
+    >
+  | PgSmartTagRuleWithMatches<
+      "type",
+      GeneratedSmartTagMatches<TScope, "type">
+    >;
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
