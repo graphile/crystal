@@ -3333,20 +3333,23 @@ function buildTheQuery<
        * clause.
        */
       const text = `\
+with ${identifiersAliasText} as materialized (
+  select ids.ordinality - 1 as idx${
+    queryValues.length > 0
+      ? `, ${queryValues
+          .map(({ codec }, idx) => {
+            return `(ids.value->>${idx})::${
+              sql.compile(codec.sqlType).text
+            } as "id${idx}"`;
+          })
+          .join(", ")}`
+      : ""
+  } from json_array_elements($${
+    rawSqlValues.length + 1
+  }::json) with ordinality as ids
+)
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-        queryValues.length > 0
-          ? `, ${queryValues
-              .map(({ codec }, idx) => {
-                return `(ids.value->>${idx})::${
-                  sql.compile(codec.sqlType).text
-                } as "id${idx}"`;
-              })
-              .join(", ")}`
-          : ""
-      } from json_array_elements($${
-        rawSqlValues.length + 1
-      }::json) with ordinality as ids) as ${identifiersAliasText},
+from ${identifiersAliasText},
 ${lateralText};`;
 
       return { text, rawSqlValues, identifierIndex };

@@ -222,8 +222,11 @@ select
   )::text end) as "2"
 from "a"."post_many"($1::"a"."post"[]) as __post_many__;
 
+with __frmcdc_comptype_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."comptype"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_comptype_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."comptype"[] as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_comptype_identifiers__,
+from __frmcdc_comptype_identifiers__,
 lateral (
   select
     to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
