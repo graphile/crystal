@@ -30,7 +30,7 @@ const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
  * plugins by orchestrating the various callback functions.
  */
 class SchemaBuilder<
-  TBuild extends GraphileBuild.Build = GraphileBuild.Build,
+  TBuild extends GraphileBuild.Build<never> = GraphileBuild.Build<never>,
 > extends EventEmitter {
   options: GraphileBuild.SchemaOptions;
   depth: number;
@@ -210,12 +210,12 @@ class SchemaBuilder<
   /**
    * Create the 'Build' object.
    */
-  createBuild(input: GraphileBuild.BuildInput): TBuild {
+  createBuild(input: GraphileBuild.BuildInput<never>): TBuild {
     const initialBuild = makeNewBuild(
       this,
       input,
       this.inflection,
-    ) as Partial<TBuild> & GraphileBuild.BuildBase;
+    ) as Partial<TBuild> & GraphileBuild.BuildBase<never>;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {
       scope: Object.create(null),
@@ -225,7 +225,7 @@ class SchemaBuilder<
     // Bind all functions so they can be dereferenced
     bindAll(
       build,
-      (Object.keys(build) as Array<keyof GraphileBuild.Build & string>).filter(
+      (Object.keys(build) as Array<keyof GraphileBuild.Build<never> & string>).filter(
         (key) => typeof build[key] === "function",
       ),
     );
@@ -262,7 +262,7 @@ class SchemaBuilder<
    * Given the `input` (result of the "gather" phase), builds the GraphQL
    * schema synchronously.
    */
-  buildSchema(input: GraphileBuild.BuildInput): GraphQLSchema {
+  buildSchema(input: GraphileBuild.BuildInput<never>): GraphQLSchema {
     const build = this.initBuild(this.createBuild(input));
     const schemaSpec: Partial<GraphQLSchemaConfig> = {
       directives: [...build.graphql.specifiedDirectives],

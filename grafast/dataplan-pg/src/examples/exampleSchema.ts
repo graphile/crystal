@@ -1786,7 +1786,7 @@ export function makeExampleSchema(
     typeof singleTableItemsResource
   >;
   type RelationalItemsStep = PgSelectStep<typeof relationalItemsResource>;
-  type RelationalItemStep = PgSelectSingleStep<typeof relationalItemsResource>;
+  type _RelationalItemStep = PgSelectSingleStep<typeof relationalItemsResource>;
   type RelationalTopicStep = PgSelectSingleStep<
     typeof relationalTopicsResource
   >;
@@ -1801,7 +1801,7 @@ export function makeExampleSchema(
     typeof relationalChecklistItemsResource
   >;
   type UnionItemsStep = PgSelectStep<typeof unionItemsResource>;
-  type UnionItemStep = PgSelectSingleStep<typeof unionItemsResource>;
+  type _UnionItemStep = PgSelectSingleStep<typeof unionItemsResource>;
   type UnionTopicStep = PgSelectSingleStep<typeof unionTopicsResource>;
   type UnionPostStep = PgSelectSingleStep<typeof unionPostsResource>;
   type UnionDividerStep = PgSelectSingleStep<typeof unionDividersResource>;

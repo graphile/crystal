@@ -132,8 +132,7 @@ declare global {
       : Step;
 
     interface BuildInput<
-      TScope extends
-        keyof GraphileBuild.ScopedGeneratedTypes = keyof GraphileBuild.ScopedGeneratedTypes,
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
     > {
       pgRegistry: [GeneratedTypesForScope<TScope>] extends [never]
         ? PgRegistry

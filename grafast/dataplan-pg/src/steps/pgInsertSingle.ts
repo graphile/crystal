@@ -16,9 +16,9 @@ import type { PgResource } from "../datasource.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
-  PgCodecAttributeNullability,
   ObjectForResource,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecWithAttributes,
   PgQueryBuilder,
   PgTypedStep,

@@ -329,7 +329,7 @@ declare global {
      * The absolute bare bones `Build` object that graphile-build makes before
      * calling any hooks.
      */
-    interface BuildBase {
+    interface BuildBase<TScope extends keyof ScopedGeneratedTypes = "default"> {
       /**
        * Various libraries and utilities to save from having to import them in
        * plugins (and thereby avoid having module conflict errors).
@@ -352,7 +352,7 @@ declare global {
        * Input from the "data gathering" phase that plugins can use to
        * influence what types/fields/etc are added to the GraphQL schema.
        */
-      input: BuildInput;
+      input: BuildInput<TScope>;
 
       /**
        * Returns true if `Build.versions` contains an entry for `packageName`
@@ -619,7 +619,7 @@ declare global {
      * there's no concrete list of all the things in the build object other
      * than actually inspecting it.
      */
-    interface Build extends BuildBase {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> extends BuildBase<TScope> {
       // QueryPlugin
       $$isQuery: symbol;
 
@@ -935,7 +935,7 @@ declare global {
      * the various parameters to the hook function.
      */
     interface SchemaBuilderHooks<
-      TBuild extends GraphileBuild.Build = GraphileBuild.Build,
+      TBuild extends GraphileBuild.Build<never> = GraphileBuild.Build<never>,
     > {
       /**
        * The build object represents the current schema build and is passed to all
@@ -943,9 +943,9 @@ declare global {
        * generate GraphQL objects during this phase.
        */
       build: GraphileBuild.Hook<
-        Partial<TBuild> & GraphileBuild.BuildBase,
+        Partial<TBuild> & GraphileBuild.BuildBase<never>,
         GraphileBuild.ContextBuild,
-        Partial<TBuild> & GraphileBuild.BuildBase
+        Partial<TBuild> & GraphileBuild.BuildBase<never>
       >[];
 
       /**

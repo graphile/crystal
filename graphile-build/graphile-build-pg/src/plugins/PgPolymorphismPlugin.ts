@@ -74,7 +74,7 @@ declare global {
     }
   }
   namespace GraphileBuild {
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       pgResourcesByPolymorphicTypeName: {
         [polymorphicTypeName: string]: {
           resources: PgResource[];
@@ -841,7 +841,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       build(build) {
         const { input, inflection } = build;
         const pgRegistry = input.pgRegistry as PgRegistry;
-        const pgResourcesByPolymorphicTypeName: GraphileBuild.Build["pgResourcesByPolymorphicTypeName"] =
+        const pgResourcesByPolymorphicTypeName: GraphileBuild.Build<never>["pgResourcesByPolymorphicTypeName"] =
           Object.create(null);
 
         const allResources = Object.values(pgRegistry.pgResources);
@@ -1011,7 +1011,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             },
             nodeIdSpecForCodec(codec) {
               const helpers = (
-                build as GraphileBuild.Build
+                build as GraphileBuild.Build<never>
               ).nodeIdHelpersForCodec(codec);
               return helpers ? helpers.getSpec : null;
             },

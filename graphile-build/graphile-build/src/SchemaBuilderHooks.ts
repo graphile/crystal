@@ -5,7 +5,7 @@ import "./global.ts";
  * hook functions to be registered into it.
  */
 export function makeSchemaBuilderHooks<
-  TBuild extends GraphileBuild.Build = GraphileBuild.Build,
+  TBuild extends GraphileBuild.Build<never> = GraphileBuild.Build<never>,
 >(): GraphileBuild.SchemaBuilderHooks<TBuild> {
   return {
     build: [],

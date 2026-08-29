@@ -314,7 +314,7 @@ const gatherBase = (
   }
 
   async function run() {
-    const output: Partial<GraphileBuild.BuildInput> = Object.create(null);
+    const output: Partial<GraphileBuild.BuildInput<never>> = Object.create(null);
     if (gatherPlugins) {
       // Reset state
       for (const plugin of gatherPlugins) {
@@ -338,12 +338,12 @@ const gatherBase = (
       }
     }
 
-    return output as GraphileBuild.BuildInput;
+    return output as GraphileBuild.BuildInput<never>;
   }
 
   async function watch(
     callback: (
-      gather: GraphileBuild.BuildInput | null,
+      gather: GraphileBuild.BuildInput<never> | null,
       error: Error | undefined,
       retry: () => void,
     ) => PromiseOrDirect<void>,
@@ -442,7 +442,7 @@ function promiseToCallback<T, U>(
 export const gather = (
   preset: GraphileConfig.Preset,
   shared?: GatherShared,
-): Promise<GraphileBuild.BuildInput> => {
+): Promise<GraphileBuild.BuildInput<never>> => {
   const { run } = gatherBase(preset, shared);
   return run();
 };
@@ -459,7 +459,7 @@ export const watchGather = (
   preset: GraphileConfig.Preset,
   shared: GatherShared | undefined,
   callback: (
-    gather: GraphileBuild.BuildInput | null,
+    gather: GraphileBuild.BuildInput<never> | null,
     error: Error | undefined,
     retry: () => void,
   ) => PromiseOrDirect<void>,
@@ -515,7 +515,7 @@ async function writeFileIfDiffers(
  */
 export function buildSchema(
   rawPreset: GraphileConfig.Preset,
-  input: GraphileBuild.BuildInput,
+  input: GraphileBuild.BuildInput<never>,
   shared?: BuildSchemaShared,
 ): GraphQLSchema {
   const { builder, schema } = _buildSchema(rawPreset, input, shared);
@@ -525,7 +525,7 @@ export function buildSchema(
 
 function _buildSchema(
   rawPreset: GraphileConfig.Preset,
-  input: GraphileBuild.BuildInput,
+  input: GraphileBuild.BuildInput<never>,
   shared: BuildSchemaShared = {},
 ): { builder: SchemaBuilder; schema: GraphQLSchema } {
   const preset = { extends: [GraphileBuildLibPreset, rawPreset] };
@@ -848,8 +848,7 @@ declare global {
      * gather phase.
      */
     interface BuildInput<
-      TScope extends
-        keyof GraphileBuild.ScopedGeneratedTypes = keyof GraphileBuild.ScopedGeneratedTypes,
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
     > {
       // Expand this interface with declaration merging
     }
@@ -880,7 +879,7 @@ declare global {
       (
         behavior: GraphileBuild.BehaviorString,
         entity: GraphileBuild.BehaviorEntities[entityType],
-        build: GraphileBuild.Build,
+        build: GraphileBuild.Build<never>,
       ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]
     >;
   }
@@ -1012,7 +1011,7 @@ declare global {
        * phase to the 'output' object.
        */
       main?: (
-        output: Partial<GraphileBuild.BuildInput>,
+        output: Partial<GraphileBuild.BuildInput<never>>,
         info: GatherPluginContext<TState, TCache>,
       ) => Promise<void>;
 
@@ -1038,7 +1037,7 @@ declare global {
           | GraphileBuild.BehaviorString[]
           | ((
               behavior: GraphileBuild.BehaviorString,
-              build: GraphileBuild.Build,
+              build: GraphileBuild.Build<never>,
             ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
 
         behaviorRegistry?: {
@@ -1079,9 +1078,9 @@ declare global {
            */
           build?: PluginHook<
             GraphileBuild.Hook<
-              Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
+              Partial<GraphileBuild.Build<never>> & GraphileBuild.BuildBase<never>,
               GraphileBuild.ContextBuild,
-              Partial<GraphileBuild.Build> & GraphileBuild.BuildBase
+              Partial<GraphileBuild.Build<never>> & GraphileBuild.BuildBase<never>
             >
           >;
 
@@ -1094,7 +1093,7 @@ declare global {
             GraphileBuild.Hook<
               Record<string, never>,
               GraphileBuild.ContextInit,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1107,7 +1106,7 @@ declare global {
             GraphileBuild.Hook<
               GraphQLSchema,
               GraphileBuild.ContextFinalize,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1118,7 +1117,7 @@ declare global {
             GraphileBuild.Hook<
               GraphQLSchemaConfig,
               GraphileBuild.ContextSchema,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1129,7 +1128,7 @@ declare global {
             GraphileBuild.Hook<
               GraphQLNamedType[],
               GraphileBuild.ContextSchemaTypes,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1149,42 +1148,42 @@ declare global {
             GraphileBuild.Hook<
               GraphileBuild.GrafastObjectTypeConfig<any>,
               GraphileBuild.ContextObject,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLObjectType_interfaces?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInterfaceType[],
               GraphileBuild.ContextObjectInterfaces,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLObjectType_fields?: PluginHook<
             GraphileBuild.Hook<
               GraphileBuild.GrafastFieldConfigMap<any>,
               GraphileBuild.ContextObjectFields,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLObjectType_fields_field?: PluginHook<
             GraphileBuild.Hook<
               GrafastFieldConfig<any, any, any>,
               GraphileBuild.ContextObjectFieldsField,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLObjectType_fields_field_args?: PluginHook<
             GraphileBuild.Hook<
               GrafastFieldConfigArgumentMap,
               GraphileBuild.ContextObjectFieldsFieldArgs,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLObjectType_fields_field_args_arg?: PluginHook<
             GraphileBuild.Hook<
               GrafastArgumentConfig<any, any, any>,
               GraphileBuild.ContextObjectFieldsFieldArgsArg,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1201,21 +1200,21 @@ declare global {
             GraphileBuild.Hook<
               GraphileBuild.GrafastInputObjectTypeConfig,
               GraphileBuild.ContextInputObject,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInputObjectType_fields?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInputFieldConfigMap,
               GraphileBuild.ContextInputObjectFields,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInputObjectType_fields_field?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInputFieldConfig,
               GraphileBuild.ContextInputObjectFieldsField,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1230,21 +1229,21 @@ declare global {
             GraphileBuild.Hook<
               GraphQLEnumTypeConfig,
               GraphileBuild.ContextEnum,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLEnumType_values?: PluginHook<
             GraphileBuild.Hook<
               GraphQLEnumValueConfigMap,
               GraphileBuild.ContextEnumValues,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLEnumType_values_value?: PluginHook<
             GraphileBuild.Hook<
               GraphQLEnumValueConfig,
               GraphileBuild.ContextEnumValuesValue,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1258,14 +1257,14 @@ declare global {
             GraphileBuild.Hook<
               GraphileBuild.GrafastUnionTypeConfig<any>,
               GraphileBuild.ContextUnion,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLUnionType_types?: PluginHook<
             GraphileBuild.Hook<
               GraphQLObjectType[],
               GraphileBuild.ContextUnionTypes,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1284,42 +1283,42 @@ declare global {
             GraphileBuild.Hook<
               GraphileBuild.GrafastInterfaceTypeConfig<any>,
               GraphileBuild.ContextInterface,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInterfaceType_fields?: PluginHook<
             GraphileBuild.Hook<
               GraphQLFieldConfigMap<any, any>,
               GraphileBuild.ContextInterfaceFields,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInterfaceType_fields_field?: PluginHook<
             GraphileBuild.Hook<
               GraphQLFieldConfig<any, any>,
               GraphileBuild.ContextInterfaceFieldsField,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInterfaceType_fields_field_args?: PluginHook<
             GraphileBuild.Hook<
               GraphQLFieldConfigArgumentMap,
               GraphileBuild.ContextInterfaceFieldsFieldArgs,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInterfaceType_fields_field_args_arg?: PluginHook<
             GraphileBuild.Hook<
               GraphQLArgumentConfig,
               GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
           GraphQLInterfaceType_interfaces?: PluginHook<
             GraphileBuild.Hook<
               GraphQLInterfaceType[],
               GraphileBuild.ContextInterfaceInterfaces,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
 
@@ -1330,7 +1329,7 @@ declare global {
             GraphileBuild.Hook<
               GraphQLScalarTypeConfig<any, any>,
               GraphileBuild.ContextScalar,
-              GraphileBuild.Build
+              GraphileBuild.Build<never>
             >
           >;
         };

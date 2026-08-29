@@ -68,7 +68,7 @@ declare global {
       typeName: string,
     ) => void;
 
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       /**
        * A copy of `import * from "@dataplan/pg"` so that plugins don't need to
        * import it directly.
@@ -147,13 +147,13 @@ declare global {
        * there will be just a single executor anyway, and the type of the
        * executor doesn't tend to matter much.
        */
-      pgExecutor: GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"][keyof GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"]];
+      pgExecutor: Build<TScope>["input"]["pgRegistry"]["pgExecutors"][keyof Build<TScope>["input"]["pgRegistry"]["pgExecutors"]];
       /** Shortcut to the resources in the registry */
-      pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
+      pgResources: Build<TScope>["input"]["pgRegistry"]["pgResources"];
       /** Shortcut to the codecs in the registry */
-      pgCodecs: GraphileBuild.Build["input"]["pgRegistry"]["pgCodecs"];
+      pgCodecs: Build<TScope>["input"]["pgRegistry"]["pgCodecs"];
       /** Shortcut to the relations in the registry */
-      pgRelations: GraphileBuild.Build["input"]["pgRegistry"]["pgRelations"];
+      pgRelations: Build<TScope>["input"]["pgRegistry"]["pgRelations"];
     }
 
     interface BehaviorEntities {

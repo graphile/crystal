@@ -29,7 +29,7 @@ declare global {
       isPageInfoHasNextPageField?: boolean;
       isPageInfoHasPreviousPageField?: boolean;
     }
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       registerCursorConnection(options: RegisterCursorConnectionOptions): void;
     }
   }

@@ -18,7 +18,7 @@ declare global {
       ($nodeId: ExecutableStep<Maybe<string>>): ExecutableStep<any>;
       deprecationReason?: string;
     };
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       specForHandler?(handler: NodeIdHandler): (nodeId: Maybe<string>) => any;
       nodeFetcherByTypeName?(typeName: string): NodeFetcher | null;
     }
@@ -101,7 +101,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
             nodeFetcherByTypeName(typeName) {
               const existing = nodeFetcherByTypeNameCache.get(typeName);
               if (existing) return existing;
-              const finalBuild = build as GraphileBuild.Build;
+              const finalBuild = build as GraphileBuild.Build<never>;
               const { specForHandler } = finalBuild;
               if (!specForHandler) return null;
               const handler = finalBuild.getNodeIdHandler?.(typeName);

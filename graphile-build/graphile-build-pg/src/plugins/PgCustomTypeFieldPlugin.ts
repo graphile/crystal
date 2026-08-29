@@ -90,7 +90,7 @@ declare global {
       "typeField:single": true;
       "queryField:single": true;
     }
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       pgGetArgDetailsFromParameters(
         resource: PgResource<any, any, any, any, any>,
         parameters?: readonly PgResourceParameter[],
@@ -291,7 +291,7 @@ function hasRecord(
 
 declare global {
   namespace GraphileBuild {
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       [$$rootQuery]: Array<PgResource<any, any, any, any, any>>;
       [$$rootMutation]: Array<PgResource<any, any, any, any, any>>;
       [$$computed]: Map<
@@ -543,7 +543,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             offset = 0,
           ) => {
             const parameters = memoSlice(inParameters, offset);
-            const finalBuild = build as GraphileBuild.Build;
+            const finalBuild = build as GraphileBuild.Build<never>;
             const argDetails = parameters.map((param, index) => {
               const argName = finalBuild.inflection.argument({
                 param,
@@ -1085,7 +1085,7 @@ const scalarComputed = EXPORTABLE(
 
 function modFields(
   fields: GraphileBuild.GrafastFieldConfigMap<any>,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   context:
     | GraphileBuild.ContextObjectFields
     | GraphileBuild.ContextInterfaceFields,
@@ -1456,7 +1456,7 @@ function modFields(
 }
 
 function getPreferredType(
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   rawInnerType: GraphQLOutputType,
   preferredTypeName: string,
 ): GraphQLOutputType {
@@ -1525,7 +1525,7 @@ function getPreferredType(
 }
 
 function getFunctionSourceReturnGraphQLType(
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   resource: PgResource<any, any, any, any, any>,
 ): GraphQLOutputType | null {
   const resourceInnerCodec: PgCodec<any, any, any, any, undefined, any, any> =

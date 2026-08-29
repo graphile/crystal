@@ -58,7 +58,7 @@ declare global {
 }
 
 const isInsertable = (
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   resource: PgResource<any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;

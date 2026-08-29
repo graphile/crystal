@@ -23,10 +23,10 @@ import type { PgResource, PgResourceUnique } from "../datasource.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
-  PgCodecAttributeNullability,
   GetPgResourceUniques,
   ObjectForResource,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecWithAttributes,
   PgQueryBuilder,
   PlanByUniques,

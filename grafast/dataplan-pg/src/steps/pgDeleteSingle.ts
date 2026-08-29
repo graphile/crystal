@@ -25,9 +25,9 @@ import type {
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
-  PgCodecAttributeNullability,
   GetPgResourceUniques,
   PgCodec,
+  PgCodecAttributeNullability,
   PgQueryBuilder,
   PlanByUniques,
   ReadonlyArrayOrDirect,

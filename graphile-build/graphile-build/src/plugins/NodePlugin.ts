@@ -17,7 +17,7 @@ declare global {
       nodeIdFieldName(this: Inflection): string;
     }
 
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       [NODE_ID_CODECS]?: { [codecName: string]: NodeIdCodec };
       [NODE_ID_HANDLER_BY_TYPE_NAME]?: { [typeName: string]: NodeIdHandler };
       registerNodeIdCodec?(codec: NodeIdCodec): void;

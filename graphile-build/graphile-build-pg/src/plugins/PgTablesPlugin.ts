@@ -980,7 +980,7 @@ const EXCLUDE = true;
 const INCLUDE = false;
 
 function partitionExclude(
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   resource: PgResource,
 ): boolean {
   const pp = resource.extensions?.partitionParent;
@@ -1091,7 +1091,7 @@ function partitionExclude(
 }
 
 function getPartitionParent(
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   resource: PgResource,
 ): PgResource<any, any, any, any, any> | null {
   const pp = resource.extensions?.partitionParent;

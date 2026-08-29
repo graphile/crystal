@@ -43,7 +43,7 @@ declare global {
       "attribute:filterBy": true;
       "attribute:orderBy": true;
     }
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       pgResolveOutputType(
         codec: PgCodec,
         notNull?: boolean,
@@ -126,7 +126,7 @@ const HIDE_BY_DEFAULT: ReadonlyArray<PgCodec> = [
 
 function processAttribute(
   fields: GraphQLFieldConfigMap<any, any>,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   context:
     | GraphileBuild.ContextObjectFields
     | GraphileBuild.ContextInterfaceFields,
@@ -461,7 +461,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
           {
             pgResolveOutputType(codec, notNull) {
               return resolveOutputType(
-                build as GraphileBuild.Build,
+                build as GraphileBuild.Build<never>,
                 codec,
                 notNull,
               );
@@ -786,7 +786,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 };
 
 function resolveOutputType(
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   codec: PgCodec,
   notNull?: boolean,
 ): [baseCodec: PgCodec, resolvedType: GraphQLOutputType] | null {

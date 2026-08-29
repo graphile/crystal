@@ -394,7 +394,7 @@ async function main() {
   );
 
   // We're crafting our own input
-  const input: GraphileBuild.BuildInput = {
+  const input: GraphileBuild.BuildInput<never> = {
     pgRegistry: pgRegistry as unknown as PgRegistry,
   };
   const schema = buildSchema(config, input);

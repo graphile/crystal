@@ -23,14 +23,17 @@ export interface MakeAddPgTableOrderByPluginOrders {
 
 const counterByName = new Map<string, number>();
 
-export function addPgTableOrderBy(
+export function addPgTableOrderBy<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+>(
   match: {
+    scope?: TScope;
     serviceName?: string;
     schemaName: string;
     tableName: string;
   },
   ordersGenerator: (
-    build: GraphileBuild.Build,
+    build: GraphileBuild.Build<TScope>,
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to "${match.schemaName}"."${match.tableName}"`,
 ): GraphileConfig.Plugin {
@@ -66,7 +69,7 @@ export function addPgTableOrderBy(
           ) {
             return values;
           }
-          const newValues = ordersGenerator(build);
+          const newValues = ordersGenerator(build as GraphileBuild.Build<TScope>);
 
           return extend(values, newValues, hint);
         },

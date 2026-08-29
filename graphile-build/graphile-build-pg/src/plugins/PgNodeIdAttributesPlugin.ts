@@ -53,8 +53,8 @@ const pgConditionApplyNodeId = EXPORTABLE(
       getIdentifiers: (nodeId: Maybe<string>) => null | readonly any[],
       localAttributeCodecs: PgCodec[],
       localAttributes: readonly string[],
-      sql: GraphileBuild.Build["sql"],
-      sqlValueWithCodec: GraphileBuild.Build["dataplanPg"]["sqlValueWithCodec"],
+      sql: GraphileBuild.Build<never>["sql"],
+      sqlValueWithCodec: GraphileBuild.Build<never>["dataplanPg"]["sqlValueWithCodec"],
       typeName: string,
       condition: PgCondition,
       nodeId: unknown,
@@ -243,7 +243,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 return memo;
               }
               const helpers = (
-                build as GraphileBuild.Build
+                build as GraphileBuild.Build<never>
               ).nodeIdHelpersForCodec(relation.remoteResource.codec);
               if (!helpers) {
                 return memo;

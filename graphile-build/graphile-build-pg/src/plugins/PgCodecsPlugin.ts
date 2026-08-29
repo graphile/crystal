@@ -66,7 +66,7 @@ declare global {
       }): string;
     }
 
-    interface Build {
+    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
       allPgCodecs: Set<PgCodec>;
       /** Throws if not found */
       getPgCodecByDatabaseName(

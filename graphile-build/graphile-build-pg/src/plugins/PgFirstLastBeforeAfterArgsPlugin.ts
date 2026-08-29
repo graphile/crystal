@@ -150,7 +150,7 @@ const applyAfterArg = EXPORTABLE(
 
 function commonFn(
   args: GrafastFieldConfigArgumentMap,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.Build<never>,
   context:
     | GraphileBuild.ContextObjectFieldsFieldArgs
     | GraphileBuild.ContextInterfaceFieldsFieldArgs,

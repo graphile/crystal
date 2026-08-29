@@ -145,7 +145,7 @@ export function changeNullability(
     T extends GrafastFieldConfig<any, any, any>,
   >(
     field: T,
-    build: GraphileBuild.Build,
+    build: GraphileBuild.Build<never>,
     context:
       | GraphileBuild.ContextObjectFieldsField
       | GraphileBuild.ContextInterfaceFieldsField,
@@ -175,7 +175,7 @@ export function changeNullability(
 
   function objectOrInterfaceArgsArgCallback<T extends GrafastArgumentConfig>(
     arg: T,
-    build: GraphileBuild.Build,
+    build: GraphileBuild.Build<never>,
     context:
       | GraphileBuild.ContextObjectFieldsFieldArgsArg
       | GraphileBuild.ContextInterfaceFieldsFieldArgsArg,

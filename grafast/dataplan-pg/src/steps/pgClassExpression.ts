@@ -6,10 +6,10 @@ import sql, { $$toSQL } from "pg-sql2";
 import type { PgCodecJSDatatype } from "../codecs.ts";
 import type { PgResource } from "../datasource.ts";
 import type {
-  PgCodecAttributeNullability,
   GetPgCodecAttributes,
   PgClassSingleStep,
   PgCodec,
+  PgCodecAttributeNullability,
   PgTypedStep,
 } from "../interfaces.ts";
 import { PgDeleteSingleStep } from "./pgDeleteSingle.ts";
