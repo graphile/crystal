@@ -9,8 +9,11 @@ where (
 order by __forums__."id" asc
 limit 2;
 
+with __messages_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids
+)
 select __messages_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids) as __messages_identifiers__,
+from __messages_identifiers__,
 lateral (
   select
     __messages__."body" as "0",
@@ -24,8 +27,11 @@ lateral (
   limit 2
 ) as __messages_result__;
 
+with __users_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __users_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__,
+from __users_identifiers__,
 lateral (
   select
     __users__."username" as "0",
