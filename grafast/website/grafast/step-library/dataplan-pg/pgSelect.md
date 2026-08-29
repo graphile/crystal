@@ -320,7 +320,7 @@ performance issues. Supported strategies:
 - `auto`: uses heuristics to choose the inlining strategy.
 - `forbidden`: prevents this query from being inlined into its parent.
 - `preferLeftJoin`: prefers the use of a `left join` when this query can return
-  at most one row for each parent row, falling back to a subquery when that is
+  at most one row for each parent row, falling back to a subquery when that's
   not suitable.
 - `preferSubquery`: prefers the use of a subquery in the parent query's `select`
   list.
