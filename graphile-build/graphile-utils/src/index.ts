@@ -19,6 +19,7 @@ export {
 } from "./makeAddPgTableOrderByPlugin.ts";
 export type {
   ChangeNullabilityRules,
+  ChangeNullabilityRulesForScope,
   ChangeNullabilityTypeRules,
   NullabilitySpec,
   NullabilitySpecString,

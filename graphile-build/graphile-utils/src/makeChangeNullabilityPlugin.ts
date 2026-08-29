@@ -41,6 +41,91 @@ export interface ChangeNullabilityRules {
   [typeName: string]: ChangeNullabilityTypeRules;
 }
 
+type NullabilitySpecFor<TNullability> = boolean | NullabilitySpecForShape<TNullability>;
+
+type NullabilitySpecForShape<TNullability> = TNullability extends {
+  list: infer TInner;
+}
+  ? `[${NullabilitySpecForShape<TInner>}]` | `[${NullabilitySpecForShape<TInner>}]!`
+  : "" | "!";
+
+type GeneratedFieldRule<TField> = TField extends {
+  nullability: infer TNullability;
+  args: infer TArgs;
+  argNullabilities: infer TArgNullabilities;
+}
+  ?
+      | NullabilitySpecFor<TNullability>
+      | {
+          type?: NullabilitySpecFor<TNullability>;
+          args?: {
+            [TArgName in keyof TArgs & keyof TArgNullabilities & string]?:
+              | NullabilitySpecFor<TArgNullabilities[TArgName]>
+              | undefined;
+          };
+        }
+  : never;
+
+type GeneratedObjectOrInterfaceTypeRules<TType> = TType extends {
+  fields: infer TFields;
+}
+  ? {
+      [TFieldName in keyof TFields & string]?: GeneratedFieldRule<
+        TFields[TFieldName]
+      >;
+    }
+  : never;
+
+type GeneratedInputObjectTypeRules<TType> = TType extends {
+  fields: infer TFields;
+  fieldNullabilities: infer TFieldNullabilities;
+}
+  ? {
+      [TFieldName in keyof TFields & keyof TFieldNullabilities & string]?:
+        | NullabilitySpecFor<TFieldNullabilities[TFieldName]>
+        | undefined;
+    }
+  : never;
+
+type GeneratedChangeNullabilityRules<TSchema> = [TSchema] extends [never]
+  ? ChangeNullabilityRules
+  : TSchema extends {
+        objects: infer TObjects;
+        interfaces: infer TInterfaces;
+        inputObjects: infer TInputObjects;
+      }
+    ? {
+        [TTypeName in
+          | keyof TObjects
+          | keyof TInterfaces
+          | keyof TInputObjects]?: TTypeName extends keyof TObjects
+          ? GeneratedObjectOrInterfaceTypeRules<TObjects[TTypeName]>
+          : TTypeName extends keyof TInterfaces
+            ? GeneratedObjectOrInterfaceTypeRules<TInterfaces[TTypeName]>
+            : TTypeName extends keyof TInputObjects
+              ? GeneratedInputObjectTypeRules<TInputObjects[TTypeName]>
+              : never;
+      }
+    : never;
+
+export type ChangeNullabilityRulesForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+> = {
+  [TTypeName in keyof GeneratedChangeNullabilityRules<
+    GraphileBuild.GeneratedTypesForScope<TScope> extends {
+      schema: infer TSchema;
+    }
+      ? TSchema
+      : never
+  >]: GeneratedChangeNullabilityRules<
+    GraphileBuild.GeneratedTypesForScope<TScope> extends {
+      schema: infer TSchema;
+    }
+      ? TSchema
+      : never
+  >[TTypeName];
+};
+
 let counter = 0;
 
 function doIt(
@@ -116,6 +201,16 @@ function doIt(
   }
 }
 
+export function changeNullability<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  const TRules extends ChangeNullabilityRulesForScope<TScope> = ChangeNullabilityRulesForScope<TScope>,
+>(
+  rules: TRules &
+    Record<
+      Exclude<keyof TRules, keyof ChangeNullabilityRulesForScope<TScope>>,
+      never
+    >,
+): GraphileConfig.Plugin;
 export function changeNullability(
   rules: ChangeNullabilityRules,
 ): GraphileConfig.Plugin {
