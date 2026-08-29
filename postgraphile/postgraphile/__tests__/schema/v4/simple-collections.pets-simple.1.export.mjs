@@ -691,8 +691,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_people_odd_pets = () => EMPTY_ARRAY;
+const makeArgs_people_odd_pets = () => [];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
