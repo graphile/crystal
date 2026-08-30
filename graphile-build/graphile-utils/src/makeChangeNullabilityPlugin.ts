@@ -212,15 +212,7 @@ function doIt(
 
 export function changeNullability<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
-  const TRules extends
-    ScopedChangeNullabilityRules<TScope> = ScopedChangeNullabilityRules<TScope>,
->(
-  rules: TRules &
-    Record<
-      Exclude<keyof TRules, keyof ScopedChangeNullabilityRules<TScope>>,
-      never
-    >,
-): GraphileConfig.Plugin;
+>(rules: ScopedChangeNullabilityRules<TScope>): GraphileConfig.Plugin;
 export function changeNullability(
   rules: ChangeNullabilityRules,
 ): GraphileConfig.Plugin {
