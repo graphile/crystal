@@ -135,13 +135,23 @@ export interface ExtensionDefinition
   resolvers?: Resolvers;
 }
 
+type GeneratedFieldArgs<TArgs> = {
+  [TArgName in keyof TArgs]: NonNullable<TArgs[TArgName]> extends {
+    Type: infer TType;
+  }
+    ? TType
+    : never;
+} extends infer TGeneratedArgs extends BaseGraphQLArguments
+  ? TGeneratedArgs
+  : never;
+
 type GeneratedFieldPlans<TSource extends Step, TFields> = {
   [TFieldName in keyof TFields]?: TFields[TFieldName] extends {
-    args: infer TArgs extends BaseGraphQLArguments;
+    args: infer TArgs;
   }
     ? TFields[TFieldName] extends { Result: infer TResult extends Step }
-      ? FieldPlan<TSource, TArgs, TResult>
-      : FieldPlan<TSource, TArgs>
+      ? FieldPlan<TSource, GeneratedFieldArgs<TArgs>, TResult>
+      : FieldPlan<TSource, GeneratedFieldArgs<TArgs>>
     : never;
 };
 

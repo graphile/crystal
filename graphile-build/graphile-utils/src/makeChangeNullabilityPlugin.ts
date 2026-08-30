@@ -65,13 +65,13 @@ type GeneratedFieldRule<TField> = TField extends {
       | NullabilitySpecFor<TListDepth>
       | {
           type?: NullabilitySpecFor<TListDepth>;
-          args?: TField extends { argListDepths: infer TArgListDepths }
-            ? {
-                [TArgName in keyof TArgs & keyof TArgListDepths & string]?:
-                  | NullabilitySpecFor<TArgListDepths[TArgName] & number>
-                  | undefined;
-              }
-            : never;
+          args?: {
+            [TArgName in keyof TArgs & string]?: NonNullable<
+              TArgs[TArgName]
+            > extends { listDepth: infer TArgListDepth extends number }
+              ? NullabilitySpecFor<TArgListDepth>
+              : never;
+          };
         }
   : never;
 
