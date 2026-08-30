@@ -165,5 +165,5 @@ function pruneBuild<TScope extends keyof GraphileBuild.PluginScopes>(
       input: { pgRegistry },
     }),
     [dataplanPg, grafast, graphql, pgRegistry, sql],
-  ) as PrunedBuild<TScope>;
+  );
 }
