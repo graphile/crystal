@@ -921,7 +921,7 @@ declare global {
     type Hook<
       Type,
       TContext extends Context,
-      TBuild extends Partial<Build> = Build,
+      TBuild extends BuildBase = Build,
     > = {
       (input: Type, build: TBuild, context: TContext): Type;
       displayName?: string;
