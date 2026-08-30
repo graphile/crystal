@@ -314,7 +314,7 @@ const gatherBase = (
   }
 
   async function run() {
-    const output: Partial<GraphileBuild.BuildInput<never>> = Object.create(null);
+    const output: Partial<GraphileBuild.BuildInput> = Object.create(null);
     if (gatherPlugins) {
       // Reset state
       for (const plugin of gatherPlugins) {
@@ -338,12 +338,12 @@ const gatherBase = (
       }
     }
 
-    return output as GraphileBuild.BuildInput<never>;
+    return output as GraphileBuild.BuildInput;
   }
 
   async function watch(
     callback: (
-      gather: GraphileBuild.BuildInput<never> | null,
+      gather: GraphileBuild.BuildInput | null,
       error: Error | undefined,
       retry: () => void,
     ) => PromiseOrDirect<void>,
@@ -442,7 +442,7 @@ function promiseToCallback<T, U>(
 export const gather = (
   preset: GraphileConfig.Preset,
   shared?: GatherShared,
-): Promise<GraphileBuild.BuildInput<never>> => {
+): Promise<GraphileBuild.BuildInput> => {
   const { run } = gatherBase(preset, shared);
   return run();
 };
@@ -459,7 +459,7 @@ export const watchGather = (
   preset: GraphileConfig.Preset,
   shared: GatherShared | undefined,
   callback: (
-    gather: GraphileBuild.BuildInput<never> | null,
+    gather: GraphileBuild.BuildInput | null,
     error: Error | undefined,
     retry: () => void,
   ) => PromiseOrDirect<void>,
@@ -515,7 +515,7 @@ async function writeFileIfDiffers(
  */
 export function buildSchema(
   rawPreset: GraphileConfig.Preset,
-  input: GraphileBuild.BuildInput<never>,
+  input: GraphileBuild.BuildInput,
   shared?: BuildSchemaShared,
 ): GraphQLSchema {
   const { builder, schema } = _buildSchema(rawPreset, input, shared);
@@ -525,7 +525,7 @@ export function buildSchema(
 
 function _buildSchema(
   rawPreset: GraphileConfig.Preset,
-  input: GraphileBuild.BuildInput<never>,
+  input: GraphileBuild.BuildInput,
   shared: BuildSchemaShared = {},
 ): { builder: SchemaBuilder; schema: GraphQLSchema } {
   const preset = { extends: [GraphileBuildLibPreset, rawPreset] };
@@ -822,65 +822,56 @@ export { version } from "./version.ts";
 
 declare global {
   namespace GraphileBuild {
-    /** Extend this interface with generated types for the default schema. */
-    interface ScopedGeneratedTypes_default {}
+    interface PluginScope_default {
+      // Extend this with declaration merging
+    }
 
-    /**
-     * Augment this interface to provide generated build-time types. Scope the
-     * generated types to a given name to allow for multiple runtime schemas.
-     */
-    interface ScopedGeneratedTypes {
-      default: ScopedGeneratedTypes_default;
+    interface PluginScopes {
+      default: PluginScope_default;
+      // Extend this with declaration merging
 
       // [scopeName: string]: {
       //   schema: {
       //     objects: {
       //       [typeName: string]: {
       //         Step: ExepectedStepTypes
+      //         listDepth: 0
+      //         args: {
+      //           [argName: string]: {
+      //             listDepth: 0
+      //             Type: ...
+      //           }
+      //         }
       //       }
       //     }
       //   }
       // }
     }
 
-    /**
-     * Input to the 'schema build' phase, this is typically the output of the
-     * gather phase.
-     */
-    interface BuildInput<
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
-    > {
-      // Expand this interface with declaration merging
-    }
-
-    type GeneratedTypesForScope<TScopeName extends keyof ScopedGeneratedTypes> =
-      ScopedGeneratedTypes[TScopeName];
-
     /** The source step for a GraphQL object type, when known. */
     type StepForObjectType<
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+      TScope extends keyof GraphileBuild.PluginScopes,
       TTypeName extends string,
-    > =
-      GeneratedTypesForScope<TScope> extends {
-        schema: {
-          objects: infer TObjects;
-        };
-      }
-        ? TTypeName extends keyof TObjects
-          ? TObjects[TTypeName] extends { Step: infer TStep }
-            ? TStep
-            : grafast.Step
+    > = PluginScopes[TScope] extends {
+      schema: {
+        objects: infer TObjects;
+      };
+    }
+      ? TTypeName extends keyof TObjects
+        ? TObjects[TTypeName] extends { Step: infer TStep }
+          ? TStep
           : grafast.Step
-        : grafast.Step;
+        : grafast.Step
+      : grafast.Step;
 
     type EntityBehaviorHook<
       entityType extends keyof GraphileBuild.BehaviorEntities,
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
+      TScope extends keyof GraphileBuild.PluginScopes = never,
     > = PluginHook<
       (
         behavior: GraphileBuild.BehaviorString,
         entity: GraphileBuild.BehaviorEntities[entityType],
-        build: GraphileBuild.Build<TScope>,
+        build: GraphileBuild.ScopedBuild<TScope>,
       ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]
     >;
   }
@@ -915,7 +906,7 @@ declare global {
     }
 
     interface PluginInflectionConfig<
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
+      TScope extends keyof GraphileBuild.PluginScopes = never,
     > {
       /**
        * Define new inflectors here
@@ -964,7 +955,7 @@ declare global {
       TNamespace extends keyof GatherHelpers,
       TState extends { [key: string]: any } = { [key: string]: any },
       TCache extends { [key: string]: any } = { [key: string]: any },
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
+      TScope extends keyof GraphileBuild.PluginScopes = never,
     > {
       /**
        * A unique namespace for this plugin to use.
@@ -1015,7 +1006,7 @@ declare global {
        * phase to the 'output' object.
        */
       main?: (
-        output: Partial<GraphileBuild.BuildInput<TScope>>,
+        output: Partial<GraphileBuild.ScopedBuildInput<TScope>>,
         info: GatherPluginContext<TState, TCache>,
       ) => Promise<void>;
 
@@ -1030,359 +1021,320 @@ declare global {
       ) => PromiseOrDirect<() => void>;
     }
 
-    interface PluginSchemaConfigBase {
-        globalBehavior?:
-          | GraphileBuild.BehaviorString
-          | GraphileBuild.BehaviorString[]
-          | ((
-              behavior: GraphileBuild.BehaviorString,
-              build: GraphileBuild.Build<never>,
-            ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
-
-        behaviorRegistry?: {
-          add?: Partial<
-            Record<
-              keyof GraphileBuild.BehaviorStrings,
-              {
-                description: string;
-                entities: ReadonlyArray<keyof GraphileBuild.BehaviorEntities>;
-              }
-            >
-          >;
-        };
-
-        /**
-         * You should use `before`, `after` and `provides` to ensure that the entity
-         * behaviors apply in order. The order should be roughly:
-         *
-         * - `default` - default global behaviors like "update"
-         * - `inferred` - behaviors that are inferred based on the entity, e.g. a plugin might disable filtering _by default_ on a relation if it's unindexed
-         * - `override` - overrides set explicitly by the user
-         */
-        entityBehavior?: {
-          [entityType in keyof GraphileBuild.BehaviorEntities]?:
-            | GraphileBuild.BehaviorString
-            | GraphileBuild.BehaviorString[]
-            | {
-                inferred?: GraphileBuild.EntityBehaviorHook<entityType>;
-                override?: GraphileBuild.EntityBehaviorHook<entityType>;
-              };
-        };
-
-        hooks?: {
-          /**
-           * The build object represents the current schema build and is passed to all
-           * hooks, hook the 'build' event to extend this object. Note: you MUST NOT
-           * generate GraphQL objects during this phase.
-           */
-          build?: PluginHook<
-            GraphileBuild.Hook<
-              Partial<GraphileBuild.Build<never>> & GraphileBuild.BuildBase<never>,
-              GraphileBuild.ContextBuild,
-              Partial<GraphileBuild.Build<never>> & GraphileBuild.BuildBase<never>
-            >
-          >;
-
-          /**
-           * The `init` phase runs after `build` is complete but before any types
-           * or the schema are actually built. It is the only phase in which you
-           * can register GraphQL types; do so using `build.registerType`.
-           */
-          init?: PluginHook<
-            GraphileBuild.Hook<
-              Record<string, never>,
-              GraphileBuild.ContextInit,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * 'finalize' phase is called once the schema is built; typically you
-           * shouldn't use this, but it's useful for interfacing with external
-           * libraries that mutate an already constructed schema.
-           */
-          finalize?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLSchema,
-              GraphileBuild.ContextFinalize,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * Add 'query', 'mutation' or 'subscription' types in this hook:
-           */
-          GraphQLSchema?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLSchemaConfig,
-              GraphileBuild.ContextSchema,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * Add any types that need registering (typically polymorphic types) here
-           */
-          GraphQLSchema_types?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLNamedType[],
-              GraphileBuild.ContextSchemaTypes,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * When creating a GraphQLObjectType via `newWithHooks`, we'll
-           * execute, the following hooks:
-           * - 'GraphQLObjectType' to add any root-level attributes, e.g. add a description
-           * - 'GraphQLObjectType_interfaces' to add additional interfaces to this object type
-           * - 'GraphQLObjectType_fields' to add additional fields to this object type (is
-           *   ran asynchronously and gets a reference to the final GraphQL Object as
-           *   `Self` in the context)
-           * - 'GraphQLObjectType_fields_field' to customize an individual field from above
-           * - 'GraphQLObjectType_fields_field_args' to add additional arguments to a field
-           * - 'GraphQLObjectType_fields_field_args_arg' to customize an individual argument from above
-           */
-          GraphQLObjectType?: PluginHook<
-            GraphileBuild.Hook<
-              GraphileBuild.GrafastObjectTypeConfig<any>,
-              GraphileBuild.ContextObject,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLObjectType_interfaces?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLInterfaceType[],
-              GraphileBuild.ContextObjectInterfaces,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLObjectType_fields?: PluginHook<
-            GraphileBuild.Hook<
-              GraphileBuild.GrafastFieldConfigMap<any>,
-              GraphileBuild.ContextObjectFields,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLObjectType_fields_field?: PluginHook<
-            GraphileBuild.Hook<
-              GrafastFieldConfig<any, any, any>,
-              GraphileBuild.ContextObjectFieldsField,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLObjectType_fields_field_args?: PluginHook<
-            GraphileBuild.Hook<
-              GrafastFieldConfigArgumentMap,
-              GraphileBuild.ContextObjectFieldsFieldArgs,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLObjectType_fields_field_args_arg?: PluginHook<
-            GraphileBuild.Hook<
-              GrafastArgumentConfig<any, any, any>,
-              GraphileBuild.ContextObjectFieldsFieldArgsArg,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * When creating a GraphQLInputObjectType via `newWithHooks`, we'll
-           * execute, the following hooks:
-           * - 'GraphQLInputObjectType' to add any root-level attributes, e.g. add a description
-           * - 'GraphQLInputObjectType_fields' to add additional fields to this object type (is
-           *   ran asynchronously and gets a reference to the final GraphQL Object as
-           *   `Self` in the context)
-           * - 'GraphQLInputObjectType_fields_field' to customize an individual field from above
-           */
-          GraphQLInputObjectType?: PluginHook<
-            GraphileBuild.Hook<
-              GraphileBuild.GrafastInputObjectTypeConfig,
-              GraphileBuild.ContextInputObject,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInputObjectType_fields?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLInputFieldConfigMap,
-              GraphileBuild.ContextInputObjectFields,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInputObjectType_fields_field?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLInputFieldConfig,
-              GraphileBuild.ContextInputObjectFieldsField,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * When creating a GraphQLEnumType via `newWithHooks`, we'll
-           * execute, the following hooks:
-           * - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
-           * - 'GraphQLEnumType_values' to add additional values
-           * - 'GraphQLEnumType_values_value' to change an individual value
-           */
-          GraphQLEnumType?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLEnumTypeConfig,
-              GraphileBuild.ContextEnum,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLEnumType_values?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLEnumValueConfigMap,
-              GraphileBuild.ContextEnumValues,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLEnumType_values_value?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLEnumValueConfig,
-              GraphileBuild.ContextEnumValuesValue,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * When creating a GraphQLUnionType via `newWithHooks`, we'll
-           * execute, the following hooks:
-           * - 'GraphQLUnionType' to add any root-level attributes, e.g. add a description
-           * - 'GraphQLUnionType_types' to add additional types to this union
-           */
-          GraphQLUnionType?: PluginHook<
-            GraphileBuild.Hook<
-              GraphileBuild.GrafastUnionTypeConfig<any>,
-              GraphileBuild.ContextUnion,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLUnionType_types?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLObjectType[],
-              GraphileBuild.ContextUnionTypes,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * When creating a GraphQLInterfaceType via `newWithHooks`, we'll
-           *  execute, the following hooks:
-           *  - 'GraphQLInterfaceType' to add any root-level attributes, e.g. add a description
-           *  - 'GraphQLInterfaceType_fields' to add additional fields to this interface type (is
-           *    ran asynchronously and gets a reference to the final GraphQL Interface as
-           *    `Self` in the context)
-           *  - 'GraphQLInterfaceType_fields_field' to customise an individual field from above
-           *  - 'GraphQLInterfaceType_fields_field_args' to add additional arguments to a field
-           *  - 'GraphQLInterfaceType_fields_field_args_arg' to customize an individual arguments from the above
-           */
-          GraphQLInterfaceType?: PluginHook<
-            GraphileBuild.Hook<
-              GraphileBuild.GrafastInterfaceTypeConfig<any>,
-              GraphileBuild.ContextInterface,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInterfaceType_fields?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLFieldConfigMap<any, any>,
-              GraphileBuild.ContextInterfaceFields,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInterfaceType_fields_field?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLFieldConfig<any, any>,
-              GraphileBuild.ContextInterfaceFieldsField,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInterfaceType_fields_field_args?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLFieldConfigArgumentMap,
-              GraphileBuild.ContextInterfaceFieldsFieldArgs,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInterfaceType_fields_field_args_arg?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLArgumentConfig,
-              GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
-              GraphileBuild.Build<never>
-            >
-          >;
-          GraphQLInterfaceType_interfaces?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLInterfaceType[],
-              GraphileBuild.ContextInterfaceInterfaces,
-              GraphileBuild.Build<never>
-            >
-          >;
-
-          /**
-           * For scalars
-           */
-          GraphQLScalarType?: PluginHook<
-            GraphileBuild.Hook<
-              GraphQLScalarTypeConfig<any, any>,
-              GraphileBuild.ContextScalar,
-              GraphileBuild.Build<never>
-            >
-          >;
-        };
-    }
-
-    type PluginSchemaHooks<
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
-    > = {
-      [TKey in keyof GraphileBuild.SchemaBuilderHooks<
-        GraphileBuild.Build<TScope>,
-        TScope
-      >]?: GraphileBuild.SchemaBuilderHooks<
-        GraphileBuild.Build<TScope>,
-        TScope
-      >[TKey] extends ReadonlyArray<
-        infer THook extends (...args: any[]) => any
-      >
-        ? PluginHook<THook>
-        : never;
-    };
-
-    type PluginSchemaConfig<
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
-    > = Omit<
-      PluginSchemaConfigBase,
-      "globalBehavior" | "entityBehavior" | "hooks"
-    > & {
-      globalBehavior?:
-        | GraphileBuild.BehaviorString
-        | GraphileBuild.BehaviorString[]
-        | ((
-            behavior: GraphileBuild.BehaviorString,
-            build: GraphileBuild.Build<TScope>,
-          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
-
-      entityBehavior?: {
-        [entityType in keyof GraphileBuild.BehaviorEntities]?:
-          | GraphileBuild.BehaviorString
-          | GraphileBuild.BehaviorString[]
-          | {
-              inferred?: GraphileBuild.EntityBehaviorHook<entityType, TScope>;
-              override?: GraphileBuild.EntityBehaviorHook<entityType, TScope>;
-            };
-      };
-
-      hooks?: PluginSchemaHooks<TScope>;
-    };
-
     interface Plugin {
       inflection?: PluginInflectionConfig<never>;
 
       gather?: PluginGatherConfig<keyof GatherHelpers, any, any, never>;
 
       schema?: PluginSchemaConfig<never>;
+    }
+
+    interface PluginSchemaConfig<
+      TScope extends keyof GraphileBuild.PluginScopes = never,
+    > {
+      globalBehavior?:
+        | GraphileBuild.BehaviorString
+        | GraphileBuild.BehaviorString[]
+        | ((
+            behavior: GraphileBuild.BehaviorString,
+            build: GraphileBuild.ScopedBuild<TScope>,
+          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
+
+      behaviorRegistry?: {
+        add?: Partial<
+          Record<
+            keyof GraphileBuild.BehaviorStrings,
+            {
+              description: string;
+              entities: ReadonlyArray<keyof GraphileBuild.BehaviorEntities>;
+            }
+          >
+        >;
+      };
+
+      /**
+       * You should use `before`, `after` and `provides` to ensure that the entity
+       * behaviors apply in order. The order should be roughly:
+       *
+       * - `default` - default global behaviors like "update"
+       * - `inferred` - behaviors that are inferred based on the entity, e.g. a plugin might disable filtering _by default_ on a relation if it's unindexed
+       * - `override` - overrides set explicitly by the user
+       */
+      entityBehavior?: {
+        [entityType in keyof GraphileBuild.BehaviorEntities]?:
+          | GraphileBuild.BehaviorString
+          | GraphileBuild.BehaviorString[]
+          | {
+              inferred?: GraphileBuild.EntityBehaviorHook<entityType>;
+              override?: GraphileBuild.EntityBehaviorHook<entityType>;
+            };
+      };
+
+      hooks?: {
+        /**
+         * The build object represents the current schema build and is passed to all
+         * hooks, hook the 'build' event to extend this object. Note: you MUST NOT
+         * generate GraphQL objects during this phase.
+         */
+        build?: PluginHook<
+          GraphileBuild.Hook<
+            Partial<GraphileBuild.ScopedBuild<TScope>> &
+              GraphileBuild.ScopedBuildBase<TScope>,
+            GraphileBuild.ContextBuild,
+            Partial<GraphileBuild.ScopedBuild<TScope>> &
+              GraphileBuild.ScopedBuildBase<TScope>
+          >
+        >;
+
+        /**
+         * The `init` phase runs after `build` is complete but before any types
+         * or the schema are actually built. It is the only phase in which you
+         * can register GraphQL types; do so using `build.registerType`.
+         */
+        init?: PluginHook<
+          GraphileBuild.Hook<
+            Record<string, never>,
+            GraphileBuild.ContextInit,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * 'finalize' phase is called once the schema is built; typically you
+         * shouldn't use this, but it's useful for interfacing with external
+         * libraries that mutate an already constructed schema.
+         */
+        finalize?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLSchema,
+            GraphileBuild.ContextFinalize,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * Add 'query', 'mutation' or 'subscription' types in this hook:
+         */
+        GraphQLSchema?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLSchemaConfig,
+            GraphileBuild.ContextSchema,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * Add any types that need registering (typically polymorphic types) here
+         */
+        GraphQLSchema_types?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLNamedType[],
+            GraphileBuild.ContextSchemaTypes,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * When creating a GraphQLObjectType via `newWithHooks`, we'll
+         * execute, the following hooks:
+         * - 'GraphQLObjectType' to add any root-level attributes, e.g. add a description
+         * - 'GraphQLObjectType_interfaces' to add additional interfaces to this object type
+         * - 'GraphQLObjectType_fields' to add additional fields to this object type (is
+         *   ran asynchronously and gets a reference to the final GraphQL Object as
+         *   `Self` in the context)
+         * - 'GraphQLObjectType_fields_field' to customize an individual field from above
+         * - 'GraphQLObjectType_fields_field_args' to add additional arguments to a field
+         * - 'GraphQLObjectType_fields_field_args_arg' to customize an individual argument from above
+         */
+        GraphQLObjectType?: PluginHook<
+          GraphileBuild.Hook<
+            GraphileBuild.GrafastObjectTypeConfig<any>,
+            GraphileBuild.ContextObject,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLObjectType_interfaces?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLInterfaceType[],
+            GraphileBuild.ContextObjectInterfaces,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLObjectType_fields?: PluginHook<
+          GraphileBuild.Hook<
+            GraphileBuild.GrafastFieldConfigMap<any>,
+            GraphileBuild.ContextObjectFields,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLObjectType_fields_field?: PluginHook<
+          GraphileBuild.Hook<
+            GrafastFieldConfig<any, any, any>,
+            GraphileBuild.ContextObjectFieldsField,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLObjectType_fields_field_args?: PluginHook<
+          GraphileBuild.Hook<
+            GrafastFieldConfigArgumentMap,
+            GraphileBuild.ContextObjectFieldsFieldArgs,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLObjectType_fields_field_args_arg?: PluginHook<
+          GraphileBuild.Hook<
+            GrafastArgumentConfig<any, any, any>,
+            GraphileBuild.ContextObjectFieldsFieldArgsArg,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * When creating a GraphQLInputObjectType via `newWithHooks`, we'll
+         * execute, the following hooks:
+         * - 'GraphQLInputObjectType' to add any root-level attributes, e.g. add a description
+         * - 'GraphQLInputObjectType_fields' to add additional fields to this object type (is
+         *   ran asynchronously and gets a reference to the final GraphQL Object as
+         *   `Self` in the context)
+         * - 'GraphQLInputObjectType_fields_field' to customize an individual field from above
+         */
+        GraphQLInputObjectType?: PluginHook<
+          GraphileBuild.Hook<
+            GraphileBuild.GrafastInputObjectTypeConfig,
+            GraphileBuild.ContextInputObject,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInputObjectType_fields?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLInputFieldConfigMap,
+            GraphileBuild.ContextInputObjectFields,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInputObjectType_fields_field?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLInputFieldConfig,
+            GraphileBuild.ContextInputObjectFieldsField,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * When creating a GraphQLEnumType via `newWithHooks`, we'll
+         * execute, the following hooks:
+         * - 'GraphQLEnumType' to add any root-level attributes, e.g. add a description
+         * - 'GraphQLEnumType_values' to add additional values
+         * - 'GraphQLEnumType_values_value' to change an individual value
+         */
+        GraphQLEnumType?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLEnumTypeConfig,
+            GraphileBuild.ContextEnum,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLEnumType_values?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLEnumValueConfigMap,
+            GraphileBuild.ContextEnumValues,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLEnumType_values_value?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLEnumValueConfig,
+            GraphileBuild.ContextEnumValuesValue,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * When creating a GraphQLUnionType via `newWithHooks`, we'll
+         * execute, the following hooks:
+         * - 'GraphQLUnionType' to add any root-level attributes, e.g. add a description
+         * - 'GraphQLUnionType_types' to add additional types to this union
+         */
+        GraphQLUnionType?: PluginHook<
+          GraphileBuild.Hook<
+            GraphileBuild.GrafastUnionTypeConfig<any>,
+            GraphileBuild.ContextUnion,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLUnionType_types?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLObjectType[],
+            GraphileBuild.ContextUnionTypes,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * When creating a GraphQLInterfaceType via `newWithHooks`, we'll
+         *  execute, the following hooks:
+         *  - 'GraphQLInterfaceType' to add any root-level attributes, e.g. add a description
+         *  - 'GraphQLInterfaceType_fields' to add additional fields to this interface type (is
+         *    ran asynchronously and gets a reference to the final GraphQL Interface as
+         *    `Self` in the context)
+         *  - 'GraphQLInterfaceType_fields_field' to customise an individual field from above
+         *  - 'GraphQLInterfaceType_fields_field_args' to add additional arguments to a field
+         *  - 'GraphQLInterfaceType_fields_field_args_arg' to customize an individual arguments from the above
+         */
+        GraphQLInterfaceType?: PluginHook<
+          GraphileBuild.Hook<
+            GraphileBuild.GrafastInterfaceTypeConfig<any>,
+            GraphileBuild.ContextInterface,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInterfaceType_fields?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLFieldConfigMap<any, any>,
+            GraphileBuild.ContextInterfaceFields,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInterfaceType_fields_field?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLFieldConfig<any, any>,
+            GraphileBuild.ContextInterfaceFieldsField,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInterfaceType_fields_field_args?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLFieldConfigArgumentMap,
+            GraphileBuild.ContextInterfaceFieldsFieldArgs,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInterfaceType_fields_field_args_arg?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLArgumentConfig,
+            GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+        GraphQLInterfaceType_interfaces?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLInterfaceType[],
+            GraphileBuild.ContextInterfaceInterfaces,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+
+        /**
+         * For scalars
+         */
+        GraphQLScalarType?: PluginHook<
+          GraphileBuild.Hook<
+            GraphQLScalarTypeConfig<any, any>,
+            GraphileBuild.ContextScalar,
+            GraphileBuild.ScopedBuild<TScope>
+          >
+        >;
+      };
     }
   }
 }
