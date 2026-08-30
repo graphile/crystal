@@ -11,6 +11,8 @@ import {
 import { AsyncHooks, orderedApply, resolvePreset } from "graphile-config";
 
 export { isValidBehaviorString } from "./behavior.ts";
+export type { ScopedPlugin } from "./scopedPlugin.ts";
+export { scopedPlugin } from "./scopedPlugin.ts";
 import extend from "./extend.ts";
 import { makeInitialInflection } from "./inflection.ts";
 import {
