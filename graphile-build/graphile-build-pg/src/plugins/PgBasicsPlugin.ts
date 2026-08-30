@@ -136,6 +136,23 @@ declare global {
         ReadonlyArray<PgResourceUnique>,
         undefined
       > | null;
+      // DX shortcuts
+      /**
+       * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
+       * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       *
+       * Note: the TypeScript type for this is an approximation, because
+       * TypeScript doesn't have a concept of "first key". For most people
+       * there will be just a single executor anyway, and the type of the
+       * executor doesn't tend to matter much.
+       */
+      pgExecutor: GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"][keyof GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"]];
+      /** Shortcut to the resources in the registry */
+      pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
+      /** Shortcut to the codecs in the registry */
+      pgCodecs: GraphileBuild.Build["input"]["pgRegistry"]["pgCodecs"];
+      /** Shortcut to the relations in the registry */
+      pgRelations: GraphileBuild.Build["input"]["pgRegistry"]["pgRelations"];
     }
 
     interface BuildScopedExtensions<TScope extends keyof PluginScopes> {
