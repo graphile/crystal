@@ -35,6 +35,7 @@ export type {
   ObjectResolver,
   Plans,
   Resolvers,
+  ScopedGeneratedExtensionDefinition,
 } from "./makeExtendSchemaPlugin.ts";
 export {
   extendSchema,

@@ -197,8 +197,8 @@ type GeneratedObjects<TObjects> = {
   >;
 };
 
-type ScopedGeneratedExtensionDefinition<
-  TScope extends keyof GraphileBuild.PluginScopes,
+export type ScopedGeneratedExtensionDefinition<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = GraphileBuild.PluginScopes[TScope] extends {
   schema: {
     objects: infer TObjects;
@@ -208,10 +208,6 @@ type ScopedGeneratedExtensionDefinition<
       objects?: GeneratedObjects<TObjects>;
     }
   : ExtensionDefinition;
-
-export type GeneratedExtensionDefinition<
-  TScope extends keyof GraphileBuild.PluginScopes = "default",
-> = ScopedGeneratedExtensionDefinition<TScope>;
 
 type ParentConstructors<T> = { new (...args: any[]): T };
 
@@ -279,10 +275,10 @@ export function extendSchema<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
   generator:
-    | GeneratedExtensionDefinition<TScope>
+    | ScopedGeneratedExtensionDefinition<TScope>
     | ((
         build: GraphileBuild.ScopedBuild<TScope>,
-      ) => GeneratedExtensionDefinition<TScope>),
+      ) => ScopedGeneratedExtensionDefinition<TScope>),
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {
   let graphql: GraphileBuild.Build["graphql"];
