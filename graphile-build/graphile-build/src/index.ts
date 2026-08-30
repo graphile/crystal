@@ -853,15 +853,16 @@ declare global {
       //   schema: {
       //     objects: {
       //       [typeName: string]: {
-      //         Step?: ExpectedStepTypes;
+      //         step?: ExpectedStepTypes;
       //         fields: {
       //           [fieldName: string]: {
       //             listDepth: number;
-      //             Result?: ExpectedStepTypes;
+      //             result?: ExpectedStepTypes;
       //             args: {
       //               [argName: string]: {
       //                 listDepth: number;
-      //                 Type: unknown;
+      //                 optional?: true;
+      //                 type: unknown;
       //               };
       //             };
       //           }
@@ -870,7 +871,17 @@ declare global {
       //     };
       //     interfaces: { [typeName: string]: {} };
       //     unions: { [typeName: string]: {} };
-      //     inputObjects: { [typeName: string]: {} };
+      //     inputObjects: {
+      //       [typeName: string]: {
+      //         fields: {
+      //           [fieldName: string]: {
+      //             listDepth: number;
+      //             optional?: true;
+      //             type: unknown;
+      //           };
+      //         };
+      //       };
+      //     };
       //     scalars: { [typeName: string]: { type: unknown } };
       //     enums: { [typeName: string]: { values: { [valueName: string]: { value: unknown } } } };
       //   };
@@ -887,7 +898,7 @@ declare global {
       };
     }
       ? TTypeName extends keyof TObjects
-        ? TObjects[TTypeName] extends { Step: infer TStep }
+        ? TObjects[TTypeName] extends { step: infer TStep }
           ? TStep
           : grafast.Step
         : grafast.Step

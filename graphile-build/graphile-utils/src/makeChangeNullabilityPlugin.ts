@@ -87,12 +87,13 @@ type GeneratedObjectOrInterfaceTypeRules<TType> = TType extends {
 
 type GeneratedInputObjectTypeRules<TType> = TType extends {
   fields: infer TFields;
-  fieldListDepths: infer TFieldListDepths;
 }
   ? {
-      [TFieldName in keyof TFields & keyof TFieldListDepths & string]?:
-        | NullabilitySpecFor<TFieldListDepths[TFieldName] & number>
-        | undefined;
+      [TFieldName in keyof TFields & string]?: TFields[TFieldName] extends {
+        listDepth: infer TListDepth extends number;
+      }
+        ? NullabilitySpecFor<TListDepth>
+        : never;
     }
   : never;
 

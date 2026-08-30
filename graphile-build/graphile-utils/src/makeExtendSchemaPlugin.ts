@@ -136,9 +136,21 @@ export interface ExtensionDefinition
 }
 
 type GeneratedFieldArgs<TArgs> = {
-  [TArgName in keyof TArgs]: NonNullable<TArgs[TArgName]> extends {
-    Type: infer TType;
+  [TArgName in keyof TArgs as TArgs[TArgName] extends {
+    optional: true;
   }
+    ? never
+    : TArgName]: TArgs[TArgName] extends {
+    type: infer TType;
+  }
+    ? TType
+    : never;
+} & {
+  [TArgName in keyof TArgs as TArgs[TArgName] extends {
+    optional: true;
+  }
+    ? TArgName
+    : never]?: TArgs[TArgName] extends { type: infer TType }
     ? TType
     : never;
 } extends infer TGeneratedArgs extends BaseGraphQLArguments
@@ -160,7 +172,7 @@ type GeneratedFieldPlans<TSource extends Step, TFields> = {
     args: infer TArgs;
   }
     ? ValueForKey<TFields, TFieldName> extends {
-        Result: infer TResult extends Step;
+        result: infer TResult extends Step;
       }
       ? FieldPlan<TSource, GeneratedFieldArgs<TArgs>, TResult>
       : FieldPlan<TSource, GeneratedFieldArgs<TArgs>>
@@ -170,7 +182,7 @@ type GeneratedFieldPlans<TSource extends Step, TFields> = {
 type GeneratedObjectPlan<TObject> = [TObject] extends [
   { fields: infer TFields },
 ]
-  ? [TObject] extends [{ Step: infer TSource extends Step }]
+  ? [TObject] extends [{ step: infer TSource extends Step }]
     ? Omit<ObjectPlan<TSource>, "plans"> & {
         plans?: GeneratedFieldPlans<TSource, TFields>;
       }
