@@ -936,6 +936,7 @@ declare global {
      */
     interface SchemaBuilderHooks<
       TBuild extends GraphileBuild.Build<never> = GraphileBuild.Build<never>,
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
     > {
       /**
        * The build object represents the current schema build and is passed to all
@@ -943,9 +944,9 @@ declare global {
        * generate GraphQL objects during this phase.
        */
       build: GraphileBuild.Hook<
-        Partial<TBuild> & GraphileBuild.BuildBase<never>,
+        Partial<TBuild> & GraphileBuild.BuildBase<TScope>,
         GraphileBuild.ContextBuild,
-        Partial<TBuild> & GraphileBuild.BuildBase<never>
+        Partial<TBuild> & GraphileBuild.BuildBase<TScope>
       >[];
 
       /**

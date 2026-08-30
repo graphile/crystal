@@ -9,6 +9,9 @@ import type { SchemaResult } from "graphile-build";
 import { makeSchema, watchSchema } from "graphile-build";
 import { resolvePreset } from "graphile-config";
 
+export type { ScopedPlugin } from "./scopedPlugin.ts";
+export { scopedPlugin } from "./scopedPlugin.ts";
+
 export { makeSchema, watchSchema };
 
 export interface PostGraphileInstance {

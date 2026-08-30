@@ -875,11 +875,12 @@ declare global {
 
     type EntityBehaviorHook<
       entityType extends keyof GraphileBuild.BehaviorEntities,
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
     > = PluginHook<
       (
         behavior: GraphileBuild.BehaviorString,
         entity: GraphileBuild.BehaviorEntities[entityType],
-        build: GraphileBuild.Build<never>,
+        build: GraphileBuild.Build<TScope>,
       ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]
     >;
   }
@@ -913,7 +914,9 @@ declare global {
       schema?: GraphileBuild.SchemaOptions;
     }
 
-    interface PluginInflectionConfig {
+    interface PluginInflectionConfig<
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
+    > {
       /**
        * Define new inflectors here
        */
@@ -961,6 +964,7 @@ declare global {
       TNamespace extends keyof GatherHelpers,
       TState extends { [key: string]: any } = { [key: string]: any },
       TCache extends { [key: string]: any } = { [key: string]: any },
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
     > {
       /**
        * A unique namespace for this plugin to use.
@@ -1011,7 +1015,7 @@ declare global {
        * phase to the 'output' object.
        */
       main?: (
-        output: Partial<GraphileBuild.BuildInput<never>>,
+        output: Partial<GraphileBuild.BuildInput<TScope>>,
         info: GatherPluginContext<TState, TCache>,
       ) => Promise<void>;
 
@@ -1026,12 +1030,7 @@ declare global {
       ) => PromiseOrDirect<() => void>;
     }
 
-    interface Plugin {
-      inflection?: PluginInflectionConfig;
-
-      gather?: PluginGatherConfig<keyof GatherHelpers, any, any>;
-
-      schema?: {
+    interface PluginSchemaConfigBase {
         globalBehavior?:
           | GraphileBuild.BehaviorString
           | GraphileBuild.BehaviorString[]
@@ -1333,7 +1332,57 @@ declare global {
             >
           >;
         };
+    }
+
+    type PluginSchemaHooks<
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
+    > = {
+      [TKey in keyof GraphileBuild.SchemaBuilderHooks<
+        GraphileBuild.Build<TScope>,
+        TScope
+      >]?: GraphileBuild.SchemaBuilderHooks<
+        GraphileBuild.Build<TScope>,
+        TScope
+      >[TKey] extends ReadonlyArray<
+        infer THook extends (...args: any[]) => any
+      >
+        ? PluginHook<THook>
+        : never;
+    };
+
+    type PluginSchemaConfig<
+      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = never,
+    > = Omit<
+      PluginSchemaConfigBase,
+      "globalBehavior" | "entityBehavior" | "hooks"
+    > & {
+      globalBehavior?:
+        | GraphileBuild.BehaviorString
+        | GraphileBuild.BehaviorString[]
+        | ((
+            behavior: GraphileBuild.BehaviorString,
+            build: GraphileBuild.Build<TScope>,
+          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
+
+      entityBehavior?: {
+        [entityType in keyof GraphileBuild.BehaviorEntities]?:
+          | GraphileBuild.BehaviorString
+          | GraphileBuild.BehaviorString[]
+          | {
+              inferred?: GraphileBuild.EntityBehaviorHook<entityType, TScope>;
+              override?: GraphileBuild.EntityBehaviorHook<entityType, TScope>;
+            };
       };
+
+      hooks?: PluginSchemaHooks<TScope>;
+    };
+
+    interface Plugin {
+      inflection?: PluginInflectionConfig<never>;
+
+      gather?: PluginGatherConfig<keyof GatherHelpers, any, any, never>;
+
+      schema?: PluginSchemaConfig<never>;
     }
   }
 }
