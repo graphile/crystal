@@ -145,13 +145,14 @@ type GeneratedFieldPlans<TSource extends Step, TFields> = {
     : never;
 };
 
-type GeneratedObjectPlan<TObject> = TObject extends {
-  Step: infer TSource extends Step;
-  fields: infer TFields;
-}
-  ? Omit<ObjectPlan<TSource>, "plans"> & {
-      plans?: GeneratedFieldPlans<TSource, TFields>;
-    }
+type GeneratedObjectPlan<TObject> = TObject extends { fields: infer TFields }
+  ? TObject extends { Step: infer TSource extends Step }
+    ? Omit<ObjectPlan<TSource>, "plans"> & {
+        plans?: GeneratedFieldPlans<TSource, TFields>;
+      }
+    : Omit<ObjectPlan<Step>, "plans"> & {
+        plans?: GeneratedFieldPlans<Step, TFields>;
+      }
   : ObjectPlan;
 
 type GeneratedObjects<TObjects> = {
