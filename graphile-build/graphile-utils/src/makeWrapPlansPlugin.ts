@@ -53,7 +53,10 @@ export type PlanWrapperFilterRule<T> = (
 export interface WrapPlansOptions<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 > {
-  /** The generated-types scope this plugin applies to. */
+  /**
+   * The generated-types scope used to infer scoped types. This has no runtime
+   * effect.
+   */
   scope?: TScope;
   /** The name to give this plugin, to make debugging easier */
   name?: string;
