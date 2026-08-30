@@ -125,7 +125,7 @@ function arraysMatch(a1: any[], a2: any[]): boolean {
 }
 
 function debugAndSimplify(
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   prefix: string,
   previous: string,
   suffix: string,
@@ -188,7 +188,7 @@ function debugAndSimplify(
 }
 
 function getEntities(
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   entityType: keyof GraphileBuild.BehaviorEntities,
 ) {
   const registry = build.input.pgRegistry as PgRegistry;

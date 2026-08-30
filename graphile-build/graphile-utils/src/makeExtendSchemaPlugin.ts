@@ -190,8 +190,8 @@ type GeneratedObjects<TObjects> = {
 };
 
 type GeneratedExtensionDefinitionForScope<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
-> = GraphileBuild.ScopedGeneratedTypes[TScope] extends {
+  TScope extends keyof GraphileBuild.PluginScopes,
+> = GraphileBuild.PluginScopes[TScope] extends {
   schema: {
     objects: infer TObjects;
   };
@@ -202,7 +202,7 @@ type GeneratedExtensionDefinitionForScope<
   : ExtensionDefinition;
 
 export type GeneratedExtensionDefinition<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = GeneratedExtensionDefinitionForScope<TScope>;
 
 type ParentConstructors<T> = { new (...args: any[]): T };
@@ -254,7 +254,7 @@ interface TypeExtensions {
 
 declare global {
   namespace GraphileBuild {
-    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
+    interface Build {
       makeExtendSchemaPlugin: {
         [uniquePluginName: string]: {
           typeExtensions: TypeExtensions;
@@ -268,20 +268,14 @@ declare global {
 }
 
 export function extendSchema<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
   generator:
     | GeneratedExtensionDefinition<TScope>
-    | ((build: GraphileBuild.Build<TScope>) => GeneratedExtensionDefinition<TScope>),
-  uniquePluginName?: string,
-): GraphileConfig.Plugin;
-export function extendSchema(
-  generator:
-    | ExtensionDefinition
-    | ((build: GraphileBuild.Build<never>) => ExtensionDefinition),
+    | ((build: GraphileBuild.ScopedBuild<TScope>) => GeneratedExtensionDefinition<TScope>),
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {
-  let graphql: GraphileBuild.Build<never>["graphql"];
+  let graphql: GraphileBuild.Build["graphql"];
   if (typeof generator === "function" && generator.length >= 2) {
     console.trace(
       "[DEPRECATED] Your makeExtendSchemaPlugin generator callback accepts two arguments: `(build, options)`; instead you should just use the `build` argument since `options` is just `build.options`.",
@@ -314,6 +308,16 @@ export function extendSchema(
         },
 
         init(_, build, _context) {
+          const extensionDefinition = (typeof generator === "function"
+            ? generator.length === 1
+              ? generator(build as GraphileBuild.ScopedBuild<TScope>)
+              : /* TODO: DELETE THIS! */
+                ((generator as any)(
+                  build,
+                  build.options,
+                ) as ExtensionDefinition)
+            : generator) as ExtensionDefinition;
+
           const {
             GraphQLDirective,
             GraphQLEnumType,
@@ -337,15 +341,7 @@ export function extendSchema(
             interfaces,
             unions,
             objects,
-          } = typeof generator === "function"
-            ? generator.length === 1
-              ? generator(build)
-              : /* TODO: DELETE THIS! */
-                ((generator as any)(
-                  build,
-                  build.options,
-                ) as ExtensionDefinition)
-            : generator;
+          } = extensionDefinition;
 
           if (typeDefs == null) {
             throw new Error(
@@ -1314,7 +1310,7 @@ export function extendSchema(
     }
   }
 
-  function getType(type: TypeNode, build: GraphileBuild.Build<never>): GraphQLType {
+  function getType(type: TypeNode, build: GraphileBuild.Build): GraphQLType {
     if (type.kind === "NamedType") {
       const Type = build.getTypeByName(getName(type.name));
       if (!Type) {
@@ -1338,7 +1334,7 @@ export function extendSchema(
 
   function getInterfaces(
     interfaces: ReadonlyArray<NamedTypeNode> | undefined,
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
   ): GraphQLInterfaceType[] {
     if (!interfaces) return [];
     return interfaces.map(
@@ -1436,7 +1432,7 @@ export function extendSchema(
 
   function getArguments(
     args: ReadonlyArray<InputValueDefinitionNode> | undefined,
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
   ) {
     if (args && args.length) {
       return args.reduce((memo, arg) => {
@@ -1471,7 +1467,7 @@ export function extendSchema(
   }
 
   function getFields<TSource>(
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
     context:
       | GraphileBuild.ContextInterfaceFields
       | GraphileBuild.ContextObjectFields,
@@ -1633,7 +1629,7 @@ export function extendSchema(
   }
 
   function getInputFields(
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
     context: GraphileBuild.ContextInputObjectFields,
     fields: ReadonlyArray<InputValueDefinitionNode> | undefined,
     plans: Plans,

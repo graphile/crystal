@@ -61,7 +61,7 @@ const makeSchemaWithSpyAndPlugins = (
         optionKey: "optionValue",
       },
     },
-    {} as GraphileBuild.BuildInput<never>,
+    {} as GraphileBuild.BuildInput,
     {},
   );
 

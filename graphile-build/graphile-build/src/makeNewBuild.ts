@@ -47,9 +47,9 @@ interface TypeDetails {
  */
 export default function makeNewBuild(
   builder: SchemaBuilder<any>,
-  input: GraphileBuild.BuildInput<never>,
+  input: GraphileBuild.BuildInput,
   inflection: GraphileBuild.Inflection,
-): GraphileBuild.BuildBase<never> {
+): GraphileBuild.BuildBase {
   const lib = builder.resolvedPreset.lib ?? {};
 
   const building = new Set<string>();
@@ -80,7 +80,7 @@ export default function makeNewBuild(
 
   // TODO: allow registering a previously constructed type.
   function register(
-    this: GraphileBuild.BuildBase<never>,
+    this: GraphileBuild.BuildBase,
     klass: { new (spec: any): GraphQLNamedType },
     typeName: string,
     scope: GraphileBuild.SomeScope,
@@ -123,7 +123,7 @@ export default function makeNewBuild(
     };
   }
 
-  const build: GraphileBuild.BuildBase<never> = {
+  const build: GraphileBuild.BuildBase = {
     // FORBID EXPORTING!
     ...({ $$export: false } as object),
 

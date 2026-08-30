@@ -1,5 +1,4 @@
 import type { PgRegistry } from "@dataplan/pg";
-import type { Step } from "grafast";
 
 import type { PartitionExpose } from "./interfaces.ts";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.ts";
@@ -109,34 +108,12 @@ declare global {
       [tagName: string]: null | true | string | (string | true)[];
     }
 
-    interface ScopedGeneratedTypes {
-      // [scopeName: string]: {
-      //   pgRegistry: TypedPgRegistry
-      // }
-    }
-
-    /** The source step for a generated GraphQL object type, when known. */
-    type GetGraphQLObjectStep<
-      TTypeName extends string,
-      TScope extends keyof ScopedGeneratedTypes = "default",
-    > = ScopedGeneratedTypes[TScope] extends {
-      schema: {
-        objects: infer TObjects;
-      };
-    }
-      ? TTypeName extends keyof TObjects
-        ? TObjects[TTypeName] extends { Step: infer TStep extends Step }
-          ? TStep
-          : Step
-        : Step
-      : Step;
-
-    interface BuildInput<
-      TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+    interface BuildInputScopedExtensions<
+      TScope extends keyof PluginScopes,
     > {
-      pgRegistry: [GeneratedTypesForScope<TScope>] extends [never]
+      pgRegistry: [PluginScopes[TScope]] extends [never]
         ? PgRegistry
-        : GeneratedTypesForScope<TScope> extends {
+        : PluginScopes[TScope] extends {
               pgRegistry: infer TRegistry extends PgRegistry<
                 any,
                 any,
@@ -146,6 +123,10 @@ declare global {
             }
           ? TRegistry
           : PgRegistry;
+    }
+
+    interface BuildInput {
+      pgRegistry: PgRegistry;
     }
 
     interface SchemaOptions {

@@ -208,7 +208,7 @@ const getPgSelectSingleFromMutationResult = EXPORTABLE(
   (PgDeleteSingleStep, pgSelectFromRecord) =>
     (
       resource: Exclude<
-        ReturnType<GraphileBuild.Build<never>["pgTableResource"]>,
+        ReturnType<GraphileBuild.Build["pgTableResource"]>,
         null | undefined
       >,
       pkAttributes: readonly string[],
@@ -241,7 +241,7 @@ const pgMutationPayloadEdge = EXPORTABLE(
       constant: typeof import("grafast").constant,
       first: typeof import("grafast").first,
       resource: Exclude<
-        ReturnType<GraphileBuild.Build<never>["pgTableResource"]>,
+        ReturnType<GraphileBuild.Build["pgTableResource"]>,
         null | undefined
       >,
       pkAttributes: readonly string[],

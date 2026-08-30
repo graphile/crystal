@@ -26,11 +26,11 @@ export interface MakeAddPgTableOrderByPluginOrders {
 const counterByName = new Map<string, number>();
 
 export function addPgTableOrderBy<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
   match: TableMatchForScope<TScope>,
   ordersGenerator: (
-    build: GraphileBuild.Build<TScope>,
+    build: GraphileBuild.ScopedBuild<TScope>,
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
@@ -71,7 +71,7 @@ export function addPgTableOrderBy<
             return values;
           }
           const newValues = ordersGenerator(
-            build as GraphileBuild.Build<TScope>,
+            build as GraphileBuild.ScopedBuild<TScope>,
           );
 
           return extend(values, newValues, hint);

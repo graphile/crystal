@@ -68,7 +68,7 @@ declare global {
       typeName: string,
     ) => void;
 
-    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
+    interface Build {
       /**
        * A copy of `import * from "@dataplan/pg"` so that plugins don't need to
        * import it directly.
@@ -137,6 +137,9 @@ declare global {
         undefined
       > | null;
 
+    }
+
+    interface BuildScopedExtensions<TScope extends keyof PluginScopes> {
       // DX shortcuts
       /**
        * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
@@ -147,13 +150,13 @@ declare global {
        * there will be just a single executor anyway, and the type of the
        * executor doesn't tend to matter much.
        */
-      pgExecutor: Build<TScope>["input"]["pgRegistry"]["pgExecutors"][keyof Build<TScope>["input"]["pgRegistry"]["pgExecutors"]];
+      pgExecutor: ScopedBuild<TScope>["input"]["pgRegistry"]["pgExecutors"][keyof ScopedBuild<TScope>["input"]["pgRegistry"]["pgExecutors"]];
       /** Shortcut to the resources in the registry */
-      pgResources: Build<TScope>["input"]["pgRegistry"]["pgResources"];
+      pgResources: ScopedBuild<TScope>["input"]["pgRegistry"]["pgResources"];
       /** Shortcut to the codecs in the registry */
-      pgCodecs: Build<TScope>["input"]["pgRegistry"]["pgCodecs"];
+      pgCodecs: ScopedBuild<TScope>["input"]["pgRegistry"]["pgCodecs"];
       /** Shortcut to the relations in the registry */
-      pgRelations: Build<TScope>["input"]["pgRegistry"]["pgRelations"];
+      pgRelations: ScopedBuild<TScope>["input"]["pgRegistry"]["pgRelations"];
     }
 
     interface BehaviorEntities {

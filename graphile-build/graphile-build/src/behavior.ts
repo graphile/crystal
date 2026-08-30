@@ -118,7 +118,7 @@ export class Behavior {
           callback: (
             behavior: GraphileBuild.BehaviorString,
             entity: GraphileBuild.BehaviorEntities[entityType],
-            build: GraphileBuild.Build<never>,
+            build: GraphileBuild.Build,
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
@@ -128,7 +128,7 @@ export class Behavior {
           callback: (
             behavior: GraphileBuild.BehaviorString,
             entity: GraphileBuild.BehaviorEntities[entityType],
-            build: GraphileBuild.Build<never>,
+            build: GraphileBuild.Build,
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
@@ -162,11 +162,11 @@ export class Behavior {
 
   private globalDefaultBehavior: ResolvedBehavior;
   private resolvedPreset: GraphileConfig.ResolvedPreset;
-  private build: GraphileBuild.Build<never>;
+  private build: GraphileBuild.Build;
 
   constructor(
     resolvedPreset: GraphileConfig.ResolvedPreset,
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
   ) {
     this.resolvedPreset = resolvedPreset;
     this.build = build;

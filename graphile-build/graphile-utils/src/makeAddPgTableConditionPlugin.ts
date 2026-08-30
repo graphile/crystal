@@ -8,12 +8,12 @@ import type { TableMatchForScope } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 export function addPgTableCondition<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
   match: TableMatchForScope<TScope>,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
-    build: GraphileBuild.Build<TScope>,
+    build: GraphileBuild.ScopedBuild<TScope>,
   ) => GrafastInputFieldConfig,
   // DEPRECATED! Use `apply` instead.
   conditionGenerator?: (
@@ -75,7 +75,7 @@ export function addPgTableCondition<
             return fields;
           }
           const conditionFieldSpec = conditionFieldSpecGenerator(
-            build as GraphileBuild.Build<TScope>,
+            build as GraphileBuild.ScopedBuild<TScope>,
           );
           if (
             conditionFieldSpec.apply ||
@@ -94,7 +94,7 @@ export function addPgTableCondition<
               );
             }
             // build applyPlan
-            const _build = pruneBuild(build as GraphileBuild.Build<TScope>);
+            const _build = pruneBuild(build as GraphileBuild.ScopedBuild<TScope>);
             conditionFieldSpec.apply = EXPORTABLE(
               (_build, conditionGenerator, sql, sqlValueWithCodec) =>
                 function apply(condition: PgCondition, val) {
@@ -137,16 +137,16 @@ export function addPgTableCondition<
 /** @deprecated renamed to addPgTableCondition */
 export const makeAddPgTableConditionPlugin = addPgTableCondition;
 
-type PrunedBuild<TScope extends keyof GraphileBuild.ScopedGeneratedTypes> =
+type PrunedBuild<TScope extends keyof GraphileBuild.PluginScopes> =
   Pick<
-    GraphileBuild.Build<TScope>,
+    GraphileBuild.ScopedBuild<TScope>,
     "sql" | "grafast" | "graphql" | "dataplanPg"
   > & {
-    input: Pick<GraphileBuild.Build<TScope>["input"], "pgRegistry">;
+    input: Pick<GraphileBuild.ScopedBuild<TScope>["input"], "pgRegistry">;
   };
 
-function pruneBuild<TScope extends keyof GraphileBuild.ScopedGeneratedTypes>(
-  build: GraphileBuild.Build<TScope>,
+function pruneBuild<TScope extends keyof GraphileBuild.PluginScopes>(
+  build: GraphileBuild.ScopedBuild<TScope>,
 ): PrunedBuild<TScope> {
   const {
     sql,

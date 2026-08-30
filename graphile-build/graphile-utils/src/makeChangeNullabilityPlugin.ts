@@ -118,16 +118,16 @@ type GeneratedChangeNullabilityRules<TSchema> = [TSchema] extends [never]
     : never;
 
 export type ChangeNullabilityRulesForScope<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = {
   [TTypeName in keyof GeneratedChangeNullabilityRules<
-    GraphileBuild.GeneratedTypesForScope<TScope> extends {
+    GraphileBuild.PluginScopes[TScope] extends {
       schema: infer TSchema;
     }
       ? TSchema
       : never
   >]: GeneratedChangeNullabilityRules<
-    GraphileBuild.GeneratedTypesForScope<TScope> extends {
+    GraphileBuild.PluginScopes[TScope] extends {
       schema: infer TSchema;
     }
       ? TSchema
@@ -211,7 +211,7 @@ function doIt(
 }
 
 export function changeNullability<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
   const TRules extends ChangeNullabilityRulesForScope<TScope> = ChangeNullabilityRulesForScope<TScope>,
 >(
   rules: TRules &
@@ -249,7 +249,7 @@ export function changeNullability(
     T extends GrafastFieldConfig<any, any, any>,
   >(
     field: T,
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
     context:
       | GraphileBuild.ContextObjectFieldsField
       | GraphileBuild.ContextInterfaceFieldsField,
@@ -279,7 +279,7 @@ export function changeNullability(
 
   function objectOrInterfaceArgsArgCallback<T extends GrafastArgumentConfig>(
     arg: T,
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
     context:
       | GraphileBuild.ContextObjectFieldsFieldArgsArg
       | GraphileBuild.ContextInterfaceFieldsFieldArgsArg,

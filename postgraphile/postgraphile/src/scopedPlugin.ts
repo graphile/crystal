@@ -6,7 +6,7 @@
  * used wherever plugins are accepted.
  */
 export type ScopedPlugin<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = Omit<GraphileConfig.Plugin, "inflection" | "gather" | "schema"> & {
   inflection?: GraphileConfig.PluginInflectionConfig<TScope>;
   gather?: GraphileConfig.PluginGatherConfig<
@@ -25,7 +25,7 @@ export type ScopedPlugin<
  * behaviour. Configure the same `generatedTypesScope` when generating types.
  */
 export function scopedPlugin<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(plugin: ScopedPlugin<TScope>): GraphileConfig.Plugin {
   return plugin as GraphileConfig.Plugin;
 }

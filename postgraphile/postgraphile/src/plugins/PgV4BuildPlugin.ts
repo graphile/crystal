@@ -4,9 +4,9 @@ import "graphile-build-pg";
 
 declare global {
   namespace GraphileBuild {
-    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
+    interface Build {
       /** @deprecated Use build.sql instead */
-      pgSql: GraphileBuild.Build<never>["sql"];
+      pgSql: GraphileBuild.Build["sql"];
     }
   }
   namespace GraphileConfig {

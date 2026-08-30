@@ -12,7 +12,7 @@ import type {} from "graphile-build";
 // Declaration merging to expand hooked types
 declare global {
   namespace GraphileBuild {
-    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
+    interface Build {
       // Declare extra properties added via `plugin.schema.hooks.build` here
     }
   }
@@ -25,11 +25,11 @@ export const AllHooksNoopPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(mutableBuild, build, context) {
-        // This hook is for adding helpers to the `GraphileBuild.Build<never>` object
+        // This hook is for adding helpers to the `GraphileBuild.Build` object
         // that will be accessible by all other hooks.
 
         // NOTE: use declaration merging to add your new properties to the
-        // GraphileBuild.Build<never> TypeScript type (see above)
+        // GraphileBuild.Build TypeScript type (see above)
 
         // NOTE: `mutableBuild === build` at this point
 

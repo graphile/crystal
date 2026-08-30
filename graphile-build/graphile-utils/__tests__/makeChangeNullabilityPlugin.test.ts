@@ -57,7 +57,7 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
         ...plugins,
       ],
     },
-    {} as GraphileBuild.BuildInput<never>,
+    {} as GraphileBuild.BuildInput,
     {},
   );
 

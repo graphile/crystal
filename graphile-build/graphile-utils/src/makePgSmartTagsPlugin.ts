@@ -57,8 +57,8 @@ export type PgSmartTagRule<
 > = PgSmartTagRules[TKind];
 
 type GatherPgIntrospectionForScope<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
-> = GraphileBuild.GeneratedTypesForScope<TScope> extends {
+  TScope extends keyof GraphileBuild.PluginScopes,
+> = GraphileBuild.PluginScopes[TScope] extends {
   gather: { pgIntrospection: infer TPgIntrospection };
 }
   ? TPgIntrospection
@@ -142,7 +142,7 @@ type SmartTagNamespaceMatches<TIntrospection> = {
 }[keyof TIntrospection & string];
 
 type GeneratedSmartTagMatches<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+  TScope extends keyof GraphileBuild.PluginScopes,
   TKind extends PgSmartTagSupportedKinds,
 > = [GatherPgIntrospectionForScope<TScope>] extends [never]
   ? string
@@ -178,7 +178,7 @@ type PgSmartTagRuleWithMatches<
 };
 
 export type PgSmartTagRuleForScope<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > =
   | PgSmartTagRuleWithMatches<
       "class",
@@ -364,7 +364,7 @@ function rulesFrom(
 }
 
 export type UpdatePgSmartTagRulesCallback<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = (
   ruleOrRules:
     | PgSmartTagRuleForScope<TScope>
@@ -373,7 +373,7 @@ export type UpdatePgSmartTagRulesCallback<
 ) => void;
 
 export type SubscribeToPgSmartTagUpdatesCallback<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = (
   cb: UpdatePgSmartTagRulesCallback<TScope> | null,
 ) => PromiseOrDirect<void>;
@@ -402,7 +402,7 @@ async function resolveRules(
 
 let counter = 0;
 export function pgSmartTags<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
   initialRules: ThunkOrDirect<
     PromiseOrDirect<

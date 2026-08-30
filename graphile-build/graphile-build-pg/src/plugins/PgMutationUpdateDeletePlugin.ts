@@ -154,7 +154,7 @@ declare global {
 }
 
 const isUpdatable = (
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   resource: PgResource<any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
@@ -166,7 +166,7 @@ const isUpdatable = (
 };
 
 const isDeletable = (
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   resource: PgResource<any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
@@ -970,7 +970,7 @@ return (_$root, args) => {
 };
 
 function getSpecs(
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   resource: PgResource<any, PgCodecWithAttributes, any, any, any>,
   mode: "resource:update" | "resource:delete",
 ) {

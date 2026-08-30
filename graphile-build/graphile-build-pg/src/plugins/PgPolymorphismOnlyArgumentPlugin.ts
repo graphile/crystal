@@ -163,7 +163,7 @@ function makeFieldsHook(isInterface: boolean) {
   return (
     args: GrafastFieldConfigArgumentMap | GraphQLFieldConfigArgumentMap,
 
-    build: GraphileBuild.Build<never>,
+    build: GraphileBuild.Build,
     context:
       | GraphileBuild.ContextObjectFieldsFieldArgs
       | GraphileBuild.ContextInterfaceFieldsFieldArgs,

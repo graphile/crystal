@@ -53,7 +53,7 @@ interface MakeNewWithHooksOptions {
 export type NewWithHooksFunction = <
   TType extends GraphQLNamedType | GraphQLSchema,
 >(
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   klass: { new (spec: SpecForType<TType>): TType },
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,

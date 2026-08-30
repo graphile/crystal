@@ -34,9 +34,9 @@ const ref_sql = te.ref(sql, "sql");
 
 declare global {
   namespace GraphileBuild {
-    interface Build<TScope extends keyof ScopedGeneratedTypes = "default"> {
+    interface Build {
       pgExcludeDueToPartitioning(
-        this: GraphileBuild.Build<never>,
+        this: GraphileBuild.Build,
         resource: PgResource<any, any, any, any, any>,
       ): boolean;
     }
@@ -779,7 +779,7 @@ return function (otherSource, connection) {
 
 function addRelations(
   fields: GraphQLFieldConfigMap<any, any>,
-  build: GraphileBuild.Build<never>,
+  build: GraphileBuild.Build,
   context:
     | GraphileBuild.ContextObjectFields
     | GraphileBuild.ContextInterfaceFields,
