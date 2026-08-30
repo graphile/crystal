@@ -4,16 +4,13 @@ import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type { TableMatch } from "./resolveTableMatch.ts";
+import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
 >(
-  match: {
-    scope?: TScope;
-    serviceName?: string;
-    schemaName: string;
-    tableName: string;
-  },
+  match: string | TableMatch,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build<TScope>,
@@ -33,7 +30,7 @@ export function addPgTableCondition<
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
-  const { serviceName = "main", schemaName, tableName } = match;
+  const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
   const plugin: GraphileConfig.Plugin = {
     name: displayName,
