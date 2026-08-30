@@ -136,7 +136,6 @@ declare global {
         ReadonlyArray<PgResourceUnique>,
         undefined
       > | null;
-
     }
 
     interface BuildScopedExtensions<TScope extends keyof PluginScopes> {

@@ -94,7 +94,9 @@ export function addPgTableCondition<
               );
             }
             // build applyPlan
-            const _build = pruneBuild(build as GraphileBuild.ScopedBuild<TScope>);
+            const _build = pruneBuild(
+              build as GraphileBuild.ScopedBuild<TScope>,
+            );
             conditionFieldSpec.apply = EXPORTABLE(
               (_build, conditionGenerator, sql, sqlValueWithCodec) =>
                 function apply(condition: PgCondition, val) {
@@ -137,13 +139,12 @@ export function addPgTableCondition<
 /** @deprecated renamed to addPgTableCondition */
 export const makeAddPgTableConditionPlugin = addPgTableCondition;
 
-type PrunedBuild<TScope extends keyof GraphileBuild.PluginScopes> =
-  Pick<
-    GraphileBuild.ScopedBuild<TScope>,
-    "sql" | "grafast" | "graphql" | "dataplanPg"
-  > & {
-    input: Pick<GraphileBuild.ScopedBuild<TScope>["input"], "pgRegistry">;
-  };
+type PrunedBuild<TScope extends keyof GraphileBuild.PluginScopes> = Pick<
+  GraphileBuild.ScopedBuild<TScope>,
+  "sql" | "grafast" | "graphql" | "dataplanPg"
+> & {
+  input: Pick<GraphileBuild.ScopedBuild<TScope>["input"], "pgRegistry">;
+};
 
 function pruneBuild<TScope extends keyof GraphileBuild.PluginScopes>(
   build: GraphileBuild.ScopedBuild<TScope>,

@@ -149,12 +149,8 @@ type KeysOfUnion<T> = T extends T ? keyof T : never;
 type CommonKeys<T> = {
   [TKey in KeysOfUnion<T>]: [T] extends [Record<TKey, unknown>] ? TKey : never;
 }[KeysOfUnion<T>];
-type ValueForKey<T, TKey extends PropertyKey> = T extends Record<
-  TKey,
-  infer TValue
->
-  ? TValue
-  : never;
+type ValueForKey<T, TKey extends PropertyKey> =
+  T extends Record<TKey, infer TValue> ? TValue : never;
 
 type GeneratedFieldPlans<TSource extends Step, TFields> = {
   [TFieldName in CommonKeys<TFields>]?: ValueForKey<
@@ -272,7 +268,9 @@ export function extendSchema<
 >(
   generator:
     | GeneratedExtensionDefinition<TScope>
-    | ((build: GraphileBuild.ScopedBuild<TScope>) => GeneratedExtensionDefinition<TScope>),
+    | ((
+        build: GraphileBuild.ScopedBuild<TScope>,
+      ) => GeneratedExtensionDefinition<TScope>),
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {
   let graphql: GraphileBuild.Build["graphql"];
@@ -308,15 +306,17 @@ export function extendSchema<
         },
 
         init(_, build, _context) {
-          const extensionDefinition = (typeof generator === "function"
-            ? generator.length === 1
-              ? generator(build as GraphileBuild.ScopedBuild<TScope>)
-              : /* TODO: DELETE THIS! */
-                ((generator as any)(
-                  build,
-                  build.options,
-                ) as ExtensionDefinition)
-            : generator) as ExtensionDefinition;
+          const extensionDefinition = (
+            typeof generator === "function"
+              ? generator.length === 1
+                ? generator(build as GraphileBuild.ScopedBuild<TScope>)
+                : /* TODO: DELETE THIS! */
+                  ((generator as any)(
+                    build,
+                    build.options,
+                  ) as ExtensionDefinition)
+              : generator
+          ) as ExtensionDefinition;
 
           const {
             GraphQLDirective,

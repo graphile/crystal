@@ -65,11 +65,13 @@ type GatherPgIntrospectionForScope<
   : never;
 
 type SmartTagClassMatches<TIntrospection> = {
-  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
     schemas: infer TSchemas;
   }
     ? {
-        [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends {
           classes: infer TClasses;
         }
           ? {
@@ -86,15 +88,18 @@ type SmartTagAttributeOrConstraintMatches<
   TIntrospection,
   TKey extends "attributes" | "constraints",
 > = {
-  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
     schemas: infer TSchemas;
   }
     ? {
-        [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends {
           classes: infer TClasses;
         }
           ? {
-              [TClassName in keyof TClasses & string]: TClasses[TClassName] extends Record<
+              [TClassName in keyof TClasses &
+                string]: TClasses[TClassName] extends Record<
                 TKey,
                 infer TEntries
               >
@@ -115,14 +120,13 @@ type SmartTagSchemaEntryMatches<
   TIntrospection,
   TKey extends "functions" | "types",
 > = {
-  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
     schemas: infer TSchemas;
   }
     ? {
-        [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends Record<
-          TKey,
-          infer TEntries
-        >
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends Record<TKey, infer TEntries>
           ? {
               [TEntryName in keyof TEntries & string]:
                 | TEntryName
@@ -134,7 +138,8 @@ type SmartTagSchemaEntryMatches<
 }[keyof TIntrospection & string];
 
 type SmartTagNamespaceMatches<TIntrospection> = {
-  [TServiceName in keyof TIntrospection & string]: TIntrospection[TServiceName] extends {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
     schemas: infer TSchemas;
   }
     ? keyof TSchemas & string
@@ -355,9 +360,7 @@ export type UpdatePgSmartTagRulesCallback<
 
 export type SubscribeToPgSmartTagUpdatesCallback<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
-> = (
-  cb: UpdatePgSmartTagRulesCallback<TScope> | null,
-) => PromiseOrDirect<void>;
+> = (cb: UpdatePgSmartTagRulesCallback<TScope> | null) => PromiseOrDirect<void>;
 
 interface Cache {
   rulesPromise: PromiseOrDirect<PgSmartTagRule[]>;
@@ -387,9 +390,7 @@ export function pgSmartTags<
 >(
   initialRules: ThunkOrDirect<
     PromiseOrDirect<
-      | PgSmartTagRuleForScope<TScope>
-      | PgSmartTagRuleForScope<TScope>[]
-      | null
+      PgSmartTagRuleForScope<TScope> | PgSmartTagRuleForScope<TScope>[] | null
     >
   >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback<TScope> | null,

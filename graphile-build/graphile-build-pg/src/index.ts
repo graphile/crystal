@@ -108,9 +108,7 @@ declare global {
       [tagName: string]: null | true | string | (string | true)[];
     }
 
-    interface BuildInputScopedExtensions<
-      TScope extends keyof PluginScopes,
-    > {
+    interface BuildInputScopedExtensions<TScope extends keyof PluginScopes> {
       pgRegistry: [PluginScopes[TScope]] extends [never]
         ? PgRegistry
         : PluginScopes[TScope] extends {

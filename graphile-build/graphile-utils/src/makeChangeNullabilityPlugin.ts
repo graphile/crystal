@@ -90,8 +90,8 @@ type GeneratedInputObjectTypeRules<TType> = TType extends {
   fieldListDepths: infer TFieldListDepths;
 }
   ? {
-        [TFieldName in keyof TFields & keyof TFieldListDepths & string]?:
-          | NullabilitySpecFor<TFieldListDepths[TFieldName] & number>
+      [TFieldName in keyof TFields & keyof TFieldListDepths & string]?:
+        | NullabilitySpecFor<TFieldListDepths[TFieldName] & number>
         | undefined;
     }
   : never;
@@ -212,7 +212,8 @@ function doIt(
 
 export function changeNullability<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
-  const TRules extends ChangeNullabilityRulesForScope<TScope> = ChangeNullabilityRulesForScope<TScope>,
+  const TRules extends
+    ChangeNullabilityRulesForScope<TScope> = ChangeNullabilityRulesForScope<TScope>,
 >(
   rules: TRules &
     Record<

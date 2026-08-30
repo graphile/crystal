@@ -213,11 +213,9 @@ class SchemaBuilder<
   createBuild(
     input: GraphileBuild.ScopedBuildInput<TScope>,
   ): GraphileBuild.ScopedBuild<TScope> {
-    const initialBuild = makeNewBuild(
-      this,
-      input,
-      this.inflection,
-    ) as Partial<GraphileBuild.ScopedBuild<TScope>> &
+    const initialBuild = makeNewBuild(this, input, this.inflection) as Partial<
+      GraphileBuild.ScopedBuild<TScope>
+    > &
       GraphileBuild.ScopedBuildBase<TScope>;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {

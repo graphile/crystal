@@ -54,7 +54,8 @@ export type TableMatchStringForScope<
 > = [GatherPgIntrospectionForScope<TScope>] extends [never]
   ? string
   : {
-      [TServiceName in keyof GatherPgIntrospectionForScope<TScope> & string]: TableMatchStringsForService<
+      [TServiceName in keyof GatherPgIntrospectionForScope<TScope> &
+        string]: TableMatchStringsForService<
         TServiceName,
         GatherPgIntrospectionForScope<TScope>[TServiceName]
       >;

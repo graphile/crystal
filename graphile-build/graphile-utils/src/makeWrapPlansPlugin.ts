@@ -35,9 +35,7 @@ export interface PlanWrapperRules {
 
 export type PlanWrapperRulesGenerator<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
-> = (
-  build: GraphileBuild.ScopedBuild<TScope>,
-) => PlanWrapperRules;
+> = (build: GraphileBuild.ScopedBuild<TScope>) => PlanWrapperRules;
 
 export type PlanWrapperFilter<
   T,
@@ -78,10 +76,7 @@ export interface WrapPlansOptions<
 let counter = 0;
 const EMPTY_OPTIONS: WrapPlansOptions<never> = Object.freeze({});
 
-interface PlanWrapperState<
-  T,
-  TScope extends keyof GraphileBuild.PluginScopes,
-> {
+interface PlanWrapperState<T, TScope extends keyof GraphileBuild.PluginScopes> {
   rules: PlanWrapperRules | null;
   filter: PlanWrapperFilter<T, TScope> | null;
 }
