@@ -6,6 +6,8 @@ import type {
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type { TableMatch } from "./resolveTableMatch.ts";
+import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
 
@@ -26,18 +28,17 @@ const counterByName = new Map<string, number>();
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
 >(
-  match: {
-    scope?: TScope;
-    serviceName?: string;
-    schemaName: string;
-    tableName: string;
-  },
+  match: string | TableMatch,
   ordersGenerator: (
     build: GraphileBuild.Build<TScope>,
   ) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with addPgTableOrderBy to "${match.schemaName}"."${match.tableName}"`,
+  hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
-  const { serviceName = "main", schemaName, tableName } = match;
+  const {
+    serviceName = "main",
+    schemaName,
+    tableName,
+  } = resolveTableMatch(match);
   const baseDisplayName = `addPgTableOrderBy_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
