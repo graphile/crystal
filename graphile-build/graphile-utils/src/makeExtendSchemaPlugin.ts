@@ -138,8 +138,9 @@ export interface ExtensionDefinition
 type GeneratedFieldPlans<TSource extends Step, TFields> = {
   [TFieldName in keyof TFields]?: TFields[TFieldName] extends {
     args: infer TArgs extends BaseGraphQLArguments;
+    Result: infer TResult extends Step;
   }
-    ? FieldPlan<TSource, TArgs>
+    ? FieldPlan<TSource, TArgs, TResult>
     : never;
 };
 
