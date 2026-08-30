@@ -41,26 +41,34 @@ export interface ChangeNullabilityRules {
   [typeName: string]: ChangeNullabilityTypeRules;
 }
 
-type NullabilitySpecFor<TNullability> = boolean | NullabilitySpecForShape<TNullability>;
+type NullabilitySpecForListDepth<
+  TListDepth extends number,
+  TDepth extends readonly unknown[] = [],
+> = number extends TListDepth
+  ? NullabilitySpec
+  : TDepth["length"] extends TListDepth
+    ? "" | "!"
+    :
+        | NullabilitySpecForListDepth<TListDepth, [...TDepth, unknown]>
+        | `[${NullabilitySpecForListDepth<TListDepth, [...TDepth, unknown]>}]`
+        | `[${NullabilitySpecForListDepth<TListDepth, [...TDepth, unknown]>}]!`;
 
-type NullabilitySpecForShape<TNullability> = TNullability extends {
-  list: infer TInner;
-}
-  ? `[${NullabilitySpecForShape<TInner>}]` | `[${NullabilitySpecForShape<TInner>}]!`
-  : "" | "!";
+type NullabilitySpecFor<TListDepth extends number> =
+  | boolean
+  | NullabilitySpecForListDepth<TListDepth>;
 
 type GeneratedFieldRule<TField> = TField extends {
-  nullability: infer TNullability;
+  listDepth: infer TListDepth extends number;
   args: infer TArgs;
-  argNullabilities: infer TArgNullabilities;
+  argListDepths: infer TArgListDepths;
 }
   ?
-      | NullabilitySpecFor<TNullability>
+      | NullabilitySpecFor<TListDepth>
       | {
-          type?: NullabilitySpecFor<TNullability>;
+          type?: NullabilitySpecFor<TListDepth>;
           args?: {
-            [TArgName in keyof TArgs & keyof TArgNullabilities & string]?:
-              | NullabilitySpecFor<TArgNullabilities[TArgName]>
+            [TArgName in keyof TArgs & keyof TArgListDepths & string]?:
+              | NullabilitySpecFor<TArgListDepths[TArgName] & number>
               | undefined;
           };
         }
@@ -78,11 +86,11 @@ type GeneratedObjectOrInterfaceTypeRules<TType> = TType extends {
 
 type GeneratedInputObjectTypeRules<TType> = TType extends {
   fields: infer TFields;
-  fieldNullabilities: infer TFieldNullabilities;
+  fieldListDepths: infer TFieldListDepths;
 }
   ? {
-      [TFieldName in keyof TFields & keyof TFieldNullabilities & string]?:
-        | NullabilitySpecFor<TFieldNullabilities[TFieldName]>
+        [TFieldName in keyof TFields & keyof TFieldListDepths & string]?:
+          | NullabilitySpecFor<TFieldListDepths[TFieldName] & number>
         | undefined;
     }
   : never;
