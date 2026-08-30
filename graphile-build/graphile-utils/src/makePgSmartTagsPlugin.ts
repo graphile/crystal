@@ -395,13 +395,6 @@ export function pgSmartTags<
   >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback<TScope> | null,
   details?: { name?: string; description?: string; version?: string },
-): GraphileConfig.Plugin;
-export function pgSmartTags(
-  initialRules: ThunkOrDirect<
-    PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
-  >,
-  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
-  details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
   return {
