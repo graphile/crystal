@@ -60,17 +60,18 @@ type NullabilitySpecFor<TListDepth extends number> =
 type GeneratedFieldRule<TField> = TField extends {
   listDepth: infer TListDepth extends number;
   args: infer TArgs;
-  argListDepths: infer TArgListDepths;
 }
   ?
       | NullabilitySpecFor<TListDepth>
       | {
           type?: NullabilitySpecFor<TListDepth>;
-          args?: {
-            [TArgName in keyof TArgs & keyof TArgListDepths & string]?:
-              | NullabilitySpecFor<TArgListDepths[TArgName] & number>
-              | undefined;
-          };
+          args?: TField extends { argListDepths: infer TArgListDepths }
+            ? {
+                [TArgName in keyof TArgs & keyof TArgListDepths & string]?:
+                  | NullabilitySpecFor<TArgListDepths[TArgName] & number>
+                  | undefined;
+              }
+            : never;
         }
   : never;
 
