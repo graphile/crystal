@@ -16,7 +16,10 @@ import type {
 import type {} from "graphile-config";
 import JSON5 from "json5";
 
-import { parseIdentifierParts } from "./parseIdentifierParts.ts";
+import {
+  type IdentifierPart,
+  parseIdentifierParts,
+} from "./parseIdentifierParts.ts";
 
 type PromiseOrDirect<T> = Promise<T> | T;
 type ThunkOrDirect<T> = (() => T) | T;
@@ -54,7 +57,142 @@ type PgSmartTagRules = {
 // Form a union of the options
 export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
-> = PgSmartTagRules[keyof PgSmartTagRules] & { kind: TKind };
+> = PgSmartTagRules[TKind];
+
+type ScopedGatherPgIntrospection<
+  TScope extends keyof GraphileBuild.PluginScopes,
+> = GraphileBuild.PluginScopes[TScope] extends {
+  gather: { pgIntrospection: infer TPgIntrospection };
+}
+  ? TPgIntrospection
+  : never;
+
+type SmartTagClassMatches<TIntrospection> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends {
+          classes: infer TClasses;
+        }
+          ? {
+              [TClassName in keyof TClasses & string]:
+                | IdentifierPart<TClassName>
+                | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TClassName>}`;
+            }[keyof TClasses & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagAttributeOrConstraintMatches<
+  TIntrospection,
+  TKey extends "attributes" | "constraints",
+> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends {
+          classes: infer TClasses;
+        }
+          ? {
+              [TClassName in keyof TClasses &
+                string]: TClasses[TClassName] extends Record<
+                TKey,
+                infer TEntries
+              >
+                ? {
+                    [TEntryName in keyof TEntries & string]:
+                      | IdentifierPart<TEntryName>
+                      | `${IdentifierPart<TClassName>}.${IdentifierPart<TEntryName>}`
+                      | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TClassName>}.${IdentifierPart<TEntryName>}`;
+                  }[keyof TEntries & string]
+                : never;
+            }[keyof TClasses & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagSchemaEntryMatches<
+  TIntrospection,
+  TKey extends "functions" | "types",
+> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends Record<TKey, infer TEntries>
+          ? {
+              [TEntryName in keyof TEntries & string]:
+                | IdentifierPart<TEntryName>
+                | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TEntryName>}`;
+            }[keyof TEntries & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagNamespaceMatches<TIntrospection> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? IdentifierPart<keyof TSchemas & string>
+    : never;
+}[keyof TIntrospection & string];
+
+type GeneratedSmartTagMatches<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TKind extends PgSmartTagSupportedKinds,
+> = [ScopedGatherPgIntrospection<TScope>] extends [never]
+  ? string
+  : TKind extends "class"
+    ? SmartTagClassMatches<ScopedGatherPgIntrospection<TScope>>
+    : TKind extends "attribute"
+      ? SmartTagAttributeOrConstraintMatches<
+          ScopedGatherPgIntrospection<TScope>,
+          "attributes"
+        >
+      : TKind extends "constraint"
+        ? SmartTagAttributeOrConstraintMatches<
+            ScopedGatherPgIntrospection<TScope>,
+            "constraints"
+          >
+        : TKind extends "procedure"
+          ? SmartTagSchemaEntryMatches<
+              ScopedGatherPgIntrospection<TScope>,
+              "functions"
+            >
+          : TKind extends "type"
+            ? SmartTagSchemaEntryMatches<
+                ScopedGatherPgIntrospection<TScope>,
+                "types"
+              >
+            : SmartTagNamespaceMatches<ScopedGatherPgIntrospection<TScope>>;
+
+type PgSmartTagRuleWithMatches<
+  TKind extends PgSmartTagSupportedKinds,
+  TMatches extends string,
+> = Omit<PgSmartTagRule<TKind>, "match"> & {
+  match: TMatches | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+};
+
+export type ScopedPgSmartTagRule<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = {
+  [TKind in PgSmartTagSupportedKinds]: PgSmartTagRuleWithMatches<
+    TKind,
+    GeneratedSmartTagMatches<TScope, TKind>
+  >;
+}[PgSmartTagSupportedKinds];
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
@@ -214,13 +352,18 @@ function rulesFrom(
   return [rawRules.map(compileRule), rawRules];
 }
 
-export type UpdatePgSmartTagRulesCallback = (
-  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
+export type UpdatePgSmartTagRulesCallback<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (
+  ruleOrRules:
+    | ScopedPgSmartTagRule<TScope>
+    | ScopedPgSmartTagRule<TScope>[]
+    | null,
 ) => void;
 
-export type SubscribeToPgSmartTagUpdatesCallback = (
-  cb: UpdatePgSmartTagRulesCallback | null,
-) => PromiseOrDirect<void>;
+export type SubscribeToPgSmartTagUpdatesCallback<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (cb: UpdatePgSmartTagRulesCallback<TScope> | null) => PromiseOrDirect<void>;
 
 interface Cache {
   rulesPromise: PromiseOrDirect<PgSmartTagRule[]>;
@@ -245,11 +388,15 @@ async function resolveRules(
 }
 
 let counter = 0;
-export function pgSmartTags(
+export function pgSmartTags<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
   initialRules: ThunkOrDirect<
-    PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
+    PromiseOrDirect<
+      ScopedPgSmartTagRule<TScope> | ScopedPgSmartTagRule<TScope>[] | null
+    >
   >,
-  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
+  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback<TScope> | null,
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;

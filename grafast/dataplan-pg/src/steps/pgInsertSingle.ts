@@ -18,6 +18,7 @@ import type {
   GetPgResourceCodec,
   ObjectForResource,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecWithAttributes,
   PgQueryBuilder,
   PgTypedStep,
@@ -173,7 +174,8 @@ export class PgInsertSingleStep<
       >
         ? UCodec
         : never,
-      TResource
+      TResource,
+      PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
   /**
@@ -188,7 +190,8 @@ export class PgInsertSingleStep<
     >
       ? UCodec
       : never,
-    TResource
+    TResource,
+    PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     if (!this.resource.codec.attributes) {
       throw new Error(`Cannot call .get() when there's no attributes.`);

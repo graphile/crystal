@@ -239,11 +239,16 @@ export function makeExampleSchema(
         },
       >(
         options: TOptions,
-      ): PgCodecAttribute<TOptions extends { codec: infer U } ? U : never> => {
+      ): PgCodecAttribute<
+        TOptions extends { codec: infer U } ? U : never,
+        TOptions extends { notNull: true } ? true : false
+      > => {
         const { notNull, codec, expression, via, identicalVia } = options;
         return {
           codec: codec as TOptions extends { codec: infer U } ? U : never,
-          notNull: !!notNull,
+          notNull: !!notNull as TOptions extends { notNull: true }
+            ? true
+            : false,
           expression,
           via,
           identicalVia,
@@ -1781,7 +1786,7 @@ export function makeExampleSchema(
     typeof singleTableItemsResource
   >;
   type RelationalItemsStep = PgSelectStep<typeof relationalItemsResource>;
-  type RelationalItemStep = PgSelectSingleStep<typeof relationalItemsResource>;
+  type _RelationalItemStep = PgSelectSingleStep<typeof relationalItemsResource>;
   type RelationalTopicStep = PgSelectSingleStep<
     typeof relationalTopicsResource
   >;
@@ -1796,7 +1801,7 @@ export function makeExampleSchema(
     typeof relationalChecklistItemsResource
   >;
   type UnionItemsStep = PgSelectStep<typeof unionItemsResource>;
-  type UnionItemStep = PgSelectSingleStep<typeof unionItemsResource>;
+  type _UnionItemStep = PgSelectSingleStep<typeof unionItemsResource>;
   type UnionTopicStep = PgSelectSingleStep<typeof unionTopicsResource>;
   type UnionPostStep = PgSelectSingleStep<typeof unionPostsResource>;
   type UnionDividerStep = PgSelectSingleStep<typeof unionDividersResource>;
@@ -2692,7 +2697,7 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (TYPES, forumsUniqueAuthorCountResource) =>
+          (forumsUniqueAuthorCountResource) =>
             function plan($forum, { $featured }) {
               return forumsUniqueAuthorCountResource.execute([
                 {
@@ -2700,11 +2705,10 @@ export function makeExampleSchema(
                 },
                 {
                   step: $featured,
-                  pgCodec: TYPES.boolean,
                 },
               ]);
             },
-          [TYPES, forumsUniqueAuthorCountResource],
+          [forumsUniqueAuthorCountResource],
         ),
       },
 
@@ -4175,19 +4179,18 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (TYPES, deoptimizeIfAppropriate, uniqueAuthorCountResource) =>
+          (deoptimizeIfAppropriate, uniqueAuthorCountResource) =>
             function plan(_$root, { $featured }) {
               const $plan = uniqueAuthorCountResource.execute([
                 {
                   step: $featured,
-                  pgCodec: TYPES.boolean,
                   name: "featured",
                 },
               ]);
               deoptimizeIfAppropriate($plan);
               return $plan;
             },
-          [TYPES, deoptimizeIfAppropriate, uniqueAuthorCountResource],
+          [deoptimizeIfAppropriate, uniqueAuthorCountResource],
         ),
       },
 
@@ -4352,7 +4355,10 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (singleTableItemsResource) =>
             function plan(_$root, { $id }) {
-              const $item: SingleTableItemStep = singleTableItemsResource.get({
+              const $item: PgSelectSingleStep<
+                typeof singleTableItemsResource,
+                null
+              > = singleTableItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
               return $item;
@@ -4371,7 +4377,10 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (constant, singleTableItemsResource) =>
             function plan(_$root, { $id }) {
-              const $item: SingleTableItemStep = singleTableItemsResource.get({
+              const $item: PgSelectSingleStep<
+                typeof singleTableItemsResource,
+                null
+              > = singleTableItemsResource.get({
                 id: $id as ExecutableStep<number>,
                 type: constant("TOPIC", false),
               });
@@ -4391,7 +4400,10 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (relationalItemsResource) =>
             function plan(_$root, { $id }) {
-              const $item: RelationalItemStep = relationalItemsResource.get({
+              const $item: PgSelectSingleStep<
+                typeof relationalItemsResource,
+                null
+              > = relationalItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
               return $item;
@@ -4480,9 +4492,10 @@ export function makeExampleSchema(
             unionItemsResource,
           ) =>
             function plan(_$root, { $id }) {
-              const $item: UnionItemStep = unionItemsResource.get({
-                id: $id as ExecutableStep<number>,
-              });
+              const $item: PgSelectSingleStep<typeof unionItemsResource, null> =
+                unionItemsResource.get({
+                  id: $id as ExecutableStep<number>,
+                });
               const $type = inhibitOnNull($item.get("type"));
               const $__typename = lambda(
                 $type,
@@ -4594,31 +4607,18 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (
-            TYPES,
-            deoptimizeIfAppropriate,
-            each,
-            entitySearchResource,
-            entityUnion,
-          ) =>
+          (deoptimizeIfAppropriate, each, entitySearchResource, entityUnion) =>
             function plan(_$root, { $query }) {
               const $step = entitySearchResource.execute([
                 {
                   step: $query,
-                  pgCodec: TYPES.text,
                   name: "query",
                 },
               ]) as PgSelectStep;
               deoptimizeIfAppropriate($step);
               return each($step, ($item) => entityUnion($item as any));
             },
-          [
-            TYPES,
-            deoptimizeIfAppropriate,
-            each,
-            entitySearchResource,
-            entityUnion,
-          ],
+          [deoptimizeIfAppropriate, each, entitySearchResource, entityUnion],
         ),
       },
 
@@ -4955,7 +4955,8 @@ export function makeExampleSchema(
   type PgRecord<TResource extends PgResource<any, any, any, any, any>> =
     PgClassExpressionStep<
       PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
-      TResource
+      TResource,
+      never
     >;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<

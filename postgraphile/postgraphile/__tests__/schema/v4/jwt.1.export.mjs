@@ -1798,8 +1798,7 @@ const argDetailsSimple_type_function = [{
 }];
 const makeArgs_type_function = (args, path = []) => argDetailsSimple_type_function.map(details => makeArg(path, args, details));
 const resource_type_functionPgResource = registry.pgResources["type_function"];
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_type_function_connection = () => EMPTY_ARRAY;
+const makeArgs_type_function_connection = () => [];
 const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
 const type_function_connection_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_type_function_connection(args);

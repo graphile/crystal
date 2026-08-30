@@ -4042,8 +4042,7 @@ const nodeIdCodecs = {
     })
   }
 };
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_first_party_vulnerabilities_cvss_score_int = () => EMPTY_ARRAY;
+const makeArgs_first_party_vulnerabilities_cvss_score_int = () => [];
 const resource_single_table_items_meaning_of_lifePgResource = registry.pgResources["single_table_items_meaning_of_life"];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";

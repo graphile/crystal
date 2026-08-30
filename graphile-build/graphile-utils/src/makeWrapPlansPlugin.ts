@@ -33,13 +33,16 @@ export interface PlanWrapperRules {
   };
 }
 
-export type PlanWrapperRulesGenerator = (
-  build: GraphileBuild.Build,
-) => PlanWrapperRules;
+export type PlanWrapperRulesGenerator<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (build: GraphileBuild.ScopedBuild<TScope>) => PlanWrapperRules;
 
-export type PlanWrapperFilter<T> = (
+export type PlanWrapperFilter<
+  T,
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (
   context: GraphileBuild.ContextObjectFieldsField,
-  build: GraphileBuild.Build,
+  build: GraphileBuild.ScopedBuild<TScope>,
   field: GrafastFieldConfig<any, any, any>,
 ) => T | null;
 
@@ -47,7 +50,14 @@ export type PlanWrapperFilterRule<T> = (
   match: T,
 ) => PlanWrapperRule | PlanWrapperFn;
 
-export interface WrapPlansOptions {
+export interface WrapPlansOptions<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> {
+  /**
+   * The generated-types scope used to infer scoped types. This has no runtime
+   * effect.
+   */
+  scope?: TScope;
   /** The name to give this plugin, to make debugging easier */
   name?: string;
   /** Optional version of the plugin */
@@ -67,29 +77,37 @@ export interface WrapPlansOptions {
 }
 
 let counter = 0;
-const EMPTY_OPTIONS: WrapPlansOptions = Object.freeze({});
+const EMPTY_OPTIONS: WrapPlansOptions<never> = Object.freeze({});
 
-interface PlanWrapperState<T> {
+interface PlanWrapperState<T, TScope extends keyof GraphileBuild.PluginScopes> {
   rules: PlanWrapperRules | null;
-  filter: PlanWrapperFilter<T> | null;
+  filter: PlanWrapperFilter<T, TScope> | null;
 }
 
-export function wrapPlans(
-  rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
-  options?: WrapPlansOptions,
+export function wrapPlans<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
+  rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator<TScope>,
+  options?: WrapPlansOptions<TScope>,
 ): GraphileConfig.Plugin;
-export function wrapPlans<T>(
-  filter: PlanWrapperFilter<T>,
+export function wrapPlans<
+  T,
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
+  filter: PlanWrapperFilter<T, TScope>,
   rule: PlanWrapperFilterRule<T>,
-  options?: WrapPlansOptions,
+  options?: WrapPlansOptions<TScope>,
 ): GraphileConfig.Plugin;
-export function wrapPlans<T>(
+export function wrapPlans<
+  T,
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
   rulesOrGeneratorOrFilter:
     | PlanWrapperRules
-    | PlanWrapperRulesGenerator
-    | PlanWrapperFilter<T>,
-  ruleOrOptions?: PlanWrapperFilterRule<T> | WrapPlansOptions,
-  maybeOptions?: WrapPlansOptions,
+    | PlanWrapperRulesGenerator<TScope>
+    | PlanWrapperFilter<T, TScope>,
+  ruleOrOptions?: PlanWrapperFilterRule<T> | WrapPlansOptions<TScope>,
+  maybeOptions?: WrapPlansOptions<TScope>,
 ): GraphileConfig.Plugin {
   // Parse out the overloaded signature
   const [rule, options = EMPTY_OPTIONS, forbidden] =
@@ -153,22 +171,22 @@ export function wrapPlans<T>(
           // Disambiguate first argument
           const rulesOrGenerator:
             | PlanWrapperRules
-            | PlanWrapperRulesGenerator
+            | PlanWrapperRulesGenerator<TScope>
             | null = rule ? null : (rulesOrGeneratorOrFilter as any);
-          const filter: PlanWrapperFilter<T> | null = rule
+          const filter: PlanWrapperFilter<T, TScope> | null = rule
             ? (rulesOrGeneratorOrFilter as any)
             : null;
 
           const rules: PlanWrapperRules | null =
             typeof rulesOrGenerator === "function"
-              ? rulesOrGenerator(build)
+              ? rulesOrGenerator(build as GraphileBuild.ScopedBuild<TScope>)
               : rulesOrGenerator;
-          const state: PlanWrapperState<T> = { rules, filter };
+          const state: PlanWrapperState<T, TScope> = { rules, filter };
           Object.assign((build as any)[symbol], state);
           return _;
         },
         GraphQLObjectType_fields_field(field, build, context) {
-          const state = (build as any)[symbol] as PlanWrapperState<T>;
+          const state = (build as any)[symbol] as PlanWrapperState<T, TScope>;
           const { rules, filter } = state;
           const {
             EXPORTABLE,
@@ -180,7 +198,11 @@ export function wrapPlans<T>(
           } = context;
           let planWrapperOrSpec;
           if (filter) {
-            const filterResult: any = filter(context, build, field);
+            const filterResult: any = filter(
+              context,
+              build as GraphileBuild.ScopedBuild<TScope>,
+              field,
+            );
             if (!filterResult) {
               if (filterResult !== null) {
                 // eslint-disable-next-line no-console

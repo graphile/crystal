@@ -26,6 +26,7 @@ import type {
   GetPgResourceUniques,
   ObjectForResource,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecWithAttributes,
   PgQueryBuilder,
   PlanByUniques,
@@ -221,7 +222,8 @@ export class PgUpdateSingleStep<
   __inferGet?: {
     [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
       GetPgResourceAttributes<TResource>[TAttr]["codec"],
-      TResource
+      TResource,
+      PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
   /**
@@ -232,7 +234,8 @@ export class PgUpdateSingleStep<
     attr: TAttr,
   ): PgClassExpressionStep<
     GetPgResourceAttributes<TResource>[TAttr]["codec"],
-    TResource
+    TResource,
+    PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     const resourceAttribute: PgCodecAttribute =
       this.resource.codec.attributes![attr as string];

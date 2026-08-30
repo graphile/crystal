@@ -2,7 +2,7 @@ import type { inspect, Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import type { CustomInspectFunction } from "util";
 
-import type { PgCodecAttributes } from "./codecs.ts";
+import type { PgCodecAttribute, PgCodecAttributes } from "./codecs.ts";
 import type {
   PgCodecRefs,
   PgResource,
@@ -19,14 +19,19 @@ import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.ts";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.ts";
 import type { RuntimeSQLThunk } from "./utils.ts";
 
+/** The nullability of a value selected from a codec attribute. */
+export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
+  TAttribute extends PgCodecAttribute<any, true> ? never : null;
+
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSingleStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TNullability extends null = null,
 > =
-  | PgSelectSingleStep<TResource>
+  | PgSelectSingleStep<TResource, TNullability>
   | PgInsertSingleStep<TResource>
   | PgUpdateSingleStep<TResource>
   | PgDeleteSingleStep<TResource>;
@@ -657,16 +662,7 @@ export interface PgRegistry<
   >,
   TResourceOptions extends {
     [name in string]: PgResourceOptions<any, any, any, any>;
-  } = Record<
-    string,
-    PgResourceOptions<
-      string,
-      // TYPES: This maybe shouldn't be PgCodecWithAttributes, but PgCodec instead?
-      PgCodecWithAttributes, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >
-  >,
+  } = Record<string, PgResourceOptions<string, PgCodec, any, any>>,
   TRelations extends {
     [codecName in keyof TCodecs]?: {
       [relationName in string]: PgCodecRelationConfig<any, any>;
@@ -676,16 +672,8 @@ export interface PgRegistry<
     Record<
       string,
       PgCodecRelationConfig<
-        // TCodecs[keyof TCodecs] &
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        // TResourceOptions[keyof TResourceOptions] &
-        PgResourceOptions<
-          any,
-          // TCodecs[keyof TCodecs] &
-          PgCodecWithAttributes,
-          any,
-          any
-        >
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >
     >
   >,

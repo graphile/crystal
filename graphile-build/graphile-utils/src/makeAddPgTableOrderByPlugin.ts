@@ -6,6 +6,8 @@ import type {
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
 
@@ -23,18 +25,16 @@ export interface MakeAddPgTableOrderByPluginOrders {
 
 const counterByName = new Map<string, number>();
 
-export function addPgTableOrderBy(
-  match: {
-    serviceName?: string;
-    schemaName: string;
-    tableName: string;
-  },
+export function addPgTableOrderBy<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
+  match: ScopedTableMatch<TScope>,
   ordersGenerator: (
-    build: GraphileBuild.Build,
+    build: GraphileBuild.ScopedBuild<TScope>,
   ) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with addPgTableOrderBy to "${match.schemaName}"."${match.tableName}"`,
+  hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
-  const { serviceName = "main", schemaName, tableName } = match;
+  const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const baseDisplayName = `addPgTableOrderBy_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
@@ -66,7 +66,9 @@ export function addPgTableOrderBy(
           ) {
             return values;
           }
-          const newValues = ordersGenerator(build);
+          const newValues = ordersGenerator(
+            build as GraphileBuild.ScopedBuild<TScope>,
+          );
 
           return extend(values, newValues, hint);
         },

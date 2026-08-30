@@ -1580,7 +1580,7 @@ export class PgSelectStep<
 
   private getParentForInlining(): {
     $pgSelect: PgSelectStep<PgResource>;
-    $pgSelectSingle: PgSelectSingleStep<PgResource>;
+    $pgSelectSingle: PgSelectSingleStep<PgResource, any>;
   } | null {
     /**
      * These are the dependencies that are not PgClassExpressionSteps, we just
@@ -1600,7 +1600,8 @@ export class PgSelectStep<
      * it's used when remapping of keys is required after inlining ourself into
      * $pgSelect.
      */
-    let $pgSelectSingle: PgSelectSingleStep<PgResource> | undefined = undefined;
+    let $pgSelectSingle: PgSelectSingleStep<PgResource, any> | undefined =
+      undefined;
 
     // Scan through the dependencies to find a suitable ancestor step to merge with
     for (
@@ -2070,7 +2071,7 @@ export class PgSelectStep<
    */
   singleAsRecord(
     options?: PgSelectSinglePlanOptions,
-  ): PgSelectSingleStep<TResource> {
+  ): PgSelectSingleStep<TResource, null> {
     this.setUnique(true);
     return new PgSelectSingleStep(this, first(this, true), options);
   }
@@ -2094,10 +2095,11 @@ export class PgSelectStep<
     any
   >
     ? UAttributes extends PgCodecAttributes
-      ? PgSelectSingleStep<TResource>
+      ? PgSelectSingleStep<TResource, null>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
-          TResource
+          TResource,
+          null
         >
     : never {
     if (!options) {
@@ -2117,10 +2119,11 @@ export class PgSelectStep<
     any
   >
     ? UAttributes extends PgCodecAttributes
-      ? PgSelectSingleStep<TResource>
+      ? PgSelectSingleStep<TResource, null>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
-          TResource
+          TResource,
+          null
         >
     : never {
     const $single = this.singleAsRecord(options);

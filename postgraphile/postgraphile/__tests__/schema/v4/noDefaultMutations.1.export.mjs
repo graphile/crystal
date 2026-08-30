@@ -4249,8 +4249,7 @@ const resource_my_tablePgResource = registry.pgResources["my_table"];
 const resource_null_test_recordPgResource = registry.pgResources["null_test_record"];
 const resource_personPgResource = registry.pgResources["person"];
 const resource_person_secretPgResource = registry.pgResources["person_secret"];
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_compound_type_computed_field = () => EMPTY_ARRAY;
+const makeArgs_compound_type_computed_field = () => [];
 const resource_badly_behaved_functionPgResource = registry.pgResources["badly_behaved_function"];
 const badly_behaved_function_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_compound_type_computed_field(args);

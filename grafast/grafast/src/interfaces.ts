@@ -195,6 +195,13 @@ export interface BaseGraphQLArguments {
   [key: string]: unknown;
 }
 
+type FieldArgsInputObjectChildValue<
+  TParent,
+  TKey extends keyof NonNullable<TParent>,
+> =
+  | NonNullable<TParent>[TKey]
+  | (Extract<TParent, null | undefined> extends never ? never : undefined);
+
 export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
@@ -234,10 +241,11 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   [key in keyof TObj & string as `$${key}`]: Step<TObj[key]> &
     ([unknown] extends [TObj[key]]
       ? { [subkey in string as `$${subkey}`]: Step<any> }
-      : TObj[key] extends Record<string, any>
+      : NonNullable<TObj[key]> extends Record<string, any>
         ? {
-            [subkey in keyof TObj[key] & string as `$${subkey}`]: Step<
-              TObj[key][subkey]
+            [subkey in keyof NonNullable<TObj[key]> &
+              string as `$${subkey}`]: Step<
+              FieldArgsInputObjectChildValue<TObj[key], subkey>
             >;
           }
         : unknown);

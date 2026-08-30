@@ -7041,8 +7041,7 @@ const argDetailsSimple_query_compound_type_array = [{
 }];
 const makeArgs_query_compound_type_array = (args, path = []) => argDetailsSimple_query_compound_type_array.map(details => makeArg(path, args, details));
 const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_compound_type_computed_field = () => EMPTY_ARRAY;
+const makeArgs_compound_type_computed_field = () => [];
 const resource_query_interval_arrayPgResource = registry.pgResources["query_interval_array"];
 const resource_query_interval_setPgResource = registry.pgResources["query_interval_set"];
 const query_interval_set_getSelectPlanFromParentAndArgs = ($root, args, _info) => {

@@ -11,6 +11,7 @@ import type {
   GetPgResourceCodec,
   GetPgResourceRelations,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecRelation,
   PgQueryRootStep,
   PgRegistry,
@@ -33,7 +34,7 @@ import { PgSelectStep } from "./pgSelect.ts";
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 export interface PgSelectSinglePlanOptions {
-  fromRelation?: [PgSelectSingleStep<PgResource>, string];
+  fromRelation?: [PgSelectSingleStep<PgResource, any>, string];
 }
 
 const EMPTY_TUPLE = Object.freeze([]) as never[];
@@ -63,10 +64,11 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
  */
 export class PgSelectSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
+    TNullability extends null = never,
   >
   extends UnbatchedStep<
     | unknown[]
-    | null /* What we return will be a tuple based on the values selected */
+    | TNullability /* What we return will be a tuple based on the values selected */
   >
   implements
     PgTypedStep<
@@ -149,7 +151,8 @@ export class PgSelectSingleStep<
    */
   getSelfNamed(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
-    TResource
+    TResource,
+    TNullability
   > {
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to getSelfNamed on aggregate plan");
@@ -166,7 +169,9 @@ export class PgSelectSingleStep<
       >
         ? UCodec
         : never,
-      TResource
+      TResource,
+      | TNullability
+      | PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
 
@@ -183,7 +188,9 @@ export class PgSelectSingleStep<
     >
       ? UCodec
       : never,
-    TResource
+    TResource,
+    | TNullability
+    | PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     return this.cacheStep("get", attr, () => this._getInternal(attr));
   }
@@ -197,7 +204,9 @@ export class PgSelectSingleStep<
     >
       ? UCodec
       : never,
-    TResource
+    TResource,
+    | TNullability
+    | PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     if (this.mode === "aggregate") {
       throw new Error("Invalid call to .get() on aggregate plan");
@@ -274,7 +283,12 @@ export class PgSelectSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression<any, TResource>(
+    const sqlExpr = pgClassExpression<
+      any,
+      TResource,
+      | TNullability
+      | PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
+    >(
       this,
       attr === ""
         ? this.resource.codec
@@ -312,13 +326,23 @@ export class PgSelectSingleStep<
   public select<TExpressionCodec extends PgCodec>(
     fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
     codec: TExpressionCodec,
+    guaranteedNotNull: true,
+  ): PgClassExpressionStep<TExpressionCodec, TResource, TNullability>;
+  public select<TExpressionCodec extends PgCodec>(
+    fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
+    codec: TExpressionCodec,
+    guaranteedNotNull?: false | undefined,
+  ): PgClassExpressionStep<TExpressionCodec, TResource, TNullability | null>;
+  public select<TExpressionCodec extends PgCodec>(
+    fragment: PgSQLCallbackOrDirect<SQL, this | PlantimeEmbeddable>,
+    codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
-  ): PgClassExpressionStep<TExpressionCodec, TResource> {
-    const sqlExpr = pgClassExpression<TExpressionCodec, TResource>(
-      this,
-      codec,
-      guaranteedNotNull,
-    );
+  ): PgClassExpressionStep<TExpressionCodec, TResource, TNullability | null> {
+    const sqlExpr = pgClassExpression<
+      TExpressionCodec,
+      TResource,
+      TNullability | null
+    >(this, codec, guaranteedNotNull);
     return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
@@ -362,7 +386,8 @@ export class PgSelectSingleStep<
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"],
+    null
   > | null {
     if (this.fromRelation) {
       const { refId, relationName } = this.fromRelation;
@@ -378,7 +403,7 @@ export class PgSelectSingleStep<
           if (reciprocalRelationName === relationIdentifier) {
             const reciprocalRelation = reciprocal[1];
             if (reciprocalRelation.isUnique) {
-              return $fromPlan as PgSelectSingleStep<any>;
+              return $fromPlan as PgSelectSingleStep<any, any>;
             }
           }
         }
@@ -392,7 +417,8 @@ export class PgSelectSingleStep<
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
-    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
+    GetPgResourceRelations<TResource>[TRelationName]["remoteResource"],
+    null
   > {
     const $existingPlan = this.existingSingleRelation(relationIdentifier);
     if ($existingPlan) {
@@ -412,7 +438,7 @@ export class PgSelectSingleStep<
 
     const options: PgSelectSinglePlanOptions = {
       fromRelation: [
-        this as PgSelectSingleStep<any>,
+        this as PgSelectSingleStep<any, any>,
         relationIdentifier as string,
       ],
     };
@@ -422,7 +448,7 @@ export class PgSelectSingleStep<
         return memo;
       }, Object.create(null)),
       options,
-    ) as PgSelectSingleStep<any>;
+    ) as PgSelectSingleStep<any, null>;
   }
 
   public manyRelation<
@@ -452,13 +478,18 @@ export class PgSelectSingleStep<
 
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
-    TResource
+    TResource,
+    TNullability
   > {
     return this.cacheStep(
       "record",
       "",
       () =>
-        pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+        pgClassExpression<
+          GetPgResourceCodec<TResource>,
+          TResource,
+          TNullability
+        >(
           this,
           this.resource.codec as GetPgResourceCodec<TResource>,
           undefined,
@@ -471,8 +502,8 @@ export class PgSelectSingleStep<
   }
 
   deduplicate(
-    peers: PgSelectSingleStep<any>[],
-  ): PgSelectSingleStep<TResource>[] {
+    peers: PgSelectSingleStep<any, any>[],
+  ): PgSelectSingleStep<TResource, TNullability>[] {
     // We've been careful to not store anything locally so we shouldn't
     // need to move anything across to the peer.
     return peers.filter((peer) => {
@@ -545,13 +576,15 @@ export class PgSelectSingleStep<
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
     result: string[] | null,
-  ): unknown[] | null {
+  ): unknown[] | TNullability {
     if (result == null) {
-      return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
+      return this._coalesceToEmptyObject ? EMPTY_TUPLE : (null as TNullability);
     } else if (this.nullCheckAttributeIndex != null) {
       const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
       if (nullIfAttributeNull == null) {
-        return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
+        return this._coalesceToEmptyObject
+          ? EMPTY_TUPLE
+          : (null as TNullability);
       }
     } else if (this.nullCheckId != null) {
       const nullIfExpressionNotTrue = result[this.nullCheckId];
@@ -559,7 +592,9 @@ export class PgSelectSingleStep<
         nullIfExpressionNotTrue == null ||
         TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
       ) {
-        return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
+        return this._coalesceToEmptyObject
+          ? EMPTY_TUPLE
+          : (null as TNullability);
       }
     }
     return result;
@@ -621,12 +656,17 @@ export function pgSelectFromRecord<
  */
 export function pgSelectSingleFromRecord<
   TResource extends PgResource<any, any, any, any>,
+  TNullability extends null = null,
 >(
   resource: TResource,
   $record:
-    | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
+    | PgClassExpressionStep<
+        GetPgResourceCodec<TResource>,
+        TResource,
+        TNullability
+      >
     | Step,
-): PgSelectSingleStep<TResource> {
+): PgSelectSingleStep<TResource, TNullability> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return operationPlan().cacheStep(
     $record,
@@ -636,7 +676,7 @@ export function pgSelectSingleFromRecord<
       pgSelectFromRecord(
         resource,
         $record,
-      ).single() as PgSelectSingleStep<TResource>,
+      ).single() as unknown as PgSelectSingleStep<TResource, TNullability>,
   );
 }
 

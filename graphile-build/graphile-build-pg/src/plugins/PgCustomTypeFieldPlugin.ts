@@ -63,10 +63,7 @@ import type {} from "./PgBasicsPlugin.ts";
 import type {} from "./PgProceduresPlugin.ts";
 
 const EMPTY_ARRAY = Object.freeze([]);
-const makeEmptyArray = EXPORTABLE(
-  (EMPTY_ARRAY) => () => EMPTY_ARRAY,
-  [EMPTY_ARRAY],
-);
+const makeEmptyArray = EXPORTABLE(() => () => [], []);
 
 const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
@@ -105,16 +102,13 @@ declare global {
             description?: string;
           };
         };
-        makeArgs(
-          args: FieldArgs,
-          path?: string[],
-        ): readonly PgSelectArgumentSpec[];
+        makeArgs(args: FieldArgs, path?: string[]): PgSelectArgumentSpec[];
         makeArgsRuntime(
           schema: GraphQLSchema,
           /** Suitable for input object fields, or arguments */
           fieldsOrArgs: Record<string, { type: GraphQLInputType }>,
           input: Record<string, any>,
-        ): readonly PgSelectArgumentRuntimeValue[];
+        ): PgSelectArgumentRuntimeValue[];
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName?: string | null;
@@ -696,7 +690,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       (args: FieldArgs, path: string[] = []) =>
                         argDetailsSimple.map((details) =>
                           makeArg(path, args, details),
-                        ) as ReadonlyArray<ReturnType<typeof makeArg>>,
+                        ) as Array<ReturnType<typeof makeArg>>,
                     [argDetailsSimple, makeArg],
                   );
             const makeArgsRuntime =
@@ -711,7 +705,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       ) =>
                         argDetailsSimple.map((details) =>
                           makeArgRuntime(schema, fields, input, details),
-                        ) as ReadonlyArray<ReturnType<typeof makeArgRuntime>>,
+                        ) as Array<ReturnType<typeof makeArgRuntime>>,
                     [argDetailsSimple, makeArgRuntime],
                   );
 
@@ -992,7 +986,7 @@ const pgFunctionArgumentsFromArgs = EXPORTABLE(
       extraSelectArgs: readonly PgSelectArgumentSpec[],
     ): {
       $row: PgSelectSingleStep;
-      selectArgs: readonly PgSelectArgumentSpec[];
+      selectArgs: PgSelectArgumentSpec[];
     };
     function pgFunctionArgumentsFromArgs(
       $in: Step,
@@ -1586,7 +1580,9 @@ const makeArg = EXPORTABLE(
           | null
           | ((
               $nodeId: Step<Maybe<string>>,
-            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
+            ) =>
+              | PgSelectSingleStep<any, any>
+              | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentSpec {
       const { graphqlArgName, postgresArgName, pgCodec, fetcher } = details;
@@ -1597,7 +1593,10 @@ const makeArg = EXPORTABLE(
         fetcher
           ? trap(
               (
-                fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep
+                fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep<
+                  any,
+                  any
+                >
               ).record(),
               TRAP_INHIBITED,
             )
@@ -1627,7 +1626,9 @@ const makeArgRuntime = EXPORTABLE(
           | null
           | ((
               $nodeId: Step<Maybe<string>>,
-            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
+            ) =>
+              | PgSelectSingleStep<any, any>
+              | PgClassExpressionStep<any, any>);
       },
     ): PgSelectArgumentRuntimeValue {
       const { graphqlArgName, postgresArgName, /*pgCodec,*/ fetcher } = details;

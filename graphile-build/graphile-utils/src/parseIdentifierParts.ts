@@ -1,3 +1,17 @@
+export type EscapeIdentifierQuotes<TIdentifier extends string> =
+  TIdentifier extends `${infer TBefore}"${infer TAfter}`
+    ? `${TBefore}""${EscapeIdentifierQuotes<TAfter>}`
+    : TIdentifier;
+
+/**
+ * A single identifier part in the format accepted by `parseIdentifierParts`.
+ */
+export type IdentifierPart<TIdentifier extends string> = TIdentifier extends
+  | `${string}.${string}`
+  | `${string}"${string}`
+  ? `"${EscapeIdentifierQuotes<TIdentifier>}"`
+  : TIdentifier;
+
 export function parseIdentifierParts(identifier: string): string[] {
   let hadQuotes = false;
   let inQuotes = false;

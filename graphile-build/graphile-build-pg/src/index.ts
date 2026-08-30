@@ -108,15 +108,23 @@ declare global {
       [tagName: string]: null | true | string | (string | true)[];
     }
 
-    /** Augment this interface to provide generated build-time types. */
-    interface GeneratedTypes {}
-
     interface BuildInput {
-      pgRegistry: GeneratedTypes extends {
-        pgRegistry: infer TRegistry extends PgRegistry;
-      }
-        ? TRegistry
-        : PgRegistry;
+      pgRegistry: PgRegistry;
+    }
+
+    interface BuildInputScopedExtensions<TScope extends keyof PluginScopes> {
+      pgRegistry: [PluginScopes[TScope]] extends [never]
+        ? PgRegistry
+        : PluginScopes[TScope] extends {
+              pgRegistry: infer TRegistry extends PgRegistry<
+                any,
+                any,
+                any,
+                any
+              >;
+            }
+          ? TRegistry
+          : PgRegistry;
     }
 
     interface SchemaOptions {
