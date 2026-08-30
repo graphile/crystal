@@ -4,13 +4,13 @@ import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { TableMatch } from "./resolveTableMatch.ts";
+import type { TableMatchForScope } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
 >(
-  match: string | TableMatch,
+  match: TableMatchForScope<TScope>,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build<TScope>,
@@ -137,14 +137,13 @@ export function addPgTableCondition<
 /** @deprecated renamed to addPgTableCondition */
 export const makeAddPgTableConditionPlugin = addPgTableCondition;
 
-type PrunedBuild<
-  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
-> = Pick<
-  GraphileBuild.Build<TScope>,
-  "sql" | "grafast" | "graphql" | "dataplanPg"
-> & {
-  input: Pick<GraphileBuild.Build<TScope>["input"], "pgRegistry">;
-};
+type PrunedBuild<TScope extends keyof GraphileBuild.ScopedGeneratedTypes> =
+  Pick<
+    GraphileBuild.Build<TScope>,
+    "sql" | "grafast" | "graphql" | "dataplanPg"
+  > & {
+    input: Pick<GraphileBuild.Build<TScope>["input"], "pgRegistry">;
+  };
 
 function pruneBuild<TScope extends keyof GraphileBuild.ScopedGeneratedTypes>(
   build: GraphileBuild.Build<TScope>,

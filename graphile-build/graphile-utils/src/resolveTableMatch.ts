@@ -1,3 +1,5 @@
+import type {} from "graphile-build";
+
 import { parseIdentifierParts } from "./parseIdentifierParts.ts";
 
 const DEFAULT_SERVICE_NAME = "main";
@@ -7,6 +9,60 @@ export type TableMatch = {
   schemaName: string;
   tableName: string;
 };
+
+type GatherPgIntrospectionForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+> = GraphileBuild.GeneratedTypesForScope<TScope> extends {
+  gather: { pgIntrospection: infer TPgIntrospection };
+}
+  ? TPgIntrospection
+  : never;
+
+type EscapeIdentifierQuotes<TIdentifier extends string> =
+  TIdentifier extends `${infer TBefore}"${infer TAfter}`
+    ? `${TBefore}""${EscapeIdentifierQuotes<TAfter>}`
+    : TIdentifier;
+
+type IdentifierPart<TIdentifier extends string> = TIdentifier extends
+  | `${string}.${string}`
+  | `${string}"${string}`
+  ? `"${EscapeIdentifierQuotes<TIdentifier>}"`
+  : TIdentifier;
+
+type TableMatchStringsForService<
+  TServiceName extends string,
+  TService,
+> = TService extends { schemas: infer TSchemas }
+  ? {
+      [TSchemaName in keyof TSchemas & string]: TSchemas[TSchemaName] extends {
+        classes: infer TClasses;
+      }
+        ? {
+            [TTableName in keyof TClasses & string]:
+              | `${IdentifierPart<TServiceName>}.${IdentifierPart<TSchemaName>}.${IdentifierPart<TTableName>}`
+              | (TServiceName extends "main"
+                  ? `${IdentifierPart<TSchemaName>}.${IdentifierPart<TTableName>}`
+                  : never);
+          }[keyof TClasses & string]
+        : never;
+    }[keyof TSchemas & string]
+  : never;
+
+/** Valid string table matches from gather-time generated types, when present. */
+export type TableMatchStringForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+> = [GatherPgIntrospectionForScope<TScope>] extends [never]
+  ? string
+  : {
+      [TServiceName in keyof GatherPgIntrospectionForScope<TScope> & string]: TableMatchStringsForService<
+        TServiceName,
+        GatherPgIntrospectionForScope<TScope>[TServiceName]
+      >;
+    }[keyof GatherPgIntrospectionForScope<TScope> & string];
+
+export type TableMatchForScope<
+  TScope extends keyof GraphileBuild.ScopedGeneratedTypes,
+> = TableMatch | TableMatchStringForScope<TScope>;
 
 export function resolveTableMatch(
   matcher: string | TableMatch,
