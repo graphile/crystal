@@ -811,9 +811,10 @@ select * from a where id = 1;
               const resource = Object.values(build.pgResources).find(
                 (r) => !r.parameters && r.codec === codec,
               );
-              const pk =
-                resource?.uniques.find((u: PgResourceUnique) => u.isPrimary) ??
-                resource?.uniques[0];
+              const uniques = resource?.uniques as
+                | PgResourceUnique[]
+                | undefined;
+              const pk = uniques?.find((u) => u.isPrimary) ?? uniques?.[0];
               const pkCols = pk?.attributes;
               build.registerObjectType(
                 tableTypeName,
