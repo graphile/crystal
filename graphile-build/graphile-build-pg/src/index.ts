@@ -127,10 +127,6 @@ declare global {
           : PgRegistry;
     }
 
-    interface BuildInput {
-      pgRegistry: PgRegistry;
-    }
-
     interface SchemaOptions {
       /**
        * What to expose when we see a partitioned table (or its child partitions).
