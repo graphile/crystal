@@ -34,11 +34,7 @@ export function addPgTableOrderBy<
   ) => MakeAddPgTableOrderByPluginOrders,
   hint = `Adding orders with addPgTableOrderBy to ${typeof match === "string" ? match : `"${match.schemaName}"."${match.tableName}"`}`,
 ): GraphileConfig.Plugin {
-  const {
-    serviceName = "main",
-    schemaName,
-    tableName,
-  } = resolveTableMatch(match);
+  const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const baseDisplayName = `addPgTableOrderBy_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
