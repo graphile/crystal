@@ -4,13 +4,13 @@ import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { TableMatchForScope } from "./resolveTableMatch.ts";
+import type { ScopedTableMatch } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
-  match: TableMatchForScope<TScope>,
+  match: ScopedTableMatch<TScope>,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,

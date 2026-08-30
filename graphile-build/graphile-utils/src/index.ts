@@ -19,10 +19,10 @@ export {
 } from "./makeAddPgTableOrderByPlugin.ts";
 export type {
   ChangeNullabilityRules,
-  ChangeNullabilityRulesForScope,
   ChangeNullabilityTypeRules,
   NullabilitySpec,
   NullabilitySpecString,
+  ScopedChangeNullabilityRules,
 } from "./makeChangeNullabilityPlugin.ts";
 export {
   changeNullability,
@@ -44,8 +44,8 @@ export type {
   JSONPgSmartTags,
   PgSmartTagFilterFunction,
   PgSmartTagRule,
-  PgSmartTagRuleForScope,
   PgSmartTagTags,
+  ScopedPgSmartTagRule,
   SubscribeToJSONPgSmartTagsUpdatesCallback,
   SubscribeToPgSmartTagUpdatesCallback,
   UpdateJSONPgSmartTagsCallback,

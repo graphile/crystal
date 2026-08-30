@@ -185,7 +185,7 @@ type GeneratedObjects<TObjects> = {
   >;
 };
 
-type GeneratedExtensionDefinitionForScope<
+type ScopedGeneratedExtensionDefinition<
   TScope extends keyof GraphileBuild.PluginScopes,
 > = GraphileBuild.PluginScopes[TScope] extends {
   schema: {
@@ -199,7 +199,7 @@ type GeneratedExtensionDefinitionForScope<
 
 export type GeneratedExtensionDefinition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
-> = GeneratedExtensionDefinitionForScope<TScope>;
+> = ScopedGeneratedExtensionDefinition<TScope>;
 
 type ParentConstructors<T> = { new (...args: any[]): T };
 

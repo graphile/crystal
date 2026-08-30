@@ -117,7 +117,7 @@ type GeneratedChangeNullabilityRules<TSchema> = [TSchema] extends [never]
       }
     : never;
 
-export type ChangeNullabilityRulesForScope<
+export type ScopedChangeNullabilityRules<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = {
   [TTypeName in keyof GeneratedChangeNullabilityRules<
@@ -213,11 +213,11 @@ function doIt(
 export function changeNullability<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
   const TRules extends
-    ChangeNullabilityRulesForScope<TScope> = ChangeNullabilityRulesForScope<TScope>,
+    ScopedChangeNullabilityRules<TScope> = ScopedChangeNullabilityRules<TScope>,
 >(
   rules: TRules &
     Record<
-      Exclude<keyof TRules, keyof ChangeNullabilityRulesForScope<TScope>>,
+      Exclude<keyof TRules, keyof ScopedChangeNullabilityRules<TScope>>,
       never
     >,
 ): GraphileConfig.Plugin;

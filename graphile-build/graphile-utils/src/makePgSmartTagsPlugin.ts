@@ -56,7 +56,7 @@ export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
 > = PgSmartTagRules[TKind];
 
-type GatherPgIntrospectionForScope<
+type ScopedGatherPgIntrospection<
   TScope extends keyof GraphileBuild.PluginScopes,
 > = GraphileBuild.PluginScopes[TScope] extends {
   gather: { pgIntrospection: infer TPgIntrospection };
@@ -149,31 +149,31 @@ type SmartTagNamespaceMatches<TIntrospection> = {
 type GeneratedSmartTagMatches<
   TScope extends keyof GraphileBuild.PluginScopes,
   TKind extends PgSmartTagSupportedKinds,
-> = [GatherPgIntrospectionForScope<TScope>] extends [never]
+> = [ScopedGatherPgIntrospection<TScope>] extends [never]
   ? string
   : TKind extends "class"
-    ? SmartTagClassMatches<GatherPgIntrospectionForScope<TScope>>
+    ? SmartTagClassMatches<ScopedGatherPgIntrospection<TScope>>
     : TKind extends "attribute"
       ? SmartTagAttributeOrConstraintMatches<
-          GatherPgIntrospectionForScope<TScope>,
+          ScopedGatherPgIntrospection<TScope>,
           "attributes"
         >
       : TKind extends "constraint"
         ? SmartTagAttributeOrConstraintMatches<
-            GatherPgIntrospectionForScope<TScope>,
+            ScopedGatherPgIntrospection<TScope>,
             "constraints"
           >
         : TKind extends "procedure"
           ? SmartTagSchemaEntryMatches<
-              GatherPgIntrospectionForScope<TScope>,
+              ScopedGatherPgIntrospection<TScope>,
               "functions"
             >
           : TKind extends "type"
             ? SmartTagSchemaEntryMatches<
-                GatherPgIntrospectionForScope<TScope>,
+                ScopedGatherPgIntrospection<TScope>,
                 "types"
               >
-            : SmartTagNamespaceMatches<GatherPgIntrospectionForScope<TScope>>;
+            : SmartTagNamespaceMatches<ScopedGatherPgIntrospection<TScope>>;
 
 type PgSmartTagRuleWithMatches<
   TKind extends PgSmartTagSupportedKinds,
@@ -182,7 +182,7 @@ type PgSmartTagRuleWithMatches<
   match: TMatches | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
 };
 
-export type PgSmartTagRuleForScope<
+export type ScopedPgSmartTagRule<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = {
   [TKind in PgSmartTagSupportedKinds]: PgSmartTagRuleWithMatches<
@@ -353,8 +353,8 @@ export type UpdatePgSmartTagRulesCallback<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 > = (
   ruleOrRules:
-    | PgSmartTagRuleForScope<TScope>
-    | PgSmartTagRuleForScope<TScope>[]
+    | ScopedPgSmartTagRule<TScope>
+    | ScopedPgSmartTagRule<TScope>[]
     | null,
 ) => void;
 
@@ -390,7 +390,7 @@ export function pgSmartTags<
 >(
   initialRules: ThunkOrDirect<
     PromiseOrDirect<
-      PgSmartTagRuleForScope<TScope> | PgSmartTagRuleForScope<TScope>[] | null
+      ScopedPgSmartTagRule<TScope> | ScopedPgSmartTagRule<TScope>[] | null
     >
   >,
   subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback<TScope> | null,

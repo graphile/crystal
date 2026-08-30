@@ -6,7 +6,7 @@ import type {
 import type { GraphQLEnumValueConfig } from "graphql";
 
 import { EXPORTABLE } from "./exportable.ts";
-import type { TableMatchForScope } from "./resolveTableMatch.ts";
+import type { ScopedTableMatch } from "./resolveTableMatch.ts";
 import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 type ArrayOrDirect<T> = T | Array<T>;
@@ -28,7 +28,7 @@ const counterByName = new Map<string, number>();
 export function addPgTableOrderBy<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(
-  match: TableMatchForScope<TScope>,
+  match: ScopedTableMatch<TScope>,
   ordersGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
   ) => MakeAddPgTableOrderByPluginOrders,

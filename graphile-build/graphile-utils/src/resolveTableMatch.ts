@@ -10,7 +10,7 @@ export type TableMatch = {
   tableName: string;
 };
 
-type GatherPgIntrospectionForScope<
+type ScopedGatherPgIntrospection<
   TScope extends keyof GraphileBuild.PluginScopes,
 > = GraphileBuild.PluginScopes[TScope] extends {
   gather: { pgIntrospection: infer TPgIntrospection };
@@ -49,21 +49,21 @@ type TableMatchStringsForService<
   : never;
 
 /** Valid string table matches from gather-time generated types, when present. */
-export type TableMatchStringForScope<
+export type ScopedTableMatchString<
   TScope extends keyof GraphileBuild.PluginScopes,
-> = [GatherPgIntrospectionForScope<TScope>] extends [never]
+> = [ScopedGatherPgIntrospection<TScope>] extends [never]
   ? string
   : {
-      [TServiceName in keyof GatherPgIntrospectionForScope<TScope> &
+      [TServiceName in keyof ScopedGatherPgIntrospection<TScope> &
         string]: TableMatchStringsForService<
         TServiceName,
-        GatherPgIntrospectionForScope<TScope>[TServiceName]
+        ScopedGatherPgIntrospection<TScope>[TServiceName]
       >;
-    }[keyof GatherPgIntrospectionForScope<TScope> & string];
+    }[keyof ScopedGatherPgIntrospection<TScope> & string];
 
-export type TableMatchForScope<
-  TScope extends keyof GraphileBuild.PluginScopes,
-> = TableMatch | TableMatchStringForScope<TScope>;
+export type ScopedTableMatch<TScope extends keyof GraphileBuild.PluginScopes> =
+  | TableMatch
+  | ScopedTableMatchString<TScope>;
 
 export function resolveTableMatch(
   matcher: string | TableMatch,
