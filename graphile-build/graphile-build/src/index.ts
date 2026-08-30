@@ -906,6 +906,7 @@ declare global {
     }
 
     interface PluginInflectionConfig<
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       TScope extends keyof GraphileBuild.PluginScopes = never,
     > {
       /**

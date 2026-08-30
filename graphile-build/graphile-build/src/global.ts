@@ -109,6 +109,7 @@ declare global {
     interface BuildInput {
       // Expand this interface with declaration merging
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface BuildInputScopedExtensions<TScope extends keyof PluginScopes> {
       // Expand this interface with declaration merging
     }
@@ -657,6 +658,7 @@ declare global {
       behavior: Behavior & BehaviorDynamicMethods;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface BuildScopedExtensions<TScope extends keyof PluginScopes> {
       // Expand this interface with declaration merging
     }
