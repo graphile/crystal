@@ -8,21 +8,12 @@ type GraphQLInputType = AllGraphQL.GraphQLInputType;
 type GraphQLOutputType = AllGraphQL.GraphQLOutputType;
 type GraphQLType = AllGraphQL.GraphQLType;
 
-export type NullabilitySpecString =
-  | ""
-  | "!"
-  | "[]"
-  | "[]!"
-  | "[!]"
-  | "[!]!"
-  | "[[]]"
-  | "[[]]!"
-  | "[[]!]"
-  | "[[]!]!"
-  | "[[!]]"
-  | "[[!]]!"
-  | "[[!]!]"
-  | "[[!]!]!";
+type NullabilityDepth0 = "" | "!";
+type NullabilityDepth1 = `[${NullabilityDepth0}]${"" | "!"}`;
+type NullabilityDepth2 = `[${NullabilityDepth1}]${"" | "!"}`;
+
+export type NullabilitySpecString = string &
+  (NullabilityDepth0 | NullabilityDepth1 | NullabilityDepth2);
 
 // For backwards compatibility
 export type NullabilitySpec = boolean | NullabilitySpecString;
@@ -41,17 +32,12 @@ export interface ChangeNullabilityRules {
   [typeName: string]: ChangeNullabilityTypeRules;
 }
 
-type NullabilitySpecForListDepth<
-  TListDepth extends number,
-  TDepth extends readonly unknown[] = [],
-> = number extends TListDepth
-  ? NullabilitySpec
-  : TDepth["length"] extends TListDepth
-    ? "" | "!"
-    :
-        | NullabilitySpecForListDepth<TListDepth, [...TDepth, unknown]>
-        | `[${NullabilitySpecForListDepth<TListDepth, [...TDepth, unknown]>}]`
-        | `[${NullabilitySpecForListDepth<TListDepth, [...TDepth, unknown]>}]!`;
+type NullabilitySpecForListDepth<TListDepth extends number> =
+  TListDepth extends 0
+    ? NullabilityDepth0
+    : TListDepth extends 1
+      ? NullabilityDepth0 | NullabilityDepth1
+      : NullabilitySpecString;
 
 type NullabilitySpecFor<TListDepth extends number> =
   | boolean
