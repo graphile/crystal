@@ -812,7 +812,7 @@ select * from a where id = 1;
                 (r) => !r.parameters && r.codec === codec,
               );
               const uniques = resource?.uniques as
-                | PgResourceUnique[]
+                | readonly PgResourceUnique[]
                 | undefined;
               const pk = uniques?.find((u) => u.isPrimary) ?? uniques?.[0];
               const pkCols = pk?.attributes;

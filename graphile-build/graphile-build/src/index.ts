@@ -831,20 +831,49 @@ declare global {
       // Extend this with declaration merging
 
       // [scopeName: string]: {
+      //   gather?: {
+      //     pgIntrospection: {
+      //       [serviceName: string]: {
+      //         schemas: {
+      //           [schemaName: string]: {
+      //             functions: { [functionName: string]: {} };
+      //             classes: {
+      //               [className: string]: {
+      //                 attributes: { [attributeName: string]: {} };
+      //                 constraints: { [constraintName: string]: {} };
+      //               };
+      //             };
+      //             types: { [typeName: string]: {} };
+      //           };
+      //         };
+      //       };
+      //     };
+      //   };
+      //   pgRegistry?: TypedPgRegistry;
       //   schema: {
       //     objects: {
       //       [typeName: string]: {
-      //         Step: ExepectedStepTypes
-      //         listDepth: 0
-      //         args: {
-      //           [argName: string]: {
-      //             listDepth: 0
-      //             Type: ...
+      //         Step?: ExpectedStepTypes;
+      //         fields: {
+      //           [fieldName: string]: {
+      //             listDepth: number;
+      //             Result?: ExpectedStepTypes;
+      //             args: {
+      //               [argName: string]: {
+      //                 listDepth: number;
+      //                 Type: unknown;
+      //               };
+      //             };
       //           }
-      //         }
-      //       }
-      //     }
-      //   }
+      //         };
+      //       };
+      //     };
+      //     interfaces: { [typeName: string]: {} };
+      //     unions: { [typeName: string]: {} };
+      //     inputObjects: { [typeName: string]: {} };
+      //     scalars: { [typeName: string]: { type: unknown } };
+      //     enums: { [typeName: string]: { values: { [valueName: string]: { value: unknown } } } };
+      //   };
       // }
     }
 
