@@ -150,9 +150,7 @@ type GeneratedFieldArgs<TArgs> = {
     optional: true;
   }
     ? TArgName
-    : never]?: TArgs[TArgName] extends { type: infer TType }
-    ? TType
-    : never;
+    : never]?: TArgs[TArgName] extends { type: infer TType } ? TType : never;
 } extends infer TGeneratedArgs extends BaseGraphQLArguments
   ? TGeneratedArgs
   : never;
