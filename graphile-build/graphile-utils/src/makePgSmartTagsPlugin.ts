@@ -179,31 +179,12 @@ type PgSmartTagRuleWithMatches<
 
 export type PgSmartTagRuleForScope<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
-> =
-  | PgSmartTagRuleWithMatches<
-      "class",
-      GeneratedSmartTagMatches<TScope, "class">
-    >
-  | PgSmartTagRuleWithMatches<
-      "attribute",
-      GeneratedSmartTagMatches<TScope, "attribute">
-    >
-  | PgSmartTagRuleWithMatches<
-      "procedure",
-      GeneratedSmartTagMatches<TScope, "procedure">
-    >
-  | PgSmartTagRuleWithMatches<
-      "namespace",
-      GeneratedSmartTagMatches<TScope, "namespace">
-    >
-  | PgSmartTagRuleWithMatches<
-      "constraint",
-      GeneratedSmartTagMatches<TScope, "constraint">
-    >
-  | PgSmartTagRuleWithMatches<
-      "type",
-      GeneratedSmartTagMatches<TScope, "type">
-    >;
+> = {
+  [TKind in PgSmartTagSupportedKinds]: PgSmartTagRuleWithMatches<
+    TKind,
+    GeneratedSmartTagMatches<TScope, TKind>
+  >;
+}[PgSmartTagSupportedKinds];
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
