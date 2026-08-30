@@ -212,10 +212,8 @@ function doIt(
 
 export function changeNullability<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
->(rules: ScopedChangeNullabilityRules<TScope>): GraphileConfig.Plugin;
-export function changeNullability(
-  rules: ChangeNullabilityRules,
-): GraphileConfig.Plugin {
+>(scopedRules: ScopedChangeNullabilityRules<TScope>): GraphileConfig.Plugin {
+  const rules = scopedRules as ChangeNullabilityRules;
   const expectedMatches = Object.entries(rules).flatMap(
     ([typeName, typeRules]) =>
       Object.keys(typeRules).flatMap((fieldName) => {
