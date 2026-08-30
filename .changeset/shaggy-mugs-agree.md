@@ -11,6 +11,11 @@ Improves types in `@dataplan/pg` around codecs, resources, nullability, range
 values, and resource execution arguments. Adds support for PostGraphile Pro (V5)
 type generation.
 
+**NOTE**: `pgResource.execute(...)` no longer accepts `pgCodec` in the
+arguments; it was always ignored internally because the parameter codec was
+used, now we explicitly don't accept it. `{ step, name?, pgCodec }` &rarr;
+`{ step, name? }`
+
 The new PostGraphile Pro (V5) plugin can generate registry, plan resolver,
 introspection (for smart tags) and other related types, and even supports
 correct types across multiple PostGraphile schemas in the same TypeScript
