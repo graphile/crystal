@@ -16,7 +16,10 @@ import type {
 import type {} from "graphile-config";
 import JSON5 from "json5";
 
-import { parseIdentifierParts } from "./parseIdentifierParts.ts";
+import {
+  type IdentifierPart,
+  parseIdentifierParts,
+} from "./parseIdentifierParts.ts";
 
 type PromiseOrDirect<T> = Promise<T> | T;
 type ThunkOrDirect<T> = (() => T) | T;
@@ -76,8 +79,8 @@ type SmartTagClassMatches<TIntrospection> = {
         }
           ? {
               [TClassName in keyof TClasses & string]:
-                | TClassName
-                | `${TSchemaName}.${TClassName}`;
+                | IdentifierPart<TClassName>
+                | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TClassName>}`;
             }[keyof TClasses & string]
           : never;
       }[keyof TSchemas & string]
@@ -105,9 +108,9 @@ type SmartTagAttributeOrConstraintMatches<
               >
                 ? {
                     [TEntryName in keyof TEntries & string]:
-                      | TEntryName
-                      | `${TClassName}.${TEntryName}`
-                      | `${TSchemaName}.${TClassName}.${TEntryName}`;
+                      | IdentifierPart<TEntryName>
+                      | `${IdentifierPart<TClassName>}.${IdentifierPart<TEntryName>}`
+                      | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TClassName>}.${IdentifierPart<TEntryName>}`;
                   }[keyof TEntries & string]
                 : never;
             }[keyof TClasses & string]
@@ -129,8 +132,8 @@ type SmartTagSchemaEntryMatches<
           string]: TSchemas[TSchemaName] extends Record<TKey, infer TEntries>
           ? {
               [TEntryName in keyof TEntries & string]:
-                | TEntryName
-                | `${TSchemaName}.${TEntryName}`;
+                | IdentifierPart<TEntryName>
+                | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TEntryName>}`;
             }[keyof TEntries & string]
           : never;
       }[keyof TSchemas & string]
@@ -142,7 +145,7 @@ type SmartTagNamespaceMatches<TIntrospection> = {
     string]: TIntrospection[TServiceName] extends {
     schemas: infer TSchemas;
   }
-    ? keyof TSchemas & string
+    ? IdentifierPart<keyof TSchemas & string>
     : never;
 }[keyof TIntrospection & string];
 

@@ -1,6 +1,9 @@
 import type {} from "graphile-build";
 
-import { parseIdentifierParts } from "./parseIdentifierParts.ts";
+import {
+  type IdentifierPart,
+  parseIdentifierParts,
+} from "./parseIdentifierParts.ts";
 
 const DEFAULT_SERVICE_NAME = "main";
 
@@ -17,17 +20,6 @@ type ScopedGatherPgIntrospection<
 }
   ? TPgIntrospection
   : never;
-
-type EscapeIdentifierQuotes<TIdentifier extends string> =
-  TIdentifier extends `${infer TBefore}"${infer TAfter}`
-    ? `${TBefore}""${EscapeIdentifierQuotes<TAfter>}`
-    : TIdentifier;
-
-type IdentifierPart<TIdentifier extends string> = TIdentifier extends
-  | `${string}.${string}`
-  | `${string}"${string}`
-  ? `"${EscapeIdentifierQuotes<TIdentifier>}"`
-  : TIdentifier;
 
 type TableMatchStringsForService<
   TServiceName extends string,
