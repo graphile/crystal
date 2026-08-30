@@ -145,18 +145,36 @@ type GeneratedFieldArgs<TArgs> = {
   ? TGeneratedArgs
   : never;
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+type CommonKeys<T> = {
+  [TKey in KeysOfUnion<T>]: [T] extends [Record<TKey, unknown>] ? TKey : never;
+}[KeysOfUnion<T>];
+type ValueForKey<T, TKey extends PropertyKey> = T extends Record<
+  TKey,
+  infer TValue
+>
+  ? TValue
+  : never;
+
 type GeneratedFieldPlans<TSource extends Step, TFields> = {
-  [TFieldName in keyof TFields]?: TFields[TFieldName] extends {
+  [TFieldName in CommonKeys<TFields>]?: ValueForKey<
+    TFields,
+    TFieldName
+  > extends {
     args: infer TArgs;
   }
-    ? TFields[TFieldName] extends { Result: infer TResult extends Step }
+    ? ValueForKey<TFields, TFieldName> extends {
+        Result: infer TResult extends Step;
+      }
       ? FieldPlan<TSource, GeneratedFieldArgs<TArgs>, TResult>
       : FieldPlan<TSource, GeneratedFieldArgs<TArgs>>
     : never;
 };
 
-type GeneratedObjectPlan<TObject> = TObject extends { fields: infer TFields }
-  ? TObject extends { Step: infer TSource extends Step }
+type GeneratedObjectPlan<TObject> = [TObject] extends [
+  { fields: infer TFields },
+]
+  ? [TObject] extends [{ Step: infer TSource extends Step }]
     ? Omit<ObjectPlan<TSource>, "plans"> & {
         plans?: GeneratedFieldPlans<TSource, TFields>;
       }
@@ -166,7 +184,9 @@ type GeneratedObjectPlan<TObject> = TObject extends { fields: infer TFields }
   : ObjectPlan;
 
 type GeneratedObjects<TObjects> = {
-  [TObjectName in keyof TObjects]?: GeneratedObjectPlan<TObjects[TObjectName]>;
+  [TObjectName in CommonKeys<TObjects>]?: GeneratedObjectPlan<
+    ValueForKey<TObjects, TObjectName>
+  >;
 };
 
 type GeneratedExtensionDefinitionForScope<
@@ -183,10 +203,7 @@ type GeneratedExtensionDefinitionForScope<
 
 export type GeneratedExtensionDefinition<
   TScope extends keyof GraphileBuild.ScopedGeneratedTypes = "default",
-> = GeneratedExtensionDefinitionForScope<TScope> & {
-  /** The generated schema scope(s) this extension targets. */
-  scope?: TScope | readonly TScope[];
-};
+> = GeneratedExtensionDefinitionForScope<TScope>;
 
 type ParentConstructors<T> = { new (...args: any[]): T };
 
