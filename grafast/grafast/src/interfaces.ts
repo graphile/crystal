@@ -204,7 +204,7 @@ type FieldArgsInputObjectChildValue<
 export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
-  getRaw<TValue extends TObj = TObj>(path?: undefined): Step<TValue>;
+  getRaw(): Step<TObj>;
   getRaw<TKey extends keyof TObj & string>(path: TKey): Step<TObj[TKey]>;
   getRaw(path: ReadonlyArray<string | number>): AnyInputStep;
   getBaked<TKey extends keyof TObj & string>(path: TKey): Step;
