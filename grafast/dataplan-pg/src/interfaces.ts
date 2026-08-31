@@ -415,9 +415,9 @@ export type PgOrderFragmentSpec = {
   readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
-export type PgOrderAttributeSpec = {
+export type PgOrderAttributeSpec<TAttribute extends string = string> = {
   /** The attribute you're using for ordering */
-  readonly attribute: string;
+  readonly attribute: TAttribute;
   /** An optional expression to wrap this attribute with, and the type that expression returns */
   readonly callback?: (
     attributeExpression: SQL,
@@ -433,7 +433,9 @@ export type PgOrderAttributeSpec = {
 /**
  * The information required to specify an entry in an 'ORDER BY' clause.
  */
-export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
+export type PgOrderSpec<TAttribute extends string = string> =
+  | PgOrderFragmentSpec
+  | PgOrderAttributeSpec<TAttribute>;
 
 /**
  * The information required to specify an entry in a `GROUP BY` clause.

@@ -1053,7 +1053,10 @@ export class PgSelectStep<
   }
 
   orderBy(
-    order: PgSQLCallbackOrDirect<PgOrderSpec, this | PlantimeEmbeddable>,
+    order: PgSQLCallbackOrDirect<
+      PgOrderSpec<keyof GetPgResourceAttributes<TResource> & string>,
+      this | PlantimeEmbeddable
+    >,
   ): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(validateOrderSpec(this.scopedSQL(order)));
@@ -4102,7 +4105,12 @@ export interface PgSelectQueryBuilder<
 > extends PgQueryBuilder {
   mode: PgSelectMode;
   /** Instruct to add another order */
-  orderBy(spec: PgSQLCallbackOrDirect<PgOrderSpec, RuntimeEmbeddable>): void;
+  orderBy(
+    spec: PgSQLCallbackOrDirect<
+      PgOrderSpec<keyof GetPgResourceAttributes<TResource> & string>,
+      RuntimeEmbeddable
+    >,
+  ): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
   /** Returns the SQL alias representing the table related to this relation */
