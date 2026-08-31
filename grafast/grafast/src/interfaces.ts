@@ -53,7 +53,6 @@ import type {
   __TrackedValueStep,
   __TrackedValueStepWithDollars,
   ConstantStep,
-  ObjectStep,
 } from "./steps/index.ts";
 
 export type { ExecutionEntryFlags };
@@ -205,10 +204,9 @@ type FieldArgsInputObjectChildValue<
 export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
+  getRaw<TValue extends TObj = TObj>(path?: undefined): Step<TValue>;
   getRaw<TKey extends keyof TObj & string>(path: TKey): Step<TObj[TKey]>;
-  getRaw(
-    path?: ReadonlyArray<string | number>,
-  ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
+  getRaw(path: ReadonlyArray<string | number>): AnyInputStep;
   getBaked<TKey extends keyof TObj & string>(path: TKey): Step;
   getBaked(path: ReadonlyArray<string | number>): Step;
   typeAt(path: keyof TObj & string): GraphQLInputType;
