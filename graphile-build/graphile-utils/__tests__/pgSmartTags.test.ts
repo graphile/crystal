@@ -25,7 +25,7 @@ import {
 } from "../src/makePgSmartTagsPlugin.ts";
 
 declare global {
-  // eslint-disable @typescript-eslint/no-empty-object-type
+  /* eslint-disable @typescript-eslint/no-empty-object-type */
   namespace GraphileBuild {
     interface PluginScopes {
       pgSmartTagsTypecheck: {
@@ -47,7 +47,7 @@ declare global {
       };
     }
   }
-  // eslint-enable @typescript-eslint/no-empty-object-type
+  /* eslint-enable @typescript-eslint/no-empty-object-type */
 }
 
 function typecheckScopedJsonPgSmartTags(): void {
