@@ -58,7 +58,7 @@ export function withFieldArgsForArguments<T extends Step>(
   const applied = new Map<string, Step>();
   let autoApplyDisabled = false;
 
-  function getRaw(path?: undefined): Step;
+  function getRaw(): Step;
   function getRaw<TKey extends string>(path: TKey): Step;
   function getRaw(path: ReadonlyArray<string | number>): AnyInputStep;
   function getRaw(
