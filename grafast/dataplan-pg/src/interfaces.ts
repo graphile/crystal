@@ -415,27 +415,40 @@ export type PgOrderFragmentSpec = {
   readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
-export type PgOrderAttributeSpec<TAttribute extends string = string> = {
-  /** The attribute you're using for ordering */
-  readonly attribute: TAttribute;
-  /** An optional expression to wrap this attribute with, and the type that expression returns */
-  readonly callback?: (
-    attributeExpression: SQL,
-    attributeCodec: PgCodec,
-    nullable: boolean,
-  ) => [fragment: SQL, codec: PgCodec, nullable?: boolean];
+export type PgOrderAttributeSpec<
+  TAttributes extends PgCodecAttributes = PgCodecAttributes,
+  TAttribute extends keyof TAttributes & string = keyof TAttributes & string,
+> = TAttribute extends keyof TAttributes & string
+  ? {
+      /** The attribute you're using for ordering */
+      readonly attribute: TAttribute;
+      /** An optional expression to wrap this attribute with, and the type that expression returns */
+      readonly callback?: {
+        // Method syntax deliberately keeps this callback bivariant, so a
+        // resource-specific order spec remains assignable to the general one.
+        bivarianceHack(
+          attributeExpression: SQL,
+          attributeCodec: TAttributes[TAttribute]["codec"],
+          nullable: [
+            PgCodecAttributeNullability<TAttributes[TAttribute]>,
+          ] extends [never]
+            ? false
+            : boolean,
+        ): [fragment: SQL, codec: PgCodec, nullable?: boolean];
+      }["bivarianceHack"];
 
-  readonly fragment?: never;
-  readonly codec?: never;
-  readonly nullable?: boolean;
-} & PgOrderCommonSpec;
+      readonly fragment?: never;
+      readonly codec?: never;
+      readonly nullable?: boolean;
+    } & PgOrderCommonSpec
+  : never;
 
 /**
  * The information required to specify an entry in an 'ORDER BY' clause.
  */
-export type PgOrderSpec<TAttribute extends string = string> =
-  | PgOrderFragmentSpec
-  | PgOrderAttributeSpec<TAttribute>;
+export type PgOrderSpec<
+  TAttributes extends PgCodecAttributes = PgCodecAttributes,
+> = PgOrderFragmentSpec | PgOrderAttributeSpec<TAttributes>;
 
 /**
  * The information required to specify an entry in a `GROUP BY` clause.
@@ -785,7 +798,9 @@ export interface PgQueryBuilder {
   getMetaRaw(key: string): unknown;
 }
 
-export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;
+export type PgSelectQueryBuilderCallback<
+  TResource extends PgResource<any, any, any, any, any> = PgResource,
+> = (qb: PgSelectQueryBuilder<TResource>) => void;
 export type PgUnionAllQueryBuilderCallback = (
   qb: PgUnionAllQueryBuilder,
 ) => void;

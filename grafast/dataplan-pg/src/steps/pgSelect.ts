@@ -416,7 +416,7 @@ export class PgSelectStep<
      * we only use it for internal optimizations (specifically around
      * `.apply(...)`).
      */
-    PgSelectQueryBuilder
+    PgSelectQueryBuilder<TResource>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -1054,7 +1054,7 @@ export class PgSelectStep<
 
   orderBy(
     order: PgSQLCallbackOrDirect<
-      PgOrderSpec<keyof GetPgResourceAttributes<TResource> & string>,
+      PgOrderSpec<GetPgResourceAttributes<TResource>>,
       this | PlantimeEmbeddable
     >,
   ): void {
@@ -1070,10 +1070,12 @@ export class PgSelectStep<
   }
 
   apply(
-    $step: Step<ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>>,
+    $step: Step<
+      ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback<TResource>>>
+    >,
   ) {
     if ($step instanceof ConstantStep) {
-      ($step.data as PgSelectQueryBuilderCallback)(this);
+      ($step.data as PgSelectQueryBuilderCallback<TResource>)(this);
     } else {
       this.applyDepIds.push(this.addUnaryDependency($step));
     }
@@ -4107,7 +4109,7 @@ export interface PgSelectQueryBuilder<
   /** Instruct to add another order */
   orderBy(
     spec: PgSQLCallbackOrDirect<
-      PgOrderSpec<keyof GetPgResourceAttributes<TResource> & string>,
+      PgOrderSpec<GetPgResourceAttributes<TResource>>,
       RuntimeEmbeddable
     >,
   ): void;
