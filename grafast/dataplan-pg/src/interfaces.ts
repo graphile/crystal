@@ -799,7 +799,13 @@ export interface PgQueryBuilder {
 }
 
 export type PgSelectQueryBuilderCallback<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
 > = (qb: PgSelectQueryBuilder<TResource>) => void;
 export type PgUnionAllQueryBuilderCallback = (
   qb: PgUnionAllQueryBuilder,

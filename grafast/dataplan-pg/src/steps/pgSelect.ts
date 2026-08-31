@@ -4103,7 +4103,13 @@ function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
 }
 
 export interface PgSelectQueryBuilder<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
 > extends PgQueryBuilder {
   mode: PgSelectMode;
   /** Instruct to add another order */
