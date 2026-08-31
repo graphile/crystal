@@ -59,7 +59,6 @@ export {
   makePgSmartTagsPlugin,
   pgSmartTags,
   pgSmartTagsFromFile,
-  pgSmartTagRulesFromJSON,
   TagsFilePlugin,
 } from "./makePgSmartTagsPlugin.ts";
 export {

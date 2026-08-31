@@ -568,6 +568,7 @@ export type JSONPgSmartTags<
   };
 };
 
+/** @internal */
 export function pgSmartTagRulesFromJSON<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
 >(json: JSONPgSmartTags<TScope> | null): ScopedPgSmartTagRule<TScope>[] {
