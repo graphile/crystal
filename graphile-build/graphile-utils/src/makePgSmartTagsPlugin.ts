@@ -726,12 +726,12 @@ export function jsonPgSmartTags<
   );
 }
 
-export const pgSmartTagsFromFile = <
-  TScope extends keyof GraphileBuild.PluginScopes = "default",
->(
+export function pgSmartTagsFromFile(
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
   name?: keyof GraphileConfig.Plugins,
-): GraphileConfig.Plugin => {
+): GraphileConfig.Plugin {
+  // This function doesn't benefit from having a generic scope
+  type TScope = never;
   /*
    * We're wrapping the `smartTagsPlugin` defined below with a plugin wrapper
    * so that any errors from reading the smart tags file are thrown when the
@@ -784,7 +784,7 @@ export const pgSmartTagsFromFile = <
   );
 
   return plugin;
-};
+}
 
 export const TagsFilePlugin = pgSmartTagsFromFile(undefined, "TagsFilePlugin");
 
