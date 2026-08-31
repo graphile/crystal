@@ -107,7 +107,6 @@ import {
   PgManyFilter,
   PgResource,
   pgSelect,
-  pgSelectSingleFromRecord,
   PgSelectSingleStep,
   pgUpdateSingle,
   PgUpdateSingleStep,
@@ -5061,14 +5060,11 @@ export function makeExampleSchema(
       post: {
         type: RelationalPost,
         plan: EXPORTABLE(
-          (pgSelectSingleFromRecord, relationalPostsResource) =>
+          () =>
             function plan($post) {
-              return pgSelectSingleFromRecord(
-                relationalPostsResource,
-                $post.record(),
-              );
+              return $post.toSelectSingle();
             },
-          [pgSelectSingleFromRecord, relationalPostsResource],
+          [],
         ),
       },
 

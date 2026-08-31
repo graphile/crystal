@@ -33,8 +33,8 @@ export type PgClassSingleStep<
 > =
   | PgSelectSingleStep<TResource, TNullability>
   | PgInsertSingleStep<TResource>
-  | PgUpdateSingleStep<TResource>
-  | PgDeleteSingleStep<TResource>;
+  | PgUpdateSingleStep<TResource, TNullability>
+  | PgDeleteSingleStep<TResource, TNullability>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL

@@ -34,6 +34,8 @@ import type {
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -54,6 +56,7 @@ interface PgUpdatePlanFinalizeResults {
  */
 export class PgUpdateSingleStep<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TNullability extends null = null,
 > extends Step<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -283,13 +286,26 @@ export class PgUpdateSingleStep<
 
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
-    TResource
+    TResource,
+    TNullability
   > {
-    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+    return pgClassExpression<
+      GetPgResourceCodec<TResource>,
+      TResource,
+      TNullability
+    >(
       this,
       this.resource.codec as GetPgResourceCodec<TResource>,
       false,
     )`${this.alias}`;
+  }
+
+  /**
+   * Creates a select step for this updated record, enabling select-specific
+   * APIs such as `.getClassStep()` and `.select()`.
+   */
+  public toSelectSingle(): PgSelectSingleStep<TResource, TNullability> {
+    return pgSelectSingleFromRecord(this.resource, this.record());
   }
 
   /**
