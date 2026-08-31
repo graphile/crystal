@@ -416,7 +416,7 @@ export class PgSelectStep<
      * we only use it for internal optimizations (specifically around
      * `.apply(...)`).
      */
-    PgSelectQueryBuilder
+    PgSelectQueryBuilder<TResource>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -1053,7 +1053,10 @@ export class PgSelectStep<
   }
 
   orderBy(
-    order: PgSQLCallbackOrDirect<PgOrderSpec, this | PlantimeEmbeddable>,
+    order: PgSQLCallbackOrDirect<
+      PgOrderSpec<GetPgResourceAttributes<TResource>>,
+      this | PlantimeEmbeddable
+    >,
   ): void {
     this.locker.assertParameterUnlocked("orderBy");
     this.orders.push(validateOrderSpec(this.scopedSQL(order)));
@@ -1067,10 +1070,12 @@ export class PgSelectStep<
   }
 
   apply(
-    $step: Step<ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>>,
+    $step: Step<
+      ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback<TResource>>>
+    >,
   ) {
     if ($step instanceof ConstantStep) {
-      ($step.data as PgSelectQueryBuilderCallback)(this);
+      ($step.data as PgSelectQueryBuilderCallback<TResource>)(this);
     } else {
       this.applyDepIds.push(this.addUnaryDependency($step));
     }
@@ -4098,11 +4103,22 @@ function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
 }
 
 export interface PgSelectQueryBuilder<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
 > extends PgQueryBuilder {
   mode: PgSelectMode;
   /** Instruct to add another order */
-  orderBy(spec: PgSQLCallbackOrDirect<PgOrderSpec, RuntimeEmbeddable>): void;
+  orderBy(
+    spec: PgSQLCallbackOrDirect<
+      PgOrderSpec<GetPgResourceAttributes<TResource>>,
+      RuntimeEmbeddable
+    >,
+  ): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
   /** Returns the SQL alias representing the table related to this relation */

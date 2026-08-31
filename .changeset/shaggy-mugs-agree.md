@@ -26,8 +26,11 @@ available, while preserving broad fallbacks when they are not.
 With this plugin, many of the standard PostGraphile APIs can become more
 strongly typed with minimal user input. If you only have one PostGraphile
 instance then using the default generation should be picked up automatically by
-most plugin helpers -- `extendSchema()`, `wrapPlans()`, `pgSmartTags()`,
-`changeNullability()`, `addPgTableConditionPlugin()`, `addPgTableOrderBy()` --
-and for manual plugins you can use the `scopedPlugin(...)` helper to define your
-plugin. If you run multiple schemas then you can pass a generic (e.g.
-`extendSchema<"public-api">(...)`) to indicate the types to use.
+most plugin helpers -- `extendSchema()`, `wrapPlans()` (for the filter-based
+form of `wrapPlans()`, pass the `scope` property to options rather than adding a
+generic, this allows the filter return type to still be inferred automatically),
+`pgSmartTags()`, `changeNullability()`, `addPgTableCondition()`,
+`addPgTableOrderBy()` -- and for manual plugins you can use the
+`scopedPlugin(...)` helper to define your plugin. If you run multiple schemas
+then you can pass a generic (e.g. `extendSchema<"public-api">(...)`) to indicate
+the types to use.

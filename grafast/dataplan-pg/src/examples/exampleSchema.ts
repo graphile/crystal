@@ -1691,6 +1691,22 @@ export function makeExampleSchema(
     const _testGood: "int4" = $id.pgCodec.name;
     // @ts-expect-error
     const _testBad: "text" = $id.pgCodec.name;
+
+    const $people = pgSelect({
+      resource: registry.pgResources.people,
+      identifiers: [],
+    });
+    $people.orderBy({
+      attribute: "person_id",
+      direction: "ASC",
+      callback(_attributeExpression, attributeCodec, nullable) {
+        const _testCodec: "int4" = attributeCodec.name;
+        const _testNullability: false = nullable;
+        // @ts-expect-error 'person_id' uses the int4 codec, not text.
+        const _testWrongCodec: "text" = attributeCodec.name;
+        return [_attributeExpression, attributeCodec];
+      },
+    });
   }
 
   const deoptimizeIfAppropriate = EXPORTABLE(
