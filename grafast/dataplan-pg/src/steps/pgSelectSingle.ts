@@ -138,6 +138,14 @@ export class PgSelectSingleStep<
     return plan;
   }
 
+  /**
+   * Returns this record as a select step. This lets code written against a
+   * `PgClassSingleStep` use select-specific APIs without a type assertion.
+   */
+  public toSelectSingle(): PgSelectSingleStep<TResource, TNullability> {
+    return this;
+  }
+
   /** @internal */
   public getItemStep(): Step<unknown[]> {
     const plan = this.getDep(this.itemStepId);
