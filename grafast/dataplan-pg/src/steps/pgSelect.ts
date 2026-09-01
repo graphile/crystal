@@ -1080,6 +1080,8 @@ export class PgSelectStep<
    * @deprecated Not really deprecated, just you probably don't want this...
    * it's very hard to use correctly. You should probably use `.apply(...)` to
    * get access to the runtime query builder instead.
+   *
+   * @experimental
    */
   getOrderIsUnique(): boolean {
     return this.isOrderUnique;
@@ -3002,6 +3004,7 @@ function buildTheQueryCore<
     setOrderIsUnique() {
       info.isOrderUnique = true;
     },
+    /** @experimental */
     getOrderIsUnique() {
       return info.isOrderUnique;
     },
@@ -4140,7 +4143,11 @@ export interface PgSelectQueryBuilder<
   ): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
-  /** True if we've been told the order is unique. At plan-time this being false is somewhat irrelevant, since any `.apply(...)` callbacks might make it unique later. */
+  /**
+   * True if we've been told the order is unique. At plan-time this being false is somewhat irrelevant, since any `.apply(...)` callbacks might make it unique later.
+   *
+   * @experimental
+   */
   getOrderIsUnique(): boolean;
   /** Returns the SQL alias representing the table related to this relation */
   singleRelation<
