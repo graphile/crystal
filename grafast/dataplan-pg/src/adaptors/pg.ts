@@ -384,8 +384,9 @@ export function makePgAdaptorWithPgClient(
 
 /**
  * Returns a `withPgClient` for the given `PoolClient` instance. ONLY
- * SUITABLE FOR TESTS!
- *
+ * SUITABLE FOR TESTS! Only for use on a PoolClient fresh from the `pg` pool,
+ * do NOT use with a PoolClient accessed via the `.rawClient` property of a
+ * `NodePostgresPgClient`.
  */
 export function makeWithPgClientViaPgClientAlreadyInTransaction(
   pgClient: PoolClient,
