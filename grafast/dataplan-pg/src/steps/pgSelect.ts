@@ -1069,6 +1069,24 @@ export class PgSelectStep<
     this.isOrderUnique = true;
   }
 
+  /**
+   * Ordering matters, and reading this at the right time is a real challenge.
+   * If you have arg plans, strongly encourage not reading this until they have
+   * been applied (e.g. via `fieldArgs.autoApply(...)`). Even then, some orders
+   * are applied at runtime, so you shouldn't use this method - instead use
+   * `.apply(...)` and check the runtime query builder itself. Kept purely for
+   * consistency with query builder.
+   *
+   * @deprecated Not really deprecated, just you probably don't want this...
+   * it's very hard to use correctly. You should probably use `.apply(...)` to
+   * get access to the runtime query builder instead.
+   *
+   * @experimental
+   */
+  getOrderIsUnique(): boolean {
+    return this.isOrderUnique;
+  }
+
   apply(
     $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback<TResource>>>
@@ -2986,6 +3004,10 @@ function buildTheQueryCore<
     setOrderIsUnique() {
       info.isOrderUnique = true;
     },
+    /** @experimental */
+    getOrderIsUnique() {
+      return info.isOrderUnique;
+    },
     singleRelation(relationIdentifier) {
       // NOTE: this is almost an exact copy of the same method on PgSelectStep,
       // except using `info`... We should harmonize them.
@@ -4121,6 +4143,12 @@ export interface PgSelectQueryBuilder<
   ): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
+  /**
+   * True if we've been told the order is unique. At plan-time this being false is somewhat irrelevant, since any `.apply(...)` callbacks might make it unique later.
+   *
+   * @experimental
+   */
+  getOrderIsUnique(): boolean;
   /** Returns the SQL alias representing the table related to this relation */
   singleRelation<
     TRelationName extends keyof GetPgResourceRelations<TResource> & string,
