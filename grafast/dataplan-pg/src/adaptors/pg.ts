@@ -391,6 +391,11 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   pgClient: PoolClient,
   alreadyInTransaction = false,
 ): WithPgClient<NodePostgresPgClient> {
+  if (pgClient[$$queue]) {
+    throw new Error(
+      "This client already has an associated pgClientAdaptor, wrapping it again would cause a deadlock",
+    );
+  }
   const release = () => {};
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,
