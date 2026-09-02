@@ -4,7 +4,8 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { Step } from "../dist/index.js";
+import { FLAG_ERROR } from "../dist/constants.js";
+import type { ExecutionDetails } from "../dist/index.js";
 import {
   assertNotNull,
   constant,
@@ -17,13 +18,42 @@ import {
   list,
   makeGrafastSchema,
   sideEffect,
+  Step,
   trap,
   TRAP_ERROR,
   TRAP_INHIBITED,
+  UnbatchedStep,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
+
+class ForcedUnbatchedStep extends UnbatchedStep<number> {
+  isSyncAndSafe = true;
+
+  add($step: Step) {
+    this.addDependency($step);
+  }
+
+  unbatchedExecute(): number {
+    throw new Error("ForcedUnbatchedStep should not execute");
+  }
+}
+
+class FlagInspectorStep extends Step<number> {
+  isSyncAndSafe = true;
+
+  add($step: Step) {
+    this.addDependency({
+      step: $step,
+      acceptFlags: TRAP_ERROR | TRAP_INHIBITED,
+    });
+  }
+
+  execute({ values: [v], indexMap }: ExecutionDetails<[unknown]>) {
+    return indexMap((i) => v._flagsAt(i));
+  }
+}
 
 declare global {
   namespace Grafast {
@@ -77,6 +107,7 @@ const makeSchema = () => {
         inhibitIfPreservesInhibition(setNullToNull: Int): Int
         mySideEffect: Int
         mySideEffectError: MySideEffectError
+        forcedUnbatchedErrorFlags: Int
         implicitSideEffectErrorIsTrapped: Int
         implicitSideEffectErrorIsConditionallyTrapped(condition: Boolean!): Int
         implicitSideEffectErrorIsConditionallyNotTrapped(
@@ -200,6 +231,18 @@ const makeSchema = () => {
             });
             return $errorValue;
           },
+          forcedUnbatchedErrorFlags() {
+            const $forced = new ForcedUnbatchedStep();
+            const $inspector = new FlagInspectorStep();
+            const $a = constant(1);
+            sideEffect($a, () => {
+              throw new Error("Forced unbatched error");
+            });
+            const $errored = lambda($a, (a) => a + 1, true);
+            $forced.add($errored);
+            $inspector.add($forced);
+            return $inspector;
+          },
           implicitSideEffectErrorIsTrapped() {
             return implicitSideEffectErrorPlan("trap");
           },
@@ -305,6 +348,26 @@ const executeImplicitSideEffectError = async (
   })) as ExecutionResult;
   return { contextValue, result };
 };
+
+it("does not add inhibition to forced errors in unbatched steps", async () => {
+  const result = await grafast({
+    schema: makeSchema(),
+    source: /* GraphQL */ `
+      query Q {
+        forcedUnbatchedErrorFlags
+      }
+    `,
+    contextValue: {} as Grafast.Context,
+    resolvedPreset,
+    requestContext,
+  });
+  expect(result).to.deep.equal({
+    data: {
+      forcedUnbatchedErrorFlags:
+        FLAG_ERROR /* Explicitly NOT FLAG_ERROR | FLAG_INHIBITED */,
+    },
+  });
+});
 
 it("traps errors from implicit side effects", async () => {
   const { contextValue, result } = await executeImplicitSideEffectError(
