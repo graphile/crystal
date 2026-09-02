@@ -314,7 +314,7 @@ export class __FlagStep<TStep extends Step>
         let resultValue = undefined;
         if ((disallowedFlags & FLAG_INHIBITED) === FLAG_INHIBITED) {
           // We were already rejected, maintain this
-          resultFlags |= FLAG_INHIBITED;
+          resultFlags |= FLAG_INHIBITED | FLAG_NULL;
           resultValue = null;
         }
         if ((disallowedFlags & FLAG_ERROR) === FLAG_ERROR) {
