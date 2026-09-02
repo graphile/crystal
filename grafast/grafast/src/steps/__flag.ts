@@ -137,15 +137,13 @@ export class __FlagStep<TStep extends Step>
     this.valueForInhibited = resolveTrapValue(valueForInhibited);
     this.valueForError = resolveTrapValue(valueForError);
     const trapsErrors = (acceptFlags & FLAG_ERROR) === FLAG_ERROR;
+    const trapsInhibition = (acceptFlags & FLAG_INHIBITED) === FLAG_INHIBITED;
+    const trapsSideEffectFlags = trapsErrors || trapsInhibition;
     this.canBeInlined =
-      (!trapsErrors || !this.implicitSideEffectStep) &&
+      !trapsSideEffectFlags &&
       !$cond &&
       valueForInhibited === "PASS_THROUGH" &&
-      valueForError === "PASS_THROUGH" &&
-      // Can't PASS_THROUGH errors since they need to be converted into TRAPPED
-      // error.
-      // TODO: should we be handling this in Grafast core?
-      !trapsErrors;
+      valueForError === "PASS_THROUGH";
     if (!this.canBeInlined) {
       this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
       if ($cond) {
@@ -158,7 +156,7 @@ export class __FlagStep<TStep extends Step>
       this.listItem = this._listItem;
     }
     if (
-      trapsErrors &&
+      trapsSideEffectFlags &&
       (this.implicitSideEffectStep || this.layerPlan.latestSideEffectStep)
     ) {
       if (this.implicitSideEffectStep !== this.layerPlan.latestSideEffectStep) {
@@ -167,7 +165,7 @@ export class __FlagStep<TStep extends Step>
         );
       }
 
-      // We've been instructed to capture errors.
+      // We've been instructed to capture flags from the side effect.
       // Need to make this have the side effect, to prevent us being inlined.
       this.hasSideEffects = true;
       this.layerPlan.latestSideEffectStep = this;
