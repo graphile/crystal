@@ -289,6 +289,7 @@ export function extendSchema<
   return {
     name: uniquePluginName,
     version: "0.0.0",
+    provides: ["extendSchema"],
     after: [
       "QueryPlugin",
       "MutationPlugin",

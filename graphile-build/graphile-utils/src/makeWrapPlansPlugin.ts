@@ -156,6 +156,7 @@ export function wrapPlans<
 
   return {
     name,
+    provides: ["wrapPlans"],
     description,
     version,
     schema: {
