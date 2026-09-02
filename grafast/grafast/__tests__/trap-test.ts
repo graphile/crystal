@@ -44,6 +44,7 @@ const makeSchema = () => {
         inhibitIfPreservesInhibition(setNullToNull: Int): Int
         mySideEffect: Int
         mySideEffectError: MySideEffectError
+        implicitSideEffectErrorIsTrapped: Int
       }
       input EmptyableInput {
         a: Int
@@ -161,6 +162,18 @@ const makeSchema = () => {
             });
             return $errorValue;
           },
+          implicitSideEffectErrorIsTrapped() {
+            const $a = constant(1);
+            sideEffect($a, () => {
+              throw new Error("Implicit side effect failed");
+            });
+            const $trapped = trap($a, TRAP_ERROR, {
+              valueForError: "NULL",
+            });
+            return lambda($trapped, (trapped) => {
+              return trapped == null ? 42 : trapped;
+            });
+          },
         },
       },
     },
@@ -210,6 +223,23 @@ it("enables trapping an error to null", async () => {
   })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({ nonError: 2, error: null });
+});
+it("traps errors from implicit side effects", async () => {
+  const schema = makeSchema();
+  const result = (await grafast({
+    schema,
+    source: /* GraphQL */ `
+      query Q {
+        implicitSideEffectErrorIsTrapped
+      }
+    `,
+    contextValue: {},
+    resolvedPreset,
+    requestContext,
+  })) as ExecutionResult;
+  expect(result).to.deep.equal({
+    data: { implicitSideEffectErrorIsTrapped: 42 },
+  });
 });
 it("enables trapping an error to emptyList", async () => {
   const schema = makeSchema();
