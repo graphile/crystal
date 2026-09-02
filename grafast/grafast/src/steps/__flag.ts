@@ -174,7 +174,7 @@ export class __FlagStep<TStep extends Step>
       // We'll also make our implicit side effect explicit
       this.implicitErrorDep = this.addDependency({
         step: this.implicitSideEffectStep!,
-        acceptFlags,
+        acceptFlags: TRAPPABLE_FLAGS,
       });
       sudo(this).implicitSideEffectStep = null;
     }
