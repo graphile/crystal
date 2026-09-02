@@ -6,6 +6,7 @@ import { it } from "mocha";
 import {
   context,
   grafast,
+  inhibitOnNull,
   makeGrafastSchema,
   sideEffect,
 } from "../dist/index.js";
@@ -89,4 +90,49 @@ it("cancels future steps on error", async () => {
     ],
   );
   assert.equal(contextValue.number, 4);
+});
+
+it("does not discard an earlier side effect when the returned side effect is inhibited", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      type Query {
+        noop: Int
+      }
+      type Mutation {
+        test(a: Int): Int
+      }
+    `,
+    objects: {
+      Mutation: {
+        plans: {
+          test(_, fieldArgs) {
+            sideEffect(null, () => {
+              throw new Error("Moo");
+            });
+            const $a = inhibitOnNull(fieldArgs.getRaw("a"));
+            return sideEffect($a, (a) => a + 2);
+          },
+        },
+      },
+    },
+    enableDeferStream: false,
+  });
+
+  const result = await grafast({
+    schema,
+    source: /* GraphQL */ `
+      mutation {
+        test(a: null)
+      }
+    `,
+    resolvedPreset,
+  });
+  if (!("data" in result)) {
+    throw new Error("Unexpected response shape");
+  }
+  assert.deepEqual(result.data, { test: null });
+  assert.deepEqual(
+    result.errors?.map((e) => e.message),
+    ["Moo"],
+  );
 });
