@@ -136,3 +136,75 @@ it("does not discard an earlier side effect when the returned side effect is inh
     ["Moo"],
   );
 });
+
+// TODO: rename this test file to just 'sideEffects' maybe...
+it("does not reuse a context access step across mutation fields", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      type Query {
+        noop: Int
+      }
+      type Mutation {
+        mutationOne: Int
+        mutationTwo: Int
+        mutationThree: Int
+      }
+    `,
+    objects: {
+      Mutation: {
+        plans: {
+          mutationOne() {
+            const $context = context();
+            sideEffect($context, (context) => {
+              context.number = 1;
+            });
+            const $foo = $context.get("number");
+            return $foo;
+          },
+          mutationTwo() {
+            const $context = context();
+            sideEffect($context, (context) => {
+              context.number = 2;
+            });
+            const $foo = $context.get("number");
+            return $foo;
+          },
+          mutationThree() {
+            const $context = context();
+            sideEffect($context, (context) => {
+              context.number = 3;
+            });
+            const $foo = $context.get("number");
+            return $foo;
+          },
+        },
+      },
+    },
+    enableDeferStream: false,
+  });
+
+  const contextValue = { number: 0 };
+  const result = await grafast({
+    schema,
+    source: /* GraphQL */ `
+      mutation {
+        mutationOne
+        mutationTwo
+        mutationThree
+      }
+    `,
+    resolvedPreset,
+    contextValue,
+  });
+  if (!("data" in result)) {
+    throw new Error("Unexpected response shape");
+  }
+  assert.deepEqual(result, {
+    data: {
+      mutationOne: 1,
+      mutationTwo: 2,
+      mutationThree: 3,
+    },
+  });
+  assert.deepEqual(contextValue, { number: 3 });
+});
