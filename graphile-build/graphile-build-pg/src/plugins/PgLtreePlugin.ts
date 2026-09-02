@@ -7,8 +7,13 @@ import { gatherConfig } from "graphile-build";
 import { version } from "../version.ts";
 
 interface State {
-  ltreeCodec: PgCodec<string, any, any, any, undefined, any, any>;
-  ltreeArrayCodec: PgCodec;
+  codecsByServiceName: Map<
+    string,
+    {
+      ltreeCodec: PgCodec<string, any, any, any, undefined, any, any>;
+      ltreeArrayCodec: PgCodec;
+    }
+  >;
 }
 interface Cache {}
 
@@ -27,33 +32,8 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
   version,
 
   gather: gatherConfig<never, State, Cache>({
-    initialState(cache, { lib }) {
-      const {
-        dataplanPg: { listOfCodec },
-        graphileBuild: { EXPORTABLE },
-        sql,
-      } = lib;
-      const ltreeCodec: PgCodec<string, any, any, any, undefined, any, any> =
-        EXPORTABLE(
-          (sql) => ({
-            name: "ltree",
-            sqlType: sql`ltree`,
-            toPg(str) {
-              return str;
-            },
-            fromPg(str) {
-              return str;
-            },
-            executor: null,
-            attributes: undefined,
-          }),
-          [sql],
-        );
-      const ltreeArrayCodec = EXPORTABLE(
-        (listOfCodec, ltreeCodec) => listOfCodec(ltreeCodec),
-        [listOfCodec, ltreeCodec],
-      );
-      return { ltreeCodec, ltreeArrayCodec };
+    initialState() {
+      return { codecsByServiceName: new Map() };
     },
     hooks: {
       async pgCodecs_findPgCodec(info, event) {
@@ -70,11 +50,60 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         );
         if (!ltreeExt || pgType.typnamespace !== ltreeExt.extnamespace) {
           return;
-        } else if (typname === "ltree") {
-          event.pgCodec = info.state.ltreeCodec;
+        }
+
+        let codecs = info.state.codecsByServiceName.get(serviceName);
+        if (!codecs) {
+          const namespace = pgType.getNamespace();
+          if (!namespace) {
+            throw new Error(
+              `Could not get namespace '${pgType.typnamespace}' for ltree type`,
+            );
+          }
+
+          const {
+            dataplanPg: { listOfCodec },
+            graphileBuild: { EXPORTABLE },
+            sql,
+          } = info.lib;
+          const ltreeCodec: PgCodec<
+            string,
+            any,
+            any,
+            any,
+            undefined,
+            any,
+            any
+          > = EXPORTABLE(
+            (namespaceName, sql) => ({
+              name: "ltree",
+              sqlType: sql.identifier(namespaceName, "ltree"),
+              toPg(str) {
+                return str;
+              },
+              fromPg(str) {
+                return str;
+              },
+              executor: null,
+              attributes: undefined,
+            }),
+            [namespace.nspname, sql],
+          );
+          codecs = {
+            ltreeCodec,
+            ltreeArrayCodec: EXPORTABLE(
+              (listOfCodec, ltreeCodec) => listOfCodec(ltreeCodec),
+              [listOfCodec, ltreeCodec],
+            ),
+          };
+          info.state.codecsByServiceName.set(serviceName, codecs);
+        }
+
+        if (typname === "ltree") {
+          event.pgCodec = codecs.ltreeCodec;
         } else {
           assert(typname === "_ltree");
-          event.pgCodec = info.state.ltreeArrayCodec;
+          event.pgCodec = codecs.ltreeArrayCodec;
         }
       },
     },
