@@ -1760,7 +1760,7 @@ const cInt8ArrayDomainCodec = domainOfCodec(LIST_TYPES.bigint, "cInt8ArrayDomain
 });
 const spec_bTypes_attributes_ltree_codec_ltree = {
   name: "ltree",
-  sqlType: sql`ltree`,
+  sqlType: sql.identifier("a", "ltree"),
   toPg(str) {
     return str;
   },
