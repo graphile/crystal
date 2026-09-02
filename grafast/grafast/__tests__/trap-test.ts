@@ -4,9 +4,11 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
+import type { Step } from "../dist/index.js";
 import {
   assertNotNull,
   constant,
+  context,
   grafast,
   inhibitIf,
   inhibitOnEmpty,
@@ -22,6 +24,29 @@ import {
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
+
+const implicitSideEffectErrorPlan = (
+  mode: "trap" | "inhibit",
+  $condition?: Step<boolean>,
+) => {
+  const $context = context();
+  const $a = constant(1);
+  sideEffect($a, () => {
+    throw new Error("Implicit side effect failed");
+  });
+  sideEffect([$a, $context], ([a, context]) => {
+    (context as { beforeTrap?: boolean }).beforeTrap = true;
+    return a + 1;
+  });
+  const $trapped =
+    mode === "trap"
+      ? trap($a, TRAP_ERROR, {
+          if: $condition ?? undefined,
+          valueForError: "NULL",
+        })
+      : inhibitOnNull($a);
+  return lambda($a, (a) => a + 3, true);
+};
 
 const makeSchema = () => {
   return makeGrafastSchema({
@@ -45,6 +70,11 @@ const makeSchema = () => {
         mySideEffect: Int
         mySideEffectError: MySideEffectError
         implicitSideEffectErrorIsTrapped: Int
+        implicitSideEffectErrorIsConditionallyTrapped(condition: Boolean!): Int
+        implicitSideEffectErrorIsConditionallyNotTrapped(
+          condition: Boolean!
+        ): Int
+        implicitSideEffectErrorIsNotTrapped: Int
       }
       input EmptyableInput {
         a: Int
@@ -163,16 +193,16 @@ const makeSchema = () => {
             return $errorValue;
           },
           implicitSideEffectErrorIsTrapped() {
-            const $a = constant(1);
-            sideEffect($a, () => {
-              throw new Error("Implicit side effect failed");
-            });
-            const $trapped = trap($a, TRAP_ERROR, {
-              valueForError: "NULL",
-            });
-            return lambda($trapped, (trapped) => {
-              return trapped == null ? 42 : trapped;
-            });
+            return implicitSideEffectErrorPlan("trap");
+          },
+          implicitSideEffectErrorIsConditionallyTrapped(_, { $condition }) {
+            return implicitSideEffectErrorPlan("trap", $condition);
+          },
+          implicitSideEffectErrorIsConditionallyNotTrapped(_, { $condition }) {
+            return implicitSideEffectErrorPlan("trap", $condition);
+          },
+          implicitSideEffectErrorIsNotTrapped() {
+            return implicitSideEffectErrorPlan("inhibit");
           },
         },
       },
@@ -224,22 +254,73 @@ it("enables trapping an error to null", async () => {
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({ nonError: 2, error: null });
 });
-it("traps errors from implicit side effects", async () => {
+const executeImplicitSideEffectError = async (
+  fieldName: string,
+  condition?: boolean,
+) => {
   const schema = makeSchema();
+  const contextValue: { beforeTrap?: boolean } = {};
   const result = (await grafast({
     schema,
     source: /* GraphQL */ `
-      query Q {
-        implicitSideEffectErrorIsTrapped
+      query Q${condition === undefined ? "" : "($condition: Boolean!)"} {
+        ${fieldName}${condition === undefined ? "" : "(condition: $condition)"}
       }
     `,
-    contextValue: {},
+    variableValues: condition === undefined ? undefined : { condition },
+    contextValue,
     resolvedPreset,
     requestContext,
   })) as ExecutionResult;
+  return { contextValue, result };
+};
+
+it("traps errors from implicit side effects", async () => {
+  const { contextValue, result } = await executeImplicitSideEffectError(
+    "implicitSideEffectErrorIsTrapped",
+  );
   expect(result).to.deep.equal({
-    data: { implicitSideEffectErrorIsTrapped: 42 },
+    data: { implicitSideEffectErrorIsTrapped: 4 },
   });
+  expect(contextValue.beforeTrap).to.be.undefined;
+});
+
+it("conditionally traps errors from implicit side effects", async () => {
+  const { contextValue, result } = await executeImplicitSideEffectError(
+    "implicitSideEffectErrorIsConditionallyTrapped",
+    true,
+  );
+  expect(result).to.deep.equal({
+    data: { implicitSideEffectErrorIsConditionallyTrapped: 4 },
+  });
+  expect(contextValue.beforeTrap).to.be.undefined;
+});
+
+it("does not trap errors from implicit side effects with inhibitOnNull", async () => {
+  const { contextValue, result } = await executeImplicitSideEffectError(
+    "implicitSideEffectErrorIsNotTrapped",
+  );
+  expect(result.data).to.deep.equal({
+    implicitSideEffectErrorIsNotTrapped: null,
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Implicit side effect failed",
+  ]);
+  expect(contextValue.beforeTrap).to.be.undefined;
+});
+
+it("does not trap errors when the conditional trap condition is false", async () => {
+  const { contextValue, result } = await executeImplicitSideEffectError(
+    "implicitSideEffectErrorIsConditionallyNotTrapped",
+    false,
+  );
+  expect(result.data).to.deep.equal({
+    implicitSideEffectErrorIsConditionallyNotTrapped: null,
+  });
+  expect(result.errors?.map((error) => error.message)).to.deep.equal([
+    "Implicit side effect failed",
+  ]);
+  expect(contextValue.beforeTrap).to.be.undefined;
 });
 it("enables trapping an error to emptyList", async () => {
   const schema = makeSchema();
