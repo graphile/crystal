@@ -80,8 +80,10 @@ export function flagError<TError extends Error = Error>(
  *
  * @internal
  */
-export function isFlaggedValue(value: object): value is FlaggedValue {
-  return Object.hasOwn(value, $$flagged);
+export function isFlaggedValue(value: {
+  [$$flagged]?: true;
+}): value is FlaggedValue {
+  return value[$$flagged] === true;
 }
 
 export class SafeError<
