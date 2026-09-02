@@ -153,9 +153,20 @@ export class __FlagStep<TStep extends Step>
       this.listItem = this._listItem;
     }
     if ((acceptFlags & FLAG_ERROR) === FLAG_ERROR) {
-      // We've been instructed to capture errors
-      sudo(this).implicitSideEffectStep = null;
-      this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
+      if (this.implicitSideEffectStep || this.layerPlan.latestSideEffectStep) {
+        if (
+          this.implicitSideEffectStep !== this.layerPlan.latestSideEffectStep
+        ) {
+          throw new Error(
+            "GrafastInternalError<>: ${this} expected latest side effect and implicit side effect to be equal",
+          );
+        }
+        // We've been instructed to capture errors
+        sudo(this).implicitSideEffectStep = null;
+        // Need to make this have the side effect, to prevent us being inlined
+        this.hasSideEffects = true;
+        this.layerPlan.latestSideEffectStep = this;
+      }
     }
   }
   public toStringMeta(): string | null {
