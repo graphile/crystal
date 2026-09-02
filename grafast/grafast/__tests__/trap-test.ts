@@ -290,7 +290,7 @@ const executeImplicitSideEffectError = async (
   condition?: boolean,
 ) => {
   const schema = makeSchema();
-  const contextValue: Grafast.Context = {};
+  const contextValue = {} as Grafast.Context;
   const result = (await grafast({
     schema,
     source: /* GraphQL */ `
