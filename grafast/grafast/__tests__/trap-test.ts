@@ -102,6 +102,7 @@ const makeSchema = () => {
         inhibitOnEmptyInput(input: EmptyableInput): String
         inhibitOnEmptyBoolean(value: Boolean): Boolean
         inhibitOnEmptyInt(value: Int): Int
+        trapInhibitedAfterSideEffect(someList: [Int!]): [Int]
         inhibitIfList(value: [Int!]): [Int]!
         inhibitIfPreservesErrors(setNullToError: Int): Int
         inhibitIfPreservesInhibition(setNullToNull: Int): Int
@@ -181,6 +182,20 @@ const makeSchema = () => {
             const $guarded = inhibitOnEmpty($value);
             return trap($guarded, TRAP_INHIBITED, {
               valueForInhibited: "NULL",
+            });
+          },
+          trapInhibitedAfterSideEffect(_, { $someList }) {
+            const $a = inhibitOnEmpty($someList);
+            sideEffect($a, () => {
+              throw new Error("This side effect should be inhibited");
+            });
+            const $b = lambda(
+              $a,
+              (list: number[]) => list.map((n) => n + 1),
+              true,
+            );
+            return trap($b, TRAP_INHIBITED, {
+              valueForInhibited: "EMPTY_LIST",
             });
           },
           inhibitIfList(_, { $value }) {
@@ -516,6 +531,20 @@ it("supports inhibitIf and inhibitOnEmpty", async () => {
     inhibitEmptyList: [], // No `0` prefixed, so inhibited
     inhibitNonEmptyList: [0, 4, 5],
     preservedInhibition: null, // If inhibition was lost, this would be 42
+  });
+});
+
+it("traps inhibition inherited through a side effect", async () => {
+  const result = (await grafast({
+    source: /* GraphQL */ `
+      query Q {
+        trapInhibitedAfterSideEffect(someList: [])
+      }
+    `,
+    schema: makeSchema(),
+  })) as ExecutionResult;
+  expect(result).to.deep.equal({
+    data: { trapInhibitedAfterSideEffect: [] },
   });
 });
 
