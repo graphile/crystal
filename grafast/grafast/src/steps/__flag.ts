@@ -162,7 +162,7 @@ export class __FlagStep<TStep extends Step>
     ) {
       if (this.implicitSideEffectStep !== this.layerPlan.latestSideEffectStep) {
         throw new Error(
-          "GrafastInternalError<0f9e5c52-20dc-41a5-9a47-6f8275764c1a>: ${this} expected latest side effect and implicit side effect to be equal",
+          `GrafastInternalError<0f9e5c52-20dc-41a5-9a47-6f8275764c1a>: ${this} expected latest side effect and implicit side effect to be equal`,
         );
       }
 
