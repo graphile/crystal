@@ -103,6 +103,7 @@ const makeSchema = () => {
         inhibitOnEmptyBoolean(value: Boolean): Boolean
         inhibitOnEmptyInt(value: Int): Int
         trapInhibitedAfterSideEffect(someList: [Int!]): [Int]
+        doesNotInheritInhibitionFromSideEffect(someList: [Int!]): Int
         inhibitIfList(value: [Int!]): [Int]!
         inhibitIfPreservesErrors(setNullToError: Int): Int
         inhibitIfPreservesInhibition(setNullToNull: Int): Int
@@ -197,6 +198,13 @@ const makeSchema = () => {
             return trap($b, TRAP_INHIBITED, {
               valueForInhibited: "EMPTY_LIST",
             });
+          },
+          doesNotInheritInhibitionFromSideEffect(_, { $someList }) {
+            const $a = inhibitOnEmpty($someList);
+            sideEffect($a, () => {
+              throw new Error("This side effect should be inhibited");
+            });
+            return lambda(null, () => 42);
           },
           inhibitIfList(_, { $value }) {
             const $isEmpty = lambda($value, (list) => list.length === 0, true);
@@ -545,6 +553,20 @@ it("traps inhibition inherited through a side effect", async () => {
   })) as ExecutionResult;
   expect(result).to.deep.equal({
     data: { trapInhibitedAfterSideEffect: [] },
+  });
+});
+
+it("does not inherit inhibition from an implicit side effect", async () => {
+  const result = (await grafast({
+    source: /* GraphQL */ `
+      query Q {
+        doesNotInheritInhibitionFromSideEffect(someList: [])
+      }
+    `,
+    schema: makeSchema(),
+  })) as ExecutionResult;
+  expect(result).to.deep.equal({
+    data: { doesNotInheritInhibitionFromSideEffect: 42 },
   });
 });
 
