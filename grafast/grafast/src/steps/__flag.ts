@@ -6,6 +6,7 @@ import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
+  NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../constants.ts";
 import type { FlaggedValue } from "../error.ts";
@@ -306,11 +307,11 @@ export class __FlagStep<TStep extends Step>
 
       // Search for "f2b3b1b3" for similar block
       const dataFlags = dataEv._flagsAt(i);
-      const implictErrorFlags = implicitErrorEv?._flagsAt(i) ?? 0;
+      const implictErrorFlags = implicitErrorEv?._flagsAt(i) ?? NO_FLAGS;
       const flags = dataFlags | implictErrorFlags;
       const disallowedFlags = flags & forbiddenFlags;
-      if (disallowedFlags) {
-        let resultFlags = 0;
+      if (disallowedFlags !== NO_FLAGS) {
+        let resultFlags = NO_FLAGS;
         let resultValue = undefined;
         if ((disallowedFlags & FLAG_INHIBITED) === FLAG_INHIBITED) {
           // We were already rejected, maintain this
@@ -331,8 +332,9 @@ export class __FlagStep<TStep extends Step>
             );
           }
         }
-        if (resultFlags === 0) {
-          // We weren't already inhibited
+        if (resultFlags === NO_FLAGS) {
+          // We weren't already inhibited (e.g. value was simple `null` but our
+          // flags don't allow `FLAG_NULL`)
           return onRejectReturnValue;
         } else if (resultValue === null && resultFlags === $$inhibit.flags) {
           // This branch is just an optimization to avoid an additional allocation
