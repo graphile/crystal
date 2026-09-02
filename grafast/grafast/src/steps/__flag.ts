@@ -312,15 +312,15 @@ export class __FlagStep<TStep extends Step>
       if (disallowedFlags) {
         let resultFlags = 0;
         let resultValue = undefined;
-        if (disallowedFlags & FLAG_INHIBITED) {
+        if ((disallowedFlags & FLAG_INHIBITED) === FLAG_INHIBITED) {
           // We were already rejected, maintain this
           resultFlags |= FLAG_INHIBITED;
           resultValue = null;
         }
-        if (disallowedFlags & FLAG_ERROR) {
+        if ((disallowedFlags & FLAG_ERROR) === FLAG_ERROR) {
           // We were already rejected, maintain this
           resultFlags |= FLAG_ERROR;
-          if (dataFlags & FLAG_ERROR) {
+          if ((dataFlags & FLAG_ERROR) === FLAG_ERROR) {
             resultValue = dataEv.at(i);
           } else if (implicitErrorEv != null) {
             resultValue = implicitErrorEv.at(i);
@@ -338,10 +338,16 @@ export class __FlagStep<TStep extends Step>
           return flaggedValue(resultFlags, resultValue, null);
         }
       } else {
-        if (flags & FLAG_ERROR && this.valueForError !== false) {
+        if (
+          (flags & FLAG_ERROR) === FLAG_ERROR &&
+          this.valueForError !== false
+        ) {
           return valueForError;
         }
-        if (flags & FLAG_INHIBITED && this.valueForInhibited !== false) {
+        if (
+          (flags & FLAG_INHIBITED) === FLAG_INHIBITED &&
+          this.valueForInhibited !== false
+        ) {
           return valueForInhibited;
         }
         // Assume pass-through
