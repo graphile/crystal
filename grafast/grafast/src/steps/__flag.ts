@@ -334,6 +334,9 @@ export class __FlagStep<TStep extends Step>
         if (resultFlags === 0) {
           // We weren't already inhibited
           return onRejectReturnValue;
+        } else if (resultValue === null && resultFlags === $$inhibit.flags) {
+          // This branch is just an optimization to avoid an additional allocation
+          return $$inhibit;
         } else {
           return flaggedValue(resultFlags, resultValue, null);
         }
