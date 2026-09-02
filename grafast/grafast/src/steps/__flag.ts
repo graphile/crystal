@@ -9,13 +9,14 @@ import {
   TRAPPABLE_FLAGS,
 } from "../constants.ts";
 import type { FlaggedValue } from "../error.ts";
-import { $$inhibit, flagError, SafeError } from "../error.ts";
+import { $$inhibit, flagError, flaggedValue, SafeError } from "../error.ts";
 import { inspect } from "../inspect.ts";
 import type {
   AddDependencyOptions,
   DataFromStep,
   ExecutionDetails,
   ExecutionEntryFlags,
+  ExecutionValue,
   GrafastResultsList,
   Maybe,
 } from "../interfaces.ts";
@@ -105,6 +106,7 @@ export class __FlagStep<TStep extends Step>
 
   isSyncAndSafe = false;
   private ifDep: number | null = null;
+  private implicitErrorDep: number | null = null;
   private forbiddenFlags: ExecutionEntryFlags;
   private onRejectReturnValue: FlaggedValue<Error> | FlaggedValue<null>;
   private valueForInhibited: ResolvedTrapValue;
@@ -133,14 +135,16 @@ export class __FlagStep<TStep extends Step>
       onReject == null ? $$inhibit : flagError(onReject, step.id);
     this.valueForInhibited = resolveTrapValue(valueForInhibited);
     this.valueForError = resolveTrapValue(valueForError);
+    const trapsErrors = (acceptFlags & FLAG_ERROR) === FLAG_ERROR;
     this.canBeInlined =
+      (!trapsErrors || !this.implicitSideEffectStep) &&
       !$cond &&
       valueForInhibited === "PASS_THROUGH" &&
       valueForError === "PASS_THROUGH" &&
       // Can't PASS_THROUGH errors since they need to be converted into TRAPPED
       // error.
       // TODO: should we be handling this in Grafast core?
-      (acceptFlags & FLAG_ERROR) === 0;
+      !trapsErrors;
     if (!this.canBeInlined) {
       this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
       if ($cond) {
@@ -152,20 +156,27 @@ export class __FlagStep<TStep extends Step>
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
     }
-    if ((acceptFlags & FLAG_ERROR) === FLAG_ERROR) {
-      if (this.implicitSideEffectStep || this.layerPlan.latestSideEffectStep) {
-        if (
-          this.implicitSideEffectStep !== this.layerPlan.latestSideEffectStep
-        ) {
-          throw new Error(
-            "GrafastInternalError<>: ${this} expected latest side effect and implicit side effect to be equal",
-          );
-        }
-        // We've been instructed to capture errors.
-        // Need to make this have the side effect, to prevent us being inlined.
-        this.hasSideEffects = true;
-        this.layerPlan.latestSideEffectStep = this;
+    if (
+      trapsErrors &&
+      (this.implicitSideEffectStep || this.layerPlan.latestSideEffectStep)
+    ) {
+      if (this.implicitSideEffectStep !== this.layerPlan.latestSideEffectStep) {
+        throw new Error(
+          "GrafastInternalError<0f9e5c52-20dc-41a5-9a47-6f8275764c1a>: ${this} expected latest side effect and implicit side effect to be equal",
+        );
       }
+
+      // We've been instructed to capture errors.
+      // Need to make this have the side effect, to prevent us being inlined.
+      this.hasSideEffects = true;
+      this.layerPlan.latestSideEffectStep = this;
+
+      // We'll also make our implicit side effect explicit
+      this.implicitErrorDep = this.addDependency({
+        step: this.implicitSideEffectStep!,
+        acceptFlags,
+      });
+      sudo(this).implicitSideEffectStep = null;
     }
   }
   public toStringMeta(): string | null {
@@ -271,12 +282,16 @@ export class __FlagStep<TStep extends Step>
     super.finalize();
   }
 
-  private fancyExecute(
-    details: ExecutionDetails<[data: DataFromStep<TStep>, cond?: boolean]>,
-  ): any {
-    const dataEv = details.values[0]!;
+  private fancyExecute(details: ExecutionDetails): any {
+    const dataEv = details.values[0] as ExecutionValue<DataFromStep<TStep>>;
     const condEv =
-      this.ifDep === null ? null : details.values[this.ifDep as 1]!;
+      this.ifDep === null
+        ? null
+        : (details.values[this.ifDep] as ExecutionValue<boolean>);
+    const implicitErrorEv =
+      this.implicitErrorDep === null
+        ? null
+        : (details.values[this.implicitErrorDep] as ExecutionValue<unknown>);
     const {
       forbiddenFlags: thisForbiddenFlags,
       onRejectReturnValue,
@@ -290,18 +305,37 @@ export class __FlagStep<TStep extends Step>
         : DEFAULT_FORBIDDEN_FLAGS;
 
       // Search for "f2b3b1b3" for similar block
-      const flags = dataEv._flagsAt(i);
+      const dataFlags = dataEv._flagsAt(i);
+      const implictErrorFlags = implicitErrorEv?._flagsAt(i) ?? 0;
+      const flags = dataFlags | implictErrorFlags;
       const disallowedFlags = flags & forbiddenFlags;
       if (disallowedFlags) {
+        let resultFlags = 0;
+        let resultValue = undefined;
         if (disallowedFlags & FLAG_INHIBITED) {
           // We were already rejected, maintain this
-          return $$inhibit;
-        } else if (disallowedFlags & FLAG_ERROR) {
+          resultFlags |= FLAG_INHIBITED;
+          resultValue = null;
+        }
+        if (disallowedFlags & FLAG_ERROR) {
           // We were already rejected, maintain this
-          return flagError(dataEv.at(i) as Error);
-        } else {
+          resultFlags |= FLAG_ERROR;
+          if (dataFlags & FLAG_ERROR) {
+            resultValue = dataEv.at(i);
+          } else if (implicitErrorEv != null) {
+            resultValue = implicitErrorEv.at(i);
+          } else {
+            // TODO: what if $if errors!
+            throw new Error(
+              `GrafastInternalError<41f5fe7c-2691-497a-b140-0ce24c7638a7>: error flag must come from data or implicit error`,
+            );
+          }
+        }
+        if (resultFlags === 0) {
           // We weren't already inhibited
           return onRejectReturnValue;
+        } else {
+          return flaggedValue(resultFlags, resultValue, null);
         }
       } else {
         if (flags & FLAG_ERROR && this.valueForError !== false) {
