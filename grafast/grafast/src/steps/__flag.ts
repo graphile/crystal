@@ -161,9 +161,8 @@ export class __FlagStep<TStep extends Step>
             "GrafastInternalError<>: ${this} expected latest side effect and implicit side effect to be equal",
           );
         }
-        // We've been instructed to capture errors
-        sudo(this).implicitSideEffectStep = null;
-        // Need to make this have the side effect, to prevent us being inlined
+        // We've been instructed to capture errors.
+        // Need to make this have the side effect, to prevent us being inlined.
         this.hasSideEffects = true;
         this.layerPlan.latestSideEffectStep = this;
       }
