@@ -152,8 +152,11 @@ export class __FlagStep<TStep extends Step>
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
     }
-    sudo(this).implicitSideEffectStep = null;
-    this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
+    if ((acceptFlags & FLAG_ERROR) === FLAG_ERROR) {
+      // We've been instructed to capture errors
+      sudo(this).implicitSideEffectStep = null;
+      this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
+    }
   }
   public toStringMeta(): string | null {
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;

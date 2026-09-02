@@ -26,8 +26,8 @@ where (
 );
 
 select
-  __relational_items__."id"::text as "0",
-  __relational_items__."type"::text as "1"
+  __relational_items__."type"::text as "0",
+  __relational_items__."id"::text as "1"
 from interfaces_and_unions.relational_items as __relational_items__
 where
   (

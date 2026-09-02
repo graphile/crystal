@@ -948,7 +948,12 @@ export function executeBucket(
             }
             // End "f2b3b1b3" block
 
-            break;
+            if ((indexFlags & FLAG_ERROR) === FLAG_ERROR) {
+              // If we're now flagged as an error, we can stop. Otherwise, even
+              // if we're inhibited, we must keep going - because there might
+              // _also_ be an error.
+              break;
+            }
           }
         }
       } else {
