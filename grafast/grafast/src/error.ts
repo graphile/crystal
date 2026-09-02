@@ -31,7 +31,8 @@ function flaggedValueToString(this: FlaggedValue) {
   }
 }
 
-function flaggedValue<T>(
+/** @internal */
+export function flaggedValue<T>(
   flags: ExecutionEntryFlags,
   value: any,
   planId: null | number,

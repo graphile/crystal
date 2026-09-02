@@ -726,7 +726,7 @@ export function executeBucket(
               } else if (forceIndexValue == null && rejectValue != null) {
                 indexFlags |= FLAG_ERROR;
                 forceIndexValue = rejectValue;
-              } else {
+              } else if ((indexFlags & FLAG_NULL) === FLAG_NULL) {
                 indexFlags |= FLAG_INHIBITED;
               }
               // End "17217999b7a7" block
@@ -978,7 +978,7 @@ export function executeBucket(
         if (forceIndexValue == null && rejectValue != null) {
           indexFlags |= FLAG_ERROR;
           forceIndexValue = rejectValue;
-        } else {
+        } else if ((indexFlags & FLAG_NULL) === FLAG_NULL) {
           indexFlags |= FLAG_INHIBITED;
         }
         // End "17217999b7a7" block

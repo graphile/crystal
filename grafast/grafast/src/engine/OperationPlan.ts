@@ -4437,6 +4437,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
   private inlineSteps() {
     flagLoop: for (const $step of this.stepTracker.activeSteps) {
       if ($step instanceof __FlagStep) {
+        if ($step.hasSideEffects) continue;
         const $flag = $step;
         // We can only inline it if it's not used by an output plan or layer plan
         {
