@@ -115,3 +115,12 @@ declare module "grafast" {
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
+
+declare global {
+  namespace GraphileConfig {
+    interface Provides {
+      extendSchema: true;
+      wrapPlans: true;
+    }
+  }
+}
