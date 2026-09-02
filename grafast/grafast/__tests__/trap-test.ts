@@ -207,7 +207,30 @@ const makeSchema = () => {
             return implicitSideEffectErrorPlan("trap", $condition);
           },
           implicitSideEffectErrorIsConditionallyNotTrapped(_, { $condition }) {
-            return implicitSideEffectErrorPlan("trap", $condition);
+            const $context = context();
+            const $a = constant(1);
+            const $se1 = sideEffect($a, () => {
+              throw new Error("Implicit side effect failed");
+            });
+            const $se2 = sideEffect([$a, $context], ([a, context]) => {
+              context.beforeTrap = true;
+              return a + 1;
+            });
+            const $trapped = trap($a, TRAP_ERROR, {
+              if: $condition,
+              valueForError: "NULL",
+            });
+            expect($se2.implicitSideEffectStep).to.equal($se1);
+            expect($trapped.hasSideEffects).to.equal(true);
+            // The constructor makes this implicit dependency explicit.
+            expect($trapped.implicitSideEffectStep).to.equal(null);
+            expect(
+              ($trapped as unknown as { dependencies: readonly Step[] })
+                .dependencies[2],
+            ).to.equal($se2);
+            const $afterTrap = lambda($a, (a) => a + 3, true);
+            expect($afterTrap.implicitSideEffectStep).to.equal($trapped);
+            return $afterTrap;
           },
           implicitSideEffectErrorIsNotTrapped() {
             return implicitSideEffectErrorPlan("inhibit");
