@@ -25,6 +25,14 @@ import {
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
 
+declare global {
+  namespace Grafast {
+    interface Context {
+      beforeTrap?: boolean;
+    }
+  }
+}
+
 const implicitSideEffectErrorPlan = (
   mode: "trap" | "inhibit",
   $condition?: Step<boolean>,
@@ -35,7 +43,7 @@ const implicitSideEffectErrorPlan = (
     throw new Error("Implicit side effect failed");
   });
   sideEffect([$a, $context], ([a, context]) => {
-    (context as { beforeTrap?: boolean }).beforeTrap = true;
+    context.beforeTrap = true;
     return a + 1;
   });
   const $trapped =
@@ -259,7 +267,7 @@ const executeImplicitSideEffectError = async (
   condition?: boolean,
 ) => {
   const schema = makeSchema();
-  const contextValue: { beforeTrap?: boolean } = {};
+  const contextValue: Grafast.Context = {};
   const result = (await grafast({
     schema,
     source: /* GraphQL */ `
