@@ -65,15 +65,34 @@ const executor = new PgExecutor({
     });
   }
 });
-const post_tableIdentifier = sql.identifier("smart_comment_relations", "post");
-const post_tableCodec = recordCodec({
-  name: "post_table",
-  identifier: post_tableIdentifier,
+const buildingsIdentifier = sql.identifier("smart_comment_relations", "buildings");
+const buildingsCodec = recordCodec({
+  name: "buildings",
+  identifier: buildingsIdentifier,
   attributes: {
     __proto__: null,
     id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    property_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
       codec: TYPES.text,
       notNull: true
+    },
+    floors: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    is_primary: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true
     }
   },
   extensions: {
@@ -81,25 +100,55 @@ const post_tableCodec = recordCodec({
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "post"
+      name: "buildings"
     },
     tags: {
       __proto__: null,
-      name: "post_table",
-      omit: true,
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+      foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
     }
   },
   executor: executor
 });
-const postsIdentifier = sql.identifier("smart_comment_relations", "post_view");
-const postsCodec = recordCodec({
-  name: "posts",
-  identifier: postsIdentifier,
+const housesIdentifier = sql.identifier("smart_comment_relations", "houses");
+const housesCodec = recordCodec({
+  name: "houses",
+  identifier: housesIdentifier,
   attributes: {
     __proto__: null,
-    id: {
+    building_name: {
       codec: TYPES.text
+    },
+    property_name_or_number: {
+      codec: TYPES.text,
+      notNull: true,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    street_name: {
+      codec: TYPES.text,
+      notNull: true,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    street_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    building_id: {
+      codec: TYPES.int
+    },
+    property_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    floors: {
+      codec: TYPES.int
     }
   },
   extensions: {
@@ -107,12 +156,12 @@ const postsCodec = recordCodec({
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "post_view"
+      name: "houses"
     },
     tags: {
       __proto__: null,
-      name: "posts",
-      unique: "id"
+      primaryKey: "street_id,property_id",
+      foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
     }
   },
   executor: executor
@@ -179,18 +228,13 @@ const offersCodec = recordCodec({
   },
   executor: executor
 });
-const streetsIdentifier = sql.identifier("smart_comment_relations", "streets");
-const streetsCodec = recordCodec({
-  name: "streets",
-  identifier: streetsIdentifier,
+const post_tableIdentifier = sql.identifier("smart_comment_relations", "post");
+const post_tableCodec = recordCodec({
+  name: "post_table",
+  identifier: post_tableIdentifier,
   attributes: {
     __proto__: null,
     id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    name: {
       codec: TYPES.text,
       notNull: true
     }
@@ -200,11 +244,38 @@ const streetsCodec = recordCodec({
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "streets"
+      name: "post"
     },
     tags: {
       __proto__: null,
-      unique: "name"
+      name: "post_table",
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+    }
+  },
+  executor: executor
+});
+const postsIdentifier = sql.identifier("smart_comment_relations", "post_view");
+const postsCodec = recordCodec({
+  name: "posts",
+  identifier: postsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "post_view"
+    },
+    tags: {
+      __proto__: null,
+      name: "posts",
+      unique: "id"
     }
   },
   executor: executor
@@ -267,67 +338,10 @@ const streetPropertyCodec = recordCodec({
   },
   executor: executor
 });
-const housesIdentifier = sql.identifier("smart_comment_relations", "houses");
-const housesCodec = recordCodec({
-  name: "houses",
-  identifier: housesIdentifier,
-  attributes: {
-    __proto__: null,
-    building_name: {
-      codec: TYPES.text
-    },
-    property_name_or_number: {
-      codec: TYPES.text,
-      notNull: true,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    street_name: {
-      codec: TYPES.text,
-      notNull: true,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    street_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    building_id: {
-      codec: TYPES.int
-    },
-    property_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    floors: {
-      codec: TYPES.int
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "smart_comment_relations",
-      name: "houses"
-    },
-    tags: {
-      __proto__: null,
-      primaryKey: "street_id,property_id",
-      foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
-    }
-  },
-  executor: executor
-});
-const buildingsIdentifier = sql.identifier("smart_comment_relations", "buildings");
-const buildingsCodec = recordCodec({
-  name: "buildings",
-  identifier: buildingsIdentifier,
+const streetsIdentifier = sql.identifier("smart_comment_relations", "streets");
+const streetsCodec = recordCodec({
+  name: "streets",
+  identifier: streetsIdentifier,
   attributes: {
     __proto__: null,
     id: {
@@ -335,23 +349,9 @@ const buildingsCodec = recordCodec({
       notNull: true,
       hasDefault: true
     },
-    property_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
     name: {
       codec: TYPES.text,
       notNull: true
-    },
-    floors: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    is_primary: {
-      codec: TYPES.boolean,
-      notNull: true,
-      hasDefault: true
     }
   },
   extensions: {
@@ -359,60 +359,63 @@ const buildingsCodec = recordCodec({
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "buildings"
+      name: "streets"
     },
     tags: {
       __proto__: null,
-      foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
+      unique: "name"
     }
   },
   executor: executor
 });
-const post_table_resourceOptionsConfig = {
+const buildingsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const buildings_resourceOptionsConfig = {
   executor: executor,
-  name: "post_table",
-  identifier: "main.smart_comment_relations.post",
-  from: post_tableIdentifier,
-  codec: post_tableCodec,
+  name: "buildings",
+  identifier: "main.smart_comment_relations.buildings",
+  from: buildingsIdentifier,
+  codec: buildingsCodec,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "post"
+      name: "buildings"
     },
     tags: {
-      name: "post_table",
-      omit: true,
-      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+      foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
     }
   },
-  uniques: [{
-    attributes: ["id"],
-    isPrimary: true
-  }]
+  uniques: buildingsUniques
 };
-const postsUniques = [{
-  attributes: ["id"]
+const housesUniques = [{
+  attributes: ["street_id", "property_id"],
+  isPrimary: true
 }];
-const posts_resourceOptionsConfig = {
+const houses_resourceOptionsConfig = {
   executor: executor,
-  name: "posts",
-  identifier: "main.smart_comment_relations.post_view",
-  from: postsIdentifier,
-  codec: postsCodec,
+  name: "houses",
+  identifier: "main.smart_comment_relations.houses",
+  from: housesIdentifier,
+  codec: housesCodec,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "post_view"
+      name: "houses"
     },
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
     isView: true,
     tags: {
-      name: "posts",
-      unique: "id"
+      primaryKey: "street_id,property_id",
+      foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
     }
   },
-  uniques: postsUniques
+  uniques: housesUniques
 };
 const offer_table_resourceOptionsConfig = {
   executor: executor,
@@ -462,29 +465,51 @@ const offers_resourceOptionsConfig = {
   },
   uniques: offersUniques
 };
-const streetsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}, {
-  attributes: ["name"]
-}];
-const streets_resourceOptionsConfig = {
+const post_table_resourceOptionsConfig = {
   executor: executor,
-  name: "streets",
-  identifier: "main.smart_comment_relations.streets",
-  from: streetsIdentifier,
-  codec: streetsCodec,
+  name: "post_table",
+  identifier: "main.smart_comment_relations.post",
+  from: post_tableIdentifier,
+  codec: post_tableCodec,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "streets"
+      name: "post"
     },
     tags: {
-      unique: "name"
+      name: "post_table",
+      omit: true,
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     }
   },
-  uniques: streetsUniques
+  uniques: [{
+    attributes: ["id"],
+    isPrimary: true
+  }]
+};
+const postsUniques = [{
+  attributes: ["id"]
+}];
+const posts_resourceOptionsConfig = {
+  executor: executor,
+  name: "posts",
+  identifier: "main.smart_comment_relations.post_view",
+  from: postsIdentifier,
+  codec: postsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "post_view"
+    },
+    isView: true,
+    tags: {
+      name: "posts",
+      unique: "id"
+    }
+  },
+  uniques: postsUniques
 };
 const propertiesUniques = [{
   attributes: ["id"],
@@ -524,54 +549,29 @@ const street_property_resourceOptionsConfig = {
   },
   uniques: street_propertyUniques
 };
-const housesUniques = [{
-  attributes: ["street_id", "property_id"],
-  isPrimary: true
-}];
-const houses_resourceOptionsConfig = {
-  executor: executor,
-  name: "houses",
-  identifier: "main.smart_comment_relations.houses",
-  from: housesIdentifier,
-  codec: housesCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "smart_comment_relations",
-      name: "houses"
-    },
-    isInsertable: false,
-    isUpdatable: false,
-    isDeletable: false,
-    isView: true,
-    tags: {
-      primaryKey: "street_id,property_id",
-      foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
-    }
-  },
-  uniques: housesUniques
-};
-const buildingsUniques = [{
+const streetsUniques = [{
   attributes: ["id"],
   isPrimary: true
+}, {
+  attributes: ["name"]
 }];
-const buildings_resourceOptionsConfig = {
+const streets_resourceOptionsConfig = {
   executor: executor,
-  name: "buildings",
-  identifier: "main.smart_comment_relations.buildings",
-  from: buildingsIdentifier,
-  codec: buildingsCodec,
+  name: "streets",
+  identifier: "main.smart_comment_relations.streets",
+  from: streetsIdentifier,
+  codec: streetsCodec,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "smart_comment_relations",
-      name: "buildings"
+      name: "streets"
     },
     tags: {
-      foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
+      unique: "name"
     }
   },
-  uniques: buildingsUniques
+  uniques: streetsUniques
 };
 const registry = makeRegistry({
   pgExecutors: {
@@ -580,20 +580,20 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    post_table: post_tableCodec,
     text: TYPES.text,
-    posts: postsCodec,
-    offer_table: offer_tableCodec,
-    int4: TYPES.int,
-    offers: offersCodec,
-    streets: streetsCodec,
-    properties: propertiesCodec,
-    streetProperty: streetPropertyCodec,
-    houses: housesCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
+    int4: TYPES.int,
     bool: TYPES.boolean,
     buildings: buildingsCodec,
+    houses: housesCodec,
+    offer_table: offer_tableCodec,
+    offers: offersCodec,
+    post_table: post_tableCodec,
+    posts: postsCodec,
+    properties: propertiesCodec,
+    streetProperty: streetPropertyCodec,
+    streets: streetsCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -936,15 +936,15 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    post_table: post_table_resourceOptionsConfig,
-    posts: posts_resourceOptionsConfig,
+    buildings: buildings_resourceOptionsConfig,
+    houses: houses_resourceOptionsConfig,
     offer_table: offer_table_resourceOptionsConfig,
     offers: offers_resourceOptionsConfig,
-    streets: streets_resourceOptionsConfig,
+    post_table: post_table_resourceOptionsConfig,
+    posts: posts_resourceOptionsConfig,
     properties: properties_resourceOptionsConfig,
     street_property: street_property_resourceOptionsConfig,
-    houses: houses_resourceOptionsConfig,
-    buildings: buildings_resourceOptionsConfig
+    streets: streets_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -1146,13 +1146,13 @@ const registry = makeRegistry({
     }
   }
 });
-const resource_postsPgResource = registry.pgResources["posts"];
+const resource_buildingsPgResource = registry.pgResources["buildings"];
+const resource_housesPgResource = registry.pgResources["houses"];
 const resource_offersPgResource = registry.pgResources["offers"];
-const resource_streetsPgResource = registry.pgResources["streets"];
+const resource_postsPgResource = registry.pgResources["posts"];
 const resource_propertiesPgResource = registry.pgResources["properties"];
 const resource_street_propertyPgResource = registry.pgResources["street_property"];
-const resource_housesPgResource = registry.pgResources["houses"];
-const resource_buildingsPgResource = registry.pgResources["buildings"];
+const resource_streetsPgResource = registry.pgResources["streets"];
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -1182,12 +1182,12 @@ const makeTableNodeIdHandler = ({
     deprecationReason
   };
 };
-const nodeIdHandler_Offer = makeTableNodeIdHandler({
-  typeName: "Offer",
-  identifier: "offer_views",
+const nodeIdHandler_Building = makeTableNodeIdHandler({
+  typeName: "Building",
+  identifier: "buildings",
   nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_offersPgResource,
-  pk: offersUniques[0].attributes
+  resource: resource_buildingsPgResource,
+  pk: buildingsUniques[0].attributes
 });
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
@@ -1212,20 +1212,31 @@ function specForHandler(handler) {
   specForHandlerCache.set(handler, spec);
   return spec;
 }
+const nodeFetcher_Building = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
+  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
+};
+const nodeIdHandler_House = makeTableNodeIdHandler({
+  typeName: "House",
+  identifier: "houses",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_housesPgResource,
+  pk: housesUniques[0].attributes
+});
+const nodeFetcher_House = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_House));
+  return nodeIdHandler_House.get(nodeIdHandler_House.getSpec($decoded));
+};
+const nodeIdHandler_Offer = makeTableNodeIdHandler({
+  typeName: "Offer",
+  identifier: "offer_views",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_offersPgResource,
+  pk: offersUniques[0].attributes
+});
 const nodeFetcher_Offer = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Offer));
   return nodeIdHandler_Offer.get(nodeIdHandler_Offer.getSpec($decoded));
-};
-const nodeIdHandler_Street = makeTableNodeIdHandler({
-  typeName: "Street",
-  identifier: "streets",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_streetsPgResource,
-  pk: streetsUniques[0].attributes
-});
-const nodeFetcher_Street = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Street));
-  return nodeIdHandler_Street.get(nodeIdHandler_Street.getSpec($decoded));
 };
 const nodeIdHandler_Property = makeTableNodeIdHandler({
   typeName: "Property",
@@ -1249,27 +1260,16 @@ const nodeFetcher_StreetProperty = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_StreetProperty));
   return nodeIdHandler_StreetProperty.get(nodeIdHandler_StreetProperty.getSpec($decoded));
 };
-const nodeIdHandler_House = makeTableNodeIdHandler({
-  typeName: "House",
-  identifier: "houses",
+const nodeIdHandler_Street = makeTableNodeIdHandler({
+  typeName: "Street",
+  identifier: "streets",
   nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_housesPgResource,
-  pk: housesUniques[0].attributes
+  resource: resource_streetsPgResource,
+  pk: streetsUniques[0].attributes
 });
-const nodeFetcher_House = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_House));
-  return nodeIdHandler_House.get(nodeIdHandler_House.getSpec($decoded));
-};
-const nodeIdHandler_Building = makeTableNodeIdHandler({
-  typeName: "Building",
-  identifier: "buildings",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_buildingsPgResource,
-  pk: buildingsUniques[0].attributes
-});
-const nodeFetcher_Building = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
-  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
+const nodeFetcher_Street = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Street));
+  return nodeIdHandler_Street.get(nodeIdHandler_Street.getSpec($decoded));
 };
 function applyFirstArg(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
@@ -1300,12 +1300,12 @@ function applyOrderByArgToConnection(parent, $connection, value) {
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: nodeIdHandler_Query,
+  Building: nodeIdHandler_Building,
+  House: nodeIdHandler_House,
   Offer: nodeIdHandler_Offer,
-  Street: nodeIdHandler_Street,
   Property: nodeIdHandler_Property,
   StreetProperty: nodeIdHandler_StreetProperty,
-  House: nodeIdHandler_House,
-  Building: nodeIdHandler_Building
+  Street: nodeIdHandler_Street
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -1318,6 +1318,18 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const Building_propertyIdPlan = $record => {
+  return $record.get("property_id");
+};
+const Building_propertyByPropertyIdPlan = $record => resource_propertiesPgResource.get({
+  id: $record.get("property_id")
+});
+const Property_streetIdPlan = $record => {
+  return $record.get("street_id");
+};
+const Property_streetByStreetIdPlan = $record => resource_streetsPgResource.get({
+  id: $record.get("street_id")
+});
 const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
 function toString(value) {
   return "" + value;
@@ -1331,74 +1343,62 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
     }
   });
 }
-const OfferCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
-const OffersOrderBy_ID_ASCApply = queryBuilder => {
+const PropertyCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
+const PropertyCondition_streetIdApply = ($condition, val) => applyAttributeCondition("street_id", TYPES.int, $condition, val);
+const PropertiesOrderBy_ID_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "id",
     direction: "ASC"
   });
   queryBuilder.setOrderIsUnique();
 };
-const OffersOrderBy_ID_DESCApply = queryBuilder => {
+const PropertiesOrderBy_ID_DESCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "id",
     direction: "DESC"
   });
   queryBuilder.setOrderIsUnique();
 };
-const Property_streetIdPlan = $record => {
-  return $record.get("street_id");
-};
-const Property_streetByStreetIdPlan = $record => resource_streetsPgResource.get({
-  id: $record.get("street_id")
-});
-const House_propertyIdPlan = $record => {
-  return $record.get("property_id");
-};
-const House_propertyByPropertyIdPlan = $record => resource_propertiesPgResource.get({
-  id: $record.get("property_id")
-});
-const HouseCondition_streetIdApply = ($condition, val) => applyAttributeCondition("street_id", TYPES.int, $condition, val);
-const HouseCondition_propertyIdApply = ($condition, val) => applyAttributeCondition("property_id", TYPES.int, $condition, val);
-const HouseCondition_floorsApply = ($condition, val) => applyAttributeCondition("floors", TYPES.int, $condition, val);
-const HousesOrderBy_PROPERTY_ID_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "property_id",
-    direction: "ASC"
-  });
-};
-const HousesOrderBy_PROPERTY_ID_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "property_id",
-    direction: "DESC"
-  });
-};
-const HousesOrderBy_FLOORS_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "floors",
-    direction: "ASC"
-  });
-};
-const HousesOrderBy_FLOORS_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "floors",
-    direction: "DESC"
-  });
-};
+const BuildingCondition_propertyIdApply = ($condition, val) => applyAttributeCondition("property_id", TYPES.int, $condition, val);
 const BuildingCondition_nameApply = ($condition, val) => applyAttributeCondition("name", TYPES.text, $condition, val);
+const BuildingCondition_floorsApply = ($condition, val) => applyAttributeCondition("floors", TYPES.int, $condition, val);
+const BuildingsOrderBy_PROPERTY_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "property_id",
+    direction: "ASC"
+  });
+};
+const BuildingsOrderBy_PROPERTY_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "property_id",
+    direction: "DESC"
+  });
+};
+const BuildingsOrderBy_FLOORS_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "floors",
+    direction: "ASC"
+  });
+};
+const BuildingsOrderBy_FLOORS_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "floors",
+    direction: "DESC"
+  });
+};
 function applyInputToInsert(_, $object) {
   return $object;
 }
+const specFromArgs_Building = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
+};
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
 const specFromArgs_Offer = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Offer, $nodeId);
-};
-const specFromArgs_Street = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Street, $nodeId);
 };
 const specFromArgs_Property = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -1408,9 +1408,9 @@ const specFromArgs_StreetProperty = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
 };
-const specFromArgs_Building = args => {
+const specFromArgs_Street = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Street, $nodeId);
 };
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
@@ -1422,17 +1422,6 @@ function planCreatePayloadResult($object) {
 const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
   return constant(EMPTY_OBJECT3);
-}
-function applyClientMutationIdForCreate(qb, val) {
-  qb.setMeta("clientMutationId", val);
-}
-function applyCreateFields(qb, arg) {
-  if (arg != null) {
-    return qb.setBuilder();
-  }
-}
-function PostInput_idApply(obj, val, info) {
-  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -1454,16 +1443,42 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
+const CreateBuildingPayload_buildingEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
+const CreateBuildingPayload_propertyByPropertyIdPlan = $record => resource_propertiesPgResource.get({
+  id: $record.get("result").get("property_id")
+});
+const CreateBuildingPayload_namedAfterStreetPlan = $record => resource_streetsPgResource.get({
+  name: $record.get("result").get("name")
+});
+function applyClientMutationIdForCreate(qb, val) {
+  qb.setMeta("clientMutationId", val);
+}
+function applyCreateFields(qb, arg) {
+  if (arg != null) {
+    return qb.setBuilder();
+  }
+}
+function BuildingInput_idApply(obj, val, info) {
+  obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function BuildingInput_propertyIdApply(obj, val, info) {
+  obj.set("property_id", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function BuildingInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function BuildingInput_floorsApply(obj, val, info) {
+  obj.set("floors", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function BuildingInput_isPrimaryApply(obj, val, info) {
+  obj.set("is_primary", bakedInputRuntime(info.schema, info.field.type, val));
+}
 const CreateOfferPayload_offerEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_offersPgResource, offersUniques[0].attributes, $mutation, fieldArgs);
 const CreateOfferPayload_postByPostIdPlan = $record => resource_postsPgResource.get({
   id: $record.get("result").get("post_id")
 });
 function OfferInput_postIdApply(obj, val, info) {
   obj.set("post_id", bakedInputRuntime(info.schema, info.field.type, val));
-}
-const CreateStreetPayload_streetEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_streetsPgResource, streetsUniques[0].attributes, $mutation, fieldArgs);
-function StreetInput_nameApply(obj, val, info) {
-  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreatePropertyPayload_propertyEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_propertiesPgResource, propertiesUniques[0].attributes, $mutation, fieldArgs);
 const CreatePropertyPayload_streetByStreetIdPlan = $record => resource_streetsPgResource.get({
@@ -1491,22 +1506,7 @@ function StreetPropertyInput_propIdApply(obj, val, info) {
 function StreetPropertyInput_currentOwnerApply(obj, val, info) {
   obj.set("current_owner", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const CreateBuildingPayload_buildingEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_buildingsPgResource, buildingsUniques[0].attributes, $mutation, fieldArgs);
-const CreateBuildingPayload_propertyByPropertyIdPlan = $record => resource_propertiesPgResource.get({
-  id: $record.get("result").get("property_id")
-});
-const CreateBuildingPayload_namedAfterStreetPlan = $record => resource_streetsPgResource.get({
-  name: $record.get("result").get("name")
-});
-function BuildingInput_propertyIdApply(obj, val, info) {
-  obj.set("property_id", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function BuildingInput_floorsApply(obj, val, info) {
-  obj.set("floors", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function BuildingInput_isPrimaryApply(obj, val, info) {
-  obj.set("is_primary", bakedInputRuntime(info.schema, info.field.type, val));
-}
+const CreateStreetPayload_streetEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_streetsPgResource, streetsUniques[0].attributes, $mutation, fieldArgs);
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -1530,17 +1530,17 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  """Get a single \`Post\`."""
-  postById(id: String!): Post
+  """Get a single \`Building\`."""
+  buildingById(id: Int!): Building
+
+  """Get a single \`House\`."""
+  houseByStreetIdAndPropertyId(streetId: Int!, propertyId: Int!): House
 
   """Get a single \`Offer\`."""
   offerById(id: Int!): Offer
 
-  """Get a single \`Street\`."""
-  streetById(id: Int!): Street
-
-  """Get a single \`Street\`."""
-  streetByName(name: String!): Street
+  """Get a single \`Post\`."""
+  postById(id: String!): Post
 
   """Get a single \`Property\`."""
   propertyById(id: Int!): Property
@@ -1548,23 +1548,29 @@ type Query implements Node {
   """Get a single \`StreetProperty\`."""
   streetPropertyByStrIdAndPropId(strId: Int!, propId: Int!): StreetProperty
 
-  """Get a single \`House\`."""
-  houseByStreetIdAndPropertyId(streetId: Int!, propertyId: Int!): House
+  """Get a single \`Street\`."""
+  streetById(id: Int!): Street
 
-  """Get a single \`Building\`."""
-  buildingById(id: Int!): Building
+  """Get a single \`Street\`."""
+  streetByName(name: String!): Street
+
+  """Reads a single \`Building\` using its globally unique \`ID\`."""
+  building(
+    """The globally unique \`ID\` to be used in selecting a single \`Building\`."""
+    nodeId: ID!
+  ): Building
+
+  """Reads a single \`House\` using its globally unique \`ID\`."""
+  house(
+    """The globally unique \`ID\` to be used in selecting a single \`House\`."""
+    nodeId: ID!
+  ): House
 
   """Reads a single \`Offer\` using its globally unique \`ID\`."""
   offer(
     """The globally unique \`ID\` to be used in selecting a single \`Offer\`."""
     nodeId: ID!
   ): Offer
-
-  """Reads a single \`Street\` using its globally unique \`ID\`."""
-  street(
-    """The globally unique \`ID\` to be used in selecting a single \`Street\`."""
-    nodeId: ID!
-  ): Street
 
   """Reads a single \`Property\` using its globally unique \`ID\`."""
   property(
@@ -1580,20 +1586,14 @@ type Query implements Node {
     nodeId: ID!
   ): StreetProperty
 
-  """Reads a single \`House\` using its globally unique \`ID\`."""
-  house(
-    """The globally unique \`ID\` to be used in selecting a single \`House\`."""
+  """Reads a single \`Street\` using its globally unique \`ID\`."""
+  street(
+    """The globally unique \`ID\` to be used in selecting a single \`Street\`."""
     nodeId: ID!
-  ): House
+  ): Street
 
-  """Reads a single \`Building\` using its globally unique \`ID\`."""
-  building(
-    """The globally unique \`ID\` to be used in selecting a single \`Building\`."""
-    nodeId: ID!
-  ): Building
-
-  """Reads and enables pagination through a set of \`Post\`."""
-  allPosts(
+  """Reads and enables pagination through a set of \`Building\`."""
+  allBuildings(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1615,11 +1615,40 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: PostCondition
+    condition: BuildingCondition
 
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [NATURAL]
-  ): PostsConnection
+    """The method to use when ordering \`Building\`."""
+    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BuildingsConnection
+
+  """Reads and enables pagination through a set of \`House\`."""
+  allHouses(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: HouseCondition
+
+    """The method to use when ordering \`House\`."""
+    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): HousesConnection
 
   """Reads and enables pagination through a set of \`Offer\`."""
   allOffers(
@@ -1650,8 +1679,8 @@ type Query implements Node {
     orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
   ): OffersConnection
 
-  """Reads and enables pagination through a set of \`Street\`."""
-  allStreets(
+  """Reads and enables pagination through a set of \`Post\`."""
+  allPosts(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1673,11 +1702,11 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: StreetCondition
+    condition: PostCondition
 
-    """The method to use when ordering \`Street\`."""
-    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): StreetsConnection
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [NATURAL]
+  ): PostsConnection
 
   """Reads and enables pagination through a set of \`Property\`."""
   allProperties(
@@ -1737,8 +1766,63 @@ type Query implements Node {
     orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): StreetPropertiesConnection
 
+  """Reads and enables pagination through a set of \`Street\`."""
+  allStreets(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StreetCondition
+
+    """The method to use when ordering \`Street\`."""
+    orderBy: [StreetsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StreetsConnection
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+type Building implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  propertyId: Int!
+  name: String!
+  floors: Int!
+  isPrimary: Boolean!
+
+  """Reads a single \`Property\` that is related to this \`Building\`."""
+  propertyByPropertyId: Property
+
+  """Reads a single \`Street\` that is related to this \`Building\`."""
+  namedAfterStreet: Street
+
   """Reads and enables pagination through a set of \`House\`."""
-  allHouses(
+  housesByBuildingId(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1764,10 +1848,52 @@ type Query implements Node {
 
     """The method to use when ordering \`House\`."""
     orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): HousesConnection
+  ): HousesConnection!
+}
+
+type Property implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  streetId: Int!
+  nameOrNumber: String!
+
+  """Reads a single \`Street\` that is related to this \`Property\`."""
+  streetByStreetId: Street
+
+  """Reads and enables pagination through a set of \`StreetProperty\`."""
+  streetPropertiesByPropId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: StreetPropertyCondition
+
+    """The method to use when ordering \`StreetProperty\`."""
+    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): StreetPropertiesConnection!
 
   """Reads and enables pagination through a set of \`Building\`."""
-  allBuildings(
+  buildingsByPropertyId(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1793,22 +1919,10 @@ type Query implements Node {
 
     """The method to use when ordering \`Building\`."""
     orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): BuildingsConnection
-}
+  ): BuildingsConnection!
 
-"""An object with a globally unique \`ID\`."""
-interface Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-}
-
-type Post {
-  id: String
-
-  """Reads and enables pagination through a set of \`Offer\`."""
-  offersByPostId(
+  """Reads and enables pagination through a set of \`House\`."""
+  housesByPropertyId(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -1830,89 +1944,11 @@ type Post {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: OfferCondition
+    condition: HouseCondition
 
-    """The method to use when ordering \`Offer\`."""
-    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
-  ): OffersConnection!
-}
-
-"""A connection to a list of \`Offer\` values."""
-type OffersConnection {
-  """A list of \`Offer\` objects."""
-  nodes: [Offer]!
-
-  """
-  A list of edges which contains the \`Offer\` and cursor to aid in pagination.
-  """
-  edges: [OffersEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Offer\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Offer implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  postId: String
-
-  """Reads a single \`Post\` that is related to this \`Offer\`."""
-  postByPostId: Post
-}
-
-"""A \`Offer\` edge in the connection."""
-type OffersEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Offer\` at the end of the edge."""
-  node: Offer
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
-"""
-A condition to be used against \`Offer\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input OfferCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`postId\` field."""
-  postId: String
-}
-
-"""Methods to use when ordering \`Offer\`."""
-enum OffersOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POST_ID_ASC
-  POST_ID_DESC
+    """The method to use when ordering \`House\`."""
+    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): HousesConnection!
 }
 
 type Street implements Node {
@@ -2057,104 +2093,59 @@ type PropertiesConnection {
   totalCount: Int!
 }
 
-type Property implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  streetId: Int!
-  nameOrNumber: String!
+"""A \`Property\` edge in the connection."""
+type PropertiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
 
-  """Reads a single \`Street\` that is related to this \`Property\`."""
-  streetByStreetId: Street
+  """The \`Property\` at the end of the edge."""
+  node: Property
+}
 
-  """Reads and enables pagination through a set of \`StreetProperty\`."""
-  streetPropertiesByPropId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
 
-    """Only read the last \`n\` values of the set."""
-    last: Int
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
 
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
 
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
 
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
 
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: StreetPropertyCondition
+"""
+A condition to be used against \`Property\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input PropertyCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
 
-    """The method to use when ordering \`StreetProperty\`."""
-    orderBy: [StreetPropertiesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): StreetPropertiesConnection!
+  """Checks for equality with the object’s \`streetId\` field."""
+  streetId: Int
 
-  """Reads and enables pagination through a set of \`Building\`."""
-  buildingsByPropertyId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
+  """Checks for equality with the object’s \`nameOrNumber\` field."""
+  nameOrNumber: String
+}
 
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: BuildingCondition
-
-    """The method to use when ordering \`Building\`."""
-    orderBy: [BuildingsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): BuildingsConnection!
-
-  """Reads and enables pagination through a set of \`House\`."""
-  housesByPropertyId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: HouseCondition
-
-    """The method to use when ordering \`House\`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): HousesConnection!
+"""Methods to use when ordering \`Property\`."""
+enum PropertiesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  STREET_ID_ASC
+  STREET_ID_DESC
+  NAME_OR_NUMBER_ASC
+  NAME_OR_NUMBER_DESC
 }
 
 """A connection to a list of \`StreetProperty\` values."""
@@ -2217,126 +2208,6 @@ type House implements Node {
 
   """Reads a single \`StreetProperty\` that is related to this \`House\`."""
   streetPropertyByStreetIdAndPropertyId: StreetProperty
-}
-
-type Building implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  propertyId: Int!
-  name: String!
-  floors: Int!
-  isPrimary: Boolean!
-
-  """Reads a single \`Property\` that is related to this \`Building\`."""
-  propertyByPropertyId: Property
-
-  """Reads a single \`Street\` that is related to this \`Building\`."""
-  namedAfterStreet: Street
-
-  """Reads and enables pagination through a set of \`House\`."""
-  housesByBuildingId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: HouseCondition
-
-    """The method to use when ordering \`House\`."""
-    orderBy: [HousesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): HousesConnection!
-}
-
-"""A connection to a list of \`House\` values."""
-type HousesConnection {
-  """A list of \`House\` objects."""
-  nodes: [House]!
-
-  """
-  A list of edges which contains the \`House\` and cursor to aid in pagination.
-  """
-  edges: [HousesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`House\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`House\` edge in the connection."""
-type HousesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`House\` at the end of the edge."""
-  node: House
-}
-
-"""
-A condition to be used against \`House\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input HouseCondition {
-  """Checks for equality with the object’s \`buildingName\` field."""
-  buildingName: String
-
-  """Checks for equality with the object’s \`propertyNameOrNumber\` field."""
-  propertyNameOrNumber: String
-
-  """Checks for equality with the object’s \`streetName\` field."""
-  streetName: String
-
-  """Checks for equality with the object’s \`streetId\` field."""
-  streetId: Int
-
-  """Checks for equality with the object’s \`buildingId\` field."""
-  buildingId: Int
-
-  """Checks for equality with the object’s \`propertyId\` field."""
-  propertyId: Int
-
-  """Checks for equality with the object’s \`floors\` field."""
-  floors: Int
-}
-
-"""Methods to use when ordering \`House\`."""
-enum HousesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  BUILDING_NAME_ASC
-  BUILDING_NAME_DESC
-  PROPERTY_NAME_OR_NUMBER_ASC
-  PROPERTY_NAME_OR_NUMBER_DESC
-  STREET_NAME_ASC
-  STREET_NAME_DESC
-  STREET_ID_ASC
-  STREET_ID_DESC
-  BUILDING_ID_ASC
-  BUILDING_ID_DESC
-  PROPERTY_ID_ASC
-  PROPERTY_ID_DESC
-  FLOORS_ASC
-  FLOORS_DESC
 }
 
 """A \`StreetProperty\` edge in the connection."""
@@ -2440,41 +2311,170 @@ enum BuildingsOrderBy {
   IS_PRIMARY_DESC
 }
 
-"""A \`Property\` edge in the connection."""
-type PropertiesEdge {
+"""A connection to a list of \`House\` values."""
+type HousesConnection {
+  """A list of \`House\` objects."""
+  nodes: [House]!
+
+  """
+  A list of edges which contains the \`House\` and cursor to aid in pagination.
+  """
+  edges: [HousesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`House\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`House\` edge in the connection."""
+type HousesEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The \`Property\` at the end of the edge."""
-  node: Property
+  """The \`House\` at the end of the edge."""
+  node: House
 }
 
 """
-A condition to be used against \`Property\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
+A condition to be used against \`House\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
-input PropertyCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
+input HouseCondition {
+  """Checks for equality with the object’s \`buildingName\` field."""
+  buildingName: String
+
+  """Checks for equality with the object’s \`propertyNameOrNumber\` field."""
+  propertyNameOrNumber: String
+
+  """Checks for equality with the object’s \`streetName\` field."""
+  streetName: String
 
   """Checks for equality with the object’s \`streetId\` field."""
   streetId: Int
 
-  """Checks for equality with the object’s \`nameOrNumber\` field."""
-  nameOrNumber: String
+  """Checks for equality with the object’s \`buildingId\` field."""
+  buildingId: Int
+
+  """Checks for equality with the object’s \`propertyId\` field."""
+  propertyId: Int
+
+  """Checks for equality with the object’s \`floors\` field."""
+  floors: Int
 }
 
-"""Methods to use when ordering \`Property\`."""
-enum PropertiesOrderBy {
+"""Methods to use when ordering \`House\`."""
+enum HousesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  BUILDING_NAME_ASC
+  BUILDING_NAME_DESC
+  PROPERTY_NAME_OR_NUMBER_ASC
+  PROPERTY_NAME_OR_NUMBER_DESC
+  STREET_NAME_ASC
+  STREET_NAME_DESC
+  STREET_ID_ASC
+  STREET_ID_DESC
+  BUILDING_ID_ASC
+  BUILDING_ID_DESC
+  PROPERTY_ID_ASC
+  PROPERTY_ID_DESC
+  FLOORS_ASC
+  FLOORS_DESC
+}
+
+type Offer implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  postId: String
+
+  """Reads a single \`Post\` that is related to this \`Offer\`."""
+  postByPostId: Post
+}
+
+type Post {
+  id: String
+
+  """Reads and enables pagination through a set of \`Offer\`."""
+  offersByPostId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: OfferCondition
+
+    """The method to use when ordering \`Offer\`."""
+    orderBy: [OffersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OffersConnection!
+}
+
+"""A connection to a list of \`Offer\` values."""
+type OffersConnection {
+  """A list of \`Offer\` objects."""
+  nodes: [Offer]!
+
+  """
+  A list of edges which contains the \`Offer\` and cursor to aid in pagination.
+  """
+  edges: [OffersEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Offer\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Offer\` edge in the connection."""
+type OffersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Offer\` at the end of the edge."""
+  node: Offer
+}
+
+"""
+A condition to be used against \`Offer\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input OfferCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`postId\` field."""
+  postId: String
+}
+
+"""Methods to use when ordering \`Offer\`."""
+enum OffersOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  STREET_ID_ASC
-  STREET_ID_DESC
-  NAME_OR_NUMBER_ASC
-  NAME_OR_NUMBER_DESC
+  POST_ID_ASC
+  POST_ID_DESC
 }
 
 """A connection to a list of \`Post\` values."""
@@ -2570,13 +2570,13 @@ enum StreetsOrderBy {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
-  """Creates a single \`Post\`."""
-  createPost(
+  """Creates a single \`Building\`."""
+  createBuilding(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreatePostInput!
-  ): CreatePostPayload
+    input: CreateBuildingInput!
+  ): CreateBuildingPayload
 
   """Creates a single \`Offer\`."""
   createOffer(
@@ -2586,13 +2586,13 @@ type Mutation {
     input: CreateOfferInput!
   ): CreateOfferPayload
 
-  """Creates a single \`Street\`."""
-  createStreet(
+  """Creates a single \`Post\`."""
+  createPost(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateStreetInput!
-  ): CreateStreetPayload
+    input: CreatePostInput!
+  ): CreatePostPayload
 
   """Creates a single \`Property\`."""
   createProperty(
@@ -2610,21 +2610,29 @@ type Mutation {
     input: CreateStreetPropertyInput!
   ): CreateStreetPropertyPayload
 
-  """Creates a single \`Building\`."""
-  createBuilding(
+  """Creates a single \`Street\`."""
+  createStreet(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateBuildingInput!
-  ): CreateBuildingPayload
+    input: CreateStreetInput!
+  ): CreateStreetPayload
 
-  """Updates a single \`Post\` using a unique key and a patch."""
-  updatePostById(
+  """Updates a single \`Building\` using its globally unique id and a patch."""
+  updateBuilding(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdatePostByIdInput!
-  ): UpdatePostPayload
+    input: UpdateBuildingInput!
+  ): UpdateBuildingPayload
+
+  """Updates a single \`Building\` using a unique key and a patch."""
+  updateBuildingById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateBuildingByIdInput!
+  ): UpdateBuildingPayload
 
   """Updates a single \`Offer\` using its globally unique id and a patch."""
   updateOffer(
@@ -2642,29 +2650,13 @@ type Mutation {
     input: UpdateOfferByIdInput!
   ): UpdateOfferPayload
 
-  """Updates a single \`Street\` using its globally unique id and a patch."""
-  updateStreet(
+  """Updates a single \`Post\` using a unique key and a patch."""
+  updatePostById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateStreetInput!
-  ): UpdateStreetPayload
-
-  """Updates a single \`Street\` using a unique key and a patch."""
-  updateStreetById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateStreetByIdInput!
-  ): UpdateStreetPayload
-
-  """Updates a single \`Street\` using a unique key and a patch."""
-  updateStreetByName(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateStreetByNameInput!
-  ): UpdateStreetPayload
+    input: UpdatePostByIdInput!
+  ): UpdatePostPayload
 
   """Updates a single \`Property\` using its globally unique id and a patch."""
   updateProperty(
@@ -2700,29 +2692,45 @@ type Mutation {
     input: UpdateStreetPropertyByStrIdAndPropIdInput!
   ): UpdateStreetPropertyPayload
 
-  """Updates a single \`Building\` using its globally unique id and a patch."""
-  updateBuilding(
+  """Updates a single \`Street\` using its globally unique id and a patch."""
+  updateStreet(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateBuildingInput!
-  ): UpdateBuildingPayload
+    input: UpdateStreetInput!
+  ): UpdateStreetPayload
 
-  """Updates a single \`Building\` using a unique key and a patch."""
-  updateBuildingById(
+  """Updates a single \`Street\` using a unique key and a patch."""
+  updateStreetById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateBuildingByIdInput!
-  ): UpdateBuildingPayload
+    input: UpdateStreetByIdInput!
+  ): UpdateStreetPayload
 
-  """Deletes a single \`Post\` using a unique key."""
-  deletePostById(
+  """Updates a single \`Street\` using a unique key and a patch."""
+  updateStreetByName(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeletePostByIdInput!
-  ): DeletePostPayload
+    input: UpdateStreetByNameInput!
+  ): UpdateStreetPayload
+
+  """Deletes a single \`Building\` using its globally unique id."""
+  deleteBuilding(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingInput!
+  ): DeleteBuildingPayload
+
+  """Deletes a single \`Building\` using a unique key."""
+  deleteBuildingById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteBuildingByIdInput!
+  ): DeleteBuildingPayload
 
   """Deletes a single \`Offer\` using its globally unique id."""
   deleteOffer(
@@ -2740,29 +2748,13 @@ type Mutation {
     input: DeleteOfferByIdInput!
   ): DeleteOfferPayload
 
-  """Deletes a single \`Street\` using its globally unique id."""
-  deleteStreet(
+  """Deletes a single \`Post\` using a unique key."""
+  deletePostById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteStreetInput!
-  ): DeleteStreetPayload
-
-  """Deletes a single \`Street\` using a unique key."""
-  deleteStreetById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteStreetByIdInput!
-  ): DeleteStreetPayload
-
-  """Deletes a single \`Street\` using a unique key."""
-  deleteStreetByName(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteStreetByNameInput!
-  ): DeleteStreetPayload
+    input: DeletePostByIdInput!
+  ): DeletePostPayload
 
   """Deletes a single \`Property\` using its globally unique id."""
   deleteProperty(
@@ -2796,55 +2788,79 @@ type Mutation {
     input: DeleteStreetPropertyByStrIdAndPropIdInput!
   ): DeleteStreetPropertyPayload
 
-  """Deletes a single \`Building\` using its globally unique id."""
-  deleteBuilding(
+  """Deletes a single \`Street\` using its globally unique id."""
+  deleteStreet(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteBuildingInput!
-  ): DeleteBuildingPayload
+    input: DeleteStreetInput!
+  ): DeleteStreetPayload
 
-  """Deletes a single \`Building\` using a unique key."""
-  deleteBuildingById(
+  """Deletes a single \`Street\` using a unique key."""
+  deleteStreetById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteBuildingByIdInput!
-  ): DeleteBuildingPayload
+    input: DeleteStreetByIdInput!
+  ): DeleteStreetPayload
+
+  """Deletes a single \`Street\` using a unique key."""
+  deleteStreetByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteStreetByNameInput!
+  ): DeleteStreetPayload
 }
 
-"""The output of our create \`Post\` mutation."""
-type CreatePostPayload {
+"""The output of our create \`Building\` mutation."""
+type CreateBuildingPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Post\` that was created by this mutation."""
-  post: Post
+  """The \`Building\` that was created by this mutation."""
+  building: Building
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+
+  """An edge for our \`Building\`. May be used by Relay 1."""
+  buildingEdge(
+    """The method to use when ordering \`Building\`."""
+    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): BuildingsEdge
+
+  """Reads a single \`Property\` that is related to this \`Building\`."""
+  propertyByPropertyId: Property
+
+  """Reads a single \`Street\` that is related to this \`Building\`."""
+  namedAfterStreet: Street
 }
 
-"""All input for the create \`Post\` mutation."""
-input CreatePostInput {
+"""All input for the create \`Building\` mutation."""
+input CreateBuildingInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The \`Post\` to be created by this mutation."""
-  post: PostInput!
+  """The \`Building\` to be created by this mutation."""
+  building: BuildingInput!
 }
 
-"""An input for mutations affecting \`Post\`"""
-input PostInput {
-  id: String
+"""An input for mutations affecting \`Building\`"""
+input BuildingInput {
+  id: Int
+  propertyId: Int!
+  name: String!
+  floors: Int
+  isPrimary: Boolean
 }
 
 """The output of our create \`Offer\` mutation."""
@@ -2891,45 +2907,38 @@ input OfferInput {
   postId: String
 }
 
-"""The output of our create \`Street\` mutation."""
-type CreateStreetPayload {
+"""The output of our create \`Post\` mutation."""
+type CreatePostPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Street\` that was created by this mutation."""
-  street: Street
+  """The \`Post\` that was created by this mutation."""
+  post: Post
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our \`Street\`. May be used by Relay 1."""
-  streetEdge(
-    """The method to use when ordering \`Street\`."""
-    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StreetsEdge
 }
 
-"""All input for the create \`Street\` mutation."""
-input CreateStreetInput {
+"""All input for the create \`Post\` mutation."""
+input CreatePostInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The \`Street\` to be created by this mutation."""
-  street: StreetInput!
+  """The \`Post\` to be created by this mutation."""
+  post: PostInput!
 }
 
-"""An input for mutations affecting \`Street\`"""
-input StreetInput {
-  id: Int
-  name: String!
+"""An input for mutations affecting \`Post\`"""
+input PostInput {
+  id: String
 }
 
 """The output of our create \`Property\` mutation."""
@@ -3025,15 +3034,56 @@ input StreetPropertyInput {
   currentOwner: String
 }
 
-"""The output of our create \`Building\` mutation."""
-type CreateBuildingPayload {
+"""The output of our create \`Street\` mutation."""
+type CreateStreetPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Building\` that was created by this mutation."""
+  """The \`Street\` that was created by this mutation."""
+  street: Street
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Street\`. May be used by Relay 1."""
+  streetEdge(
+    """The method to use when ordering \`Street\`."""
+    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StreetsEdge
+}
+
+"""All input for the create \`Street\` mutation."""
+input CreateStreetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Street\` to be created by this mutation."""
+  street: StreetInput!
+}
+
+"""An input for mutations affecting \`Street\`"""
+input StreetInput {
+  id: Int
+  name: String!
+}
+
+"""The output of our update \`Building\` mutation."""
+type UpdateBuildingPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Building\` that was updated by this mutation."""
   building: Building
 
   """
@@ -3054,62 +3104,49 @@ type CreateBuildingPayload {
   namedAfterStreet: Street
 }
 
-"""All input for the create \`Building\` mutation."""
-input CreateBuildingInput {
+"""All input for the \`updateBuilding\` mutation."""
+input UpdateBuildingInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The \`Building\` to be created by this mutation."""
-  building: BuildingInput!
+  """
+  The globally unique \`ID\` which will identify a single \`Building\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`Building\` being updated.
+  """
+  buildingPatch: BuildingPatch!
 }
 
-"""An input for mutations affecting \`Building\`"""
-input BuildingInput {
+"""
+Represents an update to a \`Building\`. Fields that are set will be updated.
+"""
+input BuildingPatch {
   id: Int
-  propertyId: Int!
-  name: String!
+  propertyId: Int
+  name: String
   floors: Int
   isPrimary: Boolean
 }
 
-"""The output of our update \`Post\` mutation."""
-type UpdatePostPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Post\` that was updated by this mutation."""
-  post: Post
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`updatePostById\` mutation."""
-input UpdatePostByIdInput {
+"""All input for the \`updateBuildingById\` mutation."""
+input UpdateBuildingByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: String!
+  id: Int!
 
   """
-  An object where the defined keys will be set on the \`Post\` being updated.
+  An object where the defined keys will be set on the \`Building\` being updated.
   """
-  postPatch: PostPatch!
-}
-
-"""Represents an update to a \`Post\`. Fields that are set will be updated."""
-input PostPatch {
-  id: String
+  buildingPatch: BuildingPatch!
 }
 
 """The output of our update \`Offer\` mutation."""
@@ -3180,84 +3217,41 @@ input UpdateOfferByIdInput {
   offerPatch: OfferPatch!
 }
 
-"""The output of our update \`Street\` mutation."""
-type UpdateStreetPayload {
+"""The output of our update \`Post\` mutation."""
+type UpdatePostPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Street\` that was updated by this mutation."""
-  street: Street
+  """The \`Post\` that was updated by this mutation."""
+  post: Post
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our \`Street\`. May be used by Relay 1."""
-  streetEdge(
-    """The method to use when ordering \`Street\`."""
-    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StreetsEdge
 }
 
-"""All input for the \`updateStreet\` mutation."""
-input UpdateStreetInput {
+"""All input for the \`updatePostById\` mutation."""
+input UpdatePostByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
+  id: String!
 
   """
-  The globally unique \`ID\` which will identify a single \`Street\` to be updated.
+  An object where the defined keys will be set on the \`Post\` being updated.
   """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Street\` being updated.
-  """
-  streetPatch: StreetPatch!
+  postPatch: PostPatch!
 }
 
-"""
-Represents an update to a \`Street\`. Fields that are set will be updated.
-"""
-input StreetPatch {
-  id: Int
-  name: String
-}
-
-"""All input for the \`updateStreetById\` mutation."""
-input UpdateStreetByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the \`Street\` being updated.
-  """
-  streetPatch: StreetPatch!
-}
-
-"""All input for the \`updateStreetByName\` mutation."""
-input UpdateStreetByNameInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  name: String!
-
-  """
-  An object where the defined keys will be set on the \`Street\` being updated.
-  """
-  streetPatch: StreetPatch!
+"""Represents an update to a \`Post\`. Fields that are set will be updated."""
+input PostPatch {
+  id: String
 }
 
 """The output of our update \`Property\` mutation."""
@@ -3402,16 +3396,97 @@ input UpdateStreetPropertyByStrIdAndPropIdInput {
   streetPropertyPatch: StreetPropertyPatch!
 }
 
-"""The output of our update \`Building\` mutation."""
-type UpdateBuildingPayload {
+"""The output of our update \`Street\` mutation."""
+type UpdateStreetPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Building\` that was updated by this mutation."""
+  """The \`Street\` that was updated by this mutation."""
+  street: Street
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Street\`. May be used by Relay 1."""
+  streetEdge(
+    """The method to use when ordering \`Street\`."""
+    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StreetsEdge
+}
+
+"""All input for the \`updateStreet\` mutation."""
+input UpdateStreetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Street\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`Street\` being updated.
+  """
+  streetPatch: StreetPatch!
+}
+
+"""
+Represents an update to a \`Street\`. Fields that are set will be updated.
+"""
+input StreetPatch {
+  id: Int
+  name: String
+}
+
+"""All input for the \`updateStreetById\` mutation."""
+input UpdateStreetByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the \`Street\` being updated.
+  """
+  streetPatch: StreetPatch!
+}
+
+"""All input for the \`updateStreetByName\` mutation."""
+input UpdateStreetByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
+
+  """
+  An object where the defined keys will be set on the \`Street\` being updated.
+  """
+  streetPatch: StreetPatch!
+}
+
+"""The output of our delete \`Building\` mutation."""
+type DeleteBuildingPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Building\` that was deleted by this mutation."""
   building: Building
+  deletedBuildingId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3431,8 +3506,8 @@ type UpdateBuildingPayload {
   namedAfterStreet: Street
 }
 
-"""All input for the \`updateBuilding\` mutation."""
-input UpdateBuildingInput {
+"""All input for the \`deleteBuilding\` mutation."""
+input DeleteBuildingInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3440,67 +3515,19 @@ input UpdateBuildingInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Building\` to be updated.
+  The globally unique \`ID\` which will identify a single \`Building\` to be deleted.
   """
   nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Building\` being updated.
-  """
-  buildingPatch: BuildingPatch!
 }
 
-"""
-Represents an update to a \`Building\`. Fields that are set will be updated.
-"""
-input BuildingPatch {
-  id: Int
-  propertyId: Int
-  name: String
-  floors: Int
-  isPrimary: Boolean
-}
-
-"""All input for the \`updateBuildingById\` mutation."""
-input UpdateBuildingByIdInput {
+"""All input for the \`deleteBuildingById\` mutation."""
+input DeleteBuildingByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   id: Int!
-
-  """
-  An object where the defined keys will be set on the \`Building\` being updated.
-  """
-  buildingPatch: BuildingPatch!
-}
-
-"""The output of our delete \`Post\` mutation."""
-type DeletePostPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Post\` that was deleted by this mutation."""
-  post: Post
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`deletePostById\` mutation."""
-input DeletePostByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: String!
 }
 
 """The output of our delete \`Offer\` mutation."""
@@ -3554,62 +3581,31 @@ input DeleteOfferByIdInput {
   id: Int!
 }
 
-"""The output of our delete \`Street\` mutation."""
-type DeleteStreetPayload {
+"""The output of our delete \`Post\` mutation."""
+type DeletePostPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Street\` that was deleted by this mutation."""
-  street: Street
-  deletedStreetId: ID
+  """The \`Post\` that was deleted by this mutation."""
+  post: Post
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-
-  """An edge for our \`Street\`. May be used by Relay 1."""
-  streetEdge(
-    """The method to use when ordering \`Street\`."""
-    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): StreetsEdge
 }
 
-"""All input for the \`deleteStreet\` mutation."""
-input DeleteStreetInput {
+"""All input for the \`deletePostById\` mutation."""
+input DeletePostByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Street\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the \`deleteStreetById\` mutation."""
-input DeleteStreetByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
-"""All input for the \`deleteStreetByName\` mutation."""
-input DeleteStreetByNameInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  name: String!
+  id: String!
 }
 
 """The output of our delete \`Property\` mutation."""
@@ -3718,38 +3714,32 @@ input DeleteStreetPropertyByStrIdAndPropIdInput {
   propId: Int!
 }
 
-"""The output of our delete \`Building\` mutation."""
-type DeleteBuildingPayload {
+"""The output of our delete \`Street\` mutation."""
+type DeleteStreetPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Building\` that was deleted by this mutation."""
-  building: Building
-  deletedBuildingId: ID
+  """The \`Street\` that was deleted by this mutation."""
+  street: Street
+  deletedStreetId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our \`Building\`. May be used by Relay 1."""
-  buildingEdge(
-    """The method to use when ordering \`Building\`."""
-    orderBy: [BuildingsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): BuildingsEdge
-
-  """Reads a single \`Property\` that is related to this \`Building\`."""
-  propertyByPropertyId: Property
-
-  """Reads a single \`Street\` that is related to this \`Building\`."""
-  namedAfterStreet: Street
+  """An edge for our \`Street\`. May be used by Relay 1."""
+  streetEdge(
+    """The method to use when ordering \`Street\`."""
+    orderBy: [StreetsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): StreetsEdge
 }
 
-"""All input for the \`deleteBuilding\` mutation."""
-input DeleteBuildingInput {
+"""All input for the \`deleteStreet\` mutation."""
+input DeleteStreetInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3757,19 +3747,29 @@ input DeleteBuildingInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Building\` to be deleted.
+  The globally unique \`ID\` which will identify a single \`Street\` to be deleted.
   """
   nodeId: ID!
 }
 
-"""All input for the \`deleteBuildingById\` mutation."""
-input DeleteBuildingByIdInput {
+"""All input for the \`deleteStreetById\` mutation."""
+input DeleteStreetByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
   id: Int!
+}
+
+"""All input for the \`deleteStreetByName\` mutation."""
+input DeleteStreetByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  name: String!
 }`;
 export const objects = {
   Query: {
@@ -4398,8 +4398,8 @@ export const objects = {
         const specifier = nodeIdHandler_Building.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Building.codec.name].encode);
       },
-      propertyByPropertyId: House_propertyByPropertyIdPlan,
-      propertyId: House_propertyIdPlan
+      propertyByPropertyId: Building_propertyByPropertyIdPlan,
+      propertyId: Building_propertyIdPlan
     },
     planType($specifier) {
       const spec = Object.create(null);
@@ -4576,8 +4576,8 @@ export const objects = {
         const specifier = nodeIdHandler_House.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_House.codec.name].encode);
       },
-      propertyByPropertyId: House_propertyByPropertyIdPlan,
-      propertyId: House_propertyIdPlan,
+      propertyByPropertyId: Building_propertyByPropertyIdPlan,
+      propertyId: Building_propertyIdPlan,
       propertyNameOrNumber($record) {
         return $record.get("property_name_or_number");
       },
@@ -4969,22 +4969,22 @@ export const interfaces = {
 export const inputObjects = {
   BuildingCondition: {
     plans: {
-      floors: HouseCondition_floorsApply,
-      id: OfferCondition_idApply,
+      floors: BuildingCondition_floorsApply,
+      id: PropertyCondition_idApply,
       isPrimary($condition, val) {
         return applyAttributeCondition("is_primary", TYPES.boolean, $condition, val);
       },
       name: BuildingCondition_nameApply,
-      propertyId: HouseCondition_propertyIdApply
+      propertyId: BuildingCondition_propertyIdApply
     }
   },
   BuildingInput: {
     baked: createObjectAndApplyChildren,
     plans: {
       floors: BuildingInput_floorsApply,
-      id: PostInput_idApply,
+      id: BuildingInput_idApply,
       isPrimary: BuildingInput_isPrimaryApply,
-      name: StreetInput_nameApply,
+      name: BuildingInput_nameApply,
       propertyId: BuildingInput_propertyIdApply
     }
   },
@@ -4992,9 +4992,9 @@ export const inputObjects = {
     baked: createObjectAndApplyChildren,
     plans: {
       floors: BuildingInput_floorsApply,
-      id: PostInput_idApply,
+      id: BuildingInput_idApply,
       isPrimary: BuildingInput_isPrimaryApply,
-      name: StreetInput_nameApply,
+      name: BuildingInput_nameApply,
       propertyId: BuildingInput_propertyIdApply
     }
   },
@@ -5102,12 +5102,12 @@ export const inputObjects = {
       buildingName($condition, val) {
         return applyAttributeCondition("building_name", TYPES.text, $condition, val);
       },
-      floors: HouseCondition_floorsApply,
-      propertyId: HouseCondition_propertyIdApply,
+      floors: BuildingCondition_floorsApply,
+      propertyId: BuildingCondition_propertyIdApply,
       propertyNameOrNumber($condition, val) {
         return applyAttributeCondition("property_name_or_number", TYPES.text, $condition, val);
       },
-      streetId: HouseCondition_streetIdApply,
+      streetId: PropertyCondition_streetIdApply,
       streetName($condition, val) {
         return applyAttributeCondition("street_name", TYPES.text, $condition, val);
       }
@@ -5115,7 +5115,7 @@ export const inputObjects = {
   },
   OfferCondition: {
     plans: {
-      id: OfferCondition_idApply,
+      id: PropertyCondition_idApply,
       postId($condition, val) {
         return applyAttributeCondition("post_id", TYPES.text, $condition, val);
       }
@@ -5124,14 +5124,14 @@ export const inputObjects = {
   OfferInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply,
+      id: BuildingInput_idApply,
       postId: OfferInput_postIdApply
     }
   },
   OfferPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply,
+      id: BuildingInput_idApply,
       postId: OfferInput_postIdApply
     }
   },
@@ -5145,28 +5145,28 @@ export const inputObjects = {
   PostInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply
+      id: BuildingInput_idApply
     }
   },
   PostPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply
+      id: BuildingInput_idApply
     }
   },
   PropertyCondition: {
     plans: {
-      id: OfferCondition_idApply,
+      id: PropertyCondition_idApply,
       nameOrNumber($condition, val) {
         return applyAttributeCondition("name_or_number", TYPES.text, $condition, val);
       },
-      streetId: HouseCondition_streetIdApply
+      streetId: PropertyCondition_streetIdApply
     }
   },
   PropertyInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply,
+      id: BuildingInput_idApply,
       nameOrNumber: PropertyInput_nameOrNumberApply,
       streetId: PropertyInput_streetIdApply
     }
@@ -5174,29 +5174,29 @@ export const inputObjects = {
   PropertyPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply,
+      id: BuildingInput_idApply,
       nameOrNumber: PropertyInput_nameOrNumberApply,
       streetId: PropertyInput_streetIdApply
     }
   },
   StreetCondition: {
     plans: {
-      id: OfferCondition_idApply,
+      id: PropertyCondition_idApply,
       name: BuildingCondition_nameApply
     }
   },
   StreetInput: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply,
-      name: StreetInput_nameApply
+      id: BuildingInput_idApply,
+      name: BuildingInput_nameApply
     }
   },
   StreetPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
-      id: PostInput_idApply,
-      name: StreetInput_nameApply
+      id: BuildingInput_idApply,
+      name: BuildingInput_nameApply
     }
   },
   StreetPropertyCondition: {
@@ -5316,10 +5316,10 @@ export const scalars = {
 export const enums = {
   BuildingsOrderBy: {
     values: {
-      FLOORS_ASC: HousesOrderBy_FLOORS_ASCApply,
-      FLOORS_DESC: HousesOrderBy_FLOORS_DESCApply,
-      ID_ASC: OffersOrderBy_ID_ASCApply,
-      ID_DESC: OffersOrderBy_ID_DESCApply,
+      FLOORS_ASC: BuildingsOrderBy_FLOORS_ASCApply,
+      FLOORS_DESC: BuildingsOrderBy_FLOORS_DESCApply,
+      ID_ASC: PropertiesOrderBy_ID_ASCApply,
+      ID_DESC: PropertiesOrderBy_ID_DESCApply,
       IS_PRIMARY_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "is_primary",
@@ -5362,8 +5362,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      PROPERTY_ID_ASC: HousesOrderBy_PROPERTY_ID_ASCApply,
-      PROPERTY_ID_DESC: HousesOrderBy_PROPERTY_ID_DESCApply
+      PROPERTY_ID_ASC: BuildingsOrderBy_PROPERTY_ID_ASCApply,
+      PROPERTY_ID_DESC: BuildingsOrderBy_PROPERTY_ID_DESCApply
     }
   },
   HousesOrderBy: {
@@ -5392,8 +5392,8 @@ export const enums = {
           direction: "DESC"
         });
       },
-      FLOORS_ASC: HousesOrderBy_FLOORS_ASCApply,
-      FLOORS_DESC: HousesOrderBy_FLOORS_DESCApply,
+      FLOORS_ASC: BuildingsOrderBy_FLOORS_ASCApply,
+      FLOORS_DESC: BuildingsOrderBy_FLOORS_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         housesUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -5412,8 +5412,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      PROPERTY_ID_ASC: HousesOrderBy_PROPERTY_ID_ASCApply,
-      PROPERTY_ID_DESC: HousesOrderBy_PROPERTY_ID_DESCApply,
+      PROPERTY_ID_ASC: BuildingsOrderBy_PROPERTY_ID_ASCApply,
+      PROPERTY_ID_DESC: BuildingsOrderBy_PROPERTY_ID_DESCApply,
       PROPERTY_NAME_OR_NUMBER_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "property_name_or_number",
@@ -5456,8 +5456,8 @@ export const enums = {
   },
   OffersOrderBy: {
     values: {
-      ID_ASC: OffersOrderBy_ID_ASCApply,
-      ID_DESC: OffersOrderBy_ID_DESCApply,
+      ID_ASC: PropertiesOrderBy_ID_ASCApply,
+      ID_DESC: PropertiesOrderBy_ID_DESCApply,
       POST_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "post_id",
@@ -5492,14 +5492,14 @@ export const enums = {
   },
   PostsOrderBy: {
     values: {
-      ID_ASC: OffersOrderBy_ID_ASCApply,
-      ID_DESC: OffersOrderBy_ID_DESCApply
+      ID_ASC: PropertiesOrderBy_ID_ASCApply,
+      ID_DESC: PropertiesOrderBy_ID_DESCApply
     }
   },
   PropertiesOrderBy: {
     values: {
-      ID_ASC: OffersOrderBy_ID_ASCApply,
-      ID_DESC: OffersOrderBy_ID_DESCApply,
+      ID_ASC: PropertiesOrderBy_ID_ASCApply,
+      ID_DESC: PropertiesOrderBy_ID_DESCApply,
       NAME_OR_NUMBER_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name_or_number",
@@ -5606,8 +5606,8 @@ export const enums = {
   },
   StreetsOrderBy: {
     values: {
-      ID_ASC: OffersOrderBy_ID_ASCApply,
-      ID_DESC: OffersOrderBy_ID_DESCApply,
+      ID_ASC: PropertiesOrderBy_ID_ASCApply,
+      ID_DESC: PropertiesOrderBy_ID_DESCApply,
       NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "name",

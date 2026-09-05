@@ -1,0 +1,144 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for mutations/v4/mutation-create-emoty-range"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 75, 76, 85, 80, 79<br /><br />1: PgInsertSingle[72]<br />2: <br />ᐳ: Object[77]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 72, 85, 77, 80, 79<br /><br />ROOT Object{1}ᐸ{result}ᐳ[77]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 72, 80<br /><br />ROOT PgInsertSingle{1}ᐸtypes()ᐳ[72]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 79, 86<br /><br />ROOT Constantᐸ[HIDDEN]ᐳ[79]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 94, 100, 106<br /><br />ROOT Access{3}ᐸ88.startᐳ[94]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 95, 101, 107<br /><br />ROOT Access{3}ᐸ89.startᐳ[95]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 96, 102, 108<br /><br />ROOT Access{3}ᐸ90.startᐳ[96]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 97, 103, 109<br /><br />ROOT Access{3}ᐸ88.endᐳ[97]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 98, 104, 110<br /><br />ROOT Access{3}ᐸ89.endᐳ[98]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 99, 105, 111<br /><br />ROOT Access{3}ᐸ90.endᐳ[99]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3 & Bucket4
+    Bucket3 --> Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10
+
+    %% plan dependencies
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸ201ᐳ[112]<br />- Constantᐸ30ᐳ[113]<br />- Constantᐸ'467131188225'ᐳ[114]<br />- Constantᐸ'15.2'ᐳ[115]<br />- Constantᐸfalseᐳ[116]<br />- Constantᐸ'abc'ᐳ[117]<br />- Constantᐸ'red'ᐳ[118]<br />- Constantᐸ[ 'red', 'green' ]ᐳ[16]<br />- Constantᐸ6ᐳ[119]<br />- Constantᐸ5ᐳ[120]<br />- Constantᐸ[   'have',  'you',   'ever',  'been',   'down',  'the',   'ᐳ[19]<br />- Constantᐸ{ x: 1, y: 2, z: 3 }ᐳ[121]<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[122]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'2016-10-07 16:12:21.747269'ᐳ[127]<br />- Constantᐸ'2016-10-09 16:12:45.218676-04'ᐳ[128]<br />- Constantᐸ'2016-10-15'ᐳ[129]<br />- Constantᐸ'19:13:18.625699'ᐳ[130]<br />- Constantᐸ'13:13:29.585176-04'ᐳ[131]<br />- Constantᐸ[ §{ seconds: 2, minutes: 3, hours: 4, days: 5, months: 6, yᐳ[42]<br />- Constantᐸ1234567.89ᐳ[136]<br />- Constantᐸ'192.168.0.0/16'ᐳ[156]<br />- Constantᐸ'0cafec0ffee0'ᐳ[157]<br />- Constantᐸ[ 'TEXT 2098288669218571759', 'TEXT 2098288669218571760', 'Tᐳ[70]<br />- Constantᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ[71]"}}:::plan
+    __InputObject22{{"__InputObject[22∈0] ➊<br />More deps:<br />- Constantᐸtrueᐳ[123]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject24{{"__InputObject[24∈0] ➊<br />More deps:<br />- Constantᐸtrueᐳ[123]"}}:::plan
+    __InputObject29{{"__InputObject[29∈0] ➊<br />More deps:<br />- Constantᐸfalseᐳ[116]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject37{{"__InputObject[37∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[132]<br />- Constantᐸ2ᐳ[133]<br />- Constantᐸ3ᐳ[134]<br />- Constantᐸ4ᐳ[135]<br />- Constantᐸ5ᐳ[120]<br />- Constantᐸ6ᐳ[119]"}}:::plan
+    __InputObject44{{"__InputObject[44∈0] ➊<br />More deps:<br />- Constantᐸ123ᐳ[137]<br />- Constantᐸ'abc'ᐳ[117]<br />- Constantᐸ'green'ᐳ[138]<br />- Constantᐸ'ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf'ᐳ[139]<br />- Constantᐸ'FOO_BAR'ᐳ[140]<br />- Constantᐸ''ᐳ[141]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ20ᐳ[142]"}}:::plan
+    __InputObject51{{"__InputObject[51∈0] ➊<br />More deps:<br />- Constantᐸ0ᐳ[155]"}}:::plan
+    __InputObject67{{"__InputObject[67∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[132]<br />- Constantᐸ3ᐳ[134]"}}:::plan
+    __InputObject22 & __InputObject24 & __InputObject29 & __InputObject37 & __InputObject44 & __InputObject51 & __InputObject67 --> __InputObject8
+    __InputObject52{{"__InputObject[52∈0] ➊<br />More deps:<br />- Constantᐸ456ᐳ[143]<br />- Constantᐸ'def'ᐳ[144]<br />- Constantᐸ'blue'ᐳ[145]<br />- Constantᐸ'79863dcf-0433-4c3d-bc51-978326d4546f'ᐳ[146]<br />- Constantᐸ'BAR_FOO'ᐳ[147]<br />- Constantᐸ'one'ᐳ[148]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ42ᐳ[149]"}}:::plan
+    __InputObject60{{"__InputObject[60∈0] ➊<br />More deps:<br />- Constantᐸ789ᐳ[150]<br />- Constantᐸ'ghi'ᐳ[151]<br />- Constantᐸ'red'ᐳ[118]<br />- Constantᐸ'b687ee42-c515-4544-b742-525e39517e7d'ᐳ[152]<br />- Constantᐸ'BAZ_QUX'ᐳ[153]<br />- Constantᐸ''ᐳ[141]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ-8ᐳ[154]"}}:::plan
+    __InputObject25{{"__InputObject[25∈0] ➊<br />More deps:<br />- Constantᐸ'1927-11-05'ᐳ[124]<br />- Constantᐸfalseᐳ[116]"}}:::plan
+    __InputObject27{{"__InputObject[27∈0] ➊<br />More deps:<br />- Constantᐸ'1927-11-07'ᐳ[125]<br />- Constantᐸfalseᐳ[116]"}}:::plan
+    __InputObject25 & __InputObject27 --> __InputObject24
+    __InputObject30{{"__InputObject[30∈0] ➊<br />More deps:<br />- Constantᐸ500ᐳ[126]<br />- Constantᐸfalseᐳ[116]"}}:::plan
+    __InputObject30 --> __InputObject29
+    __InputObject52 & __InputObject60 --> __InputObject51
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject8 --> __InputObject6
+    Object75{{"Object[75∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access73{{"Access[73∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access74{{"Access[74∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access73 & Access74 --> Object75
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access73
+    __Value2 --> Access74
+    ApplyInput76{{"ApplyInput[76∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput76
+    PgInsertSingle72[["PgInsertSingle[72∈1] ➊<br />ᐸtypes()ᐳ"]]:::sideeffectplan
+    Object75 & ApplyInput76 --> PgInsertSingle72
+    Object77{{"Object[77∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle72 --> Object77
+    Access78{{"Access[78∈2] ➊<br />ᐸ72.m.clientMutationIdᐳ"}}:::plan
+    Object77 o--o Access78
+    Lambda86{{"Lambda[86∈2] ➊<br />ᐸrawEncodeᐳ<br />More deps:<br />- Constantᐸ'query'ᐳ[85]"}}:::plan
+    List83{{"List[83∈3] ➊<br />ᐸ80,81ᐳ<br />More deps:<br />- Constantᐸ'types'ᐳ[80]"}}:::plan
+    PgClassExpression81{{"PgClassExpression[81∈3] ➊<br />ᐸ__types__.”id”ᐳ"}}:::plan
+    PgClassExpression81 --> List83
+    Access82{{"Access[82∈3] ➊<br />ᐸ72.tᐳ"}}:::plan
+    Access82 --> PgClassExpression81
+    PgInsertSingle72 --> Access82
+    Lambda84{{"Lambda[84∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List83 --> Lambda84
+    PgClassExpression88{{"PgClassExpression[88∈3] ➊<br />ᐸ__types__.”numrange”ᐳ"}}:::plan
+    Access82 --> PgClassExpression88
+    PgClassExpression89{{"PgClassExpression[89∈3] ➊<br />ᐸ__types__.”daterange”ᐳ"}}:::plan
+    Access82 --> PgClassExpression89
+    PgClassExpression90{{"PgClassExpression[90∈3] ➊<br />ᐸ__types__....int_range”ᐳ"}}:::plan
+    Access82 --> PgClassExpression90
+    Access91{{"Access[91∈3] ➊<br />ᐸ88.emptyᐳ"}}:::plan
+    PgClassExpression88 --> Access91
+    Access92{{"Access[92∈3] ➊<br />ᐸ89.emptyᐳ"}}:::plan
+    PgClassExpression89 --> Access92
+    Access93{{"Access[93∈3] ➊<br />ᐸ90.emptyᐳ"}}:::plan
+    PgClassExpression90 --> Access93
+    Access94{{"Access[94∈3] ➊<br />ᐸ88.startᐳ"}}:::plan
+    Access91 o--o Access94
+    Access95{{"Access[95∈3] ➊<br />ᐸ89.startᐳ"}}:::plan
+    Access92 o--o Access95
+    Access96{{"Access[96∈3] ➊<br />ᐸ90.startᐳ"}}:::plan
+    Access93 o--o Access96
+    Access97{{"Access[97∈3] ➊<br />ᐸ88.endᐳ"}}:::plan
+    Access94 o--o Access97
+    Access98{{"Access[98∈3] ➊<br />ᐸ89.endᐳ"}}:::plan
+    Access95 o--o Access98
+    Access99{{"Access[99∈3] ➊<br />ᐸ90.endᐳ"}}:::plan
+    Access96 o--o Access99
+    Access100{{"Access[100∈3] ➊<br />ᐸ88.start.valueᐳ"}}:::plan
+    Access97 o--o Access100
+    Access101{{"Access[101∈3] ➊<br />ᐸ89.start.valueᐳ"}}:::plan
+    Access98 o--o Access101
+    Access102{{"Access[102∈3] ➊<br />ᐸ90.start.valueᐳ"}}:::plan
+    Access99 o--o Access102
+    Access103{{"Access[103∈3] ➊<br />ᐸ88.end.valueᐳ"}}:::plan
+    Access100 o--o Access103
+    Access104{{"Access[104∈3] ➊<br />ᐸ89.end.valueᐳ"}}:::plan
+    Access101 o--o Access104
+    Access105{{"Access[105∈3] ➊<br />ᐸ90.end.valueᐳ"}}:::plan
+    Access102 o--o Access105
+    Access106{{"Access[106∈3] ➊<br />ᐸ88.start.inclusiveᐳ"}}:::plan
+    Access103 o--o Access106
+    Access107{{"Access[107∈3] ➊<br />ᐸ89.start.inclusiveᐳ"}}:::plan
+    Access104 o--o Access107
+    Access108{{"Access[108∈3] ➊<br />ᐸ90.start.inclusiveᐳ"}}:::plan
+    Access105 o--o Access108
+    Access109{{"Access[109∈3] ➊<br />ᐸ88.end.inclusiveᐳ"}}:::plan
+    Access106 o--o Access109
+    Access110{{"Access[110∈3] ➊<br />ᐸ89.end.inclusiveᐳ"}}:::plan
+    Access107 o--o Access110
+    Access111{{"Access[111∈3] ➊<br />ᐸ90.end.inclusiveᐳ"}}:::plan
+    Access108 o--o Access111
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,__InputObject6,__InputObject8,__InputObject22,__InputObject24,__InputObject25,__InputObject27,__InputObject29,__InputObject30,__InputObject37,__InputObject44,__InputObject51,__InputObject52,__InputObject60,__InputObject67,Access73,Access74,Object75,ApplyInput76 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgInsertSingle72,Object77 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,Access78,Lambda86 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression81,Access82,List83,Lambda84,PgClassExpression88,PgClassExpression89,PgClassExpression90,Access91,Access92,Access93,Access94,Access95,Access96,Access97,Access98,Access99,Access100,Access101,Access102,Access103,Access104,Access105,Access106,Access107,Access108,Access109,Access110,Access111 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7 bucket7
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8 bucket8
+    classDef bucket9 stroke:#ff0000
+    class Bucket9 bucket9
+    classDef bucket10 stroke:#ffff00
+    class Bucket10 bucket10
+

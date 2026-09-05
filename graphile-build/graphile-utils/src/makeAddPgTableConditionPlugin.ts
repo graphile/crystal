@@ -4,12 +4,16 @@ import type { GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type { ScopedTableMatch } from "./resolveTableMatch.ts";
+import { resolveTableMatch } from "./resolveTableMatch.ts";
 
-export function addPgTableCondition(
-  match: { serviceName?: string; schemaName: string; tableName: string },
+export function addPgTableCondition<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
+  match: ScopedTableMatch<TScope>,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
-    build: GraphileBuild.Build,
+    build: GraphileBuild.ScopedBuild<TScope>,
   ) => GrafastInputFieldConfig,
   // DEPRECATED! Use `apply` instead.
   conditionGenerator?: (
@@ -20,13 +24,13 @@ export function addPgTableCondition(
       sqlValueWithCodec: typeof sqlValueWithCodec;
       // We can't afford to make the entire of build EXPORTABLE, and people
       // really ought to move to using the `apply` method, so...
-      build: ReturnType<typeof pruneBuild>;
+      build: PrunedBuild<TScope>;
       /** @internal We might expose this in future if needed */
       condition: PgCondition;
     },
   ) => SQL | null | undefined,
 ): GraphileConfig.Plugin {
-  const { serviceName = "main", schemaName, tableName } = match;
+  const { serviceName, schemaName, tableName } = resolveTableMatch(match);
   const displayName = `makeAddPgTableConditionPlugin__${schemaName}__${tableName}__${conditionFieldName}`;
   const plugin: GraphileConfig.Plugin = {
     name: displayName,
@@ -70,7 +74,9 @@ export function addPgTableCondition(
           ) {
             return fields;
           }
-          const conditionFieldSpec = conditionFieldSpecGenerator(build);
+          const conditionFieldSpec = conditionFieldSpecGenerator(
+            build as GraphileBuild.ScopedBuild<TScope>,
+          );
           if (
             conditionFieldSpec.apply ||
             conditionFieldSpec.extensions?.grafast?.apply
@@ -88,7 +94,9 @@ export function addPgTableCondition(
               );
             }
             // build applyPlan
-            const _build = pruneBuild(build);
+            const _build = pruneBuild(
+              build as GraphileBuild.ScopedBuild<TScope>,
+            );
             conditionFieldSpec.apply = EXPORTABLE(
               (_build, conditionGenerator, sql, sqlValueWithCodec) =>
                 function apply(condition: PgCondition, val) {
@@ -131,7 +139,16 @@ export function addPgTableCondition(
 /** @deprecated renamed to addPgTableCondition */
 export const makeAddPgTableConditionPlugin = addPgTableCondition;
 
-function pruneBuild(build: GraphileBuild.Build) {
+type PrunedBuild<TScope extends keyof GraphileBuild.PluginScopes> = Pick<
+  GraphileBuild.ScopedBuild<TScope>,
+  "sql" | "grafast" | "graphql" | "dataplanPg"
+> & {
+  input: Pick<GraphileBuild.ScopedBuild<TScope>["input"], "pgRegistry">;
+};
+
+function pruneBuild<TScope extends keyof GraphileBuild.PluginScopes>(
+  build: GraphileBuild.ScopedBuild<TScope>,
+): PrunedBuild<TScope> {
   const {
     sql,
     grafast,

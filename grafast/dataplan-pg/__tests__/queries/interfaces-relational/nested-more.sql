@@ -10,36 +10,38 @@ select
       to_char(__relational_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
       __relational_items_2."is_explicitly_archived"::text,
       to_char(__relational_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      __relational_items__."id"::text,
-      __relational_items__."type"::text,
-      __relational_items__."type2"::text,
-      __relational_items__."position"::text,
-      to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      __relational_items__."is_explicitly_archived"::text,
-      to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      __people__."username",
+      (
+        select array[
+          __relational_items__."id"::text,
+          __relational_items__."type"::text,
+          __relational_items__."type2"::text,
+          __relational_items__."position"::text,
+          to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+          to_char(__relational_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+          __relational_items__."is_explicitly_archived"::text,
+          to_char(__relational_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+          __people__."username"
+        ]::text[]
+        from interfaces_and_unions.relational_items as __relational_items__
+        left outer join interfaces_and_unions.people as __people__
+        on (
+        /* WHERE becoming ON */
+          (
+            __people__."person_id" = __relational_items__."author_id"
+          ) and (
+            true /* authorization checks */
+          )
+        )
+        where
+          (
+            __relational_items__."id" = __relational_items_2."parent_id"
+          ) and (
+            true /* authorization checks */
+          )
+      )::text,
       __people_2."username"
     ]::text[]
     from interfaces_and_unions.relational_items as __relational_items_2
-    left outer join interfaces_and_unions.relational_items as __relational_items__
-    on (
-    /* WHERE becoming ON */
-      (
-        __relational_items__."id" = __relational_items_2."parent_id"
-      ) and (
-        true /* authorization checks */
-      )
-    )
-    left outer join interfaces_and_unions.people as __people__
-    on (
-    /* WHERE becoming ON */
-      (
-        __people__."person_id" = __relational_items__."author_id"
-      ) and (
-        true /* authorization checks */
-      )
-    )
     left outer join interfaces_and_unions.people as __people_2
     on (
     /* WHERE becoming ON */
@@ -63,8 +65,11 @@ where (
 )
 order by __people_3."person_id" asc;
 
+with __relational_topics_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_topics_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_topics_identifiers__,
+from __relational_topics_identifiers__,
 lateral (
   select
     __relational_topics__."id"::text as "0",
@@ -78,8 +83,11 @@ lateral (
     )
 ) as __relational_topics_result__;
 
+with __relational_posts_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_posts_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_posts_identifiers__,
+from __relational_posts_identifiers__,
 lateral (
   select
     __relational_posts__."id"::text as "0",
@@ -93,8 +101,11 @@ lateral (
     )
 ) as __relational_posts_result__;
 
+with __relational_dividers_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_dividers_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_dividers_identifiers__,
+from __relational_dividers_identifiers__,
 lateral (
   select
     __relational_dividers__."id"::text as "0",
@@ -118,8 +129,11 @@ where
     true /* authorization checks */
   );
 
+with __relational_checklist_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_checklist_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklist_items_identifiers__,
+from __relational_checklist_items_identifiers__,
 lateral (
   select
     __relational_checklist_items__."id"::text as "0",
@@ -143,8 +157,11 @@ where
     true /* authorization checks */
   );
 
+with __relational_checklists_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_checklists_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklists_identifiers__,
+from __relational_checklists_identifiers__,
 lateral (
   select
     __relational_checklists__."id"::text as "0",

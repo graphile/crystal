@@ -82,6 +82,7 @@ enum AnEnum {
 scalar AnInt
 
 type AnIntRange {
+  empty: Boolean!
   end: AnIntRangeBound
   start: AnIntRangeBound
 }
@@ -97,6 +98,7 @@ input AnIntRangeBoundInput {
 }
 
 input AnIntRangeInput {
+  empty: Boolean! = false
   end: AnIntRangeBoundInput
   start: AnIntRangeBoundInput
 }
@@ -165,6 +167,7 @@ scalar Base64EncodedBinary
 scalar BigFloat
 
 type BigFloatRange {
+  empty: Boolean!
   end: BigFloatRangeBound
   start: BigFloatRangeBound
 }
@@ -180,6 +183,7 @@ input BigFloatRangeBoundInput {
 }
 
 input BigFloatRangeInput {
+  empty: Boolean! = false
   end: BigFloatRangeBoundInput
   start: BigFloatRangeBoundInput
 }
@@ -618,6 +622,7 @@ scalar Cursor
 scalar Date
 
 type DateRange {
+  empty: Boolean!
   end: DateRangeBound
   start: DateRangeBound
 }
@@ -633,6 +638,7 @@ input DateRangeBoundInput {
 }
 
 input DateRangeInput {
+  empty: Boolean! = false
   end: DateRangeBoundInput
   start: DateRangeBoundInput
 }
@@ -1116,6 +1122,7 @@ input FloatRangeBoundInput {
 }
 
 input FloatRangeInput {
+  empty: Boolean! = false
   end: FloatRangeBoundInput
   start: FloatRangeBoundInput
 }

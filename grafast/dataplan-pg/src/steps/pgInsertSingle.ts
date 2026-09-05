@@ -18,6 +18,7 @@ import type {
   GetPgResourceCodec,
   ObjectForResource,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecWithAttributes,
   PgQueryBuilder,
   PgTypedStep,
@@ -25,6 +26,8 @@ import type {
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
 interface PgInsertSinglePlanFinalizeResults {
   table: SQL;
@@ -173,7 +176,8 @@ export class PgInsertSingleStep<
       >
         ? UCodec
         : never,
-      TResource
+      TResource,
+      PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
   /**
@@ -188,7 +192,8 @@ export class PgInsertSingleStep<
     >
       ? UCodec
       : never,
-    TResource
+    TResource,
+    PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     if (!this.resource.codec.attributes) {
       throw new Error(`Cannot call .get() when there's no attributes.`);
@@ -239,13 +244,22 @@ export class PgInsertSingleStep<
 
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
-    TResource
+    TResource,
+    never
   > {
-    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+    return pgClassExpression<GetPgResourceCodec<TResource>, TResource, never>(
       this,
       this.resource.codec as GetPgResourceCodec<TResource>,
-      false,
+      true,
     )`${this.alias}`;
+  }
+
+  /**
+   * Creates a select step for this inserted record, enabling select-specific
+   * APIs such as `.getClassStep()` and `.select()`.
+   */
+  public toSelectSingle(): PgSelectSingleStep<TResource, never> {
+    return pgSelectSingleFromRecord(this.resource, this.record());
   }
 
   /**
