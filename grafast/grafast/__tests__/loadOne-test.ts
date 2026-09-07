@@ -3,7 +3,12 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { LoadedRecordStep, ObjectPlan, Step } from "../dist/index.js";
+import type {
+  LoadedRecordStep,
+  Maybe,
+  ObjectPlan,
+  Step,
+} from "../dist/index.js";
 import {
   context,
   grafast,
@@ -88,8 +93,10 @@ let CALLS: {
     | number
     | { identifier: number }
     | readonly [identifier: number]
-    | { orgId: number; regNo: number }
-    | readonly [orgId: number, regNo: number]
+    | { orgId: number | null | undefined; regNo: number }
+    | readonly [orgId: number | undefined, regNo: number]
+    | null
+    | undefined
   >;
   result: object;
   attributes: readonly (keyof Thing)[] | null;
@@ -133,12 +140,18 @@ const loadThingByIdentifierLists = loadOneLoader({
 
 const loadThingByOrgIdRegNoObjs = loadOneCallback(
   (
-    specs: ReadonlyArray<{ orgId: number; regNo: number }>,
+    specs: ReadonlyArray<
+      Maybe<{ orgId: number | null | undefined; regNo: number }>
+    >,
     { attributes, params },
   ) => {
     const result = specs
       .map((spec) =>
-        THINGS.find((t) => t.orgId === spec.orgId && t.orgRegNo === spec.regNo),
+        spec == null || spec.orgId == null
+          ? undefined
+          : THINGS.find(
+              (t) => t.orgId === spec.orgId && t.orgRegNo === spec.regNo,
+            ),
       )
       .map((t) => (t && attributes ? pick(t, attributes) : t));
     CALLS.push({ specs, result, attributes, params });
@@ -148,12 +161,16 @@ const loadThingByOrgIdRegNoObjs = loadOneCallback(
 
 const loadThingByOrgIdRegNoTuples = loadOneCallback(
   (
-    specs: ReadonlyArray<readonly [orgId: number, regNo: number]>,
+    specs: ReadonlyArray<
+      Maybe<readonly [orgId: number | undefined, regNo: number]>
+    >,
     { attributes, params },
   ) => {
     const result = specs
       .map((spec) =>
-        THINGS.find((t) => t.orgId === spec[0] && t.orgRegNo === spec[1]),
+        spec == null || spec[0] == null
+          ? undefined
+          : THINGS.find((t) => t.orgId === spec[0] && t.orgRegNo === spec[1]),
       )
       .map((t) => (t && attributes ? pick(t, attributes) : t));
     CALLS.push({ specs, result, attributes, params });
@@ -162,9 +179,9 @@ const loadThingByOrgIdRegNoTuples = loadOneCallback(
 );
 
 const loadOrgByIds = loadOneCallback(
-  (specs: readonly number[], { attributes, params }) => {
+  (specs: ReadonlyArray<Maybe<number>>, { attributes, params }) => {
     const result = specs
-      .map((id) => ORGS.find((t) => t.id === id))
+      .map((id) => (id == null ? undefined : ORGS.find((t) => t.id === id)))
       .map((t) => (t && attributes ? pick(t, attributes) : t));
     // CALLS.push({ specs, result, attributes, params });
     return result;
@@ -240,17 +257,17 @@ const makeSchema = (useStreamableStep = false) => {
             });
           },
         },
-      } as ObjectPlan<LoadedRecordStep<Thing, Thing>>,
+      } as ObjectPlan<LoadedRecordStep<Thing>>,
       Org: {
         plans: {
-          thingByTuple($org: LoadedRecordStep<Org, Org>, { $regNo }) {
+          thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
             return loadOne([$orgId, $regNo], {
               load: loadThingByOrgIdRegNoTuples,
               ioEquivalence: ["orgId", "orgRegNo"],
             });
           },
-          thingByObj($org: LoadedRecordStep<Org, Org>, { $regNo }) {
+          thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
             return loadOne(
               { orgId: $orgId, regNo: $regNo },
