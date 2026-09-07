@@ -81,6 +81,11 @@ export function loadOneLoader<
 const idByLoad = new WeakMap<LoadOneCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
+type LoadOneGetStep<
+  TData,
+  TAttr extends keyof Exclude<TData, null | undefined>,
+> = Step<Exclude<TData, null | undefined>[TAttr]>;
+
 export class LoadOneStep<
   const TLookup extends Multistep,
   TItem,
@@ -244,10 +249,18 @@ export class LoadOneStep<
   }
 
   // Things that were originally in LoadedRecordStep
+  __inferGet?: {
+    [TAttr in keyof Exclude<TData, null | undefined> & string]: LoadOneGetStep<
+      TData,
+      TAttr
+    >;
+  };
   get<
     TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
-  >(attr: TAttr) {
-    return this.cacheStep("get", attr, () => this._getInner(attr));
+  >(attr: TAttr): LoadOneGetStep<TData, TAttr> {
+    return this.cacheStep("get", attr, () =>
+      this._getInner(attr),
+    ) as LoadOneGetStep<TData, TAttr>;
   }
   private _getInner<
     TAttr extends keyof Exclude<TData, null | undefined> & (string | number),

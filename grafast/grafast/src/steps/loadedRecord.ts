@@ -6,6 +6,11 @@ import { access } from "./access.ts";
 import { constant } from "./constant.ts";
 import { LoadManyStep } from "./loadMany.ts";
 
+type LoadedRecordGetStep<
+  TData,
+  TAttr extends keyof Exclude<TData, null | undefined>,
+> = Step<Exclude<TData, null | undefined>[TAttr]>;
+
 /**
  * You shouldn't create instances of this yourself - use `loadOne` or `loadMany` instead.
  */
@@ -46,10 +51,16 @@ export class LoadedRecordStep<
   toStringMeta() {
     return this.sourceDescription ?? null;
   }
+  __inferGet?: {
+    [TAttr in keyof Exclude<TData, null | undefined> &
+      string]: LoadedRecordGetStep<TData, TAttr>;
+  };
   get<
     TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
-  >(attr: TAttr) {
-    return this.cacheStep("get", attr, () => this._getInner(attr));
+  >(attr: TAttr): LoadedRecordGetStep<TData, TAttr> {
+    return this.cacheStep("get", attr, () =>
+      this._getInner(attr),
+    ) as LoadedRecordGetStep<TData, TAttr>;
   }
   private _getInner<
     TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
