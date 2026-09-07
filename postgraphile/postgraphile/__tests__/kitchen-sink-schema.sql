@@ -50,7 +50,7 @@ alter default privileges revoke execute on functions from public;
 create extension tablefunc with schema a;
 create extension hstore;
 create extension intarray;
-create extension ltree;
+create extension ltree with schema a;
 
 comment on schema a is 'The a schema.';
 comment on schema b is 'qwerty';
@@ -329,8 +329,8 @@ create table b.types (
   "int8_array_domain" c.int8_array_domain,
   "bytea" bytea,
   "bytea_array" bytea[],
-  "ltree" ltree,
-  "ltree_array" ltree[],
+  "ltree" a.ltree,
+  "ltree_array" a.ltree[],
   "tsvector" tsvector,
   "tsvector_array" tsvector[],
   "tsquery" tsquery,
