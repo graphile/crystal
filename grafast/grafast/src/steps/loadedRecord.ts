@@ -10,15 +10,8 @@ type LoadedRecordGetStep<
   TData,
   TAttr extends keyof Exclude<TData, null | undefined>,
 > = Step<
-  | Exclude<Exclude<TData, null | undefined>[TAttr], null | undefined>
-  | (TData extends Exclude<TData, null | undefined>
-      ? Exclude<TData, null | undefined>[TAttr] extends Exclude<
-          Exclude<TData, null | undefined>[TAttr],
-          null | undefined
-        >
-        ? never
-        : undefined
-      : undefined)
+  | Exclude<TData, null | undefined>[TAttr]
+  | (Extract<TData, null | undefined> extends never ? never : undefined)
 >;
 
 /**
@@ -65,9 +58,9 @@ export class LoadedRecordStep<
     [TAttr in keyof Exclude<TData, null | undefined> &
       string]: LoadedRecordGetStep<TData, TAttr>;
   };
-  get<
-    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
-  >(attr: TAttr): LoadedRecordGetStep<TData, TAttr> {
+  get<TAttr extends keyof Exclude<TData, null | undefined> & (string | number)>(
+    attr: TAttr,
+  ): LoadedRecordGetStep<TData, TAttr> {
     return this.cacheStep("get", attr, () =>
       this._getInner(attr),
     ) as LoadedRecordGetStep<TData, TAttr>;
