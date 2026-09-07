@@ -240,17 +240,17 @@ const makeSchema = (useStreamableStep = false) => {
             });
           },
         },
-      } as ObjectPlan<LoadedRecordStep<Thing>>,
+      } as ObjectPlan<LoadedRecordStep<Thing, Thing>>,
       Org: {
         plans: {
-          thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
+          thingByTuple($org: LoadedRecordStep<Org, Org>, { $regNo }) {
             const $orgId = $org.get("id");
             return loadOne([$orgId, $regNo], {
               load: loadThingByOrgIdRegNoTuples,
               ioEquivalence: ["orgId", "orgRegNo"],
             });
           },
-          thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
+          thingByObj($org: LoadedRecordStep<Org, Org>, { $regNo }) {
             const $orgId = $org.get("id");
             return loadOne(
               { orgId: $orgId, regNo: $regNo },

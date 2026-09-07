@@ -9,7 +9,17 @@ import { LoadManyStep } from "./loadMany.ts";
 type LoadedRecordGetStep<
   TData,
   TAttr extends keyof Exclude<TData, null | undefined>,
-> = Step<Exclude<TData, null | undefined>[TAttr]>;
+> = Step<
+  | Exclude<Exclude<TData, null | undefined>[TAttr], null | undefined>
+  | (TData extends Exclude<TData, null | undefined>
+      ? Exclude<TData, null | undefined>[TAttr] extends Exclude<
+          Exclude<TData, null | undefined>[TAttr],
+          null | undefined
+        >
+        ? never
+        : undefined
+      : undefined)
+>;
 
 /**
  * You shouldn't create instances of this yourself - use `loadOne` or `loadMany` instead.

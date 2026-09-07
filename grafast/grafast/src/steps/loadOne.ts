@@ -84,7 +84,17 @@ let loadCounter = 0;
 type LoadOneGetStep<
   TData,
   TAttr extends keyof Exclude<TData, null | undefined>,
-> = Step<Exclude<TData, null | undefined>[TAttr]>;
+> = Step<
+  | Exclude<Exclude<TData, null | undefined>[TAttr], null | undefined>
+  | (TData extends Exclude<TData, null | undefined>
+      ? Exclude<TData, null | undefined>[TAttr] extends Exclude<
+          Exclude<TData, null | undefined>[TAttr],
+          null | undefined
+        >
+        ? never
+        : undefined
+      : undefined)
+>;
 
 export class LoadOneStep<
   const TLookup extends Multistep,
