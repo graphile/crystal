@@ -1237,7 +1237,11 @@ function modFields(
             resource.extensions?.tags?.deprecated,
           );
           memo[fieldName] = fieldWithHooks(
-            { fieldName, fieldBehaviorScope: "mutationField" },
+            {
+              fieldName,
+              fieldBehaviorScope: "mutationField",
+              pgFieldResource: resource,
+            },
             {
               type: payloadType,
               args: {
@@ -1275,6 +1279,7 @@ function modFields(
               fieldBehaviorScope: isRootQuery
                 ? "queryField:single"
                 : "typeField:single",
+              pgFieldResource: resource,
             },
             {
               type: build.nullableIf(
