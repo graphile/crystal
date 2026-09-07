@@ -46,10 +46,14 @@ export class LoadedRecordStep<
   toStringMeta() {
     return this.sourceDescription ?? null;
   }
-  get(attr: keyof TItem & (string | number)) {
+  get<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     return this.cacheStep("get", attr, () => this._getInner(attr));
   }
-  private _getInner(attr: keyof TItem & (string | number)) {
+  private _getInner<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     // Allow auto-collapsing of the waterfall by knowing keys are equivalent
     if (
       this.operationPlan.phase === "plan" &&
@@ -58,7 +62,7 @@ export class LoadedRecordStep<
       return this.ioEquivalence[attr as any];
     }
 
-    this.attributes.add(attr);
+    this.attributes.add(attr as keyof TItem);
     return access(this, attr);
   }
   setParam<TParamKey extends keyof TParams>(

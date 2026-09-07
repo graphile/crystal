@@ -244,10 +244,14 @@ export class LoadOneStep<
   }
 
   // Things that were originally in LoadedRecordStep
-  get(attr: keyof TItem & (string | number)) {
+  get<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     return this.cacheStep("get", attr, () => this._getInner(attr));
   }
-  private _getInner(attr: keyof TItem & (string | number)) {
+  private _getInner<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     if (this.operationPlan.phase === "plan") {
       // Allow auto-collapsing of the waterfall by knowing keys are equivalent
       const accessMap = this.getAccessMap();
@@ -257,7 +261,7 @@ export class LoadOneStep<
       }
     }
 
-    this.attributes.add(attr);
+    this.attributes.add(attr as keyof TItem);
     return access(this, attr);
   }
 }
