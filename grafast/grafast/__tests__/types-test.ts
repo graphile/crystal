@@ -35,7 +35,7 @@ const myPlan: FieldPlanResolver = () => {
   assert<Equals<StepValue<typeof $a3>, number>>();
 
   const $nullableRecord = loadOne($dependency, (dependencies) =>
-    dependencies.map(() => ({ a: 1 } as { a: number } | null)),
+    dependencies.map(() => ({ a: 1 }) as { a: number } | null),
   );
   const $nullableA1 = get($nullableRecord, "a");
   assert<Equals<StepValue<typeof $nullableA1>, number | undefined>>();
