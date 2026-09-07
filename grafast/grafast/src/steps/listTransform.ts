@@ -253,7 +253,7 @@ export class __ListTransformStep<
       );
     }
 
-    const listStepValue = values[this.listStepDepId];
+    const listStepValue = values[this.listStepDepId as 0];
 
     if (itemStep._isUnary) {
       const list = listStepValue.unaryValue();
