@@ -18,6 +18,7 @@ import type {
 } from "@dataplan/pg";
 import {
   generatePgParameterAnalysis,
+  PgCallStep,
   pgClassExpression,
   pgFromExpression,
   pgSelectSingleFromRecord,
@@ -309,16 +310,24 @@ declare global {
 }
 
 const pgSelectFromPayload = EXPORTABLE(
-  (PgSelectStep) =>
+  (PgCallStep, PgSelectStep) =>
     function pgSelectFromPayload(
       $payload: ObjectStep<{
         result:
           | PgSelectStep
           | PgSelectSingleStep
-          | PgClassExpressionStep<any, any>;
+          | PgClassExpressionStep<any, any>
+          | PgCallStep;
       }>,
     ) {
       const $result = $payload.getStepForKey("result");
+      if ($result instanceof PgCallStep) {
+        // Procedures are invoked via `call`, not `select`, so there's no
+        // `PgSelectStep` to find. The call step itself is the target that
+        // nested `apply`-capable input fields (e.g. `clientMutationId`)
+        // should be applied to.
+        return $result;
+      }
       const $parent =
         "getParentStep" in $result
           ? ($result.getParentStep() as PgSelectSingleStep)
@@ -331,7 +340,7 @@ const pgSelectFromPayload = EXPORTABLE(
         throw new Error(`Could not determine PgSelectStep for ${$result}`);
       }
     },
-  [PgSelectStep],
+  [PgCallStep, PgSelectStep],
   "pgSelectFromPayload",
 );
 
@@ -343,12 +352,17 @@ const applyInputArgViaPgSelect = EXPORTABLE(
         result:
           | PgSelectStep
           | PgSelectSingleStep
-          | PgClassExpressionStep<any, any>;
+          | PgClassExpressionStep<any, any>
+          | PgCallStep;
       }>,
       arg: FieldArg,
     ) {
       const $pgSelect = pgSelectFromPayload($payload);
-      arg.apply($pgSelect);
+      // `PgCallStep`'s `apply()` takes a `PgCallQueryBuilder` rather than a
+      // `PgSelectQueryBuilder`, but both satisfy the same structural `apply`
+      // protocol at runtime (only `clientMutationId` uses it here), so the
+      // precise `qb` type is immaterial to the caller.
+      arg.apply($pgSelect as any);
     },
   [pgSelectFromPayload],
   "applyInputArgViaPgSelect",

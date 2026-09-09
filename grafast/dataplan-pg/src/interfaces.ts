@@ -11,6 +11,7 @@ import type {
   PgResourceUnique,
 } from "./datasource.ts";
 import type { PgExecutor } from "./executor.ts";
+import type { PgCallStep } from "./steps/pgCall.ts";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
 import type { PgSelectQueryBuilder } from "./steps/pgSelect.ts";
@@ -29,7 +30,8 @@ export type PgClassSingleStep<
   | PgSelectSingleStep<TResource>
   | PgInsertSingleStep<TResource>
   | PgUpdateSingleStep<TResource>
-  | PgDeleteSingleStep<TResource>;
+  | PgDeleteSingleStep<TResource>
+  | PgCallStep<TResource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL

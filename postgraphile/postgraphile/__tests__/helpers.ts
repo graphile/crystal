@@ -267,6 +267,8 @@ export async function runTestQuery(
     search_path?: string;
     muteWarnings?: boolean;
     dontLogErrors?: boolean;
+    /** Skip this test (and its snapshots) if the server's server_version_num is lower than this. */
+    requiresPg?: number;
   },
   options: {
     callback?: (
@@ -286,6 +288,7 @@ export async function runTestQuery(
   errors?: readonly GraphQLError[];
   queries: PgClientQuery[];
   extensions?: any;
+  skipped?: boolean;
 }> {
   const {
     variableValues,
@@ -296,6 +299,7 @@ export async function runTestQuery(
     search_path,
     muteWarnings = true,
     dontLogErrors = false,
+    requiresPg,
   } = config;
   const { path } = options;
 
@@ -395,6 +399,9 @@ export async function runTestQuery(
   // Load test data
   await pgPool.query(await kitchenSinkData());
   const serverVersionNum = await getServerVersionNum(pgPool);
+  if (requiresPg != null && serverVersionNum < requiresPg) {
+    return { data: undefined, errors: undefined, queries: [], skipped: true };
+  }
   if (serverVersionNum >= 110000) {
     await pgPool.query(await pg11Data());
   }
@@ -776,7 +783,10 @@ export const assertSnapshotsMatch = async (
     throw new Error(`Failed to trim .test.graphql from '${path}'`);
   }
 
-  const { data, payloads, queries, errors, extensions } = await result;
+  const { data, payloads, queries, errors, extensions, skipped } = await result;
+  if (skipped) {
+    return;
+  }
 
   const replacements = { uuid: new Map<string, number>(), uuidCounter: 1 };
 
@@ -855,8 +865,11 @@ export const assertResultsMatch = async (
   result2: ReturnType<typeof runTestQuery>,
   { config }: { config: any },
 ): Promise<void> => {
-  const { data: data1 } = await result1;
+  const { data: data1, skipped } = await result1;
   const { data: data2 } = await result2;
+  if (skipped) {
+    return;
+  }
   const data1a = makeResultSnapshotSafe(data1, {
     uuid: new Map<string, number>(),
     uuidCounter: 1,
@@ -876,8 +889,11 @@ export const assertErrorsMatch = async (
   result2: ReturnType<typeof runTestQuery>,
   { config }: { config: any },
 ): Promise<void> => {
-  const { errors: errors1 } = await result1;
+  const { errors: errors1, skipped } = await result1;
   const { errors: errors2 } = await result2;
+  if (skipped) {
+    return;
+  }
   expect(errors2).toEqual(errors1);
 };
 
