@@ -2993,16 +2993,29 @@ export class OperationPlan {
     // Loop through the groups and resolve the plan ONCE per group.
     // We don't care about the signature here; that was just for grouping
     for (const entry of groups.values()) {
-      const planFieldDetails: PlanFieldDetails = {
-        ...entry.firstDetails,
-        fieldNodes: entry.extraDetails.flatMap((d) => d.fieldNodes),
-        polymorphicPaths: entry.firstDetails.polymorphicPaths
-          ? new Set([
-              ...entry.firstDetails.polymorphicPaths,
-              ...entry.extraDetails.flatMap((d) => [...d.polymorphicPaths!]),
-            ])
-          : null,
-      };
+      let planFieldDetails = entry.firstDetails;
+      if (entry.extraDetails.length > 1) {
+        const fieldNodes: FieldNode[] = [];
+        const polymorphicPaths: Set<string> | null = entry.firstDetails
+          .polymorphicPaths
+          ? new Set()
+          : null;
+        for (const d of entry.extraDetails) {
+          for (const node of d.fieldNodes) {
+            fieldNodes.push(node);
+          }
+          if (polymorphicPaths != null) {
+            for (const pp of d.polymorphicPaths!) {
+              polymorphicPaths.add(pp);
+            }
+          }
+        }
+        planFieldDetails = {
+          ...planFieldDetails,
+          fieldNodes,
+          polymorphicPaths,
+        };
+      }
       let result: PlanFieldBatchResult;
       try {
         result = this._realPlanField(planFieldDetails);
