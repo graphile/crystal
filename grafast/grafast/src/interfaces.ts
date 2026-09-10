@@ -3,6 +3,7 @@ import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
   ExecutionArgs,
+  FieldNode,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -294,6 +295,9 @@ export interface FieldInfo {
   fieldName: string;
   field: GraphQLField<any, any, any>;
   parentType: GraphQLObjectType;
+
+  /** @experimental */
+  fieldNodes: readonly FieldNode[];
 }
 
 /**
