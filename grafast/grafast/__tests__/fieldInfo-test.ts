@@ -3,8 +3,8 @@ import { expect } from "chai";
 import { print } from "graphql";
 import { it } from "mocha";
 
-import { constant, grafast, makeGrafastSchema } from "../dist/index.js";
 import type { FieldInfo } from "../dist/index.js";
+import { constant, grafast, makeGrafastSchema } from "../dist/index.js";
 
 it("exposes every merged field node to FieldInfo for aliases and fragments", async () => {
   const fieldNodes: Record<string, string[]> = Object.create(null);
