@@ -11,8 +11,11 @@ where
   )
 order by __forums__."id" asc;
 
+with __messages_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids
+)
 select __messages_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids) as __messages_identifiers__,
+from __messages_identifiers__,
 lateral (
   select
     __messages_identifiers__.idx as "0"

@@ -112,7 +112,10 @@ A `pgSelect` step has loads of useful methods, including:
   have the same values for the ordered columns) set this for efficiency
 - `.groupBy(...)` - add a `GROUP BY` clause
 - `.having(...)` - add a `HAVING` clause
-- `.setInliningForbidden()` - prevent this select being inlined into its parent
+- `.setInliningStrategy()` - choose if/how the step should be inlined into the
+  parent
+- `.setChildInliningStrategy()` - choose if/how child steps should be inlined
+  into this step
 - `.setTrusted()` - don't invoke the `selectAuth()` and other methods from the
   resource (for efficiency, presumably because they were already validated some other way).
 - `.setUnique()` - indicate that this will return at most one row.

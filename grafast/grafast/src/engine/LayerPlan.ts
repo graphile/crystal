@@ -537,8 +537,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
       parentLayerPlan.children.push(this);
     }
-    this.latestSideEffectStep =
-      this.sideEffectRootLayerPlan?.latestSideEffectStep ?? null;
+    if (reason.type === "nullableBoundary") {
+      // nullableBoundary will handle error and inhibit automatically
+      this.latestSideEffectStep = null;
+    } else {
+      this.latestSideEffectStep =
+        this.sideEffectRootLayerPlan?.latestSideEffectStep ?? null;
+    }
   }
 
   toString() {

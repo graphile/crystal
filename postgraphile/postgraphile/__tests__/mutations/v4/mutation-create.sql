@@ -18,7 +18,8 @@ insert into "b"."types" as __types__ ("id", "smallint", "bigint", "numeric", "de
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "15",
   __types__."an_int_range"::text as "16",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "17",

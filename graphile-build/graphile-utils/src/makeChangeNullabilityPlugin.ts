@@ -8,21 +8,12 @@ type GraphQLInputType = AllGraphQL.GraphQLInputType;
 type GraphQLOutputType = AllGraphQL.GraphQLOutputType;
 type GraphQLType = AllGraphQL.GraphQLType;
 
-export type NullabilitySpecString =
-  | ""
-  | "!"
-  | "[]"
-  | "[]!"
-  | "[!]"
-  | "[!]!"
-  | "[[]]"
-  | "[[]]!"
-  | "[[]!]"
-  | "[[]!]!"
-  | "[[!]]"
-  | "[[!]]!"
-  | "[[!]!]"
-  | "[[!]!]!";
+type NullabilityDepth0 = "" | "!";
+type NullabilityDepth1 = `[${NullabilityDepth0}]${"" | "!"}`;
+type NullabilityDepth2 = `[${NullabilityDepth1}]${"" | "!"}`;
+
+export type NullabilitySpecString = string &
+  (NullabilityDepth0 | NullabilityDepth1 | NullabilityDepth2);
 
 // For backwards compatibility
 export type NullabilitySpec = boolean | NullabilitySpecString;
@@ -40,6 +31,96 @@ export interface ChangeNullabilityTypeRules {
 export interface ChangeNullabilityRules {
   [typeName: string]: ChangeNullabilityTypeRules;
 }
+
+type NullabilitySpecForListDepth<TListDepth extends number> =
+  TListDepth extends 0
+    ? NullabilityDepth0
+    : TListDepth extends 1
+      ? NullabilityDepth0 | NullabilityDepth1
+      : NullabilitySpecString;
+
+type NullabilitySpecFor<TListDepth extends number> =
+  | boolean
+  | NullabilitySpecForListDepth<TListDepth>;
+
+type GeneratedFieldRule<TField> = TField extends {
+  listDepth: infer TListDepth extends number;
+  args: infer TArgs;
+}
+  ?
+      | NullabilitySpecFor<TListDepth>
+      | {
+          type?: NullabilitySpecFor<TListDepth>;
+          args?: {
+            [TArgName in keyof TArgs & string]?: NonNullable<
+              TArgs[TArgName]
+            > extends { listDepth: infer TArgListDepth extends number }
+              ? NullabilitySpecFor<TArgListDepth>
+              : never;
+          };
+        }
+  : never;
+
+type GeneratedObjectOrInterfaceTypeRules<TType> = TType extends {
+  fields: infer TFields;
+}
+  ? {
+      [TFieldName in keyof TFields & string]?: GeneratedFieldRule<
+        TFields[TFieldName]
+      >;
+    }
+  : never;
+
+type GeneratedInputObjectTypeRules<TType> = TType extends {
+  fields: infer TFields;
+}
+  ? {
+      [TFieldName in keyof TFields & string]?: TFields[TFieldName] extends {
+        listDepth: infer TListDepth extends number;
+      }
+        ? NullabilitySpecFor<TListDepth>
+        : never;
+    }
+  : never;
+
+type GeneratedChangeNullabilityRules<TSchema> = [TSchema] extends [never]
+  ? ChangeNullabilityRules
+  : TSchema extends {
+        objects: infer TObjects;
+        interfaces: infer TInterfaces;
+        inputObjects: infer TInputObjects;
+      }
+    ? {
+        [TTypeName in
+          | keyof TObjects
+          | keyof TInterfaces
+          | keyof TInputObjects]?: TTypeName extends keyof TObjects
+          ? GeneratedObjectOrInterfaceTypeRules<TObjects[TTypeName]>
+          : TTypeName extends keyof TInterfaces
+            ? GeneratedObjectOrInterfaceTypeRules<TInterfaces[TTypeName]>
+            : TTypeName extends keyof TInputObjects
+              ? GeneratedInputObjectTypeRules<TInputObjects[TTypeName]>
+              : never;
+      }
+    : never;
+
+export type ScopedChangeNullabilityRules<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = {
+  [TTypeName in keyof GeneratedChangeNullabilityRules<
+    GraphileBuild.PluginScopes[TScope] extends {
+      schema: infer TSchema;
+    }
+      ? TSchema
+      : never
+  >]: GeneratedChangeNullabilityRules<
+    GraphileBuild.PluginScopes[TScope] extends {
+      schema: infer TSchema;
+    }
+      ? TSchema
+      : never
+  >[TTypeName];
+};
 
 let counter = 0;
 
@@ -116,9 +197,10 @@ function doIt(
   }
 }
 
-export function changeNullability(
-  rules: ChangeNullabilityRules,
-): GraphileConfig.Plugin {
+export function changeNullability<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(scopedRules: ScopedChangeNullabilityRules<TScope>): GraphileConfig.Plugin {
+  const rules = scopedRules as ChangeNullabilityRules;
   const expectedMatches = Object.entries(rules).flatMap(
     ([typeName, typeRules]) =>
       Object.keys(typeRules).flatMap((fieldName) => {

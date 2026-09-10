@@ -44,8 +44,11 @@ from (
 ) __vulnerability__
 
 
+with __first_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __first_party_vulnerabilities_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __first_party_vulnerabilities_identifiers__,
+from __first_party_vulnerabilities_identifiers__,
 lateral (
   select
     __first_party_vulnerabilities__."id"::text as "0",
@@ -57,8 +60,11 @@ lateral (
   )
 ) as __first_party_vulnerabilities_result__;
 
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from __union_identifiers__,
 lateral (
   select
     __owners__."0" as "0",
@@ -174,8 +180,11 @@ lateral (
   ) __owners__
 ) as __union_result__;
 
+with __organizations_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __organizations_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __organizations_identifiers__,
+from __organizations_identifiers__,
 lateral (
   select
     __organizations__."organization_id"::text as "0",
@@ -187,8 +196,11 @@ lateral (
   )
 ) as __organizations_result__;
 
+with __people_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __people_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __people_identifiers__,
+from __people_identifiers__,
 lateral (
   select
     __people__."person_id"::text as "0",

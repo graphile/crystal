@@ -8,11 +8,11 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/procedure-query-volatile"
-    Bucket0("Bucket 0 (root)<br /><br />1: Access[11]<br />2: Access[12]<br />3: Object[13]<br />4: Constantᐸ2ᐳ[43]<br />5: Constantᐸundefinedᐳ[7]<br />6: Constantᐸ'Budd Deey'ᐳ[44]<br />7: __InputObject[8]<br />8: ApplyInput[15]<br />9: PgSelect[10]<br />10: __InputObject[16]<br />11: ApplyInput[21]<br />12: PgSelect[17]<br />13: Connection[14], PgSelectRows[22]<br />ᐳ: Access[33], Access[39]<br />14: ConnectionItems[25]<br />ᐳ: 32, 34, 35, 36"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 10, 39, 25, 34, 36<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: Access[11]<br />2: Access[12]<br />3: Object[13]<br />4: Constantᐸ2ᐳ[43]<br />5: Constantᐸundefinedᐳ[7]<br />6: Constantᐸ'Budd Deey'ᐳ[44]<br />7: __InputObject[8]<br />8: ApplyInput[15]<br />9: PgSelect[10]<br />10: __InputObject[16]<br />11: ApplyInput[21]<br />12: PgSelect[17]<br />13: Connection[14], PgSelectRows[22]<br />ᐳ: Access[33]<br />14: ConnectionItems[25]<br />ᐳ: 32, 34, 35, 36"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 33, 25, 34, 36<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 17<br /><br />ROOT __Item{2}ᐸ22ᐳ[23]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24<br /><br />ROOT PgSelectSingle{2}ᐸtable_set_query_volatileᐳ[24]"):::bucket
-    Bucket5("Bucket 5 (listItem)<br />Deps: 39<br /><br />ROOT __Item{5}ᐸ25ᐳ[29]"):::bucket
+    Bucket5("Bucket 5 (listItem)<br />Deps: 33<br /><br />ROOT __Item{5}ᐸ25ᐳ[29]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 29, 30, 40<br /><br />ROOT Edge{5}[30]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 41<br /><br />ROOT PgSelectSingle{6}ᐸtable_set_query_volatileᐳ[41]"):::bucket
     end
@@ -46,11 +46,9 @@ graph TD
     PgSelect17 --> PgSelectRows22
     ConnectionItems25[["ConnectionItems[25∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[14]"]]:::plan
     First32{{"First[32∈0] ➊<br />More deps:<br />- ConnectionItems[25]"}}:::plan
-    Access33{{"Access[33∈0] ➊<br />ᐸ10.cursorDetailsᐳ"}}:::plan
+    Access33{{"Access[33∈0] ➊<br />ᐸ10.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect10 --> Access33
     Last35{{"Last[35∈0] ➊<br />More deps:<br />- ConnectionItems[25]"}}:::plan
-    Access39{{"Access[39∈0] ➊<br />ᐸ10.cursorDetailsᐳ"}}:::plan
-    PgSelect10 --> Access39
     PageInfo28{{"PageInfo[28∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
     Access37{{"Access[37∈1] ➊<br />ᐸ14.hasNextPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
     Access38{{"Access[38∈1] ➊<br />ᐸ14.hasPreviousPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
@@ -62,9 +60,9 @@ graph TD
     PgSelectSingle24 --> PgClassExpression31
     Edge30{{"Edge[30∈5]"}}:::plan
     __Item29[/"__Item[29∈5]<br />ᐸ25ᐳ<br />More deps:<br />- ConnectionItems[25]"\]:::itemplan
-    PgCursor40{{"PgCursor[40∈5]"}}:::plan
+    PgCursor40{{"PgCursor[40∈5]<br />More deps:<br />- Access[33]"}}:::plan
     __Item29 & PgCursor40 --> Edge30
-    __Item29 & Access39 --> PgCursor40
+    __Item29 --> PgCursor40
     PgSelectSingle41{{"PgSelectSingle[41∈6]<br />ᐸtable_set_query_volatileᐳ"}}:::plan
     __Item29 --> PgSelectSingle41
     PgClassExpression42{{"PgClassExpression[42∈7]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
@@ -72,7 +70,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__InputObject8,PgSelect10,Access11,Access12,Object13,Connection14,ApplyInput15,__InputObject16,PgSelect17,ApplyInput21,PgSelectRows22,ConnectionItems25,First32,Access33,Last35,Access39 bucket0
+    class Bucket0,__Value2,__InputObject8,PgSelect10,Access11,Access12,Object13,Connection14,ApplyInput15,__InputObject16,PgSelect17,ApplyInput21,PgSelectRows22,ConnectionItems25,First32,Access33,Last35 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PageInfo28,Access37,Access38 bucket1
     classDef bucket2 stroke:#7f007f

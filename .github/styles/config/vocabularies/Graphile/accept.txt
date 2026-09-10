@@ -19,3 +19,8 @@ booleans
 preprocessor
 unformatted
 autofixed
+inline
+inlined
+inlining
+subquery
+subqueries

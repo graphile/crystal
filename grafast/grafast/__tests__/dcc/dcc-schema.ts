@@ -743,7 +743,7 @@ const SharedLocationResolvers = {
 const SharedNpcResolvers = {
   friends(
     $npc: Step<NpcData>,
-    { $first }: FieldArgs<{ first: Maybe<number> }>,
+    { $first }: FieldArgs<{ first?: Maybe<number> }>,
   ) {
     const $friends = get($npc, "friends");
     return lambda([$friends, $first], applyLimit);

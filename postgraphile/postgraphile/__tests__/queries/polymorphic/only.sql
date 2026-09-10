@@ -41,8 +41,11 @@ from (
 ) __application__
 
 
+with __aws_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __aws_applications_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __aws_applications_identifiers__,
+from __aws_applications_identifiers__,
 lateral (
   select
     __aws_applications__."aws_id" as "0",
@@ -54,8 +57,11 @@ lateral (
   )
 ) as __aws_applications_result__;
 
+with __gcp_applications_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __gcp_applications_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __gcp_applications_identifiers__,
+from __gcp_applications_identifiers__,
 lateral (
   select
     __gcp_applications__."gcp_id" as "0",
@@ -67,8 +73,11 @@ lateral (
   )
 ) as __gcp_applications_result__;
 
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from __union_identifiers__,
 lateral (
   select
     __vulnerabilities__."0" as "0",
@@ -102,8 +111,11 @@ lateral (
   ) __vulnerabilities__
 ) as __union_result__;
 
+with __union_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __union_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __union_identifiers__,
+from __union_identifiers__,
 lateral (
   select
     __vulnerabilities__."0" as "0",
@@ -137,8 +149,11 @@ lateral (
   ) __vulnerabilities__
 ) as __union_result__;
 
+with __third_party_vulnerabilities_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __third_party_vulnerabilities_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __third_party_vulnerabilities_identifiers__,
+from __third_party_vulnerabilities_identifiers__,
 lateral (
   select
     __third_party_vulnerabilities__."id"::text as "0",

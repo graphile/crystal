@@ -229,23 +229,18 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             // We're building a PgCodec to represent specifically the
             // return type of this function.
 
-            const numberOfArguments = allArgTypes.length ?? 0;
             const attributes: PgCodecAttributes = Object.create(null);
-            for (let i = 0, l = numberOfArguments; i < l; i++) {
-              // i for IN arguments, o for OUT arguments, b for INOUT arguments,
-              // v for VARIADIC arguments, t for TABLE arguments
-              const argMode = (pgProc.proargmodes?.[i] ?? "i") as
-                | "i"
-                | "o"
-                | "b"
-                | "v"
-                | "t";
-
-              if (argMode === "o" || argMode === "b" || argMode === "t") {
-                const argType = allArgTypes[i];
-                const trueArgName = pgProc.proargnames?.[i];
-                const argName = trueArgName || `column${i + 1}`;
-
+            // Initiate parallel discovery up front to make registry more stable
+            const argDetails = await Promise.all(
+              allArgTypes.map(async (argType, i) => {
+                // i for IN arguments, o for OUT arguments, b for INOUT arguments,
+                // v for VARIADIC arguments, t for TABLE arguments
+                const argMode = (pgProc.proargmodes?.[i] ?? "i") as
+                  | "i"
+                  | "o"
+                  | "b"
+                  | "v"
+                  | "t";
                 const tag = tags[`arg${i}modifier`];
                 const typeModifier =
                   typeof tag === "string"
@@ -253,16 +248,27 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                       ? parseInt(tag, 10)
                       : tag
                     : undefined;
-
-                // This argument exists on the record type output
-                // NOTE: we treat `OUT foo`, `INOUT foo` and
-                // `RETURNS TABLE (foo ...)` as the same.
-                const attributeCodec =
-                  await info.helpers.pgCodecs.getCodecFromType(
+                return {
+                  i,
+                  argType,
+                  argMode,
+                  tag,
+                  typeModifier,
+                  attributeCodec: await info.helpers.pgCodecs.getCodecFromType(
                     serviceName,
                     argType,
                     typeModifier,
-                  );
+                  ),
+                };
+              }),
+            );
+            for (const { i, argMode, argType, attributeCodec } of argDetails) {
+              if (argMode === "o" || argMode === "b" || argMode === "t") {
+                const trueArgName = pgProc.proargnames?.[i];
+                const argName = trueArgName || `column${i + 1}`;
+                // This argument exists on the record type output
+                // NOTE: we treat `OUT foo`, `INOUT foo` and
+                // `RETURNS TABLE (foo ...)` as the same.
                 if (!attributeCodec) {
                   console.warn(
                     `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
@@ -325,7 +331,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const isMutation =
             pgProc.provolatile !== "i" && pgProc.provolatile !== "s";
 
-          const numberOfArguments = allArgTypes.length ?? 0;
+          const numberOfArguments = allArgTypes.length;
           const numberOfArgumentsWithDefaults = pgProc.pronargdefaults ?? 0;
           const isStrict = pgProc.proisstrict ?? false;
           const isStrictish =
@@ -335,17 +341,26 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             numberOfInputArguments - numberOfArgumentsWithDefaults;
           /** Because only input arguments count against pronargdefaults */
           let inputIndex = -1;
+          const argCodecs = await Promise.all(
+            allArgTypes.map((argType, i) => {
+              const typeModifierTag = tags[`arg${i}modifier`];
+              const typeModifier =
+                typeof typeModifierTag === "string"
+                  ? /^[0-9]+$/.test(typeModifierTag)
+                    ? parseInt(typeModifierTag, 10)
+                    : typeModifierTag
+                  : undefined;
+              return info.helpers.pgCodecs.getCodecFromType(
+                serviceName,
+                argType,
+                typeModifier,
+              );
+            }),
+          );
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
-            const typeModifierTag = tags[`arg${i}modifier`];
-            const typeModifier =
-              typeof typeModifierTag === "string"
-                ? /^[0-9]+$/.test(typeModifierTag)
-                  ? parseInt(typeModifierTag, 10)
-                  : typeModifierTag
-                : undefined;
             const tag = tags[`arg${i}variant`];
             const variant = typeof tag === "string" ? tag : undefined;
 
@@ -367,11 +382,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               // This is an input argument, not an output argument
               inputIndex++;
               // Generate a parameter for this argument
-              const argCodec = await info.helpers.pgCodecs.getCodecFromType(
-                serviceName,
-                argType,
-                typeModifier,
-              );
+              const argCodec = argCodecs[i];
               if (!argCodec) {
                 console.warn(
                   `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
@@ -584,17 +595,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [options, pgResourceOptions],
             );
           }
-        })().then((resourceOptions) => {
-          if (resourceOptions) {
-            registryBuilder.addResource(resourceOptions);
-          }
-          return resourceOptions;
-        });
+        })();
 
         resourceOptionsByPgProc.set(pgProc, resourceOptionsPromise!);
-
-        const registryBuilder =
-          await info.helpers.pgRegistry.getRegistryBuilder();
 
         return resourceOptionsPromise;
       },
@@ -663,6 +666,20 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
         }
 
         await helpers.pgProcedures.getResourceOptions(serviceName, pgProc);
+      },
+      pgRegistry_PgRegistryBuilder_pgResources: {
+        after: ["PgTablesPlugin"],
+        async callback(info, event) {
+          const { registryBuilder } = event;
+          for (const resourceOptionsByPgProc of info.state.resourceOptionsByPgProcByService.values()) {
+            for (const resourceOptionsPromise of resourceOptionsByPgProc.values()) {
+              const resourceOptions = await resourceOptionsPromise;
+              if (resourceOptions != null) {
+                registryBuilder.addResource(resourceOptions);
+              }
+            }
+          }
+        },
       },
     },
   }),

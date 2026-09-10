@@ -60,14 +60,14 @@ graph TD
     Access243{{"Access[243∈3]<br />ᐸ249.m.joinDetailsFor168ᐳ"}}:::plan
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
     Access243 & PgSelectSingle35 --> List244
-    List248{{"List[248∈3]<br />ᐸ247,22ᐳ"}}:::plan
-    Access247{{"Access[247∈3]<br />ᐸ257.m.joinDetailsFor29ᐳ"}}:::plan
-    PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    Access247 & PgSelectSingle22 --> List248
+    List248{{"List[248∈3]<br />ᐸ247,21ᐳ"}}:::plan
+    Access247{{"Access[247∈3]<br />ᐸ257.m.subqueryDetailsFor29ᐳ"}}:::plan
+    __Item21[/"__Item[21∈3]<br />ᐸ20ᐳ"\]:::itemplan
+    Access247 & __Item21 --> List248
     List252{{"List[252∈3]<br />ᐸ251,22ᐳ"}}:::plan
     Access251{{"Access[251∈3]<br />ᐸ257.m.joinDetailsFor84ᐳ"}}:::plan
+    PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
     Access251 & PgSelectSingle22 --> List252
-    __Item21[/"__Item[21∈3]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelectRows20 ==> __Item21
     __Item21 --> PgSelectSingle22
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
@@ -81,7 +81,7 @@ graph TD
     First33{{"First[33∈3]"}}:::plan
     PgSelectRows34[["PgSelectRows[34∈3]"]]:::plan
     PgSelectRows34 --> First33
-    Lambda249{{"Lambda[249∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda249{{"Lambda[249∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda249 --> PgSelectRows34
     First33 --> PgSelectSingle35
     PgClassExpression78{{"PgClassExpression[78∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan

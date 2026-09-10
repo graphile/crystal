@@ -845,12 +845,12 @@ export class OperationPlan {
       firstKey = key;
     }
     assert.ok(firstKey != null, "selection set cannot be empty");
-    const fields = groupedFieldSet.fields.get(firstKey);
-    if (!fields) {
+    const fieldNodes = groupedFieldSet.fields.get(firstKey);
+    if (!fieldNodes) {
       throw new SafeError("Consistency error.");
     }
     // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
-    const field = fields[0];
+    const field = fieldNodes[0];
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
@@ -897,6 +897,7 @@ export class OperationPlan {
         applyAfterMode: "subscribePlan",
         rawParentStep: this.trackedRootValueStep,
         field: fieldSpec,
+        fieldNodes,
         trackedArguments,
         streamDetails: true,
       })();
@@ -968,7 +969,7 @@ export class OperationPlan {
             {
               ...this.resolveInfoOperationBase,
               fieldName,
-              fieldNodes: fields,
+              fieldNodes,
               parentType: this.subscriptionType!,
               returnType: fieldSpec.type,
               // @ts-ignore
@@ -1395,6 +1396,7 @@ export class OperationPlan {
               applyAfterMode: "plan",
               rawParentStep: parentStep,
               field: objectField,
+              fieldNodes,
               trackedArguments,
               streamDetails: isList ? (streamDetails ?? false) : null,
             },
@@ -2850,7 +2852,10 @@ export class OperationPlan {
       string,
       {
         firstDetails: PlanFieldDetails;
-        extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
+        extraDetails: {
+          polymorphicPaths: ReadonlySet<string> | null;
+          fieldNodes: readonly FieldNode[];
+        }[];
         streamDetails: boolean | StreamDetails | null;
         indexes: number[];
       }
@@ -2868,6 +2873,7 @@ export class OperationPlan {
         // applyAfterMode,
         rawParentStep,
         // field,
+        fieldNodes,
         trackedArguments,
         streamDetails,
       } = batchPlanFieldDetails;
@@ -2886,7 +2892,7 @@ export class OperationPlan {
       if (!entry) {
         entry = {
           firstDetails: batchPlanFieldDetails,
-          extraDetails: [{ polymorphicPaths }],
+          extraDetails: [{ polymorphicPaths, fieldNodes }],
           streamDetails,
           indexes: [i],
         };
@@ -2948,6 +2954,9 @@ export class OperationPlan {
                 throw new Error(
                   `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
                 );
+              case "fieldNodes":
+                // Explicitly differences in fieldNodes are allowed
+                break;
               case "trackedArguments":
                 if (
                   !recordsMatch(
@@ -2961,10 +2970,7 @@ export class OperationPlan {
                 }
                 break;
               case "streamDetails":
-                // If any of them don't stream, turn streaming off
-                if (!streamDetails) {
-                  entry.streamDetails = null;
-                }
+                // If any don't stream, streaming is turned off below
                 break;
               default: {
                 const never: never = key;
@@ -2977,22 +2983,41 @@ export class OperationPlan {
         }
 
         entry.indexes.push(i);
-        entry.extraDetails.push({ polymorphicPaths });
+        entry.extraDetails.push({ polymorphicPaths, fieldNodes });
+        // If any of them don't stream, turn streaming off
+        if (!streamDetails) {
+          entry.streamDetails = null;
+        }
       }
     }
 
     // Loop through the groups and resolve the plan ONCE per group.
     // We don't care about the signature here; that was just for grouping
     for (const entry of groups.values()) {
-      const planFieldDetails: PlanFieldDetails = {
-        ...entry.firstDetails,
-        polymorphicPaths: entry.firstDetails.polymorphicPaths
-          ? new Set([
-              ...entry.firstDetails.polymorphicPaths,
-              ...entry.extraDetails.flatMap((d) => [...d.polymorphicPaths!]),
-            ])
-          : null,
-      };
+      let planFieldDetails = entry.firstDetails;
+      if (entry.extraDetails.length > 1) {
+        const fieldNodes: FieldNode[] = [];
+        const polymorphicPaths: Set<string> | null = entry.firstDetails
+          .polymorphicPaths
+          ? new Set()
+          : null;
+        for (const d of entry.extraDetails) {
+          for (const node of d.fieldNodes) {
+            fieldNodes.push(node);
+          }
+          if (polymorphicPaths != null) {
+            for (const pp of d.polymorphicPaths!) {
+              polymorphicPaths.add(pp);
+            }
+          }
+        }
+        planFieldDetails = {
+          ...planFieldDetails,
+          fieldNodes,
+          polymorphicPaths,
+          streamDetails: entry.streamDetails,
+        };
+      }
       let result: PlanFieldBatchResult;
       try {
         result = this._realPlanField(planFieldDetails);
@@ -3019,6 +3044,7 @@ export class OperationPlan {
       field,
       trackedArguments,
       streamDetails,
+      fieldNodes,
     } = planFieldDetails;
     const coordinate = `${typeName}.${fieldName}`;
 
@@ -3066,6 +3092,7 @@ export class OperationPlan {
             fieldName,
             field,
             parentType: assertObjectType(this.schema.getType(typeName)),
+            fieldNodes,
           }),
       );
       let haltTree = false;
@@ -4437,6 +4464,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
   private inlineSteps() {
     flagLoop: for (const $step of this.stepTracker.activeSteps) {
       if ($step instanceof __FlagStep) {
+        if ($step.hasSideEffects) continue;
         const $flag = $step;
         // We can only inline it if it's not used by an output plan or layer plan
         {
@@ -5790,6 +5818,7 @@ interface PlanFieldDetails {
   applyAfterMode: ApplyAfterModeArg;
   rawParentStep: Step;
   field: GraphQLField<any, any>;
+  fieldNodes: readonly FieldNode[];
   trackedArguments: TrackedArguments;
   // If 'true' this is a subscription rather than a stream
   // If 'false' this is a list but it will never stream

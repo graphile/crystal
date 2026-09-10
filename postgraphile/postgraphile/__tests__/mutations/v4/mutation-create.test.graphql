@@ -127,14 +127,17 @@ mutation CreateMutation($config: KeyValueHash!) {
       json
       jsonb
       numrange {
+        empty
         start { value inclusive }
         end { value inclusive }
       }
       daterange {
+        empty
         start { value inclusive }
         end { value inclusive }
       }
       anIntRange {
+        empty
         start { value inclusive }
         end { value inclusive }
       }

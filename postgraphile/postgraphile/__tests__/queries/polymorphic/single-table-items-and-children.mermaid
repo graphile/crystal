@@ -54,17 +54,17 @@ graph TD
     Lambda79{{"Lambda[79∈3]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda79 --> PgSelectRows54
     List78 --> Lambda79
-    __Item55[/"__Item[55∈5]<br />ᐸ54ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"\]:::itemplan
+    __Item55[/"__Item[55∈5]<br />ᐸ54ᐳ<br />ᐳSingleTableChecklistItem<br />ᐳSingleTableChecklist<br />ᐳSingleTableDivider<br />ᐳSingleTablePost<br />ᐳSingleTableTopic"\]:::itemplan
     PgSelectRows54 ==> __Item55
     PgSelectSingle56{{"PgSelectSingle[56∈5]^<br />ᐸsingle_table_itemsᐳ"}}:::plan
     __Item55 --> PgSelectSingle56
-    PgClassExpression61{{"PgClassExpression[61∈5]^<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle56 --> PgClassExpression61
-    PgClassExpression64{{"PgClassExpression[64∈5]^<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgClassExpression64{{"PgClassExpression[64∈5]<br />ᐸ__single_t...s__.”type”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle56 --> PgClassExpression64
     Lambda65{{"Lambda[65∈5]^<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
     PgClassExpression64 --> Lambda65
-    PgClassExpression71{{"PgClassExpression[71∈5]^<br />ᐸ__single_t...”position”ᐳ"}}:::plan
+    PgClassExpression71{{"PgClassExpression[71∈5]<br />ᐸ__single_t...”position”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgClassExpression61 o--o PgClassExpression71
 
     %% define steps
