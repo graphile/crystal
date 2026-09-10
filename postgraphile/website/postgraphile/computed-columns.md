@@ -165,6 +165,45 @@ which can be queried like:
 }
 ```
 
+### Overloaded functions
+
+PostgreSQL allows functions to be overloaded (multiple functions with the same
+name but different argument types). By default, PostGraphile skips overloaded
+functions because their derived names would clash. To use overloaded functions
+(for example computed column functions with the same name targeting different
+tables, such as `my_schema.code(my_schema.pets)` and
+`my_schema.code(my_schema.buildings)`), add the `PgFunctionOverloadsPreset` to
+your preset; it factors the input argument types into the internal resource
+names (e.g. `code__pets` and `code__buildings`) so that overloads no longer
+clash:
+
+```ts
+import { PgFunctionOverloadsPreset } from "graphile-build-pg";
+
+const preset: GraphileConfig.Preset = {
+  extends: [
+    // ...
+    PgFunctionOverloadsPreset,
+  ],
+};
+```
+
+Note that the preset applies to all functions, so anything named after the
+resource name may change; in particular, custom query and mutation fields for
+functions with input arguments get the argument types appended to their field
+names. You can use the [`@name` smart tag](./smart-tags#name) on a function to
+pick its name explicitly.
+
+Also note that computed column functions like the `code` example above don't
+follow the `${tableName}_${fieldName}` naming convention, so they won't be
+_detected_ as computed columns automatically; you'll need to mark them
+explicitly with a [smart tag](./smart-tags):
+
+```sql
+comment on function my_schema.code(my_schema.pets)
+  is E'@behavior +typeField -queryField';
+```
+
 ### Advice
 
 See the advice in [the Custom Queries article](./custom-queries#advice).
