@@ -2970,10 +2970,7 @@ export class OperationPlan {
                 }
                 break;
               case "streamDetails":
-                // If any of them don't stream, turn streaming off
-                if (!streamDetails) {
-                  entry.streamDetails = null;
-                }
+                // If any don't stream, streaming is turned off below
                 break;
               default: {
                 const never: never = key;
@@ -2987,6 +2984,10 @@ export class OperationPlan {
 
         entry.indexes.push(i);
         entry.extraDetails.push({ polymorphicPaths, fieldNodes });
+        // If any of them don't stream, turn streaming off
+        if (!streamDetails) {
+          entry.streamDetails = null;
+        }
       }
     }
 
@@ -3014,6 +3015,7 @@ export class OperationPlan {
           ...planFieldDetails,
           fieldNodes,
           polymorphicPaths,
+          streamDetails: entry.streamDetails,
         };
       }
       let result: PlanFieldBatchResult;
