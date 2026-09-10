@@ -897,6 +897,7 @@ export class OperationPlan {
         applyAfterMode: "subscribePlan",
         rawParentStep: this.trackedRootValueStep,
         field: fieldSpec,
+        fieldNodes,
         trackedArguments,
         streamDetails: true,
       })();
@@ -1395,6 +1396,7 @@ export class OperationPlan {
               applyAfterMode: "plan",
               rawParentStep: parentStep,
               field: objectField,
+              fieldNodes,
               trackedArguments,
               streamDetails: isList ? (streamDetails ?? false) : null,
             },
@@ -2850,7 +2852,10 @@ export class OperationPlan {
       string,
       {
         firstDetails: PlanFieldDetails;
-        extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
+        extraDetails: {
+          polymorphicPaths: ReadonlySet<string> | null;
+          fieldNodes: readonly FieldNode[];
+        }[];
         streamDetails: boolean | StreamDetails | null;
         indexes: number[];
       }
@@ -2868,6 +2873,7 @@ export class OperationPlan {
         // applyAfterMode,
         rawParentStep,
         // field,
+        fieldNodes,
         trackedArguments,
         streamDetails,
       } = batchPlanFieldDetails;
@@ -2886,7 +2892,7 @@ export class OperationPlan {
       if (!entry) {
         entry = {
           firstDetails: batchPlanFieldDetails,
-          extraDetails: [{ polymorphicPaths }],
+          extraDetails: [{ polymorphicPaths, fieldNodes }],
           streamDetails,
           indexes: [i],
         };
@@ -2948,6 +2954,9 @@ export class OperationPlan {
                 throw new Error(
                   `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
                 );
+              case "fieldNodes":
+                // Explicitly differences in fieldNodes are allowed
+                break;
               case "trackedArguments":
                 if (
                   !recordsMatch(
@@ -2977,7 +2986,7 @@ export class OperationPlan {
         }
 
         entry.indexes.push(i);
-        entry.extraDetails.push({ polymorphicPaths });
+        entry.extraDetails.push({ polymorphicPaths, fieldNodes });
       }
     }
 
@@ -2986,6 +2995,7 @@ export class OperationPlan {
     for (const entry of groups.values()) {
       const planFieldDetails: PlanFieldDetails = {
         ...entry.firstDetails,
+        fieldNodes: entry.extraDetails.flatMap((d) => d.fieldNodes),
         polymorphicPaths: entry.firstDetails.polymorphicPaths
           ? new Set([
               ...entry.firstDetails.polymorphicPaths,
@@ -3019,6 +3029,7 @@ export class OperationPlan {
       field,
       trackedArguments,
       streamDetails,
+      fieldNodes,
     } = planFieldDetails;
     const coordinate = `${typeName}.${fieldName}`;
 
@@ -3066,6 +3077,7 @@ export class OperationPlan {
             fieldName,
             field,
             parentType: assertObjectType(this.schema.getType(typeName)),
+            fieldNodes,
           }),
       );
       let haltTree = false;
@@ -5791,6 +5803,7 @@ interface PlanFieldDetails {
   applyAfterMode: ApplyAfterModeArg;
   rawParentStep: Step;
   field: GraphQLField<any, any>;
+  fieldNodes: readonly FieldNode[];
   trackedArguments: TrackedArguments;
   // If 'true' this is a subscription rather than a stream
   // If 'false' this is a list but it will never stream
