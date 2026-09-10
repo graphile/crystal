@@ -845,12 +845,12 @@ export class OperationPlan {
       firstKey = key;
     }
     assert.ok(firstKey != null, "selection set cannot be empty");
-    const fields = groupedFieldSet.fields.get(firstKey);
-    if (!fields) {
+    const fieldNodes = groupedFieldSet.fields.get(firstKey);
+    if (!fieldNodes) {
       throw new SafeError("Consistency error.");
     }
     // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
-    const field = fields[0];
+    const field = fieldNodes[0];
     const fieldName = field.name.value; // Unaffected by alias.
     const rootTypeFields = rootType.getFields();
     const fieldSpec: GraphQLField<unknown, unknown> = rootTypeFields[fieldName];
@@ -968,7 +968,7 @@ export class OperationPlan {
             {
               ...this.resolveInfoOperationBase,
               fieldName,
-              fieldNodes: fields,
+              fieldNodes,
               parentType: this.subscriptionType!,
               returnType: fieldSpec.type,
               // @ts-ignore
