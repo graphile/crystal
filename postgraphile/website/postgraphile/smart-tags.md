@@ -319,6 +319,54 @@ comment on table users is
   E'@behavior -insert -delete';
 ```
 
+## @arg0description, @arg1description, ...
+
+The `PgArgumentDescriptionsPlugin`, loaded by default, adds descriptions to
+GraphQL arguments for [custom queries](./custom-queries.md) and
+[computed columns](./computed-columns.md), and to input fields for
+[custom mutations](./custom-mutations.md).
+
+Use `@arg0description` for the first SQL argument, `@arg1description` for the
+second, and so on. These positions refer to the SQL declaration, regardless of
+GraphQL argument inflection. For computed columns, the hidden row argument still
+occupies position zero, so the first exposed argument uses `@arg1description`.
+OUT and TABLE arguments count towards the positions but receive no input
+description; INOUT arguments receive descriptions on their inputs.
+
+```sql
+create function public.greet(person_name text)
+returns text as $$
+  select 'Hello, ' || person_name;
+$$ language sql stable;
+
+comment on function public.greet(text) is
+  E'@arg0description The name of the person to greet.\nGreets a person.';
+```
+
+The GraphQL argument `personName` now has the description "The name of the person
+to greet." The function's own description remains "Greets a person."
+
+You can also set these tags in a [smart tags file](./smart-tags-file.md), using
+`\n` for line breaks within a description:
+
+```json5 title="postgraphile.tags.json5"
+{
+  version: 1,
+  config: {
+    procedure: {
+      "public.greet": {
+        tags: {
+          arg0description: "The name to greet.\nInclude their preferred title.",
+        },
+      },
+    },
+  },
+}
+```
+
+A tag without a value is ignored. Arguments without these tags retain their
+existing descriptions.
+
 ## @arg0variant, @arg1variant, ...
 
 When building a custom mutation, you probably want to use the composite type
