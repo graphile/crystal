@@ -120,6 +120,7 @@ declare global {
           postgresArgName?: string | null;
           pgCodec: PgCodec;
           inputType: GraphQLInputType;
+          description?: string;
           optional?: boolean;
         }>;
         parameterAnalysis: ReturnType<typeof generatePgParameterAnalysis>;
@@ -642,6 +643,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 graphqlArgName: argName,
                 pgCodec: param.codec,
                 inputType,
+                ...(param.extensions?.argDescription !== undefined
+                  ? { description: param.extensions.argDescription }
+                  : null),
                 ...(param.name ? { postgresArgName: param.name } : null),
                 ...(param.optional ? { optional: true } : null),
                 ...(fetcher ? { fetcher } : null),
@@ -653,9 +657,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             // of args to affect the others!
             const makeFieldArgs = () =>
               argDetails.reduce(
-                (memo, { inputType, graphqlArgName }) => {
+                (memo, { inputType, graphqlArgName, description }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
+                    ...(description !== undefined ? { description } : null),
                   };
                   return memo;
                 },
@@ -853,9 +858,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                           // Not used for isMutation; that's handled elsewhere
                           return argDetails.reduce(
-                            (memo, { inputType, graphqlArgName }) => {
+                            (
+                              memo,
+                              { inputType, graphqlArgName, description },
+                            ) => {
                               memo[graphqlArgName] = {
                                 type: inputType,
+                                ...(description !== undefined
+                                  ? { description }
+                                  : null),
                               };
                               return memo;
                             },
