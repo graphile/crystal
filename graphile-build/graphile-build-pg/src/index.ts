@@ -41,6 +41,7 @@ export { PgRowByUniquePlugin } from "./plugins/PgRowByUniquePlugin.ts";
 export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.ts";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.ts";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.ts";
+export { PgViewConstraintsPlugin } from "./plugins/PgViewConstraintsPlugin/index.ts";
 export { defaultPreset } from "./preset.ts";
 export { parseDatabaseIdentifier, parseDatabaseIdentifiers } from "./utils.ts";
 export { version } from "./version.ts";
