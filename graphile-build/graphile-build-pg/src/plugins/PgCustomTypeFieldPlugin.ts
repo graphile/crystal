@@ -734,7 +734,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         after: ["PgCodecs"],
         callback(_, build) {
           const {
-            graphql: { GraphQLList, GraphQLString, getNamedType },
+            graphql: { GraphQLList, GraphQLString },
             inflection,
             options,
             pgGetArgDetailsFromParameters,
