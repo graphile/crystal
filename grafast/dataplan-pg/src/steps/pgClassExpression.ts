@@ -3,11 +3,13 @@ import { access, exportAs, UnbatchedStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
+import type { PgCodecJSDatatype } from "../codecs.ts";
 import type { PgResource } from "../datasource.ts";
 import type {
   GetPgCodecAttributes,
   PgClassSingleStep,
   PgCodec,
+  PgCodecAttributeNullability,
   PgTypedStep,
 } from "../interfaces.ts";
 import { PgDeleteSingleStep } from "./pgDeleteSingle.ts";
@@ -30,8 +32,9 @@ import { PgUpdateSingleStep } from "./pgUpdateSingle.ts";
 export class PgClassExpressionStep<
     TExpressionCodec extends PgCodec,
     TResource extends PgResource<any, any, any, any, any>,
+    TNullability extends null = null,
   >
-  extends UnbatchedStep<any>
+  extends UnbatchedStep<PgCodecJSDatatype<TExpressionCodec> | TNullability>
   implements PgTypedStep<TExpressionCodec>
 {
   static $$export = {
@@ -140,7 +143,11 @@ export class PgClassExpressionStep<
   __inferGet?: {
     [TAttr in keyof GetPgCodecAttributes<TExpressionCodec>]: PgClassExpressionStep<
       GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
-      TResource
+      TResource,
+      | TNullability
+      | PgCodecAttributeNullability<
+          GetPgCodecAttributes<TExpressionCodec>[TAttr]
+        >
     >;
   };
   /* Here's the proper type of this function, but that makes using it painful.
@@ -181,7 +188,9 @@ export class PgClassExpressionStep<
     attributeName: TAttr,
   ): PgClassExpressionStep<
     GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
-    TResource
+    TResource,
+    | TNullability
+    | PgCodecAttributeNullability<GetPgCodecAttributes<TExpressionCodec>[TAttr]>
   > {
     return this.cacheStep("get", attributeName, () =>
       this._getInternal(attributeName),
@@ -193,7 +202,9 @@ export class PgClassExpressionStep<
     attributeName: TAttr,
   ): PgClassExpressionStep<
     GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
-    TResource
+    TResource,
+    | TNullability
+    | PgCodecAttributeNullability<GetPgCodecAttributes<TExpressionCodec>[TAttr]>
   > {
     const attributes = this.pgCodec.attributes;
     if (attributes === undefined) {
@@ -234,7 +245,9 @@ export class PgClassExpressionStep<
     )}` as any;
   }
 
-  public getParentStep(): PgClassSingleStep<TResource> | PgUnionAllSingleStep {
+  public getParentStep():
+    | PgClassSingleStep<TResource, any>
+    | PgUnionAllSingleStep {
     const $row = this.getDep(this.rowDependencyId);
     const step = this.needsTupleAccess
       ? ($row as AccessStep<any>).getParentStep()
@@ -265,21 +278,24 @@ export class PgClassExpressionStep<
     return this;
   }
 
-  public unbatchedExecute(_extra: UnbatchedExecutionExtra, v: any): any {
+  public unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    v: any,
+  ): PgCodecJSDatatype<TExpressionCodec> | TNullability {
     if (v == null) {
-      return null;
+      return null as TNullability;
     }
     const rawValue = v[this.attrIndex!];
     if (rawValue == null) {
-      return null;
+      return null as TNullability;
     } else {
       return this.pgCodec.fromPg(rawValue);
     }
   }
 
   public deduplicate(
-    peers: Array<PgClassExpressionStep<any, any>>,
-  ): PgClassExpressionStep<TExpressionCodec, TResource>[] {
+    peers: Array<PgClassExpressionStep<any, any, any>>,
+  ): PgClassExpressionStep<TExpressionCodec, TResource, TNullability>[] {
     const parentPlan = this.getParentStep();
     const classPlan =
       parentPlan instanceof PgSelectSingleStep
@@ -314,16 +330,17 @@ export class PgClassExpressionStep<
 function pgClassExpression<
   TExpressionCodec extends PgCodec,
   TResource extends PgResource<any, any, any, any, any>,
+  TNullability extends null = null,
 >(
-  table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
+  table: PgClassSingleStep<TResource, any> | PgUnionAllSingleStep,
   codec: TExpressionCodec,
   guaranteedNotNull?: boolean,
 ): (
   strings: TemplateStringsArray,
   ...dependencies: ReadonlyArray<PgTypedStep<any> | SQL>
-) => PgClassExpressionStep<TExpressionCodec, TResource> {
+) => PgClassExpressionStep<TExpressionCodec, TResource, TNullability> {
   return (strings, ...dependencies) => {
-    return new PgClassExpressionStep(
+    return new PgClassExpressionStep<TExpressionCodec, TResource, TNullability>(
       table,
       codec,
       strings,

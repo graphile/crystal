@@ -17,6 +17,7 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecAttributeVia,
+  PgCodecJSDatatype,
 } from "./codecs.ts";
 import { TYPES } from "./codecs.ts";
 import type {
@@ -39,6 +40,7 @@ import type {
   PgRefDefinition,
   PgRegistry,
   PgRegistryConfig,
+  PgTypedStep,
   PlanByUniques,
 } from "./interfaces.ts";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.ts";
@@ -106,6 +108,8 @@ export type PgResourceParameterExtensions =
 export interface PgResourceParameter<
   TName extends string | null = string | null,
   TCodec extends PgCodec = PgCodec,
+  TNotNull extends boolean | undefined = boolean | undefined,
+  TOptional extends boolean | undefined = boolean | undefined,
 > {
   /**
    * Name of the parameter, if null then we must use positional rather than
@@ -123,25 +127,126 @@ export interface PgResourceParameter<
    * defaults, therefore `optional: true` is the "odd one out", rather than
    * using `required: false`.
    */
-  optional?: boolean;
+  optional?: TOptional;
   /**
    * If true and the parameter is supplied, then the parameter must not be
    * null.
    */
-  notNull?: boolean;
-  extensions?: PgResourceParameterExtensions;
+  notNull?: TNotNull;
+  extensions?: DataplanPg.PgResourceParameterExtensions;
 }
+
+// For the .execute method
+export type PgResourceExecuteArguments<
+  TParameters extends readonly PgResourceParameter[] | undefined =
+    | readonly PgResourceParameter[]
+    | undefined,
+> = TParameters extends undefined
+  ? never
+  : {
+      [Index in keyof TParameters]: TParameters[Index] extends PgResourceParameter<
+        infer UName,
+        infer UCodec,
+        infer UNotNull,
+        any
+      >
+        ? {
+            step:
+              | PgTypedStep<UCodec>
+              | Step<
+                  | PgCodecJSDatatype<UCodec>
+                  | (UNotNull extends true ? null : never)
+                >;
+            name?: UName;
+          }
+        : never;
+    }[keyof TParameters & number][];
+
+type PgResourceParameterStep<
+  TCodec extends PgCodec<any, any, any, any, any, any, any>,
+  TNotNull extends boolean | undefined,
+> = Step<PgCodecJSDatatype<TCodec> | (TNotNull extends true ? never : null)>;
+
+type PgResourceExecutePositionalArgumentsFromTuple<
+  TParameters extends readonly PgResourceParameter[],
+> = TParameters extends readonly [
+  infer UHead extends PgResourceParameter<any, any, any, any>,
+  ...infer UTail extends readonly PgResourceParameter<any, any, any, any>[],
+]
+  ? UHead extends PgResourceParameter<
+      any,
+      infer UCodec,
+      infer UNotNull,
+      infer UOptional
+    >
+    ? UOptional extends true
+      ? [
+          PgResourceParameterStep<UCodec, UNotNull>?,
+          ...PgResourceExecutePositionalArgumentsFromTuple<UTail>,
+        ]
+      : [
+          PgResourceParameterStep<UCodec, UNotNull>,
+          ...PgResourceExecutePositionalArgumentsFromTuple<UTail>,
+        ]
+    : never
+  : readonly [];
+
+// For .executePositional
+export type PgResourceExecutePositionalArguments<
+  TParameters extends readonly PgResourceParameter[] | undefined,
+> = TParameters extends undefined
+  ? never
+  : PgResourceExecutePositionalArgumentsFromTuple<
+      Exclude<TParameters, undefined>
+    >;
+
+// For .executeNamed
+export type PgResourceExecuteNamedArguments<
+  TParameters extends readonly PgResourceParameter[] | undefined,
+> = TParameters extends readonly PgResourceParameter[]
+  ? {
+      // Required params
+      [TParameter in TParameters[number] as TParameter["optional"] extends true
+        ? never
+        : Extract<
+            TParameter["name"],
+            string
+          >]: TParameter extends PgResourceParameter<
+        any,
+        infer UCodec,
+        infer UNotNull,
+        any
+      >
+        ? PgResourceParameterStep<UCodec, UNotNull>
+        : never;
+    } & {
+      // Optional params
+      [TParameter in TParameters[number] as TParameter["optional"] extends true
+        ? Extract<TParameter["name"], string>
+        : never]?: TParameter extends PgResourceParameter<
+        any,
+        infer UCodec,
+        infer UNotNull,
+        any
+      >
+        ? PgResourceParameterStep<UCodec, UNotNull>
+        : never;
+    }
+  : never;
 
 /**
  * Description of a unique constraint on a PgResource.
  */
 export interface PgResourceUnique<
   TAttributes extends PgCodecAttributes = PgCodecAttributes,
+  TUniqueAttributes extends ReadonlyArray<
+    keyof TAttributes & string
+  > = ReadonlyArray<keyof TAttributes & string>,
 > {
   /**
    * The attributes that are unique
    */
-  attributes: ReadonlyArray<keyof TAttributes & string>;
+  attributes: TUniqueAttributes;
   /**
    * If this is true, this represents the "primary key" of the resource.
    */
@@ -150,7 +255,7 @@ export interface PgResourceUnique<
   /**
    * Space for you to add your own metadata
    */
-  extensions?: PgResourceUniqueExtensions;
+  extensions?: DataplanPg.PgResourceUniqueExtensions;
 }
 
 export interface PgCodecRefPathEntry {
@@ -166,7 +271,7 @@ export interface PgCodecRef {
   definition: PgRefDefinition;
   paths: Array<PgCodecRefPath>;
   description?: string;
-  extensions?: PgCodecRefExtensions;
+  extensions?: DataplanPg.PgCodecRefExtensions;
 }
 
 export interface PgCodecRefs {
@@ -304,6 +409,10 @@ export class PgResource<
   public sqlPartitionByIndex: SQL | null = null;
 
   public readonly parameters: TParameters;
+  /** @internal */
+  private parameterByName: {
+    [name: string]: Exclude<TParameters, undefined>[number];
+  };
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
   public readonly isMutation: boolean;
@@ -358,7 +467,22 @@ export class PgResource<
     this.identifier = identifier ?? name;
     this.from = from;
     this.uniques = uniques ?? ([] as never);
-    this.parameters = parameters as TParameters;
+    {
+      this.parameters = parameters as TParameters;
+      this.parameterByName = Object.create(null);
+      if (parameters) {
+        for (const param of parameters) {
+          if (param.name) {
+            if (this.parameterByName[param.name]) {
+              throw new Error(
+                `Two parameters cannot have the same name '${param.name}'`,
+              );
+            }
+            this.parameterByName[param.name] = param;
+          }
+        }
+      }
+    }
     this.description = description;
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
@@ -412,7 +536,7 @@ export class PgResource<
       identifier?: string;
       from: SQL;
       uniques?: TNewUniques;
-      extensions?: PgResourceExtensions;
+      extensions?: DataplanPg.PgResourceExtensions;
     },
   ): PgResourceOptions<TNewName, TCodec, TNewUniques, undefined> {
     const { name, identifier, from, uniques, extensions } = overrideOptions;
@@ -657,8 +781,8 @@ export class PgResource<
     // This is internal, it's an optimisation we can use but you shouldn't.
     _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
   ): GetPgCodecAttributes<TCodec> extends PgCodecAttributes
-    ? PgSelectSingleStep<this>
-    : PgClassExpressionStep<TCodec, this> {
+    ? PgSelectSingleStep<this, null>
+    : PgClassExpressionStep<TCodec, this, null> {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional resources; please use .execute()",
@@ -752,14 +876,49 @@ export class PgResource<
     return pgSelect({ resource: this, identifiers });
   }
 
+  /** Use `executePositional` or `executeNamed` for stronger types and more ergonomic format */
   execute(
-    args: ReadonlyArray<PgSelectArgumentSpec> = [],
+    args: PgResourceExecuteArguments<TParameters> = [] as unknown as PgResourceExecuteArguments<TParameters>,
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ): ExecutableStep<unknown> {
+    if (!this.parameters) {
+      throw new Error(`This resource has no parameters, so cannot execute`);
+    }
+    const params = this.parameters;
+    let namedOnly = false;
+    const resolvedArgs: PgSelectArgumentSpec[] = args.map((arg, i) => {
+      const { name, ...rest } = arg;
+      if (name != null) {
+        if (name !== params[i].name) {
+          namedOnly = true;
+        }
+        const param = this.parameterByName[name];
+        if (!param) {
+          throw new Error(`No parameter named '${name}' exists`);
+        }
+        const pgCodec = param.codec;
+        return {
+          ...rest,
+          name,
+          pgCodec,
+        };
+      } else {
+        const pgCodec = params[i].codec;
+        if (namedOnly) {
+          throw new Error(
+            `Argument at index ${i} doesn't use a name, but the previous argument does; positional arguments cannot come after named arguments`,
+          );
+        }
+        return {
+          ...rest,
+          pgCodec,
+        };
+      }
+    });
     const $select = pgSelect({
       resource: this,
       identifiers: [],
-      args,
+      args: resolvedArgs,
       mode,
     });
     if (this.isUnique) {
@@ -782,6 +941,43 @@ export class PgResource<
     } else {
       return $select;
     }
+  }
+
+  executePositional(
+    ...steps: PgResourceExecutePositionalArguments<TParameters>
+  ): ExecutableStep<unknown> {
+    if (!this.parameters) {
+      throw new Error(
+        `This resource has no parameters, so cannot executePositional`,
+      );
+    }
+    const parameters = this.parameters;
+    if (steps.length > parameters.length) {
+      throw new Error(
+        `${this}.executePositional() received ${steps.length} arguments, but this resource has only ${parameters.length} parameters`,
+      );
+    }
+    return this.execute(
+      steps.map((step) => ({
+        step,
+      })) as PgResourceExecuteArguments<TParameters>,
+    );
+  }
+
+  executeNamed(
+    namedSteps: PgResourceExecuteNamedArguments<TParameters>,
+  ): ExecutableStep<unknown> {
+    if (!this.parameters) {
+      throw new Error(
+        `This resource has no parameters, so cannot executeNamed`,
+      );
+    }
+    return this.execute(
+      Object.entries(namedSteps).map(([name, step]) => ({
+        step,
+        name,
+      })) as PgResourceExecuteArguments<TParameters>,
+    );
   }
 
   public applyAuthorizationChecksToPlan($step: PgSelectStep<this>): void {
@@ -1130,6 +1326,9 @@ export function makeRegistry<
       if (codec.rangeOfCodec) {
         addCodec(codec.rangeOfCodec);
       }
+      if (codec.baseCodec) {
+        addCodec(codec.baseCodec);
+      }
 
       // Tell the system to read the built codec from the registry
       Object.defineProperties(codec, {
@@ -1256,6 +1455,9 @@ export function makeRegistry<
     }
     if (codec.domainOfCodec) {
       walkCodec(codec.domainOfCodec, isAccessibleViaAttribute, seen);
+    }
+    if (codec.baseCodec) {
+      walkCodec(codec.baseCodec, isAccessibleViaAttribute, seen);
     }
   };
 
@@ -1461,6 +1663,9 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}, {}> {
       }
       if (codec.rangeOfCodec) {
         this.addCodec(codec.rangeOfCodec);
+      }
+      if (codec.baseCodec) {
+        this.addCodec(codec.baseCodec);
       }
       if (codec.attributes) {
         for (const col of Object.values(codec.attributes)) {

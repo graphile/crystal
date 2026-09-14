@@ -163,6 +163,11 @@ scalar AnInt
 
 """A range of `AnInt`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: AnIntRangeBound
 
@@ -194,6 +199,13 @@ input AnIntRangeBoundInput {
 
 """A range of `AnInt`."""
 input AnIntRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: AnIntRangeBoundInput
 
@@ -2578,6 +2590,13 @@ input FloatRangeBoundInput {
 
 """A range of `Float`."""
 input FloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: FloatRangeBoundInput
 
@@ -5023,7 +5042,7 @@ type Post implements node {
   computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   computedIntervalArray: [interval]
 
-  """Reads and enables pagination through a set of `Interval`."""
+  """Reads and enables pagination through a set of `interval`."""
   computedIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -7772,6 +7791,11 @@ scalar bigfloat
 
 """A range of `bigfloat`."""
 type bigfloatRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: bigfloatRangeBound
 
@@ -7803,6 +7827,13 @@ input bigfloatRangeBoundInput {
 
 """A range of `bigfloat`."""
 input bigfloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: bigfloatRangeBoundInput
 
@@ -7825,6 +7856,11 @@ scalar date
 
 """A range of `date`."""
 type dateRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: dateRangeBound
 
@@ -7856,6 +7892,13 @@ input dateRangeBoundInput {
 
 """A range of `date`."""
 input dateRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: dateRangeBoundInput
 
@@ -10064,7 +10107,7 @@ type query implements node {
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10136,7 +10179,7 @@ type query implements node {
     offset: Int
   ): FuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10167,7 +10210,7 @@ type query implements node {
   """Get a single `Input`."""
   inputById(id: Int!): Input
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10312,7 +10355,7 @@ type query implements node {
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [interval]
 
-  """Reads and enables pagination through a set of `Interval`."""
+  """Reads and enables pagination through a set of `interval`."""
   queryIntervalSet(
     """Read all values in the set after (below) this cursor."""
     after: cursor
@@ -10396,7 +10439,7 @@ type query implements node {
   """Get a single `SimilarTable2`."""
   similarTable2ById(id: Int!): SimilarTable2
 
-  """Reads and enables pagination through a set of `Int8`."""
+  """Reads and enables pagination through a set of `bigint`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: cursor

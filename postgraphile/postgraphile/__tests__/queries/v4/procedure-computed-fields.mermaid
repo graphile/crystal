@@ -18,7 +18,7 @@ graph TD
     Bucket11("Bucket 11 (listItem)<br />Deps: 307, 311<br /><br />ROOT __Item{11}ᐸ39ᐳ[64]"):::bucket
     Bucket12("Bucket 12 (listItem)<br />Deps: 319, 323, 326<br /><br />ROOT __Item{12}ᐸ42ᐳ[66]"):::bucket
     Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ45ᐳ[68]"):::bucket
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 275, 63, 287, 291, 303<br /><br />ROOT PgSelectSingle{10}ᐸtypesᐳ[63]<br />1: <br />ᐳ: 276, 288, 292, 304, 277, 289, 293, 305, 279, 283<br />2: 76, 85, 98, 116<br />ᐳ: 75, 77, 84, 86, 97, 99, 115, 117, 161, 184, 202, 280, 281, 284, 285<br />3: PgSelectRows[166], PgSelectRows[189]<br />ᐳ: 165, 167, 188, 190"):::bucket
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 275, 63, 287, 62, 291, 303<br /><br />ROOT PgSelectSingle{10}ᐸtypesᐳ[63]<br />1: <br />ᐳ: 276, 288, 292, 304, 277, 289, 293, 305, 279, 283<br />2: 76, 85, 98, 116<br />ᐳ: 75, 77, 84, 86, 97, 99, 115, 117, 161, 184, 202, 280, 281, 284, 285<br />3: PgSelectRows[166], PgSelectRows[189]<br />ᐳ: 165, 167, 188, 190"):::bucket
     Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 65, 307, 64, 311<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[65]<br />1: <br />ᐳ: 78, 89, 101, 119, 127, 129, 131, 133, 135, 150, 151, 308, 312, 309, 313<br />2: Connection[155], PgSelectRows[156]<br />3: ConnectionItems[181]"):::bucket
     Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 67, 319, 66, 323, 326<br /><br />ROOT PgSelectSingle{12}ᐸpersonᐳ[67]<br />1: <br />ᐳ: 79, 91, 320, 324, 321, 325<br />2: Connection[107], PgSelectRows[124]<br />ᐳ: First[123], PgSelectSingle[125]<br />3: ConnectionItems[169]"):::bucket
     Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 69<br /><br />ROOT PgSelectSingle{13}ᐸedge_caseᐳ[69]"):::bucket
@@ -147,11 +147,11 @@ graph TD
     BakedInput144 --> PgFromExpression149
     Access275{{"Access[275∈0] ➊<br />ᐸ8.m.joinDetailsFor71ᐳ"}}:::plan
     PgSelect8 --> Access275
-    Access287{{"Access[287∈0] ➊<br />ᐸ8.m.joinDetailsFor82ᐳ"}}:::plan
+    Access287{{"Access[287∈0] ➊<br />ᐸ8.m.subqueryDetailsFor82ᐳ"}}:::plan
     PgSelect8 --> Access287
     Access291{{"Access[291∈0] ➊<br />ᐸ8.m.joinDetailsFor95ᐳ"}}:::plan
     PgSelect8 --> Access291
-    Access303{{"Access[303∈0] ➊<br />ᐸ8.m.joinDetailsFor113ᐳ"}}:::plan
+    Access303{{"Access[303∈0] ➊<br />ᐸ8.m.subqueryDetailsFor113ᐳ"}}:::plan
     PgSelect8 --> Access303
     Access307{{"Access[307∈0] ➊<br />ᐸ15.m.subqueryDetailsFor145ᐳ"}}:::plan
     PgSelect15 --> Access307
@@ -200,12 +200,12 @@ graph TD
     List284{{"List[284∈14]<br />ᐸ283,86ᐳ"}}:::plan
     Access283{{"Access[283∈14]<br />ᐸ289.m.joinDetailsFor186ᐳ"}}:::plan
     Access283 & PgSelectSingle86 --> List284
-    List288{{"List[288∈14]<br />ᐸ287,63ᐳ"}}:::plan
-    Access287 & PgSelectSingle63 --> List288
+    List288{{"List[288∈14]<br />ᐸ287,62ᐳ"}}:::plan
+    Access287 & __Item62 --> List288
     List292{{"List[292∈14]<br />ᐸ291,63ᐳ"}}:::plan
     Access291 & PgSelectSingle63 --> List292
-    List304{{"List[304∈14]<br />ᐸ303,63ᐳ"}}:::plan
-    Access303 & PgSelectSingle63 --> List304
+    List304{{"List[304∈14]<br />ᐸ303,62ᐳ"}}:::plan
+    Access303 & __Item62 --> List304
     First75{{"First[75∈14]"}}:::plan
     PgSelectRows76[["PgSelectRows[76∈14]"]]:::plan
     PgSelectRows76 --> First75
@@ -216,7 +216,7 @@ graph TD
     First84{{"First[84∈14]"}}:::plan
     PgSelectRows85[["PgSelectRows[85∈14]"]]:::plan
     PgSelectRows85 --> First84
-    Lambda289{{"Lambda[289∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda289{{"Lambda[289∈14]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda289 --> PgSelectRows85
     First84 --> PgSelectSingle86
     First97{{"First[97∈14]"}}:::plan
@@ -229,7 +229,7 @@ graph TD
     First115{{"First[115∈14]"}}:::plan
     PgSelectRows116[["PgSelectRows[116∈14]"]]:::plan
     PgSelectRows116 --> First115
-    Lambda305{{"Lambda[305∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda305{{"Lambda[305∈14]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda305 --> PgSelectRows116
     PgSelectSingle117{{"PgSelectSingle[117∈14]<br />ᐸfrmcdc_nestedCompoundTypeᐳ"}}:::plan
     First115 --> PgSelectSingle117
