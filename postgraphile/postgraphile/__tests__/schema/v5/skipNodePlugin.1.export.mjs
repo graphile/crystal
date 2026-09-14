@@ -8625,7 +8625,7 @@ type Query {
   ): QueryIntervalSetConnection
   queryTextArray: [String]
 
-  """Reads and enables pagination through a set of \`Int8\`."""
+  """Reads and enables pagination through a set of \`BigInt\`."""
   staticBigInteger(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -8735,7 +8735,7 @@ type Query {
   ): CFuncOutOutSetofConnection
   cFuncOutOutUnnamed: CFuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   cFuncOutSetof(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -8789,7 +8789,7 @@ type Query {
     after: Cursor
   ): CFuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   cFuncReturnsTableOneCol(
     i: Int
 
@@ -8806,7 +8806,7 @@ type Query {
     after: Cursor
   ): CFuncReturnsTableOneColConnection
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   cIntSetQuery(
     x: Int
     y: Int

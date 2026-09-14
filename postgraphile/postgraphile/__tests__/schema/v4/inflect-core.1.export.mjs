@@ -9083,7 +9083,7 @@ type Q implements N {
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   queryIntervalArray: [I]
 
-  """Reads and enables pagination through a set of \`Interval\`."""
+  """Reads and enables pagination through a set of \`I\`."""
   queryIntervalSet(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9105,7 +9105,7 @@ type Q implements N {
   ): QueryIntervalSetConnection
   queryTextArray: [String]
 
-  """Reads and enables pagination through a set of \`Int8\`."""
+  """Reads and enables pagination through a set of \`BigInt\`."""
   staticBigInteger(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9248,7 +9248,7 @@ type Q implements N {
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcOutSetof(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9320,7 +9320,7 @@ type Q implements N {
     after: Cursor
   ): FuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcReturnsTableOneCol(
     i: Int
 
@@ -9343,7 +9343,7 @@ type Q implements N {
     after: Cursor
   ): FuncReturnsTableOneColConnection
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   intSetQuery(
     x: Int
     y: Int
@@ -10374,7 +10374,7 @@ type Post implements N {
   computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   computedIntervalArray: [I]
 
-  """Reads and enables pagination through a set of \`Interval\`."""
+  """Reads and enables pagination through a set of \`I\`."""
   computedIntervalSet(
     """Only read the first \`n\` values of the set."""
     first: Int

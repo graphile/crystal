@@ -5560,7 +5560,7 @@ type Query implements Node {
   ): [FuncOutOutSetofRecord!]
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcOutSetof(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -5657,7 +5657,7 @@ type Query implements Node {
     offset: Int
   ): [FuncReturnsTableMultiColRecord!]
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcReturnsTableOneCol(
     i: Int
 
@@ -5689,7 +5689,7 @@ type Query implements Node {
     offset: Int
   ): [Int!]
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   intSetQuery(
     x: Int
     y: Int
