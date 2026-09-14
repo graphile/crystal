@@ -1,0 +1,13 @@
+{
+  singleOutput: {
+    doubled: {
+      doubled: 10,
+    },
+  },
+  multipleOutputs: {
+    result: {
+      total: 10,
+      product: 25,
+    },
+  },
+}
