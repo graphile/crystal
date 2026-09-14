@@ -1635,10 +1635,14 @@ function getFunctionSourceReturnGraphQLTypes(
           : inflection.connectionType(namedType.name)
       : null;
 
-    const connectionType =
+    // Not all "can use connection" types actually have a connection type
+    const connectionTypeBase =
       connectionTypeName != null
-        ? build.getOutputTypeByName(connectionTypeName)
+        ? build.getTypeByName(connectionTypeName)
         : null;
+    const connectionType = isOutputType(connectionTypeBase)
+      ? connectionTypeBase
+      : null;
     return { namedType, baseType, canUseConnection, connectionType };
   } else {
     return { namedType, baseType, canUseConnection, connectionType: null };
