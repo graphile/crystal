@@ -1,5 +1,16 @@
 # graphile-build-pg
 
+## 5.1.5
+
+### Patch Changes
+
+- [#3170](https://github.com/graphile/crystal/pull/3170)
+  [`3a2ed03`](https://github.com/graphile/crystal/commit/3a2ed038d0d9cdd05231c03c96b16bdb9ad8fa7f)
+  Thanks [@benjie](https://github.com/benjie)! - Change how dataplanPg and
+  grafast helpers are imported by the introspection plugin so that when AI
+  copies this pattern it does it the right way and doesn't have to add loads of
+  dependencies.
+
 ## 5.1.4
 
 ### Patch Changes
