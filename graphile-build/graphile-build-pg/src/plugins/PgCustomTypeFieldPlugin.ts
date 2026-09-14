@@ -49,11 +49,11 @@ import {
   trap,
   TRAP_INHIBITED,
 } from "grafast";
-import {
-  type GraphQLInputType,
-  type GraphQLNamedType,
-  type GraphQLOutputType,
-  type GraphQLSchema,
+import type {
+  GraphQLInputType,
+  GraphQLNamedType,
+  GraphQLOutputType,
+  GraphQLSchema,
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 import type {} from "graphile-config";
@@ -905,8 +905,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           );
                           return fields;
                         }
-                        const { regularType: baseType, namedType } =
-                          returnTypes;
+                        const { baseType, namedType } = returnTypes;
                         const returnGraphQLTypeName = namedType.name;
                         const resultFieldName =
                           inflection.functionMutationResultFieldName({
@@ -1271,7 +1270,7 @@ function modFields(
           if (!returnTypes) {
             return memo;
           }
-          const { regularType: type } = returnTypes;
+          const { baseType } = returnTypes;
 
           const fieldName = isRootQuery
             ? inflection.customQueryField({ resource })
@@ -1290,7 +1289,7 @@ function modFields(
             {
               type: build.nullableIf(
                 !resource.extensions?.tags?.notNull,
-                type!,
+                baseType,
               ),
               args: makeFieldArgs(),
               plan: getSelectPlanFromParentAndArgs as any,
@@ -1308,7 +1307,7 @@ function modFields(
           if (!returnTypes) {
             return memo;
           }
-          const { regularType: type, connectionType, namedType } = returnTypes;
+          const { baseType, connectionType, namedType } = returnTypes;
 
           // isUnique is false => this is a 'setof' resource.
 
@@ -1421,7 +1420,7 @@ function modFields(
                             !resource.extensions?.tags?.notNull &&
                               (resource.isList ||
                                 !options.pgForbidSetofFunctionsToReturnNull),
-                            type!,
+                            baseType,
                           ),
                         ),
                       ),
@@ -1519,7 +1518,7 @@ function getFunctionSourceReturnGraphQLTypes(
   resource: PgResource<any, any, any, any, any>,
 ): {
   namedType: GraphQLOutputType & GraphQLNamedType;
-  regularType: GraphQLOutputType;
+  baseType: GraphQLOutputType;
   connectionType: GraphQLOutputType | null;
 } | null {
   const {
@@ -1597,7 +1596,7 @@ function getFunctionSourceReturnGraphQLTypes(
   }
 
   // TODO: nullability
-  const regularType =
+  const baseType =
     innerType && resource.codec.arrayOfCodec
       ? new GraphQLList(innerType)
       : innerType;
@@ -1625,7 +1624,7 @@ function getFunctionSourceReturnGraphQLTypes(
       ? build.getOutputTypeByName(connectionTypeName)
       : null;
 
-  return { namedType, regularType, connectionType };
+  return { namedType, baseType, connectionType };
 }
 
 const makeArg = EXPORTABLE(
