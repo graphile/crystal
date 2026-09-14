@@ -1307,17 +1307,17 @@ function modFields(
           if (!returnTypes) {
             return memo;
           }
-          const { baseType, connectionType, namedType } = returnTypes;
+          const { baseType, connectionType, namedType, canUseConnection } =
+            returnTypes;
 
           // isUnique is false => this is a 'setof' resource.
 
           const baseScope = isRootQuery ? `queryField` : `typeField`;
           const connectionFieldBehaviorScope =
             `${baseScope}:resource:connection` as const;
-          const listFieldBehaviorScope =
-            connectionType != null
-              ? (`${baseScope}:resource:list` as const)
-              : (`${baseScope}:resource:array` as const);
+          const listFieldBehaviorScope = canUseConnection
+            ? (`${baseScope}:resource:list` as const)
+            : (`${baseScope}:resource:array` as const);
           if (
             connectionType != null &&
             build.behavior.pgResourceMatches(
@@ -1516,11 +1516,20 @@ function getPreferredType(
 function getFunctionSourceReturnGraphQLTypes(
   build: GraphileBuild.Build,
   resource: PgResource<any, any, any, any, any>,
-): {
-  namedType: GraphQLOutputType & GraphQLNamedType;
-  baseType: GraphQLOutputType;
-  connectionType: GraphQLOutputType | null;
-} | null {
+):
+  | {
+      namedType: GraphQLOutputType & GraphQLNamedType;
+      baseType: GraphQLOutputType;
+      canUseConnection: false;
+      connectionType: null;
+    }
+  | {
+      namedType: GraphQLOutputType & GraphQLNamedType;
+      baseType: GraphQLOutputType;
+      canUseConnection: true;
+      connectionType: GraphQLOutputType | null;
+    }
+  | null {
   const {
     graphql: { getNamedType, isOutputType, GraphQLList },
     inflection,
@@ -1607,24 +1616,27 @@ function getFunctionSourceReturnGraphQLTypes(
   const canUseConnection =
     !resource.isUnique && !resource.sqlPartitionByIndex && !resource.isList;
 
-  const connectionTypeName = canUseConnection
-    ? shouldUseCustomConnection(resource)
-      ? resource.codec.attributes
-        ? inflection.recordFunctionConnectionType({ resource })
-        : inflection.scalarFunctionConnectionType({ resource })
-      : preferredCodec.attributes
-        ? graphqlTypeForPreferredCodec !== namedType
-          ? inflection.connectionType(namedType.name)
-          : inflection.tableConnectionType(preferredCodec)
-        : inflection.connectionType(namedType.name)
-    : null;
-
-  const connectionType =
-    connectionTypeName != null
-      ? build.getOutputTypeByName(connectionTypeName)
+  if (canUseConnection) {
+    const connectionTypeName = canUseConnection
+      ? shouldUseCustomConnection(resource)
+        ? resource.codec.attributes
+          ? inflection.recordFunctionConnectionType({ resource })
+          : inflection.scalarFunctionConnectionType({ resource })
+        : preferredCodec.attributes
+          ? graphqlTypeForPreferredCodec !== namedType
+            ? inflection.connectionType(namedType.name)
+            : inflection.tableConnectionType(preferredCodec)
+          : inflection.connectionType(namedType.name)
       : null;
 
-  return { namedType, baseType, connectionType };
+    const connectionType =
+      connectionTypeName != null
+        ? build.getOutputTypeByName(connectionTypeName)
+        : null;
+    return { namedType, baseType, canUseConnection, connectionType };
+  } else {
+    return { namedType, baseType, canUseConnection, connectionType: null };
+  }
 }
 
 const makeArg = EXPORTABLE(
