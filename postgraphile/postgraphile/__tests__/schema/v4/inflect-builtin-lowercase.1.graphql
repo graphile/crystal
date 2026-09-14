@@ -163,6 +163,11 @@ scalar AnInt
 
 """A range of `AnInt`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: AnIntRangeBound
 
@@ -194,6 +199,13 @@ input AnIntRangeBoundInput {
 
 """A range of `AnInt`."""
 input AnIntRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: AnIntRangeBoundInput
 
@@ -2578,6 +2590,13 @@ input FloatRangeBoundInput {
 
 """A range of `Float`."""
 input FloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: FloatRangeBoundInput
 
@@ -5900,6 +5919,7 @@ type Type implements node {
   nullableRange: bigfloatRange
   numeric: bigfloat!
   numrange: bigfloatRange!
+  oid: oid
   point: point!
 
   """Reads a single `Post` that is related to this `Type`."""
@@ -6023,6 +6043,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s `numrange` field."""
   numrange: bigfloatRangeInput
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: oid
 
   """Checks for equality with the object’s `point` field."""
   point: pointInput
@@ -6196,6 +6219,7 @@ input TypeInput {
   nullableRange: bigfloatRangeInput
   numeric: bigfloat!
   numrange: bigfloatRangeInput!
+  oid: oid
   point: pointInput!
   regclass: regclass
   regconfig: regconfig
@@ -6250,6 +6274,7 @@ input TypePatch {
   nullableRange: bigfloatRangeInput
   numeric: bigfloat
   numrange: bigfloatRangeInput
+  oid: oid
   point: pointInput
   regclass: regclass
   regconfig: regconfig
@@ -6375,6 +6400,8 @@ enum TypesOrderBy {
   NULLABLE_POINT_DESC
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   POINT_ASC
   POINT_DESC
   REGCLASS_ASC
@@ -7764,6 +7791,11 @@ scalar bigfloat
 
 """A range of `bigfloat`."""
 type bigfloatRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: bigfloatRangeBound
 
@@ -7795,6 +7827,13 @@ input bigfloatRangeBoundInput {
 
 """A range of `bigfloat`."""
 input bigfloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: bigfloatRangeBoundInput
 
@@ -7817,6 +7856,11 @@ scalar date
 
 """A range of `date`."""
 type dateRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: dateRangeBound
 
@@ -7848,6 +7892,13 @@ input dateRangeBoundInput {
 
 """A range of `date`."""
 input dateRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: dateRangeBoundInput
 
@@ -9166,6 +9217,9 @@ interface node {
   nodeId: ID!
 }
 
+"""PostgreSQL identifier for a database entity"""
+scalar oid
+
 """Information about pagination in a connection."""
 type pageinfo {
   """When paginating forwards, the cursor to continue."""
@@ -10456,6 +10510,44 @@ type query implements node {
     """
     offset: Int
   ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQueryVolatile(
+    """Read all values in the set after (below) this cursor."""
+    after: cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PeopleConnection
+  tableSetQueryVolatileList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [Person]
 
   """Reads a single `Type` using its globally unique `ID`."""
   type(

@@ -1,7 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -63,31 +65,6 @@ const executor = new PgExecutor({
     });
   }
 });
-const peopleIdentifier = sql.identifier("simple_collections", "people");
-const peopleCodec = recordCodec({
-  name: "people",
-  identifier: peopleIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    name: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "simple_collections",
-      name: "people"
-    }
-  },
-  executor: executor
-});
 const petsIdentifier = sql.identifier("simple_collections", "pets");
 const petsCodec = recordCodec({
   name: "pets",
@@ -113,6 +90,31 @@ const petsCodec = recordCodec({
       serviceName: "main",
       schemaName: "simple_collections",
       name: "pets"
+    }
+  },
+  executor: executor
+});
+const peopleIdentifier = sql.identifier("simple_collections", "people");
+const peopleCodec = recordCodec({
+  name: "people",
+  identifier: peopleIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    name: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "simple_collections",
+      name: "people"
     }
   },
   executor: executor
@@ -163,12 +165,12 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    people: peopleCodec,
-    int4: TYPES.int,
     text: TYPES.text,
-    pets: petsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
+    pets: petsCodec,
+    int4: TYPES.int,
+    people: peopleCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -226,6 +228,24 @@ const registry = makeRegistry({
         },
         tags: {
           name: "LetterAToDViaView"
+        }
+      }
+    }),
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
         }
       }
     }),
@@ -663,8 +683,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_people_odd_pets = () => EMPTY_ARRAY;
+const makeArgs_people_odd_pets = () => [];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -776,8 +795,9 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -1571,7 +1591,7 @@ export const objects = {
         });
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       }
     }
   },

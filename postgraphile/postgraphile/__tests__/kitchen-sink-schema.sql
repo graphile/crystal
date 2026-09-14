@@ -255,7 +255,7 @@ alter table a.unique_foreign_key add constraint second_fkey
   foreign key (compound_key_1, compound_key_2) references c.compound_key(person_id_1, person_id_2) on delete cascade;
 
 -- We're just testing the relations work as expected, we don't need everything else.
-comment on table a.unique_foreign_key is E'@omit create,update,delete,all,order,filter';
+comment on table a.unique_foreign_key is E'@omit create, update, delete, all, order, filter';
 
 create table c.edge_case (
   not_null_has_default boolean not null default false,
@@ -316,6 +316,7 @@ create table b.types (
   "inet" inet,
   "cidr" cidr,
   "macaddr" macaddr,
+  "oid" oid,
   "regproc" regproc,
   "regprocedure" regprocedure,
   "regoper" regoper,
@@ -416,6 +417,8 @@ create function c.table_mutation(id int) returns a.post as $$ select * from a.po
 create function c.table_set_query() returns setof c.person as $$ select * from c.person order by id asc $$ language sql stable;
 create function c.table_set_query_plpgsql() returns setof c.person as $$ begin return query select * from c.person order by id asc; end $$ language plpgsql stable;
 comment on function c.table_set_query() is E'@sortable\n@filterable';
+create function c.table_set_query_volatile() returns setof c.person as $$ select * from c.person order by id asc $$ language sql volatile;
+comment on function c.table_set_query_volatile() is E'@behavior +sort +filter +queryField -mutationField +list +connection';
 create function c.table_set_mutation() returns setof c.person as $$ select * from c.person order by id asc $$ language sql;
 create function c.int_set_query(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql stable;
 create function c.int_set_mutation(x int, y int, z int) returns setof integer as $$ values (1), (2), (3), (4), (x), (y), (z) $$ language sql;
@@ -1268,6 +1271,16 @@ comment on constraint enum_1 on enum_tables.lots_of_enums is E'@enum\n@enumName 
 comment on constraint enum_2 on enum_tables.lots_of_enums is E'@enum\n@enumName EnumTheSecond';
 comment on constraint enum_3 on enum_tables.lots_of_enums is E'@enum';
 comment on constraint enum_4 on enum_tables.lots_of_enums is E'@enum';
+
+create table enum_tables.empty_enum (
+  value text primary key,
+  description text
+);
+comment on table enum_tables.empty_enum is E'@enum';
+
+create function enum_tables.empty_enum_query() returns enum_tables.empty_enum as $$
+  select null::text as value, null::text as description;
+$$ language sql stable;
 
 -- Enum table needs values added as part of the migration, not as part of the
 -- data.

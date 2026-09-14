@@ -84,12 +84,14 @@ export default {
       ) {
         return new GraphQLError(
           error.originalError.message,
-          error.nodes,
-          error.source,
-          error.positions,
-          error.path,
-          error.originalError,
-          error.originalError.extensions ?? null,
+          {
+            nodes: error.nodes,
+            source: error.source,
+            positions: error.positions,
+            path: error.path,
+            originalError: error.originalError,
+            extensions: error.originalError.extensions ?? null,
+          }
         );
       } else {
         // Hash so that similar errors can easily be grouped
@@ -97,13 +99,15 @@ export default {
         console.error(`Masked GraphQL error (hash: '${hash}')`, error);
         return new GraphQLError(
           `An error occurred (logged with hash: '${hash}')`,
-          error.nodes,
-          error.source,
-          error.positions,
-          error.path,
-          error.originalError,
-          // Deliberately wipe the extensions
-          {},
+          {
+            nodes: error.nodes,
+            source: error.source,
+            positions: error.positions,
+            path: error.path,
+            originalError: error.originalError,
+            // Deliberately wipe the extensions
+            extensions: {},
+          }
         );
       }
     },

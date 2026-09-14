@@ -219,6 +219,7 @@ insert into b.types values (
   null,
   null,
   null,
+  null,
   null
 );
 
@@ -259,6 +260,7 @@ insert into b.types values (
   '192.168.0.0',
   '192.168.0.0/24',
   'feed.dead.beef',
+  23,
   'b.guid_fn',
   'b.guid_fn(b.guid)',
   '>>=',

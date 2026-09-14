@@ -61,7 +61,7 @@ export class __TrackedValueStep<
    * add constraints on). DO NOT USE IN USER CODE because it will not
    * necessarily reflect the values that should be used at runtime.
    */
-  private readonly _initialValue: TData | undefined;
+  private _initialValue: TData | undefined;
 
   /**
    * A reference to the relevant
@@ -524,6 +524,10 @@ export class __TrackedValueStep<
   // At runtime, __TrackedValueStep doesn't need to exist
   optimize() {
     return this.getDep(0);
+  }
+
+  finalize() {
+    this._initialValue = undefined;
   }
 }
 

@@ -40,7 +40,8 @@ import type {
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.ts";
 import type { InflectionBase } from "./inflection.ts";
-import type { stringTypeSpec, wrapDescription } from "./utils.ts";
+import type { TypeMeta } from "./interfaces.ts";
+import type { intTypeSpec, stringTypeSpec, wrapDescription } from "./utils.ts";
 
 /*
  * To make it easier for plugins to extend our builtin types we put them all in
@@ -109,6 +110,15 @@ declare global {
     interface BuildInput {
       // Expand this interface with declaration merging
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface BuildInputScopedExtensions<TScope extends keyof PluginScopes> {
+      // Expand this interface with declaration merging
+    }
+    type ScopedBuildInput<TScope extends keyof PluginScopes> = Omit<
+      BuildInput,
+      keyof BuildInputScopedExtensions<never>
+    > &
+      BuildInputScopedExtensions<TScope>;
 
     interface BehaviorStrings {
       "*": true;
@@ -427,9 +437,15 @@ declare global {
 
       /**
        * Generates the spec for a GraphQLScalar (except the name) with the
-       * given description/coercion.
+       * given description/coercion that represents a string.
        */
       stringTypeSpec: typeof stringTypeSpec;
+
+      /**
+       * Generates the spec for a GraphQLScalar (except the name) with the
+       * given description/coercion that represents an int.
+       */
+      intTypeSpec: typeof intTypeSpec;
 
       /**
        * Register a type by name with the system; names must be unique. It's
@@ -489,19 +505,7 @@ declare global {
        * Returns details of the type name's registration (if it has been
        * registered) - useful when types are built based on other types.
        */
-      getTypeMetaByName: (typeName: string) => {
-        Constructor: { new (spec: any): GraphQLNamedType };
-        scope: GraphileBuild.SomeScope;
-        origin: string | null | undefined;
-        Step?: { new (...args: any[]): Step } | null;
-        specGenerator:
-          | (() => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">)
-          | (() => Omit<GrafastInterfaceTypeConfig<any>, "name">)
-          | (() => Omit<GrafastUnionTypeConfig<any>, "name">)
-          | (() => Omit<GraphQLScalarTypeConfig<any, any>, "name">)
-          | (() => Omit<GraphQLEnumTypeConfig, "name">)
-          | (() => Omit<GrafastInputObjectTypeConfig, "name">);
-      } | null;
+      getTypeMetaByName: (typeName: string) => TypeMeta | null;
 
       /**
        * Returns the GraphQL type with the given name, constructing it if
@@ -614,6 +618,16 @@ declare global {
       };
     }
 
+    interface BuildBaseScopedExtensions<TScope extends keyof PluginScopes> {
+      input: ScopedBuildInput<TScope>;
+      // Expand this interface with declaration merging
+    }
+    type ScopedBuildBase<TScope extends keyof PluginScopes> = Omit<
+      BuildBase,
+      keyof BuildBaseScopedExtensions<never>
+    > &
+      BuildBaseScopedExtensions<TScope>;
+
     /**
      * The `Build` object is passed to every schema hook (as the second
      * argument); it contains useful helpers and utilities and can also store
@@ -632,6 +646,18 @@ declare global {
        */
       behavior: Behavior & BehaviorDynamicMethods;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface BuildScopedExtensions<TScope extends keyof PluginScopes> {
+      // Expand this interface with declaration merging
+    }
+    type ScopedBuild<TScope extends keyof PluginScopes> = Omit<
+      Build,
+      | keyof BuildBaseScopedExtensions<never>
+      | keyof BuildScopedExtensions<never>
+    > &
+      BuildBaseScopedExtensions<TScope> &
+      BuildScopedExtensions<TScope>;
 
     /**
      * When we register a type, field or argument, we associate a 'scope' with
@@ -884,7 +910,7 @@ declare global {
     type Hook<
       Type,
       TContext extends Context,
-      TBuild extends Partial<Build> = Build,
+      TBuild extends BuildBase = Build,
     > = {
       (input: Type, build: TBuild, context: TContext): Type;
       displayName?: string;
@@ -937,7 +963,7 @@ declare global {
      * the various parameters to the hook function.
      */
     interface SchemaBuilderHooks<
-      TBuild extends GraphileBuild.Build = GraphileBuild.Build,
+      TScope extends keyof GraphileBuild.PluginScopes = never,
     > {
       /**
        * The build object represents the current schema build and is passed to all
@@ -945,9 +971,9 @@ declare global {
        * generate GraphQL objects during this phase.
        */
       build: GraphileBuild.Hook<
-        Partial<TBuild> & GraphileBuild.BuildBase,
-        GraphileBuild.ContextBuild,
-        Partial<TBuild> & GraphileBuild.BuildBase
+        Partial<ScopedBuild<TScope>> & ScopedBuildBase<TScope>,
+        ContextBuild,
+        Partial<ScopedBuild<TScope>> & ScopedBuildBase<TScope>
       >[];
 
       /**
@@ -958,7 +984,7 @@ declare global {
       init: GraphileBuild.Hook<
         Record<string, never>,
         GraphileBuild.ContextInit,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -969,7 +995,7 @@ declare global {
       finalize: GraphileBuild.Hook<
         GraphQLSchema,
         GraphileBuild.ContextFinalize,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -978,7 +1004,7 @@ declare global {
       GraphQLSchema: GraphileBuild.Hook<
         GraphQLSchemaConfig,
         GraphileBuild.ContextSchema,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -987,7 +1013,7 @@ declare global {
       GraphQLSchema_types: GraphileBuild.Hook<
         GraphQLNamedType[],
         GraphileBuild.ContextSchemaTypes,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -1004,32 +1030,32 @@ declare global {
       GraphQLObjectType: GraphileBuild.Hook<
         GrafastObjectTypeConfig<any>,
         GraphileBuild.ContextObject,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLObjectType_interfaces: GraphileBuild.Hook<
         GraphQLInterfaceType[],
         GraphileBuild.ContextObjectInterfaces,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLObjectType_fields: GraphileBuild.Hook<
         GrafastFieldConfigMap<any>,
         GraphileBuild.ContextObjectFields,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLObjectType_fields_field: GraphileBuild.Hook<
         GrafastFieldConfig<any, any, any>,
         GraphileBuild.ContextObjectFieldsField,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLObjectType_fields_field_args: GraphileBuild.Hook<
         GrafastFieldConfigArgumentMap,
         GraphileBuild.ContextObjectFieldsFieldArgs,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLObjectType_fields_field_args_arg: GraphileBuild.Hook<
         GrafastArgumentConfig<any, any, any>,
         GraphileBuild.ContextObjectFieldsFieldArgsArg,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -1044,17 +1070,17 @@ declare global {
       GraphQLInputObjectType: GraphileBuild.Hook<
         GraphileBuild.GrafastInputObjectTypeConfig,
         GraphileBuild.ContextInputObject,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInputObjectType_fields: GraphileBuild.Hook<
         GraphQLInputFieldConfigMap,
         GraphileBuild.ContextInputObjectFields,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInputObjectType_fields_field: GraphileBuild.Hook<
         GrafastInputFieldConfig,
         GraphileBuild.ContextInputObjectFieldsField,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -1067,17 +1093,17 @@ declare global {
       GraphQLEnumType: GraphileBuild.Hook<
         GraphQLEnumTypeConfig,
         GraphileBuild.ContextEnum,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLEnumType_values: GraphileBuild.Hook<
         GraphQLEnumValueConfigMap,
         GraphileBuild.ContextEnumValues,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLEnumType_values_value: GraphileBuild.Hook<
         GraphQLEnumValueConfig,
         GraphileBuild.ContextEnumValuesValue,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -1089,12 +1115,12 @@ declare global {
       GraphQLUnionType: GraphileBuild.Hook<
         GraphileBuild.GrafastUnionTypeConfig<any>,
         GraphileBuild.ContextUnion,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLUnionType_types: GraphileBuild.Hook<
         GraphQLObjectType[],
         GraphileBuild.ContextUnionTypes,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -1110,32 +1136,32 @@ declare global {
       GraphQLInterfaceType: GraphileBuild.Hook<
         GraphileBuild.GrafastInterfaceTypeConfig<any>,
         GraphileBuild.ContextInterface,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInterfaceType_fields: GraphileBuild.Hook<
         GraphQLFieldConfigMap<any, any>,
         GraphileBuild.ContextInterfaceFields,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInterfaceType_fields_field: GraphileBuild.Hook<
         GraphQLFieldConfig<any, any>,
         GraphileBuild.ContextInterfaceFieldsField,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInterfaceType_fields_field_args: GraphileBuild.Hook<
         GraphQLFieldConfigArgumentMap,
         GraphileBuild.ContextInterfaceFieldsFieldArgs,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInterfaceType_fields_field_args_arg: GraphileBuild.Hook<
         GraphQLArgumentConfig,
         GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
-        TBuild
+        ScopedBuild<TScope>
       >[];
       GraphQLInterfaceType_interfaces: GraphileBuild.Hook<
         GraphQLInterfaceType[],
         GraphileBuild.ContextInterfaceInterfaces,
-        TBuild
+        ScopedBuild<TScope>
       >[];
 
       /**
@@ -1144,7 +1170,7 @@ declare global {
       GraphQLScalarType: GraphileBuild.Hook<
         GraphQLScalarTypeConfig<any, any>,
         GraphileBuild.ContextScalar,
-        TBuild
+        ScopedBuild<TScope>
       >[];
     }
   }

@@ -21,6 +21,7 @@ declare global {
   namespace GraphileBuild {
     interface BehaviorStrings {
       "proc:filterBy": true;
+      "condition:proc:filterBy": true;
     }
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
@@ -62,13 +63,18 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
             "can we filter by the result of this proc (function resource)",
           entities: ["pgResource"],
         },
+        "condition:proc:filterBy": {
+          description:
+            "can we add a condition filter by the result of this proc (function resource)",
+          entities: ["pgResource"],
+        },
       },
     },
     entityBehavior: {
       pgResource: {
         inferred(behavior, entity) {
           if (isSimpleScalarComputedColumnLike(entity)) {
-            return [behavior, "-proc:filterBy"];
+            return [behavior, "-condition:proc:filterBy"];
           } else {
             return behavior;
           }
@@ -95,7 +101,10 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           (resource) => {
             if (!isSimpleScalarComputedColumnLike(resource)) return false;
             if (resource.parameters![0].codec !== pgCodec) return false;
-            return build.behavior.pgResourceMatches(resource, "proc:filterBy");
+            return build.behavior.pgResourceMatches(
+              resource,
+              "condition:proc:filterBy",
+            );
           },
         );
 
@@ -123,7 +132,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
                 [fieldName]: fieldWithHooks(
                   {
                     fieldName,
-                    fieldBehaviorScope: "proc:filterBy",
+                    fieldBehaviorScope: "condition:proc:filterBy",
                     isPgConnectionConditionInputField: true,
                     pgFieldSource,
                   },

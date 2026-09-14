@@ -1,7 +1,8 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -63,74 +65,10 @@ const executor = new PgExecutor({
     });
   }
 });
-const abcdIdentifier = sql.identifier("enum_tables", "abcd");
-const abcdCodec = recordCodec({
-  name: "abcd",
-  identifier: abcdIdentifier,
-  attributes: {
-    __proto__: null,
-    letter: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    description: {
-      codec: TYPES.text,
-      extensions: {
-        tags: {
-          enumDescription: true
-        }
-      }
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      name: "abcd"
-    },
-    tags: {
-      __proto__: null,
-      enum: true,
-      enumName: "LetterAToD"
-    }
-  },
-  executor: executor
-});
-const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
-const abcdViewCodec = recordCodec({
-  name: "abcdView",
-  identifier: abcdViewIdentifier,
-  attributes: {
-    __proto__: null,
-    letter: {
-      codec: TYPES.text,
-      notNull: true
-    },
-    description: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      name: "abcd_view"
-    },
-    tags: {
-      __proto__: null,
-      primaryKey: "letter",
-      enum: true,
-      enumName: "LetterAToDViaView"
-    }
-  },
-  executor: executor
-});
-const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
-const simpleEnumCodec = recordCodec({
-  name: "simpleEnum",
-  identifier: simpleEnumIdentifier,
+const emptyEnumIdentifier = sql.identifier("enum_tables", "empty_enum");
+const emptyEnumCodec = recordCodec({
+  name: "emptyEnum",
+  identifier: emptyEnumIdentifier,
   attributes: {
     __proto__: null,
     value: {
@@ -146,108 +84,11 @@ const simpleEnumCodec = recordCodec({
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
-      name: "simple_enum"
+      name: "empty_enum"
     },
     tags: {
       __proto__: null,
       enum: true
-    }
-  },
-  executor: executor
-});
-const letterDescriptionsIdentifier = sql.identifier("enum_tables", "letter_descriptions");
-const spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum = enumCodec({
-  name: "LetterAToDEnum",
-  identifier: TYPES.text.sqlType,
-  values: [{
-    value: "A",
-    description: "The letter A"
-  }, {
-    value: "B",
-    description: "The letter B"
-  }, {
-    value: "C",
-    description: "The letter C"
-  }, {
-    value: "D",
-    description: "The letter D"
-  }],
-  extensions: {
-    isEnumTableEnum: true,
-    enumTableEnumDetails: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      tableName: "abcd",
-      constraintType: "p",
-      constraintName: "abcd_pkey"
-    },
-    tags: {
-      name: "LetterAToD"
-    }
-  }
-});
-const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
-  name: "LetterAToDViaViewEnum",
-  identifier: TYPES.text.sqlType,
-  values: [{
-    value: "A",
-    description: "The letter A"
-  }, {
-    value: "B",
-    description: "The letter B"
-  }, {
-    value: "C",
-    description: "The letter C"
-  }, {
-    value: "D",
-    description: "The letter D"
-  }],
-  extensions: {
-    isEnumTableEnum: true,
-    enumTableEnumDetails: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      tableName: "abcd_view",
-      constraintType: "p",
-      constraintName: "FAKE_enum_tables_abcd_view_primaryKey_5"
-    },
-    tags: {
-      name: "LetterAToDViaView"
-    }
-  }
-});
-const letterDescriptionsCodec = recordCodec({
-  name: "letterDescriptions",
-  identifier: letterDescriptionsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    letter: {
-      codec: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
-      notNull: true
-    },
-    letter_via_view: {
-      codec: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
-      notNull: true
-    },
-    description: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      name: "letter_descriptions"
-    },
-    tags: {
-      __proto__: null,
-      foreignKey: "(letter_via_view) references enum_tables.abcd_view"
     }
   },
   executor: executor
@@ -406,6 +247,167 @@ const referencingTableCodec = recordCodec({
   },
   executor: executor
 });
+const abcdIdentifier = sql.identifier("enum_tables", "abcd");
+const abcdCodec = recordCodec({
+  name: "abcd",
+  identifier: abcdIdentifier,
+  attributes: {
+    __proto__: null,
+    letter: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text,
+      extensions: {
+        tags: {
+          enumDescription: true
+        }
+      }
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "abcd"
+    },
+    tags: {
+      __proto__: null,
+      enum: true,
+      enumName: "LetterAToD"
+    }
+  },
+  executor: executor
+});
+const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
+const abcdViewCodec = recordCodec({
+  name: "abcdView",
+  identifier: abcdViewIdentifier,
+  attributes: {
+    __proto__: null,
+    letter: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "abcd_view"
+    },
+    tags: {
+      __proto__: null,
+      primaryKey: "letter",
+      enum: true,
+      enumName: "LetterAToDViaView"
+    }
+  },
+  executor: executor
+});
+const letterDescriptionsIdentifier = sql.identifier("enum_tables", "letter_descriptions");
+const spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum = enumCodec({
+  name: "LetterAToDEnum",
+  identifier: TYPES.text.sqlType,
+  values: [{
+    value: "A",
+    description: "The letter A"
+  }, {
+    value: "B",
+    description: "The letter B"
+  }, {
+    value: "C",
+    description: "The letter C"
+  }, {
+    value: "D",
+    description: "The letter D"
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    enumTableEnumDetails: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      tableName: "abcd",
+      constraintType: "p",
+      constraintName: "abcd_pkey"
+    },
+    tags: {
+      name: "LetterAToD"
+    }
+  }
+});
+const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
+  name: "LetterAToDViaViewEnum",
+  identifier: TYPES.text.sqlType,
+  values: [{
+    value: "A",
+    description: "The letter A"
+  }, {
+    value: "B",
+    description: "The letter B"
+  }, {
+    value: "C",
+    description: "The letter C"
+  }, {
+    value: "D",
+    description: "The letter D"
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    enumTableEnumDetails: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      tableName: "abcd_view",
+      constraintType: "p",
+      constraintName: "FAKE_enum_tables_abcd_view_primaryKey_5"
+    },
+    tags: {
+      name: "LetterAToDViaView"
+    }
+  }
+});
+const letterDescriptionsCodec = recordCodec({
+  name: "letterDescriptions",
+  identifier: letterDescriptionsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    letter: {
+      codec: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
+      notNull: true
+    },
+    letter_via_view: {
+      codec: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "letter_descriptions"
+    },
+    tags: {
+      __proto__: null,
+      foreignKey: "(letter_via_view) references enum_tables.abcd_view"
+    }
+  },
+  executor: executor
+});
 const lotsOfEnumsIdentifier = sql.identifier("enum_tables", "lots_of_enums");
 const lotsOfEnumsCodec = recordCodec({
   name: "lotsOfEnums",
@@ -448,6 +450,34 @@ const lotsOfEnumsCodec = recordCodec({
   },
   executor: executor
 });
+const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
+const simpleEnumCodec = recordCodec({
+  name: "simpleEnum",
+  identifier: simpleEnumIdentifier,
+  attributes: {
+    __proto__: null,
+    value: {
+      codec: TYPES.text,
+      notNull: true
+    },
+    description: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "simple_enum"
+    },
+    tags: {
+      __proto__: null,
+      enum: true
+    }
+  },
+  executor: executor
+});
 const abcd_resourceOptionsConfig = {
   executor: executor,
   name: "abcd",
@@ -482,6 +512,7 @@ const abcd_view_resourceOptionsConfig = {
       schemaName: "enum_tables",
       name: "abcd_view"
     },
+    isView: true,
     tags: {
       primaryKey: "letter",
       enum: true,
@@ -493,17 +524,17 @@ const abcd_view_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
-const simple_enum_resourceOptionsConfig = {
+const empty_enum_resourceOptionsConfig = {
   executor: executor,
-  name: "simple_enum",
-  identifier: "main.enum_tables.simple_enum",
-  from: simpleEnumIdentifier,
-  codec: simpleEnumCodec,
+  name: "empty_enum",
+  identifier: "main.enum_tables.empty_enum",
+  from: emptyEnumIdentifier,
+  codec: emptyEnumCodec,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "enum_tables",
-      name: "simple_enum"
+      name: "empty_enum"
     },
     tags: {
       enum: true
@@ -514,7 +545,6 @@ const simple_enum_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
-const referencing_table_mutationFunctionIdentifer = sql.identifier("enum_tables", "referencing_table_mutation");
 const letter_descriptionsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -540,25 +570,6 @@ const letter_descriptions_resourceOptionsConfig = {
     }
   },
   uniques: letter_descriptionsUniques
-};
-const referencing_tableUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const referencing_table_resourceOptionsConfig = {
-  executor: executor,
-  name: "referencing_table",
-  identifier: "main.enum_tables.referencing_table",
-  from: referencingTableIdentifier,
-  codec: referencingTableCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "enum_tables",
-      name: "referencing_table"
-    }
-  },
-  uniques: referencing_tableUniques
 };
 const lots_of_enums_resourceOptionsConfig = {
   executor: executor,
@@ -616,6 +627,48 @@ const lots_of_enums_resourceOptionsConfig = {
     }
   }]
 };
+const referencing_tableUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const referencing_table_resourceOptionsConfig = {
+  executor: executor,
+  name: "referencing_table",
+  identifier: "main.enum_tables.referencing_table",
+  from: referencingTableIdentifier,
+  codec: referencingTableCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "referencing_table"
+    }
+  },
+  uniques: referencing_tableUniques
+};
+const simple_enum_resourceOptionsConfig = {
+  executor: executor,
+  name: "simple_enum",
+  identifier: "main.enum_tables.simple_enum",
+  from: simpleEnumIdentifier,
+  codec: simpleEnumCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "simple_enum"
+    },
+    tags: {
+      enum: true
+    }
+  },
+  uniques: [{
+    attributes: ["value"],
+    isPrimary: true
+  }]
+};
+const empty_enum_queryFunctionIdentifer = sql.identifier("enum_tables", "empty_enum_query");
+const referencing_table_mutationFunctionIdentifer = sql.identifier("enum_tables", "referencing_table_mutation");
 const registry = makeRegistry({
   pgExecutors: {
     __proto__: null,
@@ -623,22 +676,41 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    abcd: abcdCodec,
     text: TYPES.text,
-    abcdView: abcdViewCodec,
-    simpleEnum: simpleEnumCodec,
+    varchar: TYPES.varchar,
+    bpchar: TYPES.bpchar,
+    emptyEnum: emptyEnumCodec,
     int4: TYPES.int,
-    letterDescriptions: letterDescriptionsCodec,
-    LetterAToDEnum: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
-    LetterAToDViaViewEnum: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
     referencingTable: referencingTableCodec,
     EnumTheFirstEnum: spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum,
     EnumTheSecondEnum: spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum,
     LotsOfEnumsEnum3Enum: spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum,
     SimpleEnumEnum: spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum,
+    abcd: abcdCodec,
+    abcdView: abcdViewCodec,
+    letterDescriptions: letterDescriptionsCodec,
+    LetterAToDEnum: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
+    LetterAToDViaViewEnum: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
     lotsOfEnums: lotsOfEnumsCodec,
-    varchar: TYPES.varchar,
-    bpchar: TYPES.bpchar,
+    simpleEnum: simpleEnumCodec,
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
+        }
+      }
+    }),
     LotsOfEnumsEnum4Enum: enumCodec({
       name: "LotsOfEnumsEnum4Enum",
       identifier: TYPES.text.sqlType,
@@ -785,7 +857,27 @@ const registry = makeRegistry({
     __proto__: null,
     abcd: abcd_resourceOptionsConfig,
     abcd_view: abcd_view_resourceOptionsConfig,
+    empty_enum: empty_enum_resourceOptionsConfig,
+    letter_descriptions: letter_descriptions_resourceOptionsConfig,
+    lots_of_enums: lots_of_enums_resourceOptionsConfig,
+    referencing_table: referencing_table_resourceOptionsConfig,
     simple_enum: simple_enum_resourceOptionsConfig,
+    empty_enum_query: PgResource.functionResourceOptions(empty_enum_resourceOptionsConfig, {
+      name: "empty_enum_query",
+      identifier: "main.enum_tables.empty_enum_query()",
+      from(...args) {
+        return sql`${empty_enum_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          name: "empty_enum_query"
+        }
+      }
+    }),
     referencing_table_mutation: {
       executor: executor,
       name: "referencing_table_mutation",
@@ -808,10 +900,7 @@ const registry = makeRegistry({
       },
       isUnique: true,
       isMutation: true
-    },
-    letter_descriptions: letter_descriptions_resourceOptionsConfig,
-    referencing_table: referencing_table_resourceOptionsConfig,
-    lots_of_enums: lots_of_enums_resourceOptionsConfig
+    }
   },
   pgRelations: {
     __proto__: null,
@@ -1116,8 +1205,9 @@ const specFromArgs_ReferencingTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 function applyClientMutationIdForCustomMutation(qb, val) {
   qb.setMeta("clientMutationId", val);
@@ -2133,7 +2223,7 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       referencingTable(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");

@@ -203,7 +203,7 @@ export class NodeGrafservBase extends GrafservBase {
             // Clean up when connection closes.
             const cleanup = () => {
               try {
-                bufferIterator.return?.()?.then(null, noop);
+                void bufferIterator.return?.().then(undefined, noop);
               } catch {
                 /* nom nom nom */
               }

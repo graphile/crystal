@@ -20,6 +20,7 @@ import {
   maybeArraysMatch,
   terminateIterable,
 } from "../utils.ts";
+import { __FlagStep } from "./__flag.ts";
 import { access } from "./access.ts";
 import { constant, ConstantStep } from "./constant.ts";
 import { each } from "./each.ts";
@@ -1205,6 +1206,11 @@ export function connection<
   TCursorValue,
   TCollectionStep
 > {
+  if (step instanceof __FlagStep) {
+    throw new Error(
+      "connection() cannot be used with trap() or inhibit...() at this time.",
+    );
+  }
   if (typeof params === "function" || params?.nodePlan || params?.cursorPlan) {
     throw new Error(
       `connection() was completely overhauled during the beta; this usage is no longer supported. Usage is much more straightforward now.`,
@@ -1231,7 +1237,7 @@ export function connection<
   return $connection;
 }
 
-interface StepWithItems<TItem = any> extends Step {
+export interface StepWithItems<TItem = any> extends Step {
   items(): Step<Maybe<ReadonlyArray<TItem>>>;
 }
 export type ItemsStep<TStep extends StepRepresentingList<any>> =

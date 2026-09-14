@@ -50,6 +50,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           const {
             inflection,
             stringTypeSpec,
+            intTypeSpec,
             options: { pgUseCustomNetworkScalars },
             graphql: {
               GraphQLInt,
@@ -175,6 +176,22 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
             "graphile-build-pg built-in",
           );
           doConnection("TSQuery");
+
+          build.registerScalarType(
+            inflection.builtin("Oid"),
+            {},
+            () =>
+              intTypeSpec(
+                build.wrapDescription(
+                  "PostgreSQL identifier for a database entity",
+                  "type",
+                ),
+                undefined,
+                inflection.builtin("Oid"),
+              ),
+            "graphile-build-pg built-in (Oid)",
+          );
+          doConnection("Oid");
 
           build.registerScalarType(
             inflection.builtin("RegProc"),

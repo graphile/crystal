@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { constant, rootValue } from "grafast";
+import { constant } from "grafast";
 
 import { EXPORTABLE } from "../utils.ts";
 
@@ -11,6 +11,8 @@ declare global {
     }
   }
 }
+
+const EMPTY_OBJECT = Object.freeze({});
 
 export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
   name: "RegisterQueryNodePlugin",
@@ -37,10 +39,10 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
           },
           getSpec: () => "irrelevant",
           get: EXPORTABLE(
-            (rootValue) => () => {
-              return rootValue();
+            (EMPTY_OBJECT, constant) => () => {
+              return constant(EMPTY_OBJECT);
             },
-            [rootValue],
+            [EMPTY_OBJECT, constant],
           ),
           plan: EXPORTABLE(
             (constant) => () => {

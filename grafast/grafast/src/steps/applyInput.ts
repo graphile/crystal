@@ -57,10 +57,9 @@ export class ApplyInputStep<
     this.getTargetFromParent = getTargetFromParent;
     this.valueDepId = this.addUnaryDependency($value) as 0;
     this.scopeDepId = $scope ? (this.addUnaryDependency($scope) as 1) : null;
-    if (!this._isUnary) {
+    if (!this.getAndFreezeIsUnary()) {
       throw new Error(`applyInput() must be unary`);
     }
-    this._isUnaryLocked = true;
   }
 
   public deduplicate(peers: readonly ApplyInputStep[]) {

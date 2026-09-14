@@ -8,11 +8,6 @@
 The React components behind [ruru][], in case you want to embed Ruru into an
 existing React project.
 
-**PRERELEASE**: this is pre-release software; use at your own risk and do not
-embed into public-facing projects. This will likely change a lot before it's
-ultimately released. The pre-release nature also explains the shocking lack of
-documentation.
-
 ## Usage
 
 For other usage patterns, please see the main [ruru][] package.

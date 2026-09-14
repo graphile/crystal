@@ -22,6 +22,7 @@ export type {
   ChangeNullabilityTypeRules,
   NullabilitySpec,
   NullabilitySpecString,
+  ScopedChangeNullabilityRules,
 } from "./makeChangeNullabilityPlugin.ts";
 export {
   changeNullability,
@@ -34,11 +35,23 @@ export type {
   ObjectResolver,
   Plans,
   Resolvers,
+  ScopedGeneratedExtensionDefinition,
 } from "./makeExtendSchemaPlugin.ts";
 export {
   extendSchema,
   makeExtendSchemaPlugin,
 } from "./makeExtendSchemaPlugin.ts";
+export type {
+  JSONPgSmartTags,
+  PgSmartTagFilterFunction,
+  PgSmartTagRule,
+  PgSmartTagTags,
+  ScopedPgSmartTagRule,
+  SubscribeToJSONPgSmartTagsUpdatesCallback,
+  SubscribeToPgSmartTagUpdatesCallback,
+  UpdateJSONPgSmartTagsCallback,
+  UpdatePgSmartTagRulesCallback,
+} from "./makePgSmartTagsPlugin.ts";
 export {
   jsonPgSmartTags,
   makeJSONPgSmartTagsPlugin,
@@ -102,3 +115,12 @@ declare module "grafast" {
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
+
+declare global {
+  namespace GraphileConfig {
+    interface Provides {
+      extendSchema: true;
+      wrapPlans: true;
+    }
+  }
+}

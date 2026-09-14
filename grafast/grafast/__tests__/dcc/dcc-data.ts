@@ -738,9 +738,12 @@ export const batchGetLootDataByItemTypeAndId: LoadManyCallback<
   never,
   Database
 > = (identifiersList, { shared: data }) => {
-  return identifiersList.map(([type, id]) =>
-    data.lootData.filter((c) => c.itemType === type && c.itemId === id),
-  );
+  return identifiersList.map(([type, id]) => {
+    const items = data.lootData.filter(
+      (c) => c.itemType === type && c.itemId === id,
+    );
+    return Math.random() > 0.5 ? Promise.resolve(items) : items;
+  });
 };
 
 export const batchGetLootDataByLootBoxId: LoadManyCallback<

@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import * as dataplanJson from "@dataplan/json";
 import * as dataplanPg from "@dataplan/pg";
 import { PgContextPlugin } from "@dataplan/pg";
 import sql, { version as pgSql2Version } from "pg-sql2";
@@ -50,6 +51,8 @@ declare global {
     interface Lib {
       /** The `@dataplan/pg` module */
       dataplanPg: typeof dataplanPg;
+      /** The `@dataplan/json` module */
+      dataplanJson: typeof dataplanJson;
       /** The `pg-sql2` module's `sql` export */
       sql: typeof sql;
     }
@@ -61,9 +64,11 @@ export const GraphileBuildPgLibPreset: GraphileConfig.Preset = {
     versions: {
       "graphile-build-pg": version,
       "@dataplan/pg": dataplanPg.version,
+      "@dataplan/json": dataplanJson.version,
       "pg-sql2": pgSql2Version,
     },
     dataplanPg,
+    dataplanJson,
     sql,
   },
 };

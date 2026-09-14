@@ -1,5 +1,13 @@
 # @dataplan/json
 
+## 1.0.1
+
+### Patch Changes
+
+- [#3086](https://github.com/graphile/crystal/pull/3086)
+  [`d5fa38b`](https://github.com/graphile/crystal/commit/d5fa38bf6fadea8d71be9372b10e814e07dccb1a)
+  Thanks [@benjie](https://github.com/benjie)! - Add `version` to exports
+
 ## 1.0.0
 
 Identical to 1.0.0-rc.6.

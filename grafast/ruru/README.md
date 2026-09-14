@@ -35,11 +35,6 @@ needed for Trevor's API, but you might want them for your API.)
 
 **Documentation**: https://grafast.org/ruru
 
-**PRERELEASE**: this is pre-release software; use at your own risk and do not
-embed into public-facing projects. This will likely change a lot before it's
-ultimately released. The pre-release nature also explains the shocking lack of
-documentation.
-
 [GNU Terry Pratchett](http://www.gnuterrypratchett.com/)
 
 [graphiql]: https://github.com/graphql/graphiql

@@ -8,7 +8,7 @@ title: tamedevil
 **Eval is evil, this module helps tame it!**
 
 It's generally recommended that you don't use `eval` or `new Function` when
-writing JavaScript/TypeScript code. There's many many reasons for this, here are
+writing JavaScript/TypeScript code. There's many reasons for this, here are
 but a few:
 
 - **code injection**: without sufficient caution, attackers could inject

@@ -1,0 +1,22 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  tableSetQueryVolatile(first: 2, condition: { name: "Budd Deey" }) {
+    edges {
+      cursor
+      node {
+        name
+      }
+    }
+    pageInfo {
+      startCursor
+      endCursor
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+  tableSetQueryVolatileList(first: 2, condition: { name: "Budd Deey" }) {
+    name
+  }
+}

@@ -192,7 +192,12 @@ export function prettyDisplayParts(
       found = true;
     }
   }
-  return str.trim();
+  return (
+    str
+      .trim()
+      // Replace 4 space indentation with 2 space
+      .replace(/^( {4})+/gm, (t) => t.substring(0, Math.floor(t.length / 2)))
+  );
 }
 
 export function prettyQuickInfoDisplayParts(

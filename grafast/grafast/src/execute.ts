@@ -7,13 +7,12 @@ import type {
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue.js";
 
 import { $$eventEmitter, $$extensions } from "./constants.ts";
-import { isDev } from "./dev.ts";
-import { inspect } from "./inspect.ts";
 import type {
   ExecuteEvent,
   ExecutionEventEmitter,
   ExecutionEventMap,
   GrafastExecutionArgs,
+  GrafastInternalExecutionArgs,
 } from "./interfaces.ts";
 import { getGrafastMiddleware } from "./middleware.ts";
 import type { GrafastOperationOptions } from "./prepare.ts";
@@ -25,45 +24,27 @@ import { isPromiseLike } from "./utils.ts";
  * @internal
  */
 export function withGrafastArgs(
-  args: GrafastExecutionArgs,
+  inArgs: GrafastExecutionArgs,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
+  const args: GrafastInternalExecutionArgs = {
+    ...inArgs,
+  };
   const options = args.resolvedPreset?.grafast;
-  if (isDev) {
-    if (
-      args.rootValue != null &&
-      (typeof args.rootValue !== "object" ||
-        Object.keys(args.rootValue).length > 0)
-    ) {
-      throw new Error(
-        `Grafast executor doesn't support there being a rootValue (found ${inspect(
-          args.rootValue,
-        )})`,
-      );
-    }
-  }
-  if (args.rootValue == null) {
-    args.rootValue = Object.create(null);
-  }
-  if (typeof args.rootValue !== "object" || args.rootValue == null) {
-    throw new Error("Grafast requires that the 'rootValue' be an object");
-  }
   const explain = options?.explain;
   const shouldExplain = !!explain;
 
   let unlisten: (() => void) | null = null;
   if (shouldExplain) {
-    const eventEmitter: ExecutionEventEmitter | undefined = new EventEmitter();
+    const eventEmitter: ExecutionEventEmitter = new EventEmitter();
     const explainOperations: any[] = [];
-    args.rootValue = Object.assign(Object.create(null), args.rootValue, {
-      [$$eventEmitter]: eventEmitter,
-      [$$extensions]: {
-        explain: {
-          operations: explainOperations,
-        },
+    args[$$eventEmitter] = eventEmitter;
+    args[$$extensions] = {
+      explain: {
+        operations: explainOperations,
       },
-    });
+    };
     const handleExplainOperation = ({
       operation,
     }: ExecutionEventMap["explainOperation"]) => {
@@ -71,12 +52,13 @@ export function withGrafastArgs(
         explainOperations.push(operation);
       }
     };
-    eventEmitter!.on("explainOperation", handleExplainOperation);
+    eventEmitter.on("explainOperation", handleExplainOperation);
     unlisten = () => {
-      eventEmitter!.removeListener("explainOperation", handleExplainOperation);
+      eventEmitter.removeListener("explainOperation", handleExplainOperation);
     };
   }
 
+  // TODO: inline this into args
   const operationOptions: RequireAllKeys<GrafastOperationOptions> = {
     explain: options?.explain,
     timeouts: options?.timeouts,
@@ -84,15 +66,15 @@ export function withGrafastArgs(
     // TODO: Delete this
     outputDataAsString: args.outputDataAsString,
   };
-  const rootValue = grafastPrepare(args, operationOptions);
+  const executionResult = grafastPrepare(args, operationOptions);
   if (unlisten !== null) {
-    Promise.resolve(rootValue).then(unlisten, unlisten);
+    Promise.resolve(executionResult).then(unlisten, unlisten);
   }
   // Convert from PromiseOrDirect to PromiseOrValue
-  if (isPromiseLike(rootValue)) {
-    return Promise.resolve(rootValue);
+  if (isPromiseLike(executionResult)) {
+    return Promise.resolve(executionResult);
   } else {
-    return rootValue;
+    return executionResult;
   }
 }
 

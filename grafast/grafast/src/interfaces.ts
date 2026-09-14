@@ -3,6 +3,7 @@ import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
   ExecutionArgs,
+  FieldNode,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -29,6 +30,8 @@ import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.ts";
 import type {
+  $$eventEmitter,
+  $$extensions,
   $$streamMore,
   $$timeout,
   $$ts,
@@ -51,7 +54,6 @@ import type {
   __TrackedValueStep,
   __TrackedValueStepWithDollars,
   ConstantStep,
-  ObjectStep,
 } from "./steps/index.ts";
 
 export type { ExecutionEntryFlags };
@@ -193,13 +195,19 @@ export interface BaseGraphQLArguments {
   [key: string]: unknown;
 }
 
+type FieldArgsInputObjectChildValue<
+  TParent,
+  TKey extends keyof NonNullable<TParent>,
+> =
+  | NonNullable<TParent>[TKey]
+  | (Extract<TParent, null | undefined> extends never ? never : undefined);
+
 export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
+  getRaw(): Step<TObj>;
   getRaw<TKey extends keyof TObj & string>(path: TKey): Step<TObj[TKey]>;
-  getRaw(
-    path?: ReadonlyArray<string | number>,
-  ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
+  getRaw(path: ReadonlyArray<string | number>): AnyInputStep;
   getBaked<TKey extends keyof TObj & string>(path: TKey): Step;
   getBaked(path: ReadonlyArray<string | number>): Step;
   typeAt(path: keyof TObj & string): GraphQLInputType;
@@ -232,10 +240,11 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   [key in keyof TObj & string as `$${key}`]: Step<TObj[key]> &
     ([unknown] extends [TObj[key]]
       ? { [subkey in string as `$${subkey}`]: Step<any> }
-      : TObj[key] extends Record<string, any>
+      : NonNullable<TObj[key]> extends Record<string, any>
         ? {
-            [subkey in keyof TObj[key] & string as `$${subkey}`]: Step<
-              TObj[key][subkey]
+            [subkey in keyof NonNullable<TObj[key]> &
+              string as `$${subkey}`]: Step<
+              FieldArgsInputObjectChildValue<TObj[key], subkey>
             >;
           }
         : unknown);
@@ -282,9 +291,13 @@ export type AnyInputStepDollars = {
 };
 
 export interface FieldInfo {
+  schema: GraphQLSchema;
   fieldName: string;
   field: GraphQLField<any, any, any>;
-  schema: GraphQLSchema;
+  parentType: GraphQLObjectType;
+
+  /** @experimental */
+  fieldNodes: readonly FieldNode[];
 }
 
 /**
@@ -825,6 +838,16 @@ export interface GrafastExecutionArgs extends ExecutionArgs {
   middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
   requestContext?: Partial<Grafast.RequestContext>;
   outputDataAsString?: boolean;
+}
+
+/** @internal */
+export interface GrafastInternalExecutionArgs extends GrafastExecutionArgs {
+  [$$eventEmitter]?: ExecutionEventEmitter;
+  [$$extensions]?: {
+    explain: {
+      operations: any[];
+    };
+  };
 }
 
 export interface ValidateSchemaEvent {

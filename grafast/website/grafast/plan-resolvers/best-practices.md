@@ -348,7 +348,7 @@ import { loadOne, trap, inhibitOnNull, TRAP_ERROR } from "grafast";
 function post_author_plan($post) {
   const $authorId = $post.get("authorId");
 
-  // Guard against null authorId — skip the load entirely
+  // Allow Gra*fast* to skip the load when authorId is null
   const $guardedId = inhibitOnNull($authorId);
 
   // Load the author; if it errors, convert to null
@@ -359,8 +359,8 @@ function post_author_plan($post) {
 
 The key flow control steps are:
 
-- [`inhibitOnNull()`](../standard-steps/inhibitOnNull.mdx) &mdash; suppresses
-  downstream work when a value is `null`
+- [`inhibitOnNull()`](../standard-steps/inhibitOnNull.mdx) &mdash; enables
+  Gra*fast* to suppress downstream work when a value is `null`
 - [`assertNotNull()`](../standard-steps/assertNotNull.mdx) &mdash; turns
   `null` into a `SafeError` visible to clients
 - [`trap()`](../standard-steps/trap.mdx) &mdash; recovers inhibited or errored

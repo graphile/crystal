@@ -24,6 +24,7 @@ import {
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
   first,
+  inspect,
   isAsyncIterable,
   isDev,
   isPromiseLike,
@@ -95,6 +96,11 @@ import {
   PgStmtBaseStep,
 } from "./pgStmt.ts";
 import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
+
+// Joins are a combinatorics problem, they're faster in small doses, but as
+// they add up they become more expensive. Let's cap it at something
+// reasonable.
+const AUTO_MAX_INLINE_LEFT_JOINS = 7;
 
 const ALWAYS_ALLOWED = true;
 
@@ -215,6 +221,27 @@ function assertSensible(step: Step): void {
 }
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
+
+/**
+ * The SQL strategy to use when a PgSelectStep is inlined into its parent, or
+ * when a PgSelectStep's children are inlined into it.
+ *
+ * - `"auto"` - dealers choice (PostGraphile will decide for you - this is the default)
+ * - `"forbidden"` - do not inline
+ * - `"preferLeftJoin"` - uses a left join for singular records where
+ *   possible (does not use it for bulk requests, otherwise the number of rows
+ *   returned could multiply up to unmanageable levels)
+ * - `"preferSubquery"` - uses a subquery within `SELECT`
+ */
+// Future strategies could include:
+// - innerJoinPreferred (**unsafe** but potentially faster than
+//   preferLeftJoin, only use when row is guaranteed to exist - not just by
+//   FK, but by RLS also)
+export type PgSelectInliningStrategy =
+  | "auto"
+  | "forbidden"
+  | "preferLeftJoin"
+  | "preferSubquery";
 
 /**
  * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
@@ -389,7 +416,7 @@ export class PgSelectStep<
      * we only use it for internal optimizations (specifically around
      * `.apply(...)`).
      */
-    PgSelectQueryBuilder
+    PgSelectQueryBuilder<TResource>
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -502,11 +529,11 @@ export class PgSelectStep<
    */
   private isUnique = false;
 
-  /**
-   * If true, we will not attempt to inline this into the parent query.
-   * Default false.
-   */
-  private isInliningForbidden = false;
+  /** The SQL strategy we'll use when inlining into our parent. */
+  private inliningStrategy: PgSelectInliningStrategy = "auto";
+
+  /** The SQL strategy we'll suggest when child PgSelectSteps inline into us. */
+  private childInliningStrategy: PgSelectInliningStrategy = "auto";
 
   /**
    * If true and this becomes a join during optimisation then it should become
@@ -602,7 +629,8 @@ export class PgSelectStep<
     $clone.isTrusted = cloneFrom.isTrusted;
     // TODO: should `isUnique` only be set if mode matches?
     $clone.isUnique = cloneFrom.isUnique;
-    $clone.isInliningForbidden = cloneFrom.isInliningForbidden;
+    $clone.inliningStrategy = cloneFrom.inliningStrategy;
+    $clone.childInliningStrategy = cloneFrom.childInliningStrategy;
 
     for (const [k, v] of cloneFrom._symbolSubstitutes) {
       $clone._symbolSubstitutes.set(k, v);
@@ -660,6 +688,11 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
+    if (!options.resource) {
+      throw new Error(
+        `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,
+      );
+    }
     const {
       resource,
       parameters = resource.parameters,
@@ -752,13 +785,41 @@ export class PgSelectStep<
     this.locker.lock();
   }
 
+  /** @deprecated Use `setInliningStrategy("forbidden")` */
   public setInliningForbidden(newInliningForbidden = true): this {
-    this.isInliningForbidden = newInliningForbidden;
+    if (newInliningForbidden) {
+      this.inliningStrategy = "forbidden";
+    } else if (this.inliningStrategy === "forbidden") {
+      this.inliningStrategy = "auto";
+    }
     return this;
   }
 
+  /** @deprecated Use `getInliningStrategy()` */
   public inliningForbidden(): boolean {
-    return this.isInliningForbidden;
+    return this.inliningStrategy === "forbidden";
+  }
+
+  public setInliningStrategy(
+    newInliningStrategy: PgSelectInliningStrategy,
+  ): this {
+    this.inliningStrategy = newInliningStrategy;
+    return this;
+  }
+
+  public getInliningStrategy(): PgSelectInliningStrategy {
+    return this.inliningStrategy;
+  }
+
+  public setChildInliningStrategy(
+    newChildInliningStrategy: PgSelectInliningStrategy,
+  ): this {
+    this.childInliningStrategy = newChildInliningStrategy;
+    return this;
+  }
+
+  public getChildInliningStrategy(): PgSelectInliningStrategy {
+    return this.childInliningStrategy;
   }
 
   public setTrusted(newIsTrusted = true): this {
@@ -992,10 +1053,13 @@ export class PgSelectStep<
   }
 
   orderBy(
-    order: PgSQLCallbackOrDirect<PgOrderSpec, this | PlantimeEmbeddable>,
+    order: PgSQLCallbackOrDirect<
+      PgOrderSpec<GetPgResourceAttributes<TResource>>,
+      this | PlantimeEmbeddable
+    >,
   ): void {
     this.locker.assertParameterUnlocked("orderBy");
-    this.orders.push(this.scopedSQL(order));
+    this.orders.push(validateOrderSpec(this.scopedSQL(order)));
   }
 
   setOrderIsUnique(): void {
@@ -1005,11 +1069,31 @@ export class PgSelectStep<
     this.isOrderUnique = true;
   }
 
+  /**
+   * Ordering matters, and reading this at the right time is a real challenge.
+   * If you have arg plans, strongly encourage not reading this until they have
+   * been applied (e.g. via `fieldArgs.autoApply(...)`). Even then, some orders
+   * are applied at runtime, so you shouldn't use this method - instead use
+   * `.apply(...)` and check the runtime query builder itself. Kept purely for
+   * consistency with query builder.
+   *
+   * @deprecated Not really deprecated, just you probably don't want this...
+   * it's very hard to use correctly. You should probably use `.apply(...)` to
+   * get access to the runtime query builder instead.
+   *
+   * @experimental
+   */
+  getOrderIsUnique(): boolean {
+    return this.isOrderUnique;
+  }
+
   apply(
-    $step: Step<ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback>>>,
+    $step: Step<
+      ReadonlyArrayOrDirect<Maybe<PgSelectQueryBuilderCallback<TResource>>>
+    >,
   ) {
     if ($step instanceof ConstantStep) {
-      ($step.data as PgSelectQueryBuilderCallback)(this);
+      ($step.data as PgSelectQueryBuilderCallback<TResource>)(this);
     } else {
       this.applyDepIds.push(this.addUnaryDependency($step));
     }
@@ -1391,12 +1475,15 @@ export class PgSelectStep<
         sql.isEquivalent(a, b, options);
 
       // Check trusted matches
-      if (p.trusted !== this.trusted) {
+      if (p.isTrusted !== this.isTrusted) {
         return false;
       }
 
-      // Check inliningForbidden matches
-      if (p.inliningForbidden !== this.inliningForbidden) {
+      // Check inline strategy matches
+      if (p.inliningStrategy !== this.inliningStrategy) {
+        return false;
+      }
+      if (p.childInliningStrategy !== this.childInliningStrategy) {
         return false;
       }
 
@@ -1516,7 +1603,7 @@ export class PgSelectStep<
 
   private getParentForInlining(): {
     $pgSelect: PgSelectStep<PgResource>;
-    $pgSelectSingle: PgSelectSingleStep<PgResource>;
+    $pgSelectSingle: PgSelectSingleStep<PgResource, any>;
   } | null {
     /**
      * These are the dependencies that are not PgClassExpressionSteps, we just
@@ -1536,7 +1623,8 @@ export class PgSelectStep<
      * it's used when remapping of keys is required after inlining ourself into
      * $pgSelect.
      */
-    let $pgSelectSingle: PgSelectSingleStep<PgResource> | undefined = undefined;
+    let $pgSelectSingle: PgSelectSingleStep<PgResource, any> | undefined =
+      undefined;
 
     // Scan through the dependencies to find a suitable ancestor step to merge with
     for (
@@ -1822,25 +1910,31 @@ export class PgSelectStep<
     // Inline ourself into our parent if we can.
     let parentDetails: ReturnType<typeof this.getParentForInlining>;
     if (
-      !this.isInliningForbidden &&
+      this.inliningStrategy !== "forbidden" &&
       !this.hasSideEffects &&
       !mightHaveStream &&
       !this.joins.some((j) => j.type !== "left") &&
       (parentDetails = this.getParentForInlining()) !== null &&
+      parentDetails.$pgSelect.childInliningStrategy !== "forbidden" &&
       parentDetails.$pgSelect.mode === "normal"
     ) {
+      // If we're auto mode, use parent's strategy, otherwise our strategy
+      // wins. Never forbidden (already asserted above).
+      const resolvedInliningStrategy =
+        this.inliningStrategy === "auto"
+          ? parentDetails.$pgSelect.childInliningStrategy
+          : this.inliningStrategy;
+
       const { $pgSelect, $pgSelectSingle } = parentDetails;
+      const staticInfo = PgSelectStep.getStaticInfo(this);
+      const { isSimpleUnique } = staticInfo;
       if (
-        this.mode === "normal" &&
-        this.isUnique &&
-        this.firstStepId == null &&
-        this.lastStepId == null &&
-        this.offsetStepId == null &&
-        // For uniques these should all pass anyway, but pays to be cautious..
-        this.groups.length === 0 &&
-        this.havingConditions.length === 0 &&
-        this.orders.length === 0 &&
-        !this.fetchOneExtra
+        isSimpleUnique === true &&
+        (resolvedInliningStrategy === "preferLeftJoin" ||
+          (resolvedInliningStrategy === "auto" &&
+            this.joins.length + this.applyDepIds.length === 0 &&
+            $pgSelect.joins.length + $pgSelect.applyDepIds.length <
+              AUTO_MAX_INLINE_LEFT_JOINS))
       ) {
         // Allow, do it via left join
         debugPlanVerbose(
@@ -1881,7 +1975,7 @@ export class PgSelectStep<
         $pgSelect.withLayerPlan(() => {
           $pgSelect.apply(
             new PgSelectInlineApplyStep(identifier, false, {
-              staticInfo: PgSelectStep.getStaticInfo(this),
+              staticInfo,
               $first: this.maybeGetDep(this.firstStepId),
               $last: this.maybeGetDep(this.lastStepId),
               $offset: this.maybeGetDep(this.offsetStepId),
@@ -1928,7 +2022,7 @@ export class PgSelectStep<
           $pgSelect.withLayerPlan(() => {
             $pgSelect.apply(
               new PgSelectInlineApplyStep(identifier, true, {
-                staticInfo: PgSelectStep.getStaticInfo(this),
+                staticInfo,
                 $first: this.maybeGetDep(this.firstStepId),
                 $last: this.maybeGetDep(this.lastStepId),
                 $offset: this.maybeGetDep(this.offsetStepId),
@@ -2000,7 +2094,7 @@ export class PgSelectStep<
    */
   singleAsRecord(
     options?: PgSelectSinglePlanOptions,
-  ): PgSelectSingleStep<TResource> {
+  ): PgSelectSingleStep<TResource, null> {
     this.setUnique(true);
     return new PgSelectSingleStep(this, first(this, true), options);
   }
@@ -2024,10 +2118,11 @@ export class PgSelectStep<
     any
   >
     ? UAttributes extends PgCodecAttributes
-      ? PgSelectSingleStep<TResource>
+      ? PgSelectSingleStep<TResource, null>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
-          TResource
+          TResource,
+          null
         >
     : never {
     if (!options) {
@@ -2047,10 +2142,11 @@ export class PgSelectStep<
     any
   >
     ? UAttributes extends PgCodecAttributes
-      ? PgSelectSingleStep<TResource>
+      ? PgSelectSingleStep<TResource, null>
       : PgClassExpressionStep<
           PgCodec<string, undefined, any, any, any, any, any>,
-          TResource
+          TResource,
+          null
         >
     : never {
     const $single = this.singleAsRecord(options);
@@ -2135,6 +2231,17 @@ export class PgSelectStep<
       fetchOneExtra: $source.fetchOneExtra,
       isOrderUnique: $source.isOrderUnique,
       isUnique: $source.isUnique,
+      isSimpleUnique:
+        $source.mode === "normal" &&
+        $source.isUnique &&
+        $source.firstStepId == null &&
+        $source.lastStepId == null &&
+        $source.offsetStepId == null &&
+        // For uniques these should all pass anyway, but pays to be cautious.
+        $source.groups.length === 0 &&
+        $source.havingConditions.length === 0 &&
+        $source.orders.length === 0 &&
+        !$source.fetchOneExtra,
       conditions: $source.conditions,
       from: $source.from,
       joins: $source.joins,
@@ -2772,6 +2879,12 @@ interface PgSelectQueryInfo<
   readonly mode: PgSelectMode;
   /** Are we fetching just one record? */
   readonly isUnique: boolean;
+  /**
+   * As `isUnique`, but with additional checks: no ordering, pagination, aggregation, etc
+   *
+   * @experimental
+   */
+  readonly isSimpleUnique: boolean;
   readonly joinAsLateral: boolean;
   /** Is the order that was established at planning time unique? */
   readonly isOrderUnique: boolean;
@@ -2882,7 +2995,7 @@ function buildTheQueryCore<
     },
     orderBy(spec) {
       if (info.mode !== "aggregate") {
-        info.orders.push(runtimeScopedSQL(spec));
+        info.orders.push(validateOrderSpec(runtimeScopedSQL(spec)));
       } else {
         // Throw it away?
         // Maybe later we can use it in the aggregates themself - e.g. `array_agg(... order by <blah>)`
@@ -2890,6 +3003,10 @@ function buildTheQueryCore<
     },
     setOrderIsUnique() {
       info.isOrderUnique = true;
+    },
+    /** @experimental */
+    getOrderIsUnique() {
+      return info.isOrderUnique;
     },
     singleRelation(relationIdentifier) {
       // NOTE: this is almost an exact copy of the same method on PgSelectStep,
@@ -3246,20 +3363,23 @@ function buildTheQuery<
        * clause.
        */
       const text = `\
+with ${identifiersAliasText} as materialized (
+  select ids.ordinality - 1 as idx${
+    queryValues.length > 0
+      ? `, ${queryValues
+          .map(({ codec }, idx) => {
+            return `(ids.value->>${idx})::${
+              sql.compile(codec.sqlType).text
+            } as "id${idx}"`;
+          })
+          .join(", ")}`
+      : ""
+  } from json_array_elements($${
+    rawSqlValues.length + 1
+  }::json) with ordinality as ids
+)
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-        queryValues.length > 0
-          ? `, ${queryValues
-              .map(({ codec }, idx) => {
-                return `(ids.value->>${idx})::${
-                  sql.compile(codec.sqlType).text
-                } as "id${idx}"`;
-              })
-              .join(", ")}`
-          : ""
-      } from json_array_elements($${
-        rawSqlValues.length + 1
-      }::json) with ordinality as ids) as ${identifiersAliasText},
+from ${identifiersAliasText},
 ${lateralText};`;
 
       return { text, rawSqlValues, identifierIndex };
@@ -3463,6 +3583,7 @@ type StaticKeys =
   | "fetchOneExtra"
   | "isOrderUnique"
   | "isUnique"
+  | "isSimpleUnique"
   | "conditions"
   | "from"
   | "joins"
@@ -3580,13 +3701,16 @@ class PgSelectInlineApplyStep<
             fetchOneExtra,
             meta,
             shouldReverseOrder,
+            isSimpleUnique,
           } = info;
           const { sql: baseQuery } = buildQueryFromParts(parts, {
             asArray: true,
           });
           const selectIndex = queryBuilder.selectAndReturnIndex(
             // 's' for 'subquery'
-            sql`array(${sql.indent(baseQuery)})::text`,
+            isSimpleUnique
+              ? sql`(${sql.indent(baseQuery)})::text`
+              : sql`array(${sql.indent(baseQuery)})::text`,
           );
 
           const details: PgSelectInlineViaSubqueryDetails = {
@@ -3598,6 +3722,7 @@ class PgSelectInlineApplyStep<
             first,
             last,
             offset,
+            isSimpleUnique,
             meta,
           };
           queryBuilder.setMeta(this.identifier, details);
@@ -3654,6 +3779,7 @@ interface PgSelectInlineViaSubqueryDetails {
   first: Maybe<number>;
   last: Maybe<number>;
   offset: Maybe<number>;
+  isSimpleUnique: boolean;
   shouldReverseOrder: boolean;
 }
 
@@ -3999,13 +4125,30 @@ function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
 }
 
 export interface PgSelectQueryBuilder<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
 > extends PgQueryBuilder {
   mode: PgSelectMode;
   /** Instruct to add another order */
-  orderBy(spec: PgSQLCallbackOrDirect<PgOrderSpec, RuntimeEmbeddable>): void;
+  orderBy(
+    spec: PgSQLCallbackOrDirect<
+      PgOrderSpec<GetPgResourceAttributes<TResource>>,
+      RuntimeEmbeddable
+    >,
+  ): void;
   /** Inform that the resulting order is now unique */
   setOrderIsUnique(): void;
+  /**
+   * True if we've been told the order is unique. At plan-time this being false is somewhat irrelevant, since any `.apply(...)` callbacks might make it unique later.
+   *
+   * @experimental
+   */
+  getOrderIsUnique(): boolean;
   /** Returns the SQL alias representing the table related to this relation */
   singleRelation<
     TRelationName extends keyof GetPgResourceRelations<TResource> & string,
@@ -4202,7 +4345,12 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
   any[],
 ]) {
-  const allVals = parseArray(item[details.selectIndex]);
+  const result = item[details.selectIndex];
+  const allVals = details.isSimpleUnique
+    ? result == null
+      ? []
+      : [parseArray(result)]
+    : parseArray(result);
   return createSelectResult(allVals, details);
 }
 
@@ -4231,3 +4379,32 @@ function hasPreviousPageCb(
     return false;
   }
 }
+
+const validateOrderSpec: (orderSpec: PgOrderSpec) => PgOrderSpec = isDev
+  ? (orderSpec) => {
+      if (orderSpec.attribute != null) {
+        if (orderSpec.fragment != null) {
+          throw new Error(
+            `When specifying 'attribute' to orderBy, 'fragment' must not be specified`,
+          );
+        }
+        if (orderSpec.codec != null) {
+          throw new Error(
+            `When specifying 'attribute' to orderBy, 'codec' must not be specified`,
+          );
+        }
+      } else {
+        if (orderSpec.fragment == null) {
+          throw new Error(
+            `Either 'attribute' or 'fragment' must be specified for orderBy.`,
+          );
+        }
+        if (orderSpec.codec == null) {
+          throw new Error(
+            `When ordering by a 'fragment' you must also specify the 'codec' that best represents the result of the ordering. This is necessary so we can correctly parse and stringify cursors.`,
+          );
+        }
+      }
+      return orderSpec;
+    }
+  : (orderSpec) => orderSpec;

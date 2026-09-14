@@ -511,7 +511,7 @@ export async function runTestQuery(
             if (operationType === "subscription") {
               const iterator = result[Symbol.asyncIterator]();
               // Terminate the subscription
-              iterator.return?.()?.then(null, noop);
+              void iterator.return?.().then(undefined, noop);
             }
 
             // Now wait for all payloads to have been collected

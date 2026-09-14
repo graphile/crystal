@@ -173,6 +173,7 @@ fragment type on Type {
   inet
   cidr
   macaddr
+  oid
   regproc
   regprocedure
   regoper

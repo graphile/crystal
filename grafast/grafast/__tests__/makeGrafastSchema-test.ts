@@ -1,9 +1,14 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import { constant } from "lodash";
 import { it } from "mocha";
 
-import { grafast, lambda, makeGrafastSchema } from "../dist/index.js";
+import {
+  constant,
+  grafast,
+  lambda,
+  makeGrafastSchema,
+  rootValue,
+} from "../dist/index.js";
 
 it("can create a schema with an input", async () => {
   const schema = makeGrafastSchema({
@@ -224,4 +229,70 @@ it("can inform you that inputObject field doesn't exist", async () => {
       `,
     }),
   ).to.throw("Input object type 'A' has no input field 'notAField'.");
+});
+
+it("preserves root query behaviour when a nested field returns rootValue()", async () => {
+  const schema = makeGrafastSchema({
+    typeDefs: /* GraphQL */ `
+      type Query {
+        greeting: String!
+      }
+
+      type Mutation {
+        noop: Payload
+      }
+
+      type Payload {
+        query: Query
+      }
+    `,
+    objects: {
+      Query: {
+        plans: {
+          greeting() {
+            return constant("hello");
+          },
+        },
+      },
+      Mutation: {
+        plans: {
+          noop() {
+            return constant({});
+          },
+        },
+      },
+      Payload: {
+        plans: {
+          query() {
+            return rootValue();
+          },
+        },
+      },
+    },
+    enableDeferStream: false,
+  });
+
+  const result = await grafast({
+    schema,
+    source: /* GraphQL */ `
+      mutation {
+        noop {
+          query {
+            greeting
+          }
+        }
+      }
+    `,
+    rootValue: null,
+  });
+  if ("next" in result) {
+    throw new Error("Iterator not expected");
+  }
+  expect(result.errors).to.be.undefined;
+  expect(result.data).to.deep.equal({
+    noop: {
+      // Even though Query is a root type, it has no value returned from the plan resolvers so it should be null
+      query: null,
+    },
+  });
 });

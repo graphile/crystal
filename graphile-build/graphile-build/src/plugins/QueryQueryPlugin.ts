@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { rootValue } from "grafast";
+import { constant } from "grafast";
 
 import { EXPORTABLE } from "../utils.ts";
 import { version } from "../version.ts";
@@ -12,6 +12,8 @@ declare global {
     }
   }
 }
+
+const EMPTY_OBJECT = Object.freeze({});
 
 /**
  * Adds the Query.query field to the Query type for Relay 1 compatibility. This
@@ -47,11 +49,11 @@ export const QueryQueryPlugin: GraphileConfig.Plugin = {
                 ),
                 type: new GraphQLNonNull(Self),
                 plan: EXPORTABLE(
-                  (rootValue) =>
+                  (EMPTY_OBJECT, constant) =>
                     function plan() {
-                      return rootValue();
+                      return constant(EMPTY_OBJECT);
                     },
-                  [rootValue],
+                  [EMPTY_OBJECT, constant],
                 ),
               },
             },

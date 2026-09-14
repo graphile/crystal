@@ -30,6 +30,7 @@ export { first, FirstStep } from "./first.ts";
 export { get } from "./get.ts";
 export type { GroupByPlanMemo } from "./groupBy.ts";
 export { groupBy } from "./groupBy.ts";
+export { inhibitIf, InhibitIfStep, inhibitOnEmpty } from "./inhibitIf.ts";
 export { lambda, LambdaStep } from "./lambda.ts";
 export { last, LastStep } from "./last.ts";
 export { list, ListStep } from "./list.ts";
@@ -78,6 +79,7 @@ export { condition, ConditionStep } from "./condition.ts";
 export { graphqlResolver, GraphQLResolverStep } from "./graphqlResolver.ts";
 export { LoadedRecordStep } from "./loadedRecord.ts";
 export type {
+  LoadManyAwaitedData,
   LoadManyCallback,
   LoadManyInfo,
   LoadManyLoader,

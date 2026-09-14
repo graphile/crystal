@@ -1,5 +1,244 @@
 # postgraphile
 
+## 5.1.4
+
+### Patch Changes
+
+- [#3038](https://github.com/graphile/crystal/pull/3038)
+  [`c90768b`](https://github.com/graphile/crystal/commit/c90768bdf13589708674ae82ced3e33e74283bcf)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add new `inhibitOnEmpty` and
+  `inhibitIf` early exit helpers to Grafast.
+
+- Updated dependencies
+  [[`c90768b`](https://github.com/graphile/crystal/commit/c90768bdf13589708674ae82ced3e33e74283bcf)]:
+  - grafast@1.1.2
+
+## 5.1.3
+
+### Patch Changes
+
+- [#3119](https://github.com/graphile/crystal/pull/3119)
+  [`53ffec5`](https://github.com/graphile/crystal/commit/53ffec58685ad8881664990a8f93d095a36a8413)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast now exports
+  `variableValues()` helper to make moving from GraphQL.js resolvers to Grafast
+  plan resolvers easier.
+
+- [#3121](https://github.com/graphile/crystal/pull/3121)
+  [`4b6f5bf`](https://github.com/graphile/crystal/commit/4b6f5bf91ce1ddcddc498319ebaf48b94b50d755)
+  Thanks [@benjie](https://github.com/benjie)! - Allow PostgreSQL enum table
+  with no values... catch at GraphQL layer.
+
+- [#3085](https://github.com/graphile/crystal/pull/3085)
+  [`711f932`](https://github.com/graphile/crystal/commit/711f93271f7d3c4eb74ef884e6f07f7591329d85)
+  Thanks [@benjie](https://github.com/benjie)! - Fix types in
+  `loadOne`/`loadMany` that were allowing steps to become `Step<Promise<TData>>`
+  rather than `Step<TData>`. Steps will never represent a promise.
+
+- [#3118](https://github.com/graphile/crystal/pull/3118)
+  [`1ad8bce`](https://github.com/graphile/crystal/commit/1ad8bced55e11f0144d458f62c67a840de858d71)
+  Thanks [@benjie](https://github.com/benjie)! - Adds `parentType` to
+  `FieldInfo` so it's easier to emulate GraphQLResolveInfo when migrating to
+  Grafast.
+- Updated dependencies
+  [[`53ffec5`](https://github.com/graphile/crystal/commit/53ffec58685ad8881664990a8f93d095a36a8413),
+  [`4b6f5bf`](https://github.com/graphile/crystal/commit/4b6f5bf91ce1ddcddc498319ebaf48b94b50d755),
+  [`711f932`](https://github.com/graphile/crystal/commit/711f93271f7d3c4eb74ef884e6f07f7591329d85),
+  [`1ad8bce`](https://github.com/graphile/crystal/commit/1ad8bced55e11f0144d458f62c67a840de858d71)]:
+  - grafast@1.1.1
+  - graphile-build-pg@5.1.3
+
+## 5.1.2
+
+### Patch Changes
+
+- [#3113](https://github.com/graphile/crystal/pull/3113)
+  [`fce4f8c`](https://github.com/graphile/crystal/commit/fce4f8c6417d5f6d7cca7227264d60a17dbb2157)
+  Thanks [@benjie](https://github.com/benjie)! - Add more details to `scope` of
+  row-by-unique accessor fields
+
+- [#3114](https://github.com/graphile/crystal/pull/3114)
+  [`10cab4a`](https://github.com/graphile/crystal/commit/10cab4ab16311f156e40a7df10fd0471f19e6378)
+  Thanks [@benjie](https://github.com/benjie)! - Node accessor fields now get
+  additional scopes (for better plugin hooking).
+
+- Updated dependencies
+  [[`fce4f8c`](https://github.com/graphile/crystal/commit/fce4f8c6417d5f6d7cca7227264d60a17dbb2157),
+  [`10cab4a`](https://github.com/graphile/crystal/commit/10cab4ab16311f156e40a7df10fd0471f19e6378)]:
+  - graphile-build-pg@5.1.2
+  - graphile-build@5.1.1
+
+## 5.1.1
+
+### Patch Changes
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`a56df3a`](https://github.com/graphile/crystal/commit/a56df3ae4abe5b79b7f81f641f9a75eda3c288a0)
+  Thanks [@benjie](https://github.com/benjie)! - In development,
+  `$pgSelect.orderBy(...)` now has some runtime validation rather than relying
+  solely on types.
+
+- [#3107](https://github.com/graphile/crystal/pull/3107)
+  [`dca7492`](https://github.com/graphile/crystal/commit/dca74929c1813119cb5d729a4cc18912e12cdd26)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in `addPgTableOrderBy`
+  that meant that an override for the `nullable` parameter would be ignored.
+
+- [#3105](https://github.com/graphile/crystal/pull/3105)
+  [`0b00895`](https://github.com/graphile/crystal/commit/0b00895e7fcbb905e8232235e7883b9cc8c12548)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce
+  build.getPgCodecByDatabaseName helper.
+
+- [#3108](https://github.com/graphile/crystal/pull/3108)
+  [`c67c6ef`](https://github.com/graphile/crystal/commit/c67c6ef8a5312f6a217322dc0c013dc4b9c0dd30)
+  Thanks [@benjaie](https://github.com/benjaie)! - Turn getGraphQLTypeByPgCodec
+  situations into a string union with central registry so it can be
+  autocompleted.
+
+- [#3112](https://github.com/graphile/crystal/pull/3112)
+  [`cc61adc`](https://github.com/graphile/crystal/commit/cc61adc5c10afdd5530d6170e96ae009e47a8866)
+  Thanks [@benjie](https://github.com/benjie)! - Add `@isIndexed` smart tag so
+  columns and foreign key constraints can be treated as if they are indexed even
+  if they aren't (for the purposes of the default index behavior plugin)
+- Updated dependencies
+  [[`a56df3a`](https://github.com/graphile/crystal/commit/a56df3ae4abe5b79b7f81f641f9a75eda3c288a0),
+  [`dca7492`](https://github.com/graphile/crystal/commit/dca74929c1813119cb5d729a4cc18912e12cdd26),
+  [`d228173`](https://github.com/graphile/crystal/commit/d228173ba16a09c0a599a56ed77f607de75be166),
+  [`0b00895`](https://github.com/graphile/crystal/commit/0b00895e7fcbb905e8232235e7883b9cc8c12548),
+  [`c67c6ef`](https://github.com/graphile/crystal/commit/c67c6ef8a5312f6a217322dc0c013dc4b9c0dd30),
+  [`cc61adc`](https://github.com/graphile/crystal/commit/cc61adc5c10afdd5530d6170e96ae009e47a8866),
+  [`5d0f9bc`](https://github.com/graphile/crystal/commit/5d0f9bc3a0e0dcfb05c5377e29973c5a0d253c7e)]:
+  - @dataplan/pg@1.1.1
+  - graphile-utils@5.0.3
+  - graphile-build-pg@5.1.1
+
+## 5.1.0
+
+### Minor Changes
+
+- [#3084](https://github.com/graphile/crystal/pull/3084)
+  [`dd3db66`](https://github.com/graphile/crystal/commit/dd3db664c1315ee594e190e9723a667da7806cfa)
+  Thanks [@benjie](https://github.com/benjie)! - Add 'oid' as a builtin type.
+
+- [#3098](https://github.com/graphile/crystal/pull/3098)
+  [`75444ac`](https://github.com/graphile/crystal/commit/75444ac72b03f8479fb4e007795be247ad5e8115)
+  Thanks [@benjie](https://github.com/benjie)! - Fix: index behaviors plugin
+  updated so that only attributes (columns) on tables, materialized views and
+  foreign tables are scanned for indexes; all other types (including composite
+  types, views, ...) are given the benefit of the doubt.
+
+  This might result in more fields showing up in your schema.
+
+- [#3081](https://github.com/graphile/crystal/pull/3081)
+  [`557791f`](https://github.com/graphile/crystal/commit/557791f9c4760cc384a1de142faf487ae557115e)
+  Thanks [@benjie](https://github.com/benjie)! - V4 preset now supports `@omit`
+  smart tags with spaces between values (e.g. `@omit create, update, delete`
+  rather than `@omit create,update,delete`)
+
+- [#3097](https://github.com/graphile/crystal/pull/3097)
+  [`b28eb75`](https://github.com/graphile/crystal/commit/b28eb7564124aa052b5b835de0dc040748ddbdc0)
+  Thanks [@benjie](https://github.com/benjie)! - V4 preset now also grants
+  `+filterProc` behavior when `@filterable` is present. Fixes compatibility with
+  `postgraphile-plugin-connection-filter`.
+
+- [#3090](https://github.com/graphile/crystal/pull/3090)
+  [`35d8b3e`](https://github.com/graphile/crystal/commit/35d8b3e440b8b7f6d6db49344bba2963d4536eaf)
+  Thanks [@benjie](https://github.com/benjie)! - Bugfix: the V4 preset now
+  correctly ignores `@omit select` like V4 would. Previously, the V4 preset
+  would silently turn `@omit select` into `-select`, which differs to V4's
+  handling of this. (Note: `@omit read` is probably what you're looking for,
+  `@omit select` is silently ignored.)
+
+- [#3060](https://github.com/graphile/crystal/pull/3060)
+  [`c21f24c`](https://github.com/graphile/crystal/commit/c21f24c2f34dac34f7c264b66ce56721bb155ae5)
+  Thanks [@benjie](https://github.com/benjie)! - `makeSchema` now awaits the
+  writing of the SDL if enabled by `exportSchemaSDLPath`
+
+### Patch Changes
+
+- [#3065](https://github.com/graphile/crystal/pull/3065)
+  [`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947)
+  Thanks [@benjie](https://github.com/benjie)! - `fieldArgs` are now created in
+  the root plan and applied in the layer plan of the target step; this fixes an
+  issue where fieldArgs could not be applied to step with side effects.
+
+- [#3088](https://github.com/graphile/crystal/pull/3088)
+  [`d3d4376`](https://github.com/graphile/crystal/commit/d3d4376dbf900b53f87e85574839939b85a31dbb)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `pgResource.extensions.isView`, `.isMaterializedView`, `.isForeignTable` so
+  plugins can determine which resources came from views/materialized
+  views/foreign tables.
+
+- [#3099](https://github.com/graphile/crystal/pull/3099)
+  [`4b5b673`](https://github.com/graphile/crystal/commit/4b5b6730748c75a9a94502d933eeb2eae6c8504c)
+  Thanks [@benjie](https://github.com/benjie)! - PostGraphile will only throw an
+  error when it fails to read enum table values from a table in a published
+  schema (one in the `schemas` list in your pgServices); enum tables in other
+  schemas will result in a warning instead (since during the gather phase we
+  don't know whether or not they will be needed come schema build time).
+
+- [#3089](https://github.com/graphile/crystal/pull/3089)
+  [`24a9481`](https://github.com/graphile/crystal/commit/24a94819ec9d35fb147c5228d6803f455109eda7)
+  Thanks [@benjie](https://github.com/benjie)! - Domain codecs can now indicate
+  if they have a default value.
+
+- [#3071](https://github.com/graphile/crystal/pull/3071)
+  [`3dff681`](https://github.com/graphile/crystal/commit/3dff681c8da4c66c37ac2f82896dc869b54d0c21)
+  Thanks [@benjie](https://github.com/benjie)! - Previously we used
+  `rootValue()` to represent the Query type; but in GraphQL.js rootValue can be
+  null/undefined. Typically you just need a truthy value, so we now use an empty
+  object.
+
+- [#3077](https://github.com/graphile/crystal/pull/3077)
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)
+  Thanks [@benjie](https://github.com/benjie)! - CLIs will now correctly
+  auto-import `graphile.config.mts` files (previously `graphile.config.ts` files
+  worked, but `graphile.config.mts` files would be ignored). With all major
+  versions of Node.js now having native support for type stripping and
+  require(esm), we recommend moving your configuration files to TypeScript
+  (using ESM and erasable syntax only).
+
+- [#3078](https://github.com/graphile/crystal/pull/3078)
+  [`00bb2ba`](https://github.com/graphile/crystal/commit/00bb2babf1900d396d064f88de520f524f67c94f)
+  Thanks [@evolkmann](https://github.com/evolkmann)! - Export types related to
+  the `pgSmartTags`/etc utils (`PgSmartTagRule`, `PgSmartTagTags`,
+  `PgSmartTagFilterFunction`, `JSONPgSmartTags`, etc.).
+
+- [#3083](https://github.com/graphile/crystal/pull/3083)
+  [`3cbbd88`](https://github.com/graphile/crystal/commit/3cbbd88f8be499796ef2604a15f157094f0caa29)
+  Thanks [@benjie](https://github.com/benjie)! - Add safer assumptions to
+  `@omit` behavior fallback
+
+- Updated dependencies
+  [[`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947),
+  [`dd3db66`](https://github.com/graphile/crystal/commit/dd3db664c1315ee594e190e9723a667da7806cfa),
+  [`d3d4376`](https://github.com/graphile/crystal/commit/d3d4376dbf900b53f87e85574839939b85a31dbb),
+  [`d5fa38b`](https://github.com/graphile/crystal/commit/d5fa38bf6fadea8d71be9372b10e814e07dccb1a),
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537),
+  [`1a9b835`](https://github.com/graphile/crystal/commit/1a9b835d0b8bc8adb22a864a23eff0c521e2309f),
+  [`ccbbd7c`](https://github.com/graphile/crystal/commit/ccbbd7c6d4245ab5f0f1a2e6a5f2f8611241ea3c),
+  [`65527f8`](https://github.com/graphile/crystal/commit/65527f86826757e1c92a7e8b4e74fc2a299b740c),
+  [`3b56a51`](https://github.com/graphile/crystal/commit/3b56a51ad751ce14b0c8c167df09bc9c3fbc11c3),
+  [`e60e2ed`](https://github.com/graphile/crystal/commit/e60e2ed455068a1d745af99fe6f9f779a8ce8088),
+  [`79b234e`](https://github.com/graphile/crystal/commit/79b234e4eea1844349bcef673f37e1858e11ef57),
+  [`f0d1f48`](https://github.com/graphile/crystal/commit/f0d1f487ecd12299cd5e416aa5c7282dfd7c9992),
+  [`4b5b673`](https://github.com/graphile/crystal/commit/4b5b6730748c75a9a94502d933eeb2eae6c8504c),
+  [`75444ac`](https://github.com/graphile/crystal/commit/75444ac72b03f8479fb4e007795be247ad5e8115),
+  [`24a9481`](https://github.com/graphile/crystal/commit/24a94819ec9d35fb147c5228d6803f455109eda7),
+  [`3dff681`](https://github.com/graphile/crystal/commit/3dff681c8da4c66c37ac2f82896dc869b54d0c21),
+  [`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1),
+  [`d3156df`](https://github.com/graphile/crystal/commit/d3156df8cd95c517f329ffa904bb2fec9db2b370),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d),
+  [`00bb2ba`](https://github.com/graphile/crystal/commit/00bb2babf1900d396d064f88de520f524f67c94f),
+  [`c21f24c`](https://github.com/graphile/crystal/commit/c21f24c2f34dac34f7c264b66ce56721bb155ae5)]:
+  - graphile-build-pg@5.1.0
+  - grafast@1.1.0
+  - @dataplan/pg@1.1.0
+  - @dataplan/json@1.0.1
+  - grafserv@1.0.1
+  - graphile-build@5.1.0
+  - graphile-config@1.1.0
+  - graphile-utils@5.0.2
+
 ## 5.0.3
 
 ### Patch Changes

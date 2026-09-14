@@ -1,5 +1,94 @@
 # grafast
 
+## 1.1.2
+
+### Patch Changes
+
+- [#3038](https://github.com/graphile/crystal/pull/3038)
+  [`c90768b`](https://github.com/graphile/crystal/commit/c90768bdf13589708674ae82ced3e33e74283bcf)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add new `inhibitOnEmpty` and
+  `inhibitIf` early exit helpers to Grafast.
+
+## 1.1.1
+
+### Patch Changes
+
+- [#3119](https://github.com/graphile/crystal/pull/3119)
+  [`53ffec5`](https://github.com/graphile/crystal/commit/53ffec58685ad8881664990a8f93d095a36a8413)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast now exports
+  `variableValues()` helper to make moving from GraphQL.js resolvers to Grafast
+  plan resolvers easier.
+
+- [#3085](https://github.com/graphile/crystal/pull/3085)
+  [`711f932`](https://github.com/graphile/crystal/commit/711f93271f7d3c4eb74ef884e6f07f7591329d85)
+  Thanks [@benjie](https://github.com/benjie)! - Fix types in
+  `loadOne`/`loadMany` that were allowing steps to become `Step<Promise<TData>>`
+  rather than `Step<TData>`. Steps will never represent a promise.
+
+- [#3118](https://github.com/graphile/crystal/pull/3118)
+  [`1ad8bce`](https://github.com/graphile/crystal/commit/1ad8bced55e11f0144d458f62c67a840de858d71)
+  Thanks [@benjie](https://github.com/benjie)! - Adds `parentType` to
+  `FieldInfo` so it's easier to emulate GraphQLResolveInfo when migrating to
+  Grafast.
+
+## 1.1.0
+
+### Minor Changes
+
+- [#3101](https://github.com/graphile/crystal/pull/3101)
+  [`e60e2ed`](https://github.com/graphile/crystal/commit/e60e2ed455068a1d745af99fe6f9f779a8ce8088)
+  Thanks [@benjie](https://github.com/benjie)! - `coalesce` optimized to provide
+  non-looping execute for small numbers of steps, and now returns
+  `constant(null)` when called with 0 steps.
+
+### Patch Changes
+
+- [#3065](https://github.com/graphile/crystal/pull/3065)
+  [`9446f64`](https://github.com/graphile/crystal/commit/9446f64f35b7f6f46fd4ea37fbde67331f4ac947)
+  Thanks [@benjie](https://github.com/benjie)! - `fieldArgs` are now created in
+  the root plan and applied in the layer plan of the target step; this fixes an
+  issue where fieldArgs could not be applied to step with side effects.
+
+- [#3061](https://github.com/graphile/crystal/pull/3061)
+  [`56f8add`](https://github.com/graphile/crystal/commit/56f8add2f7b99d7ceee0c5c18354b236f6194537)
+  Thanks [@benjie](https://github.com/benjie)! - Exposes rootValueStep on
+  OperationPlan and removes some transient values from being stored. Adds new
+  global `variableValues()` step retriever, useful for helping produce
+  GraphQLResolveInfo and similar.
+
+- [#3070](https://github.com/graphile/crystal/pull/3070)
+  [`1a9b835`](https://github.com/graphile/crystal/commit/1a9b835d0b8bc8adb22a864a23eff0c521e2309f)
+  Thanks [@benjie](https://github.com/benjie)! - Stop using deprecated
+  GraphQLError signature
+
+- [#3103](https://github.com/graphile/crystal/pull/3103)
+  [`ccbbd7c`](https://github.com/graphile/crystal/commit/ccbbd7c6d4245ab5f0f1a2e6a5f2f8611241ea3c)
+  Thanks [@benjie](https://github.com/benjie)! - Throw better errors when a step
+  class calls `this.addDependency(...)` but doesn't actually pass a step to
+  depend on. (Previously: "cannot access property `layerPlan` of undefined" or
+  similar errors were thrown.)
+
+- [#3072](https://github.com/graphile/crystal/pull/3072)
+  [`3b56a51`](https://github.com/graphile/crystal/commit/3b56a51ad751ce14b0c8c167df09bc9c3fbc11c3)
+  Thanks [@benjie](https://github.com/benjie)! - Grafast no longer coerces
+  `rootValue` to a mutable object, increasing compatibility with legacy
+  resolvers.
+
+- [#3069](https://github.com/graphile/crystal/pull/3069)
+  [`f0d1f48`](https://github.com/graphile/crystal/commit/f0d1f487ecd12299cd5e416aa5c7282dfd7c9992)
+  Thanks [@benjie](https://github.com/benjie)! - Remove vestigial
+  `insideGraphQL` code.
+
+- [#3062](https://github.com/graphile/crystal/pull/3062)
+  [`8b3904d`](https://github.com/graphile/crystal/commit/8b3904dcd26d95e0459ca4b8c469e13cf9454dc1)
+  Thanks [@benjie](https://github.com/benjie)! - Internals: clear
+  \_\_TrackedValueStep initialValue on finalize.
+
+- Updated dependencies
+  [[`350dd8d`](https://github.com/graphile/crystal/commit/350dd8df273c44f3a51805a99e48497300942de3),
+  [`5f95b1c`](https://github.com/graphile/crystal/commit/5f95b1c6ee298b3fcde49a41621861ea44809f9d)]:
+  - graphile-config@1.1.0
+
 ## 1.0.2
 
 ### Patch Changes

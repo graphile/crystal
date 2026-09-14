@@ -65,7 +65,13 @@ import {
 import { OperationPlan } from "./engine/OperationPlan.ts";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.ts";
 import { execute } from "./execute.ts";
-import { context, debugPlans, operationPlan, rootValue } from "./global.ts";
+import {
+  context,
+  debugPlans,
+  operationPlan,
+  rootValue,
+  variableValues,
+} from "./global.ts";
 import { grafast, grafastSync } from "./grafastGraphql.ts";
 import { inspect } from "./inspect.ts";
 import type {
@@ -160,6 +166,7 @@ import type {
   ListTransformItemPlanCallback,
   ListTransformOptions,
   ListTransformReduce,
+  LoadManyAwaitedData,
   LoadManyCallback,
   LoadManyInfo,
   LoadManyLoader,
@@ -212,6 +219,9 @@ import {
   graphqlResolver,
   GraphQLResolverStep,
   groupBy,
+  inhibitIf,
+  InhibitIfStep,
+  inhibitOnEmpty,
   inhibitOnNull,
   isModifier,
   lambda,
@@ -268,9 +278,11 @@ import type {
   ObjectTypeSpec,
 } from "./utils.ts";
 import {
+  abortable,
   arrayOfLength,
   arraysMatch,
   asyncIteratorWithCleanup,
+  consume,
   getEnumValueConfig,
   getEnumValueConfigs,
   GraphQLSpecifiedErrorBehaviors,
@@ -366,6 +378,7 @@ export type {
   ListTransformItemPlanCallback,
   ListTransformOptions,
   ListTransformReduce,
+  LoadManyAwaitedData,
   LoadManyCallback,
   LoadManyInfo,
   LoadManyLoader,
@@ -414,6 +427,7 @@ export {
   $$idempotent,
   $$inhibit,
   $$verbatim,
+  abortable,
   access,
   AccessStep,
   applyInput,
@@ -439,6 +453,7 @@ export {
   ConnectionStep,
   constant,
   ConstantStep,
+  consume,
   context,
   createObjectAndApplyChildren,
   currentFieldStreamDetails,
@@ -471,6 +486,9 @@ export {
   GraphQLResolverStep,
   GraphQLSpecifiedErrorBehaviors,
   groupBy,
+  inhibitIf,
+  InhibitIfStep,
+  inhibitOnEmpty,
   inhibitOnNull,
   inputObjectFieldSpec,
   inspect,
@@ -553,6 +571,7 @@ export {
   TRAP_INHIBITED,
   UnbatchedStep as UnbatchedExecutableStep,
   UnbatchedStep,
+  variableValues,
 };
 export type { PromiseWithResolve } from "./promiseWithResolve.ts";
 
@@ -586,6 +605,8 @@ exportAsMany("grafast", {
   __TrackedValueStep,
   __ValueStep,
   inspect,
+  abortable,
+  consume,
   access,
   get,
   AccessStep,
@@ -604,6 +625,10 @@ exportAsMany("grafast", {
   ConstantStep,
   context,
   rootValue,
+  variableValues,
+  inhibitIf,
+  inhibitOnEmpty,
+  InhibitIfStep,
   inhibitOnNull,
   assertNotNull,
   trap,

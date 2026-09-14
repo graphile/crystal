@@ -23,6 +23,10 @@ import { version } from "../version.ts";
 
 declare global {
   namespace GraphileBuild {
+    interface PgCodecTypeSituations {
+      patch: false;
+      base: false;
+    }
     interface BehaviorStrings {
       table: true;
       "resource:select": true;
@@ -226,6 +230,12 @@ declare global {
       isDeletable?: boolean;
       /** Is this a partitioned table (i.e. doesn't store data locally) */
       hasPartitions?: boolean;
+      /** True if this is a simple view (see also: isMaterializedView) */
+      isView?: true;
+      /** True if this is a materialized view (see also: isView) */
+      isMaterializedView?: true;
+      /** True if this is a foreign table (postgres_fdw) */
+      isForeignTable?: true;
       /** If this table _is_ a partition, details of its parent */
       partitionParent?: {
         schemaName: string;
@@ -519,6 +529,9 @@ select * from a where id = 1;
             );
           }
           const hasPartitions = pgClass.relkind === "p";
+          const isView = pgClass.relkind === "v";
+          const isMaterializedView = pgClass.relkind === "m";
+          const isForeignTable = pgClass.relkind === "f";
 
           const extensions: DataplanPg.PgResourceExtensions = {
             pg: {
@@ -533,6 +546,9 @@ select * from a where id = 1;
             ...(isUpdatable === false ? { isUpdatable } : null),
             ...(isDeletable === false ? { isDeletable } : null),
             ...(hasPartitions ? { hasPartitions } : null),
+            ...(isView ? { isView } : null),
+            ...(isMaterializedView ? { isMaterializedView } : null),
+            ...(isForeignTable ? { isForeignTable } : null),
             ...(partitionParent
               ? {
                   partitionParent: {
@@ -576,12 +592,6 @@ select * from a where id = 1;
             [finalOptions, pgResourceOptions],
           );
 
-          const registryBuilder =
-            await info.helpers.pgRegistry.getRegistryBuilder();
-          if (!resourceOptions.isVirtual) {
-            registryBuilder.addResource(resourceOptions);
-          }
-
           info.state.detailsByResourceOptions.set(resourceOptions, {
             serviceName,
             pgClass,
@@ -589,7 +599,7 @@ select * from a where id = 1;
 
           return resourceOptions;
         })();
-        resourceOptions.then(undefined, noop);
+        void resourceOptions.then(undefined, noop);
         resourceOptionsByPgClass.set(pgClass, resourceOptions);
         return resourceOptions;
       },
@@ -602,7 +612,9 @@ select * from a where id = 1;
     hooks: {
       pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, serviceName } = event;
-        void helpers.pgTables.getResourceOptions(serviceName, pgClass);
+        void helpers.pgTables
+          .getResourceOptions(serviceName, pgClass)
+          .then(undefined, noop);
       },
 
       async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {
@@ -637,6 +649,21 @@ select * from a where id = 1;
             entry,
           );
         }
+      },
+      pgRegistry_PgRegistryBuilder_pgResources: {
+        after: ["PgCodecsPlugin"],
+        async callback(info, event) {
+          const { registryBuilder } = event;
+          // Try and encourage stable order of resource discovery
+          for (const resourceOptionsByPgClass of info.state.resourceOptionsByPgClassByService.values()) {
+            for (const resourceOptionsPromise of resourceOptionsByPgClass.values()) {
+              const resourceOptions = await resourceOptionsPromise;
+              if (resourceOptions != null && !resourceOptions.isVirtual) {
+                registryBuilder.addResource(resourceOptions);
+              }
+            }
+          }
+        },
       },
     },
   }),
@@ -784,9 +811,10 @@ select * from a where id = 1;
               const resource = Object.values(build.pgResources).find(
                 (r) => !r.parameters && r.codec === codec,
               );
-              const pk =
-                resource?.uniques.find((u) => u.isPrimary) ??
-                resource?.uniques[0];
+              const uniques = resource?.uniques as
+                | readonly PgResourceUnique[]
+                | undefined;
+              const pk = uniques?.find((u) => u.isPrimary) ?? uniques?.[0];
               const pkCols = pk?.attributes;
               build.registerObjectType(
                 tableTypeName,

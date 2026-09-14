@@ -1,0 +1,397 @@
+--- unsimplified
++++ simplified
+@@ -176,24 +176,28 @@
+   femaleSkater: BigInt!
+ }
+ 
+-"""All input for the `deleteCompetingPairById` mutation."""
+-input DeleteCompetingPairByIdInput {
++"""All input for the `deleteCompetingPairByMaleSkater` mutation."""
++input DeleteCompetingPairByMaleSkaterInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  id: BigInt!
++  maleSkater: BigInt!
+ }
+ 
+-"""All input for the `deleteCompetingPairByMaleSkater` mutation."""
+-input DeleteCompetingPairByMaleSkaterInput {
++"""All input for the `deleteCompetingPairByNodeId` mutation."""
++input DeleteCompetingPairByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  maleSkater: BigInt!
++
++  """
++  The globally unique `ID` which will identify a single `CompetingPair` to be deleted.
++  """
++  nodeId: ID!
+ }
+ 
+ """All input for the `deleteCompetingPair` mutation."""
+@@ -203,11 +207,7 @@
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-
+-  """
+-  The globally unique `ID` which will identify a single `CompetingPair` to be deleted.
+-  """
+-  nodeId: ID!
++  id: BigInt!
+ }
+ 
+ """The output of our delete `CompetingPair` mutation."""
+@@ -226,7 +226,7 @@
+     """The method to use when ordering `CompetingPair`."""
+     orderBy: [CompetingPairsOrderBy!]! = [PRIMARY_KEY_ASC]
+   ): CompetingPairsEdge
+-  deletedCompetingPairId: ID
++  deletedCompetingPairNodeId: ID
+ 
+   """
+   Our root query field type. Allows us to run any query from our mutation payload.
+@@ -240,14 +240,18 @@
+   skaterByMaleSkater: Skater
+ }
+ 
+-"""All input for the `deleteSkaterById` mutation."""
+-input DeleteSkaterByIdInput {
++"""All input for the `deleteSkaterByNodeId` mutation."""
++input DeleteSkaterByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-  id: BigInt!
++
++  """
++  The globally unique `ID` which will identify a single `Skater` to be deleted.
++  """
++  nodeId: ID!
+ }
+ 
+ """All input for the `deleteSkater` mutation."""
+@@ -257,11 +261,7 @@
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
+-
+-  """
+-  The globally unique `ID` which will identify a single `Skater` to be deleted.
+-  """
+-  nodeId: ID!
++  id: BigInt!
+ }
+ 
+ """The output of our delete `Skater` mutation."""
+@@ -271,7 +271,7 @@
+   unchanged and unused. May be used by a client to track mutations.
+   """
+   clientMutationId: String
+-  deletedSkaterId: ID
++  deletedSkaterNodeId: ID
+ 
+   """
+   Our root query field type. Allows us to run any query from our mutation payload.
+@@ -308,7 +308,7 @@
+     input: CreateSkaterInput!
+   ): CreateSkaterPayload
+ 
+-  """Deletes a single `CompetingPair` using its globally unique id."""
++  """Deletes a single `CompetingPair` using a unique key."""
+   deleteCompetingPair(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -325,22 +325,22 @@
+   ): DeleteCompetingPairPayload
+ 
+   """Deletes a single `CompetingPair` using a unique key."""
+-  deleteCompetingPairById(
++  deleteCompetingPairByMaleSkater(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: DeleteCompetingPairByIdInput!
++    input: DeleteCompetingPairByMaleSkaterInput!
+   ): DeleteCompetingPairPayload
+ 
+-  """Deletes a single `CompetingPair` using a unique key."""
+-  deleteCompetingPairByMaleSkater(
++  """Deletes a single `CompetingPair` using its globally unique id."""
++  deleteCompetingPairByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: DeleteCompetingPairByMaleSkaterInput!
++    input: DeleteCompetingPairByNodeIdInput!
+   ): DeleteCompetingPairPayload
+ 
+-  """Deletes a single `Skater` using its globally unique id."""
++  """Deletes a single `Skater` using a unique key."""
+   deleteSkater(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -348,17 +348,15 @@
+     input: DeleteSkaterInput!
+   ): DeleteSkaterPayload
+ 
+-  """Deletes a single `Skater` using a unique key."""
+-  deleteSkaterById(
++  """Deletes a single `Skater` using its globally unique id."""
++  deleteSkaterByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: DeleteSkaterByIdInput!
++    input: DeleteSkaterByNodeIdInput!
+   ): DeleteSkaterPayload
+ 
+-  """
+-  Updates a single `CompetingPair` using its globally unique id and a patch.
+-  """
++  """Updates a single `CompetingPair` using a unique key and a patch."""
+   updateCompetingPair(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+@@ -375,19 +373,21 @@
+   ): UpdateCompetingPairPayload
+ 
+   """Updates a single `CompetingPair` using a unique key and a patch."""
+-  updateCompetingPairById(
++  updateCompetingPairByMaleSkater(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: UpdateCompetingPairByIdInput!
++    input: UpdateCompetingPairByMaleSkaterInput!
+   ): UpdateCompetingPairPayload
+ 
+-  """Updates a single `CompetingPair` using a unique key and a patch."""
+-  updateCompetingPairByMaleSkater(
++  """
++  Updates a single `CompetingPair` using its globally unique id and a patch.
++  """
++  updateCompetingPairByNodeId(
+     """
+     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+     """
+-    input: UpdateCompetingPairByMaleSkaterInput!
++    input: UpdateCompetingPairByNodeIdInput!
+   ): UpdateCompetingPairPayload
+ }
+ 
+@@ -416,8 +416,25 @@
+ 
+ """The root query type which gives access points into the data universe."""
+ type Query implements Node {
++  """Get a single `CompetingPair`."""
++  competingPair(id: BigInt!): CompetingPair
++
++  """Get a single `CompetingPair`."""
++  competingPairByFemaleSkater(femaleSkater: BigInt!): CompetingPair
++
++  """Get a single `CompetingPair`."""
++  competingPairByMaleSkater(maleSkater: BigInt!): CompetingPair
++
++  """Reads a single `CompetingPair` using its globally unique `ID`."""
++  competingPairByNodeId(
++    """
++    The globally unique `ID` to be used in selecting a single `CompetingPair`.
++    """
++    nodeId: ID!
++  ): CompetingPair
++
+   """Reads and enables pagination through a set of `CompetingPair`."""
+-  allCompetingPairs(
++  competingPairs(
+     """Read all values in the set after (below) this cursor."""
+     after: Cursor
+ 
+@@ -446,7 +463,7 @@
+   ): CompetingPairsConnection
+ 
+   """Reads a set of `CompetingPair`."""
+-  allCompetingPairsList(
++  competingPairsList(
+     """
+     A condition to be used in determining which values should be returned by the collection.
+     """
+@@ -462,8 +479,34 @@
+     orderBy: [CompetingPairsOrderBy!]
+   ): [CompetingPair!]
+ 
++  """Fetches an object given its globally unique `ID`."""
++  node(
++    """The globally unique `ID`."""
++    nodeId: ID!
++  ): Node
++
++  """
++  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
++  """
++  nodeId: ID!
++
++  """
++  Exposes the root query type nested one level down. This is helpful for Relay 1
++  which can only query top level fields if they are in a particular form.
++  """
++  query: Query!
++
++  """Get a single `Skater`."""
++  skater(id: BigInt!): Skater
++
++  """Reads a single `Skater` using its globally unique `ID`."""
++  skaterByNodeId(
++    """The globally unique `ID` to be used in selecting a single `Skater`."""
++    nodeId: ID!
++  ): Skater
++
+   """Reads and enables pagination through a set of `Skater`."""
+-  allSkaters(
++  skaters(
+     """Read all values in the set after (below) this cursor."""
+     after: Cursor
+ 
+@@ -492,7 +535,7 @@
+   ): SkatersConnection
+ 
+   """Reads a set of `Skater`."""
+-  allSkatersList(
++  skatersList(
+     """
+     A condition to be used in determining which values should be returned by the collection.
+     """
+@@ -507,49 +550,6 @@
+     """The method to use when ordering `Skater`."""
+     orderBy: [SkatersOrderBy!]
+   ): [Skater!]
+-
+-  """Reads a single `CompetingPair` using its globally unique `ID`."""
+-  competingPair(
+-    """
+-    The globally unique `ID` to be used in selecting a single `CompetingPair`.
+-    """
+-    nodeId: ID!
+-  ): CompetingPair
+-
+-  """Get a single `CompetingPair`."""
+-  competingPairByFemaleSkater(femaleSkater: BigInt!): CompetingPair
+-
+-  """Get a single `CompetingPair`."""
+-  competingPairById(id: BigInt!): CompetingPair
+-
+-  """Get a single `CompetingPair`."""
+-  competingPairByMaleSkater(maleSkater: BigInt!): CompetingPair
+-
+-  """Fetches an object given its globally unique `ID`."""
+-  node(
+-    """The globally unique `ID`."""
+-    nodeId: ID!
+-  ): Node
+-
+-  """
+-  The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
+-  """
+-  nodeId: ID!
+-
+-  """
+-  Exposes the root query type nested one level down. This is helpful for Relay 1
+-  which can only query top level fields if they are in a particular form.
+-  """
+-  query: Query!
+-
+-  """Reads a single `Skater` using its globally unique `ID`."""
+-  skater(
+-    """The globally unique `ID` to be used in selecting a single `Skater`."""
+-    nodeId: ID!
+-  ): Skater
+-
+-  """Get a single `Skater`."""
+-  skaterById(id: BigInt!): Skater
+ }
+ 
+ type Skater implements Node {
+@@ -616,31 +616,31 @@
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
++  femaleSkater: BigInt!
+ 
+   """
+   An object where the defined keys will be set on the `CompetingPair` being updated.
+   """
+-  competingPairPatch: CompetingPairPatch!
+-  femaleSkater: BigInt!
++  patch: CompetingPairPatch!
+ }
+ 
+-"""All input for the `updateCompetingPairById` mutation."""
+-input UpdateCompetingPairByIdInput {
++"""All input for the `updateCompetingPairByMaleSkater` mutation."""
++input UpdateCompetingPairByMaleSkaterInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
++  maleSkater: BigInt!
+ 
+   """
+   An object where the defined keys will be set on the `CompetingPair` being updated.
+   """
+-  competingPairPatch: CompetingPairPatch!
+-  id: BigInt!
++  patch: CompetingPairPatch!
+ }
+ 
+-"""All input for the `updateCompetingPairByMaleSkater` mutation."""
+-input UpdateCompetingPairByMaleSkaterInput {
++"""All input for the `updateCompetingPairByNodeId` mutation."""
++input UpdateCompetingPairByNodeIdInput {
+   """
+   An arbitrary string value with no semantic meaning. Will be included in the
+   payload verbatim. May be used to track mutations by the client.
+@@ -648,10 +648,14 @@
+   clientMutationId: String
+ 
+   """
++  The globally unique `ID` which will identify a single `CompetingPair` to be updated.
++  """
++  nodeId: ID!
++
++  """
+   An object where the defined keys will be set on the `CompetingPair` being updated.
+   """
+-  competingPairPatch: CompetingPairPatch!
+-  maleSkater: BigInt!
++  patch: CompetingPairPatch!
+ }
+ 
+ """All input for the `updateCompetingPair` mutation."""
+@@ -661,16 +665,12 @@
+   payload verbatim. May be used to track mutations by the client.
+   """
+   clientMutationId: String
++  id: BigInt!
+ 
+   """
+   An object where the defined keys will be set on the `CompetingPair` being updated.
+   """
+-  competingPairPatch: CompetingPairPatch!
+-
+-  """
+-  The globally unique `ID` which will identify a single `CompetingPair` to be updated.
+-  """
+-  nodeId: ID!
++  patch: CompetingPairPatch!
+ }
+ 
+ """The output of our update `CompetingPair` mutation."""

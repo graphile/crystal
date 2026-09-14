@@ -1,4 +1,14 @@
 import type { AsyncHooks } from "graphile-config";
+import type {
+  GraphQLEnumType,
+  GraphQLEnumTypeConfig,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  GraphQLScalarType,
+  GraphQLScalarTypeConfig,
+  GraphQLUnionType,
+} from "graphql";
 
 import type { EXPORTABLE } from "./utils.ts";
 
@@ -75,3 +85,63 @@ export interface GatherPluginContext<
    */
   cache: TCache;
 }
+
+export type TypeMeta =
+  | ObjectTypeMeta
+  | InterfaceTypeMeta
+  | UnionTypeMeta
+  | ScalarTypeMeta
+  | EnumTypeMeta
+  | InputObjectTypeMeta;
+
+export type ObjectTypeMeta = {
+  kind: "OBJECT";
+  typeName: string;
+  Constructor: typeof GraphQLObjectType;
+  scope: GraphileBuild.ScopeObject;
+  origin: string | null | undefined;
+  specGenerator: () => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">;
+};
+export type InterfaceTypeMeta = {
+  kind: "INTERFACE";
+  typeName: string;
+  Constructor: typeof GraphQLInterfaceType;
+  scope: GraphileBuild.ScopeInterface;
+  origin: string | null | undefined;
+  specGenerator: () => Omit<
+    GraphileBuild.GrafastInterfaceTypeConfig<any>,
+    "name"
+  >;
+};
+export type UnionTypeMeta = {
+  kind: "UNION";
+  typeName: string;
+  Constructor: typeof GraphQLUnionType;
+  scope: GraphileBuild.ScopeUnion;
+  origin: string | null | undefined;
+  specGenerator: () => Omit<GraphileBuild.GrafastUnionTypeConfig<any>, "name">;
+};
+export type ScalarTypeMeta = {
+  kind: "SCALAR";
+  typeName: string;
+  Constructor: typeof GraphQLScalarType;
+  scope: GraphileBuild.ScopeScalar;
+  origin: string | null | undefined;
+  specGenerator: () => Omit<GraphQLScalarTypeConfig<any, any>, "name">;
+};
+export type EnumTypeMeta = {
+  kind: "ENUM";
+  typeName: string;
+  Constructor: typeof GraphQLEnumType;
+  scope: GraphileBuild.ScopeEnum;
+  origin: string | null | undefined;
+  specGenerator: () => Omit<GraphQLEnumTypeConfig, "name">;
+};
+export type InputObjectTypeMeta = {
+  kind: "INPUT_OBJECT";
+  typeName: string;
+  Constructor: typeof GraphQLInputObjectType;
+  scope: GraphileBuild.ScopeInputObject;
+  origin: string | null | undefined;
+  specGenerator: () => Omit<GraphileBuild.GrafastInputObjectTypeConfig, "name">;
+};

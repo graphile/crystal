@@ -552,6 +552,13 @@ More than one `@unique` tag may be specified.
 comment on view my_view is E'@unique id\n@unique org,slug';
 ```
 
+### @isIndexed
+
+_From PostGraphile 5.1.1_
+
+Treats a column or foreign key constraint as if it is indexed (relevant to the
+default PgIndexBehaviorsPlugin.
+
 ### Smart Tags on virtual constraints
 
 You can also add smart tags on virtual constraints, for example adding the

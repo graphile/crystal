@@ -23,6 +23,11 @@ scalar AnInt
 
 """A range of `AnInt`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: AnIntRangeBound
 
@@ -53,6 +58,11 @@ scalar BigFloat
 
 """A range of `BigFloat`."""
 type BigFloatRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: BigFloatRangeBound
 
@@ -220,6 +230,11 @@ scalar Date
 
 """A range of `Date`."""
 type DateRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: DateRangeBound
 
@@ -336,6 +351,13 @@ input FloatRangeBoundInput {
 
 """A range of `Float`."""
 input FloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: FloatRangeBoundInput
 
@@ -1802,6 +1824,9 @@ enum NullTestRecordsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
+
 """Information about pagination in a connection."""
 type PageInfo {
   """When paginating forwards, the cursor to continue."""
@@ -2772,6 +2797,44 @@ type Query implements Node {
     """
     offset: Int
   ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  tableSetQueryVolatile(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PeopleConnection
+  tableSetQueryVolatileList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [Person!]
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 }
 
@@ -2898,6 +2961,7 @@ type Type {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
   regclass: RegClass
   regconfig: RegConfig

@@ -46,13 +46,27 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
         // memoizes because it mutates the return result; if this changes then
         // the code will no longer achieve its goal.
         for (const pgClass of introspection.classes) {
-          processTags(pgClass.getTags());
+          processTags(
+            pgClass.getTags(),
+            "pg_class",
+            `${pgClass.getNamespace()?.nspname}.${pgClass.relname}`,
+          );
         }
         for (const pgAttr of introspection.attributes) {
-          processTags(pgAttr.getTags());
+          const pgClass = pgAttr.getClass();
+          processTags(
+            pgAttr.getTags(),
+            "pg_attribute",
+            `${pgClass?.getNamespace()?.nspname}.${pgClass?.relname}.${pgAttr.attname}`,
+          );
         }
         for (const pgConstraint of introspection.constraints) {
-          processTags(pgConstraint.getTags());
+          const pgClass = pgConstraint.getClass();
+          processTags(
+            pgConstraint.getTags(),
+            "pg_constraint",
+            `${pgClass?.getNamespace()?.nspname}.${pgClass?.relname}.${pgConstraint.conname}`,
+          );
 
           // In V4, if a attribute has `@omit read` then any constraint that uses that attribute also has `@omit read`
           if (pgConstraint.contype === "f") {
@@ -73,15 +87,27 @@ export const PgV4SmartTagsPlugin: GraphileConfig.Plugin = {
           }
         }
         for (const pgProc of introspection.procs) {
-          processTags(pgProc.getTags());
+          processTags(
+            pgProc.getTags(),
+            "pg_proc",
+            `${pgProc.getNamespace()?.nspname}.${pgProc.proname}`,
+          );
         }
         for (const pgType of introspection.types) {
-          processTags(pgType.getTags());
+          processTags(
+            pgType.getTags(),
+            "pg_type",
+            `${pgType.getNamespace()?.nspname}.${pgType.typname}`,
+          );
         }
       },
       pgFakeConstraints_constraint(info, event) {
         const { entity } = event;
-        processTags(entity.getTags());
+        processTags(
+          entity.getTags(),
+          "pg_constraint",
+          `(fake) ${entity.getNamespace()?.nspname}.${entity.conname}`,
+        );
       },
     },
   }),
@@ -91,15 +117,17 @@ export default PgV4SmartTagsPlugin;
 
 function processTags(
   tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+  sourceType: string,
+  source: string,
 ): void {
   processUniqueKey(tags);
-  processOmit(tags);
+  processOmit(tags, sourceType + " " + source);
   convertBoolean(
     tags,
     "sortable",
     "orderBy order resource:connection:backwards",
   );
-  convertBoolean(tags, "filterable", "filter filterBy");
+  convertBoolean(tags, "filterable", `filter filterProc filterBy`);
   // convertBoolean(tags, "enum", "enum");
   processSimpleCollections(tags);
 }
@@ -187,12 +215,13 @@ function expandOmit(omit: string) {
       }
     });
   }
-  const parts = omit.split(",");
+  const parts = omit.split(",").map((p) => p.trim());
   return parts;
 }
 
 function processOmit(
   tags: Partial<GraphileBuild.PgSmartTagsDict> | undefined,
+  source: string,
 ): void {
   const omit = tags?.omit;
   if (!omit) {
@@ -206,7 +235,7 @@ function processOmit(
         : rawOmit;
     if (typeof omit !== "string") {
       throw new Error(
-        `Issue in smart tags; expected omit to be true/string/string[], but found something unexpected: ${inspect(
+        `Issue in smart tags for ${source}; expected omit to be true/string/string[], but found something unexpected: ${inspect(
           omit,
         )}`,
       );
@@ -258,6 +287,18 @@ function processOmit(
           behavior.push("-manyToMany");
           break;
         }
+        case "select": {
+          console.warn(
+            `WARNING: an existing smart tag for ${source} includes 'select' in the list of @omit's. This would be ignored by V4 (likely you meant to \`@omit read\` instead), so we are ignoring it to match the V4 behavior.`,
+          );
+          break;
+        }
+        case "insert": {
+          console.warn(
+            `WARNING: an existing smart tag for ${source} includes 'insert' in the list of @omit's. This would be ignored by V4 (likely you meant to \`@omit create\` instead), so we are ignoring it to match the V4 behavior.`,
+          );
+          break;
+        }
         case "": {
           // ignore
           break;
@@ -265,10 +306,11 @@ function processOmit(
         default: {
           // ENHANCE: we should give plugin authors the option of adding other
           // omits here, e.g. `@omit manyToMany`
+          const assumption = `-${part.replace(/[^a-zA-Z0-9]/g, "")}`;
           console.warn(
-            `Option '${part}' in '@omit' string '${omit}' not recognized; assuming -${part} behavior`,
+            `Option '${part}' in '@omit' string '${omit}' for ${source} not recognized; assuming ${assumption} behavior`,
           );
-          behavior.push(`-${part}`);
+          behavior.push(assumption);
           break;
         }
       }

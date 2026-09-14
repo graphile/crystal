@@ -5,12 +5,11 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgCodecWithAttributes,
-  PgExecutor,
   PgRefDefinition,
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
-import type { GraphQLType } from "grafast/graphql";
+import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
 import { gatherConfig } from "graphile-build";
 import type { PgSQL, SQL } from "pg-sql2";
 
@@ -31,6 +30,12 @@ declare global {
       "graphile-build-pg": string;
       "@dataplan/pg": string;
     }
+    type PgCodecTypeSituation = keyof GraphileBuild.PgCodecTypeSituations;
+    interface PgCodecTypeSituations {
+      // When extending, use 'true' for output situations and 'false' for input situations
+      output: true;
+      input: false;
+    }
     interface BehaviorStrings {
       select: true;
       insert: true;
@@ -48,19 +53,26 @@ declare global {
     }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation?: string,
+      situation?: PgCodecTypeSituation,
     ) => boolean;
-    type GetGraphQLTypeByPgCodec = (
+    type GetGraphQLTypeByPgCodec = <TSituation extends PgCodecTypeSituation>(
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation: string,
-    ) => GraphQLType | null;
+      situation: TSituation,
+    ) =>
+      | (true extends GraphileBuild.PgCodecTypeSituations[TSituation]
+          ? GraphQLOutputType
+          : never)
+      | (false extends GraphileBuild.PgCodecTypeSituations[TSituation]
+          ? GraphQLInputType
+          : never)
+      | null;
     type GetGraphQLTypeNameByPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation: string,
+      situation: PgCodecTypeSituation,
     ) => string | null;
     type SetGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situations: string | string[],
+      situations: PgCodecTypeSituation | PgCodecTypeSituation[],
       typeName: string,
     ) => void;
 
@@ -71,6 +83,13 @@ declare global {
        */
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       dataplanPg: typeof import("@dataplan/pg");
+
+      /**
+       * A copy of `import * from "@dataplan/json"` so that plugins don't need to
+       * import it directly.
+       */
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      dataplanJson: typeof import("@dataplan/json");
 
       /**
        * A store of metadata for given codecs. Currently internal as this API
@@ -125,19 +144,43 @@ declare global {
         ReadonlyArray<PgResourceUnique>,
         undefined
       > | null;
-
       // DX shortcuts
       /**
        * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
        * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       *
+       * Note: the TypeScript type for this is an approximation, because
+       * TypeScript doesn't have a concept of "first key". For most people
+       * there will be just a single executor anyway, and the type of the
+       * executor doesn't tend to matter much.
        */
-      pgExecutor: PgExecutor;
+      pgExecutor: GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"][keyof GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"]];
       /** Shortcut to the resources in the registry */
       pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
       /** Shortcut to the codecs in the registry */
       pgCodecs: GraphileBuild.Build["input"]["pgRegistry"]["pgCodecs"];
       /** Shortcut to the relations in the registry */
       pgRelations: GraphileBuild.Build["input"]["pgRegistry"]["pgRelations"];
+    }
+
+    interface BuildScopedExtensions<TScope extends keyof PluginScopes> {
+      // DX shortcuts
+      /**
+       * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
+       * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       *
+       * Note: the TypeScript type for this is an approximation, because
+       * TypeScript doesn't have a concept of "first key". For most people
+       * there will be just a single executor anyway, and the type of the
+       * executor doesn't tend to matter much.
+       */
+      pgExecutor: ScopedBuild<TScope>["input"]["pgRegistry"]["pgExecutors"][keyof ScopedBuild<TScope>["input"]["pgRegistry"]["pgExecutors"]];
+      /** Shortcut to the resources in the registry */
+      pgResources: ScopedBuild<TScope>["input"]["pgRegistry"]["pgResources"];
+      /** Shortcut to the codecs in the registry */
+      pgCodecs: ScopedBuild<TScope>["input"]["pgRegistry"]["pgCodecs"];
+      /** Shortcut to the relations in the registry */
+      pgRelations: ScopedBuild<TScope>["input"]["pgRegistry"]["pgRelations"];
     }
 
     interface BehaviorEntities {
@@ -402,7 +445,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       build(build) {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
-          lib: { dataplanPg, sql },
+          lib: { dataplanPg, dataplanJson, sql },
           input: { pgRegistry },
         } = build;
 
@@ -432,9 +475,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             return typeName ?? null;
           };
 
-        const getGraphQLTypeByPgCodec: GraphileBuild.GetGraphQLTypeByPgCodec = (
-          codec,
-          situation,
+        const getGraphQLTypeByPgCodec: GraphileBuild.GetGraphQLTypeByPgCodec = <
+          TSituation extends GraphileBuild.PgCodecTypeSituation,
+        >(
+          codec: PgCodec<any, any, any, any, any, any, any>,
+          situation: TSituation,
         ) => {
           if (!build.status.isInitPhaseComplete) {
             throw new Error(
@@ -445,11 +490,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             const type = getGraphQLTypeByPgCodec(codec.arrayOfCodec, situation);
             const nonNull = codec.extensions?.listItemNonNull;
             return type
-              ? new GraphQLList(nonNull ? new GraphQLNonNull(type) : type)
+              ? (new GraphQLList(
+                  nonNull ? new GraphQLNonNull(type) : type,
+                ) as any)
               : null;
           }
           const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
-          return typeName ? (build.getTypeByName(typeName) ?? null) : null;
+          return typeName
+            ? ((build.getTypeByName(typeName) as any) ?? null)
+            : null;
         };
 
         const hasGraphQLTypeForPgCodec: GraphileBuild.HasGraphQLTypeForPgCodec =
@@ -540,10 +589,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               {
                 "graphile-build-pg": version,
                 "@dataplan/pg": dataplanPg.version,
+                "@dataplan/json": dataplanJson.version,
               },
               "Adding graphile-build-pg and @dataplan/pg version to build.versions",
             ),
             dataplanPg,
+            dataplanJson,
             pgCodecMetaLookup,
             getGraphQLTypeNameByPgCodec,
             getGraphQLTypeByPgCodec,

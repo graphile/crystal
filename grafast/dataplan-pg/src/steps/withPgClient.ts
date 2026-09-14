@@ -1,6 +1,7 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
+  LoadManyAwaitedData,
   LoadManyInfo,
   LoadManyLoader,
   LoadManyStep,
@@ -156,7 +157,13 @@ export function loadOneWithPgClient<
     TParams,
     TShared
   >,
-): LoadOneStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+): LoadOneStep<
+  UnwrapMultistep<TLookup>,
+  Awaited<TItem>,
+  Awaited<TData>,
+  TParams,
+  TShared
+> {
   const newLoader = transformLoadOneLoader(executor, loader);
   return loadOne(lookup, newLoader);
 }
@@ -172,7 +179,7 @@ export type LoadOneWithPgClientCallback<
     pgClient: PgClient,
     lookups: ReadonlyArray<TSpec>,
     info: LoadOneInfo<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
@@ -244,7 +251,9 @@ function transformLoadOneLoader<
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(loaderObject.load(pgClient, lookups, info as any)),
+            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
+              // It's necessary to await the inner promises, otherwise we might release the client early
+              .then((list) => Promise.all(list)),
         );
       },
     };
@@ -302,7 +311,9 @@ function transformLoadManyLoader<
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(loaderObject.load(pgClient, lookups, info as any)),
+            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
+              // It's necessary to await the inner promises, otherwise we might release the client early
+              .then((list) => Promise.all(list)),
         );
       },
     };
@@ -328,7 +339,7 @@ export type LoadManyWithPgClientCallback<
     pgClient: PgClient,
     lookups: ReadonlyArray<TSpec>,
     info: LoadManyInfo<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
@@ -368,7 +379,13 @@ export function loadManyWithPgClient<
     TParams,
     TShared
   >,
-): LoadManyStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+): LoadManyStep<
+  UnwrapMultistep<TLookup>,
+  Awaited<TItem>,
+  LoadManyAwaitedData<TData>,
+  TParams,
+  TShared
+> {
   const newLoader = transformLoadManyLoader(executor, loader);
   return loadMany(lookup, newLoader);
 }

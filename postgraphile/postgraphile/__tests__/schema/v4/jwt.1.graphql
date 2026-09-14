@@ -2,6 +2,11 @@ scalar AnInt
 
 """A range of `AnInt`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: AnIntRangeBound
 
@@ -33,6 +38,13 @@ input AnIntRangeBoundInput {
 
 """A range of `AnInt`."""
 input AnIntRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: AnIntRangeBoundInput
 
@@ -167,6 +179,11 @@ scalar BigFloat
 
 """A range of `BigFloat`."""
 type BigFloatRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: BigFloatRangeBound
 
@@ -198,6 +215,13 @@ input BigFloatRangeBoundInput {
 
 """A range of `BigFloat`."""
 input BigFloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: BigFloatRangeBoundInput
 
@@ -425,6 +449,11 @@ scalar Date
 
 """A range of `Date`."""
 type DateRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: DateRangeBound
 
@@ -456,6 +485,13 @@ input DateRangeBoundInput {
 
 """A range of `Date`."""
 input DateRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: DateRangeBoundInput
 
@@ -1159,6 +1195,9 @@ interface Node {
   nodeId: ID!
 }
 
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
+
 """Information about pagination in a connection."""
 type PageInfo {
   """When paginating forwards, the cursor to continue."""
@@ -1404,6 +1443,7 @@ type Type implements Node {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
   regclass: RegClass
   regconfig: RegConfig
@@ -1521,6 +1561,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s `numrange` field."""
   numrange: BigFloatRangeInput
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: Oid
 
   """Checks for equality with the object’s `point` field."""
   point: PointInput
@@ -1688,6 +1731,7 @@ input TypeInput {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  oid: Oid
   point: PointInput!
   regclass: RegClass
   regconfig: RegConfig
@@ -1742,6 +1786,7 @@ input TypePatch {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -1836,6 +1881,8 @@ enum TypesOrderBy {
   NULLABLE_POINT_DESC
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   POINT_ASC
   POINT_DESC
   PRIMARY_KEY_ASC

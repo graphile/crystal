@@ -1,0 +1,26 @@
+[
+  {
+    message: 'connection() cannot be used with trap() or inhibit...() at this time.',
+    locations: [
+      {
+        line: 26,
+        column: 3,
+      },
+    ],
+    path: [
+      'connection',
+    ],
+  },
+  {
+    message: 'connection() cannot be used with trap() or inhibit...() at this time.',
+    locations: [
+      {
+        line: 8,
+        column: 3,
+      },
+    ],
+    path: [
+      'emptyConnection',
+    ],
+  },
+]

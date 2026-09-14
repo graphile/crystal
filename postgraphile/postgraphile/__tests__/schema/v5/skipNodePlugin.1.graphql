@@ -158,6 +158,11 @@ scalar AnInt
 
 """A range of `AnInt`."""
 type AnIntRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: AnIntRangeBound
 
@@ -189,6 +194,13 @@ input AnIntRangeBoundInput {
 
 """A range of `AnInt`."""
 input AnIntRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: AnIntRangeBoundInput
 
@@ -726,6 +738,7 @@ type BType {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
 
   """Reads a single `Post` that is related to this `BType`."""
@@ -800,6 +813,9 @@ input BTypeCondition {
 
   """Checks for equality with the object’s `numeric` field."""
   numeric: BigFloat
+
+  """Checks for equality with the object’s `oid` field."""
+  oid: Oid
 
   """Checks for equality with the object’s `point` field."""
   point: PointInput
@@ -989,6 +1005,7 @@ input BTypeInput {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  oid: Oid
   point: PointInput!
   regclass: RegClass
   regconfig: RegConfig
@@ -1038,6 +1055,8 @@ enum BTypeOrderBy {
   NATURAL
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ROW_ID_ASC
@@ -1092,6 +1111,7 @@ input BTypePatch {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -1206,6 +1226,11 @@ scalar BigFloat
 
 """A range of `BigFloat`."""
 type BigFloatRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: BigFloatRangeBound
 
@@ -1237,6 +1262,13 @@ input BigFloatRangeBoundInput {
 
 """A range of `BigFloat`."""
 input BigFloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: BigFloatRangeBoundInput
 
@@ -4107,6 +4139,11 @@ scalar Date
 
 """A range of `Date`."""
 type DateRange {
+  """
+  If the range has no start or end, it is either unbounded (`false`) or empty (`true`).
+  """
+  empty: Boolean!
+
   """The ending bound of our range."""
   end: DateRangeBound
 
@@ -4138,6 +4175,13 @@ input DateRangeBoundInput {
 
 """A range of `Date`."""
 input DateRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: DateRangeBoundInput
 
@@ -4944,6 +4988,13 @@ input FloatRangeBoundInput {
 
 """A range of `Float`."""
 input FloatRangeInput {
+  """
+  If `true`, the range is seen as empty and `start`/`end` are ignored. If
+  `false` (default), setting `start` and `end` to `null` (or omitting them)
+  indicates an unbounded range.
+  """
+  empty: Boolean! = false
+
   """The ending bound of our range."""
   end: FloatRangeBoundInput
 
@@ -6292,6 +6343,9 @@ enum NonUpdatableViewOrderBy {
   COLUMN_DESC
   NATURAL
 }
+
+"""PostgreSQL identifier for a database entity"""
+scalar Oid
 
 """Information about pagination in a connection."""
 type PageInfo {
@@ -7644,6 +7698,38 @@ type Query {
     """
     offset: Int
   ): CPersonConnection
+
+  """Reads and enables pagination through a set of `CPerson`."""
+  cTableSetQueryVolatile(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CPersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): CPersonConnection
+  cTableSetQueryVolatileList(
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CPersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Skip the first `n` values."""
+    offset: Int
+  ): [CPerson]
   cTypesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
 
   """Get a single `DefaultValue`."""

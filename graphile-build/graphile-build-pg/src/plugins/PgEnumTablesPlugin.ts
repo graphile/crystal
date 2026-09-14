@@ -1,4 +1,4 @@
-import type { PgCodecExtensions, PgEnumCodec, PgEnumValue } from "@dataplan/pg";
+import type { PgEnumCodec, PgEnumValue } from "@dataplan/pg";
 import { enumCodec, withPgClientFromPgService } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 import type {
@@ -199,7 +199,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
         try {
           const { rows } = await withPgClientFromPgService(
             pgService!,
-            null,
+            pgService?.pgSettingsForIntrospection ?? null,
             (client) => client.query<Record<string, string>>(query),
           );
           return rows;
@@ -208,7 +208,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           try {
             const { rows } = await withPgClientFromPgService(
               pgService!,
-              null,
+              pgService?.pgSettingsForIntrospection ?? null,
               (client) =>
                 client.query<{ user: string }>({
                   text: "select user;",
@@ -223,7 +223,7 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
              * error caused by the statement above failing.
              */
           }
-          throw new Error(`Introspection could not read from enum table "${
+          const message = `Introspection could not read from enum table "${
             pgClass.getNamespace()!.nspname
           }"."${pgClass.relname}", perhaps you need to grant access:
   GRANT USAGE ON SCHEMA "${pgClass.getNamespace()!.nspname}" TO "${role}";
@@ -231,7 +231,16 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
     pgClass.relname
   }" TO "${role}";
 Original error: ${e.message}
-`);
+`;
+          // Throw error if this enum table is in an exposed schema, otherwise just warn.
+          if (
+            pgService?.schemas?.includes(pgClass.getNamespace()?.nspname ?? "")
+          ) {
+            throw new Error(message);
+          } else {
+            console.warn(message);
+            return [];
+          }
         }
       },
       async processIntrospection(info, event) {
@@ -291,31 +300,43 @@ Original error: ${e.message}
                 attributes,
               );
 
-            for (const pgConstraint of enumConstraints) {
-              const pgAttribute = enumTableAttributes.find(
-                (pgAttribute) => pgAttribute.attnum === pgConstraint.conkey![0],
-              );
-              if (!pgAttribute) {
-                // Should never happen
-                throw new Error(
-                  "GraphileInternalError<89c93c93-7e94-406c-a822-736e2ff1e466>: could not find attribute for enum constraint",
+            // Async work in parallel up front for schema stability
+            const details = await Promise.all(
+              enumConstraints.map(async (pgConstraint) => {
+                const pgAttribute = enumTableAttributes.find(
+                  (pgAttribute) =>
+                    pgAttribute.attnum === pgConstraint.conkey![0],
                 );
-              }
+                if (!pgAttribute) {
+                  // Should never happen
+                  throw new Error(
+                    "GraphileInternalError<89c93c93-7e94-406c-a822-736e2ff1e466>: could not find attribute for enum constraint",
+                  );
+                }
+                const originalCodec =
+                  await info.helpers.pgCodecs.getCodecFromType(
+                    serviceName,
+                    pgAttribute.atttypid,
+                    pgAttribute.atttypmod,
+                  );
+                return { pgConstraint, pgAttribute, originalCodec };
+              }),
+            );
+
+            for (const {
+              pgConstraint,
+              pgAttribute,
+              originalCodec,
+            } of details) {
               const data = allData.filter(
                 (row) => row[pgAttribute.attname] != null,
               );
               if (data.length < 1) {
-                throw new Error(
+                console.warn(
                   `Enum table "${pgNamespace.nspname}"."${pgClass.relname}" contains no visible entries for enum constraint '${pgConstraint.conname}'. Check that the table contains at least one row and that the rows are not hidden by row-level security policies.`,
                 );
               }
 
-              const originalCodec =
-                await info.helpers.pgCodecs.getCodecFromType(
-                  serviceName,
-                  pgAttribute.atttypid,
-                  pgAttribute.atttypmod,
-                );
               if (!originalCodec) {
                 // LOGGING: inform user of this (or throw?)
                 continue;
@@ -330,7 +351,7 @@ Original error: ${e.message}
                 }),
               );
 
-              const extensions: PgCodecExtensions = {
+              const extensions: DataplanPg.PgCodecExtensions = {
                 // ENHANCE: more extensions/tags?
                 isEnumTableEnum: true,
                 enumTableEnumDetails: {
@@ -412,11 +433,15 @@ Original error: ${e.message}
       },
       // Make sure all our codecs are registered, even if they're not
       // referenced via relations
-      async pgRegistry_PgRegistryBuilder_pgCodecs(info, event) {
-        const { registryBuilder } = event;
-        for (const enumCodec of info.state.codecByPgConstraint.values()) {
-          registryBuilder.addCodec(enumCodec);
-        }
+      pgRegistry_PgRegistryBuilder_pgCodecs: {
+        after: ["PgCodecsPlugin"],
+        before: ["PgTablesPlugin"],
+        async callback(info, event) {
+          const { registryBuilder } = event;
+          for (const enumCodec of info.state.codecByPgConstraint.values()) {
+            registryBuilder.addCodec(enumCodec);
+          }
+        },
       },
     },
   }),

@@ -6,7 +6,23 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import type { Extension } from "interpret";
-import { jsVariants } from "interpret";
+import { jsVariants as baseJsVariants } from "interpret";
+
+const jsVariants = { ...baseJsVariants };
+const tsVariant = jsVariants[".ts"];
+const tsxVariant = jsVariants[".tsx"];
+if (tsVariant && !jsVariants[".mts"]) {
+  jsVariants[".mts"] = tsVariant;
+}
+if (tsVariant && !jsVariants[".cts"]) {
+  jsVariants[".cts"] = tsVariant;
+}
+if (tsxVariant && !jsVariants[".mtsx"]) {
+  jsVariants[".mtsx"] = tsxVariant;
+}
+if (tsxVariant && !jsVariants[".ctsx"]) {
+  jsVariants[".ctsx"] = tsxVariant;
+}
 
 const extensions = Object.keys(jsVariants);
 

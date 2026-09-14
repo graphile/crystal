@@ -1,7 +1,8 @@
 import { LIST_TYPES, PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -149,7 +151,6 @@ const resource_geomPgResource = makeRegistry({
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     point: TYPES.point,
-    geom: geomCodec,
     pointArray: LIST_TYPES.point,
     line: TYPES.line,
     lineArray: LIST_TYPES.line,
@@ -163,6 +164,7 @@ const resource_geomPgResource = makeRegistry({
     polygonArray: LIST_TYPES.polygon,
     circle: TYPES.circle,
     circleArray: LIST_TYPES.circle,
+    geom: geomCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -220,6 +222,24 @@ const resource_geomPgResource = makeRegistry({
         },
         tags: {
           name: "LetterAToDViaView"
+        }
+      }
+    }),
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
         }
       }
     }),
@@ -611,8 +631,9 @@ function applyInputToUpdateOrDelete(_, $object) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 const getPgSelectSingleFromMutationResult = (pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -1280,7 +1301,7 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       }
     }
   },

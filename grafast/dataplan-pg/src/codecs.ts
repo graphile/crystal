@@ -454,9 +454,11 @@ const codecInspect: CustomInspectFunction = function (this: PgCodec) {
       ? `ListCodec<${this.arrayOfCodec.name}[]>`
       : this.rangeOfCodec
         ? `RangeCodec<${this.rangeOfCodec.name}>`
-        : this.attributes
-          ? `RecordCodec`
-          : "Codec";
+        : this.baseCodec
+          ? `ModifiedCodec<${this.baseCodec.name}>`
+          : this.attributes
+            ? `RecordCodec`
+            : "Codec";
   return `${type}(${this.name})`;
 };
 
@@ -824,6 +826,8 @@ export function domainOfCodec<
     extensions?: Partial<DataplanPg.PgCodecExtensions>;
     /** Whether this domain is not nullable. */
     notNull?: boolean | null;
+    /** Whether this domain has a default. */
+    hasDefault?: boolean | null;
   } = {},
 ): PgCodec<
   TName,
@@ -833,7 +837,7 @@ export function domainOfCodec<
   TInnerCodec,
   undefined
 > {
-  const { description, extensions, notNull } = config;
+  const { description, extensions, notNull, hasDefault } = config;
   return {
     // Generally same as underlying type:
     ...innerCodec,
@@ -845,6 +849,7 @@ export function domainOfCodec<
     extensions,
     domainOfCodec: innerCodec.arrayOfCodec ? undefined : innerCodec,
     notNull: Boolean(notNull),
+    hasDefault: Boolean(hasDefault),
     [inspect.custom]: codecInspect,
   };
 }
@@ -866,10 +871,25 @@ function escapeRangeValue<
   return `"${encoded.replace(/"/g, '""')}"`;
 }
 
-interface PgRange<T> {
-  start: { value: T; inclusive: boolean } | null;
-  end: { value: T; inclusive: boolean } | null;
-}
+/** The value of a 'range' type from Postgres */
+export type PgRangeValue<T> =
+  | { empty: true }
+  | {
+      empty: false;
+      /** The lower bound; inclusive or exclusive. If null, there is no lower bound */
+      start: { value: T; inclusive: boolean } | null;
+      /** The upper bound; inclusive or exclusive. If null, there is no upper bound */
+      end: { value: T; inclusive: boolean } | null;
+    };
+
+export type PgCodecPGDatatype<TCodec extends PgCodec> =
+  TCodec extends PgCodec<any, any, infer TValue, any, any, any, any>
+    ? TValue
+    : never;
+export type PgCodecJSDatatype<TCodec extends PgCodec> =
+  TCodec extends PgCodec<any, any, any, infer TValue, any, any, any>
+    ? TValue
+    : never;
 
 /**
  * Returns a PgCodec that represents a range of the given inner PgCodec
@@ -905,7 +925,7 @@ export function rangeOfCodec<
   TName,
   undefined,
   string,
-  PgRange<unknown>,
+  PgRangeValue<PgCodecJSDatatype<TInnerCodec>>,
   undefined,
   undefined,
   TInnerCodec
@@ -922,7 +942,7 @@ export function rangeOfCodec<
           )},\n${innerCodec.castFromPg!(
             sql`upper(${frag})`,
             innerCodec.notNull,
-          )},\nupper_inc(${frag})`,
+          )},\nupper_inc(${frag}),\nisempty(${frag})`,
         )})::text`;
       }
     : null;
@@ -943,44 +963,47 @@ export function rangeOfCodec<
       : null),
     fromPg: needsCast
       ? function (value) {
-          const json = JSON.parse(value);
-          return {
-            start:
-              json[1] != null
-                ? {
-                    value: innerCodec.fromPg(json[1]),
-                    inclusive: !!json[0],
-                  }
-                : null,
-            end:
-              json[2] != null
-                ? {
-                    value: innerCodec.fromPg(json[2]),
-                    inclusive: !!json[3],
-                  }
-                : null,
-          };
+          const [lowerInc, lower, upper, upperInc, empty] = JSON.parse(value);
+          return empty
+            ? { empty: true }
+            : {
+                empty: false,
+                start:
+                  lower != null
+                    ? { value: innerCodec.fromPg(lower), inclusive: !!lowerInc }
+                    : null,
+                end:
+                  upper != null
+                    ? { value: innerCodec.fromPg(upper), inclusive: !!upperInc }
+                    : null,
+              };
         }
       : function (value) {
           const parsed = rangeParse(value);
-          return {
-            start:
-              parsed.lower != null
-                ? {
-                    value: innerCodec.fromPg(parsed.lower),
-                    inclusive: parsed.isLowerBoundClosed(),
-                  }
-                : null,
-            end:
-              parsed.upper != null
-                ? {
-                    value: innerCodec.fromPg(parsed.upper),
-                    inclusive: parsed.isUpperBoundClosed(),
-                  }
-                : null,
-          };
+          return parsed.isEmpty()
+            ? { empty: true }
+            : {
+                empty: false,
+                start:
+                  parsed.lower != null
+                    ? {
+                        value: innerCodec.fromPg(parsed.lower),
+                        inclusive: parsed.isLowerBoundClosed(),
+                      }
+                    : null,
+                end:
+                  parsed.upper != null
+                    ? {
+                        value: innerCodec.fromPg(parsed.upper),
+                        inclusive: parsed.isUpperBoundClosed(),
+                      }
+                    : null,
+              };
         },
     toPg(value) {
+      if (value.empty) {
+        return "empty";
+      }
       let str = "";
       if (value.start == null) {
         str += "(";
@@ -1164,6 +1187,7 @@ export const TYPES = {
   }),
   int2: s<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
   int: s<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
+  oid: s<number>()("26", "oid", { fromPg: parseAsTrustedInt }),
   bigint: s<string>()("20", "int8"),
   float4: s<number>()("700", "float4", { fromPg: parseFloat }),
   float: s<number>()("701", "float8", { fromPg: parseFloat }),
@@ -1311,6 +1335,7 @@ export const LIST_TYPES = {
       'boolean',
       'int2',
       'int',
+      'oid'
       'bigint',
       'float4',
       'float',
@@ -1370,6 +1395,7 @@ export const LIST_TYPES = {
   boolean: builtinListOfCodec("1000", TYPES.boolean),
   int2: builtinListOfCodec("1005", TYPES.int2),
   int: builtinListOfCodec("1007", TYPES.int),
+  oid: builtinListOfCodec("1028", TYPES.oid),
   bigint: builtinListOfCodec("1016", TYPES.bigint),
   float4: builtinListOfCodec("1021", TYPES.float4),
   float: builtinListOfCodec("1022", TYPES.float),
@@ -1627,6 +1653,11 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
     case "_interval":
       return LIST_TYPES.interval;
 
+    case "oid":
+      return TYPES.oid;
+    case "_oid":
+      return LIST_TYPES.oid;
+
     case "regclass":
       return TYPES.regclass;
     case "_regclass":
@@ -1693,6 +1724,9 @@ export function getInnerCodec<
   }
   if (codec.rangeOfCodec) {
     return getInnerCodec(codec.rangeOfCodec) as any;
+  }
+  if (codec.baseCodec) {
+    return getInnerCodec(codec.baseCodec) as any;
   }
   return codec as any;
 }

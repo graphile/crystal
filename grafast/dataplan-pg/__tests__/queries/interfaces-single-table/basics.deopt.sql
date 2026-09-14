@@ -7,8 +7,11 @@ where (
 )
 order by __people__."person_id" asc;
 
+with __single_table_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __single_table_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __single_table_items_identifiers__,
+from __single_table_items_identifiers__,
 lateral (
   select
     __single_table_items__."id"::text as "0",

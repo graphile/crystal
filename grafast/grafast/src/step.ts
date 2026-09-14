@@ -40,7 +40,7 @@ import type {
 } from "./interfaces.ts";
 import type { __FlagStep, __ItemStep } from "./steps/index.ts";
 import { buildOptimizedExecute } from "./unbatchedStepExecute.ts";
-import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.ts";
+import { stepADependsOnStepB, stepAMayDependOnStepB, sudo } from "./utils.ts";
 
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
@@ -116,9 +116,9 @@ export /* abstract */ class Step<TData = any> {
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   /** @internal */
-  public _isUnary: boolean;
+  public readonly _isUnary: boolean;
   /** @internal */
-  public _isUnaryLocked: boolean;
+  public readonly _isUnaryLocked: boolean;
   /**
    * Set `true` if this step should only run for certain of the polymorphic
    * paths available in its LayerPlan.
@@ -210,7 +210,9 @@ export /* abstract */ class Step<TData = any> {
   protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
-   * Just for mermaid
+   * Originally just for mermaid, do not rely on this as we may break it in a
+   * patch release.
+   *
    * @internal
    */
   public readonly dependents: ReadonlyArray<{
@@ -418,7 +420,7 @@ export /* abstract */ class Step<TData = any> {
    * non-unary dependency later will result in an error.
    */
   public getAndFreezeIsUnary() {
-    this._isUnaryLocked = true;
+    sudo(this)._isUnaryLocked = true;
     return this._isUnary;
   }
 
@@ -610,6 +612,7 @@ export /* abstract */ class Step<TData = any> {
     rawStep: Step,
     allowIndirectReason: string | null = null,
   ): number | null {
+    assertStep(rawStep, () => `${this}.addRef`);
     const step = this.operationPlan.stepTracker.getStepById(rawStep.id);
     if (isDev && !allowIndirectReason && !stepADependsOnStepB(this, step)) {
       const allRefs = (
@@ -672,10 +675,12 @@ ${printDeps(step, 1)}
   }
 
   protected canAddDependency(step: Step): boolean {
+    assertStep(step, () => `${this}.canAddDependency`);
     return stepAMayDependOnStepB(this, step);
   }
 
   protected _addDependency(options: AddDependencyOptions): number {
+    assertStep(options.step, () => `${this}._addDependency`);
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
         `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (${options.step.layerPlan} deeper than ${this.layerPlan}; creates a catch-22)`,
@@ -691,30 +696,34 @@ ${printDeps(step, 1)}
         ? { step: stepOrOptions }
         : stepOrOptions),
     };
+    assertStep(options.step, () => `${this}.addDependency`);
     return this._addDependency(options);
   }
   protected addDataDependency(
     stepOrOptions: Step | AddDependencyOptions,
   ): number {
-    const opts =
+    const options =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    assertStep(options.step, () => `${this}.addDataDependency`);
     return this._addDependency({
       dataOnly: true,
       skipDeduplication: false,
-      ...opts,
+      ...options,
     });
   }
   // Currently identical to addDependency
   protected addStrongDependency(
     stepOrOptions: Step | AddDependencyOptions,
   ): number {
-    return this._addDependency({
+    const options = {
       dataOnly: false,
       skipDeduplication: false,
       ...(stepOrOptions instanceof Step
         ? { step: stepOrOptions }
         : stepOrOptions),
-    });
+    };
+    assertStep(options.step, () => `${this}.addStrongDependency`);
+    return this._addDependency(options);
   }
 
   /**
@@ -728,6 +737,7 @@ ${printDeps(step, 1)}
   ): number {
     const options: AddUnaryDependencyOptions =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    assertStep(options.step, () => `${this}.addUnaryDependency`);
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
         `Cannot add a unary dependency on ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
@@ -892,10 +902,14 @@ export function isStep<TData = any>(step: unknown): step is Step<TData> {
   return step instanceof Step;
 }
 
-export function assertStep<TData>(step: unknown): asserts step is Step<TData> {
+export function assertStep<TData>(
+  step: unknown,
+  source?: string | (() => string),
+): asserts step is Step<TData> {
   if (!isStep(step)) {
+    const src = typeof source === "function" ? source() : source;
     throw new Error(
-      `Expected a step, but received something else: ${inspect(step)}`,
+      `${src ? `[${src}]: ` : ""}Expected a step, but received something else: ${inspect(step)}`,
     );
   }
 }

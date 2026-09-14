@@ -5,9 +5,6 @@
 [![Follow](https://img.shields.io/badge/BSky-@Graphile.org-006aff.svg)](https://bsky.app/profile/graphile.org)
 [![Follow](https://img.shields.io/badge/Mastodon-@Graphile.fosstodon.org-6364ff.svg)](https://fosstodon.org/@graphile)
 
-**PRERELEASE**: this is pre-release software; use at your own risk. This will
-likely change a lot before it's ultimately released.
-
 `graphile-config` provides a standard plugin interface and helpers that can be
 used across the entire of the Graphile suite. Primarily users will only use this
 as `import type Plugin from 'graphile-config';` so that they can export plugins.

@@ -32,6 +32,9 @@ declare global {
     interface ScopeObjectFieldsField {
       isPgCreateMutation?: boolean;
     }
+    interface ScopeInputObject {
+      isPgCreateInputType?: boolean;
+    }
     interface Inflection {
       createField(
         this: Inflection,
@@ -45,6 +48,7 @@ declare global {
         this: Inflection,
         resource: PgResource<any, any, any, any, any>,
       ): string;
+      // TODO: move this to PgTablesPlugin and give it a better definition
       tableFieldName(
         this: Inflection,
         resource: PgResource<any, any, any, any, any>,
@@ -143,7 +147,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
         return this.upperCamelCase(`${this.createField(resource)}-payload`);
       },
       tableFieldName(options, resource) {
-        return this.camelCase(`${this.tableType(resource.codec)}`);
+        return this.camelCase(this.tableType(resource.codec));
       },
     },
   },
@@ -204,7 +208,11 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             const tableFieldName = inflection.tableFieldName(resource);
             build.registerInputObjectType(
               inputTypeName,
-              { isMutationInput: true },
+              {
+                isMutationInput: true,
+                isPgCreateInputType: true,
+                pgResource: resource,
+              },
               () => ({
                 description: `All input for the create \`${tableTypeName}\` mutation.`,
                 fields: ({ fieldWithHooks }) => {

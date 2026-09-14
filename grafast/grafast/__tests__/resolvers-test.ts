@@ -13,7 +13,7 @@ import {
 } from "graphql";
 import { it } from "mocha";
 
-import { grafast } from "../dist/index.js";
+import { grafast, GrafastExecutionArgs } from "../dist/index.js";
 
 const makeSchema = () => {
   const A = new GraphQLObjectType({
@@ -103,4 +103,70 @@ it("Resolves the same in Grafast as GraphQL.js", async () => {
 
   const grafastResult = (await grafast(executionArgs)) as ExecutionResult;
   expect(grafastResult).to.deep.equal(graphqlResult);
+});
+
+describe("has correct resolveInfo.rootValue", async () => {
+  let rootValues: [string, any][] = [];
+  const Item = new GraphQLObjectType({
+    name: "Item",
+    fields: {
+      value: {
+        type: GraphQLString,
+        resolve(source, _args, _context, info) {
+          rootValues.push([info.fieldName, info.rootValue]);
+          return source.value;
+        },
+      },
+    },
+  });
+  const Query = new GraphQLObjectType({
+    name: "Query",
+    fields: {
+      rootValueKind: {
+        type: GraphQLString,
+        resolve(_source, _args, _context, info) {
+          rootValues.push([info.fieldName, info.rootValue]);
+          return info.rootValue === null ? "null" : typeof info.rootValue;
+        },
+      },
+      items: {
+        type: new GraphQLList(Item),
+        resolve(_source, _args, _context, info) {
+          rootValues.push([info.fieldName, info.rootValue]);
+          return [{ value: "a" }, { value: "b" }];
+        },
+      },
+    },
+  });
+  const schema = new GraphQLSchema({ query: Query });
+
+  const runTest = async (extraArgs: Partial<GrafastExecutionArgs>) => {
+    const source = /* GraphQL */ `
+      query Q {
+        rootValueKind
+        items {
+          value
+        }
+      }
+    `;
+
+    rootValues = [];
+    const result = (await grafast({
+      schema,
+      source,
+      ...extraArgs,
+    })) as ExecutionResult;
+    expect(result.errors).not.to.exist;
+    expect(rootValues).to.eql([
+      ["rootValueKind", extraArgs.rootValue],
+      ["items", extraArgs.rootValue],
+      ["value", extraArgs.rootValue],
+      ["value", extraArgs.rootValue],
+    ]);
+  };
+
+  it("rootValue: unset", () => runTest({}));
+  it("rootValue: undefined", () => runTest({ rootValue: undefined }));
+  it("rootValue: null", () => runTest({ rootValue: null }));
+  it("rootValue: symbol", () => runTest({ rootValue: Symbol("rootValue") }));
 });

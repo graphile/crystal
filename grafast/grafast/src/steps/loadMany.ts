@@ -52,7 +52,7 @@ export type LoadManyCallback<
   (
     lookups: ReadonlyArray<TLookup>,
     info: LoadManyInfo<TItem, TParams, TShared>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
@@ -102,6 +102,13 @@ interface LoadManyBaseParams {
   offset?: Maybe<number>;
   limit?: Maybe<number>;
 }
+
+export type LoadManyAwaitedData<TData> =
+  TData extends ReadonlyArray<infer TItem>
+    ? ReadonlyArray<Awaited<TItem>>
+    : TData extends AsyncIterable<infer TItem>
+      ? AsyncIterable<Awaited<TItem>>
+      : TData;
 
 export class LoadManyStep<
     const TLookup extends Multistep,
@@ -419,12 +426,24 @@ export function loadMany<
 >(
   lookup: TLookup,
   loader:
-    | LoadManyCallback<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>
-    | LoadManyLoader<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>,
+    | LoadManyCallback<
+        UnwrapMultistep<TLookup>,
+        Awaited<TItem>,
+        LoadManyAwaitedData<TData>,
+        TParams,
+        TShared
+      >
+    | LoadManyLoader<
+        UnwrapMultistep<TLookup>,
+        Awaited<TItem>,
+        LoadManyAwaitedData<TData>,
+        TParams,
+        TShared
+      >,
 ): LoadManyStep<
   UnwrapMultistep<TLookup>,
-  TItem,
-  TData,
+  Awaited<TItem>,
+  LoadManyAwaitedData<TData>,
   TParams,
   UnwrapMultistep<TShared>
 > {
@@ -438,8 +457,8 @@ export function loadMany<
     typeof loader === "function"
       ? ({ load: loader } as LoadManyLoader<
           UnwrapMultistep<TLookup>,
-          TItem,
-          TData,
+          Awaited<TItem>,
+          LoadManyAwaitedData<TData>,
           TParams,
           TShared
         >)

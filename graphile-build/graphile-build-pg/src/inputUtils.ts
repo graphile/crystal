@@ -10,9 +10,9 @@ export interface PgCodecMeta {
    * Given a `situation` such as 'input', 'output', 'patch', etc. returns the
    * name of the GraphQL type to use for this PgCodec.
    */
-  typeNameBySituation: {
-    [situation: string]: string;
-  };
+  typeNameBySituation: Partial<
+    Record<GraphileBuild.PgCodecTypeSituation, string>
+  >;
 }
 
 /**
@@ -104,5 +104,8 @@ function walkCodec(codec: PgCodec, metaLookup: PgCodecMetaLookup): void {
   }
   if (codec.rangeOfCodec) {
     walkCodec(codec.rangeOfCodec, metaLookup);
+  }
+  if (codec.baseCodec) {
+    walkCodec(codec.baseCodec, metaLookup);
   }
 }

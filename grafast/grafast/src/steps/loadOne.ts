@@ -42,7 +42,7 @@ export type LoadOneCallback<
   (
     specs: ReadonlyArray<TSpec>,
     info: LoadOneInfo<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
   displayName?: string;
 };
 
@@ -80,6 +80,14 @@ export function loadOneLoader<
 
 const idByLoad = new WeakMap<LoadOneCallback<any, any, any, any>, string>();
 let loadCounter = 0;
+
+type LoadOneGetStep<
+  TData,
+  TAttr extends keyof Exclude<TData, null | undefined>,
+> = Step<
+  | Exclude<TData, null | undefined>[TAttr]
+  | (Extract<TData, null | undefined> extends never ? never : undefined)
+>;
 
 export class LoadOneStep<
   const TLookup extends Multistep,
@@ -244,10 +252,22 @@ export class LoadOneStep<
   }
 
   // Things that were originally in LoadedRecordStep
-  get(attr: keyof TItem & (string | number)) {
-    return this.cacheStep("get", attr, () => this._getInner(attr));
+  __inferGet?: {
+    [TAttr in keyof Exclude<TData, null | undefined> & string]: LoadOneGetStep<
+      TData,
+      TAttr
+    >;
+  };
+  get<TAttr extends keyof Exclude<TData, null | undefined> & (string | number)>(
+    attr: TAttr,
+  ): LoadOneGetStep<TData, TAttr> {
+    return this.cacheStep("get", attr, () =>
+      this._getInner(attr),
+    ) as LoadOneGetStep<TData, TAttr>;
   }
-  private _getInner(attr: keyof TItem & (string | number)) {
+  private _getInner<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     if (this.operationPlan.phase === "plan") {
       // Allow auto-collapsing of the waterfall by knowing keys are equivalent
       const accessMap = this.getAccessMap();
@@ -257,7 +277,7 @@ export class LoadOneStep<
       }
     }
 
-    this.attributes.add(attr);
+    this.attributes.add(attr as keyof TItem);
     return access(this, attr);
   }
 }
@@ -309,13 +329,25 @@ export function loadOne<
   loader:
     | LoadOneCallback<
         UnwrapMultistep<TLookup>,
-        TItem,
-        TData,
+        Awaited<TItem>,
+        Awaited<TData>,
         TParams,
         never // If you want context, you must use the loader object
       >
-    | LoadOneLoader<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>,
-): LoadOneStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+    | LoadOneLoader<
+        UnwrapMultistep<TLookup>,
+        Awaited<TItem>,
+        Awaited<TData>,
+        TParams,
+        TShared
+      >,
+): LoadOneStep<
+  UnwrapMultistep<TLookup>,
+  Awaited<TItem>,
+  Awaited<TData>,
+  TParams,
+  TShared
+> {
   if (arguments.length > 2) {
     throw new Error(
       "The signature of loadOne has changed, additional arguments should now be passed via a 'loader' object: `loadOne(lookup, loader)` where `loader` is either a `load` function or object containing it `{ load, shared?, ioEquivalence?, paginationSupport? }`",
@@ -326,8 +358,8 @@ export function loadOne<
     typeof loader === "function"
       ? ({ load: loader } as LoadOneLoader<
           UnwrapMultistep<TLookup>,
-          TItem,
-          TData,
+          Awaited<TItem>,
+          Awaited<TData>,
           TParams,
           TShared
         >)

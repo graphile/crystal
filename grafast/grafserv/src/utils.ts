@@ -324,17 +324,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
 
       return args;
     } catch (e) {
-      return [
-        new GraphQLError(
-          e.message,
-          null,
-          undefined,
-          undefined,
-          undefined,
-          e,
-          undefined,
-        ),
-      ];
+      return [new GraphQLError(e.message, { originalError: e })];
     }
   }
   return {

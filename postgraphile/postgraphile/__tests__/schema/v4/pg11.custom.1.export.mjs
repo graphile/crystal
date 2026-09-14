@@ -1,7 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -62,94 +64,6 @@ const executor = new PgExecutor({
       withPgClient: ctx.get("withPgClient")
     });
   }
-});
-const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
-const alwaysAsIdentityCodec = recordCodec({
-  name: "alwaysAsIdentity",
-  identifier: alwaysAsIdentityIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true,
-      extensions: {
-        isInsertable: false,
-        isUpdatable: false
-      }
-    },
-    t: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "pg11",
-      name: "always_as_identity"
-    }
-  },
-  executor: executor
-});
-const byDefaultAsIdentityIdentifier = sql.identifier("pg11", "by_default_as_identity");
-const byDefaultAsIdentityCodec = recordCodec({
-  name: "byDefaultAsIdentity",
-  identifier: byDefaultAsIdentityIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    t: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "pg11",
-      name: "by_default_as_identity"
-    }
-  },
-  executor: executor
-});
-const networkIdentifier = sql.identifier("pg11", "network");
-const networkCodec = recordCodec({
-  name: "network",
-  identifier: networkIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    inet: {
-      codec: TYPES.inet
-    },
-    cidr: {
-      codec: TYPES.cidr
-    },
-    macaddr: {
-      codec: TYPES.macaddr
-    },
-    macaddr8: {
-      codec: TYPES.macaddr8
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "pg11",
-      name: "network"
-    }
-  },
-  executor: executor
 });
 const bigintDomainCodec = domainOfCodec(TYPES.bigint, "bigintDomain", sql.identifier("c", "bigint_domain"), {
   extensions: {
@@ -268,6 +182,94 @@ const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "dom
     }
   }
 });
+const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
+const alwaysAsIdentityCodec = recordCodec({
+  name: "alwaysAsIdentity",
+  identifier: alwaysAsIdentityIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        isInsertable: false,
+        isUpdatable: false
+      }
+    },
+    t: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "pg11",
+      name: "always_as_identity"
+    }
+  },
+  executor: executor
+});
+const byDefaultAsIdentityIdentifier = sql.identifier("pg11", "by_default_as_identity");
+const byDefaultAsIdentityCodec = recordCodec({
+  name: "byDefaultAsIdentity",
+  identifier: byDefaultAsIdentityIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    t: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "pg11",
+      name: "by_default_as_identity"
+    }
+  },
+  executor: executor
+});
+const networkIdentifier = sql.identifier("pg11", "network");
+const networkCodec = recordCodec({
+  name: "network",
+  identifier: networkIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    inet: {
+      codec: TYPES.inet
+    },
+    cidr: {
+      codec: TYPES.cidr
+    },
+    macaddr: {
+      codec: TYPES.macaddr
+    },
+    macaddr8: {
+      codec: TYPES.macaddr8
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "pg11",
+      name: "network"
+    }
+  },
+  executor: executor
+});
 const typesIdentifier = sql.identifier("pg11", "types");
 const typesCodec = recordCodec({
   name: "types",
@@ -325,23 +327,19 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    alwaysAsIdentity: alwaysAsIdentityCodec,
-    int4: TYPES.int,
     text: TYPES.text,
-    byDefaultAsIdentity: byDefaultAsIdentityCodec,
-    network: networkCodec,
+    varchar: TYPES.varchar,
+    bpchar: TYPES.bpchar,
+    int4: TYPES.int,
     inet: TYPES.inet,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr,
     macaddr8: TYPES.macaddr8,
-    varchar: TYPES.varchar,
-    bpchar: TYPES.bpchar,
     regrole: TYPES.regrole,
     regnamespace: TYPES.regnamespace,
     bigintDomainArrayDomain: bigintDomainArrayDomainCodec,
     bigintDomain: bigintDomainCodec,
     int8: TYPES.bigint,
-    bigintDomainArray: bigintDomainArrayCodec,
     domainConstrainedCompoundType: domainConstrainedCompoundTypeCodec,
     compoundType: compoundTypeCodec,
     color: colorCodec,
@@ -349,6 +347,10 @@ const registry = makeRegistry({
     enumCaps: enumCapsCodec,
     enumWithEmptyString: enumWithEmptyStringCodec,
     interval: TYPES.interval,
+    bigintDomainArray: bigintDomainArrayCodec,
+    alwaysAsIdentity: alwaysAsIdentityCodec,
+    byDefaultAsIdentity: byDefaultAsIdentityCodec,
+    network: networkCodec,
     types: typesCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
@@ -407,6 +409,24 @@ const registry = makeRegistry({
         },
         tags: {
           name: "LetterAToDViaView"
+        }
+      }
+    }),
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
         }
       }
     }),
@@ -961,8 +981,9 @@ function getClientMutationIdForCreatePlan($mutation) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -2519,7 +2540,7 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       type(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");

@@ -19,7 +19,11 @@ export function context(): __ValueStep<Grafast.Context> {
 }
 
 export function rootValue(): __ValueStep<Record<string, any>> {
-  return operationPlan().rootValueStep as __ValueStep<any>;
+  return operationPlan().rootValueStep;
+}
+
+export function variableValues(): __ValueStep<Record<string, any>> {
+  return operationPlan().variableValuesStep;
 }
 
 /**

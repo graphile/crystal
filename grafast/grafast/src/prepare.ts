@@ -42,18 +42,19 @@ import { establishOperationPlan } from "./establishOperationPlan.ts";
 import type {
   ErrorBehavior,
   EstablishOperationPlanEvent,
-  GrafastExecutionArgs,
+  GrafastInternalExecutionArgs,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.ts";
-import { promiseWithResolve } from "./promiseWithResolve.ts";
 import { timeSource } from "./timeSource.ts";
 import {
+  abortable,
   arrayOfLength,
   asyncIteratorWithCleanup,
+  consume,
   isPromiseLike,
 } from "./utils.ts";
 
@@ -170,19 +171,19 @@ function releaseUnusedIterators(
     for (const stream of allStreams) {
       if (stream.return) {
         try {
-          const result = stream.return();
-          if (isPromiseLike(result)) result.then(null, noop);
+          consume(stream.return());
         } catch {
           /*noop*/
         }
       } else if (stream.throw) {
         try {
-          const result = stream.throw(
-            new Error(
-              `Iterator no longer needed (due to OutputPlan branch being skipped)`,
+          consume(
+            stream.throw(
+              new Error(
+                `Iterator no longer needed (due to OutputPlan branch being skipped)`,
+              ),
             ),
           );
-          if (isPromiseLike(result)) result.then(null, noop);
         } catch {
           /*noop*/
         }
@@ -265,7 +266,6 @@ function outputBucket(
   const operationPlan = rootBucket.layerPlan.operationPlan;
   const root: PayloadRoot = {
     errorBehavior: requestContext.args.onError ?? "PROPAGATE",
-    insideGraphQL: false,
     errors: [],
     queue: [],
     streams: [],
@@ -318,16 +318,15 @@ function outputBucket(
   }
 }
 
+/** @internal */
 function executePreemptive(
-  args: GrafastExecutionArgs,
+  args: GrafastInternalExecutionArgs,
   operationPlan: OperationPlan,
   variableValues: any,
-  context: any,
-  rootValue: any,
   onError: ErrorBehavior,
   outputDataAsString: boolean,
   executionTimeout: number | null,
-  abortSignal: AbortSignal,
+  requestAbortSignal: AbortSignal,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -342,8 +341,14 @@ function executePreemptive(
     operationPlan.variableValuesStep.id,
     unaryExecutionValue(variableValues),
   );
-  store.set(operationPlan.contextStep.id, unaryExecutionValue(context));
-  store.set(operationPlan.rootValueStep.id, unaryExecutionValue(rootValue));
+  store.set(
+    operationPlan.contextStep.id,
+    unaryExecutionValue(args.contextValue),
+  );
+  store.set(
+    operationPlan.rootValueStep.id,
+    unaryExecutionValue(args.rootValue),
+  );
 
   const rootBucket = newBucket(null, {
     layerPlan: operationPlan.rootLayerPlan,
@@ -363,9 +368,8 @@ function executePreemptive(
     startTime,
     stopTime,
     // toSerialize: [],
-    eventEmitter: rootValue?.[$$eventEmitter],
-    abortSignal,
-    insideGraphQL: false,
+    eventEmitter: args[$$eventEmitter],
+    abortSignal: requestAbortSignal,
   };
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
@@ -421,7 +425,7 @@ function executePreemptive(
       return finalize(
         result,
         ctx,
-        index === 0 ? (rootValue[$$extensions] ?? undefined) : undefined,
+        index === 0 ? (args[$$extensions] ?? undefined) : undefined,
         outputDataAsString,
       );
     }
@@ -448,15 +452,14 @@ function executePreemptive(
       releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
       const errors = [
-        new GraphQLError(
-          bucketRootValue.message,
-          operationPlan.rootOutputPlan.locationDetails.node, // node
-          undefined, // source
-          null, // positions
-          null, // path
-          bucketRootValue, // originalError
-          null, // extensions
-        ),
+        new GraphQLError(bucketRootValue.message, {
+          nodes: operationPlan.rootOutputPlan.locationDetails.node,
+          source: undefined,
+          positions: null,
+          path: null,
+          originalError: bucketRootValue,
+          extensions: null,
+        }),
       ];
       const payload = Object.create(null) as ExecutionResult;
       payload.errors = errors;
@@ -478,28 +481,30 @@ function executePreemptive(
       // `releaseUnusedIterators(rootBucket, rootBucketIndex, null)` here.
       const arr = bucketRootValue as StreamMoreableArray;
       const stream = arr[$$streamMore];
-      // Do the async iterable
-      let stopped = false;
-      const { promise: abortPromise, resolve: resolveAbort } =
-        promiseWithResolve<void>();
+      const iteratorAbortController = new AbortController();
+      const abortIteratorWhenRequestAborts = () =>
+        iteratorAbortController.abort();
+      requestAbortSignal.addEventListener(
+        "abort",
+        abortIteratorWhenRequestAborts,
+        { once: true },
+      );
+      const iteratorAbortSignal = iteratorAbortController.signal;
       const iterator = newIterator((e) => {
-        stopped = true;
-        resolveAbort();
+        iteratorAbortController.abort();
+        requestAbortSignal.removeEventListener(
+          "abort",
+          abortIteratorWhenRequestAborts,
+        );
         if (e != null) {
           try {
-            const result = stream.throw?.(e);
-            if (isPromiseLike(result)) {
-              result.then(null, noop);
-            }
+            consume(stream.throw?.(e));
           } catch {
             /*noop*/
           }
         } else {
           try {
-            const result = stream.return?.();
-            if (isPromiseLike(result)) {
-              result.then(null, noop);
-            }
+            consume(stream.return?.());
           } catch {
             /*noop*/
           }
@@ -509,38 +514,54 @@ function executePreemptive(
         let i = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-          const next = await Promise.race([abortPromise, stream.next()]);
-          if (stopped || !next) {
+          const next = await abortable(
+            iteratorAbortSignal,
+            undefined,
+            stream.next(),
+          );
+          if (next === undefined) {
+            consume(stream.return?.());
             break;
           }
-          if (!next) {
-            iterator.throw(new Error("Invalid iteration")).then(null, noop);
+          if (next.done) {
+            // Stream already exited
             break;
           }
-          const { done, value } = next;
-          if (done) {
-            break;
-          }
-          const payload = await Promise.race([
-            abortPromise,
-            executeStreamPayload(value, i),
-          ]);
-          if (payload === undefined) {
-            break;
-          }
-          if (isAsyncIterable(payload)) {
-            // FIXME: do we need to avoid 'for await' because it can cause the
-            // stream to exit late if we're waiting on a promise and the stream
-            // exits in the interrim? We're assuming that no promises will be
-            // sufficiently long-lived for this to be an issue right now.
-            // TODO: should probably tie all this into an AbortController/signal too
-            for await (const entry of payload) {
-              iterator.push(entry);
+          try {
+            const payload = await abortable(
+              iteratorAbortSignal,
+              undefined,
+              executeStreamPayload(next.value, i),
+            );
+            if (payload === undefined) {
+              break;
             }
-          } else {
-            iterator.push(payload);
+            if (isAsyncIterable(payload)) {
+              const payloadIterator = payload[Symbol.asyncIterator]();
+              while (true) {
+                const next = await abortable(
+                  iteratorAbortSignal,
+                  undefined,
+                  payloadIterator.next(),
+                );
+                if (next === undefined) {
+                  consume(payloadIterator.return?.(undefined));
+                  break;
+                }
+                if (next.done) {
+                  // Iterator already exited
+                  break;
+                }
+                iterator.push(next.value);
+              }
+            } else {
+              iterator.push(payload);
+            }
+            i++;
+          } catch (error) {
+            consume(iterator.return?.());
+            throw error;
           }
-          i++;
         }
       })()
         .then(
@@ -561,12 +582,7 @@ function executePreemptive(
       rootBucket.store.get(operationPlan.variableValuesStep.id)!.at(0),
       outputDataAsString,
     );
-    return finalize(
-      result,
-      ctx,
-      rootValue[$$extensions] ?? undefined,
-      outputDataAsString,
-    );
+    return finalize(result, ctx, args[$$extensions], outputDataAsString);
   }
 
   if (isPromiseLike(bucketPromise)) {
@@ -593,7 +609,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
  * @internal
  */
 export function grafastPrepare(
-  args: GrafastExecutionArgs,
+  args: GrafastInternalExecutionArgs,
   options: GrafastOperationOptions,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
@@ -601,7 +617,7 @@ export function grafastPrepare(
   const {
     schema,
     contextValue: context,
-    rootValue = Object.create(null),
+    rootValue,
     // operationName,
     // document,
     middleware,
@@ -612,7 +628,7 @@ export function grafastPrepare(
   if (Array.isArray(exeContext) || "length" in exeContext) {
     return Object.assign(Object.create(bypassGraphQLObj), {
       errors: exeContext,
-      extensions: rootValue[$$extensions],
+      extensions: args[$$extensions],
     });
   }
 
@@ -654,15 +670,10 @@ export function grafastPrepare(
     const graphqlError =
       error instanceof GraphQLError
         ? error
-        : new GraphQLError(
-            error.message,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            error,
-            error.extensions ?? null,
-          );
+        : new GraphQLError(error.message, {
+            originalError: error,
+            extensions: error.extensions ?? null,
+          });
     return { errors: [graphqlError] };
   }
 
@@ -674,7 +685,7 @@ export function grafastPrepare(
     if (operationPlan[$$contextPlanCache] == null) {
       operationPlan[$$contextPlanCache] = operationPlan.generatePlanJSON();
     }
-    rootValue[$$extensions]?.explain?.operations.push({
+    args[$$extensions]?.explain?.operations.push({
       type: "plan",
       title: "Plan",
       plan: operationPlan[$$contextPlanCache],
@@ -688,8 +699,6 @@ export function grafastPrepare(
       args,
       operationPlan,
       variableValues,
-      context,
-      rootValue,
       onError,
       options.outputDataAsString ?? false,
       executionTimeout,
@@ -753,10 +762,7 @@ function newIterator<T = any>(
             (v) => cbs[0]({ done: false, value: v }),
             (e) => {
               try {
-                const r = cbs[1](e);
-                if (isPromiseLike(r)) {
-                  r.then(null, noop);
-                }
+                consume(cbs[1](e));
               } catch (e) {
                 // ignore
               }

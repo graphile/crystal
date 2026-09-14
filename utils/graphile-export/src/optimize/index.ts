@@ -27,10 +27,11 @@ Error.stackTraceLimit = 100;
 
 function isSimpleArg(
   arg: t.Node,
-): arg is t.Literal | t.Identifier | t.MemberExpression {
+): arg is t.Literal | t.Identifier | t.MemberExpression | t.UnaryExpression {
   return (
     t.isLiteral(arg) ||
     t.isIdentifier(arg) ||
+    (t.isUnaryExpression(arg) && isSimpleArg(arg.argument)) ||
     (t.isMemberExpression(arg) &&
       isSimpleArg(arg.object) &&
       isSimpleArg(arg.property))
@@ -634,10 +635,6 @@ export const optimize = (inAst: t.File): t.File => {
           return;
         }
 
-        if (!args.every(isSimpleArg)) {
-          return;
-        }
-
         if (!params.every(isSimpleParam)) {
           return;
         }
@@ -653,6 +650,7 @@ export const optimize = (inAst: t.File): t.File => {
         for (let i = params.length - 1; i >= 0; i--) {
           const param = params[i];
           const arg = args[i];
+          if (!isSimpleArg(arg)) continue;
           const paramPath = paramsPaths[i];
           const argPath = argumentsPaths[i];
 
@@ -678,7 +676,11 @@ export const optimize = (inAst: t.File): t.File => {
                 paramPath.scope.removeBinding(param.name);
               }
             }
-          } else if (t.isLiteral(arg) || t.isMemberExpression(arg)) {
+          } else if (
+            t.isLiteral(arg) ||
+            t.isMemberExpression(arg) ||
+            t.isUnaryExpression(arg)
+          ) {
             const binding = calleePath.scope.bindings[param.name];
 
             // Replace all references to this identifier with the value
@@ -690,6 +692,9 @@ export const optimize = (inAst: t.File): t.File => {
             argPath.remove();
             paramPath.remove();
             paramPath.scope.removeBinding(param.name);
+          } else {
+            const never: never = arg;
+            throw new Error(`Unexpected arg ${inspect(never)}`);
           }
         }
 

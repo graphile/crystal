@@ -21,7 +21,7 @@ export {
 } from "./resolvePresets.ts";
 
 export function sortedPlugins(
-  plugins: GraphileConfig.Plugin[] | undefined,
+  plugins: ReadonlyArray<GraphileConfig.Plugin> | undefined,
 ): GraphileConfig.Plugin[] {
   if (plugins) {
     return sortWithBeforeAfterProvides(plugins, "name");
@@ -75,7 +75,7 @@ declare global {
      */
     interface Preset {
       extends?: ReadonlyArray<Preset>;
-      plugins?: Plugin[];
+      plugins?: ReadonlyArray<Plugin>;
       disablePlugins?: ReadonlyArray<keyof GraphileConfig.Plugins>;
       lib?: Partial<GraphileConfig.Lib>;
 
@@ -97,7 +97,7 @@ declare global {
       // As Preset, except `extends` is omitted; `plugins`, `disablePlugins`,
       // and `lib` are required.
       extends?: never;
-      plugins: Plugin[];
+      plugins: ReadonlyArray<Plugin>;
       disablePlugins: ReadonlyArray<keyof GraphileConfig.Plugins>;
       lib: GraphileConfig.Lib;
     }

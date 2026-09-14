@@ -1,7 +1,5 @@
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 
-import { main } from "./main.ts";
-
 export function options(yargs: Argv) {
   return yargs
     .example(
@@ -21,6 +19,7 @@ export function options(yargs: Argv) {
     });
 }
 export async function run(args: ArgsFromOptions<typeof options>) {
+  const { main } = await import("./main.ts");
   const text = await main({ filename: args.config, quiet: args.quiet });
   console.log(text);
 }

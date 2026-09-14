@@ -82,6 +82,7 @@ enum AnEnum {
 scalar AnInt
 
 type AnIntRange {
+  empty: Boolean!
   end: AnIntRangeBound
   start: AnIntRangeBound
 }
@@ -97,6 +98,7 @@ input AnIntRangeBoundInput {
 }
 
 input AnIntRangeInput {
+  empty: Boolean! = false
   end: AnIntRangeBoundInput
   start: AnIntRangeBoundInput
 }
@@ -165,6 +167,7 @@ scalar Base64EncodedBinary
 scalar BigFloat
 
 type BigFloatRange {
+  empty: Boolean!
   end: BigFloatRangeBound
   start: BigFloatRangeBound
 }
@@ -180,6 +183,7 @@ input BigFloatRangeBoundInput {
 }
 
 input BigFloatRangeInput {
+  empty: Boolean! = false
   end: BigFloatRangeBoundInput
   start: BigFloatRangeBoundInput
 }
@@ -618,6 +622,7 @@ scalar Cursor
 scalar Date
 
 type DateRange {
+  empty: Boolean!
   end: DateRangeBound
   start: DateRangeBound
 }
@@ -633,6 +638,7 @@ input DateRangeBoundInput {
 }
 
 input DateRangeInput {
+  empty: Boolean! = false
   end: DateRangeBoundInput
   start: DateRangeBoundInput
 }
@@ -1116,6 +1122,7 @@ input FloatRangeBoundInput {
 }
 
 input FloatRangeInput {
+  empty: Boolean! = false
   end: FloatRangeBoundInput
   start: FloatRangeBoundInput
 }
@@ -2324,6 +2331,8 @@ enum NullTestRecordsOrderBy {
   PRIMARY_KEY_DESC
 }
 
+scalar Oid
+
 type PageInfo {
   endCursor: Cursor
   hasNextPage: Boolean!
@@ -2787,6 +2796,8 @@ type Query implements Node {
   tableQuery(id: Int): Post
   tableSetQuery(after: Cursor, before: Cursor, condition: PersonCondition, first: Int, last: Int, offset: Int, orderBy: [PeopleOrderBy!]): PeopleConnection
   tableSetQueryPlpgsql(after: Cursor, before: Cursor, first: Int, last: Int, offset: Int): PeopleConnection
+  tableSetQueryVolatile(after: Cursor, before: Cursor, condition: PersonCondition, first: Int, last: Int, offset: Int): PeopleConnection
+  tableSetQueryVolatileList(condition: PersonCondition, first: Int, offset: Int): [Person]
   type(nodeId: ID!): Type
   typeById(id: Int!): Type
   typeFunction(id: Int): Type
@@ -3179,6 +3190,7 @@ type Type implements Node {
   nullableRange: BigFloatRange
   numeric: BigFloat!
   numrange: BigFloatRange!
+  oid: Oid
   point: Point!
   postById: Post
   postBySmallint: Post
@@ -3232,6 +3244,7 @@ input TypeCondition {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -3319,6 +3332,7 @@ input TypeInput {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat!
   numrange: BigFloatRangeInput!
+  oid: Oid
   point: PointInput!
   regclass: RegClass
   regconfig: RegConfig
@@ -3372,6 +3386,7 @@ input TypePatch {
   nullableRange: BigFloatRangeInput
   numeric: BigFloat
   numrange: BigFloatRangeInput
+  oid: Oid
   point: PointInput
   regclass: RegClass
   regconfig: RegConfig
@@ -3467,6 +3482,8 @@ enum TypesOrderBy {
   NULLABLE_POINT_DESC
   NUMERIC_ASC
   NUMERIC_DESC
+  OID_ASC
+  OID_DESC
   POINT_ASC
   POINT_DESC
   PRIMARY_KEY_ASC

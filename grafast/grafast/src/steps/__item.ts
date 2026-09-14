@@ -28,8 +28,7 @@ export class __ItemStep<TData> extends UnbatchedStep<TData> {
     super();
     this.depth = depth;
     this.addDependency(parentPlan);
-    this._isUnary = false;
-    this._isUnaryLocked = true;
+    this.operationPlan.stepTracker.setNonUnary(this, []);
   }
 
   toStringMeta(): string {

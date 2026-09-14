@@ -1,7 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, each, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, each, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
+const EMPTY_OBJECT = Object.freeze({});
 const rawNodeIdCodec = {
   name: "raw",
   encode: markSyncAndSafe(function rawEncode(value) {
@@ -11,6 +12,7 @@ const rawNodeIdCodec = {
     return typeof value === "string" ? value : null;
   })
 };
+const EMPTY_OBJECT2 = Object.freeze({});
 const nodeIdHandler_Query = {
   typeName: "Query",
   codec: rawNodeIdCodec,
@@ -24,7 +26,7 @@ const nodeIdHandler_Query = {
     return "irrelevant";
   },
   get() {
-    return rootValue();
+    return constant(EMPTY_OBJECT2);
   },
   plan() {
     return constant`query`;
@@ -63,7 +65,6 @@ const executor = new PgExecutor({
     });
   }
 });
-const tIdentifier = sql.identifier("nested_arrays", "t");
 const workHourPartsCodec = recordCodec({
   name: "workHourParts",
   identifier: sql.identifier("nested_arrays", "work_hour_parts"),
@@ -142,6 +143,7 @@ const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", sql
   },
   description: "Mo, Tu, We, Th, Fr, Sa, Su, Ho"
 });
+const tIdentifier = sql.identifier("nested_arrays", "t");
 const tCodec = recordCodec({
   name: "t",
   identifier: tIdentifier,
@@ -166,11 +168,11 @@ const tCodec = recordCodec({
   },
   executor: executor
 });
-const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
 const tUniques = [{
   attributes: ["k"],
   isPrimary: true
 }];
+const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
 const registry = makeRegistry({
   pgExecutors: {
     __proto__: null,
@@ -178,19 +180,19 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
+    text: TYPES.text,
+    varchar: TYPES.varchar,
+    bpchar: TYPES.bpchar,
     bool: TYPES.boolean,
-    t: tCodec,
     int4: TYPES.int,
     workingHours: workingHoursCodec,
     workhours: workhoursCodec,
     workHour: workHourCodec,
     workHourParts: workHourPartsCodec,
     int2: TYPES.int2,
-    text: TYPES.text,
-    varchar: TYPES.varchar,
-    bpchar: TYPES.bpchar,
     workHourArray: workHourArrayCodec,
     workhoursArray: workhoursArrayCodec,
+    t: tCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -248,6 +250,24 @@ const registry = makeRegistry({
         },
         tags: {
           name: "LetterAToDViaView"
+        }
+      }
+    }),
+    EmptyEnumEnum: enumCodec({
+      name: "EmptyEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "empty_enum",
+          constraintType: "p",
+          constraintName: "empty_enum_pkey"
+        },
+        tags: {
+          name: "EmptyEnum"
         }
       }
     }),
@@ -515,6 +535,21 @@ const registry = makeRegistry({
   },
   pgResources: {
     __proto__: null,
+    t: {
+      executor: executor,
+      name: "t",
+      identifier: "main.nested_arrays.t",
+      from: tIdentifier,
+      codec: tCodec,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "nested_arrays",
+          name: "t"
+        }
+      },
+      uniques: tUniques
+    },
     check_work_hours: {
       executor: executor,
       name: "check_work_hours",
@@ -537,21 +572,6 @@ const registry = makeRegistry({
         }
       },
       isUnique: true
-    },
-    t: {
-      executor: executor,
-      name: "t",
-      identifier: "main.nested_arrays.t",
-      from: tIdentifier,
-      codec: tCodec,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "nested_arrays",
-          name: "t"
-        }
-      },
-      uniques: tUniques
     }
   },
   pgRelations: {
@@ -688,8 +708,9 @@ function applyInputToUpdateOrDelete(_, $object) {
 function planCreatePayloadResult($object) {
   return $object.get("result");
 }
+const EMPTY_OBJECT3 = Object.freeze({});
 function queryPlan() {
-  return rootValue();
+  return constant(EMPTY_OBJECT3);
 }
 const getPgSelectSingleFromMutationResult = (pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -1125,7 +1146,7 @@ export const objects = {
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
       },
       query() {
-        return rootValue();
+        return constant(EMPTY_OBJECT);
       },
       t(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");

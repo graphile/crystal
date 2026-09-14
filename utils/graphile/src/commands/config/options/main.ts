@@ -15,6 +15,14 @@ const FORBIDDEN = [
   "skipPlugins",
 ];
 
+function code(string: string, lang = "") {
+  if (string.includes("\n") || string.includes("`")) {
+    return `\n\`\`\`${lang}\n${string.trimEnd()}\n\`\`\`\n`;
+  } else {
+    return `\`${string}\``;
+  }
+}
+
 export function main(options: { filename?: string; scope?: string }) {
   const { filename, scope } = options;
   const { getCompletions, getQuickInfo } = configVfs({
@@ -274,11 +282,12 @@ modules).\
           const displayParts = prettyDisplayParts(info?.displayParts, ":");
           const hasDefaultValue = defaultValueTag?.text;
           outLaterStill(
-            `${chalk.greenBright.bold("Type")}: \`${
+            `${chalk.greenBright.bold("Type")}: ${code(
               displayParts
                 ? chalk.whiteBright(displayParts)
-                : chalk.gray("unknown")
-            }\`${hasDefaultValue ? "  " : ""}`,
+                : chalk.gray("unknown"),
+              "ts",
+            )}${hasDefaultValue ? "  " : ""}`,
           );
           if (hasDefaultValue) {
             outLaterStill(
@@ -299,25 +308,26 @@ modules).\
         ) {
           outLater("```ts");
           outLater(`{`);
+          const indent = (str: string) => "  " + str.replace(/\n/g, "\n  ");
           for (const entry of subentries) {
-            outLater("  " + entry);
+            outLater(indent(entry));
           }
           if (subentries.length && advancedSubentries.length) {
             outLater("");
-            outLater("  // Advanced");
+            outLater(indent("// Advanced"));
           }
           for (const entry of advancedSubentries) {
-            outLater("  " + entry);
+            outLater(indent(entry));
           }
           if (
             (subentries.length || advancedSubentries.length) &&
             deprecatedSubentries.length
           ) {
             outLater("");
-            outLater("  // Deprecated");
+            outLater(indent("// Deprecated"));
           }
           for (const entry of deprecatedSubentries) {
-            outLater("  " + entry);
+            outLater(indent(entry));
           }
           outLater("}");
           outLater("```");
@@ -351,8 +361,9 @@ modules).\
   if (!scope && entries.length) {
     out("```ts");
     out(`{`);
+    const indent = (str: string) => "  " + str.replace(/\n/g, "\n  ");
     for (const entry of entries) {
-      out("  " + entry);
+      out(indent(entry));
     }
     out("}");
     out("```");
