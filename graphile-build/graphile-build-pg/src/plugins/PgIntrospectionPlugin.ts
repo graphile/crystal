@@ -775,7 +775,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 };
 
 function introspectPgServices(
-  info: GatherPluginContext<{}, {}>,
+  info: GatherPluginContext<State, Cache>,
 ): Promise<RawIntrospectionResults> {
   const { withPgClientFromPgService } = info.lib.dataplanPg;
   const pgServices = info.resolvedPreset.pgServices;
