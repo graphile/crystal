@@ -105,9 +105,9 @@ export default function makeNewBuild(
       );
     }
     allTypesSources[typeName] = newTypeSource;
-    const type = getConstructorType(Constructor);
+    const kind = getConstructorKind(Constructor);
     typeRegistry[typeName] = {
-      type,
+      kind,
       Constructor,
       scope,
       specGenerator,
@@ -335,7 +335,7 @@ export default function makeNewBuild(
         case "Int":
         case "Float":
           return nullClone({
-            type: "SCALAR",
+            kind: "SCALAR",
             typeName,
             Constructor: GraphQLScalarType,
             scope: Object.freeze({}),
@@ -361,10 +361,7 @@ export default function makeNewBuild(
       }
 
       const details = typeRegistry[typeName];
-      if (details != null) {
-        return nullClone(details);
-      }
-      return null;
+      return details ? nullClone(details) : null;
     },
 
     getTypeByName(typeName) {
@@ -574,6 +571,9 @@ function mustUseThunkMessage(fn: string) {
   );
 }
 
+/**
+ * Does a copy of `obj` onto a null prototype object.
+ */
 function nullClone<T>(obj: T): T {
   return Object.assign(Object.create(null), obj);
 }
@@ -586,7 +586,7 @@ type GraphQLConstructor =
   | typeof GraphQLEnumType
   | typeof GraphQLInputObjectType;
 
-function getConstructorType(Constructor: GraphQLConstructor) {
+function getConstructorKind(Constructor: GraphQLConstructor) {
   switch (Constructor) {
     case GraphQLObjectType:
       return "OBJECT";

@@ -96,7 +96,7 @@ export type TypeMeta =
   | InputObjectTypeMeta;
 
 export type ObjectTypeMeta = {
-  type: "OBJECT";
+  kind: "OBJECT";
   typeName: string;
   Constructor: typeof GraphQLObjectType;
   scope: GraphileBuild.ScopeObject;
@@ -105,7 +105,7 @@ export type ObjectTypeMeta = {
   specGenerator: () => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">;
 };
 export type InterfaceTypeMeta = {
-  type: "INTERFACE";
+  kind: "INTERFACE";
   typeName: string;
   Constructor: typeof GraphQLInterfaceType;
   scope: GraphileBuild.ScopeInterface;
@@ -117,7 +117,7 @@ export type InterfaceTypeMeta = {
   >;
 };
 export type UnionTypeMeta = {
-  type: "UNION";
+  kind: "UNION";
   typeName: string;
   Constructor: typeof GraphQLUnionType;
   scope: GraphileBuild.ScopeUnion;
@@ -126,7 +126,7 @@ export type UnionTypeMeta = {
   specGenerator: () => Omit<GraphileBuild.GrafastUnionTypeConfig<any>, "name">;
 };
 export type ScalarTypeMeta = {
-  type: "SCALAR";
+  kind: "SCALAR";
   typeName: string;
   Constructor: typeof GraphQLScalarType;
   scope: GraphileBuild.ScopeScalar;
@@ -135,7 +135,7 @@ export type ScalarTypeMeta = {
   specGenerator: () => Omit<GraphQLScalarTypeConfig<any, any>, "name">;
 };
 export type EnumTypeMeta = {
-  type: "ENUM";
+  kind: "ENUM";
   typeName: string;
   Constructor: typeof GraphQLEnumType;
   scope: GraphileBuild.ScopeEnum;
@@ -144,7 +144,7 @@ export type EnumTypeMeta = {
   specGenerator: () => Omit<GraphQLEnumTypeConfig, "name">;
 };
 export type InputObjectTypeMeta = {
-  type: "INPUT_OBJECT";
+  kind: "INPUT_OBJECT";
   typeName: string;
   Constructor: typeof GraphQLInputObjectType;
   scope: GraphileBuild.ScopeInputObject;
