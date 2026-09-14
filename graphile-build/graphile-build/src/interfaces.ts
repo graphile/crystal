@@ -1,4 +1,16 @@
+import type { Step } from "grafast";
 import type { AsyncHooks } from "graphile-config";
+import type {
+  GraphQLEnumType,
+  GraphQLEnumTypeConfig,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
+  GraphQLObjectType,
+  GraphQLScalarType,
+  GraphQLScalarTypeConfig,
+  GraphQLUnionType,
+} from "graphql";
+import { GraphQLObjectTypeConfig } from "graphql";
 
 import type { EXPORTABLE } from "./utils.ts";
 
@@ -75,3 +87,69 @@ export interface GatherPluginContext<
    */
   cache: TCache;
 }
+
+export type TypeMeta =
+  | ObjectTypeMeta
+  | InterfaceTypeMeta
+  | UnionTypeMeta
+  | ScalarTypeMeta
+  | EnumTypeMeta
+  | InputObjectTypeMeta;
+
+export type ObjectTypeMeta = {
+  type: "OBJECT";
+  typeName: string;
+  Constructor: typeof GraphQLObjectType;
+  scope: GraphileBuild.ScopeObject;
+  origin: string | null | undefined;
+  Step?: { new (...args: any[]): Step } | null;
+  specGenerator: () => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">;
+};
+export type InterfaceTypeMeta = {
+  type: "INTERFACE";
+  typeName: string;
+  Constructor: typeof GraphQLInterfaceType;
+  scope: GraphileBuild.ScopeInterface;
+  origin: string | null | undefined;
+  Step?: never;
+  specGenerator: () => Omit<
+    GraphileBuild.GrafastInterfaceTypeConfig<any>,
+    "name"
+  >;
+};
+export type UnionTypeMeta = {
+  type: "UNION";
+  typeName: string;
+  Constructor: typeof GraphQLUnionType;
+  scope: GraphileBuild.ScopeUnion;
+  origin: string | null | undefined;
+  Step?: never;
+  specGenerator: () => Omit<GraphileBuild.GrafastUnionTypeConfig<any>, "name">;
+};
+export type ScalarTypeMeta = {
+  type: "SCALAR";
+  typeName: string;
+  Constructor: typeof GraphQLScalarType;
+  scope: GraphileBuild.ScopeScalar;
+  origin: string | null | undefined;
+  Step?: never;
+  specGenerator: () => Omit<GraphQLScalarTypeConfig<any, any>, "name">;
+};
+export type EnumTypeMeta = {
+  type: "ENUM";
+  typeName: string;
+  Constructor: typeof GraphQLEnumType;
+  scope: GraphileBuild.ScopeEnum;
+  origin: string | null | undefined;
+  Step?: never;
+  specGenerator: () => Omit<GraphQLEnumTypeConfig, "name">;
+};
+export type InputObjectTypeMeta = {
+  type: "INPUT_OBJECT";
+  typeName: string;
+  Constructor: typeof GraphQLInputObjectType;
+  scope: GraphileBuild.ScopeInputObject;
+  origin: string | null | undefined;
+  Step?: never;
+  specGenerator: () => Omit<GraphileBuild.GrafastInputObjectTypeConfig, "name">;
+};

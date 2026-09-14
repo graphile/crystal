@@ -23,6 +23,7 @@ import * as semver from "semver";
 
 import append from "./append.ts";
 import extend, { indent } from "./extend.ts";
+import type { TypeMeta } from "./interfaces.ts";
 import type SchemaBuilder from "./SchemaBuilder.ts";
 import { intTypeSpec, stringTypeSpec, wrapDescription } from "./utils.ts";
 import { version } from "./version.ts";
@@ -31,16 +32,6 @@ const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
 
 /** Have we warned the user they're using the 5-arg deprecated registerObjectType call? */
 let registerObjectType5argsDeprecatedWarned = false;
-
-/** @internal */
-interface TypeDetails {
-  typeName: string;
-  // The constructor - GraphQLScalarType, GraphQLObjectType, etc
-  klass: { new (spec: any): GraphQLNamedType };
-  scope: GraphileBuild.SomeScope;
-  specGenerator: any;
-  origin: string | null | undefined;
-}
 
 /**
  * Makes a new 'Build' object suitable to be passed through the 'build' hook.
@@ -73,7 +64,7 @@ export default function makeNewBuild(
    * Where the type factories are; so we don't construct types until they're needed.
    */
   const typeRegistry: {
-    [key: string]: TypeDetails;
+    [key: string]: TypeMeta;
   } = Object.create(null);
 
   const scopeByType = new Map<GraphQLNamedType, GraphileBuild.SomeScope>();
@@ -81,7 +72,7 @@ export default function makeNewBuild(
   // TODO: allow registering a previously constructed type.
   function register(
     this: GraphileBuild.BuildBase,
-    klass: { new (spec: any): GraphQLNamedType },
+    Constructor: GraphQLConstructor,
     typeName: string,
     scope: GraphileBuild.SomeScope,
     specGenerator: () => any,
@@ -92,7 +83,7 @@ export default function makeNewBuild(
     }
     if (!typeName) {
       throw new Error(
-        `Attempted to register a ${klass.name} with empty (or falsy) type name`,
+        `Attempted to register a ${Constructor.name} with empty (or falsy) type name`,
       );
     }
     const newTypeSource =
@@ -114,13 +105,14 @@ export default function makeNewBuild(
       );
     }
     allTypesSources[typeName] = newTypeSource;
+    const type = getConstructorType(Constructor);
     typeRegistry[typeName] = {
-      typeName,
-      klass,
+      type,
+      Constructor,
       scope,
       specGenerator,
       origin,
-    };
+    } as TypeMeta;
   }
 
   const build: GraphileBuild.BuildBase = {
@@ -342,7 +334,9 @@ export default function makeNewBuild(
         case "Boolean":
         case "Int":
         case "Float":
-          return Object.assign(Object.create(null), {
+          return nullClone({
+            type: "SCALAR",
+            typeName,
             Constructor: GraphQLScalarType,
             scope: Object.freeze({}),
             origin: "GraphQL builtin",
@@ -368,13 +362,7 @@ export default function makeNewBuild(
 
       const details = typeRegistry[typeName];
       if (details != null) {
-        const { klass: Constructor, scope, origin, specGenerator } = details;
-        return Object.assign(Object.create(null), {
-          Constructor,
-          scope,
-          origin,
-          specGenerator,
-        });
+        return nullClone(details);
       }
       return null;
     },
@@ -382,17 +370,17 @@ export default function makeNewBuild(
     getTypeByName(typeName) {
       if (
         currentTypeDetails &&
-        currentTypeDetails.klass !== GraphQLScalarType &&
+        currentTypeDetails.Constructor !== GraphQLScalarType &&
         !BUILTINS.includes(typeName)
       ) {
         const details = typeRegistry[typeName];
         if (
           !details ||
-          (details.klass !== GraphQLScalarType &&
-            details.klass !== GraphQLEnumType)
+          (details.Constructor !== GraphQLScalarType &&
+            details.Constructor !== GraphQLEnumType)
         ) {
           throw new Error(
-            `Error in spec callback for ${currentTypeDetails.klass.name} '${
+            `Error in spec callback for ${currentTypeDetails.Constructor.name} '${
               currentTypeDetails.typeName
             }'; the callback made a call to \`build.getTypeByName(${JSON.stringify(
               typeName,
@@ -423,20 +411,21 @@ style for these configuration options (e.g. change \`interfaces: \
         try {
           const details = typeRegistry[typeName];
           if (details != null) {
-            const { klass, scope } = details;
+            const { Constructor, scope } = details;
 
-            const spec = generateSpecFromDetails(details);
-            // No need to have the user specify name, and they're forbidden from
-            // changing name (use inflection instead!) so we just set it
-            // ourselves:
-            spec.name = typeName;
+            const spec = Object.assign(generateSpecFromDetails(details), {
+              // No need to have the user specify name, and they're forbidden from
+              // changing name (use inflection instead!) so we just set it
+              // ourselves:
+              name: typeName,
+            }) as ReturnType<typeof generateSpecFromDetails> & { name: string };
 
             const finishedBuild = build as ReturnType<
               (typeof builder)["createBuild"]
             >;
             const type = builder.newWithHooks<any>(
               finishedBuild,
-              klass,
+              Constructor as any,
               spec,
               scope,
             );
@@ -444,8 +433,8 @@ style for these configuration options (e.g. change \`interfaces: \
             allTypes[typeName] = type;
 
             if (
-              klass === GraphQLObjectType ||
-              klass === GraphQLInputObjectType
+              Constructor === GraphQLObjectType ||
+              Constructor === GraphQLInputObjectType
             ) {
               // Perform fields check. It's critical that `allTypes[typeName]` is
               // set above this to prevent infinite loops in case one of our
@@ -456,8 +445,7 @@ style for these configuration options (e.g. change \`interfaces: \
                 allTypes[typeName] = null;
                 return null;
               }
-            }
-            if (klass === GraphQLEnumType) {
+            } else if (Constructor === GraphQLEnumType) {
               // Perform values check.
               if (Object.keys(type.getValues()).length === 0) {
                 allTypes[typeName] = null;
@@ -565,9 +553,9 @@ style for these configuration options (e.g. change \`interfaces: \
   return build;
 }
 
-let currentTypeDetails: TypeDetails | null = null;
+let currentTypeDetails: TypeMeta | null = null;
 
-function generateSpecFromDetails(details: TypeDetails) {
+function generateSpecFromDetails(details: TypeMeta) {
   currentTypeDetails = details;
   try {
     return details.specGenerator();
@@ -584,4 +572,36 @@ function mustUseThunkMessage(fn: string) {
     fn +
     " from inside a thunk."
   );
+}
+
+function nullClone<T>(obj: T): T {
+  return Object.assign(Object.create(null), obj);
+}
+
+type GraphQLConstructor =
+  | typeof GraphQLObjectType
+  | typeof GraphQLInterfaceType
+  | typeof GraphQLUnionType
+  | typeof GraphQLScalarType
+  | typeof GraphQLEnumType
+  | typeof GraphQLInputObjectType;
+
+function getConstructorType(Constructor: GraphQLConstructor) {
+  switch (Constructor) {
+    case GraphQLObjectType:
+      return "OBJECT";
+    case GraphQLInterfaceType:
+      return "INTERFACE";
+    case GraphQLUnionType:
+      return "UNION";
+    case GraphQLScalarType:
+      return "SCALAR";
+    case GraphQLEnumType:
+      return "ENUM";
+    case GraphQLInputObjectType:
+      return "INPUT_OBJECT";
+    default: {
+      throw new Error(`Unrecognized constructor ${Constructor}`);
+    }
+  }
 }

@@ -40,6 +40,7 @@ import type {
 
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.ts";
 import type { InflectionBase } from "./inflection.ts";
+import type { TypeMeta } from "./interfaces.ts";
 import type { intTypeSpec, stringTypeSpec, wrapDescription } from "./utils.ts";
 
 /*
@@ -504,19 +505,7 @@ declare global {
        * Returns details of the type name's registration (if it has been
        * registered) - useful when types are built based on other types.
        */
-      getTypeMetaByName: (typeName: string) => {
-        Constructor: { new (spec: any): GraphQLNamedType };
-        scope: GraphileBuild.SomeScope;
-        origin: string | null | undefined;
-        Step?: { new (...args: any[]): Step } | null;
-        specGenerator:
-          | (() => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">)
-          | (() => Omit<GrafastInterfaceTypeConfig<any>, "name">)
-          | (() => Omit<GrafastUnionTypeConfig<any>, "name">)
-          | (() => Omit<GraphQLScalarTypeConfig<any, any>, "name">)
-          | (() => Omit<GraphQLEnumTypeConfig, "name">)
-          | (() => Omit<GrafastInputObjectTypeConfig, "name">);
-      } | null;
+      getTypeMetaByName: (typeName: string) => TypeMeta | null;
 
       /**
        * Returns the GraphQL type with the given name, constructing it if
