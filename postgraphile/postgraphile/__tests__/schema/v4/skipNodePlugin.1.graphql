@@ -6920,7 +6920,7 @@ type Query {
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcOutSetof(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -6992,7 +6992,7 @@ type Query {
     offset: Int
   ): FuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   funcReturnsTableOneCol(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7017,7 +7017,7 @@ type Query {
   """Get a single `Input`."""
   inputById(id: Int!): Input
 
-  """Reads and enables pagination through a set of `Int4`."""
+  """Reads and enables pagination through a set of `Int`."""
   intSetQuery(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -7139,7 +7139,7 @@ type Query {
   """Get a single `SimilarTable2`."""
   similarTable2ById(id: Int!): SimilarTable2
 
-  """Reads and enables pagination through a set of `Int8`."""
+  """Reads and enables pagination through a set of `BigInt`."""
   staticBigInteger(
     """Read all values in the set after (below) this cursor."""
     after: Cursor

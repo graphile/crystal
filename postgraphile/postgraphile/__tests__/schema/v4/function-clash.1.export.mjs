@@ -9122,7 +9122,7 @@ type Query implements Node {
   ): QueryIntervalSetConnection
   queryTextArray: [String]
 
-  """Reads and enables pagination through a set of \`Int8\`."""
+  """Reads and enables pagination through a set of \`BigInt\`."""
   staticBigInteger(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9265,7 +9265,7 @@ type Query implements Node {
   ): FuncOutOutSetofConnection
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcOutSetof(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -9337,7 +9337,7 @@ type Query implements Node {
     after: Cursor
   ): FuncReturnsTableMultiColConnection
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   funcReturnsTableOneCol(
     i: Int
 
@@ -9360,7 +9360,7 @@ type Query implements Node {
     after: Cursor
   ): FuncReturnsTableOneColConnection
 
-  """Reads and enables pagination through a set of \`Int4\`."""
+  """Reads and enables pagination through a set of \`Int\`."""
   intSetQuery(
     x: Int
     y: Int
