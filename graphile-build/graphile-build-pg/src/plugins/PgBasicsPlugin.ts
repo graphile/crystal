@@ -9,7 +9,7 @@ import type {
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
-import type { GraphQLType } from "grafast/graphql";
+import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
 import { gatherConfig } from "graphile-build";
 import type { PgSQL, SQL } from "pg-sql2";
 
@@ -32,8 +32,9 @@ declare global {
     }
     type PgCodecTypeSituation = keyof GraphileBuild.PgCodecTypeSituations;
     interface PgCodecTypeSituations {
-      input: true;
+      // When extending, use 'true' for output situations and 'false' for input situations
       output: true;
+      input: false;
     }
     interface BehaviorStrings {
       select: true;
@@ -54,10 +55,17 @@ declare global {
       codec: PgCodec<any, any, any, any, any, any, any>,
       situation?: PgCodecTypeSituation,
     ) => boolean;
-    type GetGraphQLTypeByPgCodec = (
+    type GetGraphQLTypeByPgCodec = <TSituation extends PgCodecTypeSituation>(
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation: PgCodecTypeSituation,
-    ) => GraphQLType | null;
+      situation: TSituation,
+    ) =>
+      | (true extends GraphileBuild.PgCodecTypeSituations[TSituation]
+          ? GraphQLOutputType
+          : never)
+      | (false extends GraphileBuild.PgCodecTypeSituations[TSituation]
+          ? GraphQLInputType
+          : never)
+      | null;
     type GetGraphQLTypeNameByPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
       situation: PgCodecTypeSituation,
@@ -467,9 +475,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             return typeName ?? null;
           };
 
-        const getGraphQLTypeByPgCodec: GraphileBuild.GetGraphQLTypeByPgCodec = (
-          codec,
-          situation,
+        const getGraphQLTypeByPgCodec: GraphileBuild.GetGraphQLTypeByPgCodec = <
+          TSituation extends GraphileBuild.PgCodecTypeSituation,
+        >(
+          codec: PgCodec<any, any, any, any, any, any, any>,
+          situation: TSituation,
         ) => {
           if (!build.status.isInitPhaseComplete) {
             throw new Error(
@@ -480,11 +490,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             const type = getGraphQLTypeByPgCodec(codec.arrayOfCodec, situation);
             const nonNull = codec.extensions?.listItemNonNull;
             return type
-              ? new GraphQLList(nonNull ? new GraphQLNonNull(type) : type)
+              ? (new GraphQLList(
+                  nonNull ? new GraphQLNonNull(type) : type,
+                ) as any)
               : null;
           }
           const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
-          return typeName ? (build.getTypeByName(typeName) ?? null) : null;
+          return typeName
+            ? ((build.getTypeByName(typeName) as any) ?? null)
+            : null;
         };
 
         const hasGraphQLTypeForPgCodec: GraphileBuild.HasGraphQLTypeForPgCodec =
