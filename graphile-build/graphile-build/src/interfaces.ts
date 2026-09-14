@@ -1,4 +1,3 @@
-import type { Step } from "grafast";
 import type { AsyncHooks } from "graphile-config";
 import type {
   GraphQLEnumType,
