@@ -1,11 +1,5 @@
-import type { KeysOfType, PgExecutorContext } from "@dataplan/pg";
-import {
-  PgExecutor,
-  withPgClientFromPgService,
-  withSuperuserPgClientFromPgService,
-} from "@dataplan/pg";
+import type { KeysOfType, PgExecutor, PgExecutorContext } from "@dataplan/pg";
 import type { PromiseOrDirect, Step } from "grafast";
-import { abortable, constant, context, noop, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
@@ -342,6 +336,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     }),
     helpers: {
       getExecutorForService(info, serviceName) {
+        const { constant, context, object } = info.lib.grafast;
+        const { PgExecutor } = info.lib.dataplanPg;
         if (info.state.executors[serviceName]) {
           return info.state.executors[serviceName];
         }
@@ -532,9 +528,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             // Introspect the database (or read it from CLEAN cache)
             const introspectionPromise =
               info.cache.introspectionResultsPromise ??
-              (info.cache.introspectionResultsPromise = introspectPgServices(
-                info.resolvedPreset.pgServices,
-              ));
+              (info.cache.introspectionResultsPromise =
+                introspectPgServices(info));
 
             // Don't cache errors
             introspectionPromise.then(null, () => {
@@ -655,6 +650,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     },
 
     async watch(info, callback) {
+      const { withSuperuserPgClientFromPgService } = info.lib.dataplanPg;
+      const { abortable, noop } = info.lib.grafast;
       const unlistens: Array<() => void> = [];
       for (const pgService of info.resolvedPreset.pgServices ?? []) {
         if (!pgService.pgSubscriber) {
@@ -778,8 +775,10 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 };
 
 function introspectPgServices(
-  pgServices: ReadonlyArray<GraphileConfig.PgServiceConfiguration> | undefined,
+  info: GatherPluginContext<{}, {}>,
 ): Promise<RawIntrospectionResults> {
+  const { withPgClientFromPgService } = info.lib.dataplanPg;
+  const pgServices = info.resolvedPreset.pgServices;
   if (!pgServices) {
     return Promise.resolve([]);
   }
