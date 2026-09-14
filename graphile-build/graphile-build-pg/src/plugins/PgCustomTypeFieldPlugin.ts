@@ -49,10 +49,11 @@ import {
   trap,
   TRAP_INHIBITED,
 } from "grafast";
-import type {
-  GraphQLInputType,
-  GraphQLOutputType,
-  GraphQLSchema,
+import {
+  type GraphQLInputType,
+  type GraphQLNamedType,
+  type GraphQLOutputType,
+  type GraphQLSchema,
 } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 import type {} from "graphile-config";
@@ -894,18 +895,19 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                         if (isVoid) {
                           return fields;
                         }
-                        const baseType = getFunctionSourceReturnGraphQLType(
+                        const returnTypes = getFunctionSourceReturnGraphQLTypes(
                           build,
                           resource,
                         );
-                        if (!baseType) {
+                        if (!returnTypes) {
                           console.warn(
                             `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
                           );
                           return fields;
                         }
-                        const returnGraphQLTypeName =
-                          getNamedType(baseType).name;
+                        const { regularType: baseType, namedType } =
+                          returnTypes;
+                        const returnGraphQLTypeName = namedType.name;
                         const resultFieldName =
                           inflection.functionMutationResultFieldName({
                             resource,
@@ -1262,10 +1264,14 @@ function modFields(
           // NOTE: just because it's unique doesn't mean it doesn't
           // return a list.
 
-          const type = getFunctionSourceReturnGraphQLType(build, resource);
-          if (!type) {
+          const returnTypes = getFunctionSourceReturnGraphQLTypes(
+            build,
+            resource,
+          );
+          if (!returnTypes) {
             return memo;
           }
+          const { regularType: type } = returnTypes;
 
           const fieldName = isRootQuery
             ? inflection.customQueryField({ resource })
@@ -1295,27 +1301,26 @@ function modFields(
             },
           );
         } else {
-          const type = getFunctionSourceReturnGraphQLType(build, resource);
-          if (!type) {
+          const returnTypes = getFunctionSourceReturnGraphQLTypes(
+            build,
+            resource,
+          );
+          if (!returnTypes) {
             return memo;
           }
+          const { regularType: type, connectionType, namedType } = returnTypes;
 
           // isUnique is false => this is a 'setof' resource.
-
-          // If the resource still has an array type, then it's a 'setof
-          // foo[]' which __MUST NOT USE__ GraphQL connections; see:
-          // https://relay.dev/graphql/connections.htm#sec-Node
-          const canUseConnection =
-            !resource.sqlPartitionByIndex && !resource.isList;
 
           const baseScope = isRootQuery ? `queryField` : `typeField`;
           const connectionFieldBehaviorScope =
             `${baseScope}:resource:connection` as const;
-          const listFieldBehaviorScope = canUseConnection
-            ? (`${baseScope}:resource:list` as const)
-            : (`${baseScope}:resource:array` as const);
+          const listFieldBehaviorScope =
+            connectionType != null
+              ? (`${baseScope}:resource:list` as const)
+              : (`${baseScope}:resource:array` as const);
           if (
-            canUseConnection &&
+            connectionType != null &&
             build.behavior.pgResourceMatches(
               resource,
               connectionFieldBehaviorScope,
@@ -1329,82 +1334,55 @@ function modFields(
                   resource,
                 });
 
-            const namedType = build.graphql.getNamedType(type!);
-            const preferredConnectionTypeName =
-              resource.extensions?.tags?.returnType && namedType
-                ? inflection.connectionType(namedType.name)
-                : null;
-            const connectionTypeName = shouldUseCustomConnection(resource)
-              ? resource.codec.attributes
-                ? inflection.recordFunctionConnectionType({
-                    resource,
-                  })
-                : inflection.scalarFunctionConnectionType({
-                    resource,
-                  })
-              : preferredConnectionTypeName
-                ? preferredConnectionTypeName
-                : resource.codec.attributes
-                  ? inflection.tableConnectionType(resource.codec)
-                  : namedType
-                    ? inflection.connectionType(namedType.name)
-                    : null;
-
-            const ConnectionType = connectionTypeName
-              ? build.getOutputTypeByName(connectionTypeName)
-              : null;
-
-            if (ConnectionType) {
-              const deprecationReason = tagToString(
-                resource.extensions?.tags?.deprecated,
-              );
-              memo = build.recoverable(memo, () =>
-                build.extend(
-                  memo,
-                  {
-                    [fieldName]: fieldWithHooks(
-                      {
-                        fieldName,
-                        fieldBehaviorScope: connectionFieldBehaviorScope,
-                        isPgFieldConnection: true,
-                        pgFieldResource: resource,
-                      },
-                      {
-                        description:
-                          resource.description ??
-                          `Reads and enables pagination through a set of \`${
-                            namedType?.name ??
-                            inflection.tableType(resource.codec)
-                          }\`.`,
-                        type: build.nullableIf(
-                          isRootQuery ?? false,
-                          ConnectionType,
-                        ),
-                        args: makeFieldArgs(),
-                        plan: EXPORTABLE(
-                          (connection, getSelectPlanFromParentAndArgs) =>
-                            function plan(
-                              $parent: Step,
-                              args: FieldArgs,
-                              info: FieldInfo,
-                            ) {
-                              const $select = getSelectPlanFromParentAndArgs(
-                                $parent,
-                                args,
-                                info,
-                              ) as PgSelectStep;
-                              return connection($select);
-                            },
-                          [connection, getSelectPlanFromParentAndArgs],
-                        ),
-                        ...(deprecationReason ? { deprecationReason } : null),
-                      },
-                    ),
-                  },
-                  `Adding field '${fieldName}' to '${SelfName}' from function resource '${resource.name}'`,
-                ),
-              );
-            }
+            const deprecationReason = tagToString(
+              resource.extensions?.tags?.deprecated,
+            );
+            memo = build.recoverable(memo, () =>
+              build.extend(
+                memo,
+                {
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                      fieldBehaviorScope: connectionFieldBehaviorScope,
+                      isPgFieldConnection: true,
+                      pgFieldResource: resource,
+                    },
+                    {
+                      description:
+                        resource.description ??
+                        `Reads and enables pagination through a set of \`${
+                          namedType?.name ??
+                          inflection.tableType(resource.codec)
+                        }\`.`,
+                      type: build.nullableIf(
+                        isRootQuery ?? false,
+                        connectionType,
+                      ),
+                      args: makeFieldArgs(),
+                      plan: EXPORTABLE(
+                        (connection, getSelectPlanFromParentAndArgs) =>
+                          function plan(
+                            $parent: Step,
+                            args: FieldArgs,
+                            info: FieldInfo,
+                          ) {
+                            const $select = getSelectPlanFromParentAndArgs(
+                              $parent,
+                              args,
+                              info,
+                            ) as PgSelectStep;
+                            return connection($select);
+                          },
+                        [connection, getSelectPlanFromParentAndArgs],
+                      ),
+                      ...(deprecationReason ? { deprecationReason } : null),
+                    },
+                  ),
+                },
+                `Adding field '${fieldName}' to '${SelfName}' from function resource '${resource.name}'`,
+              ),
+            );
           }
 
           if (
@@ -1536,10 +1514,18 @@ function getPreferredType(
   }
 }
 
-function getFunctionSourceReturnGraphQLType(
+function getFunctionSourceReturnGraphQLTypes(
   build: GraphileBuild.Build,
   resource: PgResource<any, any, any, any, any>,
-): GraphQLOutputType | null {
+): {
+  namedType: GraphQLOutputType & GraphQLNamedType;
+  regularType: GraphQLOutputType;
+  connectionType: GraphQLOutputType | null;
+} | null {
+  const {
+    graphql: { getNamedType, isOutputType, GraphQLList },
+    inflection,
+  } = build;
   const resourceInnerCodec: PgCodec<any, any, any, any, undefined, any, any> =
     resource.codec.arrayOfCodec ?? resource.codec;
   if (!resourceInnerCodec) {
@@ -1547,36 +1533,99 @@ function getFunctionSourceReturnGraphQLType(
   }
   if (resourceInnerCodec.polymorphism?.mode === "union") {
     console.warn(
-      `Function may not return polymorphic mode:union codec '${resource.codec.name}'; insufficient information to determine the underlying type at runtime.`,
+      `Function may not return polymorphic mode:union codec '${resource.codec.name}'; insufficient information to reliably populate the underlying type at runtime.`,
     );
     return null;
   }
   const isVoid = resourceInnerCodec === TYPES.void;
-  const rawInnerType = isVoid
-    ? null
-    : (build.getGraphQLTypeByPgCodec(resourceInnerCodec, "output") as
-        | GraphQLOutputType
-        | undefined);
-  if (!rawInnerType && !isVoid) {
-    console.warn(
-      `Failed to find a suitable type for codec '${resource.codec.name}'; not adding function field`,
+  if (isVoid) return null;
+
+  const preferredType = resource.extensions?.tags?.returnType;
+  const preferredTypeMeta =
+    typeof preferredType === "string"
+      ? build.getTypeMetaByName(preferredType)
+      : null;
+  if (typeof preferredType === "string" && preferredTypeMeta == null) {
+    throw new Error(
+      `Type ${preferredType} indicated by '@returnType' smart tag was not found`,
     );
-    return null;
-  } else if (!rawInnerType) {
+  }
+  if (preferredTypeMeta != null && preferredTypeMeta.kind !== "OBJECT") {
+    throw new Error(
+      `Type ${preferredType} indicated by '@returnType' was expected to be an OBJECT, not ${preferredTypeMeta.kind}`,
+    );
+  }
+
+  const preferredCodec: PgCodec =
+    preferredTypeMeta?.scope.pgCodec ??
+    preferredTypeMeta?.scope.pgTypeResource?.codec ??
+    resourceInnerCodec;
+
+  const graphqlTypeForPreferredCodec = build.getGraphQLTypeByPgCodec(
+    preferredCodec,
+    "output",
+  ) as GraphQLOutputType | undefined;
+  if (graphqlTypeForPreferredCodec == null) {
+    console.warn(
+      `Failed to find a suitable type for codec '${preferredCodec}' (for resource '${resource.name}'); not adding function field`,
+    );
     return null;
   }
 
-  const preferredType = resource.extensions?.tags?.returnType;
-  const innerType = preferredType
-    ? getPreferredType(build, rawInnerType, preferredType)
-    : rawInnerType;
+  const innerType =
+    preferredType != null
+      ? preferredCodec.polymorphism?.mode === "single"
+        ? build.getTypeByName(preferredType)
+        : getPreferredType(build, graphqlTypeForPreferredCodec, preferredType)
+      : graphqlTypeForPreferredCodec;
+
+  if (innerType == null) {
+    console.warn(
+      `Failed to find a suitable type for resource '${resource.name}'; not adding function field`,
+    );
+    return null;
+  } else if (!isOutputType(innerType)) {
+    throw new Error(`${innerType} is not an output type`);
+  }
+
+  const namedType = getNamedType(innerType);
+
+  if (preferredType != null && namedType.name !== preferredType) {
+    throw new Error(
+      `Was trying to get '${preferredType}' but ended up with '${namedType.name}'`,
+    );
+  }
 
   // TODO: nullability
-  const type =
+  const regularType =
     innerType && resource.codec.arrayOfCodec
-      ? new build.graphql.GraphQLList(innerType)
+      ? new GraphQLList(innerType)
       : innerType;
-  return type;
+
+  // If the resource has an array type, then it's a 'setof
+  // foo[]' which __MUST NOT USE__ GraphQL connections; see:
+  // https://relay.dev/graphql/connections.htm#sec-Node
+  const canUseConnection =
+    !resource.isUnique && !resource.sqlPartitionByIndex && !resource.isList;
+
+  const connectionTypeName = canUseConnection
+    ? shouldUseCustomConnection(resource)
+      ? resource.codec.attributes
+        ? inflection.recordFunctionConnectionType({ resource })
+        : inflection.scalarFunctionConnectionType({ resource })
+      : preferredCodec.attributes
+        ? graphqlTypeForPreferredCodec !== namedType
+          ? inflection.connectionType(namedType.name)
+          : inflection.tableConnectionType(preferredCodec)
+        : inflection.connectionType(namedType.name)
+    : null;
+
+  const connectionType =
+    connectionTypeName != null
+      ? build.getOutputTypeByName(connectionTypeName)
+      : null;
+
+  return { namedType, regularType, connectionType };
 }
 
 const makeArg = EXPORTABLE(
