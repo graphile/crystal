@@ -1351,8 +1351,7 @@ function modFields(
                       description:
                         resource.description ??
                         `Reads and enables pagination through a set of \`${
-                          namedType?.name ??
-                          inflection.tableType(resource.codec)
+                          namedType.name
                         }\`.`,
                       type: build.nullableIf(
                         isRootQuery ?? false,
