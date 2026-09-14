@@ -10,7 +10,6 @@ import type {
   GraphQLScalarTypeConfig,
   GraphQLUnionType,
 } from "graphql";
-import { GraphQLObjectTypeConfig } from "graphql";
 
 import type { EXPORTABLE } from "./utils.ts";
 

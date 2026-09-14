@@ -1104,7 +1104,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             [key in keyof typeof TYPES]:
               | string
               | null
-              | { [situation: string]: string | null };
+              | {
+                  [situation in GraphileBuild.PgCodecTypeSituation]?:
+                    | string
+                    | null;
+                };
           } = {
             unknown: null,
             void: null,
@@ -1199,22 +1203,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           for (const rawKey in typeNameByTYPESKey) {
             const key = rawKey as keyof typeof typeNameByTYPESKey;
             const val = typeNameByTYPESKey[key];
+            if (val == null) continue;
             const typeNameSpec =
               typeof val === "string" ? { input: val, output: val } : val;
-            for (const situation in typeNameSpec) {
-              const typedSituation =
-                situation as GraphileBuild.PgCodecTypeSituation;
+            for (const situation of Object.keys(
+              typeNameSpec,
+            ) as GraphileBuild.PgCodecTypeSituation[]) {
               const typeName = typeNameSpec[situation];
               // Only register type if the user hasn't already done so
               if (
                 typeName &&
-                !build.hasGraphQLTypeForPgCodec(TYPES[key], typedSituation)
+                !build.hasGraphQLTypeForPgCodec(TYPES[key], situation)
               ) {
-                build.setGraphQLTypeForPgCodec(
-                  TYPES[key],
-                  typedSituation,
-                  typeName,
-                );
+                build.setGraphQLTypeForPgCodec(TYPES[key], situation, typeName);
               }
             }
           }

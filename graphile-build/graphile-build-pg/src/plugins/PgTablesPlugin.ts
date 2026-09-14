@@ -24,8 +24,8 @@ import { version } from "../version.ts";
 declare global {
   namespace GraphileBuild {
     interface PgCodecTypeSituations {
-      patch: true;
-      base: true;
+      patch: false;
+      base: false;
     }
     interface BehaviorStrings {
       table: true;
