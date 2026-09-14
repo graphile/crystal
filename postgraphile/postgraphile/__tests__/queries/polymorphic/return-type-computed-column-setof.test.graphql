@@ -3,17 +3,6 @@
 #> simpleCollections: "both"
 
 {
-  __type(name: "SingleTablePost") {
-    fields {
-      name
-      type {
-        name
-        ofType {
-          name
-        }
-      }
-    }
-  }
   allSingleTableItems(condition: { id: 4 }) {
     nodes {
       id
