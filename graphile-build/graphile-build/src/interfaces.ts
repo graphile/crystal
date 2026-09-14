@@ -101,7 +101,6 @@ export type ObjectTypeMeta = {
   Constructor: typeof GraphQLObjectType;
   scope: GraphileBuild.ScopeObject;
   origin: string | null | undefined;
-  Step?: { new (...args: any[]): Step } | null;
   specGenerator: () => Omit<GraphileBuild.GrafastObjectTypeConfig<any>, "name">;
 };
 export type InterfaceTypeMeta = {
@@ -110,7 +109,6 @@ export type InterfaceTypeMeta = {
   Constructor: typeof GraphQLInterfaceType;
   scope: GraphileBuild.ScopeInterface;
   origin: string | null | undefined;
-  Step?: never;
   specGenerator: () => Omit<
     GraphileBuild.GrafastInterfaceTypeConfig<any>,
     "name"
@@ -122,7 +120,6 @@ export type UnionTypeMeta = {
   Constructor: typeof GraphQLUnionType;
   scope: GraphileBuild.ScopeUnion;
   origin: string | null | undefined;
-  Step?: never;
   specGenerator: () => Omit<GraphileBuild.GrafastUnionTypeConfig<any>, "name">;
 };
 export type ScalarTypeMeta = {
@@ -131,7 +128,6 @@ export type ScalarTypeMeta = {
   Constructor: typeof GraphQLScalarType;
   scope: GraphileBuild.ScopeScalar;
   origin: string | null | undefined;
-  Step?: never;
   specGenerator: () => Omit<GraphQLScalarTypeConfig<any, any>, "name">;
 };
 export type EnumTypeMeta = {
@@ -140,7 +136,6 @@ export type EnumTypeMeta = {
   Constructor: typeof GraphQLEnumType;
   scope: GraphileBuild.ScopeEnum;
   origin: string | null | undefined;
-  Step?: never;
   specGenerator: () => Omit<GraphQLEnumTypeConfig, "name">;
 };
 export type InputObjectTypeMeta = {
@@ -149,6 +144,5 @@ export type InputObjectTypeMeta = {
   Constructor: typeof GraphQLInputObjectType;
   scope: GraphileBuild.ScopeInputObject;
   origin: string | null | undefined;
-  Step?: never;
   specGenerator: () => Omit<GraphileBuild.GrafastInputObjectTypeConfig, "name">;
 };
