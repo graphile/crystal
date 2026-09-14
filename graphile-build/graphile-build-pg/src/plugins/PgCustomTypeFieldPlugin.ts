@@ -1547,19 +1547,22 @@ function getFunctionSourceReturnGraphQLTypes(
   const isVoid = resourceInnerCodec === TYPES.void;
   if (isVoid) return null;
 
-  const preferredType = resource.extensions?.tags?.returnType;
-  const preferredTypeMeta =
-    typeof preferredType === "string"
-      ? build.getTypeMetaByName(preferredType)
+  const preferredTypeName =
+    typeof resource.extensions?.tags?.returnType === "string"
+      ? resource.extensions.tags.returnType
       : null;
-  if (typeof preferredType === "string" && preferredTypeMeta == null) {
+  const preferredTypeMeta =
+    typeof preferredTypeName === "string"
+      ? build.getTypeMetaByName(preferredTypeName)
+      : null;
+  if (preferredTypeName != null && preferredTypeMeta == null) {
     throw new Error(
-      `Type ${preferredType} indicated by '@returnType' smart tag was not found`,
+      `Type ${preferredTypeName} indicated by '@returnType' smart tag was not found`,
     );
   }
   if (preferredTypeMeta != null && preferredTypeMeta.kind !== "OBJECT") {
     throw new Error(
-      `Type ${preferredType} indicated by '@returnType' was expected to be an OBJECT, not ${preferredTypeMeta.kind}`,
+      `Type ${preferredTypeName} indicated by '@returnType' was expected to be an OBJECT, not ${preferredTypeMeta.kind}`,
     );
   }
 
@@ -1580,10 +1583,14 @@ function getFunctionSourceReturnGraphQLTypes(
   }
 
   const innerType =
-    preferredType != null
+    preferredTypeName != null
       ? preferredCodec.polymorphism?.mode === "single"
-        ? build.getTypeByName(preferredType)
-        : getPreferredType(build, graphqlTypeForPreferredCodec, preferredType)
+        ? build.getTypeByName(preferredTypeName)
+        : getPreferredType(
+            build,
+            graphqlTypeForPreferredCodec,
+            preferredTypeName,
+          )
       : graphqlTypeForPreferredCodec;
 
   if (innerType == null) {
@@ -1597,9 +1604,9 @@ function getFunctionSourceReturnGraphQLTypes(
 
   const namedType = getNamedType(innerType);
 
-  if (preferredType != null && namedType.name !== preferredType) {
+  if (preferredTypeName != null && namedType.name !== preferredTypeName) {
     throw new Error(
-      `Was trying to get '${preferredType}' but ended up with '${namedType.name}'`,
+      `Was trying to get '${preferredTypeName}' but ended up with '${namedType.name}'`,
     );
   }
 
