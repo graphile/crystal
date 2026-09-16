@@ -260,7 +260,9 @@ export type PgResourceExecuteResult<
       ? PgSelectSingleStep<TResource>
       : TSqlPartitionByIndex extends SQL
         ? PgPartitionedSelectStep<TResource>
-        : PgSelectStep<TResource>
+        : TSqlPartitionByIndex extends null
+          ? PgSelectStep<TResource>
+          : ExecutableStep<unknown>
   : never;
 
 /**
