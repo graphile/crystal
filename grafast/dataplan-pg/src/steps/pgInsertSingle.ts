@@ -38,7 +38,7 @@ interface PgInsertSinglePlanFinalizeResults {
  * Inserts a row into resource with the given specified attribute values.
  */
 export class PgInsertSingleStep<
-    TResource extends PgResource<any, any, any, any, any> = PgResource,
+    TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
   >
   extends Step<
     unknown[] // tuple depending on what's selected
@@ -459,7 +459,7 @@ export class PgInsertSingleStep<
  * Inserts a row into resource with the given specified attribute values.
  */
 export function pgInsertSingle<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(
   resource: TResource,
   attributes?: {

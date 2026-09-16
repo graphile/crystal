@@ -57,7 +57,7 @@ interface PgDeletePlanFinalizeResults {
  * Deletes a row in the database, can return columns from the deleted row.
  */
 export class PgDeleteSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
   TNullability extends null = null,
 > extends Step<unknown[]> {
   static $$export = {

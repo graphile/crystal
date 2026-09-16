@@ -37,7 +37,7 @@ declare global {
     interface Build {
       pgExcludeDueToPartitioning(
         this: GraphileBuild.Build,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): boolean;
     }
     interface BehaviorStrings {
@@ -886,7 +886,7 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgResource?: PgResource<any, any, any, any, any>;
+    pgResource?: PgResource<any, any, any, any, any, any, any>;
     pgCodec: PgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     pgRefDetails?: GraphileBuild.PgRelationsPluginRefDetails;

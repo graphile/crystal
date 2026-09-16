@@ -1059,7 +1059,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
         // Now ensure all codecs are uniquely named
         const knownResourceByName = new Map<
           string,
-          PgResource<any, any, any, any, any>
+          PgResource<any, any, any, any, any, any, any>
         >();
         for (const resource of Object.values(
           build.input.pgRegistry.pgResources,

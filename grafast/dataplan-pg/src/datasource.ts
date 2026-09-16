@@ -250,9 +250,9 @@ export type PgResourceExecuteResult<
   any,
   any,
   any,
-  any,
   infer TReturnsSetof,
-  infer TReturnsArray
+  infer TReturnsArray,
+  any
 >
   ? boolean extends TReturnsSetof
     ? ExecutableStep<unknown>
@@ -339,7 +339,7 @@ export interface PgResourceOptions<
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
   selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | (($step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>) => void)
     | null;
 
   /** A nickname for this resource. Doesn't need to be unique (but should be). Used for making the SQL query and debug messages easier to understand */
@@ -399,7 +399,7 @@ export interface PgFunctionResourceOptions<
   isMutation?: boolean;
   hasImplicitOrder?: boolean;
   selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | (($step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>) => void)
     | null;
   description?: string;
 }
@@ -417,14 +417,14 @@ export class PgResource<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
+  TReturnsSetof extends boolean = boolean,
+  TReturnsArray extends boolean = boolean,
   TRegistry extends PgRegistry<any, any, any, any> = PgRegistry<
     any,
     any,
     any,
     any
   >,
-  TReturnsSetof extends boolean = boolean,
-  TReturnsArray extends boolean = boolean,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;
@@ -434,7 +434,7 @@ export class PgResource<
   public readonly from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | (($step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>) => void)
     | null;
 
   // TODO: make a public interface for this information

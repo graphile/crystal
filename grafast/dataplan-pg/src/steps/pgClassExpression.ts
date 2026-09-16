@@ -31,7 +31,7 @@ import { PgUpdateSingleStep } from "./pgUpdateSingle.ts";
  */
 export class PgClassExpressionStep<
     TExpressionCodec extends PgCodec,
-    TResource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any, any, any>,
     TNullability extends null = null,
   >
   extends UnbatchedStep<PgCodecJSDatatype<TExpressionCodec> | TNullability>
@@ -329,7 +329,7 @@ export class PgClassExpressionStep<
  */
 function pgClassExpression<
   TExpressionCodec extends PgCodec,
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
   TNullability extends null = null,
 >(
   table: PgClassSingleStep<TResource, any> | PgUnionAllSingleStep,

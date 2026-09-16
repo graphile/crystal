@@ -6,7 +6,7 @@ import type { PgClassFilter } from "../filters/pgClassFilter.ts";
 import type { PgConditionCapableParent } from "./pgCondition.ts";
 import { PgCondition } from "./pgCondition.ts";
 
-export class PgTempTable<TResource extends PgResource<any, any, any, any, any>>
+export class PgTempTable<TResource extends PgResource<any, any, any, any, any, any, any>>
   implements PgConditionCapableParent
 {
   static $$export = {

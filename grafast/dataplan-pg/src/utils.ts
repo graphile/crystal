@@ -19,7 +19,7 @@ import { PgSelectSingleStep } from "./steps/pgSelectSingle.ts";
 import { PgUpdateSingleStep } from "./steps/pgUpdateSingle.ts";
 
 export function assertPgClassSingleStep<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(
   step: ExecutableStep | PgClassSingleStep<TResource>,
 ): asserts step is PgClassSingleStep<TResource> {

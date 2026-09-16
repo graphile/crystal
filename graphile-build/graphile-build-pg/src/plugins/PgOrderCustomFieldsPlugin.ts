@@ -45,7 +45,7 @@ declare global {
 const applyOrderByCustomField = EXPORTABLE(
   (sql) =>
     (
-      pgFieldSource: PgResource<any, any, any, any, any>,
+      pgFieldSource: PgResource<any, any, any, any, any, any, any>,
       ascDesc: "asc" | "desc",
       pgOrderByNullsLast: boolean | null | undefined,
       queryBuilder: PgSelectQueryBuilder,
