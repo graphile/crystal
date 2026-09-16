@@ -915,7 +915,7 @@ export class PgResource<
   public find(
     spec: {
       [key in keyof GetPgCodecAttributes<TCodec>]?:
-        | ExecutableStep
+        | Step
         | string
         | number;
     } = Object.create(null),
