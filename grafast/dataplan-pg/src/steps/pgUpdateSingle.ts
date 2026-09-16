@@ -55,7 +55,7 @@ interface PgUpdatePlanFinalizeResults {
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
   TNullability extends null = null,
 > extends Step<unknown[]> {
   static $$export = {

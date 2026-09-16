@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
-import type { GrafastValuesList, Step } from "grafast";
+import type { __ListTransformStep, GrafastValuesList, Step } from "grafast";
 import {
   __ValueStep,
   arraysMatch,
@@ -235,6 +235,38 @@ export type PgResourceExecuteNamedArguments<
   : never;
 
 /**
+ * A list of lists produced by a function returning `setof composite[]`.
+ *
+ * @experimental
+ */
+type PgPartitionedSelectStep<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> = __ListTransformStep<PgSelectStep<TResource>, Step, unknown[][], Step>;
+
+export type PgResourceExecuteResult<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> =
+  TResource extends PgResource<
+    any,
+    any,
+    any,
+    any,
+    infer TIsUnique,
+    infer TSqlPartitionByIndex,
+    any
+  >
+    ? boolean extends TIsUnique
+      ? ExecutableStep<unknown>
+      : TIsUnique extends true
+        ? PgSelectSingleStep<TResource>
+        : TSqlPartitionByIndex extends SQL
+          ? PgPartitionedSelectStep<TResource>
+          : TSqlPartitionByIndex extends null
+            ? PgSelectStep<TResource>
+            : ExecutableStep<unknown>
+    : never;
+
+/**
  * Description of a unique constraint on a PgResource.
  */
 export interface PgResourceUnique<
@@ -290,6 +322,8 @@ export interface PgResourceOptions<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
+  TIsUnique extends boolean = boolean,
+  TSqlPartitionByIndex extends SQL | null = SQL | null,
 > {
   /**
    * The associated codec for this resource
@@ -304,7 +338,9 @@ export interface PgResourceOptions<
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
   selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | ((
+        $step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>,
+      ) => void)
     | null;
 
   /** A nickname for this resource. Doesn't need to be unique (but should be). Used for making the SQL query and debug messages easier to understand */
@@ -323,8 +359,8 @@ export interface PgResourceOptions<
    * generally only useful for PostgreSQL function resources, in which case you
    * should set it false if the function `returns setof` and true otherwise.
    */
-  isUnique?: boolean;
-  sqlPartitionByIndex?: SQL;
+  isUnique?: TIsUnique;
+  sqlPartitionByIndex?: TSqlPartitionByIndex;
   isMutation?: boolean;
   hasImplicitOrder?: boolean;
   /**
@@ -350,22 +386,44 @@ export interface PgFunctionResourceOptions<
   > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
   TNewParameters extends
     readonly PgResourceParameter[] = readonly PgResourceParameter[],
+  TReturnsSetof extends boolean = boolean,
+  TReturnsArray extends boolean = boolean,
 > {
   name: TNewName;
   identifier?: string;
   from: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
-  returnsSetof: boolean;
-  returnsArray?: boolean;
+  returnsSetof: TReturnsSetof;
+  returnsArray?: TReturnsArray;
   uniques?: TUniques;
   extensions?: DataplanPg.PgResourceExtensions;
   isMutation?: boolean;
   hasImplicitOrder?: boolean;
   selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | ((
+        $step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>,
+      ) => void)
     | null;
   description?: string;
 }
+
+type PgFunctionResourceIsUnique<
+  TReturnsSetof extends boolean,
+  TReturnsArray extends boolean,
+> = TReturnsSetof extends true
+  ? false
+  : TReturnsArray extends true
+    ? false
+    : true;
+
+type PgFunctionResourceSqlPartitionByIndex<
+  TReturnsSetof extends boolean,
+  TReturnsArray extends boolean,
+> = TReturnsSetof extends true
+  ? TReturnsArray extends true
+    ? SQL
+    : null
+  : null;
 
 /**
  * PgResource represents any resource of SELECT-able data in Postgres: tables,
@@ -380,6 +438,8 @@ export class PgResource<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
+  TIsUnique extends boolean = boolean,
+  TSqlPartitionByIndex extends SQL | null = SQL | null,
   TRegistry extends PgRegistry<any, any, any, any> = PgRegistry<
     any,
     any,
@@ -395,7 +455,9 @@ export class PgResource<
   public readonly from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | ((
+        $step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>,
+      ) => void)
     | null;
 
   // TODO: make a public interface for this information
@@ -406,7 +468,7 @@ export class PgResource<
    *
    * @experimental
    */
-  public sqlPartitionByIndex: SQL | null = null;
+  public sqlPartitionByIndex: TSqlPartitionByIndex | null = null;
 
   public readonly parameters: TParameters;
   /** @internal */
@@ -414,7 +476,7 @@ export class PgResource<
     [name: string]: Exclude<TParameters, undefined>[number];
   };
   public readonly description: string | undefined;
-  public readonly isUnique: boolean;
+  public readonly isUnique: TIsUnique;
   public readonly isMutation: boolean;
   public readonly hasImplicitOrder: boolean;
   /**
@@ -439,7 +501,14 @@ export class PgResource<
    */
   constructor(
     registry: TRegistry,
-    options: PgResourceOptions<TName, TCodec, TUniques, TParameters>,
+    options: PgResourceOptions<
+      TName,
+      TCodec,
+      TUniques,
+      TParameters,
+      TIsUnique,
+      TSqlPartitionByIndex
+    >,
   ) {
     const {
       codec,
@@ -484,8 +553,9 @@ export class PgResource<
       }
     }
     this.description = description;
-    this.isUnique = !!isUnique;
-    this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
+    this.isUnique = !!isUnique as TIsUnique;
+    this.sqlPartitionByIndex = (sqlPartitionByIndex ??
+      null) as TSqlPartitionByIndex | null;
     this.isMutation = !!isMutation;
     this.hasImplicitOrder = hasImplicitOrder ?? false;
     this.isList = !!isList;
@@ -567,6 +637,8 @@ export class PgResource<
       PgResourceUnique<GetPgCodecAttributes<TCodec>>
     >,
     const TNewName extends string,
+    const TReturnsSetof extends boolean,
+    const TReturnsArray extends boolean,
   >(
     baseOptions: Pick<
       PgResourceOptions<any, TCodec, any, any>,
@@ -576,9 +648,18 @@ export class PgResource<
       TNewName,
       TCodec,
       TNewUniques,
-      TNewParameters
+      TNewParameters,
+      TReturnsSetof,
+      TReturnsArray
     >,
-  ): PgResourceOptions<TNewName, TCodec, TNewUniques, TNewParameters> {
+  ): PgResourceOptions<
+    TNewName,
+    TCodec,
+    TNewUniques,
+    TNewParameters,
+    PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+    PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
+  > {
     const { codec, executor, selectAuth: originalSelectAuth } = baseOptions;
     const {
       name,
@@ -614,7 +695,14 @@ export class PgResource<
         hasImplicitOrder,
         selectAuth,
         description,
-      };
+      } as PgResourceOptions<
+        TNewName,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+        PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
+      >;
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
       const from = EXPORTABLE(
@@ -639,7 +727,14 @@ export class PgResource<
         selectAuth,
         isList: true,
         description,
-      };
+      } as PgResourceOptions<
+        TNewName,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+        PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
+      >;
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
       const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
@@ -668,7 +763,14 @@ export class PgResource<
         hasImplicitOrder,
         selectAuth,
         description,
-      };
+      } as PgResourceOptions<
+        TNewName,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+        PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
+      >;
     }
   }
 
@@ -880,7 +982,7 @@ export class PgResource<
   execute(
     args: PgResourceExecuteArguments<TParameters> = [] as unknown as PgResourceExecuteArguments<TParameters>,
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
-  ): ExecutableStep<unknown> {
+  ): PgResourceExecuteResult<this> {
     if (!this.parameters) {
       throw new Error(`This resource has no parameters, so cannot execute`);
     }
@@ -922,7 +1024,7 @@ export class PgResource<
       mode,
     });
     if (this.isUnique) {
-      return $select.single();
+      return $select.single() as unknown as PgResourceExecuteResult<this>;
     }
     const sqlPartitionByIndex = this.sqlPartitionByIndex;
     if (sqlPartitionByIndex) {
@@ -937,15 +1039,15 @@ export class PgResource<
           ),
         // Ordinality is 1-indexed but we want a 0-indexed number
         1,
-      );
+      ) as unknown as PgResourceExecuteResult<this>;
     } else {
-      return $select;
+      return $select as unknown as PgResourceExecuteResult<this>;
     }
   }
 
   executePositional(
     ...steps: PgResourceExecutePositionalArguments<TParameters>
-  ): ExecutableStep<unknown> {
+  ): PgResourceExecuteResult<this> {
     if (!this.parameters) {
       throw new Error(
         `This resource has no parameters, so cannot executePositional`,
@@ -966,7 +1068,7 @@ export class PgResource<
 
   executeNamed(
     namedSteps: PgResourceExecuteNamedArguments<TParameters>,
-  ): ExecutableStep<unknown> {
+  ): PgResourceExecuteResult<this> {
     if (!this.parameters) {
       throw new Error(
         `This resource has no parameters, so cannot executeNamed`,

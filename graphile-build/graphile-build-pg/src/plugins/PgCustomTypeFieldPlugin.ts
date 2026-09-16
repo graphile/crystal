@@ -93,7 +93,7 @@ declare global {
     }
     interface Build {
       pgGetArgDetailsFromParameters(
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
         parameters?: readonly PgResourceParameter[],
         offset?: number,
       ): {
@@ -223,7 +223,7 @@ function memoSlice<T>(arg: ReadonlyArray<T>, offset: number): ReadonlyArray<T> {
 }
 
 function shouldUseCustomConnection(
-  pgResource: PgResource<any, any, any, any, any>,
+  pgResource: PgResource<any, any, any, any, any, any, any>,
 ): boolean {
   const { codec } = pgResource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
@@ -233,7 +233,7 @@ function shouldUseCustomConnection(
 }
 
 function defaultProcSourceBehavior(
-  s: PgResource<any, any, any, any, any>,
+  s: PgResource<any, any, any, any, any, any, any>,
 ): GraphileBuild.BehaviorString {
   const behavior: GraphileBuild.BehaviorString[] = ["-array"];
   const firstParameter = (
@@ -293,11 +293,11 @@ function hasRecord(
 declare global {
   namespace GraphileBuild {
     interface Build {
-      [$$rootQuery]: Array<PgResource<any, any, any, any, any>>;
-      [$$rootMutation]: Array<PgResource<any, any, any, any, any>>;
+      [$$rootQuery]: Array<PgResource<any, any, any, any, any, any, any>>;
+      [$$rootMutation]: Array<PgResource<any, any, any, any, any, any, any>>;
       [$$computed]: Map<
         PgCodec<any, any, any, any, any, any, any>,
-        Array<PgResource<any, any, any, any, any>>
+        Array<PgResource<any, any, any, any, any, any, any>>
       >;
     }
   }
@@ -1514,7 +1514,7 @@ function getPreferredType(
 
 function getFunctionSourceReturnGraphQLTypes(
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ):
   | {
       namedType: GraphQLOutputType & GraphQLNamedType;

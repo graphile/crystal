@@ -186,9 +186,9 @@ declare global {
     interface BehaviorEntities {
       pgCodec: PgCodec;
       pgCodecAttribute: [codec: PgCodecWithAttributes, attributeName: string];
-      pgResource: PgResource<any, any, any, any, any>;
+      pgResource: PgResource<any, any, any, any, any, any, any>;
       pgResourceUnique: [
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
         unique: PgResourceUnique,
       ];
       pgCodecRelation: PgCodecRelation;
@@ -536,11 +536,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           };
         const resourceByCodecCacheUnstrict = new Map<
           PgCodecWithAttributes,
-          PgResource<any, any, any, any, any> | null
+          PgResource<any, any, any, any, any, any, any> | null
         >();
         const resourceByCodecCacheStrict = new Map<
           PgCodecWithAttributes,
-          PgResource<any, any, any, any, any> | null
+          PgResource<any, any, any, any, any, any, any> | null
         >();
         const pgTableResource = <TCodec extends PgCodecWithAttributes>(
           codec: TCodec,

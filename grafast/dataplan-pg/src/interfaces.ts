@@ -28,7 +28,7 @@ export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
   TNullability extends null = null,
 > =
   | PgSelectSingleStep<TResource, TNullability>
@@ -705,13 +705,17 @@ export interface PgRegistry<
       infer UName,
       infer UCodec,
       infer UUniques,
-      infer UParameters
+      infer UParameters,
+      infer UIsUnique,
+      infer USqlPartitionByIndex
     >
       ? PgResource<
           UName,
           UCodec,
           UUniques,
           UParameters,
+          UIsUnique,
+          USqlPartitionByIndex,
           PgRegistry<TCodecs, TResourceOptions, TRelations>
         >
       : never;
@@ -725,7 +729,9 @@ export interface PgRegistry<
               infer UName,
               infer UCodec,
               infer UUniques,
-              infer UParameters
+              infer UParameters,
+              infer UIsUnique,
+              infer USqlPartitionByIndex
             >;
           }
             ? PgResource<
@@ -733,6 +739,8 @@ export interface PgRegistry<
                 UCodec,
                 UUniques,
                 UParameters,
+                UIsUnique,
+                USqlPartitionByIndex,
                 PgRegistry<TCodecs, TResourceOptions, TRelations>
               >
             : never;
@@ -765,11 +773,11 @@ export type GetPgCodecAttributes<
     : PgCodecAttributes;
 
 export type GetPgResourceRegistry<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["registry"];
 
 export type GetPgResourceCodec<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["codec"];
 
 export type GetPgResourceAttributes<
@@ -777,11 +785,11 @@ export type GetPgResourceAttributes<
 > = GetPgCodecAttributes<TResource["codec"]>;
 
 export type GetPgResourceRelations<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["registry"]["pgRelations"][TResource["codec"]["name"]];
 
 export type GetPgResourceUniques<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["uniques"];
 
 export type PgSQLCallback<TResult, TEmbed = never> = (
@@ -799,7 +807,7 @@ export interface PgQueryBuilder {
 }
 
 export type PgSelectQueryBuilderCallback<
-  TResource extends PgResource<any, any, any, any, any> = PgResource<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
     any,
     any,
     any,

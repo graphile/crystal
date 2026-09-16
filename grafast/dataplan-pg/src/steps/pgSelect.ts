@@ -259,7 +259,7 @@ export type PgSelectFromOption =
   | ((...args: PgSelectArgumentDigest[]) => SQL);
 
 export interface PgSelectOptions<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 > {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
@@ -401,7 +401,15 @@ export interface PgGroupDetails {
  * purely because it hasn't been sufficiently considered.
  */
 export class PgSelectStep<
-    TResource extends PgResource<any, any, any, any, any> = PgResource,
+    TResource extends PgResource<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    > = PgResource,
   >
   extends PgStmtBaseStep<any>
   implements
@@ -583,7 +591,7 @@ export class PgSelectStep<
     };
   } = Object.create(null);
 
-  static clone<TResource extends PgResource<any, any, any, any, any>>(
+  static clone<TResource extends PgResource<any, any, any, any, any, any, any>>(
     cloneFrom: PgSelectStep<TResource>,
     mode: PgSelectMode = cloneFrom.mode,
   ): PgSelectStep<TResource> {
@@ -2212,9 +2220,9 @@ export class PgSelectStep<
     return this._meta[key];
   }
 
-  static getStaticInfo<TResource extends PgResource<any, any, any, any, any>>(
-    $source: PgSelectStep<TResource>,
-  ): StaticInfo<TResource> {
+  static getStaticInfo<
+    TResource extends PgResource<any, any, any, any, any, any, any>,
+  >($source: PgSelectStep<TResource>): StaticInfo<TResource> {
     return {
       sourceStepDescription: `PgSelectStep[${$source.id}]`,
       forceIdentity: $source.forceIdentity,
@@ -2259,7 +2267,7 @@ export class PgSelectStep<
 }
 
 export class PgSelectRowsStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 > extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -2336,7 +2344,7 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function makeOrderUniqueIfPossible<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(info: MutablePgSelectQueryInfo<TResource>): void {
   // Never re-order aggregates
   if (info.mode === "aggregate") return;
@@ -2367,9 +2375,9 @@ function makeOrderUniqueIfPossible<
   info.isOrderUnique = true;
 }
 
-export function pgSelect<TResource extends PgResource<any, any, any, any, any>>(
-  options: PgSelectOptions<TResource>,
-): PgSelectStep<TResource> {
+export function pgSelect<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(options: PgSelectOptions<TResource>): PgSelectStep<TResource> {
   return new PgSelectStep(options);
 }
 exportAs("@dataplan/pg", pgSelect, "pgSelect");
@@ -2378,7 +2386,7 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
 export function pgSelectFromRecords<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(
   resource: TResource,
   records:
@@ -2869,7 +2877,7 @@ function calculateOrderBySQL(params: {
 }
 
 interface PgSelectQueryInfo<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 > extends PgStmtCommonQueryInfo,
     PgStmtCompileQueryInfo {
   /** For debugging only */
@@ -2906,12 +2914,11 @@ interface PgSelectQueryInfo<
   readonly streamDetailsDepIds: null | readonly number[];
 }
 
-type CoreInfo<TResource extends PgResource<any, any, any, any, any>> = Readonly<
-  Omit<PgSelectQueryInfo<TResource>, "placeholders" | "deferreds">
->;
+type CoreInfo<TResource extends PgResource<any, any, any, any, any, any, any>> =
+  Readonly<Omit<PgSelectQueryInfo<TResource>, "placeholders" | "deferreds">>;
 
 interface MutablePgSelectQueryInfo<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 > extends CoreInfo<TResource>,
     MutablePgStmtCommonQueryInfo {
   readonly selects: Array<SQL>;
@@ -2930,7 +2937,7 @@ interface MutablePgSelectQueryInfo<
 }
 
 interface ResolvedPgSelectQueryInfo<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 > extends CoreInfo<TResource>,
     ResolvedPgStmtCommonQueryInfo {
   readonly groups: ReadonlyArray<PgGroupSpec>;
@@ -2938,7 +2945,7 @@ interface ResolvedPgSelectQueryInfo<
 }
 
 function buildTheQueryCore<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 >(rawInfo: CoreInfo<TResource>) {
   const info: MutablePgSelectQueryInfo<TResource> = {
     ...rawInfo,
@@ -3218,7 +3225,7 @@ function buildTheQueryCore<
 }
 
 function buildTheQuery<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 >(rawInfo: Readonly<PgSelectQueryInfo<TResource>>): QueryBuildResult {
   const {
     placeholders,
@@ -3597,13 +3604,12 @@ type StaticKeys =
   | "_symbolSubstitutes"
   | "joinAsLateral";
 
-type StaticInfo<TResource extends PgResource<any, any, any, any, any>> = Pick<
-  CoreInfo<TResource>,
-  StaticKeys
->;
+type StaticInfo<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> = Pick<CoreInfo<TResource>, StaticKeys>;
 
 class PgSelectInlineApplyStep<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -3784,7 +3790,7 @@ interface PgSelectInlineViaSubqueryDetails {
 }
 
 function buildPartsForInlining<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
 >(rawInfo: CoreInfo<TResource>) {
   const coreResult = buildTheQueryCore(rawInfo);
   return {
@@ -3794,7 +3800,7 @@ function buildPartsForInlining<
 }
 
 function applyConditionFromCursor<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(
   info: MutablePgSelectQueryInfo<TResource>,
   beforeOrAfter: "before" | "after",
@@ -3947,7 +3953,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
  * catches common user errors.
  */
 function getOrderByDigest<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(info: MutablePgSelectQueryInfo<TResource>) {
   const {
     placeholderSymbols,
@@ -3989,7 +3995,9 @@ function getOrderByDigest<
   return digest;
 }
 
-function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
+function buildQueryParts<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(
   info: ResolvedPgSelectQueryInfo<TResource>,
   options: {
     withIdentifiers?: boolean;
@@ -4065,7 +4073,9 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   };
 }
 
-function buildQuery<TResource extends PgResource<any, any, any, any, any>>(
+function buildQuery<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(
   info: MutablePgSelectQueryInfo<TResource>,
   options: {
     withIdentifiers?: boolean;
@@ -4105,10 +4115,9 @@ function buildQueryFromParts(
   return { sql: baseQuery, extraSelectIndexes };
 }
 
-function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
-  info: ResolvedPgSelectQueryInfo<TResource>,
-  reverse: boolean,
-) {
+function buildOrderBy<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(info: ResolvedPgSelectQueryInfo<TResource>, reverse: boolean) {
   const {
     orders,
     alias,
@@ -4125,7 +4134,7 @@ function buildOrderBy<TResource extends PgResource<any, any, any, any, any>>(
 }
 
 export interface PgSelectQueryBuilder<
-  TResource extends PgResource<any, any, any, any, any> = PgResource<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
     any,
     any,
     any,

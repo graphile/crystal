@@ -29,7 +29,7 @@ declare global {
         this: Inflection,
         details: {
           unique: PgResourceUnique;
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
         },
       ): string;
     }

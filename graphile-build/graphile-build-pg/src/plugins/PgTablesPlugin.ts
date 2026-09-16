@@ -59,7 +59,7 @@ declare global {
        */
       _resourceName(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -67,7 +67,7 @@ declare global {
        */
       _singularizedResourceName(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -161,14 +161,14 @@ declare global {
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
-      pgFieldResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
-      pgFieldResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
@@ -1094,7 +1094,7 @@ function partitionExclude(
 function getPartitionParent(
   build: GraphileBuild.Build,
   resource: PgResource,
-): PgResource<any, any, any, any, any> | null {
+): PgResource<any, any, any, any, any, any, any> | null {
   const pp = resource.extensions?.partitionParent;
   if (pp) {
     const serviceName = resource.extensions?.pg?.serviceName;
@@ -1117,7 +1117,7 @@ function getPartitionParent(
 }
 
 function getPartitionMode(
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ): PartitionExpose | null {
   const partitionTag = resource.extensions?.tags?.partitionExpose;
   if (typeof partitionTag === "string") {

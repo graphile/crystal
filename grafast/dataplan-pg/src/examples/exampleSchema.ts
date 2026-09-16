@@ -1737,7 +1737,7 @@ export function makeExampleSchema(
   );
 
   type ResourceConnectionPlan<
-    TResource extends PgResource<any, any, any, any, any>,
+    TResource extends PgResource<any, any, any, any, any, any, any>,
   > = ConnectionStep<
     any,
     PgSelectSingleStep<TResource>,
@@ -1845,7 +1845,7 @@ export function makeExampleSchema(
   });
 
   function attrField<
-    TMyResource extends PgResource<any, any, any, any, any>,
+    TMyResource extends PgResource<any, any, any, any, any, any, any>,
     TAttrName extends keyof GetPgResourceAttributes<TMyResource>,
   >(attrName: TAttrName, type: GraphQLOutputType) {
     return {
@@ -1861,7 +1861,7 @@ export function makeExampleSchema(
   }
 
   function singleRelationField<
-    TMyResource extends PgResource<any, any, any, any, any>,
+    TMyResource extends PgResource<any, any, any, any, any, any, any>,
     TRelationName extends keyof GetPgResourceRelations<TMyResource>,
   >(relation: TRelationName, type: GraphQLOutputType) {
     return {
@@ -2004,7 +2004,7 @@ export function makeExampleSchema(
             ($user) => {
               const $forum = usersMostRecentForumResource.execute([
                 { step: $user.record() },
-              ]) as PgSelectStep<typeof forumResource>;
+              ]);
               deoptimizeIfAppropriate($forum);
               return $forum;
             },
@@ -2904,7 +2904,10 @@ export function makeExampleSchema(
       <TCodec extends typeof _unionEntityCodec>(
         $item:
           | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
-          | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any>>,
+          | PgClassExpressionStep<
+              TCodec,
+              PgResource<any, any, any, any, any, any, any>
+            >,
       ) => {
         return lambda(
           [
@@ -4629,7 +4632,7 @@ export function makeExampleSchema(
                   step: $query,
                   name: "query",
                 },
-              ]) as PgSelectStep;
+              ]);
               deoptimizeIfAppropriate($step);
               return each($step, ($item) => entityUnion($item as any));
             },
@@ -4967,12 +4970,13 @@ export function makeExampleSchema(
     },
   });
 
-  type PgRecord<TResource extends PgResource<any, any, any, any, any>> =
-    PgClassExpressionStep<
-      PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
-      TResource,
-      never
-    >;
+  type PgRecord<
+    TResource extends PgResource<any, any, any, any, any, any, any>,
+  > = PgClassExpressionStep<
+    PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
+    TResource,
+    never
+  >;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     PgRecord<typeof relationalPostsResource>
