@@ -239,7 +239,7 @@ export type PgResourceExecuteNamedArguments<
  *
  * @experimental
  */
-export type PgPartitionedSelectStep<
+type PgPartitionedSelectStep<
   TResource extends PgResource<any, any, any, any, any, any, any>,
 > = __ListTransformStep<PgSelectStep<TResource>, Step, unknown[][], Step>;
 

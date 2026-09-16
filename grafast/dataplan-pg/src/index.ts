@@ -54,7 +54,6 @@ import type {
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
-  PgPartitionedSelectStep,
   PgResourceUnique,
   PgResourceUniqueExtensions,
 } from "./datasource.ts";
@@ -303,7 +302,6 @@ export type {
   PgResourceExtensions,
   PgResourceOptions,
   PgResourceParameter,
-  PgPartitionedSelectStep,
   PgResourceUnique,
   PgResourceUniqueExtensions,
   PgRootStep,
