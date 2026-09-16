@@ -706,16 +706,16 @@ export interface PgRegistry<
       infer UCodec,
       infer UUniques,
       infer UParameters,
-      infer UReturnsSetof,
-      infer UReturnsArray
+      infer UIsUnique,
+      infer USqlPartitionByIndex
     >
       ? PgResource<
           UName,
           UCodec,
           UUniques,
           UParameters,
-          UReturnsSetof,
-          UReturnsArray,
+          UIsUnique,
+          USqlPartitionByIndex,
           PgRegistry<TCodecs, TResourceOptions, TRelations>
         >
       : never;
@@ -730,8 +730,8 @@ export interface PgRegistry<
               infer UCodec,
               infer UUniques,
               infer UParameters,
-              infer UReturnsSetof,
-              infer UReturnsArray
+              infer UIsUnique,
+              infer USqlPartitionByIndex
             >;
           }
             ? PgResource<
@@ -739,8 +739,8 @@ export interface PgRegistry<
                 UCodec,
                 UUniques,
                 UParameters,
-                UReturnsSetof,
-                UReturnsArray,
+                UIsUnique,
+                USqlPartitionByIndex,
                 PgRegistry<TCodecs, TResourceOptions, TRelations>
               >
             : never;

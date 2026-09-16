@@ -250,21 +250,17 @@ export type PgResourceExecuteResult<
   any,
   any,
   any,
-  infer TReturnsSetof,
-  infer TReturnsArray,
+  infer TIsUnique,
+  infer TSqlPartitionByIndex,
   any
 >
-  ? boolean extends TReturnsSetof
+  ? boolean extends TIsUnique
     ? ExecutableStep<unknown>
-    : boolean extends TReturnsArray
-      ? ExecutableStep<unknown>
-      : TReturnsSetof extends true
-        ? TReturnsArray extends true
-          ? PgPartitionedSelectStep<TResource>
-          : PgSelectStep<TResource>
-        : TReturnsArray extends true
-          ? PgSelectStep<TResource>
-          : PgSelectSingleStep<TResource>
+    : TIsUnique extends true
+      ? PgSelectSingleStep<TResource>
+      : TSqlPartitionByIndex extends SQL
+        ? PgPartitionedSelectStep<TResource>
+        : PgSelectStep<TResource>
   : never;
 
 /**
@@ -311,8 +307,6 @@ export interface PgCodecRefs {
   [refName: string]: PgCodecRef;
 }
 
-declare const pgResourceOptionsType: unique symbol;
-
 /**
  * Configuration options for your PgResource
  */
@@ -325,18 +319,9 @@ export interface PgResourceOptions<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
-  TReturnsSetof extends boolean = boolean,
-  TReturnsArray extends boolean = boolean,
+  TIsUnique extends boolean = boolean,
+  TSqlPartitionByIndex extends SQL | null = SQL | null,
 > {
-  /**
-   * Retains the function return shape for type inference without adding a
-   * runtime property to resource options.
-   */
-  readonly [pgResourceOptionsType]?: {
-    returnsSetof: TReturnsSetof;
-    returnsArray: TReturnsArray;
-  };
-
   /**
    * The associated codec for this resource
    */
@@ -369,8 +354,8 @@ export interface PgResourceOptions<
    * generally only useful for PostgreSQL function resources, in which case you
    * should set it false if the function `returns setof` and true otherwise.
    */
-  isUnique?: boolean;
-  sqlPartitionByIndex?: SQL;
+  isUnique?: TIsUnique;
+  sqlPartitionByIndex?: TSqlPartitionByIndex;
   isMutation?: boolean;
   hasImplicitOrder?: boolean;
   /**
@@ -415,6 +400,24 @@ export interface PgFunctionResourceOptions<
   description?: string;
 }
 
+type PgFunctionResourceIsUnique<
+  TReturnsSetof extends boolean,
+  TReturnsArray extends boolean,
+> = TReturnsSetof extends true
+  ? false
+  : TReturnsArray extends true
+    ? false
+    : true;
+
+type PgFunctionResourceSqlPartitionByIndex<
+  TReturnsSetof extends boolean,
+  TReturnsArray extends boolean,
+> = TReturnsSetof extends true
+  ? TReturnsArray extends true
+    ? SQL
+    : null
+  : null;
+
 /**
  * PgResource represents any resource of SELECT-able data in Postgres: tables,
  * views, functions, etc.
@@ -428,8 +431,8 @@ export class PgResource<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
-  TReturnsSetof extends boolean = boolean,
-  TReturnsArray extends boolean = boolean,
+  TIsUnique extends boolean = boolean,
+  TSqlPartitionByIndex extends SQL | null = SQL | null,
   TRegistry extends PgRegistry<any, any, any, any> = PgRegistry<
     any,
     any,
@@ -456,7 +459,7 @@ export class PgResource<
    *
    * @experimental
    */
-  public sqlPartitionByIndex: SQL | null = null;
+  public sqlPartitionByIndex: TSqlPartitionByIndex | null = null;
 
   public readonly parameters: TParameters;
   /** @internal */
@@ -464,7 +467,7 @@ export class PgResource<
     [name: string]: Exclude<TParameters, undefined>[number];
   };
   public readonly description: string | undefined;
-  public readonly isUnique: boolean;
+  public readonly isUnique: TIsUnique;
   public readonly isMutation: boolean;
   public readonly hasImplicitOrder: boolean;
   /**
@@ -494,8 +497,8 @@ export class PgResource<
       TCodec,
       TUniques,
       TParameters,
-      TReturnsSetof,
-      TReturnsArray
+      TIsUnique,
+      TSqlPartitionByIndex
     >,
   ) {
     const {
@@ -541,8 +544,10 @@ export class PgResource<
       }
     }
     this.description = description;
-    this.isUnique = !!isUnique;
-    this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
+    this.isUnique = !!isUnique as TIsUnique;
+    this.sqlPartitionByIndex = (sqlPartitionByIndex ?? null) as
+      | TSqlPartitionByIndex
+      | null;
     this.isMutation = !!isMutation;
     this.hasImplicitOrder = hasImplicitOrder ?? false;
     this.isList = !!isList;
@@ -644,8 +649,8 @@ export class PgResource<
     TCodec,
     TNewUniques,
     TNewParameters,
-    TReturnsSetof,
-    TReturnsArray
+    PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+    PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
   > {
     const { codec, executor, selectAuth: originalSelectAuth } = baseOptions;
     const {
@@ -687,8 +692,8 @@ export class PgResource<
         TCodec,
         TNewUniques,
         TNewParameters,
-        TReturnsSetof,
-        TReturnsArray
+        PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+        PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
       >;
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
@@ -719,8 +724,8 @@ export class PgResource<
         TCodec,
         TNewUniques,
         TNewParameters,
-        TReturnsSetof,
-        TReturnsArray
+        PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+        PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
       >;
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
@@ -755,8 +760,8 @@ export class PgResource<
         TCodec,
         TNewUniques,
         TNewParameters,
-        TReturnsSetof,
-        TReturnsArray
+        PgFunctionResourceIsUnique<TReturnsSetof, TReturnsArray>,
+        PgFunctionResourceSqlPartitionByIndex<TReturnsSetof, TReturnsArray>
       >;
     }
   }
