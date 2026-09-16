@@ -2004,7 +2004,7 @@ export function makeExampleSchema(
             ($user) => {
               const $forum = usersMostRecentForumResource.execute([
                 { step: $user.record() },
-              ]) as PgSelectStep<typeof forumResource>;
+              ]);
               deoptimizeIfAppropriate($forum);
               return $forum;
             },
@@ -4632,7 +4632,7 @@ export function makeExampleSchema(
                   step: $query,
                   name: "query",
                 },
-              ]) as PgSelectStep;
+              ]);
               deoptimizeIfAppropriate($step);
               return each($step, ($item) => entityUnion($item as any));
             },
