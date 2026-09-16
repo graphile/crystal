@@ -257,13 +257,13 @@ export type PgResourceExecuteResult<
   >
     ? boolean extends TIsUnique
       ? ExecutableStep<unknown>
-    : TIsUnique extends true
-      ? PgSelectSingleStep<TResource>
-      : TSqlPartitionByIndex extends SQL
-        ? PgPartitionedSelectStep<TResource>
-        : TSqlPartitionByIndex extends null
-          ? PgSelectStep<TResource>
-          : ExecutableStep<unknown>
+      : TIsUnique extends true
+        ? PgSelectSingleStep<TResource>
+        : TSqlPartitionByIndex extends SQL
+          ? PgPartitionedSelectStep<TResource>
+          : TSqlPartitionByIndex extends null
+            ? PgSelectStep<TResource>
+            : ExecutableStep<unknown>
     : never;
 
 /**
