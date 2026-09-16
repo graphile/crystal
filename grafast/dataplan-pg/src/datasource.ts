@@ -245,17 +245,18 @@ type PgPartitionedSelectStep<
 
 export type PgResourceExecuteResult<
   TResource extends PgResource<any, any, any, any, any, any, any>,
-> = TResource extends PgResource<
-  any,
-  any,
-  any,
-  any,
-  infer TIsUnique,
-  infer TSqlPartitionByIndex,
-  any
->
-  ? boolean extends TIsUnique
-    ? ExecutableStep<unknown>
+> =
+  TResource extends PgResource<
+    any,
+    any,
+    any,
+    any,
+    infer TIsUnique,
+    infer TSqlPartitionByIndex,
+    any
+  >
+    ? boolean extends TIsUnique
+      ? ExecutableStep<unknown>
     : TIsUnique extends true
       ? PgSelectSingleStep<TResource>
       : TSqlPartitionByIndex extends SQL
@@ -263,7 +264,7 @@ export type PgResourceExecuteResult<
         : TSqlPartitionByIndex extends null
           ? PgSelectStep<TResource>
           : ExecutableStep<unknown>
-  : never;
+    : never;
 
 /**
  * Description of a unique constraint on a PgResource.
@@ -337,7 +338,9 @@ export interface PgResourceOptions<
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
   selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>) => void)
+    | ((
+        $step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>,
+      ) => void)
     | null;
 
   /** A nickname for this resource. Doesn't need to be unique (but should be). Used for making the SQL query and debug messages easier to understand */
@@ -397,7 +400,9 @@ export interface PgFunctionResourceOptions<
   isMutation?: boolean;
   hasImplicitOrder?: boolean;
   selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>) => void)
+    | ((
+        $step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>,
+      ) => void)
     | null;
   description?: string;
 }
@@ -450,7 +455,9 @@ export class PgResource<
   public readonly from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
   private selectAuth?:
-    | (($step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>) => void)
+    | ((
+        $step: PgSelectStep<PgResource<any, any, any, any, any, any, any>>,
+      ) => void)
     | null;
 
   // TODO: make a public interface for this information
@@ -547,9 +554,8 @@ export class PgResource<
     }
     this.description = description;
     this.isUnique = !!isUnique as TIsUnique;
-    this.sqlPartitionByIndex = (sqlPartitionByIndex ?? null) as
-      | TSqlPartitionByIndex
-      | null;
+    this.sqlPartitionByIndex = (sqlPartitionByIndex ??
+      null) as TSqlPartitionByIndex | null;
     this.isMutation = !!isMutation;
     this.hasImplicitOrder = hasImplicitOrder ?? false;
     this.isList = !!isList;

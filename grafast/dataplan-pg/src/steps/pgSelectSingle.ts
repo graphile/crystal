@@ -63,7 +63,15 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
  * telling the PgSelectStep to select the relevant expressions.
  */
 export class PgSelectSingleStep<
-    TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
+    TResource extends PgResource<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    > = PgResource,
     TNullability extends null = never,
   >
   extends UnbatchedStep<

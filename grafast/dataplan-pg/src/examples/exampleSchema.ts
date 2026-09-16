@@ -2904,7 +2904,10 @@ export function makeExampleSchema(
       <TCodec extends typeof _unionEntityCodec>(
         $item:
           | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
-          | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any, any, any>>,
+          | PgClassExpressionStep<
+              TCodec,
+              PgResource<any, any, any, any, any, any, any>
+            >,
       ) => {
         return lambda(
           [
@@ -4967,12 +4970,13 @@ export function makeExampleSchema(
     },
   });
 
-  type PgRecord<TResource extends PgResource<any, any, any, any, any, any, any>> =
-    PgClassExpressionStep<
-      PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
-      TResource,
-      never
-    >;
+  type PgRecord<
+    TResource extends PgResource<any, any, any, any, any, any, any>,
+  > = PgClassExpressionStep<
+    PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
+    TResource,
+    never
+  >;
 
   const CreateRelationalPostPayload = newObjectTypeBuilder<
     PgRecord<typeof relationalPostsResource>

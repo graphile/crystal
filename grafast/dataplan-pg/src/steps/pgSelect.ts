@@ -401,7 +401,15 @@ export interface PgGroupDetails {
  * purely because it hasn't been sufficiently considered.
  */
 export class PgSelectStep<
-    TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
+    TResource extends PgResource<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    > = PgResource,
   >
   extends PgStmtBaseStep<any>
   implements
@@ -2212,9 +2220,9 @@ export class PgSelectStep<
     return this._meta[key];
   }
 
-  static getStaticInfo<TResource extends PgResource<any, any, any, any, any, any, any>>(
-    $source: PgSelectStep<TResource>,
-  ): StaticInfo<TResource> {
+  static getStaticInfo<
+    TResource extends PgResource<any, any, any, any, any, any, any>,
+  >($source: PgSelectStep<TResource>): StaticInfo<TResource> {
     return {
       sourceStepDescription: `PgSelectStep[${$source.id}]`,
       forceIdentity: $source.forceIdentity,
@@ -2367,9 +2375,9 @@ function makeOrderUniqueIfPossible<
   info.isOrderUnique = true;
 }
 
-export function pgSelect<TResource extends PgResource<any, any, any, any, any, any, any>>(
-  options: PgSelectOptions<TResource>,
-): PgSelectStep<TResource> {
+export function pgSelect<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(options: PgSelectOptions<TResource>): PgSelectStep<TResource> {
   return new PgSelectStep(options);
 }
 exportAs("@dataplan/pg", pgSelect, "pgSelect");
@@ -2906,9 +2914,8 @@ interface PgSelectQueryInfo<
   readonly streamDetailsDepIds: null | readonly number[];
 }
 
-type CoreInfo<TResource extends PgResource<any, any, any, any, any, any, any>> = Readonly<
-  Omit<PgSelectQueryInfo<TResource>, "placeholders" | "deferreds">
->;
+type CoreInfo<TResource extends PgResource<any, any, any, any, any, any, any>> =
+  Readonly<Omit<PgSelectQueryInfo<TResource>, "placeholders" | "deferreds">>;
 
 interface MutablePgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
@@ -3597,10 +3604,9 @@ type StaticKeys =
   | "_symbolSubstitutes"
   | "joinAsLateral";
 
-type StaticInfo<TResource extends PgResource<any, any, any, any, any, any, any>> = Pick<
-  CoreInfo<TResource>,
-  StaticKeys
->;
+type StaticInfo<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> = Pick<CoreInfo<TResource>, StaticKeys>;
 
 class PgSelectInlineApplyStep<
   TResource extends PgResource<any, any, any, any, any, any, any>,
@@ -3989,7 +3995,9 @@ function getOrderByDigest<
   return digest;
 }
 
-function buildQueryParts<TResource extends PgResource<any, any, any, any, any, any, any>>(
+function buildQueryParts<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(
   info: ResolvedPgSelectQueryInfo<TResource>,
   options: {
     withIdentifiers?: boolean;
@@ -4065,7 +4073,9 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any, a
   };
 }
 
-function buildQuery<TResource extends PgResource<any, any, any, any, any, any, any>>(
+function buildQuery<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(
   info: MutablePgSelectQueryInfo<TResource>,
   options: {
     withIdentifiers?: boolean;
@@ -4105,10 +4115,9 @@ function buildQueryFromParts(
   return { sql: baseQuery, extraSelectIndexes };
 }
 
-function buildOrderBy<TResource extends PgResource<any, any, any, any, any, any, any>>(
-  info: ResolvedPgSelectQueryInfo<TResource>,
-  reverse: boolean,
-) {
+function buildOrderBy<
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+>(info: ResolvedPgSelectQueryInfo<TResource>, reverse: boolean) {
   const {
     orders,
     alias,
