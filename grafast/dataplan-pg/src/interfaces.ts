@@ -9,7 +9,6 @@ import type {
   PgResourceOptions,
   PgResourceParameter,
   PgResourceUnique,
-  PgResourceWithExecuteResult,
 } from "./datasource.ts";
 import type { PgExecutor } from "./executor.ts";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
@@ -707,15 +706,17 @@ export interface PgRegistry<
       infer UCodec,
       infer UUniques,
       infer UParameters,
-      infer UResultKind
+      infer UReturnsSetof,
+      infer UReturnsArray
     >
-      ? PgResourceWithExecuteResult<
+      ? PgResource<
           UName,
           UCodec,
           UUniques,
           UParameters,
           PgRegistry<TCodecs, TResourceOptions, TRelations>,
-          UResultKind
+          UReturnsSetof,
+          UReturnsArray
         >
       : never;
   };
@@ -729,7 +730,8 @@ export interface PgRegistry<
               infer UCodec,
               infer UUniques,
               infer UParameters,
-              infer UResultKind
+              infer UReturnsSetof,
+              infer UReturnsArray
             >;
           }
             ? PgResource<
@@ -737,7 +739,9 @@ export interface PgRegistry<
                 UCodec,
                 UUniques,
                 UParameters,
-                PgRegistry<TCodecs, TResourceOptions, TRelations>
+                PgRegistry<TCodecs, TResourceOptions, TRelations>,
+                UReturnsSetof,
+                UReturnsArray
               >
             : never;
         }

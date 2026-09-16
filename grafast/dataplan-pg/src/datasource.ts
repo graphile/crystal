@@ -234,39 +234,38 @@ export type PgResourceExecuteNamedArguments<
     }
   : never;
 
-/** The shape of the plan returned when a functional resource is executed. */
-export type PgResourceExecuteResultKind = "single" | "list" | "partitioned";
-
 /**
  * A list of lists produced by a function returning `setof composite[]`.
  *
  * @experimental
  */
 export type PgPartitionedSelectStep<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = __ListTransformStep<PgSelectStep<TResource>, Step, unknown[][], Step>;
 
 export type PgResourceExecuteResult<
-  TResource extends PgResource<any, any, any, any, any>,
-  TResultKind extends PgResourceExecuteResultKind,
-> = TResultKind extends "single"
-  ? PgSelectSingleStep<TResource>
-  : TResultKind extends "list"
-    ? PgSelectStep<TResource>
-    : TResultKind extends "partitioned"
-      ? PgPartitionedSelectStep<TResource>
-      : never;
-
-type PgFunctionResourceExecuteResultKind<
-  TReturnsSetof extends boolean,
-  TReturnsArray extends boolean | undefined,
-> = TReturnsArray extends true
-  ? TReturnsSetof extends true
-    ? "partitioned"
-    : "list"
-  : TReturnsSetof extends true
-    ? "list"
-    : "single";
+  TResource extends PgResource<any, any, any, any, any, any, any>,
+> = TResource extends PgResource<
+  any,
+  any,
+  any,
+  any,
+  any,
+  infer TReturnsSetof,
+  infer TReturnsArray
+>
+  ? boolean extends TReturnsSetof
+    ? ExecutableStep<unknown>
+    : boolean extends TReturnsArray
+      ? ExecutableStep<unknown>
+      : TReturnsSetof extends true
+        ? TReturnsArray extends true
+          ? PgPartitionedSelectStep<TResource>
+          : PgSelectStep<TResource>
+        : TReturnsArray extends true
+          ? PgSelectStep<TResource>
+          : PgSelectSingleStep<TResource>
+  : never;
 
 /**
  * Description of a unique constraint on a PgResource.
@@ -324,7 +323,8 @@ export interface PgResourceOptions<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
-  TResultKind extends PgResourceExecuteResultKind = PgResourceExecuteResultKind,
+  TReturnsSetof extends boolean = boolean,
+  TReturnsArray extends boolean = boolean,
 > {
   /**
    * The associated codec for this resource
@@ -386,7 +386,7 @@ export interface PgFunctionResourceOptions<
   TNewParameters extends
     readonly PgResourceParameter[] = readonly PgResourceParameter[],
   TReturnsSetof extends boolean = boolean,
-  TReturnsArray extends boolean | undefined = boolean | undefined,
+  TReturnsArray extends boolean = boolean,
 > {
   name: TNewName;
   identifier?: string;
@@ -423,6 +423,8 @@ export class PgResource<
     any,
     any
   >,
+  TReturnsSetof extends boolean = boolean,
+  TReturnsArray extends boolean = boolean,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;
@@ -476,7 +478,14 @@ export class PgResource<
    */
   constructor(
     registry: TRegistry,
-    options: PgResourceOptions<TName, TCodec, TUniques, TParameters>,
+    options: PgResourceOptions<
+      TName,
+      TCodec,
+      TUniques,
+      TParameters,
+      TReturnsSetof,
+      TReturnsArray
+    >,
   ) {
     const {
       codec,
@@ -605,7 +614,7 @@ export class PgResource<
     >,
     const TNewName extends string,
     const TReturnsSetof extends boolean,
-    const TReturnsArray extends boolean | undefined,
+    const TReturnsArray extends boolean,
   >(
     baseOptions: Pick<
       PgResourceOptions<any, TCodec, any, any>,
@@ -624,7 +633,8 @@ export class PgResource<
     TCodec,
     TNewUniques,
     TNewParameters,
-    PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+    TReturnsSetof,
+    TReturnsArray
   > {
     const { codec, executor, selectAuth: originalSelectAuth } = baseOptions;
     const {
@@ -666,7 +676,8 @@ export class PgResource<
         TCodec,
         TNewUniques,
         TNewParameters,
-        PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+        TReturnsSetof,
+        TReturnsArray
       >;
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
@@ -697,7 +708,8 @@ export class PgResource<
         TCodec,
         TNewUniques,
         TNewParameters,
-        PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+        TReturnsSetof,
+        TReturnsArray
       >;
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
@@ -732,7 +744,8 @@ export class PgResource<
         TCodec,
         TNewUniques,
         TNewParameters,
-        PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+        TReturnsSetof,
+        TReturnsArray
       >;
     }
   }
@@ -945,7 +958,7 @@ export class PgResource<
   execute(
     args: PgResourceExecuteArguments<TParameters> = [] as unknown as PgResourceExecuteArguments<TParameters>,
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
-  ): ExecutableStep<unknown> {
+  ): PgResourceExecuteResult<this> {
     if (!this.parameters) {
       throw new Error(`This resource has no parameters, so cannot execute`);
     }
@@ -987,7 +1000,7 @@ export class PgResource<
       mode,
     });
     if (this.isUnique) {
-      return $select.single();
+      return $select.single() as unknown as PgResourceExecuteResult<this>;
     }
     const sqlPartitionByIndex = this.sqlPartitionByIndex;
     if (sqlPartitionByIndex) {
@@ -1002,15 +1015,15 @@ export class PgResource<
           ),
         // Ordinality is 1-indexed but we want a 0-indexed number
         1,
-      );
+      ) as unknown as PgResourceExecuteResult<this>;
     } else {
-      return $select;
+      return $select as unknown as PgResourceExecuteResult<this>;
     }
   }
 
   executePositional(
     ...steps: PgResourceExecutePositionalArguments<TParameters>
-  ): ExecutableStep<unknown> {
+  ): PgResourceExecuteResult<this> {
     if (!this.parameters) {
       throw new Error(
         `This resource has no parameters, so cannot executePositional`,
@@ -1031,7 +1044,7 @@ export class PgResource<
 
   executeNamed(
     namedSteps: PgResourceExecuteNamedArguments<TParameters>,
-  ): ExecutableStep<unknown> {
+  ): PgResourceExecuteResult<this> {
     if (!this.parameters) {
       throw new Error(
         `This resource has no parameters, so cannot executeNamed`,
@@ -1136,35 +1149,6 @@ export class PgResource<
 exportAs("@dataplan/pg", PgResource, "PgResource");
 
 /** A resource with the result shape of its functional execution preserved. */
-export type PgResourceWithExecuteResult<
-  TName extends string,
-  TCodec extends PgCodec,
-  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
-  TParameters extends readonly PgResourceParameter[] | undefined,
-  TRegistry extends PgRegistry<any, any, any, any>,
-  TResultKind extends PgResourceExecuteResultKind,
-> = {
-  execute(
-    args?: PgResourceExecuteArguments<TParameters>,
-    mode?: PgSelectMode,
-  ): PgResourceExecuteResult<
-    PgResource<TName, TCodec, TUniques, TParameters, TRegistry>,
-    TResultKind
-  >;
-  executePositional(
-    ...steps: PgResourceExecutePositionalArguments<TParameters>
-  ): PgResourceExecuteResult<
-    PgResource<TName, TCodec, TUniques, TParameters, TRegistry>,
-    TResultKind
-  >;
-  executeNamed(
-    namedSteps: PgResourceExecuteNamedArguments<TParameters>,
-  ): PgResourceExecuteResult<
-    PgResource<TName, TCodec, TUniques, TParameters, TRegistry>,
-    TResultKind
-  >;
-} & PgResource<TName, TCodec, TUniques, TParameters, TRegistry>;
-
 export interface PgRegistryBuilder<
   TCodecs extends {
     [name in string]: PgCodec<
