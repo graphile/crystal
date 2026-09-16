@@ -311,6 +311,8 @@ export interface PgCodecRefs {
   [refName: string]: PgCodecRef;
 }
 
+declare const pgResourceOptionsType: unique symbol;
+
 /**
  * Configuration options for your PgResource
  */
@@ -326,6 +328,15 @@ export interface PgResourceOptions<
   TReturnsSetof extends boolean = boolean,
   TReturnsArray extends boolean = boolean,
 > {
+  /**
+   * Retains the function return shape for type inference without adding a
+   * runtime property to resource options.
+   */
+  readonly [pgResourceOptionsType]?: {
+    returnsSetof: TReturnsSetof;
+    returnsArray: TReturnsArray;
+  };
+
   /**
    * The associated codec for this resource
    */
