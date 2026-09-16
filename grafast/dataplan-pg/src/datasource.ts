@@ -1148,7 +1148,6 @@ export class PgResource<
 }
 exportAs("@dataplan/pg", PgResource, "PgResource");
 
-/** A resource with the result shape of its functional execution preserved. */
 export interface PgRegistryBuilder<
   TCodecs extends {
     [name in string]: PgCodec<
