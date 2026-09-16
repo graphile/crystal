@@ -2,4 +2,4 @@
 "@dataplan/pg": patch
 ---
 
-Expose the specific plan shape returned by generated functional resources when executing them.
+`PgResource.execute()` now infers result type from underlying function signature. This has added two more generics to `PgResource` and `PgResourceOptions`, so you may need to update your code if you are explicitly stating these generics.
