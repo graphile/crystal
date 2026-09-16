@@ -535,6 +535,15 @@ declare global {
        * ```
        */
     }
+
+    /**
+     * The union of clients supplied by the configured PostgreSQL adaptors.
+     * Falls back to the common client interface when no adaptor has been
+     * imported.
+     */
+    type DataplanPgClient = [keyof PgAdaptors] extends [never]
+      ? PgClient
+      : PgAdaptors[keyof PgAdaptors]["client"];
   }
   namespace DataplanPg {
     interface PgConditionExtensions {}
