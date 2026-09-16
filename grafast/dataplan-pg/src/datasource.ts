@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
-import type { GrafastValuesList, Step } from "grafast";
+import type { __ListTransformStep, GrafastValuesList, Step } from "grafast";
 import {
   __ValueStep,
   arraysMatch,
@@ -234,6 +234,40 @@ export type PgResourceExecuteNamedArguments<
     }
   : never;
 
+/** The shape of the plan returned when a functional resource is executed. */
+export type PgResourceExecuteResultKind = "single" | "list" | "partitioned";
+
+/**
+ * A list of lists produced by a function returning `setof composite[]`.
+ *
+ * @experimental
+ */
+export type PgPartitionedSelectStep<
+  TResource extends PgResource<any, any, any, any, any>,
+> = __ListTransformStep<PgSelectStep<TResource>, Step, unknown[][], Step>;
+
+export type PgResourceExecuteResult<
+  TResource extends PgResource<any, any, any, any, any>,
+  TResultKind extends PgResourceExecuteResultKind,
+> = TResultKind extends "single"
+  ? PgSelectSingleStep<TResource>
+  : TResultKind extends "list"
+    ? PgSelectStep<TResource>
+    : TResultKind extends "partitioned"
+      ? PgPartitionedSelectStep<TResource>
+      : never;
+
+type PgFunctionResourceExecuteResultKind<
+  TReturnsSetof extends boolean,
+  TReturnsArray extends boolean | undefined,
+> = TReturnsArray extends true
+  ? TReturnsSetof extends true
+    ? "partitioned"
+    : "list"
+  : TReturnsSetof extends true
+    ? "list"
+    : "single";
+
 /**
  * Description of a unique constraint on a PgResource.
  */
@@ -290,6 +324,7 @@ export interface PgResourceOptions<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
+  TResultKind extends PgResourceExecuteResultKind = PgResourceExecuteResultKind,
 > {
   /**
    * The associated codec for this resource
@@ -350,13 +385,15 @@ export interface PgFunctionResourceOptions<
   > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
   TNewParameters extends
     readonly PgResourceParameter[] = readonly PgResourceParameter[],
+  TReturnsSetof extends boolean = boolean,
+  TReturnsArray extends boolean | undefined = boolean | undefined,
 > {
   name: TNewName;
   identifier?: string;
   from: (...args: PgSelectArgumentDigest[]) => SQL;
   parameters: TNewParameters;
-  returnsSetof: boolean;
-  returnsArray?: boolean;
+  returnsSetof: TReturnsSetof;
+  returnsArray?: TReturnsArray;
   uniques?: TUniques;
   extensions?: DataplanPg.PgResourceExtensions;
   isMutation?: boolean;
@@ -567,6 +604,8 @@ export class PgResource<
       PgResourceUnique<GetPgCodecAttributes<TCodec>>
     >,
     const TNewName extends string,
+    const TReturnsSetof extends boolean,
+    const TReturnsArray extends boolean | undefined,
   >(
     baseOptions: Pick<
       PgResourceOptions<any, TCodec, any, any>,
@@ -576,9 +615,17 @@ export class PgResource<
       TNewName,
       TCodec,
       TNewUniques,
-      TNewParameters
+      TNewParameters,
+      TReturnsSetof,
+      TReturnsArray
     >,
-  ): PgResourceOptions<TNewName, TCodec, TNewUniques, TNewParameters> {
+  ): PgResourceOptions<
+    TNewName,
+    TCodec,
+    TNewUniques,
+    TNewParameters,
+    PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+  > {
     const { codec, executor, selectAuth: originalSelectAuth } = baseOptions;
     const {
       name,
@@ -614,7 +661,13 @@ export class PgResource<
         hasImplicitOrder,
         selectAuth,
         description,
-      };
+      } as PgResourceOptions<
+        TNewName,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+      >;
     } else if (!returnsSetof) {
       // This is a `composite[]` function; convert it to a `setof composite` function:
       const from = EXPORTABLE(
@@ -639,7 +692,13 @@ export class PgResource<
         selectAuth,
         isList: true,
         description,
-      };
+      } as PgResourceOptions<
+        TNewName,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+      >;
     } else {
       // This is a `setof composite[]` function; convert it to `setof composite` and indicate that we should partition it.
       const sqlTmp = sql.identifier(Symbol(`${name}_tmp`));
@@ -668,7 +727,13 @@ export class PgResource<
         hasImplicitOrder,
         selectAuth,
         description,
-      };
+      } as PgResourceOptions<
+        TNewName,
+        TCodec,
+        TNewUniques,
+        TNewParameters,
+        PgFunctionResourceExecuteResultKind<TReturnsSetof, TReturnsArray>
+      >;
     }
   }
 
@@ -1069,6 +1134,36 @@ export class PgResource<
   }
 }
 exportAs("@dataplan/pg", PgResource, "PgResource");
+
+/** A resource with the result shape of its functional execution preserved. */
+export type PgResourceWithExecuteResult<
+  TName extends string,
+  TCodec extends PgCodec,
+  TUniques extends ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
+  TParameters extends readonly PgResourceParameter[] | undefined,
+  TRegistry extends PgRegistry<any, any, any, any>,
+  TResultKind extends PgResourceExecuteResultKind,
+> = {
+  execute(
+    args?: PgResourceExecuteArguments<TParameters>,
+    mode?: PgSelectMode,
+  ): PgResourceExecuteResult<
+    PgResource<TName, TCodec, TUniques, TParameters, TRegistry>,
+    TResultKind
+  >;
+  executePositional(
+    ...steps: PgResourceExecutePositionalArguments<TParameters>
+  ): PgResourceExecuteResult<
+    PgResource<TName, TCodec, TUniques, TParameters, TRegistry>,
+    TResultKind
+  >;
+  executeNamed(
+    namedSteps: PgResourceExecuteNamedArguments<TParameters>,
+  ): PgResourceExecuteResult<
+    PgResource<TName, TCodec, TUniques, TParameters, TRegistry>,
+    TResultKind
+  >;
+} & PgResource<TName, TCodec, TUniques, TParameters, TRegistry>;
 
 export interface PgRegistryBuilder<
   TCodecs extends {
