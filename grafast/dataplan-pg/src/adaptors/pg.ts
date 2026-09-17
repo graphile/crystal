@@ -281,17 +281,29 @@ async function makeNodePostgresWithPgClient_inner<T>(
   return (pgClient[$$queue] = (async () => {
     try {
       // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
-      const stringifiedSettings = pgSettings
-        ? JSON.stringify(pgSettings)
-        : null;
-      if (stringifiedSettings != null && stringifiedSettings != "{}") {
+      let keys: [string, ...string[]] | null = null;
+      let values: [string, ...string[]] | null = null;
+      if (pgSettings != null) {
+        for (const [key, value] of Object.entries(pgSettings)) {
+          if (value != null) {
+            if (keys == null) {
+              keys = [key];
+              values = [value];
+            } else {
+              keys.push(key);
+              values!.push("" + value);
+            }
+          }
+        }
+      }
+      if (keys != null) {
         await pgClient.query({
           text: alreadyInTransaction ? "savepoint tx" : "begin",
         });
         try {
           await pgClient.query({
-            text: "select set_config(key, value, true) from json_each_text($1::json) el(key, value)",
-            values: [stringifiedSettings],
+            text: "select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)",
+            values: [keys, values],
           });
           const client = newNodePostgresPgClient(
             pgClient,
