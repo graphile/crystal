@@ -47,9 +47,7 @@ type GeneratedFieldArgs<TArgs> = {
     optional: true;
   }
     ? never
-    : TArgName]: TArgs[TArgName] extends { type: infer TType }
-    ? TType
-    : never;
+    : TArgName]: TArgs[TArgName] extends { type: infer TType } ? TType : never;
 } & {
   [TArgName in keyof TArgs as TArgs[TArgName] extends {
     optional: true;
@@ -62,27 +60,22 @@ type GeneratedFieldArgs<TArgs> = {
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 type CommonKeys<T> = {
-  [TKey in KeysOfUnion<T>]: [T] extends [Record<TKey, unknown>]
-    ? TKey
-    : never;
+  [TKey in KeysOfUnion<T>]: [T] extends [Record<TKey, unknown>] ? TKey : never;
 }[KeysOfUnion<T>];
-type ValueForKey<T, TKey extends PropertyKey> = T extends Record<
-  TKey,
-  infer TValue
->
-  ? TValue
-  : never;
+type ValueForKey<T, TKey extends PropertyKey> =
+  T extends Record<TKey, infer TValue> ? TValue : never;
 
-type GeneratedPlanWrapperRule<TSource extends Step, TField> =
-  TField extends { args: infer TArgs }
-    ? TField extends { result: infer TResult extends Step }
-      ?
-          | PlanWrapperRule<TSource, GeneratedFieldArgs<TArgs>, TResult>
-          | PlanWrapperFn<TSource, GeneratedFieldArgs<TArgs>, TResult>
-      :
-          | PlanWrapperRule<TSource, GeneratedFieldArgs<TArgs>>
-          | PlanWrapperFn<TSource, GeneratedFieldArgs<TArgs>>
-    : never;
+type GeneratedPlanWrapperRule<TSource extends Step, TField> = TField extends {
+  args: infer TArgs;
+}
+  ? TField extends { result: infer TResult extends Step }
+    ?
+        | PlanWrapperRule<TSource, GeneratedFieldArgs<TArgs>, TResult>
+        | PlanWrapperFn<TSource, GeneratedFieldArgs<TArgs>, TResult>
+    :
+        | PlanWrapperRule<TSource, GeneratedFieldArgs<TArgs>>
+        | PlanWrapperFn<TSource, GeneratedFieldArgs<TArgs>>
+  : never;
 
 type GeneratedPlanWrapperRules<TObjects> = {
   [TObjectName in CommonKeys<TObjects>]?: ValueForKey<
@@ -92,7 +85,9 @@ type GeneratedPlanWrapperRules<TObjects> = {
     ? TObject extends { fields: infer TFields }
       ? {
           [TFieldName in CommonKeys<TFields>]?: GeneratedPlanWrapperRule<
-            TObject extends { step: infer TSource extends Step } ? TSource : Step,
+            TObject extends { step: infer TSource extends Step }
+              ? TSource
+              : Step,
             ValueForKey<TFields, TFieldName>
           >;
         }
