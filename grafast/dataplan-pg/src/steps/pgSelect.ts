@@ -1216,7 +1216,13 @@ export class PgSelectStep<
     const context = values[this.contextId].unaryValue();
 
     const isMutation = this.mode === "mutation";
-    /** If we know one of the identifiers is `null`, can we skip execution? */
+    /**
+     * If we know one of the identifiers is `null`, can we skip execution?
+     *
+     * @remarks "aggregate" is not skippable, because it always returns at
+     * least one row (rather than zero) and the expressions may be null or
+     * non-null (e.g. `count(*)` is `0` even over the empty set).
+     */
     const isSkippable = this.mode === "normal";
 
     if (streamInitialCount == null) {
