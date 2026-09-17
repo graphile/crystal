@@ -4,7 +4,12 @@ import type {
   GraphQLList,
   GraphQLSchema,
 } from "graphql";
-import { getNullableType, isInputObjectType, isListType } from "graphql";
+import {
+  getNamedType,
+  getNullableType,
+  isInputObjectType,
+  isListType,
+} from "graphql";
 
 import { operationPlan } from "../global.ts";
 import type { UnbatchedExecutionExtra } from "../interfaces.ts";
@@ -56,11 +61,12 @@ export function bakedInput<TArg = any>(
   $value: Step,
 ) {
   const nullableInputType = getNullableType(inputType);
+  const namedInputType = getNamedType(inputType);
   // Could have done this in `optimize()` but faster to do it here.
   if (
-    isListType(nullableInputType) ||
-    (isInputObjectType(nullableInputType) &&
-      typeof nullableInputType.extensions?.grafast?.baked === "function")
+    isInputObjectType(namedInputType) &&
+    typeof namedInputType.extensions?.grafast?.baked === "function" &&
+    (namedInputType === nullableInputType || isListType(nullableInputType))
   ) {
     // Ooo, we're fancy! Do the thing!
     return operationPlan().withRootLayerPlan(
