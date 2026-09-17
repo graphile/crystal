@@ -916,14 +916,13 @@ export class PgResource<
     spec: {
       [key in keyof GetPgCodecAttributes<TCodec>]?:
         | Step<
-            | ReturnType<
-                GetPgCodecAttributes<TCodec>[key]["codec"]["fromPg"]
-              >
+            | ReturnType<GetPgCodecAttributes<TCodec>[key]["codec"]["fromPg"]>
             | null
             | undefined
           >
-        | string
-        | number;
+        // Allow explicit constants but only if they are simple
+        | (GetPgCodecAttributes<TCodec>[key]["codec"]["fromPg"] &
+            (string | number | boolean));
     } = Object.create(null),
   ): PgSelectStep<this> {
     if (this.parameters) {
