@@ -523,6 +523,8 @@ export class PgSelectStep<
 
   protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
   protected deferreds: Array<PgStmtDeferredSQL> = [];
+  /** Dependency indexes for the equality predicates created from identifiers. */
+  private identifierDepIds: number[] = [];
   private fixedPlaceholderValues = new Map<symbol, SQL>();
 
   /**
@@ -647,6 +649,7 @@ export class PgSelectStep<
     for (const v of cloneFrom.placeholders) {
       $clone.placeholders.push(v);
     }
+    $clone.identifierDepIds = [...cloneFrom.identifierDepIds];
     for (const v of cloneFrom.deferreds) {
       $clone.deferreds.push(v);
     }
@@ -764,6 +767,9 @@ export class PgSelectStep<
           identifier.codec || (identifier.step as PgTypedStep<any>).pgCodec;
         const expression = matches(this.alias);
         const placeholder = this.placeholder(step, codec);
+        this.identifierDepIds.push(
+          this.placeholders[this.placeholders.length - 1].dependencyIndex,
+        );
         this.where(sql`${expression} = ${placeholder}`);
       });
 
@@ -1210,8 +1216,22 @@ export class PgSelectStep<
     const context = values[this.contextId].unaryValue();
 
     if (streamInitialCount == null) {
-      const specs = indexMap<PgExecutorInput<any>>((i) => {
-        return {
+      const indexesToQuery: number[] = [];
+      const specs: PgExecutorInput<any>[] = [];
+      indexMap((i) => {
+        // `x = $1` cannot match a row when `$1` is null in PostgreSQL.
+        // Aggregates still need to run over the empty set, but ordinary
+        // selects can skip the query.
+        if (
+          this.mode !== "aggregate" &&
+          this.identifierDepIds.some(
+            (dependencyIndex) => values[dependencyIndex].at(i) === null,
+          )
+        ) {
+          return;
+        }
+        indexesToQuery.push(i);
+        specs.push({
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
@@ -1221,8 +1241,11 @@ export class PgSelectStep<
                   return val == null ? null : codec.toPg(val);
                 })
               : EMPTY_ARRAY,
-        };
+        });
       });
+      if (specs.length === 0) {
+        return arrayOfLength(count, NO_ROWS);
+      }
       const executeMethod =
         this.operationPlan.operation.operation === "query"
           ? "executeWithCache"
@@ -1237,12 +1260,15 @@ export class PgSelectStep<
       });
       // debugExecute("%s; result: %c", this, executionResult);
 
-      return executionResult.values.map((allVals) => {
+      const results = arrayOfLength(count, NO_ROWS);
+      executionResult.values.forEach((allVals, index) => {
+        const resultIndex = indexesToQuery[index];
         if (isPromiseLike(allVals)) {
           // Must be an error
-          return allVals as never;
+          results[resultIndex] = allVals as never;
+          return;
         }
-        return createSelectResult(allVals, {
+        results[resultIndex] = createSelectResult(allVals, {
           first,
           last,
           offset,
@@ -1253,6 +1279,7 @@ export class PgSelectStep<
           groupDetails,
         });
       });
+      return results;
     } else {
       if (shouldReverseOrder !== false) {
         throw new Error("shouldReverseOrder must be false for stream");
