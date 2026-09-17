@@ -2,7 +2,11 @@ import type { inspect, Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import type { CustomInspectFunction } from "util";
 
-import type { PgCodecAttribute, PgCodecAttributes } from "./codecs.ts";
+import type {
+  PgCodecAttribute,
+  PgCodecAttributes,
+  PgCodecJSDatatype,
+} from "./codecs.ts";
 import type {
   PgCodecRefs,
   PgResource,
@@ -467,12 +471,12 @@ type PlanByUniquesTuplePlanMap<
   [Index in keyof TTuple]: {
     // Optional attributes
     [key in keyof TAttributes as Exclude<key, keyof TTuple[number]>]?: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]> | null | undefined
+      PgCodecJSDatatype<TAttributes[key]["codec"]> | null | undefined
     >;
   } & {
     // Required unique combination of attributes
     [key in TTuple[number]]: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]> | null | undefined
+      PgCodecJSDatatype<TAttributes[key]["codec"]> | null | undefined
     >;
   };
 };
