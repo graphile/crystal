@@ -147,6 +147,7 @@ export type PgExecutorContextPlans<
 };
 
 export type PgExecutorInput<TInput> = {
+  /** The context is how we'd handle different connections with different claims */
   context: PgExecutorContext;
   queryValues: ReadonlyArray<TInput>;
 };

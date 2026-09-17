@@ -1184,7 +1184,7 @@ export class PgSelectStep<
       identifierIndex,
       name,
       streamInitialCount,
-      queryValues,
+      queryValues: rawQueryValues,
       shouldReverseOrder,
       first,
       last,
@@ -1215,60 +1215,75 @@ export class PgSelectStep<
     }
     const context = values[this.contextId].unaryValue();
 
+    const isMutation = this.mode === "mutation";
+    /** If we know one of the identifiers is `null`, can we skip execution? */
+    const isSkippable = this.mode === "normal";
+
     if (streamInitialCount == null) {
-      const indexesToQuery: number[] = [];
       const specs: PgExecutorInput<any>[] = [];
-      indexMap((i) => {
-        // `x = $1` cannot match a row when `$1` is null in PostgreSQL.
-        // Aggregates still need to run over the empty set, but ordinary
-        // selects can skip the query.
-        if (
-          this.mode !== "aggregate" &&
-          this.identifierDepIds.some(
-            (dependencyIndex) => values[dependencyIndex].at(i) === null,
-          )
-        ) {
-          return;
-        }
-        indexesToQuery.push(i);
-        specs.push({
-          // The context is how we'd handle different connections with different claims
-          context,
-          queryValues:
-            identifierIndex != null
-              ? queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex].at(i);
-                  return val == null ? null : codec.toPg(val);
-                })
-              : EMPTY_ARRAY,
-        });
-      });
-      if (specs.length === 0) {
-        return arrayOfLength(count, NO_ROWS);
-      }
+      const resultIndexes =
+        identifierIndex == null
+          ? indexMap((i) => {
+              if (isMutation || i === 0) {
+                // Do the work
+                const specIdx =
+                  specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
+                return specIdx;
+              }
+              return 0; // Share the first result
+            })
+          : indexMap<number | null>((i) => {
+              const queryValues: unknown[] = [];
+              for (const { dependencyIndex, codec } of rawQueryValues) {
+                let result: unknown;
+                const val = values[dependencyIndex].at(i);
+                if (val == null) {
+                  if (
+                    isSkippable &&
+                    this.identifierDepIds.includes(dependencyIndex)
+                  ) {
+                    // We're using `WHERE foo = $1` and we know `$1` is null, so we know the result
+                    // will yield no rows.
+                    return null;
+                  }
+                  result = null;
+                } else {
+                  result = codec.toPg(val);
+                }
+                queryValues.push(result);
+              }
+              // TODO: if !isMutation, dedupe queryValues
+              const specIdx = specs.push({ context, queryValues }) - 1;
+              return specIdx;
+            });
       const executeMethod =
         this.operationPlan.operation.operation === "query"
           ? "executeWithCache"
           : "executeWithoutCache";
-      const executionResult = await this.resource[executeMethod](specs, {
-        text,
-        rawSqlValues,
-        identifierIndex,
-        name,
-        eventEmitter,
-        useTransaction: this.mode === "mutation",
-      });
+      const executionResult =
+        specs.length > 0
+          ? await this.resource[executeMethod](specs, {
+              text,
+              rawSqlValues,
+              identifierIndex,
+              name,
+              eventEmitter,
+              useTransaction: isMutation,
+            })
+          : null;
       // debugExecute("%s; result: %c", this, executionResult);
 
-      const results = arrayOfLength(count, NO_ROWS);
-      executionResult.values.forEach((allVals, index) => {
-        const resultIndex = indexesToQuery[index];
+      return indexMap((i) => {
+        const executionResultIndex = resultIndexes[i];
+        const allVals =
+          executionResultIndex === null
+            ? EMPTY_ARRAY
+            : executionResult!.values[executionResultIndex];
         if (isPromiseLike(allVals)) {
           // Must be an error
-          results[resultIndex] = allVals as never;
-          return;
+          return allVals as never;
         }
-        results[resultIndex] = createSelectResult(allVals, {
+        return createSelectResult(allVals, {
           first,
           last,
           offset,
@@ -1279,7 +1294,6 @@ export class PgSelectStep<
           groupDetails,
         });
       });
-      return results;
     } else {
       if (shouldReverseOrder !== false) {
         throw new Error("shouldReverseOrder must be false for stream");
@@ -1296,7 +1310,7 @@ export class PgSelectStep<
             context,
             queryValues:
               identifierIndex != null
-                ? queryValues.map(({ dependencyIndex, codec }) => {
+                ? rawQueryValues.map(({ dependencyIndex, codec }) => {
                     const val = values[dependencyIndex].at(i);
                     return val == null ? null : codec.toPg(val);
                   })
@@ -1321,7 +1335,7 @@ export class PgSelectStep<
           context,
           queryValues:
             identifierIndex != null
-              ? queryValues.map(({ dependencyIndex, codec }) => {
+              ? rawQueryValues.map(({ dependencyIndex, codec }) => {
                   const val = values[dependencyIndex].at(i);
                   return val == null ? val : codec.toPg(val);
                 })
