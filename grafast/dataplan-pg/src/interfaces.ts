@@ -460,19 +460,19 @@ export interface PgGroupSpec {
   // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
-export type TuplePlanMap<
+type PlanByUniquesTuplePlanMap<
   TAttributes extends PgCodecAttributes,
   TTuple extends ReadonlyArray<keyof TAttributes>,
 > = {
   [Index in keyof TTuple]: {
     // Optional attributes
     [key in keyof TAttributes as Exclude<key, keyof TTuple[number]>]?: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+      ReturnType<TAttributes[key]["codec"]["fromPg"]> | null | undefined
     >;
   } & {
     // Required unique combination of attributes
     [key in TTuple[number]]: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+      ReturnType<TAttributes[key]["codec"]["fromPg"]> | null | undefined
     >;
   };
 };
@@ -489,7 +489,10 @@ export type PlanByUniques<
   TAttributes extends PgCodecAttributes,
   TUniqueAttributes extends ReadonlyArray<PgResourceUnique<TAttributes>>,
 > = TAttributes extends PgCodecAttributes
-  ? TuplePlanMap<TAttributes, TUniqueAttributes[number]["attributes"]>[number]
+  ? PlanByUniquesTuplePlanMap<
+      TAttributes,
+      TUniqueAttributes[number]["attributes"]
+    >[number]
   : undefined;
 
 export type PgConditionLike = Modifier<any> & {

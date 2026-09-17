@@ -122,7 +122,6 @@ import type {
   PgTypedStep,
   PgUnionAllQueryBuilderCallback,
   PlanByUniques,
-  TuplePlanMap,
 } from "./interfaces.ts";
 import type { PgLockableParameter, PgLockCallback } from "./pgLocker.ts";
 import type { PgAdaptor } from "./pgServices.ts";
@@ -328,7 +327,6 @@ export type {
   PgWhereConditionSpec,
   PlanByUniques,
   SideEffectWithPgClientStepCallback,
-  TuplePlanMap,
   WithPgClient,
 };
 export {
