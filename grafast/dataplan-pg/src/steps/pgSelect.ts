@@ -523,6 +523,8 @@ export class PgSelectStep<
 
   protected placeholders: Array<PgStmtDeferredPlaceholder> = [];
   protected deferreds: Array<PgStmtDeferredSQL> = [];
+  /** Dependency indexes for the equality predicates created from identifiers. */
+  private identifierDepIds: number[] = [];
   private fixedPlaceholderValues = new Map<symbol, SQL>();
 
   /**
@@ -647,6 +649,7 @@ export class PgSelectStep<
     for (const v of cloneFrom.placeholders) {
       $clone.placeholders.push(v);
     }
+    $clone.identifierDepIds = [...cloneFrom.identifierDepIds];
     for (const v of cloneFrom.deferreds) {
       $clone.deferreds.push(v);
     }
@@ -764,6 +767,9 @@ export class PgSelectStep<
           identifier.codec || (identifier.step as PgTypedStep<any>).pgCodec;
         const expression = matches(this.alias);
         const placeholder = this.placeholder(step, codec);
+        this.identifierDepIds.push(
+          this.placeholders[this.placeholders.length - 1].dependencyIndex,
+        );
         this.where(sql`${expression} = ${placeholder}`);
       });
 
@@ -1178,7 +1184,7 @@ export class PgSelectStep<
       identifierIndex,
       name,
       streamInitialCount,
-      queryValues,
+      queryValues: rawQueryValues,
       shouldReverseOrder,
       first,
       last,
@@ -1209,35 +1215,94 @@ export class PgSelectStep<
     }
     const context = values[this.contextId].unaryValue();
 
+    const isMutation = this.mode === "mutation";
+    /**
+     * If we know one of the identifiers is `null`, can we skip execution?
+     *
+     * @remarks "aggregate" is not skippable, because it always returns at
+     * least one row (rather than zero) and the expressions may be null or
+     * non-null (e.g. `count(*)` is `0` even over the empty set).
+     */
+    const isSkippable = this.mode === "normal";
+
     if (streamInitialCount == null) {
-      const specs = indexMap<PgExecutorInput<any>>((i) => {
-        return {
-          // The context is how we'd handle different connections with different claims
-          context,
-          queryValues:
-            identifierIndex != null
-              ? queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex].at(i);
-                  return val == null ? null : codec.toPg(val);
-                })
-              : EMPTY_ARRAY,
-        };
-      });
+      const specs: PgExecutorInput<any>[] = [];
+      let resultIndexes: ReadonlyArray<number | null>;
+      if (identifierIndex == null) {
+        if (isMutation) {
+          // Run them all
+          resultIndexes = indexMap(
+            (_i) => specs.push({ context, queryValues: EMPTY_ARRAY }) - 1,
+          );
+        } else {
+          // We'll add at most one spec
+          let specIdx: null | number = null;
+          resultIndexes = indexMap((i) => {
+            if (
+              isSkippable &&
+              this.identifierDepIds.some(
+                (dependencyIndex) => values[dependencyIndex].at(i) == null,
+              )
+            ) {
+              // Skip!
+              return null;
+            } else {
+              if (specIdx === null) {
+                specIdx = specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
+              }
+              return specIdx;
+            }
+          });
+        }
+      } else {
+        resultIndexes = indexMap<number | null>((i) => {
+          const queryValues: unknown[] = [];
+          for (const { dependencyIndex, codec } of rawQueryValues) {
+            let result: unknown;
+            const val = values[dependencyIndex].at(i);
+            if (val == null) {
+              if (
+                isSkippable &&
+                this.identifierDepIds.includes(dependencyIndex)
+              ) {
+                // We're using `WHERE foo = $1` and we know `$1` is null, so we know the result
+                // will yield no rows.
+                return null;
+              }
+              result = null;
+            } else {
+              result = codec.toPg(val);
+            }
+            queryValues.push(result);
+          }
+          // TODO: if !isMutation, dedupe queryValues
+          const specIdx = specs.push({ context, queryValues }) - 1;
+          return specIdx;
+        });
+      }
       const executeMethod =
         this.operationPlan.operation.operation === "query"
           ? "executeWithCache"
           : "executeWithoutCache";
-      const executionResult = await this.resource[executeMethod](specs, {
-        text,
-        rawSqlValues,
-        identifierIndex,
-        name,
-        eventEmitter,
-        useTransaction: this.mode === "mutation",
-      });
+      const executionResult =
+        specs.length > 0
+          ? await this.resource[executeMethod](specs, {
+              text,
+              rawSqlValues,
+              identifierIndex,
+              name,
+              eventEmitter,
+              useTransaction: isMutation,
+            })
+          : null;
       // debugExecute("%s; result: %c", this, executionResult);
 
-      return executionResult.values.map((allVals) => {
+      return indexMap((i) => {
+        const executionResultIndex = resultIndexes[i];
+        const allVals =
+          executionResultIndex === null
+            ? EMPTY_ARRAY
+            : executionResult!.values[executionResultIndex];
         if (isPromiseLike(allVals)) {
           // Must be an error
           return allVals as never;
@@ -1269,7 +1334,7 @@ export class PgSelectStep<
             context,
             queryValues:
               identifierIndex != null
-                ? queryValues.map(({ dependencyIndex, codec }) => {
+                ? rawQueryValues.map(({ dependencyIndex, codec }) => {
                     const val = values[dependencyIndex].at(i);
                     return val == null ? null : codec.toPg(val);
                   })
@@ -1294,7 +1359,7 @@ export class PgSelectStep<
           context,
           queryValues:
             identifierIndex != null
-              ? queryValues.map(({ dependencyIndex, codec }) => {
+              ? rawQueryValues.map(({ dependencyIndex, codec }) => {
                   const val = values[dependencyIndex].at(i);
                   return val == null ? val : codec.toPg(val);
                 })
