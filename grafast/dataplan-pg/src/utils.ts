@@ -133,6 +133,11 @@ function compare4<T>(a: readonly T[], b: readonly T[]) {
   return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
 }
 
+/**
+ * Returns a function that compares the entries of two arrays that each must
+ * have exactly `length` elements in them. Does not verify the arrays have
+ * length `length`, you must assert this in calling code.
+ */
 export function getSameLengthArraysMatchFunction(
   length: number,
 ): <T>(array1: ReadonlyArray<T>, array2: ReadonlyArray<T>) => boolean {
