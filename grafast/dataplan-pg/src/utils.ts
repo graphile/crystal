@@ -116,3 +116,48 @@ export function runtimeScopedSQL<T>(
       )
     : cb;
 }
+
+function compare0<T>(_a: readonly T[], _b: readonly T[]) {
+  return true;
+}
+function compare1<T>(a: readonly T[], b: readonly T[]) {
+  return a[0] === b[0];
+}
+function compare2<T>(a: readonly T[], b: readonly T[]) {
+  return a[0] === b[0] && a[1] === b[1];
+}
+function compare3<T>(a: readonly T[], b: readonly T[]) {
+  return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
+}
+function compare4<T>(a: readonly T[], b: readonly T[]) {
+  return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
+}
+
+export function getSameLengthArraysMatchFunction(
+  length: number,
+): <T>(array1: ReadonlyArray<T>, array2: ReadonlyArray<T>) => boolean {
+  switch (length) {
+    case 0:
+      return compare0;
+    case 1:
+      return compare1;
+    case 2:
+      return compare2;
+    case 3:
+      return compare3;
+    case 4:
+      return compare4;
+    default:
+      return function sameLengthArraysMatch<T>(
+        array1: ReadonlyArray<T>,
+        array2: ReadonlyArray<T>,
+      ) {
+        for (let i = 0; i < length; i++) {
+          if (array1[i] !== array2[i]) {
+            return false;
+          }
+        }
+        return true;
+      };
+  }
+}
