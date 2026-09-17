@@ -1,6 +1,5 @@
 import type {
   AbstractTypePlanner,
-  BaseGraphQLArguments,
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   EnumValueConfig,
@@ -62,6 +61,11 @@ import type {
 import type { GraphileBuild } from "graphile-build";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type {
+  CommonKeys,
+  GeneratedFieldArgs,
+  ValueForKey,
+} from "./interfaces.ts";
 
 type Maybe<T> = T | null | undefined;
 
@@ -134,33 +138,6 @@ export interface ExtensionDefinition
   /** @deprecated Use 'plans' instead */
   resolvers?: Resolvers;
 }
-
-type GeneratedFieldArgs<TArgs> = {
-  [TArgName in keyof TArgs as TArgs[TArgName] extends {
-    optional: true;
-  }
-    ? never
-    : TArgName]: TArgs[TArgName] extends {
-    type: infer TType;
-  }
-    ? TType
-    : never;
-} & {
-  [TArgName in keyof TArgs as TArgs[TArgName] extends {
-    optional: true;
-  }
-    ? TArgName
-    : never]?: TArgs[TArgName] extends { type: infer TType } ? TType : never;
-} extends infer TGeneratedArgs extends BaseGraphQLArguments
-  ? TGeneratedArgs
-  : never;
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-type CommonKeys<T> = {
-  [TKey in KeysOfUnion<T>]: [T] extends [Record<TKey, unknown>] ? TKey : never;
-}[KeysOfUnion<T>];
-type ValueForKey<T, TKey extends PropertyKey> =
-  T extends Record<TKey, infer TValue> ? TValue : never;
 
 type GeneratedFieldPlans<TSource extends Step, TFields> = {
   [TFieldName in CommonKeys<TFields>]?: ValueForKey<

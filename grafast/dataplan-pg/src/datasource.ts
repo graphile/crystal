@@ -914,10 +914,7 @@ export class PgResource<
 
   public find(
     spec: {
-      [key in keyof GetPgCodecAttributes<TCodec>]?:
-        | ExecutableStep
-        | string
-        | number;
+      [key in keyof GetPgCodecAttributes<TCodec>]?: Step | string | number;
     } = Object.create(null),
   ): PgSelectStep<this> {
     if (this.parameters) {
