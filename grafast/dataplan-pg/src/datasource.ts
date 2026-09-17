@@ -1,11 +1,11 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
-import type { __ListTransformStep, GrafastValuesList, Step } from "grafast";
+import type { __ListTransformStep, GrafastValuesList } from "grafast";
 import {
   __ValueStep,
   arraysMatch,
   constant,
-  ExecutableStep,
+  Step,
   exportAs,
   inspect,
   partitionByIndex,
@@ -256,14 +256,14 @@ export type PgResourceExecuteResult<
     any
   >
     ? boolean extends TIsUnique
-      ? ExecutableStep<unknown>
+      ? Step<unknown>
       : TIsUnique extends true
         ? PgSelectSingleStep<TResource>
         : TSqlPartitionByIndex extends SQL
           ? PgPartitionedSelectStep<TResource>
           : TSqlPartitionByIndex extends null
             ? PgSelectStep<TResource>
-            : ExecutableStep<unknown>
+            : Step<unknown>
     : never;
 
 /**
@@ -971,7 +971,7 @@ export class PgResource<
       }
       return {
         step:
-          stepOrConstant instanceof ExecutableStep
+          stepOrConstant instanceof Step
             ? stepOrConstant
             : constant(stepOrConstant, false),
         codec,
