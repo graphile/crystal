@@ -2,7 +2,11 @@ import type { inspect, Modifier, Step } from "grafast";
 import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
 import type { CustomInspectFunction } from "util";
 
-import type { PgCodecAttribute, PgCodecAttributes } from "./codecs.ts";
+import type {
+  PgCodecAttribute,
+  PgCodecAttributes,
+  PgCodecJSDatatype,
+} from "./codecs.ts";
 import type {
   PgCodecRefs,
   PgResource,
@@ -460,19 +464,19 @@ export interface PgGroupSpec {
   // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
-export type TuplePlanMap<
+type PlanByUniquesTuplePlanMap<
   TAttributes extends PgCodecAttributes,
   TTuple extends ReadonlyArray<keyof TAttributes>,
 > = {
   [Index in keyof TTuple]: {
     // Optional attributes
     [key in keyof TAttributes as Exclude<key, keyof TTuple[number]>]?: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+      PgCodecJSDatatype<TAttributes[key]["codec"]> | null | undefined
     >;
   } & {
     // Required unique combination of attributes
     [key in TTuple[number]]: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+      PgCodecJSDatatype<TAttributes[key]["codec"]> | null | undefined
     >;
   };
 };
@@ -489,7 +493,10 @@ export type PlanByUniques<
   TAttributes extends PgCodecAttributes,
   TUniqueAttributes extends ReadonlyArray<PgResourceUnique<TAttributes>>,
 > = TAttributes extends PgCodecAttributes
-  ? TuplePlanMap<TAttributes, TUniqueAttributes[number]["attributes"]>[number]
+  ? PlanByUniquesTuplePlanMap<
+      TAttributes,
+      TUniqueAttributes[number]["attributes"]
+    >[number]
   : undefined;
 
 export type PgConditionLike = Modifier<any> & {
