@@ -1,5 +1,5 @@
 import type { inspect, Modifier, Step } from "grafast";
-import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
+import type { PgSQL, SQL } from "pg-sql2";
 import type { CustomInspectFunction } from "util";
 
 import type { PgCodecAttribute, PgCodecAttributes } from "./codecs.ts";
@@ -36,11 +36,14 @@ export type PgClassSingleStep<
   | PgUpdateSingleStep<TResource, TNullability>
   | PgDeleteSingleStep<TResource, TNullability>;
 
+/** An encoded PostgreSQL value; structured values must be serialized. */
+export type PgEncodedValue = string | number | boolean | null;
+
 /**
- * Given a value of type TInput, returns an `SQL` value to insert into an SQL
- * statement.
+ * Given a value of type TInput, returns an encoded value to pass as an SQL
+ * parameter.
  */
-export type PgEncode<TInput> = (value: TInput) => SQLRawValue;
+export type PgEncode<TInput> = (value: TInput) => PgEncodedValue;
 
 /**
  * Given a text value from PostgreSQL, returns the value cast to TCanonical.
