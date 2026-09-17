@@ -1687,8 +1687,8 @@ export function makeExampleSchema(
     registry.pgResources.people.find({
       person_id: constant(1, false),
     });
-    // @ts-expect-error 'person_id' uses the int4 codec, not text.
     registry.pgResources.people.find({
+      // @ts-expect-error 'person_id' uses the int4 codec, not text.
       person_id: constant("not an int4", false),
     });
     const $posts = $person.manyRelation("posts");
