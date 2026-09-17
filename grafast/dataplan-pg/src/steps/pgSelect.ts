@@ -1227,41 +1227,59 @@ export class PgSelectStep<
 
     if (streamInitialCount == null) {
       const specs: PgExecutorInput<any>[] = [];
-      const resultIndexes =
-        identifierIndex == null
-          ? indexMap((i) => {
-              if (isMutation || i === 0) {
-                // Do the work
-                const specIdx =
-                  specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
-                return specIdx;
+      let resultIndexes: ReadonlyArray<number | null>;
+      if (identifierIndex == null) {
+        if (isMutation) {
+          // Run them all
+          resultIndexes = indexMap(
+            (_i) => specs.push({ context, queryValues: EMPTY_ARRAY }) - 1,
+          );
+        } else {
+          // We'll add at most one spec
+          let specIdx: null | number = null;
+          resultIndexes = indexMap((i) => {
+            if (
+              isSkippable &&
+              this.identifierDepIds.some(
+                (dependencyIndex) => values[dependencyIndex].at(i) == null,
+              )
+            ) {
+              // Skip!
+              return null;
+            } else {
+              if (specIdx === null) {
+                specIdx = specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
               }
-              return 0; // Share the first result
-            })
-          : indexMap<number | null>((i) => {
-              const queryValues: unknown[] = [];
-              for (const { dependencyIndex, codec } of rawQueryValues) {
-                let result: unknown;
-                const val = values[dependencyIndex].at(i);
-                if (val == null) {
-                  if (
-                    isSkippable &&
-                    this.identifierDepIds.includes(dependencyIndex)
-                  ) {
-                    // We're using `WHERE foo = $1` and we know `$1` is null, so we know the result
-                    // will yield no rows.
-                    return null;
-                  }
-                  result = null;
-                } else {
-                  result = codec.toPg(val);
-                }
-                queryValues.push(result);
-              }
-              // TODO: if !isMutation, dedupe queryValues
-              const specIdx = specs.push({ context, queryValues }) - 1;
               return specIdx;
-            });
+            }
+          });
+        }
+      } else {
+        resultIndexes = indexMap<number | null>((i) => {
+          const queryValues: unknown[] = [];
+          for (const { dependencyIndex, codec } of rawQueryValues) {
+            let result: unknown;
+            const val = values[dependencyIndex].at(i);
+            if (val == null) {
+              if (
+                isSkippable &&
+                this.identifierDepIds.includes(dependencyIndex)
+              ) {
+                // We're using `WHERE foo = $1` and we know `$1` is null, so we know the result
+                // will yield no rows.
+                return null;
+              }
+              result = null;
+            } else {
+              result = codec.toPg(val);
+            }
+            queryValues.push(result);
+          }
+          // TODO: if !isMutation, dedupe queryValues
+          const specIdx = specs.push({ context, queryValues }) - 1;
+          return specIdx;
+        });
+      }
       const executeMethod =
         this.operationPlan.operation.operation === "query"
           ? "executeWithCache"
