@@ -268,13 +268,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
   alreadyInTransaction: boolean,
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
-  const pgSettingsEntries: Array<[string, string]> = [];
-  if (pgSettings != null) {
-    for (const [key, value] of Object.entries(pgSettings)) {
-      if (value == null) continue;
-      pgSettingsEntries.push([key, "" + value]);
-    }
-  }
 
   // PERF: under what situations is this actually required? We added it to
   // force test queries that were sharing the same client to run in series
@@ -288,14 +281,17 @@ async function makeNodePostgresWithPgClient_inner<T>(
   return (pgClient[$$queue] = (async () => {
     try {
       // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
-      if (pgSettingsEntries.length > 0) {
+      const stringifiedSettings = pgSettings
+        ? JSON.stringify(pgSettings)
+        : null;
+      if (stringifiedSettings != null && stringifiedSettings != "{}") {
         await pgClient.query({
           text: alreadyInTransaction ? "savepoint tx" : "begin",
         });
         try {
           await pgClient.query({
-            text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el",
-            values: [JSON.stringify(pgSettingsEntries)],
+            text: "select set_config(key, value, true) from json_each_text($1::json) el(key, value)",
+            values: [stringifiedSettings],
           });
           const client = newNodePostgresPgClient(
             pgClient,
