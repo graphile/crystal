@@ -69,7 +69,10 @@ import type {
   RuntimeEmbeddable,
   RuntimeSQLThunk,
 } from "../utils.ts";
-import { runtimeScopedSQL } from "../utils.ts";
+import {
+  getSameLengthArraysMatchFunction,
+  runtimeScopedSQL,
+} from "../utils.ts";
 import { PgClassExpressionStep } from "./pgClassExpression.ts";
 import type {
   PgHavingConditionSpec,
@@ -1210,6 +1213,7 @@ export class PgSelectStep<
       // Fixed stuff that is local to us (aka "StaticInfo")
       ...PgSelectStep.getStaticInfo(this),
     });
+    const queryValuesLength = rawQueryValues.length;
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
     }
@@ -1255,6 +1259,9 @@ export class PgSelectStep<
           });
         }
       } else {
+        let hasSpec = false;
+        const queryValuesMatch =
+          getSameLengthArraysMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
           const queryValues: unknown[] = [];
           for (const { dependencyIndex, codec } of rawQueryValues) {
@@ -1275,8 +1282,17 @@ export class PgSelectStep<
             }
             queryValues.push(result);
           }
-          // TODO: if !isMutation, dedupe queryValues
+          if (!isMutation && hasSpec) {
+            // Dedupe
+            const existingIdx = specs.findIndex((s) =>
+              queryValuesMatch(queryValues, s.queryValues),
+            );
+            if (existingIdx !== -1) {
+              return existingIdx;
+            }
+          }
           const specIdx = specs.push({ context, queryValues }) - 1;
+          hasSpec = true;
           return specIdx;
         });
       }
