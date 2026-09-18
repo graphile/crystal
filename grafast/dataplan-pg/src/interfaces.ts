@@ -1,8 +1,12 @@
 import type { inspect, Modifier, Step } from "grafast";
-import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
+import type { PgSQL, SQL } from "pg-sql2";
 import type { CustomInspectFunction } from "util";
 
-import type { PgCodecAttributes } from "./codecs.ts";
+import type {
+  PgCodecAttribute,
+  PgCodecAttributes,
+  PgCodecJSDatatype,
+} from "./codecs.ts";
 import type {
   PgCodecRefs,
   PgResource,
@@ -19,23 +23,31 @@ import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.ts";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.ts";
 import type { RuntimeSQLThunk } from "./utils.ts";
 
+/** The nullability of a value selected from a codec attribute. */
+export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
+  TAttribute extends PgCodecAttribute<any, true> ? never : null;
+
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
 export type PgClassSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
+  TNullability extends null = null,
 > =
-  | PgSelectSingleStep<TResource>
+  | PgSelectSingleStep<TResource, TNullability>
   | PgInsertSingleStep<TResource>
-  | PgUpdateSingleStep<TResource>
-  | PgDeleteSingleStep<TResource>;
+  | PgUpdateSingleStep<TResource, TNullability>
+  | PgDeleteSingleStep<TResource, TNullability>;
+
+/** An encoded PostgreSQL value; structured values must be serialized. */
+export type PgEncodedValue = string | number | boolean | null;
 
 /**
- * Given a value of type TInput, returns an `SQL` value to insert into an SQL
- * statement.
+ * Given a value of type TInput, returns an encoded value to pass as an SQL
+ * parameter.
  */
-export type PgEncode<TInput> = (value: TInput) => SQLRawValue;
+export type PgEncode<TInput> = (value: TInput) => PgEncodedValue;
 
 /**
  * Given a text value from PostgreSQL, returns the value cast to TCanonical.
@@ -313,6 +325,13 @@ export interface PgCodec<
    */
   rangeOfCodec?: TRangeItemCodec;
 
+  /**
+   * If this codec is a modified form of a broader PostgreSQL type (for
+   * example via typmod or additional constraints), this references the base
+   * codec that owns the underlying SQL representation.
+   */
+  baseCodec?: PgCodec<string, any, any, any, any, any, any>;
+
   polymorphism?: PgCodecPolymorphism<any>;
 
   /**
@@ -403,25 +422,40 @@ export type PgOrderFragmentSpec = {
   readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
-export type PgOrderAttributeSpec = {
-  /** The attribute you're using for ordering */
-  readonly attribute: string;
-  /** An optional expression to wrap this attribute with, and the type that expression returns */
-  readonly callback?: (
-    attributeExpression: SQL,
-    attributeCodec: PgCodec,
-    nullable: boolean,
-  ) => [fragment: SQL, codec: PgCodec, nullable?: boolean];
+export type PgOrderAttributeSpec<
+  TAttributes extends PgCodecAttributes = PgCodecAttributes,
+  TAttribute extends keyof TAttributes & string = keyof TAttributes & string,
+> = TAttribute extends keyof TAttributes & string
+  ? {
+      /** The attribute you're using for ordering */
+      readonly attribute: TAttribute;
+      /** An optional expression to wrap this attribute with, and the type that expression returns */
+      readonly callback?: {
+        // Method syntax deliberately keeps this callback bivariant, so a
+        // resource-specific order spec remains assignable to the general one.
+        bivarianceHack(
+          attributeExpression: SQL,
+          attributeCodec: TAttributes[TAttribute]["codec"],
+          nullable: [
+            PgCodecAttributeNullability<TAttributes[TAttribute]>,
+          ] extends [never]
+            ? false
+            : boolean,
+        ): [fragment: SQL, codec: PgCodec, nullable?: boolean];
+      }["bivarianceHack"];
 
-  readonly fragment?: never;
-  readonly codec?: never;
-  readonly nullable?: boolean;
-} & PgOrderCommonSpec;
+      readonly fragment?: never;
+      readonly codec?: never;
+      readonly nullable?: boolean;
+    } & PgOrderCommonSpec
+  : never;
 
 /**
  * The information required to specify an entry in an 'ORDER BY' clause.
  */
-export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
+export type PgOrderSpec<
+  TAttributes extends PgCodecAttributes = PgCodecAttributes,
+> = PgOrderFragmentSpec | PgOrderAttributeSpec<TAttributes>;
 
 /**
  * The information required to specify an entry in a `GROUP BY` clause.
@@ -433,19 +467,19 @@ export interface PgGroupSpec {
   // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
-export type TuplePlanMap<
+type PlanByUniquesTuplePlanMap<
   TAttributes extends PgCodecAttributes,
   TTuple extends ReadonlyArray<keyof TAttributes>,
 > = {
   [Index in keyof TTuple]: {
     // Optional attributes
     [key in keyof TAttributes as Exclude<key, keyof TTuple[number]>]?: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+      PgCodecJSDatatype<TAttributes[key]["codec"]> | null | undefined
     >;
   } & {
     // Required unique combination of attributes
     [key in TTuple[number]]: Step<
-      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+      PgCodecJSDatatype<TAttributes[key]["codec"]> | null | undefined
     >;
   };
 };
@@ -462,9 +496,9 @@ export type PlanByUniques<
   TAttributes extends PgCodecAttributes,
   TUniqueAttributes extends ReadonlyArray<PgResourceUnique<TAttributes>>,
 > = TAttributes extends PgCodecAttributes
-  ? TuplePlanMap<
+  ? PlanByUniquesTuplePlanMap<
       TAttributes,
-      TUniqueAttributes[number]["attributes"] & string[]
+      TUniqueAttributes[number]["attributes"]
     >[number]
   : undefined;
 
@@ -652,52 +686,19 @@ export interface PgRegistry<
     PgCodec<string, PgCodecAttributes | undefined, any, any, any, any, any>
   >,
   TResourceOptions extends {
-    [name in string]: PgResourceOptions<
-      name,
-      PgCodec, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >;
-  } = Record<
-    string,
-    PgResourceOptions<
-      string,
-      // TYPES: This maybe shouldn't be PgCodecWithAttributes, but PgCodec instead?
-      PgCodecWithAttributes, // TCodecs[keyof TCodecs],
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >
-  >,
+    [name in string]: PgResourceOptions<any, any, any, any>;
+  } = Record<string, PgResourceOptions<string, PgCodec, any, any>>,
   TRelations extends {
     [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelationConfig<
-        // TCodecs[keyof TCodecs] &
-        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        // TResourceOptions[keyof TResourceOptions] &
-        PgResourceOptions<
-          any,
-          // TCodecs[keyof TCodecs] &
-          PgCodecWithAttributes,
-          any,
-          any
-        >
-      >;
+      [relationName in string]: PgCodecRelationConfig<any, any>;
     };
   } = Record<
     string,
     Record<
       string,
       PgCodecRelationConfig<
-        // TCodecs[keyof TCodecs] &
         PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        // TResourceOptions[keyof TResourceOptions] &
-        PgResourceOptions<
-          any,
-          // TCodecs[keyof TCodecs] &
-          PgCodecWithAttributes,
-          any,
-          any
-        >
+        PgResourceOptions<any, PgCodecWithAttributes, any, any>
       >
     >
   >,
@@ -714,13 +715,17 @@ export interface PgRegistry<
       infer UName,
       infer UCodec,
       infer UUniques,
-      infer UParameters
+      infer UParameters,
+      infer UIsUnique,
+      infer USqlPartitionByIndex
     >
       ? PgResource<
           UName,
           UCodec,
           UUniques,
           UParameters,
+          UIsUnique,
+          USqlPartitionByIndex,
           PgRegistry<TCodecs, TResourceOptions, TRelations>
         >
       : never;
@@ -734,7 +739,9 @@ export interface PgRegistry<
               infer UName,
               infer UCodec,
               infer UUniques,
-              infer UParameters
+              infer UParameters,
+              infer UIsUnique,
+              infer USqlPartitionByIndex
             >;
           }
             ? PgResource<
@@ -742,6 +749,8 @@ export interface PgRegistry<
                 UCodec,
                 UUniques,
                 UParameters,
+                UIsUnique,
+                USqlPartitionByIndex,
                 PgRegistry<TCodecs, TResourceOptions, TRelations>
               >
             : never;
@@ -774,11 +783,11 @@ export type GetPgCodecAttributes<
     : PgCodecAttributes;
 
 export type GetPgResourceRegistry<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["registry"];
 
 export type GetPgResourceCodec<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["codec"];
 
 export type GetPgResourceAttributes<
@@ -786,11 +795,11 @@ export type GetPgResourceAttributes<
 > = GetPgCodecAttributes<TResource["codec"]>;
 
 export type GetPgResourceRelations<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["registry"]["pgRelations"][TResource["codec"]["name"]];
 
 export type GetPgResourceUniques<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 > = TResource["uniques"];
 
 export type PgSQLCallback<TResult, TEmbed = never> = (
@@ -807,7 +816,15 @@ export interface PgQueryBuilder {
   getMetaRaw(key: string): unknown;
 }
 
-export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;
+export type PgSelectQueryBuilderCallback<
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource<
+    any,
+    any,
+    any,
+    any,
+    any
+  >,
+> = (qb: PgSelectQueryBuilder<TResource>) => void;
 export type PgUnionAllQueryBuilderCallback = (
   qb: PgUnionAllQueryBuilder,
 ) => void;

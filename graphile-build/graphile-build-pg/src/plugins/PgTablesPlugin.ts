@@ -24,8 +24,8 @@ import { version } from "../version.ts";
 declare global {
   namespace GraphileBuild {
     interface PgCodecTypeSituations {
-      patch: true;
-      base: true;
+      patch: false;
+      base: false;
     }
     interface BehaviorStrings {
       table: true;
@@ -59,7 +59,7 @@ declare global {
        */
       _resourceName(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -67,7 +67,7 @@ declare global {
        */
       _singularizedResourceName(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -161,14 +161,14 @@ declare global {
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
-      pgFieldResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
-      pgFieldResource?: PgResource<any, any, any, any, any>;
+      pgFieldResource?: PgResource<any, any, any, any, any, any, any>;
       pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
       pgFieldAttribute?: PgCodecAttribute<any>;
       isPgFieldConnection?: boolean;
@@ -592,12 +592,6 @@ select * from a where id = 1;
             [finalOptions, pgResourceOptions],
           );
 
-          const registryBuilder =
-            await info.helpers.pgRegistry.getRegistryBuilder();
-          if (!resourceOptions.isVirtual) {
-            registryBuilder.addResource(resourceOptions);
-          }
-
           info.state.detailsByResourceOptions.set(resourceOptions, {
             serviceName,
             pgClass,
@@ -605,7 +599,7 @@ select * from a where id = 1;
 
           return resourceOptions;
         })();
-        resourceOptions.then(undefined, noop);
+        void resourceOptions.then(undefined, noop);
         resourceOptionsByPgClass.set(pgClass, resourceOptions);
         return resourceOptions;
       },
@@ -618,7 +612,9 @@ select * from a where id = 1;
     hooks: {
       pgIntrospection_class({ helpers }, event) {
         const { entity: pgClass, serviceName } = event;
-        void helpers.pgTables.getResourceOptions(serviceName, pgClass);
+        void helpers.pgTables
+          .getResourceOptions(serviceName, pgClass)
+          .then(undefined, noop);
       },
 
       async pgRegistry_PgRegistryBuilder_pgRelations(info, _event) {
@@ -653,6 +649,21 @@ select * from a where id = 1;
             entry,
           );
         }
+      },
+      pgRegistry_PgRegistryBuilder_pgResources: {
+        after: ["PgCodecsPlugin"],
+        async callback(info, event) {
+          const { registryBuilder } = event;
+          // Try and encourage stable order of resource discovery
+          for (const resourceOptionsByPgClass of info.state.resourceOptionsByPgClassByService.values()) {
+            for (const resourceOptionsPromise of resourceOptionsByPgClass.values()) {
+              const resourceOptions = await resourceOptionsPromise;
+              if (resourceOptions != null && !resourceOptions.isVirtual) {
+                registryBuilder.addResource(resourceOptions);
+              }
+            }
+          }
+        },
       },
     },
   }),
@@ -800,9 +811,10 @@ select * from a where id = 1;
               const resource = Object.values(build.pgResources).find(
                 (r) => !r.parameters && r.codec === codec,
               );
-              const pk =
-                resource?.uniques.find((u) => u.isPrimary) ??
-                resource?.uniques[0];
+              const uniques = resource?.uniques as
+                | readonly PgResourceUnique[]
+                | undefined;
+              const pk = uniques?.find((u) => u.isPrimary) ?? uniques?.[0];
               const pkCols = pk?.attributes;
               build.registerObjectType(
                 tableTypeName,
@@ -1082,7 +1094,7 @@ function partitionExclude(
 function getPartitionParent(
   build: GraphileBuild.Build,
   resource: PgResource,
-): PgResource<any, any, any, any, any> | null {
+): PgResource<any, any, any, any, any, any, any> | null {
   const pp = resource.extensions?.partitionParent;
   if (pp) {
     const serviceName = resource.extensions?.pg?.serviceName;
@@ -1105,7 +1117,7 @@ function getPartitionParent(
 }
 
 function getPartitionMode(
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ): PartitionExpose | null {
   const partitionTag = resource.extensions?.tags?.partitionExpose;
   if (typeof partitionTag === "string") {

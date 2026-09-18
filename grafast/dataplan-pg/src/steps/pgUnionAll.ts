@@ -150,7 +150,7 @@ export interface PgUnionAllStepConfig<
   TTypeNames extends string,
 > {
   resourceByTypeName: {
-    [typeName in TTypeNames]: PgResource<any, any, any, any, any>;
+    [typeName in TTypeNames]: PgResource<any, any, any, any, any, any, any>;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
@@ -318,7 +318,7 @@ export class PgUnionAllSingleStep extends Step {
 function toSpecifier([__typename, pkValue, resourceByTypeName]: readonly [
   string,
   string,
-  Record<string, PgResource<any, any, any, any, any>>,
+  Record<string, PgResource<any, any, any, any, any, any, any>>,
 ]) {
   const resource = resourceByTypeName[__typename];
   if (!resource) return null;
@@ -586,7 +586,7 @@ export class PgUnionAllStep<
           Object.entries(spec.resourceByTypeName) as Array<
             [
               typeName: TTypeNames,
-              resource: PgResource<any, any, any, any, any>,
+              resource: PgResource<any, any, any, any, any, any, any>,
             ]
           >
         ).map(
@@ -1768,20 +1768,23 @@ ${unionHaving}\
        * clause.
        */
       const text = `\
+with ${identifiersAliasText} as materialized (
+  select ids.ordinality - 1 as idx${
+    queryValues.length > 0
+      ? `, ${queryValues
+          .map(({ codec }, idx) => {
+            return `(ids.value->>${idx})::${
+              sql.compile(codec.sqlType).text
+            } as "id${idx}"`;
+          })
+          .join(", ")}`
+      : ""
+  } from json_array_elements($${
+    rawSqlValues.length + 1
+  }::json) with ordinality as ids
+)
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-        queryValues.length > 0
-          ? `, ${queryValues
-              .map(({ codec }, idx) => {
-                return `(ids.value->>${idx})::${
-                  sql.compile(codec.sqlType).text
-                } as "id${idx}"`;
-              })
-              .join(", ")}`
-          : ""
-      } from json_array_elements($${
-        rawSqlValues.length + 1
-      }::json) with ordinality as ids) as ${identifiersAliasText},
+from ${identifiersAliasText},
 ${lateralText};`;
 
       return {

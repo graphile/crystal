@@ -18,6 +18,7 @@ import type {
   GetPgResourceCodec,
   ObjectForResource,
   PgCodec,
+  PgCodecAttributeNullability,
   PgCodecWithAttributes,
   PgQueryBuilder,
   PgTypedStep,
@@ -25,6 +26,8 @@ import type {
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
 interface PgInsertSinglePlanFinalizeResults {
   table: SQL;
@@ -35,7 +38,15 @@ interface PgInsertSinglePlanFinalizeResults {
  * Inserts a row into resource with the given specified attribute values.
  */
 export class PgInsertSingleStep<
-    TResource extends PgResource<any, any, any, any, any> = PgResource,
+    TResource extends PgResource<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    > = PgResource,
   >
   extends Step<
     unknown[] // tuple depending on what's selected
@@ -173,7 +184,8 @@ export class PgInsertSingleStep<
       >
         ? UCodec
         : never,
-      TResource
+      TResource,
+      PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
   /**
@@ -188,7 +200,8 @@ export class PgInsertSingleStep<
     >
       ? UCodec
       : never,
-    TResource
+    TResource,
+    PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
     if (!this.resource.codec.attributes) {
       throw new Error(`Cannot call .get() when there's no attributes.`);
@@ -239,13 +252,22 @@ export class PgInsertSingleStep<
 
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
-    TResource
+    TResource,
+    never
   > {
-    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+    return pgClassExpression<GetPgResourceCodec<TResource>, TResource, never>(
       this,
       this.resource.codec as GetPgResourceCodec<TResource>,
-      false,
+      true,
     )`${this.alias}`;
+  }
+
+  /**
+   * Creates a select step for this inserted record, enabling select-specific
+   * APIs such as `.getClassStep()` and `.select()`.
+   */
+  public toSelectSingle(): PgSelectSingleStep<TResource, never> {
+    return pgSelectSingleFromRecord(this.resource, this.record());
   }
 
   /**
@@ -445,7 +467,7 @@ export class PgInsertSingleStep<
  * Inserts a row into resource with the given specified attribute values.
  */
 export function pgInsertSingle<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, any, any, any, any, any, any>,
 >(
   resource: TResource,
   attributes?: {

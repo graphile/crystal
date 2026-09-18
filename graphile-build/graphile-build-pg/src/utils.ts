@@ -403,13 +403,13 @@ export function parseDatabaseIdentifiers<TExpectedLength extends number>(
 type Layer = {
   relationName: string;
   localAttributes: string[];
-  resource: PgResource<any, any, any, any, any>;
+  resource: PgResource<any, any, any, any, any, any, any>;
   remoteAttributes: string[];
   isUnique: boolean;
 };
 
 export const resolveResourceRefPath = (
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
   path: PgCodecRefPath,
 ) => {
   if (!resource) {

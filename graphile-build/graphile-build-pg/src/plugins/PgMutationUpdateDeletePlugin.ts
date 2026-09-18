@@ -47,7 +47,7 @@ declare global {
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
-      pgTypeResource?: PgResource<any, any, any, any, any>;
+      pgTypeResource?: PgResource<any, any, any, any, any, any, any>;
     }
 
     interface ScopeObjectFieldsField {
@@ -63,7 +63,7 @@ declare global {
       isPgDeleteInputType?: boolean;
       isPgDeleteByKeysInputType?: boolean;
       isPgDeleteNodeInputType?: boolean;
-      pgResource?: PgResource<any, any, any, any, any>;
+      pgResource?: PgResource<any, any, any, any, any, any, any>;
       pgResourceUnique?: PgResourceUnique;
     }
 
@@ -71,27 +71,27 @@ declare global {
       updatePayloadType(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
         },
       ): string;
       deletePayloadType(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
         },
       ): string;
 
       updateNodeField(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       updateNodeInputType(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -99,21 +99,21 @@ declare global {
       deletedNodeId(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
         },
       ): string;
 
       deleteNodeField(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       deleteNodeInputType(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -121,14 +121,14 @@ declare global {
       updateByKeysField(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       updateByKeysInputType(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -136,14 +136,14 @@ declare global {
       deleteByKeysField(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
       deleteByKeysInputType(
         this: Inflection,
         details: {
-          resource: PgResource<any, any, any, any, any>;
+          resource: PgResource<any, any, any, any, any, any, any>;
           unique: PgResourceUnique;
         },
       ): string;
@@ -155,7 +155,7 @@ declare global {
 
 const isUpdatable = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
@@ -167,7 +167,7 @@ const isUpdatable = (
 
 const isDeletable = (
   build: GraphileBuild.Build,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ) => {
   if (resource.parameters) return false;
   if (!resource.codec.attributes) return false;
@@ -698,7 +698,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
 
         const process = (
           fields: GraphQLFieldConfigMap<any, any>,
-          resources: PgResource<any, any, any, any, any>[],
+          resources: PgResource<any, any, any, any, any, any, any>[],
           mode: "resource:update" | "resource:delete",
         ) => {
           for (const resource of resources) {

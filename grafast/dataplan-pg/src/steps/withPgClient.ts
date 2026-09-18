@@ -26,7 +26,7 @@ import type {
 export type SideEffectWithPgClientStepCallback<
   TData,
   TResult,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 > = (client: TPgClient, data: TData) => Promise<TResult>;
 
 /**
@@ -37,7 +37,7 @@ export type SideEffectWithPgClientStepCallback<
 export class SideEffectWithPgClientStep<
   TData = any,
   TResult = any,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 > extends Step<TResult> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -102,7 +102,7 @@ export class SideEffectWithPgClientStep<
 export function sideEffectWithPgClient<
   const TInMultistep extends Multistep,
   TResult,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 >(
   executor: PgExecutor,
   spec: TInMultistep,
@@ -119,7 +119,7 @@ export function sideEffectWithPgClient<
 export function sideEffectWithPgClientTransaction<
   const TInMultistep extends Multistep,
   TResult,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 >(
   executor: PgExecutor,
   spec: TInMultistep,
@@ -176,7 +176,7 @@ export type LoadOneWithPgClientCallback<
   TUnarySpec = never,
 > = {
   (
-    pgClient: PgClient,
+    pgClient: GraphileConfig.DataplanPgClient,
     lookups: ReadonlyArray<TSpec>,
     info: LoadOneInfo<TItem, TParams, TUnarySpec>,
   ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;
@@ -251,7 +251,13 @@ function transformLoadOneLoader<
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
+            Promise.resolve(
+              loaderObject.load(
+                pgClient as GraphileConfig.DataplanPgClient,
+                lookups,
+                info as any,
+              ),
+            )
               // It's necessary to await the inner promises, otherwise we might release the client early
               .then((list) => Promise.all(list)),
         );
@@ -311,7 +317,13 @@ function transformLoadManyLoader<
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
+            Promise.resolve(
+              loaderObject.load(
+                pgClient as GraphileConfig.DataplanPgClient,
+                lookups,
+                info as any,
+              ),
+            )
               // It's necessary to await the inner promises, otherwise we might release the client early
               .then((list) => Promise.all(list)),
         );
@@ -336,7 +348,7 @@ export type LoadManyWithPgClientCallback<
   TUnarySpec = never,
 > = {
   (
-    pgClient: PgClient,
+    pgClient: GraphileConfig.DataplanPgClient,
     lookups: ReadonlyArray<TSpec>,
     info: LoadManyInfo<TItem, TParams, TUnarySpec>,
   ): PromiseOrDirect<ReadonlyArray<PromiseOrDirect<TData>>>;

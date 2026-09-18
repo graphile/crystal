@@ -65,6 +65,35 @@ const executor = new PgExecutor({
     });
   }
 });
+const petsIdentifier = sql.identifier("simple_collections", "pets");
+const petsCodec = recordCodec({
+  name: "pets",
+  identifier: petsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    owner_id: {
+      codec: TYPES.int,
+      notNull: true
+    },
+    name: {
+      codec: TYPES.text
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "simple_collections",
+      name: "pets"
+    }
+  },
+  executor: executor
+});
 const peopleIdentifier = sql.identifier("simple_collections", "people");
 const peopleCodec = recordCodec({
   name: "people",
@@ -91,35 +120,6 @@ const peopleCodec = recordCodec({
       __proto__: null,
       simpleCollections: "omit",
       behavior: ["-list +connection"]
-    }
-  },
-  executor: executor
-});
-const petsIdentifier = sql.identifier("simple_collections", "pets");
-const petsCodec = recordCodec({
-  name: "pets",
-  identifier: petsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    owner_id: {
-      codec: TYPES.int,
-      notNull: true
-    },
-    name: {
-      codec: TYPES.text
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "simple_collections",
-      name: "pets"
     }
   },
   executor: executor
@@ -174,12 +174,12 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    people: peopleCodec,
-    int4: TYPES.int,
     text: TYPES.text,
-    pets: petsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
+    pets: petsCodec,
+    int4: TYPES.int,
+    people: peopleCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -677,8 +677,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
-const EMPTY_ARRAY = Object.freeze([]);
-const makeArgs_people_odd_pets = () => EMPTY_ARRAY;
+const makeArgs_people_odd_pets = () => [];
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
