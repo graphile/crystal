@@ -120,7 +120,9 @@ export interface PgClient {
   withTransaction<T>(callback: (client: this) => Promise<T>): Promise<T>;
 }
 
-export interface WithPgClient<TPgClient extends PgClient = PgClient> {
+export interface WithPgClient<
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
+> {
   <T>(
     pgSettings: Record<string, string | undefined> | null,
     callback: (client: TPgClient) => T | Promise<T>,
@@ -140,7 +142,7 @@ export type PgExecutorContext<
 /** @deprecated Please use `Step<PgExecutorContext<TSettings>>` instead */
 export type PgExecutorContextPlans<
   TSettings = any,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 > = {
   pgSettings: ExecutableStep<TSettings>;
   withPgClient: ExecutableStep<WithPgClient<TPgClient>>;
@@ -211,7 +213,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
 
   /** @internal */
   public async _executeWithClient<TData>(
-    client: PgClient,
+    client: GraphileConfig.DataplanPgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
     name?: string,

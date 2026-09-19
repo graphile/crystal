@@ -251,13 +251,7 @@ function transformLoadOneLoader<
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(
-              loaderObject.load(
-                pgClient as GraphileConfig.DataplanPgClient,
-                lookups,
-                info as any,
-              ),
-            )
+            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
               // It's necessary to await the inner promises, otherwise we might release the client early
               .then((list) => Promise.all(list)),
         );
@@ -317,13 +311,7 @@ function transformLoadManyLoader<
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(
-              loaderObject.load(
-                pgClient as GraphileConfig.DataplanPgClient,
-                lookups,
-                info as any,
-              ),
-            )
+            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
               // It's necessary to await the inner promises, otherwise we might release the client early
               .then((list) => Promise.all(list)),
         );
