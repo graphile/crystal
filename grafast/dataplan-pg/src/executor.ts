@@ -165,6 +165,11 @@ export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
   /** @defaultValue `true` */
   useTransaction?: boolean;
+
+  /** @deprecated Pass a callback instead. */
+  text?: string;
+  /** @deprecated Pass a callback instead. */
+  values?: ReadonlyArray<SQLRawValue>;
 };
 type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
   /** @deprecated Pass a callback instead. */
