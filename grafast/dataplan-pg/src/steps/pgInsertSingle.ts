@@ -12,7 +12,7 @@ import { access, exportAs, inspect, multistep, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type { PgCodecAttribute, PgCodecJSDatatype } from "../codecs.ts";
+import type { PgCodecAttribute } from "../codecs.ts";
 import { sqlValueWithCodec } from "../codecs.ts";
 import type { PgResource } from "../datasource.ts";
 import type {
@@ -224,17 +224,6 @@ export class PgInsertSingleStep<
       );
     }
 
-    /*
-     * Only cast to `::text` during select; we want to use it uncasted in
-     * conditions/etc. The reasons we cast to ::text include:
-     *
-     * - to make return values consistent whether they're direct or in nested
-     *   arrays
-     * - to make sure that that various PostgreSQL clients we support do not
-     *   mangle the data in unexpected ways - we take responsibility for
-     *   decoding these string values.
-     */
-
     return {
       codec: resourceAttribute.codec,
       notNull: resourceAttribute.notNull,
@@ -263,6 +252,18 @@ export class PgInsertSingleStep<
       throw new Error(`Cannot call .get() when there's no attributes.`);
     }
     const { codec, notNull, fragment } = this._attrDetails(attr);
+    /*
+     * Only cast to `::text` during select; we want to use it uncasted in
+     * conditions/etc. The reasons we cast to ::text include:
+     *
+     * - to make return values consistent whether they're direct or in nested
+     *   arrays
+     * - to make sure that the various PostgreSQL clients we support do not
+     *   mangle the data in unexpected ways - we take responsibility for
+     *   decoding these string values.
+     *
+     * PgClassExpressionStep applies the codec's cast when selecting.
+     */
     const sqlExpr = pgClassExpression(this, codec, notNull);
     const colPlan = sqlExpr`${fragment}`;
     return colPlan as any;
@@ -329,8 +330,13 @@ export class PgInsertSingleStep<
   ): number {
     let idx = this.selectedAttributeIndexes.get(attr);
     if (idx == null) {
-      const { fragment } = this._attrDetails(attr);
-      idx = this.selectAndReturnIndex(fragment);
+      const { codec, notNull, fragment } = this._attrDetails(attr);
+      // Always selecting here, so apply the codec's cast immediately.
+      idx = this.selectAndReturnIndex(
+        codec.castFromPg
+          ? codec.castFromPg(fragment, notNull)
+          : sql`${sql.parens(fragment)}::text`,
+      );
       this.selectedAttributeIndexes.set(attr, idx);
     }
     return idx;
