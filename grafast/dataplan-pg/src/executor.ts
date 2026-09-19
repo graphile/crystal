@@ -163,6 +163,7 @@ export type PgExecutorOptions = {
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
+  transaction?: boolean;
 };
 type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
   /** @deprecated Pass a callback instead. */
@@ -959,7 +960,7 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { context } = options;
+    const { context, transaction } = options;
     const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
@@ -980,8 +981,14 @@ ${duration}
         ) as Promise<T>;
     }
 
-    // We don't explicitly need a transaction for mutations
-    const result = await withPgClient(pgSettings, callback);
+    // We don't explicitly need a transaction for mutations; but for safety
+    // create one unless caller opts out.
+    const result = await withPgClient(
+      pgSettings,
+      transaction === false
+        ? callback
+        : (client) => client.withTransaction(callback),
+    );
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
     (context as any)[this.$$cache]?.reset();
