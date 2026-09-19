@@ -2299,7 +2299,9 @@ export async function exportSchema(
   const toFormat = HEADER + code;
   const formatted = await format(toFormat, toPath, options);
   await writeFile(toPath, formatted);
-  await lint(formatted, toPath);
+  if (options.lint !== false) {
+    await lint(formatted, toPath);
+  }
 }
 
 /**
