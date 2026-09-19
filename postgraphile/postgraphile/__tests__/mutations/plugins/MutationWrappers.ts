@@ -20,7 +20,7 @@ const runMutation = EXPORTABLE(
 );
 
 const plugin = extendSchema((build) => {
-  const { c_person: people } = build.input.pgRegistry.pgResources;
+  const { person: people } = build.input.pgRegistry.pgResources;
   const { constant, context } = build.grafast;
 
   return {
@@ -40,9 +40,8 @@ const plugin = extendSchema((build) => {
                 person_full_name: $name,
                 email: $email,
               });
-              const $context = context();
               $person.wrap(
-                { $context },
+                () => ({ context: context() }),
                 ["id", "person_full_name"],
                 runMutation,
               );

@@ -6,6 +6,7 @@ import type {
   PromiseOrDirect,
   Setter,
   SetterCapable,
+  Thunk,
 } from "grafast";
 import { access, exportAs, inspect, multistep, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
@@ -347,7 +348,7 @@ export class PgInsertSingleStep<
     TDependencies extends Multistep,
     const TAttributes extends keyof TResource["codec"]["attributes"] & string,
   >(
-    $deps: TDependencies,
+    $deps: Thunk<TDependencies>,
     attributes: ReadonlyArray<TAttributes>,
     callback: PgWrapCallback<
       PgInsertSingleQueryBuilder,
@@ -356,7 +357,9 @@ export class PgInsertSingleStep<
     >,
   ): void {
     if (this.locked) throw new Error("Cannot wrap after plan is locked.");
-    const depId = this.addDependency(multistep($deps));
+    const depId = this.withMyLayerPlan(() =>
+      this.addDependency(multistep($deps)),
+    );
     const selection = attributes.map(
       (attr) => [attr, this.selectAttributeAndReturnIndex(attr)] as const,
     );
