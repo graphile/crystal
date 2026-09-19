@@ -7649,6 +7649,7 @@ type Query {
   """Get a single `CPersonSecret`."""
   cPersonSecretByPersonId(personId: Int!): CPersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
   cQueryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): CQueryOutputTwoRowsRecord
+  cReadPgSettings: JSON
   cReturnTableWithoutGrants: CCompoundKey
 
   """
