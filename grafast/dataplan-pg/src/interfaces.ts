@@ -25,14 +25,16 @@ import type { RuntimeSQLThunk } from "./utils.ts";
 
 /** The nullability of a value selected from a codec attribute. */
 export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
-  TAttribute extends PgCodecAttribute<any, true> ? never : null;
+  TAttribute extends { notNull: true } ? never : null;
 
 /** A JavaScript record containing only the selected codec attributes. */
 export type PgPickedRecord<
   TCodec extends PgCodecWithAttributes,
   TPicked extends keyof TCodec["attributes"],
 > = {
-  [Attr in TPicked]: PgCodecJSDatatype<TCodec["attributes"][Attr]["codec"]>;
+  [Attr in TPicked]:
+    | PgCodecJSDatatype<TCodec["attributes"][Attr]["codec"]>
+    | PgCodecAttributeNullability<TCodec["attributes"][Attr]>;
 };
 
 /**
@@ -841,8 +843,9 @@ export type ReadonlyArrayOrDirect<T> = T | ReadonlyArray<T>;
 export type ObjectForResource<
   TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
 > = {
-  [key in keyof GetPgResourceAttributes<TResource> &
-    string]?: PgCodecJSDatatype<TResource["codec"]["attributes"][key]["codec"]>;
+  [key in keyof GetPgResourceAttributes<TResource> & string]?:
+    | PgCodecJSDatatype<TResource["codec"]["attributes"][key]["codec"]>
+    | PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[key]>;
 };
 
 export interface PgQueryRootStep extends Step {

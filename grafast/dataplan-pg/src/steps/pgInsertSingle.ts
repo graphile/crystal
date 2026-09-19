@@ -600,15 +600,9 @@ export interface PgInsertSingleQueryBuilder<
     value: ObjectForResource<TResource>[TAttributeName],
     override?: boolean,
   ): void;
-  getRaw<
-    TAttributeName extends keyof TResource["codec"]["attributes"] & string,
-  >(
+  getRaw<TAttributeName extends keyof ObjectForResource<TResource>>(
     key: TAttributeName,
-  ):
-    | PgCodecJSDatatype<
-        TResource["codec"]["attributes"][TAttributeName]["codec"]
-      >
-    | undefined;
+  ): ObjectForResource<TResource>[TAttributeName] | undefined;
   setBuilder(): Setter<ObjectForResource<TResource>, this>;
 }
 
