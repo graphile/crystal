@@ -959,7 +959,8 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { withPgClient, pgSettings } = options.context;
+    const { context } = options;
+    const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
       callback = maybeCallback;
