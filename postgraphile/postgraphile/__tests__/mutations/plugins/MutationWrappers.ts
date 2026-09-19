@@ -13,7 +13,7 @@ const runMutation = EXPORTABLE(
       queryBuilder.set("person_full_name", formattedName, true);
       const result = await run(pgClient);
       const row = result.rows[0];
-      context.mutationResult = `Updated person ${row.id}'s name to "${row.person_full_name}"`;
+      context.mutationResult = `Updated person ${row.id}'s name to "${row.person_full_name}"; ${JSON.stringify(row)}`;
       return result;
     },
   [],
@@ -24,7 +24,7 @@ const runDeleteMutation = EXPORTABLE(
     async function runDeleteMutation(run, pgClient, { context }) {
       const result = await run(pgClient);
       const row = result.rows[0];
-      context.mutationResult = `Deleted person ${row.id} named "${row.person_full_name}"`;
+      context.mutationResult = `Deleted person ${row.id} named "${row.person_full_name}"; ${JSON.stringify(row)}`;
       return result;
     },
   [],
@@ -69,7 +69,7 @@ const runNestedWrap3 = EXPORTABLE(
         true,
       );
       const result = await run(pgClient);
-      context.mutationResult = `Updated person ${result.rows[0].id}'s name to "${result.rows[0].person_full_name}" (wrap3)`;
+      context.mutationResult = `Updated person ${result.rows[0].id}'s name to "${result.rows[0].person_full_name}"; ${JSON.stringify(result.rows[0])} (wrap3)`;
       return result;
     },
   [],
@@ -101,7 +101,7 @@ const plugin = extendSchema((build) => {
               });
               $person.wrap(
                 () => ({ context: context() }),
-                ["id", "person_full_name"],
+                ["id", "person_full_name", "about"],
                 runMutation,
               );
               return $person.get("id");
@@ -118,7 +118,7 @@ const plugin = extendSchema((build) => {
               );
               $person.wrap(
                 () => ({ context: context() }),
-                ["id", "person_full_name"],
+                ["id", "person_full_name", "about"],
                 runMutation,
               );
               return $person.get("id");
@@ -133,7 +133,7 @@ const plugin = extendSchema((build) => {
               });
               $person.wrap(
                 () => ({ context: context() }),
-                ["id", "person_full_name"],
+                ["id", "person_full_name", "about"],
                 runDeleteMutation,
               );
               return $person.get("id");
@@ -160,17 +160,17 @@ const plugin = extendSchema((build) => {
               const $dependencies = { context: $context };
               $person.wrap(
                 $dependencies,
-                ["id", "person_full_name"],
+                ["id", "person_full_name", "about"],
                 runNestedWrap1,
               );
               $person.wrap(
                 $dependencies,
-                ["id", "person_full_name"],
+                ["id", "person_full_name", "about"],
                 runNestedWrap2,
               );
               $person.wrap(
                 $dependencies,
-                ["id", "person_full_name"],
+                ["id", "person_full_name", "about"],
                 runNestedWrap3,
               );
               return $person.get("id");

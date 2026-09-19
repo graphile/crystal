@@ -2,6 +2,7 @@ import { makeWrappedMutationExecute } from "../dist/steps/pgMutationWrapper.js";
 
 const pgClient = {} as any;
 const values = [{ at: () => ({ attempt: 1 }) }] as any;
+const textCodec = { fromPg: (value: string) => value } as any;
 
 test("runs nested wrappers with the supplied client and returns the raw result", async () => {
   const events: string[] = [];
@@ -19,7 +20,7 @@ test("runs nested wrappers with the supplied client and returns the raw result",
     [
       {
         depId: 0,
-        selection: [["name", 1]],
+        selection: [["name", 1, textCodec]],
         callback: async (run, client, dependencies) => {
           expect(client).toBe(pgClient);
           expect(dependencies).toEqual({ attempt: 1 });
@@ -31,7 +32,7 @@ test("runs nested wrappers with the supplied client and returns the raw result",
       },
       {
         depId: 0,
-        selection: [["id", 0]],
+        selection: [["id", 0, textCodec]],
         callback: async (run, client) => {
           expect(client).toBe(pgClient);
           events.push("inner");
@@ -62,7 +63,7 @@ test("allows a wrapper to run the mutation more than once", async () => {
     [
       {
         depId: 0,
-        selection: [["value", 0]],
+        selection: [["value", 0, textCodec]],
         callback: async (run, client) => {
           await run(client);
           const result = await run(client);
@@ -79,4 +80,37 @@ test("allows a wrapper to run the mutation more than once", async () => {
 
   await expect(wrapped(pgClient)).resolves.toBe(rawResults[1]);
   expect(execute).toHaveBeenCalledTimes(2);
+});
+
+test("decodes selected values and preserves null", async () => {
+  const wrapped = makeWrappedMutationExecute(
+    [
+      {
+        depId: 0,
+        selection: [
+          ["id", 0, { fromPg: (value: string) => Number(value) } as any],
+          [
+            "about",
+            1,
+            {
+              fromPg: () => {
+                throw new Error("null must not be decoded");
+              },
+            } as any,
+          ],
+        ],
+        callback: async (run, client) => {
+          const result = await run(client);
+          expect(result.rows).toEqual([{ id: 42, about: null }]);
+          return result;
+        },
+      },
+    ],
+    values,
+    0,
+    {},
+    async () => ({ rows: [["42", null]], rowCount: 1 }),
+  );
+
+  await wrapped(pgClient);
 });

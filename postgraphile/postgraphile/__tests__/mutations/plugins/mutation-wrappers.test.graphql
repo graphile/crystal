@@ -1,8 +1,8 @@
 ## expect(errors).toBeFalsy()
-## expect(data.createdResult).toEqual('Updated person 99999\'s name to "Mutation Wrapper Integration Test"')
-## expect(data.updatedResult).toEqual('Updated person 99999\'s name to "Bob Jones"')
-## expect(data.deletedResult).toEqual('Deleted person 99999 named "Bob Jones"')
-## expect(data.nestedResult).toEqual('Updated person 99998\'s name to "Alice (wrap1) (wrap2) (wrap3)" (wrap3) (wrap2) (wrap1)')
+## expect(data.createdResult).toEqual('Updated person 99999\'s name to "Mutation Wrapper Integration Test"; {"id":99999,"person_full_name":"Mutation Wrapper Integration Test","about":null}')
+## expect(data.updatedResult).toEqual('Updated person 99999\'s name to "Bob Jones"; {"id":99999,"person_full_name":"Bob Jones","about":null}')
+## expect(data.deletedResult).toEqual('Deleted person 99999 named "Bob Jones"; {"id":99999,"person_full_name":"Bob Jones","about":null}')
+## expect(data.nestedResult).toEqual('Updated person 99998\'s name to "Alice (wrap1) (wrap2) (wrap3)"; {"id":99998,"person_full_name":"Alice (wrap1) (wrap2) (wrap3)","about":null} (wrap3) (wrap2) (wrap1)')
 #> schema: ["c"]
 #> extends: ["./MutationWrappers.ts:preset"]
 

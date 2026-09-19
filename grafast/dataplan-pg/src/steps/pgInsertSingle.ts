@@ -361,9 +361,10 @@ export class PgInsertSingleStep<
     const depId = this.withMyLayerPlan(() =>
       this.addDependency(multistep($deps)),
     );
-    const selection = attributes.map(
-      (attr) => [attr, this.selectAttributeAndReturnIndex(attr)] as const,
-    );
+    const selection = attributes.map((attr) => {
+      const { codec } = this._attrDetails(attr);
+      return [attr, this.selectAttributeAndReturnIndex(attr), codec] as const;
+    });
     this.wrappers.push({ depId, selection, callback });
   }
 

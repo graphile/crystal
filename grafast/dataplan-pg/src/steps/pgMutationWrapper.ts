@@ -1,9 +1,14 @@
 import type { ExecutionValue, Multistep, UnwrapMultistep } from "grafast";
 
 import type { PgClientResult, PgNotice } from "../executor.ts";
+import type { PgCodec } from "../interfaces.ts";
 
 /** @experimental */
-type Selection = readonly (readonly [attributeName: string, index: number])[];
+type Selection = readonly (readonly [
+  attributeName: string,
+  index: number,
+  codec: PgCodec,
+])[];
 
 /** @experimental */
 export type PgMutationWrapper<
@@ -101,6 +106,9 @@ function rowToRecord(
   selection: Selection,
 ): Record<string, unknown> {
   return Object.fromEntries(
-    selection.map(([attributeName, index]) => [attributeName, row[index]]),
+    selection.map(([attributeName, index, codec]) => [
+      attributeName,
+      row[index] == null ? null : codec.fromPg(row[index]),
+    ]),
   );
 }
