@@ -1,6 +1,6 @@
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 insert into "c"."left_arm" as __left_arm__ ("length_in_metres") values ($1::"float8") returning
   __left_arm__."id"::text as "0",

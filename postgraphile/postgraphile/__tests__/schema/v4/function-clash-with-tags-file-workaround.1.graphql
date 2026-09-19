@@ -7873,6 +7873,7 @@ type Query implements Node {
   ): QueryIntervalSetConnection
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   queryTextArray: [String]
+  readPgSettings: JSON
 
   """Reads a single `Reserved` using its globally unique `ID`."""
   reserved(
