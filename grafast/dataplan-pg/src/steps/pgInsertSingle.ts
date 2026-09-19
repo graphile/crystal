@@ -124,8 +124,11 @@ export class PgInsertSingleStep<
 
   private applyDepIds: number[] = [];
 
-  private wrappers: PgMutationWrapper<PgInsertSingleQueryBuilder, any, any>[] =
-    [];
+  private wrappers: PgMutationWrapper<
+    PgInsertSingleQueryBuilder,
+    any,
+    PgPickedRecord<PgCodecWithAttributes, any>
+  >[] = [];
 
   constructor(
     resource: TResource,

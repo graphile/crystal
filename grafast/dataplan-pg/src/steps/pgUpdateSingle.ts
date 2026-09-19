@@ -2,6 +2,7 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   Maybe,
+  Multistep,
   Setter,
   SetterCapable,
 } from "grafast";
@@ -10,6 +11,7 @@ import {
   exportAs,
   inspect,
   isDev,
+  multistep,
   SafeError,
   setter,
   Step,
@@ -28,12 +30,18 @@ import type {
   PgCodec,
   PgCodecAttributeNullability,
   PgCodecWithAttributes,
+  PgPickedRecord,
   PgQueryBuilder,
   PlanByUniques,
   ReadonlyArrayOrDirect,
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import {
+  makeWrappedMutationExecute,
+  type PgMutationWrapper,
+  type PgWrapCallback,
+} from "./pgMutationWrapper.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
 import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
@@ -125,6 +133,11 @@ export class PgUpdateSingleStep<
   private selects: Array<SQL> = [];
 
   private applyDepIds: number[] = [];
+  private wrappers: PgMutationWrapper<
+    PgUpdateSingleQueryBuilder,
+    any,
+    PgPickedRecord<PgCodecWithAttributes, any>
+  >[] = [];
 
   constructor(
     resource: TResource,
@@ -204,17 +217,18 @@ export class PgUpdateSingleStep<
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
     value: Step, // | PgTypedStep<TAttributes[TKey]["codec"]>
+    override = false,
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
     }
-    if (isDev) {
-      if (this.attributes.some((col) => col.name === name)) {
-        throw new Error(
-          `Attribute '${String(name)}' was specified more than once in ${this}`,
-        );
-      }
+    const existingIndex = this.attributes.findIndex((col) => col.name === name);
+    if (existingIndex >= 0 && !override) {
+      throw new Error(
+        `Attribute '${name as string}' was specified more than once in ${this}`,
+      );
     }
+    if (existingIndex >= 0) this.attributes.splice(existingIndex, 1);
     const { codec: pgCodec } = (
       this.resource.codec.attributes as GetPgResourceAttributes<TResource>
     )[name];
@@ -229,50 +243,48 @@ export class PgUpdateSingleStep<
       PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
+
+  private _attrDetails<
+    TAttr extends keyof GetPgResourceAttributes<TResource> & string,
+  >(attr: TAttr) {
+    if (!this.resource.codec.attributes) {
+      throw new Error(`${this.resource.codec} has no attributes?!`);
+    }
+    const resourceAttribute: PgCodecAttribute =
+      this.resource.codec.attributes[attr];
+    if (!resourceAttribute) {
+      throw new Error(
+        `${this.resource} does not define an attribute named '${attr}'`,
+      );
+    }
+    if (resourceAttribute.via) {
+      throw new Error(
+        `Cannot select a 'via' attribute from PgUpdateSingleStep`,
+      );
+    }
+    return {
+      codec: resourceAttribute.codec,
+      notNull: resourceAttribute.notNull,
+      fragment: resourceAttribute.expression
+        ? sql.parens(resourceAttribute.expression(this.alias))
+        : sql`${this.alias}.${sql.identifier(attr)}`,
+    };
+  }
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * updateed row.
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource> & string>(
     attr: TAttr,
   ): PgClassExpressionStep<
     GetPgResourceAttributes<TResource>[TAttr]["codec"],
     TResource,
     PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
-    const resourceAttribute: PgCodecAttribute =
-      this.resource.codec.attributes![attr as string];
-    if (!resourceAttribute) {
-      throw new Error(
-        `${this.resource} does not define an attribute named '${String(attr)}'`,
-      );
-    }
-
-    if (resourceAttribute?.via) {
-      throw new Error(
-        `Cannot select a 'via' attribute from PgUpdateSingleStep`,
-      );
-    }
-
-    /*
-     * Only cast to `::text` during select; we want to use it uncasted in
-     * conditions/etc. The reasons we cast to ::text include:
-     *
-     * - to make return values consistent whether they're direct or in nested
-     *   arrays
-     * - to make sure that that various PostgreSQL clients we support do not
-     *   mangle the data in unexpected ways - we take responsibility for
-     *   decoding these string values.
-     */
-
-    const sqlExpr = pgClassExpression(
-      this,
-      resourceAttribute.codec,
-      resourceAttribute.notNull,
-    );
-    const colPlan = resourceAttribute.expression
-      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
-      : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
+    const { codec, notNull, fragment } = this._attrDetails(attr);
+    const sqlExpr = pgClassExpression(this, codec, notNull);
+    const colPlan = sqlExpr`${fragment}`;
     return colPlan as any;
   }
 
@@ -330,12 +342,48 @@ export class PgUpdateSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  private selectedAttributeIndexes = new Map<string, number>();
+  public selectAttributeAndReturnIndex(
+    attr: keyof TResource["codec"]["attributes"] & string,
+  ): number {
+    let idx = this.selectedAttributeIndexes.get(attr);
+    if (idx == null) {
+      const { fragment } = this._attrDetails(attr);
+      idx = this.selectAndReturnIndex(fragment);
+      this.selectedAttributeIndexes.set(attr, idx);
+    }
+    return idx;
+  }
+
   apply(
     $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgUpdateSingleQueryBuilderCallback>>
     >,
   ) {
     this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
+  public wrap<
+    TDependencies extends Multistep,
+    const TAttributes extends keyof TResource["codec"]["attributes"] & string,
+  >(
+    $dependencies: TDependencies,
+    attributes: ReadonlyArray<TAttributes>,
+    callback: PgWrapCallback<
+      PgUpdateSingleQueryBuilder,
+      TDependencies,
+      PgPickedRecord<TResource["codec"] & PgCodecWithAttributes, TAttributes>
+    >,
+  ): void {
+    if (this.locked) throw new Error("Cannot wrap after plan is locked.");
+    const selection = attributes.map(
+      (attr) => [attr, this.selectAttributeAndReturnIndex(attr)] as const,
+    );
+    this.wrappers.push({
+      depId: this.addDependency(multistep($dependencies)),
+      selection,
+      callback,
+    });
   }
 
   /**
@@ -385,6 +433,8 @@ export class PgUpdateSingleStep<
       const context = contextDep.at(i);
 
       const sqlSets: SQL[] = [];
+      const attributeIndexes = new Map<string, number>();
+      const rawValues: Record<string, unknown> = Object.create(null);
       for (const { depId, name, pgCodec } of this.attributes) {
         const attVal = values[depId].at(i);
         // `null` is kept, `undefined` is skipped
@@ -392,6 +442,8 @@ export class PgUpdateSingleStep<
           const sqlIdent = sql.identifier(name as string);
           const sqlVal = sqlValueWithCodec(attVal, pgCodec);
           sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+          attributeIndexes.set(name as string, sqlSets.length - 1);
+          rawValues[name as string] = attVal;
         }
       }
 
@@ -407,14 +459,29 @@ export class PgUpdateSingleStep<
         getMetaRaw(key) {
           return meta[key];
         },
-        set(name, attVal) {
+        getRaw(name) {
+          return rawValues[name as string];
+        },
+        set(name, attVal, override = false) {
           const pgCodec = resource.codec.attributes[name]?.codec;
           if (!pgCodec) {
             throw new Error(`Attribute ${name} not recognized on ${resource}`);
           }
           const sqlIdent = sql.identifier(name as string);
           const sqlVal = sqlValueWithCodec(attVal, pgCodec);
-          sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+          const existingIndex = attributeIndexes.get(name as string);
+          if (existingIndex !== undefined) {
+            if (!override) {
+              throw new Error(
+                `Attribute '${name as string}' was specified more than once in ${resource}`,
+              );
+            }
+            sqlSets[existingIndex] = sql`${sqlIdent} = ${sqlVal}`;
+          } else {
+            attributeIndexes.set(name as string, sqlSets.length);
+            sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+          }
+          rawValues[name as string] = attVal;
         },
         setBuilder() {
           return setter(this);
@@ -457,11 +524,28 @@ export class PgUpdateSingleStep<
             }
           })
         : rawSqlValues;
-      const { rows, rowCount, notices } = await this.resource.executeMutation({
-        context,
-        text,
-        values: sqlValues,
-      });
+      const executeMutation = (client: GraphileConfig.DataplanPgClient) =>
+        resource.executor._executeWithClient(
+          client,
+          text,
+          sqlValues,
+          undefined,
+          undefined,
+          true,
+        );
+      const { rows, rowCount, notices } =
+        await this.resource.executor.executeMutation(
+          { context },
+          this.wrappers.length > 0
+            ? makeWrappedMutationExecute<PgUpdateSingleQueryBuilder, any>(
+                this.wrappers,
+                values,
+                i,
+                queryBuilder,
+                executeMutation,
+              )
+            : executeMutation,
+        );
       if (rowCount === 0) {
         // TODO: should we throw?
         return null;
@@ -575,7 +659,11 @@ export interface PgUpdateSingleQueryBuilder<
   set<TAttributeName extends keyof ObjectForResource<TResource>>(
     key: TAttributeName,
     value: ObjectForResource<TResource>[TAttributeName],
+    override?: boolean,
   ): void;
+  getRaw<TAttributeName extends keyof ObjectForResource<TResource>>(
+    key: TAttributeName,
+  ): ObjectForResource<TResource>[TAttributeName] | undefined;
   setBuilder(): Setter<ObjectForResource<TResource>, this>;
 }
 

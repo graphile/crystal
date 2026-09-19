@@ -2,6 +2,7 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   Maybe,
+  Multistep,
   PromiseOrDirect,
 } from "grafast";
 import {
@@ -10,6 +11,7 @@ import {
   flagError,
   inspect,
   isDev,
+  multistep,
   SafeError,
   Step,
 } from "grafast";
@@ -28,12 +30,18 @@ import type {
   GetPgResourceUniques,
   PgCodec,
   PgCodecAttributeNullability,
+  PgPickedRecord,
   PgQueryBuilder,
   PlanByUniques,
   ReadonlyArrayOrDirect,
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import {
+  makeWrappedMutationExecute,
+  type PgMutationWrapper,
+  type PgWrapCallback,
+} from "./pgMutationWrapper.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
 import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
@@ -120,6 +128,11 @@ export class PgDeleteSingleStep<
   private selects: Array<SQL> = [];
 
   private applyDepIds: number[] = [];
+  private wrappers: PgMutationWrapper<
+    PgDeleteSingleQueryBuilder,
+    any,
+    PgPickedRecord<PgCodecWithAttributes, any>
+  >[] = [];
 
   constructor(
     resource: TResource,
@@ -187,50 +200,48 @@ export class PgDeleteSingleStep<
       PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
+
+  private _attrDetails<
+    TAttr extends keyof GetPgResourceAttributes<TResource> & string,
+  >(attr: TAttr) {
+    if (!this.resource.codec.attributes) {
+      throw new Error(`${this.resource.codec} has no attributes?!`);
+    }
+    const resourceAttribute: PgCodecAttribute =
+      this.resource.codec.attributes[attr];
+    if (!resourceAttribute) {
+      throw new Error(
+        `${this.resource} does not define an attribute named '${attr}'`,
+      );
+    }
+    if (resourceAttribute.via) {
+      throw new Error(
+        `Cannot select a 'via' attribute from PgDeleteSingleStep`,
+      );
+    }
+    return {
+      codec: resourceAttribute.codec,
+      notNull: resourceAttribute.notNull,
+      fragment: resourceAttribute.expression
+        ? sql.parens(resourceAttribute.expression(this.alias))
+        : sql`${this.alias}.${sql.identifier(attr)}`,
+    };
+  }
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * deleteed row.
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource> & string>(
     attr: TAttr,
   ): PgClassExpressionStep<
     GetPgResourceAttributes<TResource>[TAttr]["codec"],
     TResource,
     PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
   > {
-    const resourceAttribute: PgCodecAttribute =
-      this.resource.codec.attributes![attr as string];
-    if (!resourceAttribute) {
-      throw new Error(
-        `${this.resource} does not define an attribute named '${String(attr)}'`,
-      );
-    }
-
-    if (resourceAttribute?.via) {
-      throw new Error(
-        `Cannot select a 'via' attribute from PgDeleteSingleStep`,
-      );
-    }
-
-    /*
-     * Only cast to `::text` during select; we want to use it uncasted in
-     * conditions/etc. The reasons we cast to ::text include:
-     *
-     * - to make return values consistent whether they're direct or in nested
-     *   arrays
-     * - to make sure that that various PostgreSQL clients we support do not
-     *   mangle the data in unexpected ways - we take responsibility for
-     *   decoding these string values.
-     */
-
-    const sqlExpr = pgClassExpression(
-      this,
-      resourceAttribute.codec,
-      resourceAttribute.notNull,
-    );
-    const colPlan = resourceAttribute.expression
-      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
-      : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
+    const { codec, notNull, fragment } = this._attrDetails(attr);
+    const sqlExpr = pgClassExpression(this, codec, notNull);
+    const colPlan = sqlExpr`${fragment}`;
     return colPlan as any;
   }
 
@@ -288,12 +299,48 @@ export class PgDeleteSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  private selectedAttributeIndexes = new Map<string, number>();
+  public selectAttributeAndReturnIndex(
+    attr: keyof TResource["codec"]["attributes"] & string,
+  ): number {
+    let idx = this.selectedAttributeIndexes.get(attr);
+    if (idx == null) {
+      const { fragment } = this._attrDetails(attr);
+      idx = this.selectAndReturnIndex(fragment);
+      this.selectedAttributeIndexes.set(attr, idx);
+    }
+    return idx;
+  }
+
   apply(
     $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgDeleteSingleQueryBuilderCallback>>
     >,
   ) {
     this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
+  public wrap<
+    TDependencies extends Multistep,
+    const TAttributes extends keyof TResource["codec"]["attributes"] & string,
+  >(
+    $dependencies: TDependencies,
+    attributes: ReadonlyArray<TAttributes>,
+    callback: PgWrapCallback<
+      PgDeleteSingleQueryBuilder,
+      TDependencies,
+      PgPickedRecord<TResource["codec"] & PgCodecWithAttributes, TAttributes>
+    >,
+  ): void {
+    if (this.locked) throw new Error("Cannot wrap after plan is locked.");
+    const selection = attributes.map(
+      (attr) => [attr, this.selectAttributeAndReturnIndex(attr)] as const,
+    );
+    this.wrappers.push({
+      depId: this.addDependency(multistep($dependencies)),
+      selection,
+      callback,
+    });
   }
 
   /**
@@ -362,11 +409,28 @@ export class PgDeleteSingleStep<
             }
           })
         : rawSqlValues;
-      const { rows, rowCount, notices } = await this.resource.executeMutation({
-        context,
-        text,
-        values: sqlValues,
-      });
+      const executeMutation = (client: GraphileConfig.DataplanPgClient) =>
+        this.resource.executor._executeWithClient(
+          client,
+          text,
+          sqlValues,
+          undefined,
+          undefined,
+          true,
+        );
+      const { rows, rowCount, notices } =
+        await this.resource.executor.executeMutation(
+          { context },
+          this.wrappers.length > 0
+            ? makeWrappedMutationExecute<PgDeleteSingleQueryBuilder, any>(
+                this.wrappers,
+                values,
+                i,
+                queryBuilder,
+                executeMutation,
+              )
+            : executeMutation,
+        );
       if (rowCount === 0) {
         return flagError(
           new Error(
