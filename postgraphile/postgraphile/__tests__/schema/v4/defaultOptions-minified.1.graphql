@@ -2780,6 +2780,7 @@ type Query implements Node {
   queryIntervalSet(after: Cursor, before: Cursor, first: Int, last: Int, offset: Int): QueryIntervalSetConnection
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
   queryTextArray: [String]
+  readPgSettings: JSON
   reserved(nodeId: ID!): Reserved
   reservedById(id: Int!): Reserved
   reservedInputRecord(nodeId: ID!): ReservedInputRecord

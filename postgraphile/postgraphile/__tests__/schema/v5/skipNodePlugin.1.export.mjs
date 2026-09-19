@@ -2402,6 +2402,7 @@ const person_type_functionFunctionIdentifer = sql.identifier("c", "person_type_f
 const person_type_function_connectionFunctionIdentifer = sql.identifier("c", "person_type_function_connection");
 const person_type_function_listFunctionIdentifer = sql.identifier("c", "person_type_function_list");
 const query_output_two_rowsFunctionIdentifer = sql.identifier("c", "query_output_two_rows");
+const read_pg_settingsFunctionIdentifer = sql.identifier("c", "read_pg_settings");
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
 const search_test_summariesFunctionIdentifer = sql.identifier("c", "search_test_summaries");
 const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
@@ -6363,6 +6364,25 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
+    c_read_pg_settings: {
+      executor: executor,
+      name: "c_read_pg_settings",
+      identifier: "main.c.read_pg_settings()",
+      from(...args) {
+        return sql`${read_pg_settingsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: TYPES.json,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "read_pg_settings"
+        }
+      },
+      isUnique: true
+    },
     c_return_table_without_grants: PgResource.functionResourceOptions(c_compound_key_resourceOptionsConfig, {
       name: "c_return_table_without_grants",
       identifier: "main.c.return_table_without_grants()",
@@ -7186,6 +7206,7 @@ const argDetailsSimple_c_query_output_two_rows = [{
 }];
 const makeArgs_c_query_output_two_rows = (args, path = []) => argDetailsSimple_c_query_output_two_rows.map(details => makeArg(path, args, details));
 const resource_c_query_output_two_rowsPgResource = registry.pgResources["c_query_output_two_rows"];
+const resource_c_read_pg_settingsPgResource = registry.pgResources["c_read_pg_settings"];
 const resource_c_return_table_without_grantsPgResource = registry.pgResources["c_return_table_without_grants"];
 const resource_c_search_test_summariesPgResource = registry.pgResources["c_search_test_summaries"];
 const c_search_test_summaries_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
@@ -8828,6 +8849,7 @@ type Query {
   cJsonbIdentity(json: JSON): JSON
   cNoArgsQuery: Int
   cQueryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): CQueryOutputTwoRowsRecord
+  cReadPgSettings: JSON
   cReturnTableWithoutGrants: CCompoundKey
 
   """
@@ -18474,6 +18496,10 @@ export const objects = {
       cQueryOutputTwoRows($root, args, _info) {
         const selectArgs = makeArgs_c_query_output_two_rows(args);
         return resource_c_query_output_two_rowsPgResource.execute(selectArgs);
+      },
+      cReadPgSettings($root, args, _info) {
+        const selectArgs = makeArgs_query_compound_type_array2(args);
+        return resource_c_read_pg_settingsPgResource.execute(selectArgs);
       },
       cReturnTableWithoutGrants($root, args, _info) {
         const selectArgs = makeArgs_query_compound_type_array2(args);
