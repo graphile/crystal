@@ -1,0 +1,4 @@
+{
+  wrappedCreatePerson: 99999,
+  wrappedMutationResult: "Updated person 99999's name to \"Mutation Wrapper Integration Test\"",
+}

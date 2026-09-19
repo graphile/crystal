@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { pgInsertSingle } from "@dataplan/pg";
+import { pgDeleteSingle, pgInsertSingle, pgUpdateSingle } from "@dataplan/pg";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
 const runMutation = EXPORTABLE(
@@ -19,6 +19,17 @@ const runMutation = EXPORTABLE(
   [],
 );
 
+const runDeleteMutation = EXPORTABLE(
+  () =>
+    async function runDeleteMutation(run, pgClient, { context }) {
+      const result = await run(pgClient);
+      const row = result.rows[0];
+      context.mutationResult = `Deleted person ${row.id} named "${row.person_full_name}"`;
+      return result;
+    },
+  [],
+);
+
 const plugin = extendSchema((build) => {
   const { person: people } = build.input.pgRegistry.pgResources;
   const { constant, context } = build.grafast;
@@ -27,6 +38,8 @@ const plugin = extendSchema((build) => {
     typeDefs: gql`
       extend type Mutation {
         wrappedCreatePerson(name: String!, email: String!): Int
+        wrappedUpdatePerson(name: String!): Int
+        wrappedDeletePerson: Int
         wrappedMutationResult: String
       }
     `,
@@ -48,6 +61,38 @@ const plugin = extendSchema((build) => {
               return $person.get("id");
             },
           [constant, context, people, pgInsertSingle, runMutation],
+        ),
+        wrappedUpdatePerson: EXPORTABLE(
+          (constant, context, people, pgUpdateSingle, runMutation) =>
+            function wrappedUpdatePerson(_$root, { $name }) {
+              const $person = pgUpdateSingle(
+                people,
+                { id: constant(99999, false) },
+                { person_full_name: $name },
+              );
+              $person.wrap(
+                () => ({ context: context() }),
+                ["id", "person_full_name"],
+                runMutation,
+              );
+              return $person.get("id");
+            },
+          [constant, context, people, pgUpdateSingle, runMutation],
+        ),
+        wrappedDeletePerson: EXPORTABLE(
+          (constant, context, people, pgDeleteSingle, runDeleteMutation) =>
+            function wrappedDeletePerson() {
+              const $person = pgDeleteSingle(people, {
+                id: constant(99999, false),
+              });
+              $person.wrap(
+                () => ({ context: context() }),
+                ["id", "person_full_name"],
+                runDeleteMutation,
+              );
+              return $person.get("id");
+            },
+          [constant, context, people, pgDeleteSingle, runDeleteMutation],
         ),
         wrappedMutationResult: EXPORTABLE(
           (context) =>

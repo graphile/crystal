@@ -1,0 +1,39 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for mutations/plugins/mutation-wrappers"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 8, 17, 18, 13<br /><br />1: PgInsertSingle[9]<br />2: <br />ᐳ: Access[15], PgClassExpression[14]"):::bucket
+    Bucket2("Bucket 2 (mutationField)<br />Deps: 2"):::bucket
+    end
+    Bucket0 --> Bucket1 & Bucket2
+
+    %% plan dependencies
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access10 & Access11 --> Object12
+    Object13{{"Object[13∈0] ➊<br />ᐸ{context}ᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
+    PgInsertSingle9[["PgInsertSingle[9∈1] ➊<br />ᐸperson(id,person_full_name,email)ᐳ<br />More deps:<br />- Constantᐸ99999ᐳ[8]<br />- Constantᐸ'mutation wrapper integration test'ᐳ[17]<br />- Constantᐸ'mutation-wrapper-integration-test@example.com'ᐳ[18]"]]:::sideeffectplan
+    Object12 & Object13 --> PgInsertSingle9
+    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Access15{{"Access[15∈1] ➊<br />ᐸ9.tᐳ"}}:::plan
+    Access15 --> PgClassExpression14
+    PgInsertSingle9 --> Access15
+    Access16{{"Access[16∈2] ➊<br />ᐸ2.mutationResultᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,Access10,Access11,Object12,Object13 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgInsertSingle9,PgClassExpression14,Access15 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,Access16 bucket2
+
