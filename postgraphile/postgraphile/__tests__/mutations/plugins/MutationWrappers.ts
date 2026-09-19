@@ -30,6 +30,51 @@ const runDeleteMutation = EXPORTABLE(
   [],
 );
 
+const runNestedWrap1 = EXPORTABLE(
+  () =>
+    async function runNestedWrap1(run, pgClient, { context }, queryBuilder) {
+      queryBuilder.set(
+        "person_full_name",
+        `${queryBuilder.getRaw("person_full_name")} (wrap1)`,
+        true,
+      );
+      const result = await run(pgClient);
+      context.mutationResult += " (wrap1)";
+      return result;
+    },
+  [],
+);
+
+const runNestedWrap2 = EXPORTABLE(
+  () =>
+    async function runNestedWrap2(run, pgClient, { context }, queryBuilder) {
+      queryBuilder.set(
+        "person_full_name",
+        `${queryBuilder.getRaw("person_full_name")} (wrap2)`,
+        true,
+      );
+      const result = await run(pgClient);
+      context.mutationResult += " (wrap2)";
+      return result;
+    },
+  [],
+);
+
+const runNestedWrap3 = EXPORTABLE(
+  () =>
+    async function runNestedWrap3(run, pgClient, { context }, queryBuilder) {
+      queryBuilder.set(
+        "person_full_name",
+        `${queryBuilder.getRaw("person_full_name")} (wrap3)`,
+        true,
+      );
+      const result = await run(pgClient);
+      context.mutationResult = `Updated person ${result.rows[0].id}'s name to "${result.rows[0].person_full_name}" (wrap3)`;
+      return result;
+    },
+  [],
+);
+
 const plugin = extendSchema((build) => {
   const { person: people } = build.input.pgRegistry.pgResources;
   const { constant, context } = build.grafast;
@@ -40,6 +85,7 @@ const plugin = extendSchema((build) => {
         wrappedCreatePerson(name: String!, email: String!): Int
         wrappedUpdatePerson(name: String!): Int
         wrappedDeletePerson: Int
+        wrappedNestedPerson: Int
         wrappedMutationResult: String
       }
     `,
@@ -93,6 +139,51 @@ const plugin = extendSchema((build) => {
               return $person.get("id");
             },
           [constant, context, people, pgDeleteSingle, runDeleteMutation],
+        ),
+        wrappedNestedPerson: EXPORTABLE(
+          (
+            constant,
+            context,
+            people,
+            pgInsertSingle,
+            runNestedWrap1,
+            runNestedWrap2,
+            runNestedWrap3,
+          ) =>
+            function wrappedNestedPerson() {
+              const $person = pgInsertSingle(people, {
+                id: constant(99998, false),
+                person_full_name: constant("Alice", false),
+                email: constant("nested-mutation-wrapper@example.com", false),
+              });
+              const $context = context();
+              const $dependencies = { context: $context };
+              $person.wrap(
+                $dependencies,
+                ["id", "person_full_name"],
+                runNestedWrap1,
+              );
+              $person.wrap(
+                $dependencies,
+                ["id", "person_full_name"],
+                runNestedWrap2,
+              );
+              $person.wrap(
+                $dependencies,
+                ["id", "person_full_name"],
+                runNestedWrap3,
+              );
+              return $person.get("id");
+            },
+          [
+            constant,
+            context,
+            people,
+            pgInsertSingle,
+            runNestedWrap1,
+            runNestedWrap2,
+            runNestedWrap3,
+          ],
         ),
         wrappedMutationResult: EXPORTABLE(
           (context) =>
