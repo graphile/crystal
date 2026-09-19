@@ -27,6 +27,8 @@ export interface ExportOptions {
    */
   prettier?: boolean;
 
+  lint?: boolean;
+
   /** @deprecated Use `optimizeRuns: 0` instead */
   disableOptimize?: boolean;
 
