@@ -2,8 +2,10 @@ import type { ExecutionValue, Multistep, UnwrapMultistep } from "grafast";
 
 import type { PgClientResult, PgNotice } from "../executor.ts";
 
+/** @experimental */
 type Selection = readonly (readonly [attributeName: string, index: number])[];
 
+/** @experimental */
 export type PgMutationWrapper<
   TQueryBuilder,
   TDependencies extends Multistep,
@@ -14,6 +16,7 @@ export type PgMutationWrapper<
   callback: PgWrapCallback<TQueryBuilder, TDependencies, TRecord>;
 };
 
+/** @experimental */
 export type PgWrapCallback<
   TQueryBuilder,
   TDependencies extends Multistep,
@@ -38,6 +41,7 @@ type RunCallback<TRecord extends Record<string, unknown>> = (
   client: GraphileConfig.DataplanPgClient,
 ) => Promise<PgWrapResult<TRecord>>;
 
+/** @experimental */
 export function makeWrappedMutationExecute<TQueryBuilder, TData extends any[]>(
   wrappers: readonly PgMutationWrapper<
     TQueryBuilder,

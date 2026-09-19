@@ -320,6 +320,7 @@ export class PgDeleteSingleStep<
     this.applyDepIds.push(this.addUnaryDependency($step));
   }
 
+  /** @experimental */
   public wrap<
     TDependencies extends Multistep,
     const TAttributes extends keyof TResource["codec"]["attributes"] & string,
