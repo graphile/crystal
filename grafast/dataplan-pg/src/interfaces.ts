@@ -27,6 +27,12 @@ import type { RuntimeSQLThunk } from "./utils.ts";
 export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
   TAttribute extends PgCodecAttribute<any, true> ? never : null;
 
+/** A JavaScript record containing only the selected codec attributes. */
+export type PgPickedRecord<
+  TAttributes extends PgCodecAttributes,
+  TPicked extends keyof TAttributes,
+> = { [Attr in TPicked]: PgCodecJSDatatype<TAttributes[Attr]["codec"]> };
+
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
