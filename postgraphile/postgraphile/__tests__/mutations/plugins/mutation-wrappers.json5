@@ -1,4 +1,10 @@
 {
-  wrappedCreatePerson: 99999,
-  wrappedMutationResult: "Updated person 99999's name to \"Mutation Wrapper Integration Test\"",
+  created: 99999,
+  createdResult: "Updated person 99999's name to \"Mutation Wrapper Integration Test\"",
+  updated: 99999,
+  updatedResult: "Updated person 99999's name to \"Bob Jones\"",
+  deleted: 99999,
+  deletedResult: "Deleted person 99999 named \"Bob Jones\"",
+  nested: 99998,
+  nestedResult: "Updated person 99998's name to \"Alice (wrap1) (wrap2) (wrap3)\" (wrap3) (wrap2) (wrap1)",
 }
