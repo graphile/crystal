@@ -23,21 +23,27 @@ export type PgWrapCallback<
   pgClient: GraphileConfig.DataplanPgClient,
   dependencies: UnwrapMultistep<TDependencies>,
   queryBuilder: TQueryBuilder,
-) => Promise<TRecord | null>;
+) => Promise<PgWrapResult<TRecord>>;
 
-type RunCallback<TRecord> = (
-  client: GraphileConfig.DataplanPgClient,
-) => Promise<{
+type PgWrapResult<TRecord extends Record<string, unknown>> = {
   rows: readonly TRecord[];
   rowCount: number | null;
   notices?: readonly PgNotice[];
 
   /** internal */
   _raw: PgClientResult<any>;
-}>;
+};
+
+type RunCallback<TRecord extends Record<string, unknown>> = (
+  client: GraphileConfig.DataplanPgClient,
+) => Promise<PgWrapResult<TRecord>>;
 
 export function makeWrappedMutationExecute<TQueryBuilder, TData extends any[]>(
-  wrappers: readonly PgMutationWrapper<TQueryBuilder, any, any>[],
+  wrappers: readonly PgMutationWrapper<
+    TQueryBuilder,
+    Multistep,
+    Record<string, unknown>
+  >[],
   values: readonly ExecutionValue[],
   batchIndex: number,
   queryBuilder: TQueryBuilder,
@@ -48,7 +54,7 @@ export function makeWrappedMutationExecute<TQueryBuilder, TData extends any[]>(
   if (wrappers.length > 0) {
     const [wrapper, ...tail] = wrappers;
     const { depId, callback, selection } = wrapper;
-    return (pgClientAdaptor) => {
+    return async (pgClientAdaptor) => {
       const dependencies = values[depId].at(batchIndex);
       const run = async (client: GraphileConfig.DataplanPgClient) => {
         const innerRun = makeWrappedMutationExecute(
@@ -66,7 +72,13 @@ export function makeWrappedMutationExecute<TQueryBuilder, TData extends any[]>(
           _raw: result,
         };
       };
-      return callback(run, pgClientAdaptor, dependencies, queryBuilder);
+      const result = await callback(
+        run,
+        pgClientAdaptor,
+        dependencies,
+        queryBuilder,
+      );
+      return result._raw;
     };
   } else {
     return innerCallback;
