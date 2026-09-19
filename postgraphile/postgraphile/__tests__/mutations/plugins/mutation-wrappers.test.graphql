@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy()
+## expect(data.wrappedMutationResult).toEqual('Updated person 99999\'s name to "Mutation Wrapper Integration Test"')
+#> schema: ["c"]
+#> extends: ["./MutationWrappers.ts:preset"]
+
+mutation {
+  wrappedCreatePerson(
+    name: "mutation wrapper integration test"
+    email: "mutation-wrapper-integration-test@example.com"
+  )
+  wrappedMutationResult
+}
