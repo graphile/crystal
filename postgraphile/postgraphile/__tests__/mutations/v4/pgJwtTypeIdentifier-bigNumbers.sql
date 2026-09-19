@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   case when (__authenticate__) is not distinct from null then null::text else json_build_array(
     ((__authenticate__)."role"),
@@ -12,3 +14,5 @@ from "b"."authenticate"(
   $2::"numeric",
   $3::"int8"
 ) as __authenticate__;
+
+commit; /*fake*/

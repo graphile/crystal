@@ -131,7 +131,7 @@ export interface WithPgClient<TPgClient extends PgClient = PgClient> {
 
 export type PgExecutorContext<
   TSettings = any,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 > = {
   pgSettings: TSettings;
   withPgClient: WithPgClient<TPgClient>;
@@ -163,7 +163,13 @@ export type PgExecutorOptions = {
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
+  /** @defaultValue `true` */
+  useTransaction?: boolean;
+};
+type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
+  /** @deprecated Pass a callback instead. */
   text: string;
+  /** @deprecated Pass a callback instead. */
   values: ReadonlyArray<SQLRawValue>;
 };
 
@@ -203,7 +209,8 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     return this.contextCallback();
   }
 
-  private async _executeWithClient<TData>(
+  /** @internal */
+  public async _executeWithClient<TData>(
     client: PgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
@@ -550,11 +557,18 @@ ${duration}
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
               const queryResult = common.useTransaction
-                ? await this.executeMutation<TOutput>({
-                    context,
-                    text,
-                    values: sqlValues,
-                  })
+                ? await this.executeMutation<PgClientResult<TOutput>>(
+                    { context, useTransaction: common.useTransaction },
+                    (client) =>
+                      this._executeWithClient(
+                        client,
+                        text,
+                        sqlValues,
+                        undefined,
+                        undefined,
+                        true,
+                      ),
+                  )
                 : await this._execute<TOutput>(
                     context,
                     text,
@@ -935,28 +949,52 @@ ${duration}
     };
   }
 
-  public async executeMutation<TData>(
+  public executeMutation<T>(
     options: PgExecutorMutationOptions,
-  ): Promise<PgClientResult<TData>> {
-    const { context, text, values } = options;
+    callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
+  ): Promise<T>;
+  /** @deprecated Pass a callback as the second argument instead. */
+  public executeMutation<TData>(
+    options: DeprecatedPgExecutorMutationOptions,
+  ): Promise<PgClientResult<TData>>;
+  public async executeMutation<T>(
+    options: PgExecutorMutationOptions,
+    maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
+  ): Promise<T> {
+    const { context, useTransaction } = options;
     const { withPgClient, pgSettings } = context;
+    let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
+    if (maybeCallback != null) {
+      callback = maybeCallback;
+    } else {
+      const { text, values } = options as DeprecatedPgExecutorMutationOptions;
+      if (text === undefined || values === undefined) {
+        throw new Error("PgExecutor.executeMutation requires a callback.");
+      }
+      callback = (client) =>
+        this._executeWithClient(
+          client,
+          text,
+          values,
+          undefined,
+          undefined,
+          true,
+        ) as Promise<T>;
+    }
 
-    // We don't explicitly need a transaction for mutations
-    const queryResult = await withPgClient(pgSettings, (client) =>
-      this._executeWithClient<TData>(
-        client,
-        text,
-        values,
-        undefined,
-        undefined,
-        true,
-      ),
+    // We don't explicitly need a transaction for mutations; but for safety
+    // create one unless caller opts out.
+    const result = await withPgClient(
+      pgSettings,
+      useTransaction === false
+        ? callback
+        : (client) => client.withTransaction(callback),
     );
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
     (context as any)[this.$$cache]?.reset();
 
-    return queryResult;
+    return result;
   }
 }
 

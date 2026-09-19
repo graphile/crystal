@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __type_function_mutation__."id"::text as "0",
   __type_function_mutation__."smallint"::text as "1",
@@ -122,6 +124,8 @@ select
   __type_function_mutation__."ltree_array"::text as "49"
 from "b"."type_function_mutation"($1::"int4") as __type_function_mutation__;
 
+commit; /*fake*/
+
 select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."b" as "1",
@@ -209,6 +213,8 @@ from "a"."post" as __post__
 where (
   __post__."id" = $1::"int4"
 );
+
+begin; /*fake*/
 
 select
   __type_function_list_mutation__."id"::text as "0",
@@ -334,6 +340,8 @@ select
   __type_function_list_mutation__."ltree_array"::text as "49"
 from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__;
 
+commit; /*fake*/
+
 with __frmcdc_compound_type_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
 )
@@ -469,6 +477,8 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
 ) as __post_result__;
+
+begin; /*fake*/
 
 select
   __type_function_connection_mutation__."id"::text as "0",
@@ -593,6 +603,8 @@ select
   __type_function_connection_mutation__."ltree"::text as "48",
   __type_function_connection_mutation__."ltree_array"::text as "49"
 from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
+
+commit; /*fake*/
 
 with __frmcdc_compound_type_identifiers__ as materialized (
   select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
