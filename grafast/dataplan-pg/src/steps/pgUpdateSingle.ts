@@ -367,7 +367,7 @@ export class PgUpdateSingleStep<
       idx = this.selectAndReturnIndex(
         codec.castFromPg
           ? codec.castFromPg(fragment, notNull)
-          : sql`${sql.parens(fragment)}::text`,
+          : sql`${fragment}::text`,
       );
       this.selectedAttributeIndexes.set(attr, idx);
     }
