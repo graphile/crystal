@@ -22,6 +22,7 @@ import sql, { $$toSQL } from "pg-sql2";
 import type { PgCodecAttribute } from "../codecs.ts";
 import { sqlValueWithCodec } from "../codecs.ts";
 import type { PgResource, PgResourceUnique } from "../datasource.ts";
+import type { PgClientResult } from "../executor.ts";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -379,11 +380,10 @@ export class PgUpdateSingleStep<
     const selection = attributes.map(
       (attr) => [attr, this.selectAttributeAndReturnIndex(attr)] as const,
     );
-    this.wrappers.push({
-      depId: this.addDependency(multistep($dependencies)),
-      selection,
-      callback,
-    });
+    const depId = this.withMyLayerPlan(() =>
+      this.addDependency(multistep($dependencies)),
+    );
+    this.wrappers.push({ depId, selection, callback });
   }
 
   /**
@@ -497,35 +497,38 @@ export class PgUpdateSingleStep<
         }
       }
 
-      if (sqlSets.length === 0) {
-        // No attributes to update?! This isn't allowed.
-        throw new SafeError(
-          "Attempted to update a record, but no new values were specified.",
-        );
-      }
+      const executeMutation = (
+        client: GraphileConfig.DataplanPgClient,
+      ): Promise<PgClientResult<any>> => {
+        if (sqlSets.length === 0) {
+          // No attributes to update?! Skip.
+          return Promise.resolve({
+            rows: [],
+            rowCount: 0,
+          });
+        }
 
-      const query = sql`update ${table} set ${sql.join(
-        sqlSets,
-        ", ",
-      )} where ${sqlWhere}${returning};`;
-      const { text, values: rawSqlValues } = sql.compile(query);
+        const query = sql`update ${table} set ${sql.join(
+          sqlSets,
+          ", ",
+        )} where ${sqlWhere}${returning};`;
+        const { text, values: rawSqlValues } = sql.compile(query);
 
-      const sqlValues = queryValueDetailsBySymbol.size
-        ? rawSqlValues.map((v) => {
-            if (typeof v === "symbol") {
-              const details = queryValueDetailsBySymbol.get(v);
-              if (!details) {
-                throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
+        const sqlValues = queryValueDetailsBySymbol.size
+          ? rawSqlValues.map((v) => {
+              if (typeof v === "symbol") {
+                const details = queryValueDetailsBySymbol.get(v);
+                if (!details) {
+                  throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
+                }
+                const val = values[details.depId].at(i);
+                return val == null ? null : details.processor(val);
+              } else {
+                return v;
               }
-              const val = values[details.depId].at(i);
-              return val == null ? null : details.processor(val);
-            } else {
-              return v;
-            }
-          })
-        : rawSqlValues;
-      const executeMutation = (client: GraphileConfig.DataplanPgClient) =>
-        resource.executor._executeWithClient(
+            })
+          : rawSqlValues;
+        return resource.executor._executeWithClient(
           client,
           text,
           sqlValues,
@@ -533,6 +536,7 @@ export class PgUpdateSingleStep<
           undefined,
           true,
         );
+      };
       const { rows, rowCount, notices } =
         await this.resource.executor.executeMutation(
           { context },
