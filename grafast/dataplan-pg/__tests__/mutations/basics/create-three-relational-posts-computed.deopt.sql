@@ -1,9 +1,4 @@
-select /* NOTHING?! */
-from interfaces_and_unions.insert_post($1::"int4", $2::"text") as __relational_posts__
-where (
-  true /* authorization checks */
-)
-order by __relational_posts__."id" asc;
+begin; /*fake*/
 
 select /* NOTHING?! */
 from interfaces_and_unions.insert_post($1::"int4", $2::"text") as __relational_posts__
@@ -11,6 +6,21 @@ where (
   true /* authorization checks */
 )
 order by __relational_posts__."id" asc;
+
+commit; /*fake*/
+
+begin; /*fake*/
+
+select /* NOTHING?! */
+from interfaces_and_unions.insert_post($1::"int4", $2::"text") as __relational_posts__
+where (
+  true /* authorization checks */
+)
+order by __relational_posts__."id" asc;
+
+commit; /*fake*/
+
+begin; /*fake*/
 
 select
   case when (__relational_posts__) is not distinct from null then null::text else json_build_array(
@@ -24,6 +34,8 @@ from interfaces_and_unions.insert_post($1::"int4", $2::"text") as __relational_p
 where (
   true /* authorization checks */
 );
+
+commit; /*fake*/
 
 select
   __relational_items__."type"::text as "0",

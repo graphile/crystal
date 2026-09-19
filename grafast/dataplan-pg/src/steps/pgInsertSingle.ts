@@ -2,11 +2,13 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   Maybe,
+  Multistep,
   PromiseOrDirect,
   Setter,
   SetterCapable,
+  Thunk,
 } from "grafast";
-import { access, exportAs, inspect, isDev, setter, Step } from "grafast";
+import { access, exportAs, inspect, multistep, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -20,12 +22,18 @@ import type {
   PgCodec,
   PgCodecAttributeNullability,
   PgCodecWithAttributes,
+  PgPickedRecord,
   PgQueryBuilder,
   PgTypedStep,
   ReadonlyArrayOrDirect,
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import {
+  makeWrappedMutationExecute,
+  type PgMutationWrapper,
+  type PgWrapCallback,
+} from "./pgMutationWrapper.ts";
 import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
 import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
@@ -117,6 +125,12 @@ export class PgInsertSingleStep<
 
   private applyDepIds: number[] = [];
 
+  private wrappers: PgMutationWrapper<
+    PgInsertSingleQueryBuilder,
+    any,
+    PgPickedRecord<PgCodecWithAttributes, any>
+  >[] = [];
+
   constructor(
     resource: TResource,
     attributes?: {
@@ -153,23 +167,24 @@ export class PgInsertSingleStep<
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
     value: Step, // | PgTypedStep<TAttributes[TKey]["codec"]>
+    override = false,
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
     }
-    if (isDev) {
-      if (this.attributes.some((col) => col.name === name)) {
-        throw new Error(
-          `Attribute '${String(name)}' was specified more than once in ${this}`,
-        );
-      }
+    const existingIndex = this.attributes.findIndex((col) => col.name === name);
+    if (existingIndex >= 0 && !override) {
+      throw new Error(
+        `Attribute '${name as string}' was specified more than once in ${this}`,
+      );
     }
+    if (existingIndex >= 0) this.attributes.splice(existingIndex, 1);
     const attribute = (
       this.resource.codec.attributes as GetPgResourceAttributes<TResource>
     )?.[name];
     if (!attribute) {
       throw new Error(
-        `Attribute ${String(name)} not found in ${this.resource.codec}`,
+        `Attribute ${name as string} not found in ${this.resource.codec}`,
       );
     }
     const { codec: pgCodec } = attribute;
@@ -188,11 +203,41 @@ export class PgInsertSingleStep<
       PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
+
+  private _attrDetails<
+    TAttr extends keyof GetPgResourceAttributes<TResource> & string,
+  >(attr: TAttr) {
+    if (!this.resource.codec.attributes) {
+      throw new Error(`${this.resource.codec} has no attributes?!`);
+    }
+    const resourceAttribute: PgCodecAttribute =
+      this.resource.codec.attributes[attr];
+    if (!resourceAttribute) {
+      throw new Error(
+        `${this.resource} does not define an attribute named '${attr}'`,
+      );
+    }
+
+    if (resourceAttribute?.via) {
+      throw new Error(
+        `Cannot select a 'via' attribute from PgInsertSingleStep`,
+      );
+    }
+
+    return {
+      codec: resourceAttribute.codec,
+      notNull: resourceAttribute.notNull,
+      fragment: resourceAttribute.expression
+        ? sql.parens(resourceAttribute.expression(this.alias))
+        : sql`${this.alias}.${sql.identifier(attr)}`,
+    };
+  }
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * inserted row.
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  get<TAttr extends keyof GetPgResourceAttributes<TResource> & string>(
     attr: TAttr,
   ): PgClassExpressionStep<
     GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
@@ -206,39 +251,21 @@ export class PgInsertSingleStep<
     if (!this.resource.codec.attributes) {
       throw new Error(`Cannot call .get() when there's no attributes.`);
     }
-    const resourceAttribute: PgCodecAttribute =
-      this.resource.codec.attributes[attr as string];
-    if (!resourceAttribute) {
-      throw new Error(
-        `${this.resource} does not define an attribute named '${String(attr)}'`,
-      );
-    }
-
-    if (resourceAttribute?.via) {
-      throw new Error(
-        `Cannot select a 'via' attribute from PgInsertSingleStep`,
-      );
-    }
-
+    const { codec, notNull, fragment } = this._attrDetails(attr);
     /*
      * Only cast to `::text` during select; we want to use it uncasted in
      * conditions/etc. The reasons we cast to ::text include:
      *
      * - to make return values consistent whether they're direct or in nested
      *   arrays
-     * - to make sure that that various PostgreSQL clients we support do not
+     * - to make sure that the various PostgreSQL clients we support do not
      *   mangle the data in unexpected ways - we take responsibility for
      *   decoding these string values.
+     *
+     * PgClassExpressionStep applies the codec's cast when selecting.
      */
-
-    const sqlExpr = pgClassExpression(
-      this,
-      resourceAttribute.codec,
-      resourceAttribute.notNull,
-    );
-    const colPlan = resourceAttribute.expression
-      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
-      : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
+    const sqlExpr = pgClassExpression(this, codec, notNull);
+    const colPlan = sqlExpr`${fragment}`;
     return colPlan as any;
   }
 
@@ -292,12 +319,59 @@ export class PgInsertSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  selectedAttributeIndexes = new Map<string, number>();
+  /**
+   * More efficient version of selectAndReturnIndex for attributes
+   *
+   * @internal
+   */
+  public selectAttributeAndReturnIndex(
+    attr: keyof TResource["codec"]["attributes"] & string,
+  ): number {
+    let idx = this.selectedAttributeIndexes.get(attr);
+    if (idx == null) {
+      const { codec, notNull, fragment } = this._attrDetails(attr);
+      // Always selecting here, so apply the codec's cast immediately.
+      idx = this.selectAndReturnIndex(
+        codec.castFromPg
+          ? codec.castFromPg(fragment, notNull)
+          : sql`${fragment}::text`,
+      );
+      this.selectedAttributeIndexes.set(attr, idx);
+    }
+    return idx;
+  }
+
   apply(
     $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgInsertSingleQueryBuilderCallback>>
     >,
   ) {
     this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
+  /** @experimental */
+  public wrap<
+    TDependencies extends Multistep,
+    const TAttributes extends keyof TResource["codec"]["attributes"] & string,
+  >(
+    $deps: Thunk<TDependencies>,
+    attributes: ReadonlyArray<TAttributes>,
+    callback: PgWrapCallback<
+      PgInsertSingleQueryBuilder,
+      TDependencies,
+      PgPickedRecord<TResource["codec"], TAttributes>
+    >,
+  ): void {
+    if (this.locked) throw new Error("Cannot wrap after plan is locked.");
+    const depId = this.withMyLayerPlan(() =>
+      this.addDependency(multistep($deps)),
+    );
+    const selection = attributes.map((attr) => {
+      const { codec } = this._attrDetails(attr);
+      return [attr, this.selectAttributeAndReturnIndex(attr), codec] as const;
+    });
+    this.wrappers.push({ depId, selection, callback });
   }
 
   /**
@@ -317,6 +391,7 @@ export class PgInsertSingleStep<
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const { resource, contextId, finalizeResults, alias } = this;
+    const executor = this.resource.executor;
     if (!finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -343,17 +418,21 @@ export class PgInsertSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return indexMap<PromiseOrDirect<any>>(async (i) => {
-      const context = contextDep.at(i);
+    return indexMap<PromiseOrDirect<any>>(async (batchIndex) => {
+      const context = contextDep.at(batchIndex);
 
       const sqlAttributes: SQL[] = [];
       const sqlValues: SQL[] = [];
+      const setIndexes = new Map<string, number>();
+      const rawValues: Record<string, unknown> = Object.create(null);
       for (const { depId, name, pgCodec } of this.attributes) {
-        const attVal = values[depId].at(i);
+        const attVal = values[depId].at(batchIndex);
         // `null` is kept, `undefined` is skipped
         if (attVal !== undefined) {
           const sqlIdent = sql.identifier(name as string);
           const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          setIndexes.set(name as string, sqlAttributes.length);
+          rawValues[name as string] = attVal;
           sqlAttributes.push(sqlIdent);
           sqlValues.push(sqlVal);
         }
@@ -371,15 +450,31 @@ export class PgInsertSingleStep<
         getMetaRaw(key) {
           return meta[key];
         },
-        set(name, attVal) {
+        getRaw(name) {
+          return rawValues[name as string];
+        },
+        set(name, attVal, override = false) {
           const pgCodec = resource.codec.attributes[name]?.codec;
           if (!pgCodec) {
             throw new Error(`Attribute ${name} not recognized on ${resource}`);
           }
           const sqlIdent = sql.identifier(name as string);
           const sqlVal = sqlValueWithCodec(attVal, pgCodec);
-          sqlAttributes.push(sqlIdent);
-          sqlValues.push(sqlVal);
+          const existingIndex = setIndexes.get(name as string);
+          if (existingIndex !== undefined) {
+            if (!override) {
+              throw new Error(
+                `Attribute '${name as string}' was specified more than once in ${resource}`,
+              );
+            }
+            sqlAttributes[existingIndex] = sqlIdent;
+            sqlValues[existingIndex] = sqlVal;
+          } else {
+            setIndexes.set(name as string, sqlAttributes.length);
+            sqlAttributes.push(sqlIdent);
+            sqlValues.push(sqlVal);
+          }
+          rawValues[name as string] = attVal;
         },
         setBuilder() {
           return setter(this);
@@ -395,25 +490,41 @@ export class PgInsertSingleStep<
         }
       }
 
-      let compileResult: ReturnType<typeof sql.compile>;
-      if (sqlAttributes.length > 0) {
-        // This is our common path
-        const attributes = sql.join(sqlAttributes, ", ");
-        const values = sql.join(sqlValues, ", ");
-        const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
-        compileResult = sql.compile(query);
-      } else {
-        // No columns to insert?! Odd... but okay.
-        const query = sql`insert into ${table} default values${returning};`;
-        compileResult = sql.compile(query);
-      }
-
-      const { text, values: stmtValues } = compileResult;
-      const { rows, notices, rowCount } = await this.resource.executeMutation({
-        context,
-        text,
-        values: stmtValues,
-      });
+      const executeMutation = (client: GraphileConfig.DataplanPgClient) => {
+        let compileResult: ReturnType<typeof sql.compile>;
+        if (sqlAttributes.length > 0) {
+          // This is our common path
+          const attributes = sql.join(sqlAttributes, ", ");
+          const values = sql.join(sqlValues, ", ");
+          const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
+          compileResult = sql.compile(query);
+        } else {
+          // No columns to insert?! Odd... but okay.
+          const query = sql`insert into ${table} default values${returning};`;
+          compileResult = sql.compile(query);
+        }
+        const { text, values: stmtValues } = compileResult;
+        return executor._executeWithClient(
+          client,
+          text,
+          stmtValues,
+          undefined,
+          undefined,
+          true,
+        );
+      };
+      const { rows, notices, rowCount } = await executor.executeMutation(
+        { context, useTransaction: this.wrappers.length > 0 },
+        this.wrappers.length > 0
+          ? makeWrappedMutationExecute<PgInsertSingleQueryBuilder, any>(
+              this.wrappers,
+              values,
+              batchIndex,
+              queryBuilder,
+              executeMutation,
+            )
+          : executeMutation,
+      );
       return {
         __proto__: null,
         m: meta,
@@ -493,7 +604,11 @@ export interface PgInsertSingleQueryBuilder<
   set<TAttributeName extends keyof ObjectForResource<TResource>>(
     key: TAttributeName,
     value: ObjectForResource<TResource>[TAttributeName],
+    override?: boolean,
   ): void;
+  getRaw<TAttributeName extends keyof ObjectForResource<TResource>>(
+    key: TAttributeName,
+  ): ObjectForResource<TResource>[TAttributeName] | undefined;
   setBuilder(): Setter<ObjectForResource<TResource>, this>;
 }
 
