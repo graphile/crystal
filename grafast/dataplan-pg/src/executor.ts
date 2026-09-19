@@ -131,7 +131,7 @@ export interface WithPgClient<TPgClient extends PgClient = PgClient> {
 
 export type PgExecutorContext<
   TSettings = any,
-  TPgClient extends PgClient = PgClient,
+  TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
 > = {
   pgSettings: TSettings;
   withPgClient: WithPgClient<TPgClient>;
@@ -207,7 +207,8 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     return this.contextCallback();
   }
 
-  private async _executeWithClient<TData>(
+  /** @internal */
+  public async _executeWithClient<TData>(
     client: PgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
@@ -948,7 +949,7 @@ ${duration}
 
   public executeMutation<T>(
     options: PgExecutorMutationOptions,
-    callback: (client: PgClient) => Promise<T>,
+    callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T>;
   /** @deprecated Pass a callback as the second argument instead. */
   public executeMutation<TData>(
@@ -956,10 +957,10 @@ ${duration}
   ): Promise<PgClientResult<TData>>;
   public async executeMutation<T>(
     options: PgExecutorMutationOptions,
-    maybeCallback?: (client: PgClient) => Promise<T>,
+    maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
     const { withPgClient, pgSettings } = options.context;
-    let callback: (client: PgClient) => Promise<T>;
+    let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
       callback = maybeCallback;
     } else {

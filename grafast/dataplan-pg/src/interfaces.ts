@@ -29,9 +29,11 @@ export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
 
 /** A JavaScript record containing only the selected codec attributes. */
 export type PgPickedRecord<
-  TAttributes extends PgCodecAttributes,
-  TPicked extends keyof TAttributes,
-> = { [Attr in TPicked]: PgCodecJSDatatype<TAttributes[Attr]["codec"]> };
+  TCodec extends PgCodecWithAttributes,
+  TPicked extends keyof TCodec["attributes"],
+> = {
+  [Attr in TPicked]: PgCodecJSDatatype<TCodec["attributes"][Attr]["codec"]>;
+};
 
 /**
  * A class-like source of information - could be from `SELECT`-ing a row, or
@@ -839,7 +841,8 @@ export type ReadonlyArrayOrDirect<T> = T | ReadonlyArray<T>;
 export type ObjectForResource<
   TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
 > = {
-  [key in keyof GetPgResourceAttributes<TResource> & string]?: any; // TYPES: we should be able to make this stronger using the attribute codec
+  [key in keyof GetPgResourceAttributes<TResource> &
+    string]?: PgCodecJSDatatype<TResource["codec"]["attributes"][key]["codec"]>;
 };
 
 export interface PgQueryRootStep extends Step {
