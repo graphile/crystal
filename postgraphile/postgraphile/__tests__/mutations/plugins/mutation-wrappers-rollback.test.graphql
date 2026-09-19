@@ -2,7 +2,15 @@
 ## expect(errors[0].message).toEqual("Expected wrapper failure")
 #> schema: ["c"]
 #> extends: ["./MutationWrappers.ts:preset"]
+#> directPg: true
+
+#! const { rows } = await pgClient.query("select id, person_full_name from c.person where id in (99997, 99999) order by id");
+#! expect(rows).toEqual([{ id: 99999, person_full_name: "Successful Mutation" }]);
 
 mutation {
+  successful: wrappedCreatePerson(
+    name: "successful mutation"
+    email: "successful-mutation@example.com"
+  )
   wrappedThrowingPerson
 }

@@ -466,6 +466,29 @@ export async function runTestQuery(
               ? await subscribe(args, resolvedPreset)
               : await execute(args, resolvedPreset);
 
+          const runCallback = async (
+            payloads: Omit<AsyncExecutionResult, "hasNext">[],
+          ) => {
+            if (!options.callback) {
+              return;
+            }
+            if (!config.directPg) {
+              throw new Error("Can only use callback in directPg mode");
+            }
+            const poolClient = await pgPool!.connect();
+            try {
+              await options.callback(poolClient, payloads);
+            } catch (e) {
+              console.error(
+                "Detected error during test callback; here's the payloads we have thus far:",
+              );
+              console.error(payloads);
+              throw e;
+            } finally {
+              poolClient.release();
+            }
+          };
+
           if (isAsyncIterable(result)) {
             let errors: GraphQLError[] | undefined = undefined;
             // hasNext changes based on payload order; remove it.
@@ -490,23 +513,7 @@ export async function runTestQuery(
             })();
 
             // In parallel to collecting the payloads, run the callback
-            if (options.callback) {
-              if (!config.directPg) {
-                throw new Error("Can only use callback in directPg mode");
-              }
-              const poolClient = await pgPool!.connect();
-              try {
-                await options.callback(poolClient, originalPayloads);
-              } catch (e) {
-                console.error(
-                  "Detected error during test callback; here's the payloads we have thus far:",
-                );
-                console.error(originalPayloads);
-                throw e;
-              } finally {
-                poolClient.release();
-              }
-            }
+            await runCallback(originalPayloads);
 
             if (operationType === "subscription") {
               const iterator = result[Symbol.asyncIterator]();
@@ -595,12 +602,10 @@ export async function runTestQuery(
             if (errors && !dontLogErrors) {
               console.error(result.errors?.[0].originalError || errors[0]);
             }
-            if (options.callback) {
-              throw new Error(
-                "Callback is only appropriate when operation returns an async iterable" +
-                  String(errors ? errors[0].originalError || errors[0] : ""),
-              );
-            }
+            // Ordinary operations have finished before their result is returned,
+            // so scripts run after the mutation transaction has committed or
+            // rolled back.
+            await runCallback([result]);
             return { data, errors, queries, extensions };
           }
         } finally {
