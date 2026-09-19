@@ -25,7 +25,7 @@ import type { RuntimeSQLThunk } from "./utils.ts";
 
 /** The nullability of a value selected from a codec attribute. */
 export type PgCodecAttributeNullability<TAttribute extends PgCodecAttribute> =
-  TAttribute extends { notNull: true } ? never : null;
+  TAttribute extends PgCodecAttribute<any, true> ? never : null;
 
 /** A JavaScript record containing only the selected codec attributes. */
 export type PgPickedRecord<
