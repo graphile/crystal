@@ -21,11 +21,9 @@ import type {
 } from "./codecs.ts";
 import { TYPES } from "./codecs.ts";
 import type {
-  PgClientResult,
   PgExecutor,
   PgExecutorContext,
   PgExecutorInput,
-  PgExecutorMutationOptions,
   PgExecutorOptions,
 } from "./executor.ts";
 import type {
@@ -1129,13 +1127,6 @@ export class PgResource<
     options: PgExecutorOptions,
   ) {
     return this.executor.executeStream<TInput, TOutput>(values, options);
-  }
-
-  /** @internal */
-  public executeMutation<TData>(
-    options: PgExecutorMutationOptions,
-  ): Promise<PgClientResult<TData>> {
-    return this.executor.executeMutation<TData>(options);
   }
 
   /**

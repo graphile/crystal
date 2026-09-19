@@ -163,7 +163,11 @@ export type PgExecutorOptions = {
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
+};
+type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
+  /** @deprecated Pass a callback instead. */
   text: string;
+  /** @deprecated Pass a callback instead. */
   values: ReadonlyArray<SQLRawValue>;
 };
 
@@ -550,11 +554,18 @@ ${duration}
               // deferreds further, DataLoader-style, and running one SQL query for
               // everything.
               const queryResult = common.useTransaction
-                ? await this.executeMutation<TOutput>({
-                    context,
-                    text,
-                    values: sqlValues,
-                  })
+                ? await this.executeMutation<PgClientResult<TOutput>>(
+                    { context },
+                    (client) =>
+                      this._executeWithClient(
+                        client,
+                        text,
+                        sqlValues,
+                        undefined,
+                        undefined,
+                        true,
+                      ),
+                  )
                 : await this._execute<TOutput>(
                     context,
                     text,
@@ -935,28 +946,45 @@ ${duration}
     };
   }
 
-  public async executeMutation<TData>(
+  public executeMutation<T>(
     options: PgExecutorMutationOptions,
-  ): Promise<PgClientResult<TData>> {
-    const { context, text, values } = options;
-    const { withPgClient, pgSettings } = context;
+    callback: (client: PgClient) => Promise<T>,
+  ): Promise<T>;
+  /** @deprecated Pass a callback as the second argument instead. */
+  public executeMutation<TData>(
+    options: DeprecatedPgExecutorMutationOptions,
+  ): Promise<PgClientResult<TData>>;
+  public async executeMutation<T>(
+    options: PgExecutorMutationOptions,
+    maybeCallback?: (client: PgClient) => Promise<T>,
+  ): Promise<T> {
+    const { withPgClient, pgSettings } = options.context;
+    let callback: (client: PgClient) => Promise<T>;
+    if (maybeCallback != null) {
+      callback = maybeCallback;
+    } else {
+      const { text, values } = options as DeprecatedPgExecutorMutationOptions;
+      if (text === undefined || values === undefined) {
+        throw new Error("PgExecutor.executeMutation requires a callback.");
+      }
+      callback = (client) =>
+        this._executeWithClient(
+          client,
+          text,
+          values,
+          undefined,
+          undefined,
+          true,
+        ) as Promise<T>;
+    }
 
     // We don't explicitly need a transaction for mutations
-    const queryResult = await withPgClient(pgSettings, (client) =>
-      this._executeWithClient<TData>(
-        client,
-        text,
-        values,
-        undefined,
-        undefined,
-        true,
-      ),
-    );
+    const result = await withPgClient(pgSettings, callback);
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
     (context as any)[this.$$cache]?.reset();
 
-    return queryResult;
+    return result;
   }
 }
 
