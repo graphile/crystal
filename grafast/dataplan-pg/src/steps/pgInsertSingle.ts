@@ -482,22 +482,21 @@ export class PgInsertSingleStep<
         }
       }
 
-      let compileResult: ReturnType<typeof sql.compile>;
-      if (sqlAttributes.length > 0) {
-        // This is our common path
-        const attributes = sql.join(sqlAttributes, ", ");
-        const values = sql.join(sqlValues, ", ");
-        const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
-        compileResult = sql.compile(query);
-      } else {
-        // No columns to insert?! Odd... but okay.
-        const query = sql`insert into ${table} default values${returning};`;
-        compileResult = sql.compile(query);
-      }
-
-      const { text, values: stmtValues } = compileResult;
-      const executeMutation = (client: GraphileConfig.DataplanPgClient) =>
-        executor._executeWithClient(
+      const executeMutation = (client: GraphileConfig.DataplanPgClient) => {
+        let compileResult: ReturnType<typeof sql.compile>;
+        if (sqlAttributes.length > 0) {
+          // This is our common path
+          const attributes = sql.join(sqlAttributes, ", ");
+          const values = sql.join(sqlValues, ", ");
+          const query = sql`insert into ${table} (${attributes}) values (${values})${returning};`;
+          compileResult = sql.compile(query);
+        } else {
+          // No columns to insert?! Odd... but okay.
+          const query = sql`insert into ${table} default values${returning};`;
+          compileResult = sql.compile(query);
+        }
+        const { text, values: stmtValues } = compileResult;
+        return executor._executeWithClient(
           client,
           text,
           stmtValues,
@@ -505,6 +504,7 @@ export class PgInsertSingleStep<
           undefined,
           true,
         );
+      };
       const { rows, notices, rowCount } = await executor.executeMutation(
         { context },
         this.wrappers.length > 0
