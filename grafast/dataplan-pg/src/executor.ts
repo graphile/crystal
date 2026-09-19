@@ -163,7 +163,8 @@ export type PgExecutorOptions = {
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
-  transaction?: boolean;
+  /** @default {true} */
+  useTransaction?: boolean;
 };
 type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
   /** @deprecated Pass a callback instead. */
@@ -557,7 +558,7 @@ ${duration}
               // everything.
               const queryResult = common.useTransaction
                 ? await this.executeMutation<PgClientResult<TOutput>>(
-                    { context },
+                    { context, useTransaction: common.useTransaction },
                     (client) =>
                       this._executeWithClient(
                         client,
@@ -960,7 +961,7 @@ ${duration}
     options: PgExecutorMutationOptions,
     maybeCallback?: (client: GraphileConfig.DataplanPgClient) => Promise<T>,
   ): Promise<T> {
-    const { context, transaction } = options;
+    const { context, useTransaction } = options;
     const { withPgClient, pgSettings } = context;
     let callback: (client: GraphileConfig.DataplanPgClient) => Promise<T>;
     if (maybeCallback != null) {
@@ -985,7 +986,7 @@ ${duration}
     // create one unless caller opts out.
     const result = await withPgClient(
       pgSettings,
-      transaction === false
+      useTransaction === false
         ? callback
         : (client) => client.withTransaction(callback),
     );

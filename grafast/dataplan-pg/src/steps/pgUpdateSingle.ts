@@ -541,7 +541,7 @@ export class PgUpdateSingleStep<
       };
       const { rows, rowCount, notices } =
         await this.resource.executor.executeMutation(
-          { context, transaction: this.wrappers.length > 0 },
+          { context, useTransaction: this.wrappers.length > 0 },
           this.wrappers.length > 0
             ? makeWrappedMutationExecute<PgUpdateSingleQueryBuilder, any>(
                 this.wrappers,

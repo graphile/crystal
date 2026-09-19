@@ -508,7 +508,7 @@ export class PgInsertSingleStep<
         );
       };
       const { rows, notices, rowCount } = await executor.executeMutation(
-        { context, transaction: this.wrappers.length > 0 },
+        { context, useTransaction: this.wrappers.length > 0 },
         this.wrappers.length > 0
           ? makeWrappedMutationExecute<PgInsertSingleQueryBuilder, any>(
               this.wrappers,
