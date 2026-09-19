@@ -29,7 +29,7 @@ import type {
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
 import {
-  executePgMutationWrappers,
+  makeWrappedMutationExecute,
   type PgMutationWrapper,
   type PgWrapCallback,
 } from "./pgMutationWrapper.ts";
@@ -357,10 +357,10 @@ export class PgInsertSingleStep<
   ): void {
     if (this.locked) throw new Error("Cannot wrap after plan is locked.");
     const depId = this.addDependency(multistep($deps));
-    const attributeIndexes = attributes.map((attr) =>
-      this.selectAttributeAndReturnIndex(attr),
+    const selection = attributes.map(
+      (attr) => [attr, this.selectAttributeAndReturnIndex(attr)] as const,
     );
-    this.wrappers.push({ depId, attributeIndexes, callback });
+    this.wrappers.push({ depId, selection, callback });
   }
 
   /**
@@ -407,15 +407,15 @@ export class PgInsertSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return indexMap<PromiseOrDirect<any>>(async (i) => {
-      const context = contextDep.at(i);
+    return indexMap<PromiseOrDirect<any>>(async (batchIndex) => {
+      const context = contextDep.at(batchIndex);
 
       const sqlAttributes: SQL[] = [];
       const sqlValues: SQL[] = [];
       const setIndexes = new Map<string, number>();
       const rawValues: Record<string, unknown> = Object.create(null);
       for (const { depId, name, pgCodec } of this.attributes) {
-        const attVal = values[depId].at(i);
+        const attVal = values[depId].at(batchIndex);
         // `null` is kept, `undefined` is skipped
         if (attVal !== undefined) {
           const sqlIdent = sql.identifier(name as string);
@@ -504,7 +504,15 @@ export class PgInsertSingleStep<
         );
       const { rows, notices, rowCount } = await executor.executeMutation(
         { context },
-        executeMutation,
+        this.wrappers.length > 0
+          ? makeWrappedMutationExecute<PgInsertSingleQueryBuilder, any>(
+              this.wrappers,
+              values,
+              batchIndex,
+              queryBuilder,
+              executeMutation,
+            )
+          : executeMutation,
       );
       return {
         __proto__: null,
