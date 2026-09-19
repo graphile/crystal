@@ -163,7 +163,7 @@ export type PgExecutorOptions = {
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
-  /** @default {true} */
+  /** @defaultValue `true` */
   useTransaction?: boolean;
 };
 type DeprecatedPgExecutorMutationOptions = PgExecutorMutationOptions & {
