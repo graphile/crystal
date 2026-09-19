@@ -30,6 +30,15 @@ const runDeleteMutation = EXPORTABLE(
   [],
 );
 
+const throwAfterMutation = EXPORTABLE(
+  () =>
+    async function throwAfterMutation(run, pgClient) {
+      await run(pgClient);
+      throw new Error("Expected wrapper failure");
+    },
+  [],
+);
+
 const runNestedWrap1 = EXPORTABLE(
   () =>
     async function runNestedWrap1(run, pgClient, { context }, queryBuilder) {
@@ -85,6 +94,8 @@ const plugin = extendSchema((build) => {
         wrappedCreatePerson(name: String!, email: String!): Int
         wrappedUpdatePerson(name: String!): Int
         wrappedDeletePerson: Int
+        wrappedEmptyUpdatePerson: Int
+        wrappedThrowingPerson: Int
         wrappedNestedPerson: Int
         wrappedMutationResult: String
       }
@@ -139,6 +150,33 @@ const plugin = extendSchema((build) => {
               return $person.get("id");
             },
           [constant, context, people, pgDeleteSingle, runDeleteMutation],
+        ),
+        wrappedEmptyUpdatePerson: EXPORTABLE(
+          (constant, people, pgUpdateSingle) =>
+            function wrappedEmptyUpdatePerson() {
+              const $person = pgUpdateSingle(people, {
+                id: constant(99999, false),
+              });
+              return $person.get("id");
+            },
+          [constant, people, pgUpdateSingle],
+        ),
+        wrappedThrowingPerson: EXPORTABLE(
+          (constant, context, people, pgInsertSingle, throwAfterMutation) =>
+            function wrappedThrowingPerson() {
+              const $person = pgInsertSingle(people, {
+                id: constant(99997, false),
+                person_full_name: constant("Rollback Person", false),
+                email: constant("rollback-mutation-wrapper@example.com", false),
+              });
+              $person.wrap(
+                () => ({ context: context() }),
+                ["id", "person_full_name", "about"],
+                throwAfterMutation,
+              );
+              return $person.get("id");
+            },
+          [constant, context, people, pgInsertSingle, throwAfterMutation],
         ),
         wrappedNestedPerson: EXPORTABLE(
           (

@@ -1,0 +1,8 @@
+## expect(errors).toHaveLength(1)
+## expect(errors[0].message).toEqual("Expected wrapper failure")
+#> schema: ["c"]
+#> extends: ["./MutationWrappers.ts:preset"]
+
+mutation {
+  wrappedThrowingPerson
+}
