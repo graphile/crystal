@@ -5,6 +5,7 @@ import type {
   Multistep,
   Setter,
   SetterCapable,
+  Thunk,
 } from "grafast";
 import {
   access,
@@ -369,7 +370,7 @@ export class PgUpdateSingleStep<
     TDependencies extends Multistep,
     const TAttributes extends keyof TResource["codec"]["attributes"] & string,
   >(
-    $dependencies: TDependencies,
+    $dependencies: Thunk<TDependencies>,
     attributes: ReadonlyArray<TAttributes>,
     callback: PgWrapCallback<
       PgUpdateSingleQueryBuilder,

@@ -4,6 +4,7 @@ import type {
   Maybe,
   Multistep,
   PromiseOrDirect,
+  Thunk,
 } from "grafast";
 import {
   access,
@@ -325,7 +326,7 @@ export class PgDeleteSingleStep<
     TDependencies extends Multistep,
     const TAttributes extends keyof TResource["codec"]["attributes"] & string,
   >(
-    $dependencies: TDependencies,
+    $dependencies: Thunk<TDependencies>,
     attributes: ReadonlyArray<TAttributes>,
     callback: PgWrapCallback<
       PgDeleteSingleQueryBuilder,
