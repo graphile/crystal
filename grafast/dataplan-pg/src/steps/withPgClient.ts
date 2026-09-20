@@ -238,15 +238,20 @@ function transformLoadOneLoader<
       TData,
       TParams,
       {
-        shared: Step<UnwrapMultistep<TShared>>;
+        shared?: Step<UnwrapMultistep<TShared>>;
         pgExecutorContext: Step<PgExecutorContext>;
       }
     > = {
       ...loaderObject,
-      shared: () => ({
-        shared: multistep(loaderObject.shared!),
-        pgExecutorContext: executor.context(),
-      }),
+      shared: () =>
+        loaderObject.shared
+          ? {
+              shared: multistep(loaderObject.shared),
+              pgExecutorContext: executor.context(),
+            }
+          : {
+              pgExecutorContext: executor.context(),
+            },
       load(lookups, info) {
         const {
           shared: { pgExecutorContext, shared },
@@ -257,8 +262,8 @@ function transformLoadOneLoader<
             Promise.resolve(
               loaderObject.load(pgClient, lookups, {
                 ...info,
-                shared,
-                unary: shared,
+                shared: shared!,
+                unary: shared!,
               }),
             )
               // It's necessary to await the inner promises, otherwise we might release the client early
@@ -307,15 +312,20 @@ function transformLoadManyLoader<
       TData,
       TParams,
       {
-        shared: Step<UnwrapMultistep<TShared>>;
+        shared?: Step<UnwrapMultistep<TShared>>;
         pgExecutorContext: Step<PgExecutorContext>;
       }
     > = {
       ...loaderObject,
-      shared: () => ({
-        shared: multistep(loaderObject.shared!),
-        pgExecutorContext: executor.context(),
-      }),
+      shared: () =>
+        loaderObject.shared
+          ? {
+              shared: multistep(loaderObject.shared),
+              pgExecutorContext: executor.context(),
+            }
+          : {
+              pgExecutorContext: executor.context(),
+            },
       load(lookups, info) {
         const {
           shared: { pgExecutorContext, shared },
@@ -326,8 +336,8 @@ function transformLoadManyLoader<
             Promise.resolve(
               loaderObject.load(pgClient, lookups, {
                 ...info,
-                shared,
-                unary: shared,
+                shared: shared!,
+                unary: shared!,
               }),
             )
               // It's necessary to await the inner promises, otherwise we might release the client early
