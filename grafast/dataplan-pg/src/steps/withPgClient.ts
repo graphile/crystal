@@ -11,7 +11,6 @@ import type {
   Maybe,
   Multistep,
   PromiseOrDirect,
-  Thunk,
   UnwrapMultistep,
 } from "grafast";
 import { loadMany, loadOne, multistep, Step } from "grafast";
