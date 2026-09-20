@@ -11,7 +11,6 @@ import type {
   Maybe,
   Multistep,
   PromiseOrDirect,
-  Thunk,
   UnwrapMultistep,
 } from "grafast";
 import { loadMany, loadOne, multistep, Step } from "grafast";
@@ -146,7 +145,7 @@ export function loadOneWithPgClient<
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
-  const TShared extends Record<string, Step> = Record<string, never>,
+  const TShared extends Multistep = never,
 >(
   executor: PgExecutor,
   lookup: TLookup,
@@ -188,7 +187,7 @@ type LoadOneWithPgClientLoader<
   TItem,
   TData extends Maybe<TItem>,
   TParams extends Record<string, any>,
-  TShared extends Record<string, Step>,
+  TShared extends Multistep,
 > =
   | LoadOneWithPgClientCallback<TSpec, TItem, TData, TParams, never>
   | (Omit<LoadOneLoader<TSpec, TItem, TData, TParams, TShared>, "load"> & {
@@ -208,7 +207,7 @@ function transformLoadOneLoader<
   TItem,
   TData extends Maybe<TItem>,
   TParams extends Record<string, any>,
-  TShared extends Record<string, Step>,
+  TShared extends Multistep,
 >(
   executor: PgExecutor,
   loader: LoadOneWithPgClientLoader<
@@ -230,28 +229,42 @@ function transformLoadOneLoader<
   } else {
     const loaderObject =
       typeof loader === "function"
-        ? { load: loader, shared: undefined }
+        ? ({ load: loader, shared: undefined } as never)
         : loader;
     const transformedLoader: LoadOneLoader<
       UnwrapMultistep<TLookup>,
       TItem,
       TData,
       TParams,
-      TShared & { pgExecutorContext: Step<PgExecutorContext> }
+      {
+        shared?: Step<UnwrapMultistep<TShared>>;
+        pgExecutorContext: Step<PgExecutorContext>;
+      }
     > = {
       ...loaderObject,
-      shared: () => ({
-        ...unthunk(loaderObject.shared as Thunk<TShared>),
-        pgExecutorContext: executor.context(),
-      }),
+      shared: () =>
+        loaderObject.shared
+          ? {
+              shared: multistep(loaderObject.shared),
+              pgExecutorContext: executor.context(),
+            }
+          : {
+              pgExecutorContext: executor.context(),
+            },
       load(lookups, info) {
         const {
-          shared: { pgExecutorContext },
+          shared: { pgExecutorContext, shared },
         } = info;
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
+            Promise.resolve(
+              loaderObject.load(pgClient, lookups, {
+                ...info,
+                shared: shared!,
+                unary: shared!,
+              }),
+            )
               // It's necessary to await the inner promises, otherwise we might release the client early
               .then((list) => Promise.all(list)),
         );
@@ -268,7 +281,7 @@ function transformLoadManyLoader<
   TItem,
   TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
   TParams extends Record<string, any>,
-  TShared extends Record<string, Step>,
+  TShared extends Multistep,
 >(
   executor: PgExecutor,
   loader: LoadManyWithPgClientLoader<
@@ -290,28 +303,42 @@ function transformLoadManyLoader<
   } else {
     const loaderObject =
       typeof loader === "function"
-        ? { load: loader, shared: undefined }
+        ? ({ load: loader, shared: undefined } as never)
         : loader;
     const transformedLoader: LoadManyLoader<
       UnwrapMultistep<TLookup>,
       TItem,
       TData,
       TParams,
-      TShared & { pgExecutorContext: Step<PgExecutorContext> }
+      {
+        shared?: Step<UnwrapMultistep<TShared>>;
+        pgExecutorContext: Step<PgExecutorContext>;
+      }
     > = {
       ...loaderObject,
-      shared: () => ({
-        ...unthunk(loaderObject.shared as Thunk<TShared>),
-        pgExecutorContext: executor.context(),
-      }),
+      shared: () =>
+        loaderObject.shared
+          ? {
+              shared: multistep(loaderObject.shared),
+              pgExecutorContext: executor.context(),
+            }
+          : {
+              pgExecutorContext: executor.context(),
+            },
       load(lookups, info) {
         const {
-          shared: { pgExecutorContext },
+          shared: { pgExecutorContext, shared },
         } = info;
         return pgExecutorContext.withPgClient(
           pgExecutorContext.pgSettings,
           (pgClient) =>
-            Promise.resolve(loaderObject.load(pgClient, lookups, info as any))
+            Promise.resolve(
+              loaderObject.load(pgClient, lookups, {
+                ...info,
+                shared: shared!,
+                unary: shared!,
+              }),
+            )
               // It's necessary to await the inner promises, otherwise we might release the client early
               .then((list) => Promise.all(list)),
         );
@@ -320,10 +347,6 @@ function transformLoadManyLoader<
     cacheByExecutor.set(loader, transformedLoader);
     return transformedLoader;
   }
-}
-
-function unthunk<T>(t: Thunk<T>): T {
-  return typeof t === "function" ? (t as () => T)() : t;
 }
 
 export type LoadManyWithPgClientCallback<
@@ -348,7 +371,7 @@ type LoadManyWithPgClientLoader<
   TItem,
   TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
   TParams extends Record<string, any>,
-  TShared extends Record<string, Step>,
+  TShared extends Multistep,
 > =
   | LoadManyWithPgClientCallback<TSpec, TItem, TData, TParams, never>
   | (Omit<LoadManyLoader<TSpec, TItem, TData, TParams, TShared>, "load"> & {
@@ -368,7 +391,7 @@ export function loadManyWithPgClient<
     ReadonlyArray<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
-  const TShared extends Record<string, Step> = Record<string, never>,
+  const TShared extends Multistep = never,
 >(
   executor: PgExecutor,
   lookup: TLookup,
