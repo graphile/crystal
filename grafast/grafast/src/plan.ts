@@ -46,7 +46,8 @@ export function prepare(inArgs: GrafastExecutionArgs): PlanResult {
   const args = establishInternalExecutionArgs(inArgs);
   const result = _plan(args);
   if (result.errors != null) {
-    return result;
+    const { errors } = result;
+    return { errors };
   } else {
     const { operationPlan, onError } = result;
     return { operationPlan, onError };
