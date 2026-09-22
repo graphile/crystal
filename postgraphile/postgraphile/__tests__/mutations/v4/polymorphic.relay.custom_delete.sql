@@ -17,9 +17,13 @@ where (
   __relational_items__."id" = $1::"int4"
 );
 
+begin; /*fake*/
+
 select
   __custom_delete_relational_item__.v::text as "0"
 from "polymorphic"."custom_delete_relational_item"($1::"polymorphic"."relational_items") as __custom_delete_relational_item__(v);
+
+commit; /*fake*/
 
 select
   __relational_items__."id"::text as "0",

@@ -3,8 +3,11 @@ select
 from "refs"."books" as __books__
 order by __books__."id" asc;
 
+with __people_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __people_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __people_identifiers__,
+from __people_identifiers__,
 lateral (
   select
     __people__."name" as "0",

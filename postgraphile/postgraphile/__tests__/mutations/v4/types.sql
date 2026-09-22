@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __type_function_mutation__."id"::text as "0",
   __type_function_mutation__."smallint"::text as "1",
@@ -20,7 +22,8 @@ select
     lower_inc(__type_function_mutation__."daterange"),
     to_char(lower(__type_function_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_mutation__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_mutation__."daterange")
+    upper_inc(__type_function_mutation__."daterange"),
+    isempty(__type_function_mutation__."daterange")
   )::text as "17",
   __type_function_mutation__."an_int_range"::text as "18",
   to_char(__type_function_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -121,6 +124,8 @@ select
   __type_function_mutation__."ltree_array"::text as "49"
 from "b"."type_function_mutation"($1::"int4") as __type_function_mutation__;
 
+commit; /*fake*/
+
 select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."b" as "1",
@@ -208,6 +213,8 @@ from "a"."post" as __post__
 where (
   __post__."id" = $1::"int4"
 );
+
+begin; /*fake*/
 
 select
   __type_function_list_mutation__."id"::text as "0",
@@ -231,7 +238,8 @@ select
     lower_inc(__type_function_list_mutation__."daterange"),
     to_char(lower(__type_function_list_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_list_mutation__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_list_mutation__."daterange")
+    upper_inc(__type_function_list_mutation__."daterange"),
+    isempty(__type_function_list_mutation__."daterange")
   )::text as "17",
   __type_function_list_mutation__."an_int_range"::text as "18",
   to_char(__type_function_list_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -332,8 +340,13 @@ select
   __type_function_list_mutation__."ltree_array"::text as "49"
 from unnest("b"."type_function_list_mutation"()) as __type_function_list_mutation__;
 
+commit; /*fake*/
+
+with __frmcdc_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
+from __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -348,8 +361,11 @@ lateral (
   from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
+with __frmcdc_nested_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_nested_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
+from __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_nested_compound_type__."baz_buz"::text as "0",
@@ -378,8 +394,11 @@ lateral (
   on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
+with __frmcdc_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
+from __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -394,8 +413,11 @@ lateral (
   from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
+with __frmcdc_nested_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_nested_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
+from __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_nested_compound_type__."baz_buz"::text as "0",
@@ -424,8 +446,11 @@ lateral (
   on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
+with __post_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+from __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -437,8 +462,11 @@ lateral (
   )
 ) as __post_result__;
 
+with __post_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+from __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -449,6 +477,8 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
 ) as __post_result__;
+
+begin; /*fake*/
 
 select
   __type_function_connection_mutation__."id"::text as "0",
@@ -472,7 +502,8 @@ select
     lower_inc(__type_function_connection_mutation__."daterange"),
     to_char(lower(__type_function_connection_mutation__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__type_function_connection_mutation__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__type_function_connection_mutation__."daterange")
+    upper_inc(__type_function_connection_mutation__."daterange"),
+    isempty(__type_function_connection_mutation__."daterange")
   )::text as "17",
   __type_function_connection_mutation__."an_int_range"::text as "18",
   to_char(__type_function_connection_mutation__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -573,8 +604,13 @@ select
   __type_function_connection_mutation__."ltree_array"::text as "49"
 from "b"."type_function_connection_mutation"() as __type_function_connection_mutation__;
 
+commit; /*fake*/
+
+with __frmcdc_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
+from __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -589,8 +625,11 @@ lateral (
   from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
+with __frmcdc_nested_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_nested_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
+from __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_nested_compound_type__."baz_buz"::text as "0",
@@ -619,8 +658,11 @@ lateral (
   on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
+with __frmcdc_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"c"."compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_compound_type_identifiers__,
+from __frmcdc_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_compound_type__."a"::text as "0",
@@ -635,8 +677,11 @@ lateral (
   from (select (__frmcdc_compound_type_identifiers__."id0").*) as __frmcdc_compound_type__
 ) as __frmcdc_compound_type_result__;
 
+with __frmcdc_nested_compound_type_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __frmcdc_nested_compound_type_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."nested_compound_type" as "id0" from json_array_elements($1::json) with ordinality as ids) as __frmcdc_nested_compound_type_identifiers__,
+from __frmcdc_nested_compound_type_identifiers__,
 lateral (
   select
     __frmcdc_nested_compound_type__."baz_buz"::text as "0",
@@ -665,8 +710,11 @@ lateral (
   on TRUE
 ) as __frmcdc_nested_compound_type_result__;
 
+with __post_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+from __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -678,8 +726,11 @@ lateral (
   )
 ) as __post_result__;
 
+with __post_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __post_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __post_identifiers__,
+from __post_identifiers__,
 lateral (
   select
     __post__."id"::text as "0",
@@ -713,7 +764,8 @@ update "b"."types" as __types__ set "smallint" = $1::"int2", "bigint" = $2::"int
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "17",
   __types__."an_int_range"::text as "18",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",
@@ -923,7 +975,8 @@ insert into "b"."types" as __types__ ("smallint", "bigint", "numeric", "decimal"
     lower_inc(__types__."daterange"),
     to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
     to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange")
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
   )::text as "17",
   __types__."an_int_range"::text as "18",
   to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "19",

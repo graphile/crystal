@@ -2,7 +2,9 @@ import type {
   ExecutionDetails,
   GrafastResultsList,
   Maybe,
+  Multistep,
   PromiseOrDirect,
+  Thunk,
 } from "grafast";
 import {
   access,
@@ -10,6 +12,7 @@ import {
   flagError,
   inspect,
   isDev,
+  multistep,
   SafeError,
   Step,
 } from "grafast";
@@ -27,12 +30,21 @@ import type {
   GetPgResourceCodec,
   GetPgResourceUniques,
   PgCodec,
+  PgCodecAttributeNullability,
+  PgPickedRecord,
   PgQueryBuilder,
   PlanByUniques,
   ReadonlyArrayOrDirect,
 } from "../interfaces.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
 import { pgClassExpression } from "./pgClassExpression.ts";
+import {
+  makeWrappedMutationExecute,
+  type PgMutationWrapper,
+  type PgWrapCallback,
+} from "./pgMutationWrapper.ts";
+import type { PgSelectSingleStep } from "./pgSelectSingle.ts";
+import { pgSelectSingleFromRecord } from "./pgSelectSingle.ts";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -54,7 +66,8 @@ interface PgDeletePlanFinalizeResults {
  * Deletes a row in the database, can return columns from the deleted row.
  */
 export class PgDeleteSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends PgResource<any, any, any, any, any, any, any> = PgResource,
+  TNullability extends null = null,
 > extends Step<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -116,6 +129,11 @@ export class PgDeleteSingleStep<
   private selects: Array<SQL> = [];
 
   private applyDepIds: number[] = [];
+  private wrappers: PgMutationWrapper<
+    PgDeleteSingleQueryBuilder,
+    any,
+    PgPickedRecord<PgCodecWithAttributes, any>
+  >[] = [];
 
   constructor(
     resource: TResource,
@@ -179,52 +197,64 @@ export class PgDeleteSingleStep<
   __inferGet?: {
     [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
       GetPgResourceAttributes<TResource>[TAttr]["codec"],
-      TResource
+      TResource,
+      PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
     >;
   };
-  /**
-   * Returns a plan representing a named attribute (e.g. column) from the newly
-   * deleteed row.
-   */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
-    attr: TAttr,
-  ): PgClassExpressionStep<
-    GetPgResourceAttributes<TResource>[TAttr]["codec"],
-    TResource
-  > {
+
+  private _attrDetails<
+    TAttr extends keyof GetPgResourceAttributes<TResource> & string,
+  >(attr: TAttr) {
+    if (!this.resource.codec.attributes) {
+      throw new Error(`${this.resource.codec} has no attributes?!`);
+    }
     const resourceAttribute: PgCodecAttribute =
-      this.resource.codec.attributes![attr as string];
+      this.resource.codec.attributes[attr];
     if (!resourceAttribute) {
       throw new Error(
-        `${this.resource} does not define an attribute named '${String(attr)}'`,
+        `${this.resource} does not define an attribute named '${attr}'`,
       );
     }
-
-    if (resourceAttribute?.via) {
+    if (resourceAttribute.via) {
       throw new Error(
         `Cannot select a 'via' attribute from PgDeleteSingleStep`,
       );
     }
+    return {
+      codec: resourceAttribute.codec,
+      notNull: resourceAttribute.notNull,
+      fragment: resourceAttribute.expression
+        ? sql.parens(resourceAttribute.expression(this.alias))
+        : sql`${this.alias}.${sql.identifier(attr)}`,
+    };
+  }
 
+  /**
+   * Returns a plan representing a named attribute (e.g. column) from the newly
+   * deleteed row.
+   */
+  get<TAttr extends keyof GetPgResourceAttributes<TResource> & string>(
+    attr: TAttr,
+  ): PgClassExpressionStep<
+    GetPgResourceAttributes<TResource>[TAttr]["codec"],
+    TResource,
+    PgCodecAttributeNullability<GetPgResourceAttributes<TResource>[TAttr]>
+  > {
+    const { codec, notNull, fragment } = this._attrDetails(attr);
     /*
      * Only cast to `::text` during select; we want to use it uncasted in
      * conditions/etc. The reasons we cast to ::text include:
      *
      * - to make return values consistent whether they're direct or in nested
      *   arrays
-     * - to make sure that that various PostgreSQL clients we support do not
+     * - to make sure that the various PostgreSQL clients we support do not
      *   mangle the data in unexpected ways - we take responsibility for
      *   decoding these string values.
+     *
+     * PgClassExpressionStep applies the codec's cast when selecting.
      */
-
-    const sqlExpr = pgClassExpression(
-      this,
-      resourceAttribute.codec,
-      resourceAttribute.notNull,
-    );
-    const colPlan = resourceAttribute.expression
-      ? sqlExpr`${sql.parens(resourceAttribute.expression(this.alias))}`
-      : sqlExpr`${this.alias}.${sql.identifier(String(attr))}`;
+    const sqlExpr = pgClassExpression(this, codec, notNull);
+    const colPlan = sqlExpr`${fragment}`;
     return colPlan as any;
   }
 
@@ -238,13 +268,26 @@ export class PgDeleteSingleStep<
 
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
-    TResource
+    TResource,
+    TNullability
   > {
-    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+    return pgClassExpression<
+      GetPgResourceCodec<TResource>,
+      TResource,
+      TNullability
+    >(
       this,
       this.resource.codec as GetPgResourceCodec<TResource>,
       false,
     )`${this.alias}`;
+  }
+
+  /**
+   * Creates a select step for this deleted record, enabling select-specific
+   * APIs such as `.getClassStep()` and `.select()`.
+   */
+  public toSelectSingle(): PgSelectSingleStep<TResource, TNullability> {
+    return pgSelectSingleFromRecord(this.resource, this.record());
   }
 
   /**
@@ -269,12 +312,54 @@ export class PgDeleteSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  private selectedAttributeIndexes = new Map<string, number>();
+  public selectAttributeAndReturnIndex(
+    attr: keyof TResource["codec"]["attributes"] & string,
+  ): number {
+    let idx = this.selectedAttributeIndexes.get(attr);
+    if (idx == null) {
+      const { codec, notNull, fragment } = this._attrDetails(attr);
+      // Always selecting here, so apply the codec's cast immediately.
+      idx = this.selectAndReturnIndex(
+        codec.castFromPg
+          ? codec.castFromPg(fragment, notNull)
+          : sql`${fragment}::text`,
+      );
+      this.selectedAttributeIndexes.set(attr, idx);
+    }
+    return idx;
+  }
+
   apply(
     $step: Step<
       ReadonlyArrayOrDirect<Maybe<PgDeleteSingleQueryBuilderCallback>>
     >,
   ) {
     this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
+  /** @experimental */
+  public wrap<
+    TDependencies extends Multistep,
+    const TAttributes extends keyof TResource["codec"]["attributes"] & string,
+  >(
+    $dependencies: Thunk<TDependencies>,
+    attributes: ReadonlyArray<TAttributes>,
+    callback: PgWrapCallback<
+      PgDeleteSingleQueryBuilder,
+      TDependencies,
+      PgPickedRecord<TResource["codec"] & PgCodecWithAttributes, TAttributes>
+    >,
+  ): void {
+    if (this.locked) throw new Error("Cannot wrap after plan is locked.");
+    const selection = attributes.map((attr) => {
+      const { codec } = this._attrDetails(attr);
+      return [attr, this.selectAttributeAndReturnIndex(attr), codec] as const;
+    });
+    const depId = this.withMyLayerPlan(() =>
+      this.addDependency(multistep($dependencies)),
+    );
+    this.wrappers.push({ depId, selection, callback });
   }
 
   /**
@@ -329,25 +414,43 @@ export class PgDeleteSingleStep<
         }
       }
 
-      const sqlValues = queryValueDetailsBySymbol.size
-        ? rawSqlValues.map((v) => {
-            if (typeof v === "symbol") {
-              const details = queryValueDetailsBySymbol.get(v);
-              if (!details) {
-                throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
+      const executeMutation = (client: GraphileConfig.DataplanPgClient) => {
+        const sqlValues = queryValueDetailsBySymbol.size
+          ? rawSqlValues.map((v) => {
+              if (typeof v === "symbol") {
+                const details = queryValueDetailsBySymbol.get(v);
+                if (!details) {
+                  throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
+                }
+                const val = values[details.depId].at(i);
+                return val == null ? null : details.processor(val);
+              } else {
+                return v;
               }
-              const val = values[details.depId].at(i);
-              return val == null ? null : details.processor(val);
-            } else {
-              return v;
-            }
-          })
-        : rawSqlValues;
-      const { rows, rowCount, notices } = await this.resource.executeMutation({
-        context,
-        text,
-        values: sqlValues,
-      });
+            })
+          : rawSqlValues;
+        return this.resource.executor._executeWithClient(
+          client,
+          text,
+          sqlValues,
+          undefined,
+          undefined,
+          true,
+        );
+      };
+      const { rows, rowCount, notices } =
+        await this.resource.executor.executeMutation(
+          { context, useTransaction: this.wrappers.length > 0 },
+          this.wrappers.length > 0
+            ? makeWrappedMutationExecute<PgDeleteSingleQueryBuilder, any>(
+                this.wrappers,
+                values,
+                i,
+                queryBuilder,
+                executeMutation,
+              )
+            : executeMutation,
+        );
       if (rowCount === 0) {
         return flagError(
           new Error(

@@ -105,4 +105,7 @@ function walkCodec(codec: PgCodec, metaLookup: PgCodecMetaLookup): void {
   if (codec.rangeOfCodec) {
     walkCodec(codec.rangeOfCodec, metaLookup);
   }
+  if (codec.baseCodec) {
+    walkCodec(codec.baseCodec, metaLookup);
+  }
 }

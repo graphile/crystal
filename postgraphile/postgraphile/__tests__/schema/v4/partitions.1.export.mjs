@@ -90,95 +90,6 @@ const entityKindsCodec = recordCodec({
   },
   executor: executor
 });
-const locationsIdentifier = sql.identifier("partitions", "locations");
-const locationsCodec = recordCodec({
-  name: "locations",
-  identifier: locationsIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.uuid,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "locations"
-    }
-  },
-  executor: executor
-});
-const photosIdentifier = sql.identifier("partitions", "photos");
-const photosCodec = recordCodec({
-  name: "photos",
-  identifier: photosIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.uuid,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "photos"
-    }
-  },
-  executor: executor
-});
-const profilesIdentifier = sql.identifier("partitions", "profiles");
-const profilesCodec = recordCodec({
-  name: "profiles",
-  identifier: profilesIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.uuid,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "profiles"
-    }
-  },
-  executor: executor
-});
-const usersIdentifier = sql.identifier("partitions", "users");
-const usersCodec = recordCodec({
-  name: "users",
-  identifier: usersIdentifier,
-  attributes: {
-    __proto__: null,
-    id: {
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: true
-    },
-    name: {
-      codec: TYPES.text,
-      notNull: true
-    }
-  },
-  extensions: {
-    isTableLike: true,
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "users"
-    }
-  },
-  executor: executor
-});
 const locationTagsIdentifier = sql.identifier("partitions", "location_tags");
 const spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum = enumCodec({
   name: "EntityKindsEnum",
@@ -231,6 +142,27 @@ const locationTagsCodec = recordCodec({
       serviceName: "main",
       schemaName: "partitions",
       name: "location_tags"
+    }
+  },
+  executor: executor
+});
+const locationsIdentifier = sql.identifier("partitions", "locations");
+const locationsCodec = recordCodec({
+  name: "locations",
+  identifier: locationsIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.uuid,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "locations"
     }
   },
   executor: executor
@@ -392,6 +324,27 @@ const photoTagsCodec = recordCodec({
   },
   executor: executor
 });
+const photosIdentifier = sql.identifier("partitions", "photos");
+const photosCodec = recordCodec({
+  name: "photos",
+  identifier: photosIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.uuid,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "photos"
+    }
+  },
+  executor: executor
+});
 const profileTagsIdentifier = sql.identifier("partitions", "profile_tags");
 const profileTagsCodec = recordCodec({
   name: "profileTags",
@@ -417,6 +370,27 @@ const profileTagsCodec = recordCodec({
       serviceName: "main",
       schemaName: "partitions",
       name: "profile_tags"
+    }
+  },
+  executor: executor
+});
+const profilesIdentifier = sql.identifier("partitions", "profiles");
+const profilesCodec = recordCodec({
+  name: "profiles",
+  identifier: profilesIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.uuid,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "profiles"
     }
   },
   executor: executor
@@ -454,6 +428,32 @@ const tagsCodec = recordCodec({
   },
   executor: executor
 });
+const usersIdentifier = sql.identifier("partitions", "users");
+const usersCodec = recordCodec({
+  name: "users",
+  identifier: usersIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true
+    },
+    name: {
+      codec: TYPES.text,
+      notNull: true
+    }
+  },
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "users"
+    }
+  },
+  executor: executor
+});
 const entity_kinds_resourceOptionsConfig = {
   executor: executor,
   name: "entity_kinds",
@@ -475,6 +475,29 @@ const entity_kinds_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
+const location_tagsUniques = [{
+  attributes: ["entity_kind", "entity_id", "tag"],
+  isPrimary: true
+}];
+const location_tags_resourceOptionsConfig = {
+  executor: executor,
+  name: "location_tags",
+  identifier: "main.partitions.location_tags",
+  from: locationTagsIdentifier,
+  codec: locationTagsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "location_tags"
+    },
+    partitionParent: {
+      schemaName: "partitions",
+      name: "tags"
+    }
+  },
+  uniques: location_tagsUniques
+};
 const locationsUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -493,63 +516,6 @@ const locations_resourceOptionsConfig = {
     }
   },
   uniques: locationsUniques
-};
-const photosUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const photos_resourceOptionsConfig = {
-  executor: executor,
-  name: "photos",
-  identifier: "main.partitions.photos",
-  from: photosIdentifier,
-  codec: photosCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "photos"
-    }
-  },
-  uniques: photosUniques
-};
-const profilesUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const profiles_resourceOptionsConfig = {
-  executor: executor,
-  name: "profiles",
-  identifier: "main.partitions.profiles",
-  from: profilesIdentifier,
-  codec: profilesCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "profiles"
-    }
-  },
-  uniques: profilesUniques
-};
-const usersUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const users_resourceOptionsConfig = {
-  executor: executor,
-  name: "users",
-  identifier: "main.partitions.users",
-  from: usersIdentifier,
-  codec: usersCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "users"
-    }
-  },
-  uniques: usersUniques
 };
 const measurementsUniques = [{
   attributes: ["timestamp", "key"],
@@ -570,28 +536,6 @@ const measurements_resourceOptionsConfig = {
     hasPartitions: true
   },
   uniques: measurementsUniques
-};
-const tags_resourceOptionsConfig = {
-  executor: executor,
-  name: "tags",
-  identifier: "main.partitions.tags",
-  from: tagsIdentifier,
-  codec: tagsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "tags"
-    },
-    hasPartitions: true,
-    tags: {
-      partitionExpose: "child"
-    }
-  },
-  uniques: [{
-    attributes: ["entity_kind", "entity_id", "tag"],
-    isPrimary: true
-  }]
 };
 const measurements_y2022_resourceOptionsConfig = {
   executor: executor,
@@ -659,29 +603,6 @@ const measurements_y2024_resourceOptionsConfig = {
     isPrimary: true
   }]
 };
-const location_tagsUniques = [{
-  attributes: ["entity_kind", "entity_id", "tag"],
-  isPrimary: true
-}];
-const location_tags_resourceOptionsConfig = {
-  executor: executor,
-  name: "location_tags",
-  identifier: "main.partitions.location_tags",
-  from: locationTagsIdentifier,
-  codec: locationTagsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "partitions",
-      name: "location_tags"
-    },
-    partitionParent: {
-      schemaName: "partitions",
-      name: "tags"
-    }
-  },
-  uniques: location_tagsUniques
-};
 const photo_tagsUniques = [{
   attributes: ["entity_kind", "entity_id", "tag"],
   isPrimary: true
@@ -704,6 +625,25 @@ const photo_tags_resourceOptionsConfig = {
     }
   },
   uniques: photo_tagsUniques
+};
+const photosUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const photos_resourceOptionsConfig = {
+  executor: executor,
+  name: "photos",
+  identifier: "main.partitions.photos",
+  from: photosIdentifier,
+  codec: photosCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "photos"
+    }
+  },
+  uniques: photosUniques
 };
 const profile_tagsUniques = [{
   attributes: ["entity_kind", "entity_id", "tag"],
@@ -728,6 +668,66 @@ const profile_tags_resourceOptionsConfig = {
   },
   uniques: profile_tagsUniques
 };
+const profilesUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const profiles_resourceOptionsConfig = {
+  executor: executor,
+  name: "profiles",
+  identifier: "main.partitions.profiles",
+  from: profilesIdentifier,
+  codec: profilesCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "profiles"
+    }
+  },
+  uniques: profilesUniques
+};
+const tags_resourceOptionsConfig = {
+  executor: executor,
+  name: "tags",
+  identifier: "main.partitions.tags",
+  from: tagsIdentifier,
+  codec: tagsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "tags"
+    },
+    hasPartitions: true,
+    tags: {
+      partitionExpose: "child"
+    }
+  },
+  uniques: [{
+    attributes: ["entity_kind", "entity_id", "tag"],
+    isPrimary: true
+  }]
+};
+const usersUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const users_resourceOptionsConfig = {
+  executor: executor,
+  name: "users",
+  identifier: "main.partitions.users",
+  from: usersIdentifier,
+  codec: usersCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "users"
+    }
+  },
+  uniques: usersUniques
+};
 const registry = makeRegistry({
   pgExecutors: {
     __proto__: null,
@@ -735,28 +735,28 @@ const registry = makeRegistry({
   },
   pgCodecs: {
     __proto__: null,
-    entityKinds: entityKindsCodec,
     text: TYPES.text,
-    locations: locationsCodec,
-    uuid: TYPES.uuid,
-    photos: photosCodec,
-    profiles: profilesCodec,
-    users: usersCodec,
-    int4: TYPES.int,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    timestamptz: TYPES.timestamptz,
+    uuid: TYPES.uuid,
     citext: TYPES.citext,
+    timestamptz: TYPES.timestamptz,
     float8: TYPES.float,
+    int4: TYPES.int,
+    entityKinds: entityKindsCodec,
     locationTags: locationTagsCodec,
     EntityKindsEnum: spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum,
+    locations: locationsCodec,
     measurements: measurementsCodec,
     measurementsY2022: measurementsY2022Codec,
     measurementsY2023: measurementsY2023Codec,
     measurementsY2024: measurementsY2024Codec,
     photoTags: photoTagsCodec,
+    photos: photosCodec,
     profileTags: profileTagsCodec,
+    profiles: profilesCodec,
     tags: tagsCodec,
+    users: usersCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -1073,18 +1073,18 @@ const registry = makeRegistry({
   pgResources: {
     __proto__: null,
     entity_kinds: entity_kinds_resourceOptionsConfig,
+    location_tags: location_tags_resourceOptionsConfig,
     locations: locations_resourceOptionsConfig,
-    photos: photos_resourceOptionsConfig,
-    profiles: profiles_resourceOptionsConfig,
-    users: users_resourceOptionsConfig,
     measurements: measurements_resourceOptionsConfig,
-    tags: tags_resourceOptionsConfig,
     measurements_y2022: measurements_y2022_resourceOptionsConfig,
     measurements_y2023: measurements_y2023_resourceOptionsConfig,
     measurements_y2024: measurements_y2024_resourceOptionsConfig,
-    location_tags: location_tags_resourceOptionsConfig,
     photo_tags: photo_tags_resourceOptionsConfig,
-    profile_tags: profile_tags_resourceOptionsConfig
+    photos: photos_resourceOptionsConfig,
+    profile_tags: profile_tags_resourceOptionsConfig,
+    profiles: profiles_resourceOptionsConfig,
+    tags: tags_resourceOptionsConfig,
+    users: users_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -1283,14 +1283,14 @@ const registry = makeRegistry({
     }
   }
 });
+const resource_location_tagsPgResource = registry.pgResources["location_tags"];
 const resource_locationsPgResource = registry.pgResources["locations"];
+const resource_measurementsPgResource = registry.pgResources["measurements"];
+const resource_photo_tagsPgResource = registry.pgResources["photo_tags"];
 const resource_photosPgResource = registry.pgResources["photos"];
+const resource_profile_tagsPgResource = registry.pgResources["profile_tags"];
 const resource_profilesPgResource = registry.pgResources["profiles"];
 const resource_usersPgResource = registry.pgResources["users"];
-const resource_measurementsPgResource = registry.pgResources["measurements"];
-const resource_location_tagsPgResource = registry.pgResources["location_tags"];
-const resource_photo_tagsPgResource = registry.pgResources["photo_tags"];
-const resource_profile_tagsPgResource = registry.pgResources["profile_tags"];
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -1320,12 +1320,12 @@ const makeTableNodeIdHandler = ({
     deprecationReason
   };
 };
-const nodeIdHandler_Location = makeTableNodeIdHandler({
-  typeName: "Location",
-  identifier: "locations",
+const nodeIdHandler_LocationTag = makeTableNodeIdHandler({
+  typeName: "LocationTag",
+  identifier: "location_tags",
   nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_locationsPgResource,
-  pk: locationsUniques[0].attributes
+  resource: resource_location_tagsPgResource,
+  pk: location_tagsUniques[0].attributes
 });
 const specForHandlerCache = new Map();
 function specForHandler(handler) {
@@ -1350,9 +1350,42 @@ function specForHandler(handler) {
   specForHandlerCache.set(handler, spec);
   return spec;
 }
+const nodeFetcher_LocationTag = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LocationTag));
+  return nodeIdHandler_LocationTag.get(nodeIdHandler_LocationTag.getSpec($decoded));
+};
+const nodeIdHandler_Location = makeTableNodeIdHandler({
+  typeName: "Location",
+  identifier: "locations",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_locationsPgResource,
+  pk: locationsUniques[0].attributes
+});
 const nodeFetcher_Location = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Location));
   return nodeIdHandler_Location.get(nodeIdHandler_Location.getSpec($decoded));
+};
+const nodeIdHandler_Measurement = makeTableNodeIdHandler({
+  typeName: "Measurement",
+  identifier: "measurements",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_measurementsPgResource,
+  pk: measurementsUniques[0].attributes
+});
+const nodeFetcher_Measurement = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
+  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
+};
+const nodeIdHandler_PhotoTag = makeTableNodeIdHandler({
+  typeName: "PhotoTag",
+  identifier: "photo_tags",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_photo_tagsPgResource,
+  pk: photo_tagsUniques[0].attributes
+});
+const nodeFetcher_PhotoTag = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PhotoTag));
+  return nodeIdHandler_PhotoTag.get(nodeIdHandler_PhotoTag.getSpec($decoded));
 };
 const nodeIdHandler_Photo = makeTableNodeIdHandler({
   typeName: "Photo",
@@ -1364,6 +1397,17 @@ const nodeIdHandler_Photo = makeTableNodeIdHandler({
 const nodeFetcher_Photo = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Photo));
   return nodeIdHandler_Photo.get(nodeIdHandler_Photo.getSpec($decoded));
+};
+const nodeIdHandler_ProfileTag = makeTableNodeIdHandler({
+  typeName: "ProfileTag",
+  identifier: "profile_tags",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_profile_tagsPgResource,
+  pk: profile_tagsUniques[0].attributes
+});
+const nodeFetcher_ProfileTag = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ProfileTag));
+  return nodeIdHandler_ProfileTag.get(nodeIdHandler_ProfileTag.getSpec($decoded));
 };
 const nodeIdHandler_Profile = makeTableNodeIdHandler({
   typeName: "Profile",
@@ -1386,50 +1430,6 @@ const nodeIdHandler_User = makeTableNodeIdHandler({
 const nodeFetcher_User = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
   return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
-};
-const nodeIdHandler_Measurement = makeTableNodeIdHandler({
-  typeName: "Measurement",
-  identifier: "measurements",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_measurementsPgResource,
-  pk: measurementsUniques[0].attributes
-});
-const nodeFetcher_Measurement = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
-  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
-};
-const nodeIdHandler_LocationTag = makeTableNodeIdHandler({
-  typeName: "LocationTag",
-  identifier: "location_tags",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_location_tagsPgResource,
-  pk: location_tagsUniques[0].attributes
-});
-const nodeFetcher_LocationTag = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LocationTag));
-  return nodeIdHandler_LocationTag.get(nodeIdHandler_LocationTag.getSpec($decoded));
-};
-const nodeIdHandler_PhotoTag = makeTableNodeIdHandler({
-  typeName: "PhotoTag",
-  identifier: "photo_tags",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_photo_tagsPgResource,
-  pk: photo_tagsUniques[0].attributes
-});
-const nodeFetcher_PhotoTag = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PhotoTag));
-  return nodeIdHandler_PhotoTag.get(nodeIdHandler_PhotoTag.getSpec($decoded));
-};
-const nodeIdHandler_ProfileTag = makeTableNodeIdHandler({
-  typeName: "ProfileTag",
-  identifier: "profile_tags",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_profile_tagsPgResource,
-  pk: profile_tagsUniques[0].attributes
-});
-const nodeFetcher_ProfileTag = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ProfileTag));
-  return nodeIdHandler_ProfileTag.get(nodeIdHandler_ProfileTag.getSpec($decoded));
 };
 function applyFirstArg(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
@@ -1460,14 +1460,14 @@ function applyOrderByArgToConnection(parent, $connection, value) {
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: nodeIdHandler_Query,
-  Location: nodeIdHandler_Location,
-  Photo: nodeIdHandler_Photo,
-  Profile: nodeIdHandler_Profile,
-  User: nodeIdHandler_User,
-  Measurement: nodeIdHandler_Measurement,
   LocationTag: nodeIdHandler_LocationTag,
+  Location: nodeIdHandler_Location,
+  Measurement: nodeIdHandler_Measurement,
   PhotoTag: nodeIdHandler_PhotoTag,
-  ProfileTag: nodeIdHandler_ProfileTag
+  Photo: nodeIdHandler_Photo,
+  ProfileTag: nodeIdHandler_ProfileTag,
+  Profile: nodeIdHandler_Profile,
+  User: nodeIdHandler_User
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -1480,6 +1480,12 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const LocationTag_entityKindPlan = $record => {
+  return $record.get("entity_kind");
+};
+const LocationTag_entityIdPlan = $record => {
+  return $record.get("entity_id");
+};
 function toString(value) {
   return "" + value;
 }
@@ -1490,12 +1496,6 @@ const coerce = string => {
   return string;
 };
 const totalCountConnectionPlan = $connection => $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-const LocationTag_entityKindPlan = $record => {
-  return $record.get("entity_kind");
-};
-const LocationTag_entityIdPlan = $record => {
-  return $record.get("entity_id");
-};
 function applyAttributeCondition(attributeName, attributeCodec, $condition, val) {
   $condition.where({
     type: "attribute",
@@ -1564,16 +1564,32 @@ const LocationsOrderBy_ID_DESCApply = queryBuilder => {
 function applyInputToInsert(_, $object) {
   return $object;
 }
-const specFromArgs_Location = args => {
+const specFromArgs_LocationTag = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Location, $nodeId);
+  return specFromNodeId(nodeIdHandler_LocationTag, $nodeId);
 };
 function applyInputToUpdateOrDelete(_, $object) {
   return $object;
 }
+const specFromArgs_Location = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Location, $nodeId);
+};
+const specFromArgs_Measurement = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
+};
+const specFromArgs_PhotoTag = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_PhotoTag, $nodeId);
+};
 const specFromArgs_Photo = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Photo, $nodeId);
+};
+const specFromArgs_ProfileTag = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_ProfileTag, $nodeId);
 };
 const specFromArgs_Profile = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -1582,22 +1598,6 @@ const specFromArgs_Profile = args => {
 const specFromArgs_User = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_User, $nodeId);
-};
-const specFromArgs_Measurement = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
-};
-const specFromArgs_LocationTag = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LocationTag, $nodeId);
-};
-const specFromArgs_PhotoTag = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_PhotoTag, $nodeId);
-};
-const specFromArgs_ProfileTag = args => {
-  const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ProfileTag, $nodeId);
 };
 function getClientMutationIdForCreatePlan($mutation) {
   const $insert = $mutation.getStepForKey("result");
@@ -1630,7 +1630,10 @@ const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => 
   const $connection = connection($select);
   return new EdgeStep($connection, first($connection));
 };
-const CreateLocationPayload_locationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
+const CreateLocationTagPayload_locationTagEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
+const CreateLocationTagPayload_locationByEntityIdPlan = $record => resource_locationsPgResource.get({
+  id: $record.get("result").get("entity_id")
+});
 function applyClientMutationIdForCreate(qb, val) {
   qb.setMeta("clientMutationId", val);
 }
@@ -1639,14 +1642,18 @@ function applyCreateFields(qb, arg) {
     return qb.setBuilder();
   }
 }
+function LocationTagInput_entityKindApply(obj, val, info) {
+  obj.set("entity_kind", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function LocationTagInput_entityIdApply(obj, val, info) {
+  obj.set("entity_id", bakedInputRuntime(info.schema, info.field.type, val));
+}
+function LocationTagInput_tagApply(obj, val, info) {
+  obj.set("tag", bakedInputRuntime(info.schema, info.field.type, val));
+}
+const CreateLocationPayload_locationEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
 function LocationInput_idApply(obj, val, info) {
   obj.set("id", bakedInputRuntime(info.schema, info.field.type, val));
-}
-const CreatePhotoPayload_photoEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_photosPgResource, photosUniques[0].attributes, $mutation, fieldArgs);
-const CreateProfilePayload_profileEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_profilesPgResource, profilesUniques[0].attributes, $mutation, fieldArgs);
-const CreateUserPayload_userEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_usersPgResource, usersUniques[0].attributes, $mutation, fieldArgs);
-function UserInput_nameApply(obj, val, info) {
-  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
 }
 const CreateMeasurementPayload_measurementEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_measurementsPgResource, measurementsUniques[0].attributes, $mutation, fieldArgs);
 const CreateMeasurementPayload_userByUserIdPlan = $record => resource_usersPgResource.get({
@@ -1664,27 +1671,20 @@ function MeasurementInput_valueApply(obj, val, info) {
 function MeasurementInput_userIdApply(obj, val, info) {
   obj.set("user_id", bakedInputRuntime(info.schema, info.field.type, val));
 }
-const CreateLocationTagPayload_locationTagEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
-const CreateLocationTagPayload_locationByEntityIdPlan = $record => resource_locationsPgResource.get({
-  id: $record.get("result").get("entity_id")
-});
-function LocationTagInput_entityKindApply(obj, val, info) {
-  obj.set("entity_kind", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function LocationTagInput_entityIdApply(obj, val, info) {
-  obj.set("entity_id", bakedInputRuntime(info.schema, info.field.type, val));
-}
-function LocationTagInput_tagApply(obj, val, info) {
-  obj.set("tag", bakedInputRuntime(info.schema, info.field.type, val));
-}
 const CreatePhotoTagPayload_photoTagEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
 const CreatePhotoTagPayload_photoByEntityIdPlan = $record => resource_photosPgResource.get({
   id: $record.get("result").get("entity_id")
 });
+const CreatePhotoPayload_photoEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_photosPgResource, photosUniques[0].attributes, $mutation, fieldArgs);
 const CreateProfileTagPayload_profileTagEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
 const CreateProfileTagPayload_profileByEntityIdPlan = $record => resource_profilesPgResource.get({
   id: $record.get("result").get("entity_id")
 });
+const CreateProfilePayload_profileEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_profilesPgResource, profilesUniques[0].attributes, $mutation, fieldArgs);
+const CreateUserPayload_userEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_usersPgResource, usersUniques[0].attributes, $mutation, fieldArgs);
+function UserInput_nameApply(obj, val, info) {
+  obj.set("name", bakedInputRuntime(info.schema, info.field.type, val));
+}
 function getClientMutationIdForUpdateOrDeletePlan($mutation) {
   const $result = $mutation.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -1708,11 +1708,23 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
+  """Get a single \`LocationTag\`."""
+  locationTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): LocationTag
+
   """Get a single \`Location\`."""
   locationById(id: UUID!): Location
 
+  """Get a single \`Measurement\`."""
+  measurementByTimestampAndKey(timestamp: Datetime!, key: String!): Measurement
+
+  """Get a single \`PhotoTag\`."""
+  photoTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): PhotoTag
+
   """Get a single \`Photo\`."""
   photoById(id: UUID!): Photo
+
+  """Get a single \`ProfileTag\`."""
+  profileTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): ProfileTag
 
   """Get a single \`Profile\`."""
   profileById(id: UUID!): Profile
@@ -1720,17 +1732,13 @@ type Query implements Node {
   """Get a single \`User\`."""
   userById(id: Int!): User
 
-  """Get a single \`Measurement\`."""
-  measurementByTimestampAndKey(timestamp: Datetime!, key: String!): Measurement
-
-  """Get a single \`LocationTag\`."""
-  locationTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): LocationTag
-
-  """Get a single \`PhotoTag\`."""
-  photoTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): PhotoTag
-
-  """Get a single \`ProfileTag\`."""
-  profileTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): ProfileTag
+  """Reads a single \`LocationTag\` using its globally unique \`ID\`."""
+  locationTag(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`LocationTag\`.
+    """
+    nodeId: ID!
+  ): LocationTag
 
   """Reads a single \`Location\` using its globally unique \`ID\`."""
   location(
@@ -1738,11 +1746,33 @@ type Query implements Node {
     nodeId: ID!
   ): Location
 
+  """Reads a single \`Measurement\` using its globally unique \`ID\`."""
+  measurement(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`Measurement\`.
+    """
+    nodeId: ID!
+  ): Measurement
+
+  """Reads a single \`PhotoTag\` using its globally unique \`ID\`."""
+  photoTag(
+    """The globally unique \`ID\` to be used in selecting a single \`PhotoTag\`."""
+    nodeId: ID!
+  ): PhotoTag
+
   """Reads a single \`Photo\` using its globally unique \`ID\`."""
   photo(
     """The globally unique \`ID\` to be used in selecting a single \`Photo\`."""
     nodeId: ID!
   ): Photo
+
+  """Reads a single \`ProfileTag\` using its globally unique \`ID\`."""
+  profileTag(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`ProfileTag\`.
+    """
+    nodeId: ID!
+  ): ProfileTag
 
   """Reads a single \`Profile\` using its globally unique \`ID\`."""
   profile(
@@ -1756,35 +1786,34 @@ type Query implements Node {
     nodeId: ID!
   ): User
 
-  """Reads a single \`Measurement\` using its globally unique \`ID\`."""
-  measurement(
-    """
-    The globally unique \`ID\` to be used in selecting a single \`Measurement\`.
-    """
-    nodeId: ID!
-  ): Measurement
+  """Reads and enables pagination through a set of \`LocationTag\`."""
+  allLocationTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
 
-  """Reads a single \`LocationTag\` using its globally unique \`ID\`."""
-  locationTag(
-    """
-    The globally unique \`ID\` to be used in selecting a single \`LocationTag\`.
-    """
-    nodeId: ID!
-  ): LocationTag
+    """Only read the last \`n\` values of the set."""
+    last: Int
 
-  """Reads a single \`PhotoTag\` using its globally unique \`ID\`."""
-  photoTag(
-    """The globally unique \`ID\` to be used in selecting a single \`PhotoTag\`."""
-    nodeId: ID!
-  ): PhotoTag
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
 
-  """Reads a single \`ProfileTag\` using its globally unique \`ID\`."""
-  profileTag(
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
     """
-    The globally unique \`ID\` to be used in selecting a single \`ProfileTag\`.
+    A condition to be used in determining which values should be returned by the collection.
     """
-    nodeId: ID!
-  ): ProfileTag
+    condition: LocationTagCondition
+
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LocationTagsConnection
 
   """Reads and enables pagination through a set of \`Location\`."""
   allLocations(
@@ -1815,6 +1844,64 @@ type Query implements Node {
     orderBy: [LocationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LocationsConnection
 
+  """Reads and enables pagination through a set of \`Measurement\`."""
+  allMeasurements(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MeasurementCondition
+
+    """The method to use when ordering \`Measurement\`."""
+    orderBy: [MeasurementsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MeasurementsConnection
+
+  """Reads and enables pagination through a set of \`PhotoTag\`."""
+  allPhotoTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoTagCondition
+
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotoTagsConnection
+
   """Reads and enables pagination through a set of \`Photo\`."""
   allPhotos(
     """Only read the first \`n\` values of the set."""
@@ -1843,6 +1930,35 @@ type Query implements Node {
     """The method to use when ordering \`Photo\`."""
     orderBy: [PhotosOrderBy!] = [PRIMARY_KEY_ASC]
   ): PhotosConnection
+
+  """Reads and enables pagination through a set of \`ProfileTag\`."""
+  allProfileTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileTagCondition
+
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfileTagsConnection
 
   """Reads and enables pagination through a set of \`Profile\`."""
   allProfiles(
@@ -1901,122 +2017,6 @@ type Query implements Node {
     """The method to use when ordering \`User\`."""
     orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
   ): UsersConnection
-
-  """Reads and enables pagination through a set of \`Measurement\`."""
-  allMeasurements(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: MeasurementCondition
-
-    """The method to use when ordering \`Measurement\`."""
-    orderBy: [MeasurementsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): MeasurementsConnection
-
-  """Reads and enables pagination through a set of \`LocationTag\`."""
-  allLocationTags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: LocationTagCondition
-
-    """The method to use when ordering \`LocationTag\`."""
-    orderBy: [LocationTagsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): LocationTagsConnection
-
-  """Reads and enables pagination through a set of \`PhotoTag\`."""
-  allPhotoTags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PhotoTagCondition
-
-    """The method to use when ordering \`PhotoTag\`."""
-    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PhotoTagsConnection
-
-  """Reads and enables pagination through a set of \`ProfileTag\`."""
-  allProfileTags(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ProfileTagCondition
-
-    """The method to use when ordering \`ProfileTag\`."""
-    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ProfileTagsConnection
 }
 
 """An object with a globally unique \`ID\`."""
@@ -2026,6 +2026,30 @@ interface Node {
   """
   nodeId: ID!
 }
+
+type LocationTag implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
+  locationByEntityId: Location
+}
+
+enum EntityKinds {
+  PHOTOS
+  LOCATIONS
+  PROFILES
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
 
 type Location implements Node {
   """
@@ -2064,11 +2088,6 @@ type Location implements Node {
   ): LocationTagsConnection!
 }
 
-"""
-A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
-"""
-scalar UUID
-
 """A connection to a list of \`LocationTag\` values."""
 type LocationTagsConnection {
   """A list of \`LocationTag\` objects."""
@@ -2084,25 +2103,6 @@ type LocationTagsConnection {
 
   """The count of *all* \`LocationTag\` you could get from the connection."""
   totalCount: Int!
-}
-
-type LocationTag implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-
-  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
-  locationByEntityId: Location
-}
-
-enum EntityKinds {
-  PHOTOS
-  LOCATIONS
-  PROFILES
 }
 
 """A \`LocationTag\` edge in the connection."""
@@ -2160,213 +2160,28 @@ enum LocationTagsOrderBy {
   TAG_DESC
 }
 
-type Photo implements Node {
+type Measurement implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-  id: UUID!
+  timestamp: Datetime!
+  key: String!
+  value: Float
+  userId: Int!
 
-  """Reads and enables pagination through a set of \`PhotoTag\`."""
-  photoTagsByEntityId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PhotoTagCondition
-
-    """The method to use when ordering \`PhotoTag\`."""
-    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PhotoTagsConnection!
-}
-
-"""A connection to a list of \`PhotoTag\` values."""
-type PhotoTagsConnection {
-  """A list of \`PhotoTag\` objects."""
-  nodes: [PhotoTag]!
-
-  """
-  A list of edges which contains the \`PhotoTag\` and cursor to aid in pagination.
-  """
-  edges: [PhotoTagsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`PhotoTag\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type PhotoTag implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-
-  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
-  photoByEntityId: Photo
-}
-
-"""A \`PhotoTag\` edge in the connection."""
-type PhotoTagsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`PhotoTag\` at the end of the edge."""
-  node: PhotoTag
+  """Reads a single \`User\` that is related to this \`Measurement\`."""
+  userByUserId: User
 }
 
 """
-A condition to be used against \`PhotoTag\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
 """
-input PhotoTagCondition {
-  """Checks for equality with the object’s \`entityKind\` field."""
-  entityKind: EntityKinds
-
-  """Checks for equality with the object’s \`entityId\` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s \`tag\` field."""
-  tag: String
-}
-
-"""Methods to use when ordering \`PhotoTag\`."""
-enum PhotoTagsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ENTITY_KIND_ASC
-  ENTITY_KIND_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  TAG_ASC
-  TAG_DESC
-}
-
-type Profile implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: UUID!
-
-  """Reads and enables pagination through a set of \`ProfileTag\`."""
-  profileTagsByEntityId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ProfileTagCondition
-
-    """The method to use when ordering \`ProfileTag\`."""
-    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): ProfileTagsConnection!
-}
-
-"""A connection to a list of \`ProfileTag\` values."""
-type ProfileTagsConnection {
-  """A list of \`ProfileTag\` objects."""
-  nodes: [ProfileTag]!
-
-  """
-  A list of edges which contains the \`ProfileTag\` and cursor to aid in pagination.
-  """
-  edges: [ProfileTagsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`ProfileTag\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type ProfileTag implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-
-  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
-  profileByEntityId: Profile
-}
-
-"""A \`ProfileTag\` edge in the connection."""
-type ProfileTagsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`ProfileTag\` at the end of the edge."""
-  node: ProfileTag
-}
-
-"""
-A condition to be used against \`ProfileTag\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input ProfileTagCondition {
-  """Checks for equality with the object’s \`entityKind\` field."""
-  entityKind: EntityKinds
-
-  """Checks for equality with the object’s \`entityId\` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s \`tag\` field."""
-  tag: String
-}
-
-"""Methods to use when ordering \`ProfileTag\`."""
-enum ProfileTagsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ENTITY_KIND_ASC
-  ENTITY_KIND_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  TAG_ASC
-  TAG_DESC
-}
+scalar Datetime
 
 type User implements Node {
   """
@@ -2423,29 +2238,6 @@ type MeasurementsConnection {
   totalCount: Int!
 }
 
-type Measurement implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  timestamp: Datetime!
-  key: String!
-  value: Float
-  userId: Int!
-
-  """Reads a single \`User\` that is related to this \`Measurement\`."""
-  userByUserId: User
-}
-
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
-3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
-that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
-to unexpected results.
-"""
-scalar Datetime
-
 """A \`Measurement\` edge in the connection."""
 type MeasurementsEdge {
   """A cursor for use in pagination."""
@@ -2486,6 +2278,214 @@ enum MeasurementsOrderBy {
   VALUE_DESC
   USER_ID_ASC
   USER_ID_DESC
+}
+
+type PhotoTag implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+type Photo implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: UUID!
+
+  """Reads and enables pagination through a set of \`PhotoTag\`."""
+  photoTagsByEntityId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoTagCondition
+
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotoTagsConnection!
+}
+
+"""A connection to a list of \`PhotoTag\` values."""
+type PhotoTagsConnection {
+  """A list of \`PhotoTag\` objects."""
+  nodes: [PhotoTag]!
+
+  """
+  A list of edges which contains the \`PhotoTag\` and cursor to aid in pagination.
+  """
+  edges: [PhotoTagsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`PhotoTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`PhotoTag\` edge in the connection."""
+type PhotoTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`PhotoTag\` at the end of the edge."""
+  node: PhotoTag
+}
+
+"""
+A condition to be used against \`PhotoTag\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input PhotoTagCondition {
+  """Checks for equality with the object’s \`entityKind\` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s \`entityId\` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s \`tag\` field."""
+  tag: String
+}
+
+"""Methods to use when ordering \`PhotoTag\`."""
+enum PhotoTagsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  TAG_ASC
+  TAG_DESC
+}
+
+type ProfileTag implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+type Profile implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: UUID!
+
+  """Reads and enables pagination through a set of \`ProfileTag\`."""
+  profileTagsByEntityId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileTagCondition
+
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfileTagsConnection!
+}
+
+"""A connection to a list of \`ProfileTag\` values."""
+type ProfileTagsConnection {
+  """A list of \`ProfileTag\` objects."""
+  nodes: [ProfileTag]!
+
+  """
+  A list of edges which contains the \`ProfileTag\` and cursor to aid in pagination.
+  """
+  edges: [ProfileTagsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`ProfileTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`ProfileTag\` edge in the connection."""
+type ProfileTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`ProfileTag\` at the end of the edge."""
+  node: ProfileTag
+}
+
+"""
+A condition to be used against \`ProfileTag\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ProfileTagCondition {
+  """Checks for equality with the object’s \`entityKind\` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s \`entityId\` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s \`tag\` field."""
+  tag: String
+}
+
+"""Methods to use when ordering \`ProfileTag\`."""
+enum ProfileTagsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  TAG_ASC
+  TAG_DESC
 }
 
 """A connection to a list of \`Location\` values."""
@@ -2670,6 +2670,14 @@ enum UsersOrderBy {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  """Creates a single \`LocationTag\`."""
+  createLocationTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateLocationTagInput!
+  ): CreateLocationTagPayload
+
   """Creates a single \`Location\`."""
   createLocation(
     """
@@ -2678,6 +2686,22 @@ type Mutation {
     input: CreateLocationInput!
   ): CreateLocationPayload
 
+  """Creates a single \`Measurement\`."""
+  createMeasurement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateMeasurementInput!
+  ): CreateMeasurementPayload
+
+  """Creates a single \`PhotoTag\`."""
+  createPhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePhotoTagInput!
+  ): CreatePhotoTagPayload
+
   """Creates a single \`Photo\`."""
   createPhoto(
     """
@@ -2685,6 +2709,14 @@ type Mutation {
     """
     input: CreatePhotoInput!
   ): CreatePhotoPayload
+
+  """Creates a single \`ProfileTag\`."""
+  createProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateProfileTagInput!
+  ): CreateProfileTagPayload
 
   """Creates a single \`Profile\`."""
   createProfile(
@@ -2702,37 +2734,23 @@ type Mutation {
     input: CreateUserInput!
   ): CreateUserPayload
 
-  """Creates a single \`Measurement\`."""
-  createMeasurement(
+  """
+  Updates a single \`LocationTag\` using its globally unique id and a patch.
+  """
+  updateLocationTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateMeasurementInput!
-  ): CreateMeasurementPayload
+    input: UpdateLocationTagInput!
+  ): UpdateLocationTagPayload
 
-  """Creates a single \`LocationTag\`."""
-  createLocationTag(
+  """Updates a single \`LocationTag\` using a unique key and a patch."""
+  updateLocationTagByEntityKindAndEntityIdAndTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateLocationTagInput!
-  ): CreateLocationTagPayload
-
-  """Creates a single \`PhotoTag\`."""
-  createPhotoTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePhotoTagInput!
-  ): CreatePhotoTagPayload
-
-  """Creates a single \`ProfileTag\`."""
-  createProfileTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateProfileTagInput!
-  ): CreateProfileTagPayload
+    input: UpdateLocationTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdateLocationTagPayload
 
   """Updates a single \`Location\` using its globally unique id and a patch."""
   updateLocation(
@@ -2750,6 +2768,40 @@ type Mutation {
     input: UpdateLocationByIdInput!
   ): UpdateLocationPayload
 
+  """
+  Updates a single \`Measurement\` using its globally unique id and a patch.
+  """
+  updateMeasurement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMeasurementInput!
+  ): UpdateMeasurementPayload
+
+  """Updates a single \`Measurement\` using a unique key and a patch."""
+  updateMeasurementByTimestampAndKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateMeasurementByTimestampAndKeyInput!
+  ): UpdateMeasurementPayload
+
+  """Updates a single \`PhotoTag\` using its globally unique id and a patch."""
+  updatePhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoTagInput!
+  ): UpdatePhotoTagPayload
+
+  """Updates a single \`PhotoTag\` using a unique key and a patch."""
+  updatePhotoTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdatePhotoTagPayload
+
   """Updates a single \`Photo\` using its globally unique id and a patch."""
   updatePhoto(
     """
@@ -2765,6 +2817,24 @@ type Mutation {
     """
     input: UpdatePhotoByIdInput!
   ): UpdatePhotoPayload
+
+  """
+  Updates a single \`ProfileTag\` using its globally unique id and a patch.
+  """
+  updateProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileTagInput!
+  ): UpdateProfileTagPayload
+
+  """Updates a single \`ProfileTag\` using a unique key and a patch."""
+  updateProfileTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdateProfileTagPayload
 
   """Updates a single \`Profile\` using its globally unique id and a patch."""
   updateProfile(
@@ -2798,75 +2868,21 @@ type Mutation {
     input: UpdateUserByIdInput!
   ): UpdateUserPayload
 
-  """
-  Updates a single \`Measurement\` using its globally unique id and a patch.
-  """
-  updateMeasurement(
+  """Deletes a single \`LocationTag\` using its globally unique id."""
+  deleteLocationTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateMeasurementInput!
-  ): UpdateMeasurementPayload
+    input: DeleteLocationTagInput!
+  ): DeleteLocationTagPayload
 
-  """Updates a single \`Measurement\` using a unique key and a patch."""
-  updateMeasurementByTimestampAndKey(
+  """Deletes a single \`LocationTag\` using a unique key."""
+  deleteLocationTagByEntityKindAndEntityIdAndTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateMeasurementByTimestampAndKeyInput!
-  ): UpdateMeasurementPayload
-
-  """
-  Updates a single \`LocationTag\` using its globally unique id and a patch.
-  """
-  updateLocationTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateLocationTagInput!
-  ): UpdateLocationTagPayload
-
-  """Updates a single \`LocationTag\` using a unique key and a patch."""
-  updateLocationTagByEntityKindAndEntityIdAndTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateLocationTagByEntityKindAndEntityIdAndTagInput!
-  ): UpdateLocationTagPayload
-
-  """Updates a single \`PhotoTag\` using its globally unique id and a patch."""
-  updatePhotoTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePhotoTagInput!
-  ): UpdatePhotoTagPayload
-
-  """Updates a single \`PhotoTag\` using a unique key and a patch."""
-  updatePhotoTagByEntityKindAndEntityIdAndTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdatePhotoTagByEntityKindAndEntityIdAndTagInput!
-  ): UpdatePhotoTagPayload
-
-  """
-  Updates a single \`ProfileTag\` using its globally unique id and a patch.
-  """
-  updateProfileTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateProfileTagInput!
-  ): UpdateProfileTagPayload
-
-  """Updates a single \`ProfileTag\` using a unique key and a patch."""
-  updateProfileTagByEntityKindAndEntityIdAndTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateProfileTagByEntityKindAndEntityIdAndTagInput!
-  ): UpdateProfileTagPayload
+    input: DeleteLocationTagByEntityKindAndEntityIdAndTagInput!
+  ): DeleteLocationTagPayload
 
   """Deletes a single \`Location\` using its globally unique id."""
   deleteLocation(
@@ -2884,6 +2900,38 @@ type Mutation {
     input: DeleteLocationByIdInput!
   ): DeleteLocationPayload
 
+  """Deletes a single \`Measurement\` using its globally unique id."""
+  deleteMeasurement(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMeasurementInput!
+  ): DeleteMeasurementPayload
+
+  """Deletes a single \`Measurement\` using a unique key."""
+  deleteMeasurementByTimestampAndKey(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteMeasurementByTimestampAndKeyInput!
+  ): DeleteMeasurementPayload
+
+  """Deletes a single \`PhotoTag\` using its globally unique id."""
+  deletePhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoTagInput!
+  ): DeletePhotoTagPayload
+
+  """Deletes a single \`PhotoTag\` using a unique key."""
+  deletePhotoTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoTagByEntityKindAndEntityIdAndTagInput!
+  ): DeletePhotoTagPayload
+
   """Deletes a single \`Photo\` using its globally unique id."""
   deletePhoto(
     """
@@ -2899,6 +2947,22 @@ type Mutation {
     """
     input: DeletePhotoByIdInput!
   ): DeletePhotoPayload
+
+  """Deletes a single \`ProfileTag\` using its globally unique id."""
+  deleteProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileTagInput!
+  ): DeleteProfileTagPayload
+
+  """Deletes a single \`ProfileTag\` using a unique key."""
+  deleteProfileTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileTagByEntityKindAndEntityIdAndTagInput!
+  ): DeleteProfileTagPayload
 
   """Deletes a single \`Profile\` using its globally unique id."""
   deleteProfile(
@@ -2931,70 +2995,51 @@ type Mutation {
     """
     input: DeleteUserByIdInput!
   ): DeleteUserPayload
+}
 
-  """Deletes a single \`Measurement\` using its globally unique id."""
-  deleteMeasurement(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMeasurementInput!
-  ): DeleteMeasurementPayload
+"""The output of our create \`LocationTag\` mutation."""
+type CreateLocationTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
 
-  """Deletes a single \`Measurement\` using a unique key."""
-  deleteMeasurementByTimestampAndKey(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteMeasurementByTimestampAndKeyInput!
-  ): DeleteMeasurementPayload
+  """The \`LocationTag\` that was created by this mutation."""
+  locationTag: LocationTag
 
-  """Deletes a single \`LocationTag\` using its globally unique id."""
-  deleteLocationTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteLocationTagInput!
-  ): DeleteLocationTagPayload
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 
-  """Deletes a single \`LocationTag\` using a unique key."""
-  deleteLocationTagByEntityKindAndEntityIdAndTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteLocationTagByEntityKindAndEntityIdAndTagInput!
-  ): DeleteLocationTagPayload
+  """An edge for our \`LocationTag\`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
 
-  """Deletes a single \`PhotoTag\` using its globally unique id."""
-  deletePhotoTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePhotoTagInput!
-  ): DeletePhotoTagPayload
+  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
+  locationByEntityId: Location
+}
 
-  """Deletes a single \`PhotoTag\` using a unique key."""
-  deletePhotoTagByEntityKindAndEntityIdAndTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeletePhotoTagByEntityKindAndEntityIdAndTagInput!
-  ): DeletePhotoTagPayload
+"""All input for the create \`LocationTag\` mutation."""
+input CreateLocationTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 
-  """Deletes a single \`ProfileTag\` using its globally unique id."""
-  deleteProfileTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteProfileTagInput!
-  ): DeleteProfileTagPayload
+  """The \`LocationTag\` to be created by this mutation."""
+  locationTag: LocationTagInput!
+}
 
-  """Deletes a single \`ProfileTag\` using a unique key."""
-  deleteProfileTagByEntityKindAndEntityIdAndTag(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteProfileTagByEntityKindAndEntityIdAndTagInput!
-  ): DeleteProfileTagPayload
+"""An input for mutations affecting \`LocationTag\`"""
+input LocationTagInput {
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
 }
 
 """The output of our create \`Location\` mutation."""
@@ -3037,6 +3082,97 @@ input LocationInput {
   id: UUID!
 }
 
+"""The output of our create \`Measurement\` mutation."""
+type CreateMeasurementPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Measurement\` that was created by this mutation."""
+  measurement: Measurement
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Measurement\`. May be used by Relay 1."""
+  measurementEdge(
+    """The method to use when ordering \`Measurement\`."""
+    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MeasurementsEdge
+
+  """Reads a single \`User\` that is related to this \`Measurement\`."""
+  userByUserId: User
+}
+
+"""All input for the create \`Measurement\` mutation."""
+input CreateMeasurementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Measurement\` to be created by this mutation."""
+  measurement: MeasurementInput!
+}
+
+"""An input for mutations affecting \`Measurement\`"""
+input MeasurementInput {
+  timestamp: Datetime!
+  key: String!
+  value: Float
+  userId: Int!
+}
+
+"""The output of our create \`PhotoTag\` mutation."""
+type CreatePhotoTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` that was created by this mutation."""
+  photoTag: PhotoTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""All input for the create \`PhotoTag\` mutation."""
+input CreatePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` to be created by this mutation."""
+  photoTag: PhotoTagInput!
+}
+
+"""An input for mutations affecting \`PhotoTag\`"""
+input PhotoTagInput {
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+}
+
 """The output of our create \`Photo\` mutation."""
 type CreatePhotoPayload {
   """
@@ -3075,6 +3211,51 @@ input CreatePhotoInput {
 """An input for mutations affecting \`Photo\`"""
 input PhotoInput {
   id: UUID!
+}
+
+"""The output of our create \`ProfileTag\` mutation."""
+type CreateProfileTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` that was created by this mutation."""
+  profileTag: ProfileTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""All input for the create \`ProfileTag\` mutation."""
+input CreateProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` to be created by this mutation."""
+  profileTag: ProfileTagInput!
+}
+
+"""An input for mutations affecting \`ProfileTag\`"""
+input ProfileTagInput {
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
 }
 
 """The output of our create \`Profile\` mutation."""
@@ -3158,61 +3339,15 @@ input UserInput {
   name: String!
 }
 
-"""The output of our create \`Measurement\` mutation."""
-type CreateMeasurementPayload {
+"""The output of our update \`LocationTag\` mutation."""
+type UpdateLocationTagPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Measurement\` that was created by this mutation."""
-  measurement: Measurement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Measurement\`. May be used by Relay 1."""
-  measurementEdge(
-    """The method to use when ordering \`Measurement\`."""
-    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MeasurementsEdge
-
-  """Reads a single \`User\` that is related to this \`Measurement\`."""
-  userByUserId: User
-}
-
-"""All input for the create \`Measurement\` mutation."""
-input CreateMeasurementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`Measurement\` to be created by this mutation."""
-  measurement: MeasurementInput!
-}
-
-"""An input for mutations affecting \`Measurement\`"""
-input MeasurementInput {
-  timestamp: Datetime!
-  key: String!
-  value: Float
-  userId: Int!
-}
-
-"""The output of our create \`LocationTag\` mutation."""
-type CreateLocationTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`LocationTag\` that was created by this mutation."""
+  """The \`LocationTag\` that was updated by this mutation."""
   locationTag: LocationTag
 
   """
@@ -3230,113 +3365,51 @@ type CreateLocationTagPayload {
   locationByEntityId: Location
 }
 
-"""All input for the create \`LocationTag\` mutation."""
-input CreateLocationTagInput {
+"""All input for the \`updateLocationTag\` mutation."""
+input UpdateLocationTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The \`LocationTag\` to be created by this mutation."""
-  locationTag: LocationTagInput!
+  """
+  The globally unique \`ID\` which will identify a single \`LocationTag\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`LocationTag\` being updated.
+  """
+  locationTagPatch: LocationTagPatch!
 }
 
-"""An input for mutations affecting \`LocationTag\`"""
-input LocationTagInput {
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
+"""
+Represents an update to a \`LocationTag\`. Fields that are set will be updated.
+"""
+input LocationTagPatch {
+  entityKind: EntityKinds
+  entityId: UUID
+  tag: String
 }
 
-"""The output of our create \`PhotoTag\` mutation."""
-type CreatePhotoTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`PhotoTag\` that was created by this mutation."""
-  photoTag: PhotoTag
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
-  photoTagEdge(
-    """The method to use when ordering \`PhotoTag\`."""
-    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PhotoTagsEdge
-
-  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
-  photoByEntityId: Photo
-}
-
-"""All input for the create \`PhotoTag\` mutation."""
-input CreatePhotoTagInput {
+"""
+All input for the \`updateLocationTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input UpdateLocationTagByEntityKindAndEntityIdAndTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-
-  """The \`PhotoTag\` to be created by this mutation."""
-  photoTag: PhotoTagInput!
-}
-
-"""An input for mutations affecting \`PhotoTag\`"""
-input PhotoTagInput {
   entityKind: EntityKinds!
   entityId: UUID!
   tag: String!
-}
-
-"""The output of our create \`ProfileTag\` mutation."""
-type CreateProfileTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`ProfileTag\` that was created by this mutation."""
-  profileTag: ProfileTag
 
   """
-  Our root query field type. Allows us to run any query from our mutation payload.
+  An object where the defined keys will be set on the \`LocationTag\` being updated.
   """
-  query: Query
-
-  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
-  profileTagEdge(
-    """The method to use when ordering \`ProfileTag\`."""
-    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ProfileTagsEdge
-
-  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
-  profileByEntityId: Profile
-}
-
-"""All input for the create \`ProfileTag\` mutation."""
-input CreateProfileTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`ProfileTag\` to be created by this mutation."""
-  profileTag: ProfileTagInput!
-}
-
-"""An input for mutations affecting \`ProfileTag\`"""
-input ProfileTagInput {
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
+  locationTagPatch: LocationTagPatch!
 }
 
 """The output of our update \`Location\` mutation."""
@@ -3403,6 +3476,150 @@ input UpdateLocationByIdInput {
   locationPatch: LocationPatch!
 }
 
+"""The output of our update \`Measurement\` mutation."""
+type UpdateMeasurementPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Measurement\` that was updated by this mutation."""
+  measurement: Measurement
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Measurement\`. May be used by Relay 1."""
+  measurementEdge(
+    """The method to use when ordering \`Measurement\`."""
+    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MeasurementsEdge
+
+  """Reads a single \`User\` that is related to this \`Measurement\`."""
+  userByUserId: User
+}
+
+"""All input for the \`updateMeasurement\` mutation."""
+input UpdateMeasurementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Measurement\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`Measurement\` being updated.
+  """
+  measurementPatch: MeasurementPatch!
+}
+
+"""
+Represents an update to a \`Measurement\`. Fields that are set will be updated.
+"""
+input MeasurementPatch {
+  timestamp: Datetime
+  key: String
+  value: Float
+  userId: Int
+}
+
+"""All input for the \`updateMeasurementByTimestampAndKey\` mutation."""
+input UpdateMeasurementByTimestampAndKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  timestamp: Datetime!
+  key: String!
+
+  """
+  An object where the defined keys will be set on the \`Measurement\` being updated.
+  """
+  measurementPatch: MeasurementPatch!
+}
+
+"""The output of our update \`PhotoTag\` mutation."""
+type UpdatePhotoTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` that was updated by this mutation."""
+  photoTag: PhotoTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""All input for the \`updatePhotoTag\` mutation."""
+input UpdatePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`PhotoTag\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`PhotoTag\` being updated.
+  """
+  photoTagPatch: PhotoTagPatch!
+}
+
+"""
+Represents an update to a \`PhotoTag\`. Fields that are set will be updated.
+"""
+input PhotoTagPatch {
+  entityKind: EntityKinds
+  entityId: UUID
+  tag: String
+}
+
+"""
+All input for the \`updatePhotoTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input UpdatePhotoTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """
+  An object where the defined keys will be set on the \`PhotoTag\` being updated.
+  """
+  photoTagPatch: PhotoTagPatch!
+}
+
 """The output of our update \`Photo\` mutation."""
 type UpdatePhotoPayload {
   """
@@ -3465,6 +3682,79 @@ input UpdatePhotoByIdInput {
   An object where the defined keys will be set on the \`Photo\` being updated.
   """
   photoPatch: PhotoPatch!
+}
+
+"""The output of our update \`ProfileTag\` mutation."""
+type UpdateProfileTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` that was updated by this mutation."""
+  profileTag: ProfileTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""All input for the \`updateProfileTag\` mutation."""
+input UpdateProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`ProfileTag\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`ProfileTag\` being updated.
+  """
+  profileTagPatch: ProfileTagPatch!
+}
+
+"""
+Represents an update to a \`ProfileTag\`. Fields that are set will be updated.
+"""
+input ProfileTagPatch {
+  entityKind: EntityKinds
+  entityId: UUID
+  tag: String
+}
+
+"""
+All input for the \`updateProfileTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input UpdateProfileTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """
+  An object where the defined keys will be set on the \`ProfileTag\` being updated.
+  """
+  profileTagPatch: ProfileTagPatch!
 }
 
 """The output of our update \`Profile\` mutation."""
@@ -3594,87 +3884,17 @@ input UpdateUserByIdInput {
   userPatch: UserPatch!
 }
 
-"""The output of our update \`Measurement\` mutation."""
-type UpdateMeasurementPayload {
+"""The output of our delete \`LocationTag\` mutation."""
+type DeleteLocationTagPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Measurement\` that was updated by this mutation."""
-  measurement: Measurement
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Measurement\`. May be used by Relay 1."""
-  measurementEdge(
-    """The method to use when ordering \`Measurement\`."""
-    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MeasurementsEdge
-
-  """Reads a single \`User\` that is related to this \`Measurement\`."""
-  userByUserId: User
-}
-
-"""All input for the \`updateMeasurement\` mutation."""
-input UpdateMeasurementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Measurement\` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Measurement\` being updated.
-  """
-  measurementPatch: MeasurementPatch!
-}
-
-"""
-Represents an update to a \`Measurement\`. Fields that are set will be updated.
-"""
-input MeasurementPatch {
-  timestamp: Datetime
-  key: String
-  value: Float
-  userId: Int
-}
-
-"""All input for the \`updateMeasurementByTimestampAndKey\` mutation."""
-input UpdateMeasurementByTimestampAndKeyInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  timestamp: Datetime!
-  key: String!
-
-  """
-  An object where the defined keys will be set on the \`Measurement\` being updated.
-  """
-  measurementPatch: MeasurementPatch!
-}
-
-"""The output of our update \`LocationTag\` mutation."""
-type UpdateLocationTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`LocationTag\` that was updated by this mutation."""
+  """The \`LocationTag\` that was deleted by this mutation."""
   locationTag: LocationTag
+  deletedLocationTagId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -3691,8 +3911,8 @@ type UpdateLocationTagPayload {
   locationByEntityId: Location
 }
 
-"""All input for the \`updateLocationTag\` mutation."""
-input UpdateLocationTagInput {
+"""All input for the \`deleteLocationTag\` mutation."""
+input DeleteLocationTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3700,29 +3920,15 @@ input UpdateLocationTagInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`LocationTag\` to be updated.
+  The globally unique \`ID\` which will identify a single \`LocationTag\` to be deleted.
   """
   nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`LocationTag\` being updated.
-  """
-  locationTagPatch: LocationTagPatch!
 }
 
 """
-Represents an update to a \`LocationTag\`. Fields that are set will be updated.
+All input for the \`deleteLocationTagByEntityKindAndEntityIdAndTag\` mutation.
 """
-input LocationTagPatch {
-  entityKind: EntityKinds
-  entityId: UUID
-  tag: String
-}
-
-"""
-All input for the \`updateLocationTagByEntityKindAndEntityIdAndTag\` mutation.
-"""
-input UpdateLocationTagByEntityKindAndEntityIdAndTagInput {
+input DeleteLocationTagByEntityKindAndEntityIdAndTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3731,157 +3937,6 @@ input UpdateLocationTagByEntityKindAndEntityIdAndTagInput {
   entityKind: EntityKinds!
   entityId: UUID!
   tag: String!
-
-  """
-  An object where the defined keys will be set on the \`LocationTag\` being updated.
-  """
-  locationTagPatch: LocationTagPatch!
-}
-
-"""The output of our update \`PhotoTag\` mutation."""
-type UpdatePhotoTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`PhotoTag\` that was updated by this mutation."""
-  photoTag: PhotoTag
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
-  photoTagEdge(
-    """The method to use when ordering \`PhotoTag\`."""
-    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PhotoTagsEdge
-
-  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
-  photoByEntityId: Photo
-}
-
-"""All input for the \`updatePhotoTag\` mutation."""
-input UpdatePhotoTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`PhotoTag\` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`PhotoTag\` being updated.
-  """
-  photoTagPatch: PhotoTagPatch!
-}
-
-"""
-Represents an update to a \`PhotoTag\`. Fields that are set will be updated.
-"""
-input PhotoTagPatch {
-  entityKind: EntityKinds
-  entityId: UUID
-  tag: String
-}
-
-"""
-All input for the \`updatePhotoTagByEntityKindAndEntityIdAndTag\` mutation.
-"""
-input UpdatePhotoTagByEntityKindAndEntityIdAndTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-
-  """
-  An object where the defined keys will be set on the \`PhotoTag\` being updated.
-  """
-  photoTagPatch: PhotoTagPatch!
-}
-
-"""The output of our update \`ProfileTag\` mutation."""
-type UpdateProfileTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`ProfileTag\` that was updated by this mutation."""
-  profileTag: ProfileTag
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
-  profileTagEdge(
-    """The method to use when ordering \`ProfileTag\`."""
-    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ProfileTagsEdge
-
-  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
-  profileByEntityId: Profile
-}
-
-"""All input for the \`updateProfileTag\` mutation."""
-input UpdateProfileTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`ProfileTag\` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`ProfileTag\` being updated.
-  """
-  profileTagPatch: ProfileTagPatch!
-}
-
-"""
-Represents an update to a \`ProfileTag\`. Fields that are set will be updated.
-"""
-input ProfileTagPatch {
-  entityKind: EntityKinds
-  entityId: UUID
-  tag: String
-}
-
-"""
-All input for the \`updateProfileTagByEntityKindAndEntityIdAndTag\` mutation.
-"""
-input UpdateProfileTagByEntityKindAndEntityIdAndTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-
-  """
-  An object where the defined keys will be set on the \`ProfileTag\` being updated.
-  """
-  profileTagPatch: ProfileTagPatch!
 }
 
 """The output of our delete \`Location\` mutation."""
@@ -3932,6 +3987,113 @@ input DeleteLocationByIdInput {
   id: UUID!
 }
 
+"""The output of our delete \`Measurement\` mutation."""
+type DeleteMeasurementPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Measurement\` that was deleted by this mutation."""
+  measurement: Measurement
+  deletedMeasurementId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Measurement\`. May be used by Relay 1."""
+  measurementEdge(
+    """The method to use when ordering \`Measurement\`."""
+    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): MeasurementsEdge
+
+  """Reads a single \`User\` that is related to this \`Measurement\`."""
+  userByUserId: User
+}
+
+"""All input for the \`deleteMeasurement\` mutation."""
+input DeleteMeasurementInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Measurement\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the \`deleteMeasurementByTimestampAndKey\` mutation."""
+input DeleteMeasurementByTimestampAndKeyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  timestamp: Datetime!
+  key: String!
+}
+
+"""The output of our delete \`PhotoTag\` mutation."""
+type DeletePhotoTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` that was deleted by this mutation."""
+  photoTag: PhotoTag
+  deletedPhotoTagId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""All input for the \`deletePhotoTag\` mutation."""
+input DeletePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`PhotoTag\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""
+All input for the \`deletePhotoTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input DeletePhotoTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+}
+
 """The output of our delete \`Photo\` mutation."""
 type DeletePhotoPayload {
   """
@@ -3978,6 +4140,61 @@ input DeletePhotoByIdInput {
   """
   clientMutationId: String
   id: UUID!
+}
+
+"""The output of our delete \`ProfileTag\` mutation."""
+type DeleteProfileTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` that was deleted by this mutation."""
+  profileTag: ProfileTag
+  deletedProfileTagId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""All input for the \`deleteProfileTag\` mutation."""
+input DeleteProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`ProfileTag\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""
+All input for the \`deleteProfileTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input DeleteProfileTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
 }
 
 """The output of our delete \`Profile\` mutation."""
@@ -4074,223 +4291,6 @@ input DeleteUserByIdInput {
   """
   clientMutationId: String
   id: Int!
-}
-
-"""The output of our delete \`Measurement\` mutation."""
-type DeleteMeasurementPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Measurement\` that was deleted by this mutation."""
-  measurement: Measurement
-  deletedMeasurementId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Measurement\`. May be used by Relay 1."""
-  measurementEdge(
-    """The method to use when ordering \`Measurement\`."""
-    orderBy: [MeasurementsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): MeasurementsEdge
-
-  """Reads a single \`User\` that is related to this \`Measurement\`."""
-  userByUserId: User
-}
-
-"""All input for the \`deleteMeasurement\` mutation."""
-input DeleteMeasurementInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Measurement\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the \`deleteMeasurementByTimestampAndKey\` mutation."""
-input DeleteMeasurementByTimestampAndKeyInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  timestamp: Datetime!
-  key: String!
-}
-
-"""The output of our delete \`LocationTag\` mutation."""
-type DeleteLocationTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`LocationTag\` that was deleted by this mutation."""
-  locationTag: LocationTag
-  deletedLocationTagId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`LocationTag\`. May be used by Relay 1."""
-  locationTagEdge(
-    """The method to use when ordering \`LocationTag\`."""
-    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): LocationTagsEdge
-
-  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
-  locationByEntityId: Location
-}
-
-"""All input for the \`deleteLocationTag\` mutation."""
-input DeleteLocationTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`LocationTag\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""
-All input for the \`deleteLocationTagByEntityKindAndEntityIdAndTag\` mutation.
-"""
-input DeleteLocationTagByEntityKindAndEntityIdAndTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-}
-
-"""The output of our delete \`PhotoTag\` mutation."""
-type DeletePhotoTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`PhotoTag\` that was deleted by this mutation."""
-  photoTag: PhotoTag
-  deletedPhotoTagId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
-  photoTagEdge(
-    """The method to use when ordering \`PhotoTag\`."""
-    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PhotoTagsEdge
-
-  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
-  photoByEntityId: Photo
-}
-
-"""All input for the \`deletePhotoTag\` mutation."""
-input DeletePhotoTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`PhotoTag\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""
-All input for the \`deletePhotoTagByEntityKindAndEntityIdAndTag\` mutation.
-"""
-input DeletePhotoTagByEntityKindAndEntityIdAndTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-}
-
-"""The output of our delete \`ProfileTag\` mutation."""
-type DeleteProfileTagPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`ProfileTag\` that was deleted by this mutation."""
-  profileTag: ProfileTag
-  deletedProfileTagId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
-  profileTagEdge(
-    """The method to use when ordering \`ProfileTag\`."""
-    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): ProfileTagsEdge
-
-  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
-  profileByEntityId: Profile
-}
-
-"""All input for the \`deleteProfileTag\` mutation."""
-input DeleteProfileTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`ProfileTag\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""
-All input for the \`deleteProfileTagByEntityKindAndEntityIdAndTag\` mutation.
-"""
-input DeleteProfileTagByEntityKindAndEntityIdAndTagInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
 }`;
 export const objects = {
   Query: {

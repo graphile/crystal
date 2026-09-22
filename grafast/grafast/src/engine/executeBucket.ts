@@ -726,7 +726,7 @@ export function executeBucket(
               } else if (forceIndexValue == null && rejectValue != null) {
                 indexFlags |= FLAG_ERROR;
                 forceIndexValue = rejectValue;
-              } else {
+              } else if ((indexFlags & FLAG_NULL) === FLAG_NULL) {
                 indexFlags |= FLAG_INHIBITED;
               }
               // End "17217999b7a7" block
@@ -948,7 +948,12 @@ export function executeBucket(
             }
             // End "f2b3b1b3" block
 
-            break;
+            if ((indexFlags & FLAG_ERROR) === FLAG_ERROR) {
+              // If we're now flagged as an error, we can stop. Otherwise, even
+              // if we're inhibited, we must keep going - because there might
+              // _also_ be an error.
+              break;
+            }
           }
         }
       } else {
@@ -973,7 +978,7 @@ export function executeBucket(
         if (forceIndexValue == null && rejectValue != null) {
           indexFlags |= FLAG_ERROR;
           forceIndexValue = rejectValue;
-        } else {
+        } else if ((indexFlags & FLAG_NULL) === FLAG_NULL) {
           indexFlags |= FLAG_INHIBITED;
         }
         // End "17217999b7a7" block
@@ -1141,7 +1146,18 @@ export function executeBucket(
       const $sideEffect = step.implicitSideEffectStep;
       if ($sideEffect) {
         if ($sideEffect._isUnary || !step._isUnary) {
-          addDependency($sideEffect, defaultForbiddenFlags, undefined);
+          addDependency(
+            $sideEffect,
+            // An **implicit** side effect dependency should cause steps to error
+            // (by default) if it itself errored; however, if the side effect was
+            // inhibited then further steps should not be impacted - the side
+            // effect never ran. (A side effect saying dependents should be
+            // inhibited, by returning `$$inhibit` itself, should only be
+            // relevant to dependents that _explicitly_ depend on the side
+            // effect, not implicitly by merely following it.)
+            defaultForbiddenFlags & FLAG_ERROR,
+            undefined,
+          );
         }
       }
       if (
