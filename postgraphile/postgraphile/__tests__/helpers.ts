@@ -459,23 +459,28 @@ export async function runTestQuery(
           }
 
           const planResult = grafastPrepare(args);
-          if ("operationPlan" in planResult) {
-            const {
-              variableValuesConstraints,
-              contextConstraints,
-              rootValueConstraints,
-            } = planResult.operationPlan;
-            const actualPlanConstraints =
-              variableValuesConstraints.length +
-              contextConstraints.length +
-              rootValueConstraints.length;
-            const expectedPlanConstraints = config.expectedPlanConstraints ?? 0;
-            if (actualPlanConstraints !== expectedPlanConstraints) {
-              throw new Error(
-                `Expected operation plan to have ${expectedPlanConstraints} constraints; found ${actualPlanConstraints} (variable values: ${variableValuesConstraints.length}, context: ${contextConstraints.length}, root value: ${rootValueConstraints.length}). Override this with '#> expectedPlanConstraints: ${actualPlanConstraints}' in the test header if these constraints are expected.`,
-              );
-            }
+          if (planResult.errors) {
+            throw planResult.errors[0];
           }
+          const { operationPlan } = planResult;
+          const {
+            variableValuesConstraints,
+            contextConstraints,
+            rootValueConstraints,
+          } = operationPlan;
+          const actualPlanConstraints =
+            variableValuesConstraints.length +
+            contextConstraints.length +
+            rootValueConstraints.length;
+          const expectedPlanConstraints = config.expectedPlanConstraints ?? 0;
+          if (actualPlanConstraints !== expectedPlanConstraints) {
+            throw new Error(
+              `Expected operation plan to have ${expectedPlanConstraints} constraints; found ${actualPlanConstraints} (variable values: ${variableValuesConstraints.length}, context: ${contextConstraints.length}, root value: ${rootValueConstraints.length}). Override this with '#> expectedPlanConstraints: ${actualPlanConstraints}' in the test header if these constraints are expected.`,
+            );
+          }
+          expect(operationPlan.hasNoConstraints).toBe(
+            expectedPlanConstraints === 0,
+          );
 
           const execute =
             (options.prepare ?? true)
