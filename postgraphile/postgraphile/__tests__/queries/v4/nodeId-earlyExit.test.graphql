@@ -2,6 +2,7 @@
 #> schema: ["a", "c"]
 #> subscriptions: true
 #> classicIds: true
+#> expectedPlanConstraints: 3
 
 query ($debug: Boolean! = true) {
   allPeople(condition: { name: "Twenty Seventwo" }) @include(if: $debug) {

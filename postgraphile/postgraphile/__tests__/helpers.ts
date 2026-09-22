@@ -19,6 +19,7 @@ import {
   execute as grafastExecute,
   hookArgs,
   noop,
+  prepare as grafastPrepare,
   subscribe as grafastSubscribe,
 } from "grafast";
 import type {
@@ -267,6 +268,11 @@ export async function runTestQuery(
     search_path?: string;
     muteWarnings?: boolean;
     dontLogErrors?: boolean;
+    /**
+     * The expected total number of variable, context and root value
+     * constraints on the operation plan. Defaults to zero.
+     */
+    expectedPlanConstraints?: number;
   },
   options: {
     callback?: (
@@ -450,6 +456,25 @@ export async function runTestQuery(
                 .map((e) => String(e))
                 .join(",")}`,
             );
+          }
+
+          const planResult = grafastPrepare(args);
+          if ("operationPlan" in planResult) {
+            const {
+              variableValuesConstraints,
+              contextConstraints,
+              rootValueConstraints,
+            } = planResult.operationPlan;
+            const actualPlanConstraints =
+              variableValuesConstraints.length +
+              contextConstraints.length +
+              rootValueConstraints.length;
+            const expectedPlanConstraints = config.expectedPlanConstraints ?? 0;
+            if (actualPlanConstraints !== expectedPlanConstraints) {
+              throw new Error(
+                `Expected operation plan to have ${expectedPlanConstraints} constraints; found ${actualPlanConstraints} (variable values: ${variableValuesConstraints.length}, context: ${contextConstraints.length}, root value: ${rootValueConstraints.length}). Override this with '#> expectedPlanConstraints: ${actualPlanConstraints}' in the test header if these constraints are expected.`,
+              );
+            }
           }
 
           const execute =
