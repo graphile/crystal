@@ -41,7 +41,7 @@ export function establishInternalExecutionArgs(
  *
  * @experimental
  */
-export function plan(inArgs: GrafastExecutionArgs): PlanResult {
+export function prepare(inArgs: GrafastExecutionArgs): PlanResult {
   const args = establishInternalExecutionArgs(inArgs);
   const result = _plan(args);
   if (result.errors != null) {
