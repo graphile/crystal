@@ -18,7 +18,7 @@ import type {
   ParseAndValidateEvent,
   ValidateSchemaEvent,
 } from "./interfaces.ts";
-import { establishMiddleware, getGrafastMiddleware } from "./middleware.ts";
+import { establishMiddleware } from "./middleware.ts";
 import { isPromiseLike } from "./utils.ts";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;

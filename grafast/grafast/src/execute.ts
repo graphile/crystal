@@ -12,11 +12,9 @@ import type {
   ExecutionEventEmitter,
   ExecutionEventMap,
   GrafastExecutionArgs,
-  GrafastInternalExecutionArgs,
 } from "./interfaces.ts";
-import { establishMiddleware, getGrafastMiddleware } from "./middleware.ts";
+import { establishMiddleware } from "./middleware.ts";
 import { establishInternalExecutionArgs } from "./plan.ts";
-import type { GrafastOperationOptions } from "./prepare.ts";
 import { grafastPrepare } from "./prepare.ts";
 import { isPromiseLike } from "./utils.ts";
 

@@ -1,7 +1,5 @@
 import { Middleware, orderedApply } from "graphile-config";
 
-import type { GrafastExecutionArgs } from ".";
-
 const $$middleware = Symbol("middleware");
 export function getGrafastMiddleware(
   resolvedPreset: GraphileConfig.ResolvedPreset & {

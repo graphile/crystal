@@ -3,7 +3,6 @@ import type {
   AsyncExecutionResult,
   ExecutionResult,
 } from "graphql/execution/execute.js";
-import { buildExecutionContext } from "graphql/execution/execute.js";
 import { isAsyncIterable } from "iterall";
 
 import * as assert from "./assert.ts";
@@ -59,8 +58,6 @@ import {
 
 const { GraphQLError } = graphql;
 
-const $$bypassGraphQL = Symbol("bypassGraphQL");
-
 export interface GrafastOperationOptions {
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
@@ -97,10 +94,6 @@ export interface GrafastOperationOptions {
    */
   maxPlanningDepth?: number;
 }
-
-const bypassGraphQLObj = Object.assign(Object.create(null), {
-  [$$bypassGraphQL]: true,
-});
 
 function noop() {}
 

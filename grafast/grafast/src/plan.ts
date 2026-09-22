@@ -1,15 +1,16 @@
 import { GraphQLError } from "graphql";
 import { buildExecutionContext } from "graphql/execution/execute.js";
 
-import { $$extensions, type GrafastExecutionArgs } from ".";
-import { type OperationPlan } from "./engine/OperationPlan";
+import { $$extensions } from "./constants.ts";
+import type { OperationPlan } from "./engine/OperationPlan.ts";
 import { establishOperationPlan } from "./establishOperationPlan.ts";
 import type {
   ErrorBehavior,
   EstablishOperationPlanEvent,
+  GrafastExecutionArgs,
   GrafastInternalExecutionArgs,
-} from "./interfaces";
-import { establishMiddleware } from "./middleware";
+} from "./interfaces.ts";
+import { establishMiddleware } from "./middleware.ts";
 
 type PlanResult =
   | { errors: readonly GraphQLError[] }
