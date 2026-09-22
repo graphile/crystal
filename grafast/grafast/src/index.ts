@@ -141,6 +141,7 @@ import { getGrafastMiddleware } from "./middleware.ts";
 import type { Multistep, UnwrapMultistep } from "./multistep.ts";
 import { multistep } from "./multistep.ts";
 import { getNullableInputTypeAtPath } from "./operationPlan-input.ts";
+import { plan } from "./plan.ts";
 import type { ListCapableStep, ListLikeStep, ObjectLikeStep } from "./step.ts";
 import {
   assertExecutableStep,

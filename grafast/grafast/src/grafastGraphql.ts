@@ -18,7 +18,7 @@ import type {
   ParseAndValidateEvent,
   ValidateSchemaEvent,
 } from "./interfaces.ts";
-import { getGrafastMiddleware } from "./middleware.ts";
+import { establishMiddleware, getGrafastMiddleware } from "./middleware.ts";
 import { isPromiseLike } from "./utils.ts";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
@@ -161,14 +161,8 @@ export function grafast(
     typeResolver,
     resolvedPreset,
     requestContext,
-    middleware: rawMiddleware,
   } = args;
-  const middleware =
-    rawMiddleware !== undefined
-      ? rawMiddleware
-      : resolvedPreset != null
-        ? getGrafastMiddleware(resolvedPreset)
-        : null;
+  const middleware = establishMiddleware(args);
 
   // Validate Schema
   const schemaValidationErrors =

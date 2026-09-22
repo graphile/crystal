@@ -841,13 +841,22 @@ export interface GrafastExecutionArgs extends ExecutionArgs {
 }
 
 /** @internal */
-export interface GrafastInternalExecutionArgs extends GrafastExecutionArgs {
-  [$$eventEmitter]?: ExecutionEventEmitter;
-  [$$extensions]?: {
-    explain: {
-      operations: any[];
-    };
-  };
+export interface GrafastInternalExecutionArgs
+  extends GrafastExecutionArgs,
+    GrafastOperationOptions {
+  middleware: Middleware<GraphileConfig.GrafastMiddleware> | null;
+  explain: boolean | string[] | undefined;
+  outputDataAsString: boolean | undefined;
+  timeouts: GrafastTimeouts | undefined;
+  maxPlanningDepth: number | undefined;
+  [$$eventEmitter]?: ExecutionEventEmitter | undefined;
+  [$$extensions]?:
+    | {
+        explain: {
+          operations: any[];
+        };
+      }
+    | undefined;
 }
 
 export interface ValidateSchemaEvent {
@@ -924,3 +933,5 @@ export type Thunk<T> = T | (() => T);
  * GraphQL error behavior, as per https://github.com/graphql/graphql-spec/pull/1163
  */
 export type ErrorBehavior = "PROPAGATE" | "NULL" | "HALT";
+
+export type RequireAllKeys<T> = { [P in keyof Required<T>]: T[P] | undefined };

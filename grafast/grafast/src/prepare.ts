@@ -38,10 +38,8 @@ import {
   getChildBucketAndIndex,
   getDirectLayerPlanChild,
 } from "./engine/OutputPlan.ts";
-import { establishOperationPlan } from "./establishOperationPlan.ts";
 import type {
   ErrorBehavior,
-  EstablishOperationPlanEvent,
   GrafastInternalExecutionArgs,
   GrafastTimeouts,
   JSONValue,
@@ -49,6 +47,7 @@ import type {
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.ts";
+import { _plan } from "./plan.ts";
 import { timeSource } from "./timeSource.ts";
 import {
   abortable,
@@ -592,94 +591,22 @@ function executePreemptive(
   }
 }
 
-function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
-  return establishOperationPlan(
-    event.schema,
-    event.operation,
-    event.fragments,
-    event.variableValues,
-    event.context as any,
-    event.rootValue,
-    event.onError,
-    event.options,
-  );
-}
-
 /**
  * @internal
  */
 export function grafastPrepare(
   args: GrafastInternalExecutionArgs,
-  options: GrafastOperationOptions,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  const {
-    schema,
-    contextValue: context,
-    rootValue,
-    // operationName,
-    // document,
-    middleware,
-  } = args;
-  const exeContext = buildExecutionContext(args);
-
-  // If a list of errors was returned, abort
-  if (Array.isArray(exeContext) || "length" in exeContext) {
-    return Object.assign(Object.create(bypassGraphQLObj), {
-      errors: exeContext,
-      extensions: args[$$extensions],
-    });
+  const planResult = _plan(args);
+  if (planResult.errors != null) {
   }
-
-  const { operation, fragments, variableValues } = exeContext;
-  // TODO: update this when GraphQL.js gets support for onError
-  const onError = args.onError ?? "PROPAGATE";
-
-  let operationPlan!: OperationPlan;
-  try {
-    if (middleware != null) {
-      operationPlan = middleware.runSync(
-        "establishOperationPlan",
-        {
-          schema,
-          operation,
-          fragments,
-          variableValues,
-          context: context as any,
-          rootValue,
-          onError,
-          args,
-          options,
-        },
-        establishOperationPlanFromEvent,
-      );
-    } else {
-      operationPlan = establishOperationPlan(
-        schema,
-        operation,
-        fragments,
-        variableValues,
-        context as any,
-        rootValue,
-        onError,
-        options,
-      );
-    }
-  } catch (error) {
-    const graphqlError =
-      error instanceof GraphQLError
-        ? error
-        : new GraphQLError(error.message, {
-            originalError: error,
-            extensions: error.extensions ?? null,
-          });
-    return { errors: [graphqlError] };
-  }
+  const { operationPlan, variableValues, onError } = planResult;
 
   if (
-    options.explain === true ||
-    (options.explain && options.explain.includes("plan"))
+    args.explain === true ||
+    (args.explain && args.explain.includes("plan"))
   ) {
     // Only build the plan once
     if (operationPlan[$$contextPlanCache] == null) {
@@ -692,7 +619,7 @@ export function grafastPrepare(
     });
   }
 
-  const executionTimeout = options.timeouts?.execution ?? null;
+  const executionTimeout = args.timeouts?.execution ?? null;
   const abortController = new AbortController();
   try {
     const result = executePreemptive(
@@ -700,7 +627,7 @@ export function grafastPrepare(
       operationPlan,
       variableValues,
       onError,
-      options.outputDataAsString ?? false,
+      args.outputDataAsString ?? false,
       executionTimeout,
       abortController.signal,
     );
