@@ -601,6 +601,8 @@ export function grafastPrepare(
 > {
   const planResult = _plan(args);
   if (planResult.errors != null) {
+    const { errors } = planResult;
+    return { errors };
   }
   const { operationPlan, variableValues, onError } = planResult;
 
