@@ -14,7 +14,7 @@ async function execute(
   return result as ExecutionResult;
 }
 
-it("currently warns and silently nulls a non-array list result", async () => {
+it("reports a non-array list result", async () => {
   const schema = makeGrafastSchema({
     typeDefs: "type Query { values: [String] }",
     objects: {
@@ -24,15 +24,8 @@ it("currently warns and silently nulls a non-array list result", async () => {
     },
   });
 
-  const warnings: unknown[][] = [];
-  const originalWarn = console.warn;
-  console.warn = (...args: unknown[]) => warnings.push(args);
-  try {
-    const result = await execute(schema, "{ values }");
-    expect(result.data).to.deep.equal({ values: null });
-    expect(result.errors).to.equal(undefined);
-    expect(warnings).to.have.length(1);
-  } finally {
-    console.warn = originalWarn;
-  }
+  const result = await execute(schema, "{ values }");
+  expect(result.data).to.deep.equal({ values: null });
+  expect(result.errors).to.have.length(1);
+  expect(result.errors![0].path).to.deep.equal(["values"]);
 });
