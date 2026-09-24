@@ -27,5 +27,8 @@ it("reports a non-array list result", async () => {
   const result = await execute(schema, "{ values }");
   expect(result.data).to.deep.equal({ values: null });
   expect(result.errors).to.have.length(1);
+  expect(result.errors![0].message).to.equal(
+    "Expected an array for list completion.",
+  );
   expect(result.errors![0].path).to.deep.equal(["values"]);
 });
