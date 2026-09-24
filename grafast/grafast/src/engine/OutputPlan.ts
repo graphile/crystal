@@ -1183,14 +1183,14 @@ function makeArrayExecutor<TAsString extends boolean>(
       bucketRootFlags,
     ) {
       if (!Array.isArray(bucketRootValue)) {
-        console.warn(
-          `${this} Hit fallback for value ${inspect(
-            bucketRootValue,
-          )} coercion to mode 'array'`,
-        );
-        return (asString ? "null" : null) as TAsString extends true
-          ? string
-          : JSONValue;
+        if (isDev) {
+          console.warn(
+            `${this} Hit fallback for value ${inspect(
+              bucketRootValue,
+            )} coercion to mode 'array'`,
+          );
+        }
+        throw new GraphQLError("Expected an array for list completion.");
       }
 
       if (this.child === null) {
