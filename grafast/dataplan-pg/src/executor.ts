@@ -222,13 +222,19 @@ function queueMatches(
   );
 }
 
-function addToQueue(queue: QueryQueue, item: QueuedQuery): void {
+function addToQueue(
+  queue: QueryQueue,
+  item: QueuedQuery,
+  justSignatures = false,
+): void {
   if (item.name !== undefined) queue.names.add(item.name);
   if (item.affinity !== undefined) queue.affinities.add(item.affinity);
   queue.signatures.add(item.signature);
-  if (queue.last !== undefined) queue.last.next = item;
-  else queue.first = item;
-  queue.last = item;
+  if (justSignatures === false) {
+    if (queue.last !== undefined) queue.last.next = item;
+    else queue.first = item;
+    queue.last = item;
+  }
 }
 
 function takeFromQueue(queue: QueryQueue): QueuedQuery | undefined {
@@ -248,9 +254,7 @@ function takePending(
   const l = pending.length;
   if (l === 0) return undefined;
   const first = pending[0]!;
-  if (skipAddingToQueue === false) {
-    addToQueue(queue, first);
-  }
+  addToQueue(queue, first, skipAddingToQueue);
 
   // Compact in place, preserving FIFO order for both matching and remaining
   // work. A newly matched item may make further names/signatures/affinities eligible.
