@@ -330,9 +330,9 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     client: GraphileConfig.DataplanPgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
-    name?: string,
-    publish?: PublishFunction,
-    isMutation = false,
+    name: string | undefined,
+    publish: PublishFunction | undefined,
+    isMutation: boolean,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -479,7 +479,14 @@ ${duration}
     // deferreds further, DataLoader-style, and running one SQL query for
     // everything.
     return await context.withPgClient(context.pgSettings, (client) =>
-      this._executeWithClient<TData>(client, text, values, name, publish),
+      this._executeWithClient<TData>(
+        client,
+        text,
+        values,
+        name,
+        publish,
+        false,
+      ),
     );
   }
 
@@ -569,6 +576,7 @@ ${duration}
                   item.values,
                   item.name,
                   item.publish,
+                  false,
                 );
                 item.resolve(result);
               } catch (error) {
@@ -612,7 +620,14 @@ ${duration}
     return context.withPgClient<T>(context.pgSettings, (baseClient) =>
       baseClient.withTransaction((transactionClient) => {
         const execute: ExecuteFunction = (text, values) =>
-          this._executeWithClient(transactionClient, text, values);
+          this._executeWithClient(
+            transactionClient,
+            text,
+            values,
+            undefined, // TODO: add 'name' to args?
+            undefined,
+            false,
+          );
         return callback(execute);
       }),
     );
