@@ -477,6 +477,16 @@ ${duration}
     );
   }
 
+  private getQueueState(context: PgExecutorContext) {
+    const existing = this.queryQueues.get(context);
+    if (existing) {
+      return existing;
+    }
+    const state: QueryQueueState = { queues: new Set(), pending: [] };
+    this.queryQueues.set(context, state);
+    return state;
+  }
+
   private _executeQueued<TData>(
     context: PgExecutorContext,
     text: string,
@@ -486,11 +496,10 @@ ${duration}
     affinity: symbol | undefined,
   ): Promise<PgClientResult<TData>> {
     return new Promise<PgClientResult<TData>>((resolve, reject) => {
-      const signature = getSignature(text);
       const item: QueuedQuery = {
         name,
         affinity,
-        signature,
+        signature: getSignature(text),
         next: undefined,
         text,
         values,
@@ -498,15 +507,11 @@ ${duration}
         resolve,
         reject,
       };
-      let state = this.queryQueues.get(context);
-      if (!state) {
-        state = { queues: new Set(), pending: [] };
-        this.queryQueues.set(context, state);
-      }
 
+      const state = this.getQueueState(context);
       const { queues } = state;
-      // Prefer clones of the same select, then identical SQL.
-      let queue = setFind(queues, (q) => queueMatches(q, item));
+      let queue =
+        queues.size > 0 && setFind(queues, (q) => queueMatches(q, item));
       if (queue === undefined && queues.size < this.maxClientQueues) {
         const newQueue: QueryQueue = {
           names: new Set(),
@@ -519,9 +524,8 @@ ${duration}
         queue = newQueue;
         queues.add(newQueue);
         // Wait one microtask so other ready steps can join before borrowing.
-        const queueState = state;
         queueMicrotask(
-          () => void this._drainQueryQueue(context, newQueue, queueState),
+          () => void this._drainQueryQueue(context, newQueue, state),
         );
       }
 
