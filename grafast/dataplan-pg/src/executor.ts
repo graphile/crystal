@@ -560,7 +560,7 @@ ${duration}
         queue.first !== undefined ||
         takePending(queue, pending, false) !== undefined
       ) {
-        let queryFailed = false;
+        let firstItemTaken = false;
         try {
           await context.withPgClient(context.pgSettings, async (client) => {
             while (true) {
@@ -570,6 +570,7 @@ ${duration}
                 if (item === undefined) break;
               }
               try {
+                firstItemTaken = true;
                 const result = await this._executeWithClient(
                   client,
                   item.text,
@@ -580,7 +581,6 @@ ${duration}
                 );
                 item.resolve(result);
               } catch (error) {
-                queryFailed = true;
                 item.reject(error);
                 // The adapter must roll back before we run another query.
                 throw error;
@@ -588,7 +588,7 @@ ${duration}
             }
           });
         } catch (error) {
-          if (!queryFailed) {
+          if (!firstItemTaken) {
             // Connection acquisition or setup failed; a fresh lease is not
             // known to help, so reject the remaining work.
             let item: QueuedQuery | undefined;
@@ -598,17 +598,28 @@ ${duration}
             // Other queues can still drain pending work. If this is the last
             // queue, nothing else can take it, so reject it too.
             if (queues.size === 1) {
-              for (const item of pending.splice(0)) item.reject(error);
+              const toReject = pending.splice(0);
+              for (const item of toReject) {
+                item.reject(error);
+              }
             }
+            // Cannot continue
             break;
+          } else {
+            // After an SQL or COMMIT error, the adapter has released the
+            // client. The remaining work gets a new client on the next loop.
           }
-          // After a SQL error, the adapter has rolled back and released the
-          // client. The remaining work gets a new lease on the next loop.
         }
       }
     } finally {
       queue.closed = true;
       queues.delete(queue);
+      if (queue.first !== undefined || queue.last !== undefined) {
+        console.error(
+          `Fatal @dataplan/pg consistency error: queue completed but still thinks it has a first or last item`,
+        );
+        process.exit(1);
+      }
       if (queues.size === 0) this.queryQueues.delete(context);
     }
   }
