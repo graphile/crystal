@@ -183,7 +183,9 @@ type QueuedQuery = {
 };
 
 type QueryQueue = {
+  /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
   signatures: Set<string>;
+  /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
   affinities: Set<symbol>;
   items: QueuedQuery[];
   size: number;
