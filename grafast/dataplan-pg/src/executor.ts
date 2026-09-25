@@ -22,6 +22,8 @@ import type { SQLRawValue } from "pg-sql2";
 import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
 import { setFind } from "./utils.ts";
 
+const DEFAULT_MAX_CLIENT_QUEUES = 3;
+
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);
 
@@ -208,8 +210,6 @@ function getSignature(text: string): string {
   return text; // TODO: make signature smarter
 }
 
-const MAX_CLIENT_QUEUES = 3;
-
 function queueMatches(
   queue: QueryQueue,
   item: Pick<QueuedQuery, "name" | "signature" | "affinity">,
@@ -286,17 +286,25 @@ export type PgExecutorSubscribeOptions = {
 export class PgExecutor<const TName extends string = string, TSettings = any> {
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
+  private maxClientQueues: number;
   private $$cache: symbol;
-  private queryQueues = new WeakMap<PgExecutorContext, QueryQueueState>();
+  private queryQueues: WeakMap<PgExecutorContext, QueryQueueState>;
 
   constructor(options: {
     name: TName;
     context: () => Step<PgExecutorContext<TSettings>>;
+    maxClientQueues?: number;
   }) {
-    const { name, context } = options;
+    const {
+      name,
+      context,
+      maxClientQueues = DEFAULT_MAX_CLIENT_QUEUES,
+    } = options;
     this.name = name;
-    this.$$cache = Symbol(this.name + "_cache");
     this.contextCallback = context;
+    this.maxClientQueues = maxClientQueues;
+    this.$$cache = Symbol(this.name + "_cache");
+    this.queryQueues = new WeakMap();
   }
 
   public toString(): string {
@@ -500,7 +508,7 @@ ${duration}
         !q.closed &&
         queueMatches(q, { name, affinity: executionAffinity, signature }),
     );
-    if (!queue && queues.size < MAX_CLIENT_QUEUES) {
+    if (!queue && queues.size < this.maxClientQueues) {
       const newQueue: QueryQueue = {
         names: new Set(),
         affinities: new Set(),
