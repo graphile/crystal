@@ -176,13 +176,13 @@ export type PgExecutorOptions = {
 };
 
 type QueuedQuery = {
-  next?: QueuedQuery;
-  text: string;
+  name: string | undefined;
+  affinity: symbol | undefined;
   signature: string;
-  affinity?: symbol;
+  next: QueuedQuery | undefined;
+  text: string;
   values: ReadonlyArray<SQLRawValue>;
-  name?: string;
-  publish?: PublishFunction;
+  publish: PublishFunction | undefined;
   resolve: (result: PgClientResult<any>) => void;
   reject: (error: unknown) => void;
 };
@@ -194,9 +194,9 @@ type QueryQueue = {
   affinities: Set<symbol>;
   /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
   signatures: Set<string>;
-  first?: QueuedQuery;
-  last?: QueuedQuery;
   closed: boolean;
+  first: QueuedQuery | undefined;
+  last: QueuedQuery | undefined;
 };
 
 type QueryQueueState = {
@@ -498,7 +498,7 @@ ${duration}
       queues,
       (q) =>
         !q.closed &&
-        queueMatches(q, { signature, affinity: executionAffinity }),
+        queueMatches(q, { name, affinity: executionAffinity, signature }),
     );
     if (!queue && queues.size < MAX_CLIENT_QUEUES) {
       const newQueue: QueryQueue = {
@@ -506,6 +506,8 @@ ${duration}
         affinities: new Set(),
         signatures: new Set(),
         closed: false,
+        first: undefined,
+        last: undefined,
       };
       queue = newQueue;
       queues.add(newQueue);
@@ -517,12 +519,13 @@ ${duration}
     }
 
     return new Promise<PgClientResult<TData>>((resolve, reject) => {
-      const item = {
-        text,
-        signature,
-        affinity: executionAffinity,
-        values,
+      const item: QueuedQuery = {
         name,
+        affinity: executionAffinity,
+        signature,
+        next: undefined,
+        text,
+        values,
         publish,
         resolve,
         reject,
