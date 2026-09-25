@@ -1,9 +1,10 @@
 import { execute } from "grafast";
-import { parse } from "grafast/graphql";
+import { ExecutionResult, parse } from "grafast/graphql";
 import { Pool } from "pg";
 
-import { PgExecutor } from "../dist/executor.js";
+import { EXPORTABLE } from "../src/datasource.ts";
 import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
+import { PgExecutor } from "../src/executor.ts";
 import type { PgClientQuery, WithPgClient } from "../src/index.ts";
 import {
   createTestDatabase,
@@ -22,7 +23,7 @@ test("a connection page and totalCount share one client lease", async () => {
         leases++;
         return withPgClient(pgSettings, callback);
       };
-      const result = await execute({
+      const result = (await execute({
         schema: makeExampleSchema(),
         document: parse(`
           {
@@ -36,7 +37,7 @@ test("a connection page and totalCount share one client lease", async () => {
           pgSettings: { "app.test_setting": "queue" },
           withPgClient: countedWithPgClient,
         },
-      });
+      })) as ExecutionResult<any, any>;
 
       expect(result.errors).toBeUndefined();
       expect(result.data?.allMessagesConnection?.totalCount).toBe(6);
@@ -63,7 +64,7 @@ test("root fields with the same SQL share a prepared statement client", async ()
         leases++;
         return withPgClient(pgSettings, callback);
       };
-      const result = await execute({
+      const result = (await execute({
         schema: makeExampleSchema(),
         document: parse(`
           {
@@ -81,7 +82,7 @@ test("root fields with the same SQL share a prepared statement client", async ()
           pgSettings: { "app.test_setting": "queue" },
           withPgClient: countedWithPgClient,
         },
-      });
+      })) as ExecutionResult<any, any>;
 
       expect(result.errors).toBeUndefined();
       expect(result.data?.featured?.nodes).toHaveLength(1);

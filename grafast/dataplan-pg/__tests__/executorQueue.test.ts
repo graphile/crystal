@@ -1,3 +1,4 @@
+import { EXPORTABLE } from "../dist/datasource.js";
 import { PgExecutor } from "../dist/executor.js";
 
 function makeExecutor() {
