@@ -465,8 +465,8 @@ ${duration}
     context: PgExecutorContext,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
-    name?: string,
-    publish?: PublishFunction,
+    name: string | undefined,
+    publish: PublishFunction | undefined,
   ) {
     // PERF: we could probably make this more efficient by grouping the
     // deferreds further, DataLoader-style, and running one SQL query for
@@ -480,9 +480,9 @@ ${duration}
     context: PgExecutorContext,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
-    name?: string,
-    publish?: PublishFunction,
-    executionAffinity?: symbol,
+    name: string | undefined,
+    publish: PublishFunction | undefined,
+    executionAffinity: symbol | undefined,
   ): Promise<PgClientResult<TData>> {
     let state = this.queryQueues.get(context);
     if (!state) {
