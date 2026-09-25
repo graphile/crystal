@@ -209,13 +209,25 @@ test("keeps a large clone-affinity batch on one client", async () => {
 
 test("limits unrelated queues to three and groups matching pending work", async () => {
   const executor = makeExecutor();
-  const { context, seen, withPgClient } = makeContext(async (opts) => ({
-    rows: [[opts.values[0]]],
-    rowCount: 1,
-  }));
+  const firstThreeStarted = Promise.withResolvers<void>();
+  const lastPendingStarted = Promise.withResolvers<void>();
+  const releaseFirst = Promise.withResolvers<void>();
+  const releaseOthers = Promise.withResolvers<void>();
+  let started = 0;
+  const executionOrder: string[] = [];
+  const { context, seen, withPgClient } = makeContext(async (opts) => {
+    const value = opts.values[0] as string;
+    executionOrder.push(value);
+    if (value === "f") lastPendingStarted.resolve();
+    if (value === "a" || value === "b" || value === "c") {
+      if (++started === 3) firstThreeStarted.resolve();
+      await (value === "a" ? releaseFirst : releaseOthers).promise;
+    }
+    return { rows: [[value]], rowCount: 1 };
+  });
   const affinity = Symbol("pending clone");
 
-  const results = await Promise.all([
+  const resultsPromise = Promise.all([
     run(executor, context, "select a", "a"),
     run(executor, context, "select b", "b"),
     run(executor, context, "select c", "c"),
@@ -225,6 +237,12 @@ test("limits unrelated queues to three and groups matching pending work", async 
     run(executor, context, "select d", "d3"),
     run(executor, context, "select f", "f"),
   ]);
+
+  await firstThreeStarted.promise;
+  releaseFirst.resolve();
+  await lastPendingStarted.promise;
+  releaseOthers.resolve();
+  const results = await resultsPromise;
 
   expect(results.map((r) => r.values[0][0][0])).toEqual([
     "a",
@@ -242,6 +260,9 @@ test("limits unrelated queues to three and groups matching pending work", async 
   expect(new Set(dQueries.map(({ clientNumber }) => clientNumber)).size).toBe(
     1,
   );
+  expect(
+    executionOrder.filter((value) => !["a", "b", "c"].includes(value)),
+  ).toEqual(["d1", "d2", "d3", "e", "f"]);
 });
 
 test("joins a matching queue even when all three client slots are occupied", async () => {
