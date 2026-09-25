@@ -1315,7 +1315,7 @@ export class PgSelectStep<
               rawSqlValues,
               identifierIndex,
               name,
-              executionAffinity: this.executionAffinity,
+              affinity: this.executionAffinity,
               eventEmitter,
               useTransaction: isMutation,
             })

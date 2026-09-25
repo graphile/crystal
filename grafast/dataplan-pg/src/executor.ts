@@ -134,7 +134,6 @@ export interface WithPgClient<
 /**
  * Identity scopes cached read results and in-flight client queues. A batch of
  * requests can share this object; create a new one when fresh reads are needed.
- * Do not mutate its settings or client callback while it is in use.
  */
 export type PgExecutorContext<
   TSettings = any,
@@ -164,8 +163,11 @@ export type PgExecutorOptions = {
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
   name?: string;
-  /** Clones of a select share this even when their SQL text differs. */
-  executionAffinity?: symbol;
+  /**
+   * Execution requests that share the same affinity hint that they should be
+   * executed on the same connection.
+   */
+  affinity?: symbol;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
 };
@@ -716,7 +718,7 @@ ${duration}
                       sqlValues,
                       name,
                       publishExecute,
-                      common.executionAffinity,
+                      common.affinity,
                     )
                   : await this._execute<TOutput>(
                       context,

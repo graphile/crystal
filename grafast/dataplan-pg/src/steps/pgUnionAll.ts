@@ -1049,7 +1049,7 @@ on (${sql.indent(
       rawSqlValues,
       identifierIndex,
       name,
-      executionAffinity: this.executionAffinity,
+      affinity: this.executionAffinity,
       eventEmitter,
       useTransaction: false,
     });
