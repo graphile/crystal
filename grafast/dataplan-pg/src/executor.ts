@@ -240,14 +240,15 @@ function takeFromQueue(queue: QueryQueue): QueuedQuery | undefined {
 }
 
 function takePending(queue: QueryQueue, pending: QueuedQuery[]): boolean {
-  const first = pending[0];
-  if (first === undefined) return false;
+  const l = pending.length;
+  if (l === 0) return false;
+  const first = pending[0]!;
   addToQueue(queue, first);
 
   // Compact in place, preserving FIFO order for both matching and remaining
   // work. A newly matched item may make further names/signatures/affinities eligible.
   let remaining = 0;
-  for (let i = 1; i < pending.length; i++) {
+  for (let i = 1; i < l; i++) {
     const item = pending[i];
     if (queueMatches(queue, item)) {
       addToQueue(queue, item);
@@ -255,6 +256,7 @@ function takePending(queue: QueryQueue, pending: QueuedQuery[]): boolean {
       pending[remaining++] = item;
     }
   }
+  // Truncate
   pending.length = remaining;
   return true;
 }
