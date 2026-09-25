@@ -166,6 +166,8 @@ export interface PgUnionAllStepConfig<
   /** @internal */
   _internalCloneSymbol?: symbol | string;
   /** @internal */
+  _internalCloneExecutionAffinity?: symbol;
+  /** @internal */
   _internalCloneAlias?: SQL;
 }
 
@@ -489,6 +491,11 @@ export class PgUnionAllStep<
   private connectionDepId: number | null = null;
 
   public readonly mode: PgUnionAllMode;
+  /**
+   * Used to indicate that clones and related queries should execute via the
+   * same connection to encourage data consistency.
+   */
+  private executionAffinity: symbol | undefined;
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
@@ -508,6 +515,9 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>, mode = cloneFrom.mode) {
+    // Associate cloned steps to the same connection
+    cloneFrom.executionAffinity ??= Symbol(cloneFrom.spec.name);
+
     const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
     const $clone = new PgUnionAllStep({
       ...cloneFrom.spec,
@@ -517,6 +527,7 @@ export class PgUnionAllStep<
 
       _internalCloneSymbol: cloneFrom.symbol,
       _internalCloneAlias: cloneFrom.alias,
+      _internalCloneExecutionAffinity: cloneFrom.executionAffinity,
     });
 
     if ($clone.dependencyCount !== 0) {
@@ -578,6 +589,7 @@ export class PgUnionAllStep<
         );
       }
       this.spec = spec;
+      this.executionAffinity = spec._internalCloneExecutionAffinity;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -1043,6 +1055,7 @@ on (${sql.indent(
       rawSqlValues,
       identifierIndex,
       name,
+      affinity: this.executionAffinity,
       eventEmitter,
       useTransaction: false,
     });

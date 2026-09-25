@@ -399,153 +399,6 @@ left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compo
 on TRUE
 left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE
-order by __types__."id" asc;
-
-select
-  __types__."id"::text as "0",
-  __types__."smallint"::text as "1",
-  __types__."bigint"::text as "2",
-  __types__."numeric"::text as "3",
-  __types__."decimal"::text as "4",
-  __types__."boolean"::text as "5",
-  __types__."varchar" as "6",
-  __types__."enum"::text as "7",
-  __types__."enum_array"::text as "8",
-  __types__."domain"::text as "9",
-  __types__."domain2"::text as "10",
-  __types__."text_array"::text as "11",
-  __types__."json"::text as "12",
-  __types__."jsonb"::text as "13",
-  __types__."nullable_range"::text as "14",
-  __types__."numrange"::text as "15",
-  json_build_array(
-    lower_inc(__types__."daterange"),
-    to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
-    to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
-    upper_inc(__types__."daterange"),
-    isempty(__types__."daterange")
-  )::text as "16",
-  __types__."an_int_range"::text as "17",
-  to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
-  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
-  to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
-  to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
-  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
-  to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
-  array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest(__types__."interval_array") __entry__
-  )::text as "24",
-  __types__."money"::numeric::text as "25",
-  __types__."point"::text as "26",
-  __types__."nullablePoint"::text as "27",
-  __types__."inet"::text as "28",
-  __types__."cidr"::text as "29",
-  __types__."macaddr"::text as "30",
-  __types__."oid"::text as "31",
-  __types__."regproc"::text as "32",
-  __types__."regprocedure"::text as "33",
-  __types__."regoper"::text as "34",
-  __types__."regoperator"::text as "35",
-  __types__."regclass"::text as "36",
-  __types__."regtype"::text as "37",
-  __types__."regconfig"::text as "38",
-  __types__."regdictionary"::text as "39",
-  __types__."text_array_domain"::text as "40",
-  __types__."int8_array_domain"::text as "41",
-  __types__."bytea"::text as "42",
-  __types__."bytea_array"::text as "43",
-  __types__."ltree"::text as "44",
-  __types__."ltree_array"::text as "45",
-  __post__."id"::text as "46",
-  __post__."headline" as "47",
-  __post_2."id"::text as "48",
-  __post_2."headline" as "49",
-  __frmcdc_compound_type__."a"::text as "50",
-  __frmcdc_compound_type__."b" as "51",
-  __frmcdc_compound_type__."c"::text as "52",
-  __frmcdc_compound_type__."d" as "53",
-  __frmcdc_compound_type__."e"::text as "54",
-  __frmcdc_compound_type__."f"::text as "55",
-  __frmcdc_compound_type__."foo_bar"::text as "56",
-  (not (__frmcdc_compound_type__ is null))::text as "57",
-  (
-    select array[
-      __frmcdc_nested_compound_type__."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type__ is null))::text,
-      __frmcdc_compound_type_2."a"::text,
-      __frmcdc_compound_type_2."b",
-      __frmcdc_compound_type_2."c"::text,
-      __frmcdc_compound_type_2."d",
-      __frmcdc_compound_type_2."e"::text,
-      __frmcdc_compound_type_2."f"::text,
-      __frmcdc_compound_type_2."foo_bar"::text,
-      (not (__frmcdc_compound_type_2 is null))::text,
-      __frmcdc_compound_type_3."a"::text,
-      __frmcdc_compound_type_3."b",
-      __frmcdc_compound_type_3."c"::text,
-      __frmcdc_compound_type_3."d",
-      __frmcdc_compound_type_3."e"::text,
-      __frmcdc_compound_type_3."f"::text,
-      __frmcdc_compound_type_3."foo_bar"::text,
-      (not (__frmcdc_compound_type_3 is null))::text
-    ]::text[]
-    from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
-    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
-    on TRUE
-  )::text as "58",
-  __frmcdc_compound_type_4."a"::text as "59",
-  __frmcdc_compound_type_4."b" as "60",
-  __frmcdc_compound_type_4."c"::text as "61",
-  __frmcdc_compound_type_4."d" as "62",
-  __frmcdc_compound_type_4."e"::text as "63",
-  __frmcdc_compound_type_4."f"::text as "64",
-  __frmcdc_compound_type_4."foo_bar"::text as "65",
-  (not (__frmcdc_compound_type_4 is null))::text as "66",
-  (
-    select array[
-      __frmcdc_nested_compound_type_2."baz_buz"::text,
-      (not (__frmcdc_nested_compound_type_2 is null))::text,
-      __frmcdc_compound_type_5."a"::text,
-      __frmcdc_compound_type_5."b",
-      __frmcdc_compound_type_5."c"::text,
-      __frmcdc_compound_type_5."d",
-      __frmcdc_compound_type_5."e"::text,
-      __frmcdc_compound_type_5."f"::text,
-      __frmcdc_compound_type_5."foo_bar"::text,
-      (not (__frmcdc_compound_type_5 is null))::text,
-      __frmcdc_compound_type_6."a"::text,
-      __frmcdc_compound_type_6."b",
-      __frmcdc_compound_type_6."c"::text,
-      __frmcdc_compound_type_6."d",
-      __frmcdc_compound_type_6."e"::text,
-      __frmcdc_compound_type_6."f"::text,
-      __frmcdc_compound_type_6."foo_bar"::text,
-      (not (__frmcdc_compound_type_6 is null))::text
-    ]::text[]
-    from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
-    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
-    on TRUE
-    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
-    on TRUE
-  )::text as "67"
-from "b"."types" as __types__
-left outer join "a"."post" as __post__
-on (
-/* WHERE becoming ON */ (
-  __post__."id" = __types__."id"
-))
-left outer join "a"."post" as __post_2
-on (
-/* WHERE becoming ON */ (
-  __post_2."id" = __types__."smallint"
-))
-left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
 where (
   __types__."id" = $1::"int4"
 );
@@ -841,6 +694,153 @@ left outer join lateral (select (__type_function_list__."compound_type").*) as _
 on TRUE
 left outer join lateral (select (__type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE;
+
+select
+  __types__."id"::text as "0",
+  __types__."smallint"::text as "1",
+  __types__."bigint"::text as "2",
+  __types__."numeric"::text as "3",
+  __types__."decimal"::text as "4",
+  __types__."boolean"::text as "5",
+  __types__."varchar" as "6",
+  __types__."enum"::text as "7",
+  __types__."enum_array"::text as "8",
+  __types__."domain"::text as "9",
+  __types__."domain2"::text as "10",
+  __types__."text_array"::text as "11",
+  __types__."json"::text as "12",
+  __types__."jsonb"::text as "13",
+  __types__."nullable_range"::text as "14",
+  __types__."numrange"::text as "15",
+  json_build_array(
+    lower_inc(__types__."daterange"),
+    to_char(lower(__types__."daterange"), 'YYYY-MM-DD'::text),
+    to_char(upper(__types__."daterange"), 'YYYY-MM-DD'::text),
+    upper_inc(__types__."daterange"),
+    isempty(__types__."daterange")
+  )::text as "16",
+  __types__."an_int_range"::text as "17",
+  to_char(__types__."timestamp", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "18",
+  to_char(__types__."timestamptz", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "19",
+  to_char(__types__."date", 'YYYY-MM-DD'::text) as "20",
+  to_char(date '1970-01-01' + __types__."time", 'HH24:MI:SS.US'::text) as "21",
+  to_char(date '1970-01-01' + __types__."timetz", 'HH24:MI:SS.USTZH:TZM'::text) as "22",
+  to_char(__types__."interval", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "23",
+  array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+    from unnest(__types__."interval_array") __entry__
+  )::text as "24",
+  __types__."money"::numeric::text as "25",
+  __types__."point"::text as "26",
+  __types__."nullablePoint"::text as "27",
+  __types__."inet"::text as "28",
+  __types__."cidr"::text as "29",
+  __types__."macaddr"::text as "30",
+  __types__."oid"::text as "31",
+  __types__."regproc"::text as "32",
+  __types__."regprocedure"::text as "33",
+  __types__."regoper"::text as "34",
+  __types__."regoperator"::text as "35",
+  __types__."regclass"::text as "36",
+  __types__."regtype"::text as "37",
+  __types__."regconfig"::text as "38",
+  __types__."regdictionary"::text as "39",
+  __types__."text_array_domain"::text as "40",
+  __types__."int8_array_domain"::text as "41",
+  __types__."bytea"::text as "42",
+  __types__."bytea_array"::text as "43",
+  __types__."ltree"::text as "44",
+  __types__."ltree_array"::text as "45",
+  __post__."id"::text as "46",
+  __post__."headline" as "47",
+  __post_2."id"::text as "48",
+  __post_2."headline" as "49",
+  __frmcdc_compound_type__."a"::text as "50",
+  __frmcdc_compound_type__."b" as "51",
+  __frmcdc_compound_type__."c"::text as "52",
+  __frmcdc_compound_type__."d" as "53",
+  __frmcdc_compound_type__."e"::text as "54",
+  __frmcdc_compound_type__."f"::text as "55",
+  __frmcdc_compound_type__."foo_bar"::text as "56",
+  (not (__frmcdc_compound_type__ is null))::text as "57",
+  (
+    select array[
+      __frmcdc_nested_compound_type__."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type__ is null))::text,
+      __frmcdc_compound_type_2."a"::text,
+      __frmcdc_compound_type_2."b",
+      __frmcdc_compound_type_2."c"::text,
+      __frmcdc_compound_type_2."d",
+      __frmcdc_compound_type_2."e"::text,
+      __frmcdc_compound_type_2."f"::text,
+      __frmcdc_compound_type_2."foo_bar"::text,
+      (not (__frmcdc_compound_type_2 is null))::text,
+      __frmcdc_compound_type_3."a"::text,
+      __frmcdc_compound_type_3."b",
+      __frmcdc_compound_type_3."c"::text,
+      __frmcdc_compound_type_3."d",
+      __frmcdc_compound_type_3."e"::text,
+      __frmcdc_compound_type_3."f"::text,
+      __frmcdc_compound_type_3."foo_bar"::text,
+      (not (__frmcdc_compound_type_3 is null))::text
+    ]::text[]
+    from (select (__types__."nested_compound_type").*) as __frmcdc_nested_compound_type__
+    left outer join lateral (select (__frmcdc_nested_compound_type__."a").*) as __frmcdc_compound_type_2
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
+    on TRUE
+  )::text as "58",
+  __frmcdc_compound_type_4."a"::text as "59",
+  __frmcdc_compound_type_4."b" as "60",
+  __frmcdc_compound_type_4."c"::text as "61",
+  __frmcdc_compound_type_4."d" as "62",
+  __frmcdc_compound_type_4."e"::text as "63",
+  __frmcdc_compound_type_4."f"::text as "64",
+  __frmcdc_compound_type_4."foo_bar"::text as "65",
+  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_nested_compound_type_2."baz_buz"::text,
+      (not (__frmcdc_nested_compound_type_2 is null))::text,
+      __frmcdc_compound_type_5."a"::text,
+      __frmcdc_compound_type_5."b",
+      __frmcdc_compound_type_5."c"::text,
+      __frmcdc_compound_type_5."d",
+      __frmcdc_compound_type_5."e"::text,
+      __frmcdc_compound_type_5."f"::text,
+      __frmcdc_compound_type_5."foo_bar"::text,
+      (not (__frmcdc_compound_type_5 is null))::text,
+      __frmcdc_compound_type_6."a"::text,
+      __frmcdc_compound_type_6."b",
+      __frmcdc_compound_type_6."c"::text,
+      __frmcdc_compound_type_6."d",
+      __frmcdc_compound_type_6."e"::text,
+      __frmcdc_compound_type_6."f"::text,
+      __frmcdc_compound_type_6."foo_bar"::text,
+      (not (__frmcdc_compound_type_6 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_nested_compound_type").*) as __frmcdc_nested_compound_type_2
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."a").*) as __frmcdc_compound_type_5
+    on TRUE
+    left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
+    on TRUE
+  )::text as "67"
+from "b"."types" as __types__
+left outer join "a"."post" as __post__
+on (
+/* WHERE becoming ON */ (
+  __post__."id" = __types__."id"
+))
+left outer join "a"."post" as __post_2
+on (
+/* WHERE becoming ON */ (
+  __post_2."id" = __types__."smallint"
+))
+left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
+on TRUE
+left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
+on TRUE
+order by __types__."id" asc;
 
 select
   __type_function_connection__."id"::text as "0",

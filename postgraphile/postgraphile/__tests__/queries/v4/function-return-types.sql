@@ -6,14 +6,6 @@ from "c"."func_in_inout"(
 ) as __func_in_inout__(v);
 
 select
-  __func_in_out__.v::text as "0"
-from "c"."func_in_out"($1::"int4") as __func_in_out__(v);
-
-select
-  __func_out__.v::text as "0"
-from "c"."func_out"() as __func_out__(v);
-
-select
   __func_out_out__."first_out"::text as "0",
   __func_out_out__."second_out" as "1",
   (not (__func_out_out__ is null))::text as "2"
@@ -37,6 +29,10 @@ select
 from "c"."func_out_out_setof"() as __func_out_out_setof__;
 
 select
+  (count(*))::text as "0"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
   __func_out_out_unnamed__."column1"::text as "0",
   __func_out_out_unnamed__."column2" as "1",
   (not (__func_out_out_unnamed__ is null))::text as "2"
@@ -47,11 +43,19 @@ select
 from "c"."func_out_setof"() as __func_out_setof__(v);
 
 select
+  (count(*))::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
   __func_out_table__."id"::text as "0"
 from "c"."func_out_table"() as __func_out_table__;
 
 select
   __func_out_table_setof__."id"::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
+
+select
+  (count(*))::text as "0"
 from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select
@@ -72,7 +76,15 @@ select
 from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
 
 select
+  (count(*))::text as "0"
+from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
+
+select
   __func_returns_table_one_col__.v::text as "0"
+from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
+
+select
+  (count(*))::text as "0"
 from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
 
 select
@@ -89,24 +101,12 @@ from "c"."func_out_complex_setof"(
 ) as __func_out_complex_setof__;
 
 select
-  (count(*))::text as "0"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
+  __func_in_out__.v::text as "0"
+from "c"."func_in_out"($1::"int4") as __func_in_out__(v);
 
 select
-  (count(*))::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
+  __func_out__.v::text as "0"
+from "c"."func_out"() as __func_out__(v);
 
 select
   __func_out_complex__."x"::text as "0",

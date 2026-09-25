@@ -20,6 +20,9 @@ import {
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
+import { setFind } from "./utils.ts";
+
+const DEFAULT_MAX_CLIENT_QUEUES = 3;
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);
@@ -131,6 +134,12 @@ export interface WithPgClient<
   release?(): PromiseOrDirect<void>;
 }
 
+/**
+ * The identity of this object scopes cached read results and in-flight client
+ * queues. A batch of requests can share this object; a new one should be used
+ * when fresh reads are needed - this is typically handled by
+ * `ExecutionExtra.meta` being reset after mutations/etc.
+ */
 export type PgExecutorContext<
   TSettings = any,
   TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
@@ -159,9 +168,109 @@ export type PgExecutorOptions = {
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
   name?: string;
+  /**
+   * Execution requests that share the same affinity hint that they should be
+   * executed on the same connection.
+   */
+  affinity?: symbol;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
 };
+
+type QueuedQuery = {
+  name: string | undefined;
+  affinity: symbol | undefined;
+  signature: string;
+  next: QueuedQuery | undefined;
+  text: string;
+  values: ReadonlyArray<SQLRawValue>;
+  publish: PublishFunction | undefined;
+  resolve: (result: PgClientResult<any>) => void;
+  reject: (error: unknown) => void;
+};
+
+type QueryQueue = {
+  /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
+  names: Set<string>;
+  /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
+  affinities: Set<symbol>;
+  /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
+  signatures: Set<string>;
+  closed: boolean;
+  first: QueuedQuery | undefined;
+  last: QueuedQuery | undefined;
+};
+
+type QueryQueueState = {
+  queues: Set<QueryQueue>;
+  pending: QueuedQuery[];
+};
+
+function getSignature(text: string): string {
+  return text; // TODO: make signature smarter
+}
+
+function queueMatches(
+  queue: QueryQueue,
+  item: Pick<QueuedQuery, "name" | "signature" | "affinity">,
+): boolean {
+  if (queue.closed) return false;
+  return (
+    (item.name !== undefined && queue.names.has(item.name)) ||
+    (item.affinity !== undefined && queue.affinities.has(item.affinity)) ||
+    queue.signatures.has(item.signature)
+  );
+}
+
+function addToQueue(
+  queue: QueryQueue,
+  item: QueuedQuery,
+  justSignatures = false,
+): void {
+  if (item.name !== undefined) queue.names.add(item.name);
+  if (item.affinity !== undefined) queue.affinities.add(item.affinity);
+  queue.signatures.add(item.signature);
+  if (justSignatures === false) {
+    if (queue.last !== undefined) queue.last.next = item;
+    else queue.first = item;
+    queue.last = item;
+  }
+}
+
+function takeFromQueue(queue: QueryQueue): QueuedQuery | undefined {
+  const item = queue.first;
+  if (item === undefined) return undefined;
+  queue.first = item.next;
+  if (queue.first === undefined) queue.last = undefined;
+  item.next = undefined;
+  return item;
+}
+
+function takePending(
+  queue: QueryQueue,
+  pending: QueuedQuery[],
+  skipAddingToQueue: boolean,
+): QueuedQuery | undefined {
+  const l = pending.length;
+  if (l === 0) return undefined;
+  const first = pending[0]!;
+  addToQueue(queue, first, skipAddingToQueue);
+
+  // Compact in place, preserving FIFO order for both matching and remaining
+  // work. A newly matched item may make further names/signatures/affinities eligible.
+  let remaining = 0;
+  for (let i = 1; i < l; i++) {
+    const item = pending[i];
+    if (queueMatches(queue, item)) {
+      addToQueue(queue, item);
+    } else {
+      pending[remaining++] = item;
+    }
+  }
+  // Truncate
+  pending.length = remaining;
+  return first;
+}
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
@@ -190,16 +299,25 @@ export type PgExecutorSubscribeOptions = {
 export class PgExecutor<const TName extends string = string, TSettings = any> {
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
+  private maxClientQueues: number;
   private $$cache: symbol;
+  private queryQueues: WeakMap<PgExecutorContext, QueryQueueState>;
 
   constructor(options: {
     name: TName;
     context: () => Step<PgExecutorContext<TSettings>>;
+    maxClientQueues?: number;
   }) {
-    const { name, context } = options;
+    const {
+      name,
+      context,
+      maxClientQueues = DEFAULT_MAX_CLIENT_QUEUES,
+    } = options;
     this.name = name;
-    this.$$cache = Symbol(this.name + "_cache");
     this.contextCallback = context;
+    this.maxClientQueues = maxClientQueues;
+    this.$$cache = Symbol(this.name + "_cache");
+    this.queryQueues = new WeakMap();
   }
 
   public toString(): string {
@@ -216,9 +334,9 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     client: GraphileConfig.DataplanPgClient,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
-    name?: string,
-    publish?: PublishFunction,
-    isMutation = false,
+    name: string | undefined,
+    publish: PublishFunction | undefined,
+    isMutation: boolean,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -358,15 +476,156 @@ ${duration}
     context: PgExecutorContext,
     text: string,
     values: ReadonlyArray<SQLRawValue>,
-    name?: string,
-    publish?: PublishFunction,
+    name: string | undefined,
+    publish: PublishFunction | undefined,
   ) {
     // PERF: we could probably make this more efficient by grouping the
     // deferreds further, DataLoader-style, and running one SQL query for
     // everything.
     return await context.withPgClient(context.pgSettings, (client) =>
-      this._executeWithClient<TData>(client, text, values, name, publish),
+      this._executeWithClient<TData>(
+        client,
+        text,
+        values,
+        name,
+        publish,
+        false,
+      ),
     );
+  }
+
+  private getQueueState(context: PgExecutorContext) {
+    const existing = this.queryQueues.get(context);
+    if (existing) {
+      return existing;
+    }
+    const state: QueryQueueState = { queues: new Set(), pending: [] };
+    this.queryQueues.set(context, state);
+    return state;
+  }
+
+  private _executeQueued<TData>(
+    context: PgExecutorContext,
+    text: string,
+    values: ReadonlyArray<SQLRawValue>,
+    name: string | undefined,
+    publish: PublishFunction | undefined,
+    affinity: symbol | undefined,
+  ): Promise<PgClientResult<TData>> {
+    return new Promise<PgClientResult<TData>>((resolve, reject) => {
+      const item: QueuedQuery = {
+        name,
+        affinity,
+        signature: getSignature(text),
+        next: undefined,
+        text,
+        values,
+        publish,
+        resolve,
+        reject,
+      };
+
+      const state = this.getQueueState(context);
+      const { queues } = state;
+      let queue = setFind(queues, (q) => queueMatches(q, item));
+      if (queue === undefined && queues.size < this.maxClientQueues) {
+        const newQueue: QueryQueue = {
+          names: new Set(),
+          affinities: new Set(),
+          signatures: new Set(),
+          closed: false,
+          first: undefined,
+          last: undefined,
+        };
+        queue = newQueue;
+        queues.add(newQueue);
+        // Wait one microtask so other ready steps can join before borrowing.
+        queueMicrotask(
+          () => void this._drainQueryQueue(context, newQueue, state),
+        );
+      }
+
+      if (queue) {
+        addToQueue(queue, item);
+      } else {
+        state.pending.push(item);
+      }
+    });
+  }
+
+  private async _drainQueryQueue(
+    context: PgExecutorContext,
+    queue: QueryQueue,
+    state: QueryQueueState,
+  ): Promise<void> {
+    const { queues, pending } = state;
+    try {
+      while (
+        queue.first !== undefined ||
+        takePending(queue, pending, false) !== undefined
+      ) {
+        let firstItemTaken = false;
+        try {
+          await context.withPgClient(context.pgSettings, async (client) => {
+            while (true) {
+              let item = takeFromQueue(queue);
+              if (item === undefined) {
+                item = takePending(queue, pending, true);
+                if (item === undefined) break;
+              }
+              try {
+                firstItemTaken = true;
+                const result = await this._executeWithClient(
+                  client,
+                  item.text,
+                  item.values,
+                  item.name,
+                  item.publish,
+                  false,
+                );
+                item.resolve(result);
+              } catch (error) {
+                item.reject(error);
+                // The adapter must roll back before we run another query.
+                throw error;
+              }
+            }
+          });
+        } catch (error) {
+          if (!firstItemTaken) {
+            // Connection acquisition or setup failed; a fresh lease is not
+            // known to help, so reject the remaining work.
+            let item: QueuedQuery | undefined;
+            while ((item = takeFromQueue(queue)) !== undefined) {
+              item.reject(error);
+            }
+            // Other queues can still drain pending work. If this is the last
+            // queue, nothing else can take it, so reject it too.
+            if (queues.size === 1) {
+              const toReject = pending.splice(0);
+              for (const item of toReject) {
+                item.reject(error);
+              }
+            }
+            // Cannot continue
+            break;
+          } else {
+            // After an SQL or COMMIT error, the adapter has released the
+            // client. The remaining work gets a new client on the next loop.
+          }
+        }
+      }
+    } finally {
+      queue.closed = true;
+      queues.delete(queue);
+      if (queue.first !== undefined || queue.last !== undefined) {
+        console.error(
+          `Fatal @dataplan/pg consistency error: queue completed but still thinks it has a first or last item`,
+        );
+        process.exit(1);
+      }
+      if (queues.size === 0) this.queryQueues.delete(context);
+    }
   }
 
   private withTransaction<T>(
@@ -376,7 +635,14 @@ ${duration}
     return context.withPgClient<T>(context.pgSettings, (baseClient) =>
       baseClient.withTransaction((transactionClient) => {
         const execute: ExecuteFunction = (text, values) =>
-          this._executeWithClient(transactionClient, text, values);
+          this._executeWithClient(
+            transactionClient,
+            text,
+            values,
+            undefined, // TODO: add 'name' to args?
+            undefined,
+            false,
+          );
         return callback(execute);
       }),
     );
@@ -571,13 +837,22 @@ ${duration}
                         true,
                       ),
                   )
-                : await this._execute<TOutput>(
-                    context,
-                    text,
-                    sqlValues,
-                    name,
-                    publishExecute,
-                  );
+                : useCache
+                  ? await this._executeQueued<TOutput>(
+                      context,
+                      text,
+                      sqlValues,
+                      name,
+                      publishExecute,
+                      common.affinity,
+                    )
+                  : await this._execute<TOutput>(
+                      context,
+                      text,
+                      sqlValues,
+                      name,
+                      publishExecute,
+                    );
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
@@ -602,7 +877,8 @@ ${duration}
           } catch (e) {
             // This block guarantees that all remainingDeferreds will be
             // rejected - we don't want defers hanging around!
-            remainingDeferreds.forEach((d) => {
+            remainingDeferreds.forEach((d, i) => {
+              scopedCache.delete(remaining[i] as IdentifiersJSON);
               try {
                 d.reject(e);
               } catch (e2) {
@@ -999,5 +1275,4 @@ ${duration}
     return result;
   }
 }
-
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");

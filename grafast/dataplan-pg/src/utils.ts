@@ -166,3 +166,14 @@ export function getSameLengthArraysMatchFunction(
       };
   }
 }
+
+/** Like [].find(callback) but for sets */
+export function setFind<T>(
+  set: ReadonlySet<T>,
+  callback: (value: T) => boolean,
+): T | undefined {
+  for (const val of set) {
+    if (callback(val)) return val;
+  }
+  return undefined;
+}
