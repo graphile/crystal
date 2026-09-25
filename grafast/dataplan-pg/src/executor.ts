@@ -20,6 +20,7 @@ import {
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.ts";
+import { setFind } from "./utils.ts";
 
 const LOOK_DOWN = "👇".repeat(30);
 const LOOK_UP = "👆".repeat(30);
@@ -419,7 +420,8 @@ ${duration}
     // Prefer clones of the same select, then identical SQL. A full queue
     // starts another lane to retain some parallelism.
     let queue = executionAffinity
-      ? [...queues].find(
+      ? setFind(
+          queues,
           (q) =>
             !q.closed &&
             q.size < MAX_QUERIES_PER_CLIENT_QUEUE &&
@@ -427,7 +429,8 @@ ${duration}
         )
       : undefined;
     const signature = getSignature(text, name);
-    queue ??= [...queues].find(
+    queue ??= setFind(
+      queues,
       (q) =>
         !q.closed &&
         q.size < MAX_QUERIES_PER_CLIENT_QUEUE &&
