@@ -334,6 +334,8 @@ export interface PgSelectOptions<
   /** @internal */
   _internalCloneSymbol?: symbol | string;
   /** @internal */
+  _internalCloneExecutionAffinity?: symbol;
+  /** @internal */
   _internalCloneAlias?: SQL;
 }
 
@@ -450,6 +452,8 @@ export class PgSelectStep<
    * code specifically indicates a string to use.
    */
   private readonly symbol: symbol | string;
+  /** Clones share a client affinity even when their SQL differs. */
+  private readonly executionAffinity: symbol;
   /**
    * When SELECTs get merged, symbols also need to be merged. The keys in this
    * map are the symbols of PgSelects that don't exist any more, the values are
@@ -618,6 +622,7 @@ export class PgSelectStep<
 
       _internalCloneSymbol: cloneFrom.symbol,
       _internalCloneAlias: cloneFrom.alias,
+      _internalCloneExecutionAffinity: cloneFrom.executionAffinity,
     });
 
     if ($clone.dependencyCount !== 1) {
@@ -723,6 +728,7 @@ export class PgSelectStep<
       // Clone only details
       _internalCloneSymbol,
       _internalCloneAlias,
+      _internalCloneExecutionAffinity,
     } = options;
 
     const $streamDetails = currentFieldStreamDetails();
@@ -752,6 +758,8 @@ export class PgSelectStep<
 
     this.name = name ?? resource.name;
     this.symbol = _internalCloneSymbol ?? Symbol(this.name);
+    this.executionAffinity =
+      _internalCloneExecutionAffinity ?? Symbol(this.name);
     this.alias = _internalCloneAlias ?? sql.identifier(this.symbol);
     this.hasImplicitOrder = inHasImplicitOrder ?? resource.hasImplicitOrder;
     this.joinAsLateral = inJoinAsLateral ?? !!this.resource.parameters;
@@ -1307,6 +1315,7 @@ export class PgSelectStep<
               rawSqlValues,
               identifierIndex,
               name,
+              executionAffinity: this.executionAffinity,
               eventEmitter,
               useTransaction: isMutation,
             })

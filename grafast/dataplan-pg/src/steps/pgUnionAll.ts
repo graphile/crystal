@@ -166,6 +166,8 @@ export interface PgUnionAllStepConfig<
   /** @internal */
   _internalCloneSymbol?: symbol | string;
   /** @internal */
+  _internalCloneExecutionAffinity?: symbol;
+  /** @internal */
   _internalCloneAlias?: SQL;
 }
 
@@ -489,6 +491,7 @@ export class PgUnionAllStep<
   private connectionDepId: number | null = null;
 
   public readonly mode: PgUnionAllMode;
+  private readonly executionAffinity: symbol;
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
@@ -517,6 +520,7 @@ export class PgUnionAllStep<
 
       _internalCloneSymbol: cloneFrom.symbol,
       _internalCloneAlias: cloneFrom.alias,
+      _internalCloneExecutionAffinity: cloneFrom.executionAffinity,
     });
 
     if ($clone.dependencyCount !== 0) {
@@ -578,6 +582,8 @@ export class PgUnionAllStep<
         );
       }
       this.spec = spec;
+      this.executionAffinity =
+        spec._internalCloneExecutionAffinity ?? Symbol(spec.name ?? "union");
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -1043,6 +1049,7 @@ on (${sql.indent(
       rawSqlValues,
       identifierIndex,
       name,
+      executionAffinity: this.executionAffinity,
       eventEmitter,
       useTransaction: false,
     });

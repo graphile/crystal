@@ -131,6 +131,11 @@ export interface WithPgClient<
   release?(): PromiseOrDirect<void>;
 }
 
+/**
+ * Identity scopes cached read results and in-flight client queues. A batch of
+ * requests can share this object; create a new one when fresh reads are needed.
+ * Do not mutate its settings or client callback while it is in use.
+ */
 export type PgExecutorContext<
   TSettings = any,
   TPgClient extends PgClient = GraphileConfig.DataplanPgClient,
@@ -159,9 +164,30 @@ export type PgExecutorOptions = {
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
   name?: string;
+  /** Clones of a select share this even when their SQL text differs. */
+  executionAffinity?: symbol;
   eventEmitter: ExecutionEventEmitter | undefined;
   useTransaction?: boolean;
 };
+
+type QueuedQuery = {
+  text: string;
+  values: ReadonlyArray<SQLRawValue>;
+  name?: string;
+  publish?: PublishFunction;
+  resolve: (result: PgClientResult<any>) => void;
+  reject: (error: unknown) => void;
+};
+
+type QueryQueue = {
+  texts: Set<string>;
+  affinities: Set<symbol>;
+  items: QueuedQuery[];
+  size: number;
+  closed: boolean;
+};
+
+const MAX_QUERIES_PER_CLIENT_QUEUE = 8;
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
@@ -191,6 +217,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
   private $$cache: symbol;
+  private queryQueues = new WeakMap<PgExecutorContext, Set<QueryQueue>>();
 
   constructor(options: {
     name: TName;
@@ -367,6 +394,110 @@ ${duration}
     return await context.withPgClient(context.pgSettings, (client) =>
       this._executeWithClient<TData>(client, text, values, name, publish),
     );
+  }
+
+  private _executeQueued<TData>(
+    context: PgExecutorContext,
+    text: string,
+    values: ReadonlyArray<SQLRawValue>,
+    name?: string,
+    publish?: PublishFunction,
+    executionAffinity?: symbol,
+  ): Promise<PgClientResult<TData>> {
+    let queues = this.queryQueues.get(context);
+    if (!queues) {
+      queues = new Set();
+      this.queryQueues.set(context, queues);
+    }
+
+    // Prefer clones of the same select, then identical SQL. A full queue
+    // starts another lane to retain some parallelism.
+    let queue = executionAffinity
+      ? [...queues].find(
+          (q) =>
+            !q.closed &&
+            q.size < MAX_QUERIES_PER_CLIENT_QUEUE &&
+            q.affinities.has(executionAffinity),
+        )
+      : undefined;
+    queue ??= [...queues].find(
+      (q) =>
+        !q.closed && q.size < MAX_QUERIES_PER_CLIENT_QUEUE && q.texts.has(text),
+    );
+    if (!queue) {
+      const newQueue: QueryQueue = {
+        texts: new Set(),
+        affinities: new Set(),
+        items: [],
+        size: 0,
+        closed: false,
+      };
+      queue = newQueue;
+      queues.add(newQueue);
+      // Wait one microtask so other ready steps can join before borrowing.
+      const allQueues = queues;
+      queueMicrotask(
+        () => void this._drainQueryQueue(context, newQueue, allQueues),
+      );
+    }
+    queue.texts.add(text);
+    if (executionAffinity) queue.affinities.add(executionAffinity);
+    queue.size++;
+
+    return new Promise<PgClientResult<TData>>((resolve, reject) => {
+      queue.items.push({ text, values, name, publish, resolve, reject });
+    });
+  }
+
+  private async _drainQueryQueue(
+    context: PgExecutorContext,
+    queue: QueryQueue,
+    queues: Set<QueryQueue>,
+  ): Promise<void> {
+    try {
+      while (queue.items.length > 0) {
+        let queryFailed = false;
+        try {
+          await context.withPgClient(context.pgSettings, async (client) => {
+            let item: QueuedQuery | undefined;
+            while ((item = queue.items.shift())) {
+              try {
+                const result = await this._executeWithClient(
+                  client,
+                  item.text,
+                  item.values,
+                  item.name,
+                  item.publish,
+                );
+                item.resolve(result);
+              } catch (error) {
+                queryFailed = true;
+                item.reject(error);
+                // The adapter must roll back before we run another query.
+                throw error;
+              } finally {
+                queue.size--;
+              }
+            }
+          });
+        } catch (error) {
+          if (!queryFailed) {
+            // Connection acquisition or setup failed; a fresh lease is not
+            // known to help, so reject the remaining work.
+            for (const item of queue.items.splice(0)) {
+              queue.size--;
+              item.reject(error);
+            }
+          }
+          // After a SQL error, the adapter has rolled back and released the
+          // client. The remaining work gets a new lease on the next loop.
+        }
+      }
+    } finally {
+      queue.closed = true;
+      queues.delete(queue);
+      if (queues.size === 0) this.queryQueues.delete(context);
+    }
   }
 
   private withTransaction<T>(
@@ -571,13 +702,22 @@ ${duration}
                         true,
                       ),
                   )
-                : await this._execute<TOutput>(
-                    context,
-                    text,
-                    sqlValues,
-                    name,
-                    publishExecute,
-                  );
+                : useCache
+                  ? await this._executeQueued<TOutput>(
+                      context,
+                      text,
+                      sqlValues,
+                      name,
+                      publishExecute,
+                      common.executionAffinity,
+                    )
+                  : await this._execute<TOutput>(
+                      context,
+                      text,
+                      sqlValues,
+                      name,
+                      publishExecute,
+                    );
               const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
@@ -602,7 +742,8 @@ ${duration}
           } catch (e) {
             // This block guarantees that all remainingDeferreds will be
             // rejected - we don't want defers hanging around!
-            remainingDeferreds.forEach((d) => {
+            remainingDeferreds.forEach((d, i) => {
+              scopedCache.delete(remaining[i] as IdentifiersJSON);
               try {
                 d.reject(e);
               } catch (e2) {
