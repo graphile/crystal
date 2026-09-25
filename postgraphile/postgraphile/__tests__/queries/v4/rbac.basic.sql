@@ -1,6 +1,6 @@
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __person_secret__."person_id"::text as "0",
@@ -14,7 +14,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __person_secret__."person_id"::text as "0",
@@ -26,7 +26,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __person__."id"::text as "0",
@@ -46,7 +46,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __person__."id"::text as "0",
@@ -66,7 +66,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __left_arm__."id"::text as "0",
@@ -82,7 +82,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __left_arm__."id"::text as "0",
@@ -96,7 +96,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __person__."id"::text as "0",
@@ -118,7 +118,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __post__."id"::text as "0",
@@ -134,7 +134,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __post__."id"::text as "0",
@@ -148,7 +148,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __person__."id"::text as "0",
@@ -174,7 +174,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __return_table_without_grants__."person_id_1"::text as "0",

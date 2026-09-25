@@ -103,6 +103,23 @@ end if;
 end;
 $_$ language plpgsql;
 
+create function c.read_pg_settings() returns json as $$
+  select json_build_object(
+    'statement_timeout', current_setting('statement_timeout', true),
+    'role', current_setting('role', true),
+    'jwt.claims.string', current_setting('jwt.claims.string', true),
+    'jwt.claims.number', current_setting('jwt.claims.number', true),
+    'jwt.claims.boolean_true', current_setting('jwt.claims.boolean_true', true),
+    'jwt.claims.other_string', current_setting('jwt.claims.other_string', true),
+    'jwt.claims.other_number', current_setting('jwt.claims.other_number', true),
+    'jwt.claims.boolean_false', current_setting('jwt.claims.boolean_false', true),
+    'jwt.claims.empty_string', current_setting('jwt.claims.empty_string', true),
+    'jwt.claims.escaped_string', current_setting('jwt.claims.escaped_string', true),
+    'jwt.claims.null', current_setting('jwt.claims.null', true),
+    'jwt.claims.undefined', current_setting('jwt.claims.undefined', true)
+  );
+$$ language sql stable;
+
 -- This is to test that "one-to-one" relationships work on primary keys
 create table c.person_secret (
   person_id int not null primary key references c.person on delete cascade,

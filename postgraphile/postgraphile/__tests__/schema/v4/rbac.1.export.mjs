@@ -3294,6 +3294,7 @@ const person_type_functionFunctionIdentifer = sql.identifier("c", "person_type_f
 const person_type_function_connectionFunctionIdentifer = sql.identifier("c", "person_type_function_connection");
 const person_type_function_listFunctionIdentifer = sql.identifier("c", "person_type_function_list");
 const query_output_two_rowsFunctionIdentifer = sql.identifier("c", "query_output_two_rows");
+const read_pg_settingsFunctionIdentifer = sql.identifier("c", "read_pg_settings");
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
 const search_test_summariesFunctionIdentifer = sql.identifier("c", "search_test_summaries");
 const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
@@ -7511,6 +7512,26 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
+    read_pg_settings: {
+      executor: executor,
+      name: "read_pg_settings",
+      identifier: "main.c.read_pg_settings()",
+      from(...args) {
+        return sql`${read_pg_settingsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: TYPES.json,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "read_pg_settings"
+        },
+        canExecute: true
+      },
+      isUnique: true
+    },
     return_table_without_grants: PgResource.functionResourceOptions(compound_key_resourceOptionsConfig, {
       name: "return_table_without_grants",
       identifier: "main.c.return_table_without_grants()",
@@ -7966,6 +7987,7 @@ const resource_personPgResource = registry.pgResources["person"];
 const resource_person_secretPgResource = registry.pgResources["person_secret"];
 const makeArgs_current_user_id = () => [];
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
+const resource_read_pg_settingsPgResource = registry.pgResources["read_pg_settings"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
 const resource_table_set_query_volatilePgResource = registry.pgResources["table_set_query_volatile"];
 const table_set_query_volatile_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
@@ -8395,6 +8417,7 @@ type Query implements Node {
   """Get a single \`PersonSecret\`."""
   personSecretByPersonId(personId: Int!): PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
   currentUserId: Int
+  readPgSettings: JSON
   returnTableWithoutGrants: CompoundKey
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -8793,6 +8816,11 @@ type LeftArm implements Node {
   """Reads a single \`Person\` that is related to this \`LeftArm\`."""
   personByPersonId: Person
 }
+
+"""
+A JavaScript object encoded in the JSON format as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 type CompoundKey {
   personId2: Int!
@@ -9811,6 +9839,10 @@ export const objects = {
       query() {
         return constant(EMPTY_OBJECT);
       },
+      readPgSettings($root, args, _info) {
+        const selectArgs = makeArgs_current_user_id(args);
+        return resource_read_pg_settingsPgResource.execute(selectArgs);
+      },
       returnTableWithoutGrants($root, args, _info) {
         const selectArgs = makeArgs_current_user_id(args);
         return resource_return_table_without_grantsPgResource.execute(selectArgs);
@@ -10680,6 +10712,21 @@ export const scalars = {
         return ast.value;
       }
       throw new GraphQLError(`InternetAddress can only parse string values (kind='${ast.kind}')`);
+    }
+  },
+  JSON: {
+    serialize(value) {
+      return JSON.stringify(value);
+    },
+    parseValue(value) {
+      return JSON.parse(value);
+    },
+    parseLiteral(ast, _variables) {
+      if (ast.kind === Kind.STRING) {
+        return JSON.parse(ast.value);
+      } else {
+        return undefined;
+      }
     }
   },
   KeyValueHash: {
