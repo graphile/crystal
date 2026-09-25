@@ -133,8 +133,10 @@ export interface WithPgClient<
 }
 
 /**
- * Identity scopes cached read results and in-flight client queues. A batch of
- * requests can share this object; create a new one when fresh reads are needed.
+ * The identity of this object scopes cached read results and in-flight client
+ * queues. A batch of requests can share this object; a new one should be used
+ * when fresh reads are needed - this is typically handled by
+ * `ExecutionExtra.meta` being reset after mutations/etc.
  */
 export type PgExecutorContext<
   TSettings = any,
@@ -187,9 +189,11 @@ type QueuedQuery = {
 
 type QueryQueue = {
   /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
-  signatures: Set<string>;
+  names: Set<string>;
   /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
   affinities: Set<symbol>;
+  /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
+  signatures: Set<string>;
   first?: QueuedQuery;
   last?: QueuedQuery;
   closed: boolean;
@@ -200,25 +204,27 @@ type QueryQueueState = {
   pending: QueuedQuery[];
 };
 
-function getSignature(text: string, name?: string): string {
-  return name ?? text; // TODO: make signature smarter
+function getSignature(text: string): string {
+  return text; // TODO: make signature smarter
 }
 
 const MAX_CLIENT_QUEUES = 3;
 
 function queueMatches(
   queue: QueryQueue,
-  item: Pick<QueuedQuery, "signature" | "affinity">,
+  item: Pick<QueuedQuery, "name" | "signature" | "affinity">,
 ): boolean {
   return (
+    (item.name !== undefined && queue.names.has(item.name)) ||
     (item.affinity !== undefined && queue.affinities.has(item.affinity)) ||
     queue.signatures.has(item.signature)
   );
 }
 
 function addToQueue(queue: QueryQueue, item: QueuedQuery): void {
-  queue.signatures.add(item.signature);
+  if (item.name !== undefined) queue.names.add(item.name);
   if (item.affinity !== undefined) queue.affinities.add(item.affinity);
+  queue.signatures.add(item.signature);
   if (queue.last !== undefined) queue.last.next = item;
   else queue.first = item;
   queue.last = item;
@@ -239,7 +245,7 @@ function takePending(queue: QueryQueue, pending: QueuedQuery[]): boolean {
   addToQueue(queue, first);
 
   // Compact in place, preserving FIFO order for both matching and remaining
-  // work. A newly matched item may make further signatures/affinities eligible.
+  // work. A newly matched item may make further names/signatures/affinities eligible.
   let remaining = 0;
   for (let i = 1; i < pending.length; i++) {
     const item = pending[i];
@@ -475,11 +481,19 @@ ${duration}
     }
 
     const { queues } = state;
-    const signature = getSignature(text, name);
+    const signature = getSignature(text);
     // Prefer clones of the same select, then identical SQL.
-    let queue = executionAffinity
-      ? setFind(queues, (q) => !q.closed && q.affinities.has(executionAffinity))
-      : undefined;
+    let queue =
+      executionAffinity !== undefined || name !== undefined
+        ? setFind(
+            queues,
+            (q) =>
+              !q.closed &&
+              ((name !== undefined && q.names.has(name)) ||
+                (executionAffinity !== undefined &&
+                  q.affinities.has(executionAffinity))),
+          )
+        : undefined;
     queue ??= setFind(
       queues,
       (q) =>
@@ -488,8 +502,9 @@ ${duration}
     );
     if (!queue && queues.size < MAX_CLIENT_QUEUES) {
       const newQueue: QueryQueue = {
-        signatures: new Set(),
+        names: new Set(),
         affinities: new Set(),
+        signatures: new Set(),
         closed: false,
       };
       queue = newQueue;
