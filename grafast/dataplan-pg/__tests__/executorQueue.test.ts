@@ -36,7 +36,7 @@ function run(
     rawSqlValues: [value],
     name: text,
     identifierIndex: null,
-    executionAffinity,
+    affinity: executionAffinity,
     eventEmitter: undefined,
   });
 }
@@ -169,7 +169,7 @@ test("does not queue uncached execution", async () => {
   expect(withPgClient).toHaveBeenCalledTimes(2);
 });
 
-test("splits a large identical-SQL batch into parallel client lanes", async () => {
+test("keeps a large identical-SQL batch on one client", async () => {
   const executor = makeExecutor();
   const { context, withPgClient } = makeContext(async (opts) => ({
     rows: [[opts.values[0]]],
@@ -182,10 +182,10 @@ test("splits a large identical-SQL batch into parallel client lanes", async () =
     ),
   );
 
-  expect(withPgClient).toHaveBeenCalledTimes(2);
+  expect(withPgClient).toHaveBeenCalledTimes(1);
 });
 
-test("splits a large clone-affinity batch into parallel client lanes", async () => {
+test("keeps a large clone-affinity batch on one client", async () => {
   const executor = makeExecutor();
   const { context, withPgClient } = makeContext(async (opts) => ({
     rows: [[opts.values[0]]],
@@ -199,5 +199,87 @@ test("splits a large clone-affinity batch into parallel client lanes", async () 
     ),
   );
 
-  expect(withPgClient).toHaveBeenCalledTimes(2);
+  expect(withPgClient).toHaveBeenCalledTimes(1);
+});
+
+test("limits unrelated queues to three and groups matching pending work", async () => {
+  const executor = makeExecutor();
+  const { context, seen, withPgClient } = makeContext(async (opts) => ({
+    rows: [[opts.values[0]]],
+    rowCount: 1,
+  }));
+  const affinity = Symbol("pending clone");
+
+  const results = await Promise.all([
+    run(executor, context, "select a", "a"),
+    run(executor, context, "select b", "b"),
+    run(executor, context, "select c", "c"),
+    run(executor, context, "select d", "d1", affinity),
+    run(executor, context, "select e", "e"),
+    run(executor, context, "select different d", "d2", affinity),
+    run(executor, context, "select d", "d3"),
+    run(executor, context, "select f", "f"),
+  ]);
+
+  expect(results.map((r) => r.values[0][0][0])).toEqual([
+    "a",
+    "b",
+    "c",
+    "d1",
+    "e",
+    "d2",
+    "d3",
+    "f",
+  ]);
+  expect(withPgClient).toHaveBeenCalledTimes(3);
+  const dQueries = seen.filter(({ text }) => text.includes(" d"));
+  expect(dQueries).toHaveLength(3);
+  expect(new Set(dQueries.map(({ clientNumber }) => clientNumber)).size).toBe(
+    1,
+  );
+});
+
+test("joins a matching queue even when all three client slots are occupied", async () => {
+  const executor = makeExecutor();
+  const { context, seen, withPgClient } = makeContext(async (opts) => ({
+    rows: [[opts.values[0]]],
+    rowCount: 1,
+  }));
+
+  await Promise.all([
+    run(executor, context, "select a", "a1"),
+    run(executor, context, "select b", "b"),
+    run(executor, context, "select c", "c"),
+    run(executor, context, "select d", "d"),
+    run(executor, context, "select a", "a2"),
+  ]);
+
+  expect(withPgClient).toHaveBeenCalledTimes(3);
+  const aQueries = seen.filter(({ text }) => text === "select a");
+  expect(aQueries).toHaveLength(2);
+  expect(aQueries[0].clientNumber).toBe(aQueries[1].clientNumber);
+});
+
+test("rejects pending work if the last queue cannot acquire a client", async () => {
+  const executor = makeExecutor();
+  const { context, withPgClient } = makeContext(async () => ({
+    rows: [],
+    rowCount: 0,
+  }));
+  withPgClient.mockRejectedValue(new Error("connection unavailable"));
+
+  const results = await Promise.allSettled([
+    run(executor, context, "select a", "a"),
+    run(executor, context, "select b", "b"),
+    run(executor, context, "select c", "c"),
+    run(executor, context, "select d", "d"),
+  ]);
+
+  expect(results.map((r) => r.status)).toEqual([
+    "rejected",
+    "rejected",
+    "rejected",
+    "rejected",
+  ]);
+  expect(withPgClient).toHaveBeenCalledTimes(3);
 });

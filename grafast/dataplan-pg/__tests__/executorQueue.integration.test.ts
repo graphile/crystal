@@ -121,7 +121,7 @@ test("a failed read rolls back before queued reads get a new lease", async () =>
           text,
           rawSqlValues: [],
           name: text,
-          executionAffinity,
+          affinity: executionAffinity,
           eventEmitter: undefined,
         });
 

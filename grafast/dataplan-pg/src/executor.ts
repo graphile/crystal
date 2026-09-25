@@ -174,7 +174,10 @@ export type PgExecutorOptions = {
 };
 
 type QueuedQuery = {
+  next?: QueuedQuery;
   text: string;
+  signature: string;
+  affinity?: symbol;
   values: ReadonlyArray<SQLRawValue>;
   name?: string;
   publish?: PublishFunction;
@@ -187,16 +190,68 @@ type QueryQueue = {
   signatures: Set<string>;
   /** WARNING: This grows until the queue is released; queues are expected to be short-lived. */
   affinities: Set<symbol>;
-  items: QueuedQuery[];
-  size: number;
+  first?: QueuedQuery;
+  last?: QueuedQuery;
   closed: boolean;
+};
+
+type QueryQueueState = {
+  queues: Set<QueryQueue>;
+  pending: QueuedQuery[];
 };
 
 function getSignature(text: string, name?: string): string {
   return name ?? text; // TODO: make signature smarter
 }
 
-const MAX_QUERIES_PER_CLIENT_QUEUE = 8;
+const MAX_CLIENT_QUEUES = 3;
+
+function queueMatches(
+  queue: QueryQueue,
+  item: Pick<QueuedQuery, "signature" | "affinity">,
+): boolean {
+  return (
+    (item.affinity !== undefined && queue.affinities.has(item.affinity)) ||
+    queue.signatures.has(item.signature)
+  );
+}
+
+function addToQueue(queue: QueryQueue, item: QueuedQuery): void {
+  queue.signatures.add(item.signature);
+  if (item.affinity !== undefined) queue.affinities.add(item.affinity);
+  if (queue.last !== undefined) queue.last.next = item;
+  else queue.first = item;
+  queue.last = item;
+}
+
+function takeFromQueue(queue: QueryQueue): QueuedQuery | undefined {
+  const item = queue.first;
+  if (item === undefined) return undefined;
+  queue.first = item.next;
+  if (queue.first === undefined) queue.last = undefined;
+  item.next = undefined;
+  return item;
+}
+
+function takePending(queue: QueryQueue, pending: QueuedQuery[]): boolean {
+  const first = pending[0];
+  if (first === undefined) return false;
+  addToQueue(queue, first);
+
+  // Compact in place, preserving FIFO order for both matching and remaining
+  // work. A newly matched item may make further signatures/affinities eligible.
+  let remaining = 0;
+  for (let i = 1; i < pending.length; i++) {
+    const item = pending[i];
+    if (queueMatches(queue, item)) {
+      addToQueue(queue, item);
+    } else {
+      pending[remaining++] = item;
+    }
+  }
+  pending.length = remaining;
+  return true;
+}
 
 export type PgExecutorMutationOptions = {
   context: PgExecutorContext;
@@ -226,7 +281,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   public name: TName;
   private contextCallback: () => Step<PgExecutorContext<TSettings>>;
   private $$cache: symbol;
-  private queryQueues = new WeakMap<PgExecutorContext, Set<QueryQueue>>();
+  private queryQueues = new WeakMap<PgExecutorContext, QueryQueueState>();
 
   constructor(options: {
     name: TName;
@@ -413,68 +468,72 @@ ${duration}
     publish?: PublishFunction,
     executionAffinity?: symbol,
   ): Promise<PgClientResult<TData>> {
-    let queues = this.queryQueues.get(context);
-    if (!queues) {
-      queues = new Set();
-      this.queryQueues.set(context, queues);
+    let state = this.queryQueues.get(context);
+    if (!state) {
+      state = { queues: new Set(), pending: [] };
+      this.queryQueues.set(context, state);
     }
 
-    // Prefer clones of the same select, then identical SQL. A full queue
-    // starts another lane to retain some parallelism.
-    let queue = executionAffinity
-      ? setFind(
-          queues,
-          (q) =>
-            !q.closed &&
-            q.size < MAX_QUERIES_PER_CLIENT_QUEUE &&
-            q.affinities.has(executionAffinity),
-        )
-      : undefined;
+    const { queues } = state;
     const signature = getSignature(text, name);
+    // Prefer clones of the same select, then identical SQL.
+    let queue = executionAffinity
+      ? setFind(queues, (q) => !q.closed && q.affinities.has(executionAffinity))
+      : undefined;
     queue ??= setFind(
       queues,
       (q) =>
         !q.closed &&
-        q.size < MAX_QUERIES_PER_CLIENT_QUEUE &&
-        q.signatures.has(signature),
+        queueMatches(q, { signature, affinity: executionAffinity }),
     );
-    if (!queue) {
+    if (!queue && queues.size < MAX_CLIENT_QUEUES) {
       const newQueue: QueryQueue = {
         signatures: new Set(),
         affinities: new Set(),
-        items: [],
-        size: 0,
         closed: false,
       };
       queue = newQueue;
       queues.add(newQueue);
       // Wait one microtask so other ready steps can join before borrowing.
-      const allQueues = queues;
+      const queueState = state;
       queueMicrotask(
-        () => void this._drainQueryQueue(context, newQueue, allQueues),
+        () => void this._drainQueryQueue(context, newQueue, queueState),
       );
     }
-    queue.signatures.add(signature);
-    if (executionAffinity) queue.affinities.add(executionAffinity);
-    queue.size++;
 
     return new Promise<PgClientResult<TData>>((resolve, reject) => {
-      queue.items.push({ text, values, name, publish, resolve, reject });
+      const item = {
+        text,
+        signature,
+        affinity: executionAffinity,
+        values,
+        name,
+        publish,
+        resolve,
+        reject,
+      };
+      if (queue) addToQueue(queue, item);
+      else state.pending.push(item);
     });
   }
 
   private async _drainQueryQueue(
     context: PgExecutorContext,
     queue: QueryQueue,
-    queues: Set<QueryQueue>,
+    state: QueryQueueState,
   ): Promise<void> {
+    const { queues, pending } = state;
     try {
-      while (queue.items.length > 0) {
+      while (queue.first !== undefined || takePending(queue, pending)) {
         let queryFailed = false;
         try {
           await context.withPgClient(context.pgSettings, async (client) => {
-            let item: QueuedQuery | undefined;
-            while ((item = queue.items.shift()) !== undefined) {
+            while (true) {
+              const item = takeFromQueue(queue);
+              if (item === undefined) {
+                if (takePending(queue, pending)) continue;
+                break;
+              }
               try {
                 const result = await this._executeWithClient(
                   client,
@@ -489,8 +548,6 @@ ${duration}
                 item.reject(error);
                 // The adapter must roll back before we run another query.
                 throw error;
-              } finally {
-                queue.size--;
               }
             }
           });
@@ -498,10 +555,16 @@ ${duration}
           if (!queryFailed) {
             // Connection acquisition or setup failed; a fresh lease is not
             // known to help, so reject the remaining work.
-            for (const item of queue.items.splice(0)) {
-              queue.size--;
+            let item: QueuedQuery | undefined;
+            while ((item = takeFromQueue(queue)) !== undefined) {
               item.reject(error);
             }
+            // Other queues can still drain pending work. If this is the last
+            // queue, nothing else can take it, so reject it too.
+            if (queues.size === 1) {
+              for (const item of pending.splice(0)) item.reject(error);
+            }
+            break;
           }
           // After a SQL error, the adapter has rolled back and released the
           // client. The remaining work gets a new lease on the next loop.
