@@ -1,7 +1,11 @@
 import { PgExecutor } from "../dist/executor.js";
 
 function makeExecutor() {
-  return new PgExecutor({ name: "test", context: () => null as any });
+  return EXPORTABLE(
+    (PgExecutor) =>
+      new PgExecutor({ name: "test", context: () => null as any }),
+    [PgExecutor],
+  );
 }
 
 function makeContext(query: (opts: any, clientNumber: number) => Promise<any>) {

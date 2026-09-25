@@ -111,10 +111,14 @@ test("a failed read rolls back before queued reads get a new lease", async () =>
         pgSettings: { "app.test_setting": "queue" },
         withPgClient: countedWithPgClient,
       };
-      const executor = new PgExecutor({
-        name: "queueErrorTest",
-        context: () => null as any,
-      });
+      const executor = EXPORTABLE(
+        (PgExecutor) =>
+          new PgExecutor({
+            name: "queueErrorTest",
+            context: () => null as any,
+          }),
+        [PgExecutor],
+      );
       const executionAffinity = Symbol("same select");
       const run = (text: string) =>
         executor.executeWithCache([{ context, queryValues: [] }], {
