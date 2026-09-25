@@ -214,6 +214,7 @@ function queueMatches(
   queue: QueryQueue,
   item: Pick<QueuedQuery, "name" | "signature" | "affinity">,
 ): boolean {
+  if (queue.closed) return false;
   return (
     (item.name !== undefined && queue.names.has(item.name)) ||
     (item.affinity !== undefined && queue.affinities.has(item.affinity)) ||
@@ -482,56 +483,13 @@ ${duration}
     values: ReadonlyArray<SQLRawValue>,
     name: string | undefined,
     publish: PublishFunction | undefined,
-    executionAffinity: symbol | undefined,
+    affinity: symbol | undefined,
   ): Promise<PgClientResult<TData>> {
-    let state = this.queryQueues.get(context);
-    if (!state) {
-      state = { queues: new Set(), pending: [] };
-      this.queryQueues.set(context, state);
-    }
-
-    const { queues } = state;
-    const signature = getSignature(text);
-    // Prefer clones of the same select, then identical SQL.
-    let queue =
-      executionAffinity !== undefined || name !== undefined
-        ? setFind(
-            queues,
-            (q) =>
-              !q.closed &&
-              ((name !== undefined && q.names.has(name)) ||
-                (executionAffinity !== undefined &&
-                  q.affinities.has(executionAffinity))),
-          )
-        : undefined;
-    queue ??= setFind(
-      queues,
-      (q) =>
-        !q.closed &&
-        queueMatches(q, { name, affinity: executionAffinity, signature }),
-    );
-    if (!queue && queues.size < this.maxClientQueues) {
-      const newQueue: QueryQueue = {
-        names: new Set(),
-        affinities: new Set(),
-        signatures: new Set(),
-        closed: false,
-        first: undefined,
-        last: undefined,
-      };
-      queue = newQueue;
-      queues.add(newQueue);
-      // Wait one microtask so other ready steps can join before borrowing.
-      const queueState = state;
-      queueMicrotask(
-        () => void this._drainQueryQueue(context, newQueue, queueState),
-      );
-    }
-
     return new Promise<PgClientResult<TData>>((resolve, reject) => {
+      const signature = getSignature(text);
       const item: QueuedQuery = {
         name,
-        affinity: executionAffinity,
+        affinity,
         signature,
         next: undefined,
         text,
@@ -540,8 +498,38 @@ ${duration}
         resolve,
         reject,
       };
-      if (queue) addToQueue(queue, item);
-      else state.pending.push(item);
+      let state = this.queryQueues.get(context);
+      if (!state) {
+        state = { queues: new Set(), pending: [] };
+        this.queryQueues.set(context, state);
+      }
+
+      const { queues } = state;
+      // Prefer clones of the same select, then identical SQL.
+      let queue = setFind(queues, (q) => queueMatches(q, item));
+      if (queue === undefined && queues.size < this.maxClientQueues) {
+        const newQueue: QueryQueue = {
+          names: new Set(),
+          affinities: new Set(),
+          signatures: new Set(),
+          closed: false,
+          first: undefined,
+          last: undefined,
+        };
+        queue = newQueue;
+        queues.add(newQueue);
+        // Wait one microtask so other ready steps can join before borrowing.
+        const queueState = state;
+        queueMicrotask(
+          () => void this._drainQueryQueue(context, newQueue, queueState),
+        );
+      }
+
+      if (queue) {
+        addToQueue(queue, item);
+      } else {
+        state.pending.push(item);
+      }
     });
   }
 
@@ -1245,5 +1233,4 @@ ${duration}
     return result;
   }
 }
-
 exportAs("@dataplan/pg", PgExecutor, "PgExecutor");
