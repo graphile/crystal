@@ -474,7 +474,7 @@ ${duration}
         try {
           await context.withPgClient(context.pgSettings, async (client) => {
             let item: QueuedQuery | undefined;
-            while ((item = queue.items.shift())) {
+            while ((item = queue.items.shift()) !== undefined) {
               try {
                 const result = await this._executeWithClient(
                   client,
