@@ -240,11 +240,17 @@ function takeFromQueue(queue: QueryQueue): QueuedQuery | undefined {
   return item;
 }
 
-function takePending(queue: QueryQueue, pending: QueuedQuery[]): boolean {
+function takePending(
+  queue: QueryQueue,
+  pending: QueuedQuery[],
+  skipAddingToQueue: boolean,
+): QueuedQuery | undefined {
   const l = pending.length;
-  if (l === 0) return false;
+  if (l === 0) return undefined;
   const first = pending[0]!;
-  addToQueue(queue, first);
+  if (skipAddingToQueue === false) {
+    addToQueue(queue, first);
+  }
 
   // Compact in place, preserving FIFO order for both matching and remaining
   // work. A newly matched item may make further names/signatures/affinities eligible.
@@ -259,7 +265,7 @@ function takePending(queue: QueryQueue, pending: QueuedQuery[]): boolean {
   }
   // Truncate
   pending.length = remaining;
-  return true;
+  return first;
 }
 
 export type PgExecutorMutationOptions = {
@@ -510,8 +516,7 @@ ${duration}
 
       const state = this.getQueueState(context);
       const { queues } = state;
-      let queue =
-        queues.size > 0 && setFind(queues, (q) => queueMatches(q, item));
+      let queue = setFind(queues, (q) => queueMatches(q, item));
       if (queue === undefined && queues.size < this.maxClientQueues) {
         const newQueue: QueryQueue = {
           names: new Set(),
@@ -544,15 +549,18 @@ ${duration}
   ): Promise<void> {
     const { queues, pending } = state;
     try {
-      while (queue.first !== undefined || takePending(queue, pending)) {
+      while (
+        queue.first !== undefined ||
+        takePending(queue, pending, false) !== undefined
+      ) {
         let queryFailed = false;
         try {
           await context.withPgClient(context.pgSettings, async (client) => {
             while (true) {
-              const item = takeFromQueue(queue);
+              let item = takeFromQueue(queue);
               if (item === undefined) {
-                if (takePending(queue, pending)) continue;
-                break;
+                item = takePending(queue, pending, true);
+                if (item === undefined) break;
               }
               try {
                 const result = await this._executeWithClient(
