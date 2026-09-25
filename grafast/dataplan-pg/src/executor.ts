@@ -180,12 +180,16 @@ type QueuedQuery = {
 };
 
 type QueryQueue = {
-  texts: Set<string>;
+  signatures: Set<string>;
   affinities: Set<symbol>;
   items: QueuedQuery[];
   size: number;
   closed: boolean;
 };
+
+function getSignature(text: string, name?: string): string {
+  return name ?? text; // TODO: make signature smarter
+}
 
 const MAX_QUERIES_PER_CLIENT_QUEUE = 8;
 
@@ -420,13 +424,16 @@ ${duration}
             q.affinities.has(executionAffinity),
         )
       : undefined;
+    const signature = getSignature(text, name);
     queue ??= [...queues].find(
       (q) =>
-        !q.closed && q.size < MAX_QUERIES_PER_CLIENT_QUEUE && q.texts.has(text),
+        !q.closed &&
+        q.size < MAX_QUERIES_PER_CLIENT_QUEUE &&
+        q.signatures.has(signature),
     );
     if (!queue) {
       const newQueue: QueryQueue = {
-        texts: new Set(),
+        signatures: new Set(),
         affinities: new Set(),
         items: [],
         size: 0,
@@ -440,7 +447,7 @@ ${duration}
         () => void this._drainQueryQueue(context, newQueue, allQueues),
       );
     }
-    queue.texts.add(text);
+    queue.signatures.add(signature);
     if (executionAffinity) queue.affinities.add(executionAffinity);
     queue.size++;
 
