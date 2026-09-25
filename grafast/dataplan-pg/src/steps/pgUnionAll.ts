@@ -491,7 +491,11 @@ export class PgUnionAllStep<
   private connectionDepId: number | null = null;
 
   public readonly mode: PgUnionAllMode;
-  private readonly executionAffinity: symbol;
+  /**
+   * Used to indicate that clones and related queries should execute via the
+   * same connection to encourage data consistency.
+   */
+  private executionAffinity: symbol | undefined;
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
@@ -511,6 +515,9 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>, mode = cloneFrom.mode) {
+    // Associate cloned steps to the same connection
+    cloneFrom.executionAffinity ??= Symbol(cloneFrom.spec.name);
+
     const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
     const $clone = new PgUnionAllStep({
       ...cloneFrom.spec,
@@ -582,8 +589,7 @@ export class PgUnionAllStep<
         );
       }
       this.spec = spec;
-      this.executionAffinity =
-        spec._internalCloneExecutionAffinity ?? Symbol(spec.name ?? "union");
+      this.executionAffinity = spec._internalCloneExecutionAffinity;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
