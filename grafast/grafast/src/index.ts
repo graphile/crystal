@@ -75,6 +75,9 @@ import {
 import { grafast, grafastSync } from "./grafastGraphql.ts";
 import { inspect } from "./inspect.ts";
 import type {
+  BatchCallback,
+  BatchFunction,
+  BatchKeysetEquality,
   AbstractTypePlanner,
   ArgumentApplyPlanResolver,
   BaseEventMap,
@@ -316,6 +319,9 @@ export type {
   AbstractTypePlan,
   AbstractTypePlanner,
   ActualKeyByDesiredKey,
+  BatchCallback,
+  BatchFunction,
+  BatchKeysetEquality,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,

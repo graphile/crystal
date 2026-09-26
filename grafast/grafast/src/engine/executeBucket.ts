@@ -13,6 +13,7 @@ import {
   NO_FLAGS,
 } from "../constants.ts";
 import { isDev } from "../dev.ts";
+import { batchInMeta } from "../batch.ts";
 import { flagError, isFlaggedValue, SafeError } from "../error.ts";
 import { inspect } from "../inspect.ts";
 import type {
@@ -829,6 +830,14 @@ export function executeBucket(
     const executeDetails: ExecutionDetails<readonly any[]> = {
       indexMap: makeIndexMap(count),
       indexForEach: makeIndexForEach(count),
+      batch: (callback, unaryDependencies, keysets, keysetEquality) =>
+        batchInMeta(
+          (extra.meta ??= {}),
+          callback,
+          unaryDependencies,
+          keysets,
+          keysetEquality,
+        ),
       count,
       values,
       extra,

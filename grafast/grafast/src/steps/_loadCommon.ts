@@ -1,4 +1,3 @@
-import { noop } from "../dev.ts";
 import type {
   ExecutionDetails,
   Maybe,
@@ -86,62 +85,30 @@ export function paramSig(
   );
 }
 
-interface LoadBatch {
-  deferred: PromiseWithResolvers<any>;
-  batchSpecs: readonly any[];
-}
-
-export async function executeBatches<
-  TLoadInfo extends {
-    shared: any;
-    attributes: readonly any[];
-    params: any;
-    /** @deprecated use `shared` instead (it's identical) */
-    unary: any;
-  },
-  TCallback extends (
-    specs: ReadonlyArray<any>,
-    info: TLoadInfo,
-  ) => PromiseOrDirect<ReadonlyArray<any>>,
->(loadBatches: readonly LoadBatch[], loadInfo: TLoadInfo, load: TCallback) {
-  try {
-    const numberOfBatches = loadBatches.length;
-    if (numberOfBatches === 1) {
-      const [loadBatch] = loadBatches;
-      loadBatch.deferred.resolve(load(loadBatch.batchSpecs, loadInfo));
-      return;
-    } else {
-      // Do some tick-batching!
-      const indexStarts: number[] = [];
-      const allBatchSpecs: any[] = [];
-      for (let i = 0; i < numberOfBatches; i++) {
-        const loadBatch = loadBatches[i];
-        indexStarts[i] = allBatchSpecs.length;
-        for (const batchSpec of loadBatch.batchSpecs) {
-          allBatchSpecs.push(batchSpec);
-        }
-      }
-      const results = await load(allBatchSpecs, loadInfo);
-      for (let i = 0; i < numberOfBatches; i++) {
-        const loadBatch = loadBatches[i];
-        const start = indexStarts[i];
-        const stop = indexStarts[i + 1] ?? allBatchSpecs.length;
-        const entries = results.slice(start, stop);
-        loadBatch.deferred.resolve(entries);
-      }
-    }
-  } catch (e) {
-    for (const loadBatch of loadBatches) {
-      loadBatch.deferred.reject(e);
-    }
-  }
+interface LoadMeta {
+  cache?: Map<any, any>;
 }
 
 type LoadCallback = (...args: any[]) => any;
 
-interface LoadMeta {
-  cache?: Map<any, any>;
-  loadBatchesByLoad?: Map<LoadCallback, LoadBatch[]> | undefined;
+function executeLoadBatch(
+  unaryDependencies: readonly unknown[],
+  specs: readonly unknown[],
+): PromiseOrDirect<ReadonlyArray<any>> {
+  const [load, signature, shared, ...parameterValues] = unaryDependencies;
+  const [attributes, parameterNames] = JSON.parse(signature as string) as [
+    readonly string[],
+    readonly string[],
+  ];
+  const params = Object.fromEntries(
+    parameterNames.map((name, index) => [name, parameterValues[index]]),
+  );
+  return (load as LoadCallback)(specs, {
+    attributes,
+    params,
+    shared,
+    unary: shared,
+  });
 }
 
 export function executeLoad<
@@ -178,18 +145,6 @@ export function executeLoad<
       values[depId].unaryValue(),
     ]),
   ) as Partial<TParams>;
-  const loadInfo: {
-    attributes: ReadonlyArray<any>;
-    params: Partial<TParams>;
-    shared: TLoadContext;
-    /** @deprecated use `shared` instead (it's identical) */
-    unary: TLoadContext;
-  } = {
-    ...baseLoadInfo,
-    params,
-    shared,
-    unary: shared,
-  };
 
   const results: Array<PromiseOrDirect<TData>> = [];
   for (let i = 0; i < count; i++) {
@@ -209,34 +164,30 @@ export function executeLoad<
   }
   const pendingCount = batch.size;
   if (pendingCount > 0) {
-    const deferred = Promise.withResolvers<ReadonlyArray<TData>>();
-    deferred.promise.catch(noop); // Guard against unhandledPromiseRejection
     const batchSpecs = [...batch.keys()];
-    const loadBatch: LoadBatch = { deferred, batchSpecs };
-    if (!meta.loadBatchesByLoad) {
-      meta.loadBatchesByLoad = new Map();
-    }
-    let loadBatches = meta.loadBatchesByLoad.get(load);
-    if (loadBatches) {
-      // Add to existing batch load
-      loadBatches.push(loadBatch);
-    } else {
-      // Create new batch load
-      loadBatches = [loadBatch];
-      meta.loadBatchesByLoad.set(load, loadBatches);
-      // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
-      queueMicrotask(() => {
-        // Don't allow adding anything else to the batch
-        meta.loadBatchesByLoad!.delete(load);
-        void executeBatches(loadBatches!, loadInfo, load);
-      });
-    }
+    const parameterNames = Object.keys(params).sort();
+    const loadInfoSignature = JSON.stringify([
+      baseLoadInfo.attributes,
+      parameterNames,
+    ]);
+    const unaryDependencies = [
+      load,
+      loadInfoSignature,
+      shared,
+      ...parameterNames.map((key) => params[key]),
+    ];
+    const loadResults = details.batch(
+      executeLoadBatch,
+      unaryDependencies,
+      batchSpecs,
+      "strict",
+    );
     return (async () => {
-      const loadResults = await deferred.promise;
+      const loaded = await loadResults;
       for (let pendingIndex = 0; pendingIndex < pendingCount; pendingIndex++) {
         const spec = batchSpecs[pendingIndex];
         const targetIndexes = batch.get(spec)!;
-        const loadResult = loadResults[pendingIndex];
+        const loadResult = loaded[pendingIndex];
         cache.set(spec, loadResult);
         for (const targetIndex of targetIndexes) {
           results[targetIndex] = loadResult;

@@ -64,6 +64,11 @@ import type {
 } from "../interfaces.ts";
 import { parseArray } from "../parseArray.ts";
 import { PgLocker } from "../pgLocker.ts";
+import {
+  executePgStepBatch,
+  getPgStepBatchInfo,
+  pgStepBatchMetaKey,
+} from "./pgStepBatch.ts";
 import type {
   PlantimeEmbeddable,
   RuntimeEmbeddable,
@@ -713,6 +718,7 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
+    this.metaKey = pgStepBatchMetaKey;
     if (!options.resource) {
       throw new Error(
         `Resource passed to \`pgSelect(...)\` was ${inspect(options.resource)} - perhaps you used the wrong resource name when looking it up in the registry?`,
@@ -1185,12 +1191,8 @@ export class PgSelectStep<
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastResultsList<PgSelectStepResult>> {
-    const {
-      indexMap,
-      count,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
+    const { indexMap, count, values, extra } = executionDetails;
+    const { eventEmitter } = extra;
     const {
       meta,
       text,
@@ -1312,18 +1314,27 @@ export class PgSelectStep<
       const executeMethod = isMutation
         ? "executeWithoutCache"
         : "executeWithCache";
-      const executionResult =
-        specs.length > 0
-          ? await this.resource[executeMethod](specs, {
-              text,
-              rawSqlValues,
-              identifierIndex,
-              name,
-              affinity: this.executionAffinity,
-              eventEmitter,
-              useTransaction: isMutation,
-            })
-          : null;
+      const common = {
+        text,
+        rawSqlValues,
+        identifierIndex,
+        name,
+        affinity: this.executionAffinity,
+        eventEmitter,
+        useTransaction: isMutation,
+      };
+      const executionResult = specs.length
+        ? executeMethod === "executeWithCache" && !isMutation
+          ? {
+              values: await executionDetails.batch(
+                executePgStepBatch,
+                [getPgStepBatchInfo(this.resource.executor, context, common)],
+                specs.map(({ queryValues }) => queryValues),
+                "tuple",
+              ),
+            }
+          : await this.resource[executeMethod](specs, common)
+        : null;
       // debugExecute("%s; result: %c", this, executionResult);
 
       return indexMap((i) => {

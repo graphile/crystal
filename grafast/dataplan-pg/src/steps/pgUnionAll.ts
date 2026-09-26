@@ -41,6 +41,11 @@ import type {
   ReadonlyArrayOrDirect,
 } from "../interfaces.ts";
 import { PgLocker } from "../pgLocker.ts";
+import {
+  executePgStepBatch,
+  getPgStepBatchInfo,
+  pgStepBatchMetaKey,
+} from "./pgStepBatch.ts";
 import type { PlantimeEmbeddable, RuntimeSQLThunk } from "../utils.ts";
 import { makeScopedSQL, runtimeScopedSQL } from "../utils.ts";
 import type { PgClassExpressionStep } from "./pgClassExpression.ts";
@@ -580,6 +585,7 @@ export class PgUnionAllStep<
 
   constructor(spec: PgUnionAllStepConfig<TAttributes, TTypeNames>) {
     super();
+    this.metaKey = pgStepBatchMetaKey;
     {
       this.mode = spec.mode ?? "normal";
 
@@ -974,11 +980,8 @@ on (${sql.indent(
   async execute(
     executionDetails: ExecutionDetails,
   ): Promise<GrafastValuesList<any>> {
-    const {
-      indexMap,
-      values,
-      extra: { eventEmitter },
-    } = executionDetails;
+    const { indexMap, values, extra } = executionDetails;
+    const { eventEmitter } = extra;
     const { fetchOneExtra } = this;
     const {
       meta,
@@ -1049,7 +1052,7 @@ on (${sql.indent(
     const executeMethod = this.hasSideEffects
       ? "executeWithoutCache"
       : "executeWithCache";
-    const executionResult = await this.executor[executeMethod](specs, {
+    const common = {
       text,
       rawSqlValues,
       identifierIndex,
@@ -1057,7 +1060,18 @@ on (${sql.indent(
       affinity: this.executionAffinity,
       eventEmitter,
       useTransaction: this.hasSideEffects,
-    });
+    };
+    const executionResult =
+      executeMethod === "executeWithCache"
+        ? {
+            values: await executionDetails.batch(
+              executePgStepBatch,
+              [getPgStepBatchInfo(this.executor, context, common)],
+              specs.map(({ queryValues }) => queryValues),
+              "tuple",
+            ),
+          }
+        : await this.executor[executeMethod](specs, common);
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {

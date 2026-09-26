@@ -814,6 +814,8 @@ ${printDeps(step, 1)}
    * - `indexMap`: helper function to map over each index from `0` to `count-1`,
    *   returning the resulting array.
    * - `indexForEach`: as `indexMap`, but without the array result.
+   * - `batch`: combines keysets from equivalent steps that become ready during
+   *   the same runloop tick.
    * - `meta`: [experimental]
    *
    * `execute` must return a list with `count` entries, where each value in the
