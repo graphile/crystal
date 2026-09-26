@@ -317,6 +317,9 @@ export class OperationPlan {
   /** @internal */
   public makeMetaByMetaKey: () => MetaByMetaKey;
 
+  /** @internal */
+  public hasNoConstraints = false;
+
   /**
    * @internal
    */
@@ -597,6 +600,10 @@ export class OperationPlan {
         planningTimeoutWarmupMultiplier - 0.5,
       );
     }
+    this.hasNoConstraints =
+      this.variableValuesConstraints.length === 0 &&
+      this.contextConstraints.length === 0 &&
+      this.rootValueConstraints.length === 0;
   }
 
   private lap(category: string, subcategory?: string): void {
