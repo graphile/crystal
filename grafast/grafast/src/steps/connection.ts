@@ -489,22 +489,29 @@ export class ConnectionStep<
    * constraints (before, after, first, last, offset). It's useful for
    * returning the actual edges and nodes of the connection.
    *
-   * This cannot be called before the arguments have been finalized.
+   * @param needsCollection - When merely setting the pagination attributes
+   * (first/last/before/after/offset) pass `false` as needsCollection, but when
+   * actually rendering the data (nodes/edges/pageInfo/etc) we do indeed need
+   * the collection so pass `true`.
    */
-  private setupSubplanWithPagination() {
-    this.neededCollection = true;
+  private setupSubplanWithPagination(needsCollection: boolean) {
+    if (needsCollection) {
+      this.neededCollection = true;
+    }
     return this.getDepOptions(this.collectionDepId).step as TCollectionStep &
       Partial<
         ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
       >;
   }
 
-  private getHandler():
+  private getHandler(
+    needsCollection: boolean,
+  ):
     | (TCollectionStep &
         ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>)
     | ConnectionParamsStep<TCursorValue> {
     if (this.collectionPaginationSupport?.full) {
-      return this.setupSubplanWithPagination() as any;
+      return this.setupSubplanWithPagination(needsCollection) as any;
     } else {
       return this.paginationParams();
     }
@@ -516,7 +523,7 @@ export class ConnectionStep<
 
   public setNeedsHasMore() {
     this.needsHasMore = true;
-    this.setupSubplanWithPagination();
+    this.setupSubplanWithPagination(true);
   }
 
   public getFirst(): Step<number | null | undefined> | null {
@@ -532,7 +539,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
     });
-    this.getHandler().setFirst($first);
+    this.getHandler(false).setFirst($first);
   }
   public getLast(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._lastDepId);
@@ -547,7 +554,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
     });
-    this.getHandler().setLast($last);
+    this.getHandler(false).setLast($last);
   }
   public getOffset(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._offsetDepId);
@@ -562,7 +569,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setOffset(...) must be passed a _unary_ step, but ${$offset} is not unary. See: https://err.red/gud#connection`,
     });
-    this.getHandler().setOffset($offset);
+    this.getHandler(false).setOffset($offset);
   }
   public getBefore(): Step<Maybe<TCursorValue>> | null {
     return this.maybeGetDep<Step<Maybe<TCursorValue>>>(this._beforeDepId, true);
@@ -582,7 +589,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
     });
-    this.getHandler().setBefore($parsedBeforePlan);
+    this.getHandler(false).setBefore($parsedBeforePlan);
   }
   public getAfter(): Step<Maybe<TCursorValue>> | null {
     // TODO: Move all of these to params, get rid of our dep here.
@@ -603,7 +610,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
     });
-    this.getHandler().setAfter($parsedAfterPlan);
+    this.getHandler(false).setAfter($parsedAfterPlan);
   }
 
   /**
@@ -682,7 +689,7 @@ export class ConnectionStep<
   }
   public nodePlan = ($rawItem: Step<MaybeIndexed<TItem>>) => {
     const $item = this.getUnindexedItem($rawItem);
-    const subplan = this.setupSubplanWithPagination();
+    const subplan = this.setupSubplanWithPagination(true);
     if (typeof subplan.nodeForItem === "function") {
       return subplan.nodeForItem($item);
     } else if (typeof subplan.listItem === "function") {
@@ -693,7 +700,7 @@ export class ConnectionStep<
   };
 
   public edgePlan = ($rawItem: Step<MaybeIndexed<TItem>>) => {
-    const subplan = this.setupSubplanWithPagination();
+    const subplan = this.setupSubplanWithPagination(true);
     if (typeof subplan.edgeForItem === "function") {
       return subplan.edgeForItem($rawItem);
     } else {
@@ -704,11 +711,11 @@ export class ConnectionStep<
   private captureStream() {
     const $streamDetails = currentFieldStreamDetails();
     if ($streamDetails === null || $streamDetails === true) {
-      this.getHandler().addStreamDetails?.(null);
+      this.getHandler(true).addStreamDetails?.(null);
 
       this._mightStream = false;
     } else {
-      this.getHandler().addStreamDetails?.($streamDetails);
+      this.getHandler(true).addStreamDetails?.($streamDetails);
 
       if (this._mightStream === null) {
         // Only override if it was unknown
@@ -719,13 +726,13 @@ export class ConnectionStep<
 
   public edges(): Step {
     this.captureStream();
-    this.setupSubplanWithPagination();
+    this.setupSubplanWithPagination(true);
     return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
     this.captureStream();
-    this.setupSubplanWithPagination();
+    this.setupSubplanWithPagination(true);
     return each(this._items(), this.nodePlan as any);
   }
 
@@ -776,7 +783,7 @@ export class ConnectionStep<
       return constant(EMPTY_CONNECTION_RESULT);
     }
     if (this.needsHasMore) {
-      this.getHandler().setNeedsHasMore();
+      this.getHandler(true).setNeedsHasMore();
     }
     /*
      * **IMPORTANT**: no matter the arguments, we cannot optimize ourself away
