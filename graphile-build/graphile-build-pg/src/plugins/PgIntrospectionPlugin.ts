@@ -388,14 +388,26 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                 "contextCallback",
               );
         const maxClientQueues = info.options.pgExecutorMaxClientQueues;
+        const pgExecutorConfig =
+          maxClientQueues !== undefined
+            ? EXPORTABLE(
+                (contextCallback, maxClientQueues, serviceName) => ({
+                  name: serviceName,
+                  context: contextCallback,
+                  maxClientQueues,
+                }),
+                [contextCallback, maxClientQueues, serviceName],
+              )
+            : EXPORTABLE(
+                (contextCallback, serviceName) => ({
+                  name: serviceName,
+                  context: contextCallback,
+                }),
+                [contextCallback, serviceName],
+              );
         const executor = EXPORTABLE(
-          (PgExecutor, contextCallback, maxClientQueues, serviceName) =>
-            new PgExecutor({
-              name: serviceName,
-              context: contextCallback,
-              maxClientQueues,
-            }),
-          [PgExecutor, contextCallback, maxClientQueues, serviceName],
+          (PgExecutor, pgExecutorConfig) => new PgExecutor(pgExecutorConfig),
+          [PgExecutor, pgExecutorConfig],
           serviceName === "main" ? `executor` : `${serviceName}Executor`,
         );
 
