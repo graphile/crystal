@@ -1,5 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
+#> expectedPlanConstraints: 2
 # TODO: we perform a fetch for edge1 and a fetch for edge2; ideally we'd notice
 # that the SQL is the same for both and we'd just perform the query once.
 # However, to do so we'd have to know it's definitely not a mutation (no
