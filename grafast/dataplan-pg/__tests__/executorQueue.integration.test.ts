@@ -1,5 +1,5 @@
-import { context, execute, grafast, makeGrafastSchema, object } from "grafast";
 import type { Step } from "grafast";
+import { context, execute, grafast, makeGrafastSchema, object } from "grafast";
 import { ExecutionResult, parse } from "grafast/graphql";
 import { resolvePreset } from "graphile-config";
 import { Pool } from "pg";
@@ -9,17 +9,17 @@ import { makePgAdaptorWithPgClient } from "../src/adaptors/pg.ts";
 import { EXPORTABLE } from "../src/datasource.ts";
 import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 import { PgExecutor } from "../src/executor.ts";
+import type {
+  PgClientQuery,
+  PgExecutorContext,
+  WithPgClient,
+} from "../src/index.ts";
 import {
   makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
   pgSelect,
   TYPES,
-} from "../src/index.ts";
-import type {
-  PgClientQuery,
-  PgExecutorContext,
-  WithPgClient,
 } from "../src/index.ts";
 import {
   createTestDatabase,
@@ -37,39 +37,51 @@ test("concurrent identical reads with different pgSettings stay isolated", async
       leases++;
       return baseWithPgClient(pgSettings, callback);
     };
-    const executor = new PgExecutor({
-      name: "settingsIsolationTest",
-      context: () => {
-        const $context = context();
-        return object({
-          pgSettings: $context.get("pgSettings"),
-          withPgClient: $context.get("withPgClient"),
-        }) as Step<PgExecutorContext>;
-      },
-    });
+    const executor = EXPORTABLE(
+      (PgExecutor, context, object) =>
+        new PgExecutor({
+          name: "settingsIsolationTest",
+          context: () => {
+            const $context = context();
+            return object({
+              pgSettings: $context.get("pgSettings"),
+              withPgClient: $context.get("withPgClient"),
+            }) as Step<PgExecutorContext>;
+          },
+        }),
+      [PgExecutor, context, object],
+    );
     const resourceOptions = makePgResourceOptions({
       executor,
       codec: TYPES.text,
       from: sql`(select current_setting('jwt.claims.user_id')::text)`,
       name: "current_user_id",
     });
-    const registry = makeRegistry(
-      makeRegistryBuilder()
-        .addExecutor(executor)
-        .addResource(resourceOptions)
-        .getRegistryConfig(),
+    const registry = EXPORTABLE(
+      (executor, makeRegistry, makeRegistryBuilder, resourceOptions) =>
+        makeRegistry(
+          makeRegistryBuilder()
+            .addExecutor(executor)
+            .addResource(resourceOptions)
+            .getRegistryConfig(),
+        ),
+      [executor, makeRegistry, makeRegistryBuilder, resourceOptions],
     );
     const schema = makeGrafastSchema({
       typeDefs: "type Query { currentUserId: String }",
       objects: {
         Query: {
           plans: {
-            currentUserId() {
-              return pgSelect({
-                resource: registry.pgResources.current_user_id,
-                identifiers: [],
-              }).single();
-            },
+            currentUserId: EXPORTABLE(
+              (pgSelect, registry) =>
+                function currentUserId() {
+                  return pgSelect({
+                    resource: registry.pgResources.current_user_id,
+                    identifiers: [],
+                  }).single();
+                },
+              [pgSelect, registry],
+            ),
           },
         },
       },
