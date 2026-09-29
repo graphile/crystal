@@ -3860,18 +3860,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/static@npm:^10.1.2":
-  version: 10.1.2
-  resolution: "@fastify/static@npm:10.1.2"
+"@fastify/static@npm:^10.1.5":
+  version: 10.1.5
+  resolution: "@fastify/static@npm:10.1.5"
   dependencies:
     "@fastify/accept-negotiator": "npm:^2.0.0"
     "@fastify/error": "npm:^4.0.0"
     "@fastify/send": "npm:^4.0.0"
-    content-disposition: "npm:^2.0.1"
+    content-disposition: "npm:^3.0.0"
     fastify-plugin: "npm:^6.0.0"
     fastq: "npm:^1.17.1"
     glob: "npm:^13.0.0"
-  checksum: 10/5c216ce12262f9dc7916c53c9cc045ad3eb15b2bdc8eaa6252ec9b141b9bd330104cdacb1d2a67971c5e1c7e387dfc19773de565b86f557ec045cebc454b4bfa
+  checksum: 10/f98204f5ebae543a4eba1e7006a84425130a2f1a0146c9637e3dc3a6552015228429a511335acf624e99bd6fb2a0a6ce536d5cb1433ce639ee0ffa83a1e531e5
   languageName: node
   linkType: hard
 
@@ -4975,12 +4975,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/node-server@npm:^1.19.15":
-  version: 1.19.15
-  resolution: "@hono/node-server@npm:1.19.15"
+"@hono/node-server@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "@hono/node-server@npm:2.1.3"
   peerDependencies:
     hono: ^4
-  checksum: 10/7155b6c82de7e984c59a38a252f818e317c557f68997ac3d05af8f5bb54fe620ff3ab833738f4aa46ef57d7c0a705aacd8067f05c170e7e6d88dc65c29b7e56c
+  checksum: 10/3b895ebd085504721a31dab0c05dad11a3ad4d23db6a348e60f86deb03cf6967ea67a9258a77a0f38dd445d7e7bc3069e7c24169510a83d3a6b0420112938e36
   languageName: node
   linkType: hard
 
@@ -5917,7 +5917,7 @@ __metadata:
     "@mdx-js/react": "npm:^3.1.1"
     "@types/react": "npm:^19.2.7"
     clsx: "npm:^2.1.1"
-    postcss: "npm:^8.5.23"
+    postcss: "npm:^8.5.24"
     postcss-nested: "npm:^7.0.2"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.2.0"
@@ -11313,10 +11313,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"content-disposition@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "content-disposition@npm:2.0.1"
-  checksum: 10/d3981346fdcc5c72514c3b44e08137312f6969b55d151840222e0a75ecfe295e506cc1f4f4339eaad20c170634cbc673913a04d836089fbfe5a08cd4468f2e23
+"content-disposition@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "content-disposition@npm:3.0.0"
+  checksum: 10/3ce58867a5b25b9043d70ff9a7c922f162f009f381c72983349736ed315c89fcbb578471c24e2d42d640fbd71603389bcdb1c7b71f49a87e0f84f9f93c86eee0
   languageName: node
   linkType: hard
 
@@ -13995,9 +13995,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^5.12.1":
-  version: 5.12.1
-  resolution: "fastify@npm:5.12.1"
+"fastify@npm:^5.12.5":
+  version: 5.12.5
+  resolution: "fastify@npm:5.12.5"
   dependencies:
     "@fastify/ajv-compiler": "npm:^4.0.5"
     "@fastify/error": "npm:^4.0.0"
@@ -14014,7 +14014,7 @@ __metadata:
     secure-json-parse: "npm:^4.0.0"
     semver: "npm:^7.6.0"
     toad-cache: "npm:^3.7.0"
-  checksum: 10/b1e189820cc458e91b75a246d11fa040ceaef0d4545eac29adee966a3affcf36a57751640e2568f78f5dc72eea8f1062723cc9ac91459de3ee0b3e1e00df4c44
+  checksum: 10/282ec56b8bc153b9b0048409ebd060fc20372284589aaac35e5f2b45f0f84a85bd1b5199caed10cbc7cfc7b5cf406d3188c544f3e3f5f59c602eed2c37b645b9
   languageName: node
   linkType: hard
 
@@ -14876,7 +14876,7 @@ __metadata:
     "@envelop/core": "npm:^5.3.0"
     "@fastify/websocket": "npm:^11.1.0"
     "@graphile/lru": "workspace:^"
-    "@hono/node-server": "npm:^1.19.15"
+    "@hono/node-server": "npm:^2.1.3"
     "@hono/node-ws": "npm:^1.2.0"
     "@types/aws-lambda": "npm:^8.10.159"
     "@types/express": "npm:^4.17.25"
@@ -14888,14 +14888,14 @@ __metadata:
     debug: "npm:^4.4.3"
     eventemitter3: "npm:^5.0.1"
     express: "npm:^4.21.2"
-    fastify: "npm:^5.12.1"
+    fastify: "npm:^5.12.5"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: "npm:^16.9.0"
     graphql-http: "npm:^1.22.4"
     graphql-ws: "npm:^6.0.5"
     h3: "npm:^1.15.9"
-    hono: "npm:^4.13.5"
+    hono: "npm:^4.13.11"
     jest: "npm:^30.2.0"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^3.1.2"
@@ -14944,7 +14944,7 @@ __metadata:
     "@envelop/core": "npm:^5.3.0"
     "@envelop/parser-cache": "npm:^10.0.0"
     "@envelop/validation-cache": "npm:^10.0.0"
-    "@fastify/static": "npm:^10.1.2"
+    "@fastify/static": "npm:^10.1.5"
     "@types/debug": "npm:^4.1.12"
     "@types/express": "npm:^4.17.25"
     "@types/jest": "npm:^30.0.0"
@@ -14953,7 +14953,7 @@ __metadata:
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.3"
     express: "npm:^4.21.2"
-    fastify: "npm:^5.12.1"
+    fastify: "npm:^5.12.5"
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
@@ -15599,10 +15599,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^4.13.5":
-  version: 4.13.5
-  resolution: "hono@npm:4.13.5"
-  checksum: 10/a302e8d3a5329276ca436333e54679ef864e92e1b3fbd4db0d98cc56e71748622a1654103fcdf9ee866027b797255557e1ade05c8ceb866411603d74bf71bf43
+"hono@npm:^4.13.11":
+  version: 4.13.11
+  resolution: "hono@npm:4.13.11"
+  checksum: 10/ba637aff1e873a2524c6f8528b9c9b7c30b420c72e9eaf56e5354ce6627174bd7c5d1039d983b6671d95654c297d11a9f30ea5e6706afd9fac66eabcda17c8e3
   languageName: node
   linkType: hard
 
@@ -21872,12 +21872,12 @@ __metadata:
   linkType: hard
 
 "postcss-selector-parser@npm:^6.0.11, postcss-selector-parser@npm:^6.0.16, postcss-selector-parser@npm:^6.1.1, postcss-selector-parser@npm:^6.1.2":
-  version: 6.1.2
-  resolution: "postcss-selector-parser@npm:6.1.2"
+  version: 6.1.4
+  resolution: "postcss-selector-parser@npm:6.1.4"
   dependencies:
     cssesc: "npm:^3.0.0"
     util-deprecate: "npm:^1.0.2"
-  checksum: 10/190034c94d809c115cd2f32ee6aade84e933450a43ec3899c3e78e7d7b33efd3a2a975bb45d7700b6c5b196c06a7d9acf3f1ba6f1d87032d9675a29d8bca1dd3
+  checksum: 10/68d122d44ea248f570252a08f4967758168b110a7a5349b1d5605d2a10b2ca4bbb257e36b0925053abf35b406955e730febe5a4aa3cf6997ce222d46ec0ab840
   languageName: node
   linkType: hard
 
@@ -21952,14 +21952,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.5.23":
-  version: 8.5.23
-  resolution: "postcss@npm:8.5.23"
+"postcss@npm:^8.5.24":
+  version: 8.5.24
+  resolution: "postcss@npm:8.5.24"
   dependencies:
     nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10/8387f421216696bf62a13e5a270e9fefdafc81e196903c0f8d7653f8bab315367cc2261b3c22cf197e492cb075f31bdfc07fd9c3be1cb165ff3cabe14c5a039a
+  checksum: 10/4e26169ed6fe8c2a32702d233b16368124d162a9399606381ed7a2f99ba6237360717aab339a0bd0f072280663413ff5115189b282085d1be74ffb2d25bdb562
   languageName: node
   linkType: hard
 
