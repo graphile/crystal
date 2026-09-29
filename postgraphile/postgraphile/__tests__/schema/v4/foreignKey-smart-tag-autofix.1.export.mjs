@@ -1716,6 +1716,7 @@ const person_type_functionFunctionIdentifer = sql.identifier("c", "person_type_f
 const person_type_function_connectionFunctionIdentifer = sql.identifier("c", "person_type_function_connection");
 const person_type_function_listFunctionIdentifer = sql.identifier("c", "person_type_function_list");
 const query_output_two_rowsFunctionIdentifer = sql.identifier("c", "query_output_two_rows");
+const read_pg_settingsFunctionIdentifer = sql.identifier("c", "read_pg_settings");
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
 const search_test_summariesFunctionIdentifer = sql.identifier("c", "search_test_summaries");
 const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
@@ -3915,6 +3916,25 @@ const registry = makeRegistry({
       },
       isUnique: true
     },
+    read_pg_settings: {
+      executor: executor,
+      name: "read_pg_settings",
+      identifier: "main.c.read_pg_settings()",
+      from(...args) {
+        return sql`${read_pg_settingsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      codec: TYPES.json,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "read_pg_settings"
+        }
+      },
+      isUnique: true
+    },
     return_table_without_grants: PgResource.functionResourceOptions(compound_key_resourceOptionsConfig, {
       name: "return_table_without_grants",
       identifier: "main.c.return_table_without_grants()",
@@ -4470,6 +4490,7 @@ const argDetailsSimple_query_output_two_rows = [{
 }];
 const makeArgs_query_output_two_rows = (args, path = []) => argDetailsSimple_query_output_two_rows.map(details => makeArg(path, args, details));
 const resource_query_output_two_rowsPgResource = registry.pgResources["query_output_two_rows"];
+const resource_read_pg_settingsPgResource = registry.pgResources["read_pg_settings"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
 const resource_search_test_summariesPgResource = registry.pgResources["search_test_summaries"];
 const argDetailsSimple_table_query = [{
@@ -5673,6 +5694,7 @@ type Query implements Node {
   jsonbIdentity(json: JSON): JSON
   noArgsQuery: Int
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  readPgSettings: JSON
   returnTableWithoutGrants: CompoundKey
   searchTestSummariesList(
     """Only read the first \`n\` values of the set."""
@@ -10459,6 +10481,10 @@ export const objects = {
       queryOutputTwoRows($root, args, _info) {
         const selectArgs = makeArgs_query_output_two_rows(args);
         return resource_query_output_two_rowsPgResource.execute(selectArgs);
+      },
+      readPgSettings($root, args, _info) {
+        const selectArgs = makeArgs_compound_type_computed_field(args);
+        return resource_read_pg_settingsPgResource.execute(selectArgs);
       },
       returnTableWithoutGrants($root, args, _info) {
         const selectArgs = makeArgs_compound_type_computed_field(args);

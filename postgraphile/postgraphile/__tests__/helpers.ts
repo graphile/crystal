@@ -265,6 +265,7 @@ export async function runTestQuery(
     cleanupSql?: string;
     extends?: string | string[];
     pgIdentifiers?: "qualified" | "unqualified";
+    pgSettings?: Record<string, string | number | boolean | null | undefined>;
     search_path?: string;
     muteWarnings?: boolean;
     dontLogErrors?: boolean;
@@ -299,6 +300,7 @@ export async function runTestQuery(
     setupSql,
     cleanupSql,
     pgIdentifiers,
+    pgSettings,
     search_path,
     muteWarnings = true,
     dontLogErrors = false,
@@ -353,8 +355,9 @@ export async function runTestQuery(
                 role: "postgraphile_test_authenticator",
               }
             : null,
-        pgSettings:
-          config.ignoreRBAC === false
+        pgSettings: pgSettings
+          ? () => pgSettings
+          : config.ignoreRBAC === false
             ? () => ({
                 role: "postgraphile_test_visitor",
                 "jwt.claims.user_id": "3",

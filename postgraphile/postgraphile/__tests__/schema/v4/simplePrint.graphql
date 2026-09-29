@@ -393,6 +393,7 @@ type Query implements Node {
   jsonbIdentity(json: JSON): JSON
   noArgsQuery: Int
   queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  readPgSettings: JSON
   returnTableWithoutGrants: CompoundKey
   searchTestSummariesList(
     """Only read the first `n` values of the set."""
