@@ -65,9 +65,16 @@ export function bakedInput<TArg = any>(
   // Could have done this in `optimize()` but faster to do it here.
   if (
     isInputObjectType(namedInputType) &&
-    typeof namedInputType.extensions?.grafast?.baked === "function" &&
-    (namedInputType === nullableInputType || isListType(nullableInputType))
+    typeof namedInputType.extensions?.grafast?.baked === "function"
   ) {
+    if (
+      namedInputType !== nullableInputType &&
+      !isListType(nullableInputType)
+    ) {
+      throw new Error(
+        "GrafastInternalError<23419ac9-6842-4903-a4ed-73874b80328c>: impossible type error occurred?",
+      );
+    }
     // Ooo, we're fancy! Do the thing!
     return operationPlan().withRootLayerPlan(
       () => new BakedInputStep<TArg>(nullableInputType, $value),
