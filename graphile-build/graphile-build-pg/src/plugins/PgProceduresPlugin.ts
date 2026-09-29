@@ -192,8 +192,20 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const allArgTypes = pgProc.proallargtypes ?? pgProc.proargtypes ?? [];
 
           /**
+           * PostgreSQL PROCEDUREs (as opposed to FUNCTIONs) can only be
+           * invoked via a `call` statement, never embedded in a `select`.
+           */
+          const isProcedure = pgProc.prokind === "p";
+
+          /**
            * If there's two or more OUT or inout arguments INOUT, or any TABLE
            * arguments then we'll need to generate a codec for the payload.
+           *
+           * PROCEDUREs are a special case. PostgreSQL always reports their
+           * return type as `record` as soon as they have *any* OUT/INOUT
+           * argument, even just one. FUNCTIONs only do this once there's two
+           * or more, so for procedures we must generate the payload codec
+           * starting from a single OUT/INOUT argument.
            */
           const outOrInoutOrTableArgModes =
             pgProc.proargmodes?.filter(
@@ -201,13 +213,20 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             ) ?? [];
           const isRecordReturnType =
             pgProc.prorettype === "2249"; /* OID of the 'record' type */
-          const needsPayloadCodecToBeGenerated =
-            outOrInoutOrTableArgModes.length > 1;
+          const needsPayloadCodecToBeGenerated = isProcedure
+            ? outOrInoutOrTableArgModes.length >= 1
+            : outOrInoutOrTableArgModes.length > 1;
 
           const debugProcName = `${namespace.nspname}.${pgProc.proname}`;
 
           if (isRecordReturnType && !needsPayloadCodecToBeGenerated) {
             // We do not support anonymous 'record' return type
+            return null;
+          }
+
+          if (isProcedure && outOrInoutOrTableArgModes.includes("t")) {
+            // PostgreSQL doesn't support `RETURNS TABLE` for procedures, but
+            // just in case, we don't support it either.
             return null;
           }
 
@@ -318,6 +337,17 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
           const rawParameters: PgResourceParameter[] = [];
 
+          /**
+           * For procedures only: *every* positional argument (including
+           * OUT-only ones), in declaration order. PostgreSQL's `call`
+           * statement requires a value for every positional argument, even
+           * OUT-only ones (whose value is discarded), unlike a function call.
+           */
+          const procedureArguments: Array<{
+            mode: "i" | "o" | "b";
+            codec: PgCodec;
+          }> = [];
+
           // const processedFirstInputArg = false;
 
           // "v" is for "volatile"; but let's just say anything that's not
@@ -404,6 +434,27 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   ...(variant ? { extensions: { variant } } : null),
                 }),
               );
+              if (isProcedure) {
+                procedureArguments.push({ mode: argMode, codec: argCodec });
+              }
+            } else if (isProcedure && argMode === "o") {
+              const argCodec = await info.helpers.pgCodecs.getCodecFromType(
+                serviceName,
+                argType,
+                typeModifier,
+              );
+              if (!argCodec) {
+                console.warn(
+                  `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
+                    (await info.helpers.pgIntrospection.getType(
+                      serviceName,
+                      argType,
+                    ))!.typname
+                  }); skipping procedure`,
+                );
+                return null;
+              }
+              procedureArguments.push({ mode: "o", codec: argCodec });
             }
           }
 
@@ -565,7 +616,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               hasImplicitOrder,
               extensions,
               ...(!returnsSetof ? { isUnique: true } : null),
-              ...(isMutation ? { isMutation } : null),
+              ...(isMutation || isProcedure ? { isMutation: true } : null),
+              ...(isProcedure ? { isProcedure, procedureArguments } : null),
               ...(description ? { description } : null),
             };
 

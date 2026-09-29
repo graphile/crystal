@@ -1,0 +1,17 @@
+{
+  noArgsNoOutput: {
+    __typename: "NoArgsNoOutputPayload",
+  },
+  noArgsNoOutputWithId: {
+    clientMutationId: "abc",
+  },
+  inArgsNoOutput: {
+    __typename: "InArgsNoOutputPayload",
+  },
+  inoutArg: {
+    clientMutationId: "xyz",
+    counter: {
+      counter: 11,
+    },
+  },
+}

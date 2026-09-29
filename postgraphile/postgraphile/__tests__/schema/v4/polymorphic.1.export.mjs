@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { PgCallStep, PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, access, assertStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, markSyncAndSafe, object, operationPlan, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -6061,6 +6061,13 @@ const makeArgs_custom_delete_relational_item = (args, path = []) => argDetailsSi
 const resource_custom_delete_relational_itemPgResource = registry.pgResources["custom_delete_relational_item"];
 function pgSelectFromPayload($payload) {
   const $result = $payload.getStepForKey("result");
+  if ($result instanceof PgCallStep) {
+    // Procedures are invoked via `call`, not `select`, so there's no
+    // `PgSelectStep` to find. The call step itself is the target that
+    // nested `apply`-capable input fields (e.g. `clientMutationId`)
+    // should be applied to.
+    return $result;
+  }
   const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
   const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
   if ($pgSelect instanceof PgSelectStep) {
@@ -16075,6 +16082,10 @@ export const objects = {
         args: {
           input(_, $payload, arg) {
             const $pgSelect = pgSelectFromPayload($payload);
+            // `PgCallStep`'s `apply()` takes a `PgCallQueryBuilder` rather than a
+            // `PgSelectQueryBuilder`, but both satisfy the same structural `apply`
+            // protocol at runtime (only `clientMutationId` uses it here), so the
+            // precise `qb` type is immaterial to the caller.
             arg.apply($pgSelect);
           }
         }

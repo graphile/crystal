@@ -125,6 +125,8 @@ import {
   withSuperuserPgClientFromPgService,
 } from "./pgServices.ts";
 import { PgContextPlugin } from "./plugins/PgContextPlugin.ts";
+import type { PgCallQueryBuilder } from "./steps/pgCall.ts";
+import { pgCall, PgCallStep } from "./steps/pgCall.ts";
 import {
   pgClassExpression,
   PgClassExpressionStep,
@@ -220,6 +222,7 @@ export type {
   ObjectFromPgCodecAttributes,
   PgAdaptor,
   PgBox,
+  PgCallQueryBuilder,
   PgCircle,
   PgClassSingleStep,
   PgClient,
@@ -332,6 +335,8 @@ export {
   makeRegistry,
   makeRegistryBuilder,
   PgBooleanFilter,
+  pgCall,
+  PgCallStep,
   pgClassExpression,
   PgClassExpressionStep,
   PgClassFilter,
@@ -406,6 +411,8 @@ exportAsMany("@dataplan/pg", {
   PgOrFilter,
   pgClassExpression,
   PgClassExpressionStep,
+  pgCall,
+  PgCallStep,
   PgCondition,
   pgWhereConditionSpecListToSQL,
   PgCursorStep,
