@@ -2,6 +2,7 @@ import type { PgRegistry } from "@dataplan/pg";
 
 import type { PartitionExpose } from "./interfaces.ts";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.ts";
+export { PgArgumentDescriptionsPlugin } from "./plugins/PgArgumentDescriptionsPlugin.ts";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.ts";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.ts";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.ts";
@@ -132,6 +133,11 @@ declare global {
    * extensions so we can easily use them with TypeScript.
    */
   namespace DataplanPg {
+    interface PgResourceParameterExtensions {
+      /** Description for the GraphQL argument or mutation input field. */
+      argDescription?: string;
+    }
+
     interface PgResourceExtensions {
       tags?: Partial<GraphileBuild.PgResourceTags>;
       singleOutputParameterName?: string;
