@@ -131,8 +131,10 @@ but Gra*fast* steps are much more powerful thanks to the additional dependencies
 and lifecycle methods.
 
 When the step class adds a dependency (with `this.addDependency($step)` or
-similar) a dependency index, `depIndex`, is returned. Dependency indexes start
-at 0 and increase monotonically (a dependency can never be removed[^1]).
+similar) a dependency ID, `depId`, is returned. Dependency IDs are numbers at
+runtime and start at 0, increasing monotonically (a dependency can never be
+removed[^1]). In TypeScript they are branded as `DepId<TStep>`, which preserves
+the dependency step type for helpers such as `details.values.at(depId)`.
 
 [^1]:
     To remove a dependency, you must instead replace the step with a copy that
@@ -155,9 +157,10 @@ of the execute method.
 
 `details.values` is also critical: an ordered array of execution values, one for
 each dependency. You can retrieve the execution value for a given dependency via
-its `depIndex` as `const depEv = details.values[depIndex]`. Once you have an
-execution value, you can retrieve the value for a given index in the batch via
-`const value = depEv.at(batchIndex)`.
+its `depId` as `const depEv = details.values.at(depId)`. Tuple destructuring or
+`details.values[depIndex]` is also fine when it is more convenient. Once you
+have an execution value, you can retrieve the value for a given index in the
+batch via `const value = depEv.at(batchIndex)`.
 
 Gra*fast* tracks which steps will always represent exactly one value (e.g. the
 GraphQL context, input values passed as field arguments, constants, etc), and
@@ -180,9 +183,9 @@ top of the execute method:
 class MyStep extends Step {
   constructor($a, $b, $c) {
     super();
-    this.aDepIndex = this.addUnaryDependency($a);
-    this.bDepIndex = this.addDependency($b);
-    this.cDepIndex = this.addDependency($c);
+    this.addUnaryDependency($a);
+    this.addDependency($b);
+    this.addDependency($c);
   }
   execute(details) {
     const { values } = details;
@@ -243,23 +246,25 @@ Here's a hypothetical example, concentrate on the `execute()` method and see how
 the steps outlined above play out:
 
 ```ts
+import { Step, type DepId } from "grafast";
 import { languageService } from "./services/language";
 
-class TranslationStep extends Step {
-  langDepIndex: number;
-  textDepIndex: number;
+class TranslationStep extends Step<string | undefined> {
+  langDepId: DepId<Step<string>>;
+  textDepId: DepId<Step<string>>;
+
   constructor($language: Step<string>, $text: Step<string>) {
     super();
     // Add our dependencies
-    this.langDepIndex = this.addDependency($language);
-    this.textDepIndex = this.addDependency($text);
+    this.langDepId = this.addDependency($language);
+    this.textDepId = this.addDependency($text);
   }
-  execute(details) {
+  async execute(details) {
     // highlight-start
     // 1. Extract and identify the execution value for each dependency:
     // highlight-end
-    const langEv = details.values[this.langDepIndex];
-    const textEv = details.values[this.textDepIndex];
+    const langEv = details.values.at(this.langDepId);
+    const textEv = details.values.at(this.textDepId);
 
     // highlight-start
     // 2. Map over the indices to prepare the input for our translation API:
@@ -278,7 +283,7 @@ class TranslationStep extends Step {
     // highlight-start
     // 4. Finally, return results that correlate with the inputs:
     // highlight-end
-    return indexMap((batchIndex) => {
+    return details.indexMap((batchIndex) => {
       const language = langEv.at(batchIndex);
       const sourceText = textEv.at(batchIndex);
       const match = translations.find(
@@ -736,8 +741,10 @@ as part of `Step`.
 
 When your step requires another step's value in order to execute (which is the
 case for the majority of steps!) it must add a dependency via the
-`this.addDependency($otherStep)` method. This method will return a number,
-which is the index in the `execute` values tuple that represents this step.
+`this.addDependency($otherStep)` method. This method will return a `DepId`
+(a branded number), which is the index in the `execute` values tuple that
+represents the dependency. TypeScript uses the brand to infer the dependency's
+data type when you later call `details.values.at(depId)`.
 
 It's common to do this in the constructor, but it can be done at other stages
 too, for example during the optimize phase a step's descendant might ask it to
@@ -750,8 +757,8 @@ class added two dependencies:
 class AddStep extends Step {
   constructor($a, $b) {
     super();
-    this.addDependency($a); // Returns 0
-    this.addDependency($b); // Returns 1
+    this.addDependency($a); // Returns 0 as a DepId
+    this.addDependency($b); // Returns 1 as a DepId
   }
 }
 ```
@@ -805,9 +812,10 @@ input values are not).
 
 ### getDep
 
-Pass in the number of the dependency (`0` for the first dependency, `1` for the
-second, and so on) and Gra*fast* will return the corresponding step. This should
-only be used before or during the `optimize` phase.
+Pass in the dependency ID returned from `addDependency`, or a literal dependency
+index (`0` for the first dependency, `1` for the second, and so on), and
+Gra*fast* will return the corresponding step. This should only be used before
+or during the `optimize` phase.
 
 For example in the `AddStep` example above we might have:
 

@@ -85,7 +85,7 @@ The GraphQL specification
 [notes](https://spec.graphql.org/draft/#sec-Conforming-Algorithms):
 
 > _Conformance requirements [...] can be fulfilled [...] in any way as long as
-> the perceived result is equivalent._  
+> the perceived result is equivalent._
 > ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
 
 Gra*fast* has been written very carefully by a [GraphQL Technical Steering
@@ -336,9 +336,10 @@ once all of its dependencies are ready, continuing until all steps are
 complete.
 
 At planning time a step can add a dependency on another step via `const depId =
-this.addDependency($otherStep);`. This `depId` is the index in the **values
-tuple** that the step can use at execution time to retrieve the associated
-values.
+this.addDependency($otherStep);`. This `depId` is a branded dependency ID: at
+runtime it is the index in the **values tuple**, and in TypeScript it carries
+the dependency step type so the step can use `values.at(depId)` at execution
+time to retrieve the associated values.
 
 When a step executes, its `execute` method is passed the **execution
 details** which includes:
@@ -393,7 +394,7 @@ export class RecordsByColumnStep extends Step {
     super();
     this.tableName = tableName;
     this.columnName = columnName;
-    this.columnValueDepIdx = this.addDependency($columnValue);
+    this.columnValueDepId = this.addDependency($columnValue);
   }
 
   setFirst($first) {
@@ -402,15 +403,15 @@ export class RecordsByColumnStep extends Step {
 
   async execute({ indexMap, values }) {
     // Retrieve the values for the `$columnValue` dependency
-    const columnValueDep = values[this.columnValueDepIdx];
+    const columnValueDep = values.at(this.columnValueDepId);
 
     // We may or may not have added a `$first` limit:
     const firstDep =
-      this.firstDepId !== undefined ? values[this.firstDepId] : undefined;
+      this.firstDepId !== undefined ? values.at(this.firstDepId) : undefined;
 
     // firstDep, if it exists, is definitely a unary dep (!firstDep.isBatch), so
     // we can retrieve its value directly:
-    const first = firstDep ? parseInt(firstDep.value, 10) : null;
+    const first = firstDep ? parseInt(firstDep.unaryValue(), 10) : null;
 
     // Create a `LIMIT` clause in our SQL if the user specified a `$first` limit:
     const limitSQL = Number.isFinite(first) ? `limit ${first}` : ``;
