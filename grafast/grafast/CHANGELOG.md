@@ -1,5 +1,14 @@
 # grafast
 
+## 1.1.4
+
+### Patch Changes
+
+- [#3190](https://github.com/graphile/crystal/pull/3190)
+  [`22a7958`](https://github.com/graphile/crystal/commit/22a7958eb17bd02a4b7f78afe5f294796da90653)
+  Thanks [@duckki](https://github.com/duckki)! - Report a located field error
+  when list completion receives a non-array value.
+
 ## 1.1.3
 
 ### Patch Changes
