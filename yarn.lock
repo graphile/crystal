@@ -4051,7 +4051,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
-    ws: "npm:^8.21.1"
+    ws: "npm:^8.21.2"
   bin:
     graphile-lds: ./dist/cli.js
   languageName: unknown
@@ -5873,7 +5873,7 @@ __metadata:
     dataloader: "npm:^2.2.3"
     grafast: "workspace:^"
     graphql: "npm:^16.9.0"
-    mermaid: "npm:^11.17.0"
+    mermaid: "npm:^11.17.1"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
@@ -5917,7 +5917,7 @@ __metadata:
     "@mdx-js/react": "npm:^3.1.1"
     "@types/react": "npm:^19.2.7"
     clsx: "npm:^2.1.1"
-    postcss: "npm:^8.5.24"
+    postcss: "npm:^8.5.25"
     postcss-nested: "npm:^7.0.2"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.2.0"
@@ -12954,7 +12954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"entities@npm:^4.2.0, entities@npm:^4.4.0":
+"entities@npm:^4.2.0, entities@npm:^4.4.0, entities@npm:^4.5.0":
   version: 4.5.0
   resolution: "entities@npm:4.5.0"
   checksum: 10/ede2a35c9bce1aeccd055a1b445d41c75a14a2bb1cd22e242f20cf04d236cdcd7f9c859eb83f76885327bfae0c25bf03303665ee1ce3d47c5927b98b0e3e3d48
@@ -14004,9 +14004,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^5.12.1":
-  version: 5.12.1
-  resolution: "fastify@npm:5.12.1"
+"fastify@npm:^5.12.5":
+  version: 5.12.5
+  resolution: "fastify@npm:5.12.5"
   dependencies:
     "@fastify/ajv-compiler": "npm:^4.0.5"
     "@fastify/error": "npm:^4.0.0"
@@ -14023,7 +14023,7 @@ __metadata:
     secure-json-parse: "npm:^4.0.0"
     semver: "npm:^7.6.0"
     toad-cache: "npm:^3.7.0"
-  checksum: 10/b1e189820cc458e91b75a246d11fa040ceaef0d4545eac29adee966a3affcf36a57751640e2568f78f5dc72eea8f1062723cc9ac91459de3ee0b3e1e00df4c44
+  checksum: 10/282ec56b8bc153b9b0048409ebd060fc20372284589aaac35e5f2b45f0f84a85bd1b5199caed10cbc7cfc7b5cf406d3188c544f3e3f5f59c602eed2c37b645b9
   languageName: node
   linkType: hard
 
@@ -14858,7 +14858,7 @@ __metadata:
     iterall: "npm:^1.3.0"
     jest: "npm:^30.2.0"
     lodash: "npm:^4.18.1"
-    mermaid: "npm:^11.17.0"
+    mermaid: "npm:^11.17.1"
     mocha: "npm:^11.7.5"
     nodemon: "npm:^3.1.11"
     pg-sql2: "workspace:^"
@@ -14897,14 +14897,14 @@ __metadata:
     debug: "npm:^4.4.3"
     eventemitter3: "npm:^5.0.1"
     express: "npm:^4.21.2"
-    fastify: "npm:^5.12.1"
+    fastify: "npm:^5.12.5"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: "npm:^16.9.0"
     graphql-http: "npm:^1.22.4"
     graphql-ws: "npm:^6.0.5"
     h3: "npm:^1.15.9"
-    hono: "npm:^4.13.5"
+    hono: "npm:^4.13.7"
     jest: "npm:^30.2.0"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^3.1.2"
@@ -14915,7 +14915,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
-    ws: "npm:^8.21.1"
+    ws: "npm:^8.21.2"
   peerDependencies:
     "@envelop/core": ^5.0.0
     "@whatwg-node/server": ^0.9.64
@@ -14962,7 +14962,7 @@ __metadata:
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.3"
     express: "npm:^4.21.2"
-    fastify: "npm:^5.12.1"
+    fastify: "npm:^5.12.5"
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
@@ -14979,7 +14979,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
-    ws: "npm:^8.21.1"
+    ws: "npm:^8.21.2"
   peerDependencies:
     "@dataplan/pg": "workspace:^1.0.0-rc.7"
     grafast: "workspace:^1.0.0-rc.8"
@@ -15608,10 +15608,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^4.13.5":
-  version: 4.13.5
-  resolution: "hono@npm:4.13.5"
-  checksum: 10/a302e8d3a5329276ca436333e54679ef864e92e1b3fbd4db0d98cc56e71748622a1654103fcdf9ee866027b797255557e1ade05c8ceb866411603d74bf71bf43
+"hono@npm:^4.13.7":
+  version: 4.13.7
+  resolution: "hono@npm:4.13.7"
+  checksum: 10/0f7b6bede2101e0fade436dd5054aa205f9271d905a2f638dd52fb6307354a7ae81d07ac5ec4e1a80603c618a0d50685650bb8a7e2f77b3d96a2423e1473c474
   languageName: node
   linkType: hard
 
@@ -17910,7 +17910,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"linkify-it@npm:^5.0.1":
+"linkify-it@npm:^5.0.2":
   version: 5.0.2
   resolution: "linkify-it@npm:5.0.2"
   dependencies:
@@ -18357,18 +18357,18 @@ __metadata:
   linkType: hard
 
 "markdown-it@npm:^14.1.0":
-  version: 14.2.0
-  resolution: "markdown-it@npm:14.2.0"
+  version: 14.3.2
+  resolution: "markdown-it@npm:14.3.2"
   dependencies:
     argparse: "npm:^2.0.1"
-    entities: "npm:^4.4.0"
-    linkify-it: "npm:^5.0.1"
+    entities: "npm:^4.5.0"
+    linkify-it: "npm:^5.0.2"
     mdurl: "npm:^2.0.0"
     punycode.js: "npm:^2.3.1"
     uc.micro: "npm:^2.1.0"
   bin:
     markdown-it: bin/markdown-it.mjs
-  checksum: 10/f5cdb7ca9c8115114137201590b2697ee6ca69d2d4701a0313696629d5de4022525eedcad31800263c70f04dfba0a8eae835b6aa84b65e94ae32d63d04e66211
+  checksum: 10/192fc9332aee1d9d7e71c6bbdc52e43a7cf36a85213c01d64e32e8c8ea5efea2184c55e7298524007d2336b1e4282b31b722b41c4d69d90ba018676daadd4ab8
   languageName: node
   linkType: hard
 
@@ -18766,9 +18766,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:^11.17.0":
-  version: 11.17.0
-  resolution: "mermaid@npm:11.17.0"
+"mermaid@npm:^11.17.1":
+  version: 11.17.1
+  resolution: "mermaid@npm:11.17.1"
   dependencies:
     "@braintree/sanitize-url": "npm:^7.1.2"
     "@iconify/utils": "npm:^3.0.2"
@@ -18792,7 +18792,7 @@ __metadata:
     stylis: "npm:^4.3.6"
     ts-dedent: "npm:^2.2.0"
     uuid: "npm:^11.1.0 || ^12 || ^13 || ^14.0.0"
-  checksum: 10/d831d384f4c60394aa00b3e9deb75c5eaf6f3ad3067c76435e83891cae18c35ccaa55cad03180c6aa5f7c3483ead52f87fed264557750f3933607a50e5d092ee
+  checksum: 10/1c110a85d9dda949dee345a83607bf801d78ffcebc85bb8953550e442382c8e67a3bca3344705fd3a5e598b2bfe3d516515f3e0ffefaa9ba36df2b7ecc0bc387
   languageName: node
   linkType: hard
 
@@ -20837,7 +20837,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
-    ws: "npm:^8.21.1"
+    ws: "npm:^8.21.2"
   bin:
     pgl: ./dist/cli-run.js
   languageName: unknown
@@ -21962,14 +21962,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.5.24":
-  version: 8.5.24
-  resolution: "postcss@npm:8.5.24"
+"postcss@npm:^8.5.25":
+  version: 8.5.25
+  resolution: "postcss@npm:8.5.25"
   dependencies:
     nanoid: "npm:^3.3.16"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10/4e26169ed6fe8c2a32702d233b16368124d162a9399606381ed7a2f99ba6237360717aab339a0bd0f072280663413ff5115189b282085d1be74ffb2d25bdb562
+  checksum: 10/68aaeb314a1b2407e11e926acc0462b01b3e911d3d9e755d06adc5b2ececdefe8432dc3c3c93eacc07138952e17997d4674529061b8e3a338a7ac4c1accfdf98
   languageName: node
   linkType: hard
 
@@ -22006,7 +22006,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.9.3"
-    ws: "npm:^8.21.1"
+    ws: "npm:^8.21.2"
   peerDependencies:
     "@dataplan/json": "workspace:^"
     "@dataplan/pg": "workspace:^"
@@ -23381,7 +23381,7 @@ __metadata:
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.47.0"
     webpack: "npm:^5.103.0"
-    ws: "npm:^8.21.1"
+    ws: "npm:^8.21.2"
     zx: "npm:^8.8.5"
   dependenciesMeta:
     sqlite3:
@@ -23454,7 +23454,7 @@ __metadata:
     graphql: "npm:^16.9.0"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.2.0"
-    mermaid: "npm:^11.17.0"
+    mermaid: "npm:^11.17.1"
     nodemon: "npm:^3.1.11"
     prettier: "npm:^3.6.2"
     react: "npm:^19.2.0"
@@ -26745,9 +26745,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.21.1":
-  version: 8.21.1
-  resolution: "ws@npm:8.21.1"
+"ws@npm:^8.21.2":
+  version: 8.21.2
+  resolution: "ws@npm:8.21.2"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -26756,7 +26756,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 10/8493bc543072763d7bacffb2282c9d7954dc5c599c9df4c2d15f91c217f63e293a33ffc70756e3f2bf8c5d85bc6069ad7d9983c382d4713c807b083ffb1b1719
+  checksum: 10/1fa65bfadc0dc73674638482b448e2a8cf1833d0acc2263fd27bf74b98f6f2917b2db8263b460a1ff37b6c2b8b892eba0e0eca33325a1ed7a8fe187f38550b40
   languageName: node
   linkType: hard
 
