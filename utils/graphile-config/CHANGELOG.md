@@ -1,5 +1,15 @@
 # graphile-config
 
+## 1.1.1
+
+### Patch Changes
+
+- [#3141](https://github.com/graphile/crystal/pull/3141)
+  [`4d113fa`](https://github.com/graphile/crystal/commit/4d113faa99e83efb1780f0972669f3d9c1d1c959)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  README updated to remove outdated PRERELEASE notices; these packages are no
+  longer pre-release.
+
 ## 1.1.0
 
 ### Minor Changes
