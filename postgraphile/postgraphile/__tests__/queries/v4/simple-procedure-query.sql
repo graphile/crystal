@@ -11,16 +11,6 @@ from "c"."compound_type_set_query"() as __compound_type_set_query__
 limit 5;
 
 select
-  __table_set_query__."person_full_name" as "0"
-from "c"."table_set_query"() as __table_set_query__;
-
-select
-  __table_set_query__."person_full_name" as "0"
-from "c"."table_set_query"() as __table_set_query__
-limit 2
-offset 2;
-
-select
   __int_set_query__.v::text as "0"
 from "c"."int_set_query"(
   $1::"int4",
@@ -47,3 +37,13 @@ select
 from "a"."post" as __post__
 order by __post__."id" asc
 limit 1;
+
+select
+  __table_set_query__."person_full_name" as "0"
+from "c"."table_set_query"() as __table_set_query__;
+
+select
+  __table_set_query__."person_full_name" as "0"
+from "c"."table_set_query"() as __table_set_query__
+limit 2
+offset 2;

@@ -51,17 +51,17 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    List205{{"List[205∈0] ➊<br />ᐸ204,13ᐳ"}}:::plan
-    Access204{{"Access[204∈0] ➊<br />ᐸ7.m.joinDetailsFor60ᐳ"}}:::plan
-    PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    Access204 & PgSelectSingle13 --> List205
+    List205{{"List[205∈0] ➊<br />ᐸ204,11ᐳ"}}:::plan
+    Access204{{"Access[204∈0] ➊<br />ᐸ7.m.subqueryDetailsFor60ᐳ"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
+    Access204 & First11 --> List205
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
+    PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
     First11 --> PgSelectSingle13
     PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
@@ -75,7 +75,7 @@ graph TD
     PgSelectInlineApply199["PgSelectInlineApply[199∈0] ➊"]:::plan
     PgSelectInlineApply199 --> PgSelectInlineApply203
     PgSelect7 --> Access204
-    Lambda206{{"Lambda[206∈0] ➊<br />ᐸpgInlineViaJoinTransformᐳ<br />Dependents: 2"}}:::plan
+    Lambda206{{"Lambda[206∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ<br />Dependents: 2"}}:::plan
     List205 --> Lambda206
     PgSelect20[["PgSelect[20∈2] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression14 --> PgSelect20

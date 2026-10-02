@@ -151,7 +151,6 @@ const resource_geomPgResource = makeRegistry({
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     point: TYPES.point,
-    geom: geomCodec,
     pointArray: LIST_TYPES.point,
     line: TYPES.line,
     lineArray: LIST_TYPES.line,
@@ -165,6 +164,7 @@ const resource_geomPgResource = makeRegistry({
     polygonArray: LIST_TYPES.polygon,
     circle: TYPES.circle,
     circleArray: LIST_TYPES.circle,
+    geom: geomCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,

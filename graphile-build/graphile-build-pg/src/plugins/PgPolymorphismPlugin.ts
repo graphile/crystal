@@ -501,6 +501,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             PgCodecWithAttributes,
             any,
             undefined,
+            any,
+            any,
             PgRegistry
           >;
           if (!resource.extensions?.pg) {

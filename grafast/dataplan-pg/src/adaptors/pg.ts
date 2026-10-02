@@ -268,13 +268,6 @@ async function makeNodePostgresWithPgClient_inner<T>(
   alreadyInTransaction: boolean,
 ) {
   /** Transaction level; 0 = no transaction; 1 = begin; 2,... = savepoint */
-  const pgSettingsEntries: Array<[string, string]> = [];
-  if (pgSettings != null) {
-    for (const [key, value] of Object.entries(pgSettings)) {
-      if (value == null) continue;
-      pgSettingsEntries.push([key, "" + value]);
-    }
-  }
 
   // PERF: under what situations is this actually required? We added it to
   // force test queries that were sharing the same client to run in series
@@ -288,14 +281,29 @@ async function makeNodePostgresWithPgClient_inner<T>(
   return (pgClient[$$queue] = (async () => {
     try {
       // If there's pgSettings; create a transaction and set them, otherwise no transaction needed
-      if (pgSettingsEntries.length > 0) {
+      let keys: [string, ...string[]] | null = null;
+      let values: [string, ...string[]] | null = null;
+      if (pgSettings != null) {
+        for (const [key, value] of Object.entries(pgSettings)) {
+          if (value != null) {
+            if (keys == null) {
+              keys = [key];
+              values = [value];
+            } else {
+              keys.push(key);
+              values!.push("" + value);
+            }
+          }
+        }
+      }
+      if (keys != null) {
         await pgClient.query({
           text: alreadyInTransaction ? "savepoint tx" : "begin",
         });
         try {
           await pgClient.query({
-            text: "select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el",
-            values: [JSON.stringify(pgSettingsEntries)],
+            text: "select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)",
+            values: [keys, values],
           });
           const client = newNodePostgresPgClient(
             pgClient,
@@ -384,13 +392,19 @@ export function makePgAdaptorWithPgClient(
 
 /**
  * Returns a `withPgClient` for the given `PoolClient` instance. ONLY
- * SUITABLE FOR TESTS!
- *
+ * SUITABLE FOR TESTS! Only for use on a PoolClient fresh from the `pg` pool,
+ * do NOT use with a PoolClient accessed via the `.rawClient` property of a
+ * `NodePostgresPgClient`.
  */
 export function makeWithPgClientViaPgClientAlreadyInTransaction(
   pgClient: PoolClient,
   alreadyInTransaction = false,
 ): WithPgClient<NodePostgresPgClient> {
+  if (pgClient[$$queue]) {
+    throw new Error(
+      "This client already has an associated pgClientAdaptor, wrapping it again would cause a deadlock",
+    );
+  }
   const release = () => {};
   const withPgClient: WithPgClient<NodePostgresPgClient> = async (
     pgSettings,

@@ -38,7 +38,7 @@ const initialState = (): GroupByPlanMemo => new Map();
  */
 export function groupBy<
   TListStep extends StepRepresentingList<any>,
-  TItemStep extends Step<number>,
+  TItemStep extends Step,
 >(
   listStep: TListStep,
   mapper: ListTransformItemPlanCallback<ItemsStep<TListStep>, TItemStep>,

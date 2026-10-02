@@ -1,0 +1,145 @@
+## expect(errors).toBeFalsy();
+#> schema: ["b"]
+
+mutation CreateMutation {
+  a: createType(
+    input: {
+      type: {
+        id: 201
+        smallint: 30
+        bigint: "467131188225"
+        numeric: "15.2"
+        decimal: "15.2"
+        boolean: false
+        varchar: "abc"
+        enum: RED
+        enumArray: [RED, GREEN]
+        domain: 6
+        domain2: 5
+        textArray: [
+          "have"
+          "you"
+          "ever"
+          "been"
+          "down"
+          "the"
+          "water"
+          "spout"
+          "?"
+        ]
+        json: "{\"x\":1,\"y\":2,\"z\":3}"
+        jsonb: "{\"a\":1,\"b\":2,\"c\":3}"
+        numrange: { empty: true }
+        daterange: {
+          empty: true
+          start: { value: "1927-11-05", inclusive: false }
+          end: { value: "1927-11-07", inclusive: false }
+        }
+        anIntRange: { empty: false, end: { value: 500, inclusive: false } }
+        timestamp: "2016-10-07 16:12:21.747269"
+        timestamptz: "2016-10-09 16:12:45.218676-04"
+        date: "2016-10-15"
+        time: "19:13:18.625699"
+        timetz: "13:13:29.585176-04"
+        interval: {
+          seconds: 1
+          minutes: 2
+          hours: 3
+          days: 4
+          months: 5
+          years: 6
+        }
+        intervalArray: [
+          { seconds: 2, minutes: 3, hours: 4, days: 5, months: 6, years: 7 }
+          { seconds: 3, minutes: 4, hours: 5, days: 6, months: 7, years: 8 }
+        ]
+        money: 1234567.89
+        compoundType: {
+          a: 123
+          b: "abc"
+          c: GREEN
+          d: "ec4a9fae-4ec5-4763-98eb-0327fb2dc9bf"
+          e: FOO_BAR
+          f: _EMPTY_
+          fooBar: 20
+        }
+        nestedCompoundType: {
+          a: {
+            a: 456
+            b: "def"
+            c: BLUE
+            d: "79863dcf-0433-4c3d-bc51-978326d4546f"
+            e: BAR_FOO
+            f: ONE
+            fooBar: 42
+          }
+          b: {
+            a: 789
+            b: "ghi"
+            c: RED
+            d: "b687ee42-c515-4544-b742-525e39517e7d"
+            e: BAZ_QUX
+            f: _EMPTY_
+            fooBar: -8
+          }
+          bazBuz: 0
+        }
+        point: { x: 1, y: 3 }
+        cidr: "192.168.0.0/16"
+        macaddr: "0cafec0ffee0"
+        textArrayDomain: [
+          "TEXT 2098288669218571759"
+          "TEXT 2098288669218571760"
+          "TEXT 2098288669218571761"
+        ]
+        int8ArrayDomain: [
+          "2098288669218571759"
+          "2098288669218571760"
+          "2098288669218571761"
+        ]
+      }
+    }
+  ) {
+    clientMutationId
+    type {
+      nodeId
+      id
+      numrange {
+        empty
+        start {
+          value
+          inclusive
+        }
+        end {
+          value
+          inclusive
+        }
+      }
+      daterange {
+        empty
+        start {
+          value
+          inclusive
+        }
+        end {
+          value
+          inclusive
+        }
+      }
+      anIntRange {
+        empty
+        start {
+          value
+          inclusive
+        }
+        end {
+          value
+          inclusive
+        }
+      }
+    }
+    query {
+      nodeId
+    }
+  }
+}

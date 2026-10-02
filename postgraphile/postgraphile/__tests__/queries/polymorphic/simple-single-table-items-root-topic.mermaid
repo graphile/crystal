@@ -102,7 +102,7 @@ graph TD
     Access389{{"Access[389∈3] ➊<br />ᐸ24.base64JSON.1ᐳ<br />ᐳSingleTableTopic<br />ᐳPerson<br />ᐳLogEntry<br />ᐳOrganization<br />ᐳAwsApplication<br />ᐳGcpApplication<br />ᐳRelationalItemRelation<br />ᐳRelationalItemRelationCompositePk<br />ᐳSingleTableItemRelation<br />ᐳSingleTableItemRelationCompositePk<br />ᐳSingleTablePost<br />ᐳPriority<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br />ᐳMovieCollection<br />ᐳSeriesCollection<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Lambda[24]"}}:::plan
     Access390{{"Access[390∈3] ➊<br />ᐸ24.base64JSON.2ᐳ<br />ᐳRelationalItemRelationCompositePk<br />ᐳSingleTableItemRelationCompositePk<br />More deps:<br />- Lambda[24]"}}:::plan
     PgSelect29[["PgSelect[29∈4] ➊^<br />ᐸsingle_table_itemsᐳ<br />More deps:<br />- Object[11]"]]:::plan
-    PgSelectInlineApply385["PgSelectInlineApply[385∈4] ➊<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]:::plan
+    PgSelectInlineApply385["PgSelectInlineApply[385∈4] ➊<br />ᐳSingleTableChecklistItem<br />ᐳSingleTableChecklist<br />ᐳSingleTableDivider<br />ᐳSingleTablePost<br />ᐳSingleTableTopic"]:::plan
     Access389 -->|rejectNull| PgSelect29
     PgSelectInlineApply385 --> PgSelect29
     List289{{"List[289∈4] ➊^<br />ᐸ276,288ᐳ<br />More deps:<br />- Constantᐸ'SingleTableDivider'ᐳ[276]"}}:::plan
@@ -255,7 +255,7 @@ graph TD
     PgSelect223 --> PgSelectRows228
     PgSelectSingle229{{"PgSelectSingle[229∈19] ➊^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First227 --> PgSelectSingle229
-    PgSelect233[["PgSelect[233∈20] ➊<br />ᐸcollectionsᐳ<br />ᐳMovieCollection<br />ᐳSeriesCollection<br />More deps:<br />- Object[11]"]]:::plan
+    PgSelect233[["PgSelect[233∈20] ➊<br />ᐸcollectionsᐳ<br />ᐳSeriesCollection<br />ᐳMovieCollection<br />More deps:<br />- Object[11]"]]:::plan
     Access389 -->|rejectNull| PgSelect233
     First237{{"First[237∈20] ➊^"}}:::plan
     PgSelectRows238[["PgSelectRows[238∈20] ➊^"]]:::plan

@@ -30,11 +30,11 @@ const getSchemaHooks = (plugin: GraphileConfig.Plugin) => plugin.schema?.hooks;
  * plugins by orchestrating the various callback functions.
  */
 class SchemaBuilder<
-  TBuild extends GraphileBuild.Build = GraphileBuild.Build,
+  TScope extends keyof GraphileBuild.PluginScopes = never,
 > extends EventEmitter {
   options: GraphileBuild.SchemaOptions;
   depth: number;
-  hooks: GraphileBuild.SchemaBuilderHooks<TBuild>;
+  hooks: GraphileBuild.SchemaBuilderHooks<TScope>;
 
   _currentPluginName: string | null | undefined;
 
@@ -93,9 +93,9 @@ class SchemaBuilder<
    * necessary. In JavaScript, modifying an object object tends to be
    * significantly faster than returning a modified clone.
    */
-  hook<THookName extends keyof GraphileBuild.SchemaBuilderHooks<TBuild>>(
+  hook<THookName extends keyof GraphileBuild.SchemaBuilderHooks<TScope>>(
     hookName: THookName,
-    fn: GraphileBuild.SchemaBuilderHooks[THookName][number],
+    fn: GraphileBuild.SchemaBuilderHooks<TScope>[THookName][number],
   ): void {
     if (!this.hooks[hookName]) {
       // ERRORS: fuzzy-find a similar hook
@@ -111,20 +111,20 @@ class SchemaBuilder<
    * Applies the given 'hookName' hooks to the given 'input' and returns the
    * result, which is typically a derivative of 'input'.
    */
-  applyHooks<THookName extends keyof GraphileBuild.SchemaBuilderHooks<TBuild>>(
+  applyHooks<THookName extends keyof GraphileBuild.SchemaBuilderHooks<TScope>>(
     hookName: THookName,
     input: Parameters<
-      GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
+      GraphileBuild.SchemaBuilderHooks<TScope>[THookName][number]
     >[0],
     build: Parameters<
-      GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
+      GraphileBuild.SchemaBuilderHooks<TScope>[THookName][number]
     >[1],
     context: Parameters<
-      GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
+      GraphileBuild.SchemaBuilderHooks<TScope>[THookName][number]
     >[2],
     debugStr = "",
   ): Parameters<
-    GraphileBuild.SchemaBuilderHooks<TBuild>[THookName][number]
+    GraphileBuild.SchemaBuilderHooks<TScope>[THookName][number]
   >[0] {
     if (!input) {
       throw new Error(
@@ -210,12 +210,13 @@ class SchemaBuilder<
   /**
    * Create the 'Build' object.
    */
-  createBuild(input: GraphileBuild.BuildInput): TBuild {
-    const initialBuild = makeNewBuild(
-      this,
-      input,
-      this.inflection,
-    ) as Partial<TBuild> & GraphileBuild.BuildBase;
+  createBuild(
+    input: GraphileBuild.ScopedBuildInput<TScope>,
+  ): GraphileBuild.ScopedBuild<TScope> {
+    const initialBuild = makeNewBuild(this, input, this.inflection) as Partial<
+      GraphileBuild.ScopedBuild<TScope>
+    > &
+      GraphileBuild.ScopedBuildBase<TScope>;
 
     const build = this.applyHooks("build", initialBuild, initialBuild, {
       scope: Object.create(null),
@@ -230,7 +231,7 @@ class SchemaBuilder<
       ),
     );
 
-    const finalBuild = build as TBuild;
+    const finalBuild = build as GraphileBuild.ScopedBuild<TScope>;
     finalBuild.behavior = new Behavior(
       this.resolvedPreset,
       finalBuild,
@@ -242,7 +243,7 @@ class SchemaBuilder<
     return finalBuild;
   }
 
-  initBuild(build: TBuild) {
+  initBuild(build: GraphileBuild.ScopedBuild<TScope>) {
     if (build.status.isInitPhaseComplete) {
       return build;
     }
@@ -262,7 +263,7 @@ class SchemaBuilder<
    * Given the `input` (result of the "gather" phase), builds the GraphQL
    * schema synchronously.
    */
-  buildSchema(input: GraphileBuild.BuildInput): GraphQLSchema {
+  buildSchema(input: GraphileBuild.ScopedBuildInput<TScope>): GraphQLSchema {
     const build = this.initBuild(this.createBuild(input));
     const schemaSpec: Partial<GraphQLSchemaConfig> = {
       directives: [...build.graphql.specifiedDirectives],

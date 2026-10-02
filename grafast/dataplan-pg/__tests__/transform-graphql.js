@@ -12,6 +12,8 @@
  *   `key` is a plain string and value is a JSON5 value
  *   - `directPg`: use a direct connection to PG rather than our helper which tracks queries
  *   - `checkErrorSnapshots`: if set `false` then we'll not test the errors
+ *   - `expectedPlanConstraints`: expected total number of variable, context
+ *     and root value constraints on the operation plan (defaults to `0`)
  * - Lines starting `#!` are to be added to the "callback", this is typically
  *   useful for subscription tests that need to trigger events, etc
  */

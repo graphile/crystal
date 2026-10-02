@@ -1,6 +1,6 @@
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 update "c"."person" as __person__ set "person_full_name" = $1::"varchar", "aliases" = $2::"text"[], "about" = $3::"text", "email" = $4::"b"."email", "site" = $5::"b"."wrapped_url" where (__person__."id" = $6::"int4") returning
   __person__."id"::text as "0",
@@ -16,7 +16,7 @@ commit; /*fake*/
 
 begin; /*fake*/
 
-select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+select set_config(key, value, true) from unnest($1::text[], $2::text[]) as settings(key, value)
 
 select
   __frmcdc_wrapped_url__."url" as "0"

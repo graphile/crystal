@@ -80,6 +80,11 @@ Depending on the adaptor, the PgClient may have additional methods and
 properties available - this is a common way of making your ORM's capabilities
 available inside a Gra*fast* plan.
 
+Use `GraphileConfig.DataplanPgClient` when annotating callback parameters. This
+type is the union of the clients supplied by imported adaptors, preserving their
+additional methods and properties. It falls back to `PgClient` when no adaptor
+has been imported.
+
 ## pgSettings
 
 `pgSettings` is an optional string-string map. If set, the values will be set

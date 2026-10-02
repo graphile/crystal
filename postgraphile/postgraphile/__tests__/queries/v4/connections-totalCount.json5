@@ -2,6 +2,12 @@
   a: {
     totalCount: 6,
   },
+  a1: {
+    totalCount: 6,
+  },
+  a2: {
+    totalCount: 6,
+  },
   b: {
     nodes: [
       {

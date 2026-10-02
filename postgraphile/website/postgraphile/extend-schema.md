@@ -420,9 +420,9 @@ step, or its cousin
 [`loadManyWithPgClient`](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient#loadmanywithpgclientexecutor-lookup-loader).
 These both accept an “executor” as the first argument, a step representing
 arbitrary data as the second argument, and an asynchronous callback as the third
-argument. The callback will be called with a `PgClient` instance and the list of
-resolved data from the step in the second argument, and must return a list of
-values related to the input data.
+argument. The callback will be called with a `GraphileConfig.DataplanPgClient`
+instance and the list of values yielded by the step in the second argument, and
+must return a list of values related to the input data.
 
 ```ts
 import { normalizePhone } from "@localrepo/normalize-phone-numbers";
@@ -485,11 +485,11 @@ export const MyPlugin = extendSchema((build) => {
 });
 ```
 
-:::info[`PgClient` is an abstraction]
+:::info[The PostgreSQL client is an abstraction]
 
-The `PgClient` instance is an abstraction provided by `@dataplan/pg`, it
-contains common functionality but also any helpers that the specific Postgres
-adaptor you’re using wishes to expose. [Read more about Postgres adaptors in
+The `GraphileConfig.DataplanPgClient` type includes the common `PgClient`
+functionality and any helpers exposed by the imported Postgres adaptors.
+[Read more about Postgres adaptors in
 the @dataplan/pg
 documentation](https://grafast.org/grafast/step-library/dataplan-pg/adaptors).
 

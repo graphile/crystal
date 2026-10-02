@@ -3,6 +3,7 @@ import type {
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   EnumValueConfig,
+  FieldPlan,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastSchemaConfig,
@@ -60,6 +61,11 @@ import type {
 import type { GraphileBuild } from "graphile-build";
 
 import { EXPORTABLE } from "./exportable.ts";
+import type {
+  CommonKeys,
+  GeneratedFieldArgs,
+  ValueForKey,
+} from "./interfaces.ts";
 
 type Maybe<T> = T | null | undefined;
 
@@ -133,6 +139,51 @@ export interface ExtensionDefinition
   resolvers?: Resolvers;
 }
 
+type GeneratedFieldPlans<TSource extends Step, TFields> = {
+  [TFieldName in CommonKeys<TFields>]?: ValueForKey<
+    TFields,
+    TFieldName
+  > extends {
+    args: infer TArgs;
+  }
+    ? ValueForKey<TFields, TFieldName> extends {
+        result: infer TResult extends Step;
+      }
+      ? FieldPlan<TSource, GeneratedFieldArgs<TArgs>, TResult>
+      : FieldPlan<TSource, GeneratedFieldArgs<TArgs>>
+    : never;
+};
+
+type GeneratedObjectPlan<TObject> = [TObject] extends [
+  { fields: infer TFields },
+]
+  ? [TObject] extends [{ step: infer TSource extends Step }]
+    ? Omit<ObjectPlan<TSource>, "plans"> & {
+        plans?: GeneratedFieldPlans<TSource, TFields>;
+      }
+    : Omit<ObjectPlan<Step>, "plans"> & {
+        plans?: GeneratedFieldPlans<Step, TFields>;
+      }
+  : ObjectPlan;
+
+type GeneratedObjects<TObjects> = {
+  [TObjectName in CommonKeys<TObjects>]?: GeneratedObjectPlan<
+    ValueForKey<TObjects, TObjectName>
+  >;
+};
+
+export type ScopedGeneratedExtensionDefinition<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = GraphileBuild.PluginScopes[TScope] extends {
+  schema: {
+    objects: infer TObjects;
+  };
+}
+  ? Omit<ExtensionDefinition, "objects"> & {
+      objects?: GeneratedObjects<TObjects>;
+    }
+  : ExtensionDefinition;
+
 type ParentConstructors<T> = { new (...args: any[]): T };
 
 type NewTypeDef =
@@ -195,10 +246,14 @@ declare global {
   }
 }
 
-export function extendSchema(
+export function extendSchema<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
   generator:
-    | ExtensionDefinition
-    | ((build: GraphileBuild.Build) => ExtensionDefinition),
+    | ScopedGeneratedExtensionDefinition<TScope>
+    | ((
+        build: GraphileBuild.ScopedBuild<TScope>,
+      ) => ScopedGeneratedExtensionDefinition<TScope>),
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {
   let graphql: GraphileBuild.Build["graphql"];
@@ -211,6 +266,7 @@ export function extendSchema(
   return {
     name: uniquePluginName,
     version: "0.0.0",
+    provides: ["extendSchema"],
     after: [
       "QueryPlugin",
       "MutationPlugin",
@@ -234,6 +290,18 @@ export function extendSchema(
         },
 
         init(_, build, _context) {
+          const extensionDefinition = (
+            typeof generator === "function"
+              ? generator.length === 1
+                ? generator(build as GraphileBuild.ScopedBuild<TScope>)
+                : /* TODO: DELETE THIS! */
+                  ((generator as any)(
+                    build,
+                    build.options,
+                  ) as ExtensionDefinition)
+              : generator
+          ) as ExtensionDefinition;
+
           const {
             GraphQLDirective,
             GraphQLEnumType,
@@ -257,15 +325,7 @@ export function extendSchema(
             interfaces,
             unions,
             objects,
-          } = typeof generator === "function"
-            ? generator.length === 1
-              ? generator(build)
-              : /* TODO: DELETE THIS! */
-                ((generator as any)(
-                  build,
-                  build.options,
-                ) as ExtensionDefinition)
-            : generator;
+          } = extensionDefinition;
 
           if (typeDefs == null) {
             throw new Error(

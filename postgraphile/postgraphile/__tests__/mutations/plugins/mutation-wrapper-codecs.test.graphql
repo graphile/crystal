@@ -1,0 +1,16 @@
+## expect(errors).toBeFalsy()
+## expect(JSON.parse(data.created)).toEqual({ enabled: true, json: { nested: [1, true, null] }, jsonb: { ok: true }, duration: { years: 0, months: 0, days: 1, hours: 2, minutes: 3, seconds: 4.5 }, date: "2024-01-02", tags: ["hello", "world"], nullable_json: null })
+## expect(JSON.parse(data.updatedFalse)).toEqual({ ...JSON.parse(data.created), enabled: false })
+## expect(JSON.parse(data.updatedTrue)).toEqual(JSON.parse(data.created))
+## expect(JSON.parse(data.deleted)).toEqual(JSON.parse(data.created))
+#> schema: ["mutation_wrapper_codecs"]
+#> extends: ["./MutationWrapperCodecs.ts:preset"]
+#> setupSql: "create schema mutation_wrapper_codecs; create table mutation_wrapper_codecs.codec_values (id int primary key, enabled boolean not null, json json not null default '{\"nested\":[1,true,null]}', jsonb jsonb not null default '{\"ok\":true}', duration interval not null default '1 day 02:03:04.5', date date not null default '2024-01-02', tags text[] not null default array['hello', 'world'], nullable_json json);"
+#> cleanupSql: "drop schema mutation_wrapper_codecs cascade;"
+
+mutation {
+  created: wrappedCreateCodecValues
+  updatedFalse: wrappedUpdateCodecValues(enabled: false)
+  updatedTrue: wrappedUpdateCodecValues(enabled: true)
+  deleted: wrappedDeleteCodecValues
+}

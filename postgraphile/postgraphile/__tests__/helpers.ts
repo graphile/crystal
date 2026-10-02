@@ -19,6 +19,7 @@ import {
   execute as grafastExecute,
   hookArgs,
   noop,
+  prepare as grafastPrepare,
   subscribe as grafastSubscribe,
 } from "grafast";
 import type {
@@ -264,9 +265,15 @@ export async function runTestQuery(
     cleanupSql?: string;
     extends?: string | string[];
     pgIdentifiers?: "qualified" | "unqualified";
+    pgSettings?: Record<string, string | number | boolean | null | undefined>;
     search_path?: string;
     muteWarnings?: boolean;
     dontLogErrors?: boolean;
+    /**
+     * The expected total number of variable, context and root value
+     * constraints on the operation plan. Defaults to zero.
+     */
+    expectedPlanConstraints?: number;
   },
   options: {
     callback?: (
@@ -293,6 +300,7 @@ export async function runTestQuery(
     setupSql,
     cleanupSql,
     pgIdentifiers,
+    pgSettings,
     search_path,
     muteWarnings = true,
     dontLogErrors = false,
@@ -347,8 +355,9 @@ export async function runTestQuery(
                 role: "postgraphile_test_authenticator",
               }
             : null,
-        pgSettings:
-          config.ignoreRBAC === false
+        pgSettings: pgSettings
+          ? () => pgSettings
+          : config.ignoreRBAC === false
             ? () => ({
                 role: "postgraphile_test_visitor",
                 "jwt.claims.user_id": "3",
@@ -452,6 +461,30 @@ export async function runTestQuery(
             );
           }
 
+          const planResult = grafastPrepare(args);
+          if (planResult.errors) {
+            throw planResult.errors[0];
+          }
+          const { operationPlan } = planResult;
+          const {
+            variableValuesConstraints,
+            contextConstraints,
+            rootValueConstraints,
+          } = operationPlan;
+          const actualPlanConstraints =
+            variableValuesConstraints.length +
+            contextConstraints.length +
+            rootValueConstraints.length;
+          const expectedPlanConstraints = config.expectedPlanConstraints ?? 0;
+          if (actualPlanConstraints !== expectedPlanConstraints) {
+            throw new Error(
+              `Expected operation plan to have ${expectedPlanConstraints} constraints; found ${actualPlanConstraints} (variable values: ${variableValuesConstraints.length}, context: ${contextConstraints.length}, root value: ${rootValueConstraints.length}). Override this with '#> expectedPlanConstraints: ${actualPlanConstraints}' in the test header if these constraints are expected.`,
+            );
+          }
+          expect(operationPlan.hasNoConstraints).toBe(
+            expectedPlanConstraints === 0,
+          );
+
           const execute =
             (options.prepare ?? true)
               ? grafastExecute
@@ -465,6 +498,29 @@ export async function runTestQuery(
             operationType === "subscription"
               ? await subscribe(args, resolvedPreset)
               : await execute(args, resolvedPreset);
+
+          const runCallback = async (
+            payloads: Omit<AsyncExecutionResult, "hasNext">[],
+          ) => {
+            if (!options.callback) {
+              return;
+            }
+            if (!config.directPg) {
+              throw new Error("Can only use callback in directPg mode");
+            }
+            const poolClient = await pgPool!.connect();
+            try {
+              await options.callback(poolClient, payloads);
+            } catch (e) {
+              console.error(
+                "Detected error during test callback; here's the payloads we have thus far:",
+              );
+              console.error(payloads);
+              throw e;
+            } finally {
+              poolClient.release();
+            }
+          };
 
           if (isAsyncIterable(result)) {
             let errors: GraphQLError[] | undefined = undefined;
@@ -490,23 +546,7 @@ export async function runTestQuery(
             })();
 
             // In parallel to collecting the payloads, run the callback
-            if (options.callback) {
-              if (!config.directPg) {
-                throw new Error("Can only use callback in directPg mode");
-              }
-              const poolClient = await pgPool!.connect();
-              try {
-                await options.callback(poolClient, originalPayloads);
-              } catch (e) {
-                console.error(
-                  "Detected error during test callback; here's the payloads we have thus far:",
-                );
-                console.error(originalPayloads);
-                throw e;
-              } finally {
-                poolClient.release();
-              }
-            }
+            await runCallback(originalPayloads);
 
             if (operationType === "subscription") {
               const iterator = result[Symbol.asyncIterator]();
@@ -595,12 +635,10 @@ export async function runTestQuery(
             if (errors && !dontLogErrors) {
               console.error(result.errors?.[0].originalError || errors[0]);
             }
-            if (options.callback) {
-              throw new Error(
-                "Callback is only appropriate when operation returns an async iterable" +
-                  String(errors ? errors[0].originalError || errors[0] : ""),
-              );
-            }
+            // Ordinary operations have finished before their result is returned,
+            // so scripts run after the mutation transaction has committed or
+            // rolled back.
+            await runCallback([result]);
             return { data, errors, queries, extensions };
           }
         } finally {

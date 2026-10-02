@@ -3,23 +3,8 @@ select
 from "c"."json_identity"($1::"json") as __json_identity__(v);
 
 select
-  __jsonb_identity__.v::text as "0"
-from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
-
-select
   __json_identity__.v::text as "0"
 from "c"."json_identity"($1::"json") as __json_identity__(v);
-
-select
-  __jsonb_identity__.v::text as "0"
-from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
-
-select
-  __add_1_query__.v::text as "0"
-from "a"."add_1_query"(
-  $1::"int4",
-  $2::"int4"
-) as __add_1_query__(v);
 
 select
   __add_2_query__.v::text as "0"
@@ -247,11 +232,23 @@ from "c"."int_set_query"(
 ) as __int_set_query__(v);
 
 select
+  (count(*))::text as "0"
+from "c"."int_set_query"(
+  $1::"int4",
+  $2::"int4",
+  $3::"int4"
+) as __int_set_query__(v);
+
+select
   __no_args_query__.v::text as "0"
 from "c"."no_args_query"() as __no_args_query__(v);
 
 select
   __static_big_integer__.v::text as "0"
+from "a"."static_big_integer"() as __static_big_integer__(v);
+
+select
+  (count(*))::text as "0"
 from "a"."static_big_integer"() as __static_big_integer__(v);
 
 select
@@ -284,16 +281,19 @@ from "a"."query_interval_set"() as __query_interval_set__(v);
 
 select
   (count(*))::text as "0"
-from "c"."int_set_query"(
-  $1::"int4",
-  $2::"int4",
-  $3::"int4"
-) as __int_set_query__(v);
-
-select
-  (count(*))::text as "0"
-from "a"."static_big_integer"() as __static_big_integer__(v);
-
-select
-  (count(*))::text as "0"
 from "a"."query_interval_set"() as __query_interval_set__(v);
+
+select
+  __jsonb_identity__.v::text as "0"
+from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
+
+select
+  __jsonb_identity__.v::text as "0"
+from "c"."jsonb_identity"($1::"jsonb") as __jsonb_identity__(v);
+
+select
+  __add_1_query__.v::text as "0"
+from "a"."add_1_query"(
+  $1::"int4",
+  $2::"int4"
+) as __add_1_query__(v);

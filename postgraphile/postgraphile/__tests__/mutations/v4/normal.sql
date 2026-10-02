@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __authenticate__."role" as "0",
   __authenticate__."exp"::text as "1",
@@ -10,3 +12,5 @@ from "b"."authenticate"(
   $2::"numeric",
   $3::"int8"
 ) as __authenticate__;
+
+commit; /*fake*/

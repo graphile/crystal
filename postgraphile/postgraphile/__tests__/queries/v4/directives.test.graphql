@@ -1,6 +1,7 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
 #> subscriptions: true
+#> expectedPlanConstraints: 4
 query TestDirectives($true: Boolean = true, $false: Boolean = false) {
   a: nodeId @include(if: $true)
   b: nodeId @include(if: $false)

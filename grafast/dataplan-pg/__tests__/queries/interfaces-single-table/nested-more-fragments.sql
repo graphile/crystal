@@ -15,39 +15,41 @@ select
       __single_table_items_2."description",
       __single_table_items_2."color",
       __single_table_items_2."note",
-      __single_table_items__."type"::text,
-      __single_table_items__."type2"::text,
-      __single_table_items__."position"::text,
-      to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      __single_table_items__."is_explicitly_archived"::text,
-      to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      __single_table_items__."title",
-      __single_table_items__."description",
-      __single_table_items__."color",
-      __single_table_items__."note",
-      __people__."username",
+      (
+        select array[
+          __single_table_items__."type"::text,
+          __single_table_items__."type2"::text,
+          __single_table_items__."position"::text,
+          to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+          to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+          __single_table_items__."is_explicitly_archived"::text,
+          to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+          __single_table_items__."title",
+          __single_table_items__."description",
+          __single_table_items__."color",
+          __single_table_items__."note",
+          __people__."username"
+        ]::text[]
+        from interfaces_and_unions.single_table_items as __single_table_items__
+        left outer join interfaces_and_unions.people as __people__
+        on (
+        /* WHERE becoming ON */
+          (
+            __people__."person_id" = __single_table_items__."author_id"
+          ) and (
+            true /* authorization checks */
+          )
+        )
+        where
+          (
+            __single_table_items__."id" = __single_table_items_2."parent_id"
+          ) and (
+            true /* authorization checks */
+          )
+      )::text,
       __people_2."username"
     ]::text[]
     from interfaces_and_unions.single_table_items as __single_table_items_2
-    left outer join interfaces_and_unions.single_table_items as __single_table_items__
-    on (
-    /* WHERE becoming ON */
-      (
-        __single_table_items__."id" = __single_table_items_2."parent_id"
-      ) and (
-        true /* authorization checks */
-      )
-    )
-    left outer join interfaces_and_unions.people as __people__
-    on (
-    /* WHERE becoming ON */
-      (
-        __people__."person_id" = __single_table_items__."author_id"
-      ) and (
-        true /* authorization checks */
-      )
-    )
     left outer join interfaces_and_unions.people as __people_2
     on (
     /* WHERE becoming ON */

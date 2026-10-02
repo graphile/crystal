@@ -7,8 +7,11 @@ where (
 )
 order by __relational_commentables__.id asc;
 
+with __relational_posts_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_posts_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_posts_identifiers__,
+from __relational_posts_identifiers__,
 lateral (
   select
     __relational_posts__."id"::text as "0",
@@ -60,8 +63,11 @@ where
     true /* authorization checks */
   );
 
+with __relational_checklist_items_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __relational_checklist_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_checklist_items_identifiers__,
+from __relational_checklist_items_identifiers__,
 lateral (
   select
     __relational_checklist_items__."id"::text as "0",

@@ -6,7 +6,7 @@ import { PgTempTable } from "../steps/pgTempTable.ts";
 import { PgClassFilter } from "./pgClassFilter.ts";
 
 export class PgManyFilter<
-  TChildResource extends PgResource<any, any, any, any, any>,
+  TChildResource extends PgResource<any, any, any, any, any, any, any>,
 > extends Modifier<PgClassFilter> {
   static $$export = {
     moduleName: "@dataplan/pg",

@@ -7,8 +7,11 @@ select
 from "issue_2210"."some_messages"($1::"uuid") as __some_messages__
 limit 51;
 
+with __test_user_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __test_user_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __test_user_identifiers__,
+from __test_user_identifiers__,
 lateral (
   select
     __test_user__."id" as "0",
