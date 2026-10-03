@@ -136,6 +136,8 @@ export function wellKnown(
   return undefined;
 }
 
+const namespaceKeysCache = new WeakMap<object, string[]>();
+
 function isSameNamespace<TNamespace extends Record<string, any>>(
   thing: unknown,
   namespace: TNamespace,
@@ -143,8 +145,18 @@ function isSameNamespace<TNamespace extends Record<string, any>>(
   if (typeof thing !== "object" || thing == null) {
     return false;
   }
+  let nspKeys = namespaceKeysCache.get(namespace);
+  if (!nspKeys) {
+    nspKeys = Object.keys(namespace);
+    namespaceKeysCache.set(namespace, nspKeys);
+  }
+  if (
+    nspKeys.length > 0 &&
+    (thing as Record<string, any>)[nspKeys[0]] !== namespace[nspKeys[0]]
+  ) {
+    return false;
+  }
   const thingKeys = Object.keys(thing);
-  const nspKeys = Object.keys(namespace);
   if (thingKeys.length !== nspKeys.length) {
     return false;
   }

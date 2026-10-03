@@ -1337,7 +1337,9 @@ function factoryAst<TTuple extends any[]>(
   const isCacheable = typeof fn === "function";
 
   const cacheKey = isCacheable
-    ? `${factory.toString().trim()}|${depArgs.length}`
+    ? `${factory.toString().trim()}|${depArgs.length}|${depArgs
+        .map(argShapeKey)
+        .join("\u0001")}`
     : null;
   let cacheByKey = cacheKey ? file._factoryAstCache.get(cacheKey) : null;
   if (cacheKey) {
@@ -1368,6 +1370,21 @@ function factoryAst<TTuple extends any[]>(
   const result = factoryASTInner(funcAST, depArgs);
   cacheByKey?.push({ rawArgs, depArgs, result });
   return result;
+}
+
+function argShapeKey(arg: t.Expression): string {
+  switch (arg.type) {
+    case "Identifier":
+      return "I" + arg.name;
+    case "StringLiteral":
+    case "NumericLiteral":
+    case "BooleanLiteral":
+      return "L" + JSON.stringify(arg.value);
+    case "NullLiteral":
+      return "N";
+    default:
+      return "?";
+  }
 }
 
 function factoryASTInner(
@@ -2299,7 +2316,9 @@ export async function exportSchema(
   const toFormat = HEADER + code;
   const formatted = await format(toFormat, toPath, options);
   await writeFile(toPath, formatted);
-  await lint(formatted, toPath);
+  if (options.lint !== false) {
+    await lint(formatted, toPath);
+  }
 }
 
 /**
