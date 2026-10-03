@@ -9,15 +9,16 @@ import { resolveTableMatch } from "./resolveTableMatch.ts";
 
 export function addPgTableCondition<
   TScope extends keyof GraphileBuild.PluginScopes = "default",
+  TValue = any,
 >(
   match: ScopedTableMatch<TScope>,
   conditionFieldName: string,
   conditionFieldSpecGenerator: (
     build: GraphileBuild.ScopedBuild<TScope>,
-  ) => GrafastInputFieldConfig,
+  ) => GrafastInputFieldConfig<any, TValue>,
   // DEPRECATED! Use `apply` instead.
   conditionGenerator?: (
-    value: unknown,
+    value: TValue,
     helpers: {
       sql: typeof sql;
       sqlTableAlias: SQL;
