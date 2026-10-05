@@ -7,8 +7,7 @@ ignorecase: true
 action:
   name: replace
 swap:
-  "(?:agent|virtual assistant|intelligent personal assistant)":
-    personal digital assistant
+  "(?:agent|virtual assistant|intelligent personal assistant)": personal digital assistant
   "(?:assembler|machine language)": assembly language
   "(?:drive C:|drive C>|C: drive)": drive C
   "(?:internet bot|web robot)s?": bot(s)
