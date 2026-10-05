@@ -108,7 +108,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "chalk": "^4.1.2",
     "express": "^4.21.2",
-    "fastify": "^5.12.1",
+    "fastify": "^5.12.5",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-export": "workspace:^",
@@ -120,7 +120,7 @@
     "ruru": "workspace:^",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "ws": "^8.21.1"
+    "ws": "^8.21.2"
   },
   "publishConfig": {
     "directory": "release",

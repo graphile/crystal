@@ -153,12 +153,12 @@
     "@whatwg-node/fetch": "^0.10.8",
     "@whatwg-node/server": "^0.10.10",
     "express": "^4.21.2",
-    "fastify": "^5.12.1",
+    "fastify": "^5.12.5",
     "grafast": "workspace:^",
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.4",
     "h3": "^1.15.9",
-    "hono": "^4.13.5",
+    "hono": "^4.13.7",
     "jest": "^30.2.0",
     "jest-serializer-graphql-schema": "workspace:^",
     "koa": "^3.1.2",
@@ -167,7 +167,7 @@
     "playwright": "^1.58.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "ws": "^8.21.1"
+    "ws": "^8.21.2"
   },
   "files": [
     "dist",
