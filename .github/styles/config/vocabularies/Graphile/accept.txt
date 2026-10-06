@@ -1,5 +1,6 @@
 tamedevil
 performant
+[Vv]ariadic
 substring
 (?i)autofix
 (?i)eslint
