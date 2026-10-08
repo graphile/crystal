@@ -606,7 +606,10 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       resourceOptionsByPgProcByService: new Map(),
     }),
     hooks: {
-      async pgIntrospection_proc({ helpers, resolvedPreset }, event) {
+      async pgIntrospection_proc(
+        { helpers, resolvedPreset, inflection },
+        event,
+      ) {
         const { entity: pgProc, serviceName } = event;
 
         const pgService = resolvedPreset.pgServices?.find(
@@ -648,17 +651,35 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        // We also don’t want procedures that have been defined in our namespace
-        // twice. This leads to duplicate fields in the API which throws an
-        // error. In the future we may support this case. For now though, it is
-        // too complex.
-        const overload = introspection.procs.find(
+        // We don't want procedures whose inflected resource name clashes
+        // with another overload; this would produce duplicate fields.
+        const name = inflection.functionResourceName({ serviceName, pgProc });
+        const forbiddenOverload = introspection.procs.find(
           (p) =>
             p.pronamespace === pgProc.pronamespace &&
             p.proname === pgProc.proname &&
-            p._id !== pgProc._id,
+            p._id !== pgProc._id &&
+            inflection.functionResourceName({
+              serviceName,
+              pgProc: p,
+            }) === name,
         );
-        if (overload) {
+        if (forbiddenOverload) {
+          // Warn if both functions target composite types; the user likely
+          // intended these as computed columns on different tables.
+          const thisFirstArg = pgProc.getArguments().find((a) => a.isIn);
+          const otherFirstArg = forbiddenOverload
+            .getArguments()
+            .find((a) => a.isIn);
+          if (
+            thisFirstArg?.type.typtype === "c" &&
+            otherFirstArg?.type.typtype === "c" &&
+            thisFirstArg.type._id !== otherFirstArg.type._id
+          ) {
+            console.warn(
+              `Skipping function '${namespace!.nspname}.${pgProc.proname}' because it has overloads and they generate the same name. Consider using 'PgFunctionOverloadsPreset' to factor argument types into resource names.`,
+            );
+          }
           return;
         }
 
