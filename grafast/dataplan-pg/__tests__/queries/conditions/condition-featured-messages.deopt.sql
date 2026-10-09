@@ -12,7 +12,7 @@ where
 order by __forums__."id" asc;
 
 with __messages_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($2::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from rows from (json_to_recordset($2::json) as (id0 "uuid", id1 "timestamptz")) with ordinality as ids
 )
 select __messages_result__.*
 from __messages_identifiers__,
@@ -36,7 +36,7 @@ lateral (
 ) as __messages_result__;
 
 with __messages_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($2::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from rows from (json_to_recordset($2::json) as (id0 "uuid", id1 "timestamptz")) with ordinality as ids
 )
 select __messages_result__.*
 from __messages_identifiers__,
