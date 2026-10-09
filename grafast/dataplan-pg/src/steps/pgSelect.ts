@@ -89,6 +89,7 @@ import type {
   PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
+  QueryValue,
   ResolvedPgStmtCommonQueryInfo,
 } from "./pgStmt.ts";
 import {
@@ -206,12 +207,6 @@ interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
 export interface PgSelectArgumentRuntimeValue extends PgSelectArgumentBasics {
   placeholder?: never;
   value: unknown;
-}
-
-interface QueryValue {
-  dependencyIndex: number;
-  codec: PgCodec;
-  alreadyEncoded: boolean;
 }
 
 function assertSensible(step: Step): void {

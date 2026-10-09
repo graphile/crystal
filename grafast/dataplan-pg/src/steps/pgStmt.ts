@@ -14,7 +14,7 @@ import {
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import { TYPES } from "../codecs.ts";
+import { isJsony, TYPES } from "../codecs.ts";
 import type {
   PgCodec,
   PgGroupSpec,
@@ -31,6 +31,13 @@ export interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
   alreadyEncoded: boolean;
+  /**
+   * True if the codec is TYPES.json, TYPES.jsonb, or (potentially nested)
+   * domains over these. Needed specifically so we can escape the values
+   * correctly for json_to_recordset.
+   * @internal
+   */
+  codecIsJsony: boolean;
 }
 
 /**
@@ -211,7 +218,12 @@ export abstract class PgStmtBaseStep<T>
         const idx =
           existingIndex >= 0
             ? existingIndex
-            : queryValues.push(placeholder) - 1;
+            : queryValues.push({
+                dependencyIndex,
+                codec,
+                alreadyEncoded,
+                codecIsJsony: isJsony(codec),
+              }) - 1;
 
         // Finally alias this symbol to a reference to this placeholder
         placeholderValues.set(
@@ -634,7 +646,14 @@ export function makeValues(
 
       // If none exists, add one to our query values
       const idx =
-        existingIndex >= 0 ? existingIndex : queryValues.push(placeholder) - 1;
+        existingIndex >= 0
+          ? existingIndex
+          : queryValues.push({
+              dependencyIndex,
+              codec,
+              alreadyEncoded,
+              codecIsJsony: isJsony(codec),
+            }) - 1;
 
       // Finally alias this symbol to a reference to this placeholder
       placeholderValues.set(

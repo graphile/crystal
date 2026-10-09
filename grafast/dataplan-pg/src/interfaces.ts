@@ -242,6 +242,8 @@ export interface PgScalarCodec<
   [inspect.custom]?: CustomInspectFunction;
 }
 
+export const $$isJsony = Symbol("isJsony");
+
 /**
  * A codec for an arbitrary Postgres type, tells us how to convert to-and-from
  * Postgres (including changes to the SQL statement itself). Also includes
@@ -352,6 +354,9 @@ export interface PgCodec<
 
   /** @internal */
   [inspect.custom]?: CustomInspectFunction;
+
+  /** @internal */
+  [$$isJsony]?: boolean;
 }
 
 export type PgCodecWithAttributes<
