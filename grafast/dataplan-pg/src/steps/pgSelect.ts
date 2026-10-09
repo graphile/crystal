@@ -69,10 +69,7 @@ import type {
   RuntimeEmbeddable,
   RuntimeSQLThunk,
 } from "../utils.ts";
-import {
-  getSameLengthArraysMatchFunction,
-  runtimeScopedSQL,
-} from "../utils.ts";
+import { runtimeScopedSQL } from "../utils.ts";
 import { PgClassExpressionStep } from "./pgClassExpression.ts";
 import type {
   PgHavingConditionSpec,

@@ -15,7 +15,7 @@ import {
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
-import { isJsony, TYPES } from "../codecs.ts";
+import { isJsony } from "../codecs.ts";
 import type {
   PgCodec,
   PgGroupSpec,
