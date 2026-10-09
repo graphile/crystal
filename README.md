@@ -33,7 +33,6 @@ you then manage yourself.
 | ➡️ For **PostGraphile V4** see [the `legacy` branch](https://github.com/graphile/crystal/tree/legacy) |
 | ----------------------------------------------------------------------------------------------------- |
 
-
 ## Project summaries
 
 Here's a rough breakdown of the main packages:
