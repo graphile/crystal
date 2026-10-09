@@ -1,5 +1,5 @@
 with __type_identity_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"b"."types" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "b"."types")) with ordinality as ids
 )
 select __type_identity_result__.*
 from __type_identity_identifiers__,

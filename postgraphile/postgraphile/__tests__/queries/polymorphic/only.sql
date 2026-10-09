@@ -42,7 +42,7 @@ from (
 
 
 with __aws_applications_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __aws_applications_result__.*
 from __aws_applications_identifiers__,
@@ -58,7 +58,7 @@ lateral (
 ) as __aws_applications_result__;
 
 with __gcp_applications_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __gcp_applications_result__.*
 from __gcp_applications_identifiers__,
@@ -74,7 +74,7 @@ lateral (
 ) as __gcp_applications_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __union_result__.*
 from __union_identifiers__,
@@ -112,7 +112,7 @@ lateral (
 ) as __union_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __union_result__.*
 from __union_identifiers__,
@@ -150,7 +150,7 @@ lateral (
 ) as __union_result__;
 
 with __third_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __third_party_vulnerabilities_result__.*
 from __third_party_vulnerabilities_identifiers__,
