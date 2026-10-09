@@ -65,8 +65,9 @@ import type {
 import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
-  encodeQueryValueForJsonToRecordset,
+  EMPTY_OBJECT,
   getUnary,
+  makeMakeQueryValues,
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.ts";
@@ -87,9 +88,6 @@ const digestSpecificExpressionFromAttributeName = (
   return sql.identifier(name);
 };
 
-const EMPTY_OBJECT: Readonly<Record<string, never>> = Object.freeze(
-  Object.create(null),
-);
 const NO_ROWS = Object.freeze({
   m: Object.create(null),
   hasNextPage: false,
@@ -1032,21 +1030,11 @@ on (${sql.indent(
       throw new Error("We have no context dependency?");
     }
 
-    const queryValuesLength = rawQueryValues.length;
+    const makeQueryValues = makeMakeQueryValues(rawQueryValues, values);
 
     const specs = indexMap<PgExecutorInput<any>>((i) => {
-      let queryValues: Record<string, unknown>;
-      if (identifierIndex == null) {
-        queryValues = EMPTY_OBJECT;
-      } else {
-        queryValues = Object.create(null);
-        for (let idx = 0; idx < queryValuesLength; idx++) {
-          const qv = rawQueryValues[idx];
-          const val = values[qv.dependencyIndex].at(i);
-          queryValues[`id${idx}`] =
-            val == null ? null : encodeQueryValueForJsonToRecordset(qv, val);
-        }
-      }
+      const queryValues =
+        identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i);
       return {
         // The context is how we'd handle different connections with different claims
         context,
