@@ -44,7 +44,6 @@ import type {
   PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.ts";
-import { $$isJsony } from "./interfaces.ts";
 import { makeParseArrayWithTransform, parseArray } from "./parseArray.ts";
 
 // PERF: `identity` can be shortcut
@@ -1746,12 +1745,9 @@ export function sqlValueWithCodec(value: unknown, codec: PgCodec) {
 
 /** @internal */
 export function isJsony(codec: PgCodec): boolean {
-  if (codec[$$isJsony] === undefined) {
-    let innerCodec = codec;
-    while (innerCodec.domainOfCodec != null) {
-      innerCodec = innerCodec.domainOfCodec;
-    }
-    codec[$$isJsony] = innerCodec === TYPES.json || innerCodec === TYPES.jsonb;
+  let innerCodec = codec;
+  while (innerCodec.domainOfCodec != null) {
+    innerCodec = innerCodec.domainOfCodec;
   }
-  return codec[$$isJsony];
+  return innerCodec === TYPES.json || innerCodec === TYPES.jsonb;
 }
