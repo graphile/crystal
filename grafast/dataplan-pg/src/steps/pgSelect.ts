@@ -1288,11 +1288,9 @@ export class PgSelectStep<
         }
       } else {
         let hasSpec = false;
-        const queryValuesMatch =
-          getSameLengthArraysMatchFunction(queryValuesLength);
+        const queryValuesMatch = getQueryValuesMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
           const queryValues: Record<string, unknown> = Object.create(null);
-          const valuesForDedupe: unknown[] = [];
           for (let idx = 0; idx < queryValuesLength; idx++) {
             const qv = rawQueryValues[idx];
             const val = values[qv.dependencyIndex].at(i);
@@ -1311,15 +1309,11 @@ export class PgSelectStep<
               result = encodeQueryValueForJsonToRecordset(qv, val);
             }
             queryValues[`id${idx}`] = result;
-            valuesForDedupe.push(result);
           }
           if (!isMutation && hasSpec) {
             // Dedupe
             const existingIdx = specs.findIndex((s) =>
-              queryValuesMatch(
-                valuesForDedupe,
-                rawQueryValues.map((_, idx) => s.queryValues[`id${idx}`]),
-              ),
+              queryValuesMatch(queryValues, s.queryValues),
             );
             if (existingIdx !== -1) {
               return existingIdx;
@@ -4520,3 +4514,47 @@ const validateOrderSpec: (orderSpec: PgOrderSpec) => PgOrderSpec = isDev
       return orderSpec;
     }
   : (orderSpec) => orderSpec;
+
+function compareQv0<T extends Record<string, any>>(_a: T, _b: T) {
+  return true;
+}
+function compareQv1<T extends Record<string, any>>(a: T, b: T) {
+  return a.id0 === b.id0;
+}
+function compareQv2<T extends Record<string, any>>(a: T, b: T) {
+  return a.id0 === b.id0 && a.id1 === b.id1;
+}
+function compareQv3<T extends Record<string, any>>(a: T, b: T) {
+  return a.id0 === b.id0 && a.id1 === b.id1 && a.id2 === b.id2;
+}
+function compareQv4<T extends Record<string, any>>(a: T, b: T) {
+  return (
+    a.id0 === b.id0 && a.id1 === b.id1 && a.id2 === b.id2 && a.id3 === b.id3
+  );
+}
+
+function getQueryValuesMatchFunction(length: number) {
+  switch (length) {
+    case 0:
+      return compareQv0;
+    case 1:
+      return compareQv1;
+    case 2:
+      return compareQv2;
+    case 3:
+      return compareQv3;
+    case 4:
+      return compareQv4;
+    default:
+      return function queryValuesMatch<T extends Record<string, any>>(
+        qv1: T,
+        qv2: T,
+      ) {
+        for (let i = 0; i < length; i++) {
+          const key = `id${i}`;
+          if (qv1[key] !== qv2[key]) return false;
+        }
+        return true;
+      };
+  }
+}
