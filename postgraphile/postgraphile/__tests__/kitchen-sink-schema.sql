@@ -502,6 +502,7 @@ create function a.mutation_interval_array() returns interval[] as $$ select ARRA
 create function a.mutation_interval_set() returns setof interval as $$ begin return next interval '12 seconds'; return next interval '3 hours'; return next interval '34567 seconds'; end; $$ language plpgsql volatile;
 
 -- Procs returning `type` record (to test JSON encoding)
+create function b.type_identity(input b.types) returns b.types as $$ select input $$ language sql stable;
 create function b.type_function(id int) returns b.types as $$ select * from b.types where types.id = $1; $$ language sql stable;
 create function b.type_function_list() returns b.types[] as $$ select array_agg(types order by id) from b.types $$ language sql stable;
 create function b.type_function_connection() returns setof b.types as $$ select * from b.types order by id asc $$ language sql stable;

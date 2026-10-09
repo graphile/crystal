@@ -2331,6 +2331,7 @@ const type_function_connection_mutationFunctionIdentifer = sql.identifier("b", "
 const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_list");
 const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const type_function_mutationFunctionIdentifer = sql.identifier("b", "type_function_mutation");
+const type_identityFunctionIdentifer = sql.identifier("b", "type_identity");
 const badly_behaved_functionFunctionIdentifer = sql.identifier("c", "badly_behaved_function");
 const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
@@ -4719,6 +4720,25 @@ const registry = makeRegistry({
         }
       },
       isMutation: true
+    }),
+    b_type_identity: PgResource.functionResourceOptions(b_types_resourceOptionsConfig, {
+      name: "b_type_identity",
+      identifier: "main.b.type_identity(b.types)",
+      from(...args) {
+        return sql`${type_identityFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "input",
+        codec: bTypesCodec
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_identity"
+        }
+      }
     }),
     c_badly_behaved_function: PgResource.functionResourceOptions(c_person_resourceOptionsConfig, {
       name: "c_badly_behaved_function",
@@ -7581,6 +7601,7 @@ const CPersonComputedComplexRecord_zPlan = $record => {
   $select.getClassStep().setTrusted();
   return $select;
 };
+const resource_b_type_identityPgResource = registry.pgResources["b_type_identity"];
 const BType_enumArrayPlan = $record => {
   return $record.get("enum_array");
 };
@@ -10203,6 +10224,7 @@ type CPersonEdge {
 }
 
 type BType {
+  typeIdentity: BType
   rowId: Int!
   smallint: Int!
   bigint: BigInt!
@@ -20653,6 +20675,10 @@ export const objects = {
       },
       textArrayDomain($record) {
         return $record.get("text_array_domain");
+      },
+      typeIdentity($in, args, _info) {
+        const details = pgFunctionArgumentsFromArgs($in, makeArgs_query_compound_type_array2(args));
+        return resource_b_type_identityPgResource.execute(details.selectArgs);
       }
     },
     planType($specifier) {

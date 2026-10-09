@@ -762,6 +762,7 @@ type BType {
   timestamp: Datetime!
   timestamptz: Datetime!
   timetz: Time!
+  typeIdentity: BType
   varchar: String!
 }
 

@@ -2343,6 +2343,7 @@ const type_function_connection_mutationFunctionIdentifer = sql.identifier("b", "
 const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_list");
 const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const type_function_mutationFunctionIdentifer = sql.identifier("b", "type_function_mutation");
+const type_identityFunctionIdentifer = sql.identifier("b", "type_identity");
 const badly_behaved_functionFunctionIdentifer = sql.identifier("c", "badly_behaved_function");
 const compound_type_computed_fieldFunctionIdentifer = sql.identifier("c", "compound_type_computed_field");
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
@@ -4736,6 +4737,25 @@ const registry = makeRegistry({
         }
       },
       isMutation: true
+    }),
+    type_identity: PgResource.functionResourceOptions(types_resourceOptionsConfig, {
+      name: "type_identity",
+      identifier: "main.b.type_identity(b.types)",
+      from(...args) {
+        return sql`${type_identityFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "input",
+        codec: typesCodec
+      }],
+      returnsSetof: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_identity"
+        }
+      }
     }),
     badly_behaved_function: PgResource.functionResourceOptions(person_resourceOptionsConfig, {
       name: "badly_behaved_function",
