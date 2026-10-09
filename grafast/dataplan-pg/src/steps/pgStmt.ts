@@ -7,6 +7,7 @@ import type {
 } from "grafast";
 import {
   applyTransforms,
+  isDev,
   lambda,
   markSyncAndSafe,
   SafeError,
@@ -47,15 +48,25 @@ export interface QueryValue {
  * enclosing record produces JSON values rather than JSON strings. Domains over
  * JSON/JSONB behave the same way; arrays of either type do not.
  */
-export function encodeQueryValueForJsonToRecordset(
+export const encodeQueryValueForJsonToRecordset = isDev
+  ? function encodeQueryValueForJsonToRecordset(
+      qv: QueryValue,
+      value: unknown,
+    ): unknown {
+      if (qv.codecIsJsony == undefined) {
+        throw new Error(
+          `DataplanPgInternalError<9c7f1742-8fe1-4da1-aa69-658450b26d1d>: expected QueryValue to have internal 'codecIsJsony' property`,
+        );
+      }
+      return _encodeQueryValueForJsonToRecordset(qv, value);
+    }
+  : _encodeQueryValueForJsonToRecordset;
+
+function _encodeQueryValueForJsonToRecordset(
   qv: QueryValue,
   value: unknown,
 ): unknown {
-  let innerCodec = qv.codec;
-  while (innerCodec.domainOfCodec != null) {
-    innerCodec = innerCodec.domainOfCodec;
-  }
-  if (innerCodec === TYPES.json || innerCodec === TYPES.jsonb) {
+  if (qv.codecIsJsony) {
     return qv.alreadyEncoded ? JSON.parse(value as string) : value;
   } else {
     return qv.alreadyEncoded ? value : qv.codec.toPg(value);
