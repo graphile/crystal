@@ -1228,7 +1228,7 @@ export class PgSelectStep<
       return arrayOfLength(count, NO_ROWS);
     }
     const context = values[this.contextId].unaryValue();
-    const makeQueryValues = makeMakeQueryValues(queryValuesLength);
+    const makeQueryValues = makeMakeQueryValues(rawQueryValues, values);
 
     const isMutation = this.mode === "mutation";
     /**
@@ -1362,9 +1362,7 @@ export class PgSelectStep<
             // The context is how we'd handle different connections with different claims
             context,
             queryValues:
-              identifierIndex == null
-                ? EMPTY_OBJECT
-                : makeQueryValues(rawQueryValues, values, i),
+              identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i),
           };
         });
       }
@@ -1384,9 +1382,7 @@ export class PgSelectStep<
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
-            identifierIndex == null
-              ? EMPTY_OBJECT
-              : makeQueryValues(rawQueryValues, values, i),
+            identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i),
         };
       });
       const streams = (
@@ -4547,75 +4543,70 @@ function getQueryValuesMatchFunction(length: number) {
   }
 }
 
-function makeQueryValues0(
-  _rawQueryValues: readonly QueryValue[],
-  _values: readonly ExecutionValue[],
-  _i: number,
-) {
-  return EMPTY_OBJECT;
-}
-
-function makeQueryValues1(
+function makeMakeQueryValues(
   rawQueryValues: readonly QueryValue[],
   values: readonly ExecutionValue[],
-  i: number,
-) {
-  const qv0 = rawQueryValues[0];
-  const val0 = values[qv0.dependencyIndex].at(i);
-  return {
-    id0: val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
-  };
-}
-
-function makeQueryValues2(
-  rawQueryValues: readonly QueryValue[],
-  values: readonly ExecutionValue[],
-  i: number,
-) {
-  const qv0 = rawQueryValues[0];
-  const val0 = values[qv0.dependencyIndex].at(i);
-  const qv1 = rawQueryValues[1];
-  const val1 = values[qv1.dependencyIndex].at(i);
-  return {
-    id0: val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
-    id1: val1 == null ? null : encodeQueryValueForJsonToRecordset(qv1, val1),
-  };
-}
-
-function makeQueryValues3(
-  rawQueryValues: readonly QueryValue[],
-  values: readonly ExecutionValue[],
-  i: number,
-) {
-  const qv0 = rawQueryValues[0];
-  const val0 = values[qv0.dependencyIndex].at(i);
-  const qv1 = rawQueryValues[1];
-  const val1 = values[qv1.dependencyIndex].at(i);
-  const qv2 = rawQueryValues[2];
-  const val2 = values[qv2.dependencyIndex].at(i);
-  return {
-    id0: val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
-    id1: val1 == null ? null : encodeQueryValueForJsonToRecordset(qv1, val1),
-    id2: val2 == null ? null : encodeQueryValueForJsonToRecordset(qv2, val2),
-  };
-}
-
-function makeMakeQueryValues(length: number) {
+): (i: number) => object {
+  const length = rawQueryValues.length;
   switch (length) {
-    case 0:
-      return makeQueryValues0;
-    case 1:
-      return makeQueryValues1;
-    case 2:
-      return makeQueryValues2;
-    case 3:
-      return makeQueryValues3;
+    case 0: {
+      return function makeQueryValues0(_i: number) {
+        return EMPTY_OBJECT;
+      };
+    }
+    case 1: {
+      const qv0 = rawQueryValues[0];
+      const values0 = values[qv0.dependencyIndex];
+      return function makeQueryValues1(i: number) {
+        const val0 = values0.at(i);
+        return {
+          id0:
+            val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
+        };
+      };
+    }
+    case 2: {
+      const qv0 = rawQueryValues[0];
+      const values0 = values[qv0.dependencyIndex];
+      const qv1 = rawQueryValues[1];
+      const values1 = values[qv1.dependencyIndex];
+
+      return function makeQueryValues2(i: number) {
+        const val0 = values0.at(i);
+        const val1 = values1.at(i);
+        return {
+          id0:
+            val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
+          id1:
+            val1 == null ? null : encodeQueryValueForJsonToRecordset(qv1, val1),
+        };
+      };
+    }
+    case 3: {
+      const qv0 = rawQueryValues[0];
+      const values0 = values[qv0.dependencyIndex];
+      const qv1 = rawQueryValues[1];
+      const values1 = values[qv1.dependencyIndex];
+      const qv2 = rawQueryValues[2];
+      const values2 = values[qv2.dependencyIndex];
+
+      return function makeQueryValues3(i: number) {
+        const val0 = values0.at(i);
+        const val1 = values1.at(i);
+        const val2 = values2.at(i);
+        return {
+          id0:
+            val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
+          id1:
+            val1 == null ? null : encodeQueryValueForJsonToRecordset(qv1, val1),
+          id2:
+            val2 == null ? null : encodeQueryValueForJsonToRecordset(qv2, val2),
+        };
+      };
+    }
+
     default:
-      return function makeQueryValues(
-        rawQueryValues: readonly QueryValue[],
-        values: readonly ExecutionValue[],
-        i: number,
-      ) {
+      return function makeQueryValues(i: number) {
         const queryValues: Record<string, unknown> = Object.create(null);
         for (let idx = 0; idx < length; idx++) {
           const qv = rawQueryValues[idx];
