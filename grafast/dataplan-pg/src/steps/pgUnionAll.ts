@@ -990,7 +990,7 @@ on (${sql.indent(
       identifierIndex,
       shouldReverseOrder,
       name,
-      queryValues,
+      queryValues: rawQueryValues,
       first,
       last,
       cursorDetails,
@@ -1032,27 +1032,25 @@ on (${sql.indent(
       throw new Error("We have no context dependency?");
     }
 
-    const makeQueryValues = (i: number) => {
-      const queryValuesObject: Record<string, unknown> = Object.create(null);
-      for (const [
-        idx,
-        { dependencyIndex, codec, alreadyEncoded },
-      ] of queryValues.entries()) {
-        const val = values[dependencyIndex].at(i);
-        queryValuesObject[`id${idx}`] =
-          val == null
-            ? null
-            : encodeQueryValueForJsonToRecordset(codec, val, alreadyEncoded);
-      }
-      return queryValuesObject;
-    };
+    const queryValuesLength = rawQueryValues.length;
 
     const specs = indexMap<PgExecutorInput<any>>((i) => {
+      let queryValues: Record<string, unknown>;
+      if (identifierIndex == null) {
+        queryValues = EMPTY_OBJECT;
+      } else {
+        queryValues = Object.create(null);
+        for (let idx = 0; idx < queryValuesLength; idx++) {
+          const qv = rawQueryValues[idx];
+          const val = values[qv.dependencyIndex].at(i);
+          queryValues[`id${idx}`] =
+            val == null ? null : encodeQueryValueForJsonToRecordset(qv, val);
+        }
+      }
       return {
         // The context is how we'd handle different connections with different claims
         context,
-        queryValues:
-          identifierIndex != null ? makeQueryValues(i) : EMPTY_OBJECT,
+        queryValues,
       };
     });
     const executeMethod =

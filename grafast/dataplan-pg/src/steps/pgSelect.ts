@@ -1237,15 +1237,11 @@ export class PgSelectStep<
     const context = values[this.contextId].unaryValue();
     const makeQueryValues = (i: number) => {
       const queryValues: Record<string, unknown> = Object.create(null);
-      for (const [
-        idx,
-        { dependencyIndex, codec, alreadyEncoded },
-      ] of rawQueryValues.entries()) {
-        const val = values[dependencyIndex].at(i);
+      for (let idx = 0; idx < queryValuesLength; idx++) {
+        const qv = rawQueryValues[idx];
+        const val = values[qv.dependencyIndex].at(i);
         queryValues[`id${idx}`] =
-          val == null
-            ? null
-            : encodeQueryValueForJsonToRecordset(codec, val, alreadyEncoded);
+          val == null ? null : encodeQueryValueForJsonToRecordset(qv, val);
       }
       return queryValues;
     };
@@ -1297,16 +1293,14 @@ export class PgSelectStep<
         resultIndexes = indexMap<number | null>((i) => {
           const queryValues: Record<string, unknown> = Object.create(null);
           const valuesForDedupe: unknown[] = [];
-          for (const [
-            idx,
-            { dependencyIndex, codec, alreadyEncoded },
-          ] of rawQueryValues.entries()) {
+          for (let idx = 0; idx < queryValuesLength; idx++) {
+            const qv = rawQueryValues[idx];
+            const val = values[qv.dependencyIndex].at(i);
             let result: unknown;
-            const val = values[dependencyIndex].at(i);
             if (val == null) {
               if (
                 isSkippable &&
-                this.identifierDepIds.includes(dependencyIndex)
+                this.identifierDepIds.includes(qv.dependencyIndex)
               ) {
                 // We're using `WHERE foo = $1` and we know `$1` is null, so we know the result
                 // will yield no rows.
@@ -1314,11 +1308,7 @@ export class PgSelectStep<
               }
               result = null;
             } else {
-              result = encodeQueryValueForJsonToRecordset(
-                codec,
-                val,
-                alreadyEncoded,
-              );
+              result = encodeQueryValueForJsonToRecordset(qv, val);
             }
             queryValues[`id${idx}`] = result;
             valuesForDedupe.push(result);
@@ -1394,7 +1384,7 @@ export class PgSelectStep<
             // The context is how we'd handle different connections with different claims
             context,
             queryValues:
-              identifierIndex != null ? makeQueryValues(i) : EMPTY_OBJECT,
+              identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i),
           };
         });
       }
@@ -1414,7 +1404,7 @@ export class PgSelectStep<
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
-            identifierIndex != null ? makeQueryValues(i) : EMPTY_OBJECT,
+            identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i),
         };
       });
       const streams = (

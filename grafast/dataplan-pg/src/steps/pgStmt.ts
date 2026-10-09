@@ -41,18 +41,18 @@ export interface QueryValue {
  * JSON/JSONB behave the same way; arrays of either type do not.
  */
 export function encodeQueryValueForJsonToRecordset(
-  codec: PgCodec,
+  qv: QueryValue,
   value: unknown,
-  alreadyEncoded: boolean,
 ): unknown {
-  let innerCodec = codec;
-  while (innerCodec.domainOfCodec) {
+  let innerCodec = qv.codec;
+  while (innerCodec.domainOfCodec != null) {
     innerCodec = innerCodec.domainOfCodec;
   }
   if (innerCodec === TYPES.json || innerCodec === TYPES.jsonb) {
-    return alreadyEncoded ? JSON.parse(value as string) : value;
+    return qv.alreadyEncoded ? JSON.parse(value as string) : value;
+  } else {
+    return qv.alreadyEncoded ? value : qv.codec.toPg(value);
   }
-  return alreadyEncoded ? value : codec.toPg(value);
 }
 
 /**
