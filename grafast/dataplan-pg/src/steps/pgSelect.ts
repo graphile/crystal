@@ -94,6 +94,7 @@ import type {
 import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
+  encodeQueryValueForJsonToRecordset,
   getUnary,
   makeValues,
   PgStmtBaseStep,
@@ -120,6 +121,9 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+const EMPTY_OBJECT: Readonly<Record<string, never>> = Object.freeze(
+  Object.create(null),
+);
 const NO_ROWS = Object.freeze({
   hasNextPage: false,
   hasPreviousPage: false,
@@ -1231,6 +1235,20 @@ export class PgSelectStep<
       return arrayOfLength(count, NO_ROWS);
     }
     const context = values[this.contextId].unaryValue();
+    const makeQueryValues = (i: number) => {
+      const queryValues: Record<string, unknown> = Object.create(null);
+      for (const [
+        idx,
+        { dependencyIndex, codec, alreadyEncoded },
+      ] of rawQueryValues.entries()) {
+        const val = values[dependencyIndex].at(i);
+        queryValues[`id${idx}`] =
+          val == null
+            ? null
+            : encodeQueryValueForJsonToRecordset(codec, val, alreadyEncoded);
+      }
+      return queryValues;
+    };
 
     const isMutation = this.mode === "mutation";
     /**
@@ -1249,7 +1267,7 @@ export class PgSelectStep<
         if (isMutation) {
           // Run them all
           resultIndexes = indexMap(
-            (_i) => specs.push({ context, queryValues: EMPTY_ARRAY }) - 1,
+            (_i) => specs.push({ context, queryValues: EMPTY_OBJECT }) - 1,
           );
         } else {
           // We'll add at most one spec
@@ -1265,7 +1283,8 @@ export class PgSelectStep<
               return null;
             } else {
               if (specIdx === null) {
-                specIdx = specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
+                specIdx =
+                  specs.push({ context, queryValues: EMPTY_OBJECT }) - 1;
               }
               return specIdx;
             }
@@ -1276,8 +1295,12 @@ export class PgSelectStep<
         const queryValuesMatch =
           getSameLengthArraysMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
-          const queryValues: unknown[] = [];
-          for (const { dependencyIndex, codec } of rawQueryValues) {
+          const queryValues: Record<string, unknown> = Object.create(null);
+          const valuesForDedupe: unknown[] = [];
+          for (const [
+            idx,
+            { dependencyIndex, codec, alreadyEncoded },
+          ] of rawQueryValues.entries()) {
             let result: unknown;
             const val = values[dependencyIndex].at(i);
             if (val == null) {
@@ -1291,14 +1314,22 @@ export class PgSelectStep<
               }
               result = null;
             } else {
-              result = codec.toPg(val);
+              result = encodeQueryValueForJsonToRecordset(
+                codec,
+                val,
+                alreadyEncoded,
+              );
             }
-            queryValues.push(result);
+            queryValues[`id${idx}`] = result;
+            valuesForDedupe.push(result);
           }
           if (!isMutation && hasSpec) {
             // Dedupe
             const existingIdx = specs.findIndex((s) =>
-              queryValuesMatch(queryValues, s.queryValues),
+              queryValuesMatch(
+                valuesForDedupe,
+                rawQueryValues.map((_, idx) => s.queryValues[`id${idx}`]),
+              ),
             );
             if (existingIdx !== -1) {
               return existingIdx;
@@ -1363,12 +1394,7 @@ export class PgSelectStep<
             // The context is how we'd handle different connections with different claims
             context,
             queryValues:
-              identifierIndex != null
-                ? rawQueryValues.map(({ dependencyIndex, codec }) => {
-                    const val = values[dependencyIndex].at(i);
-                    return val == null ? null : codec.toPg(val);
-                  })
-                : EMPTY_ARRAY,
+              identifierIndex != null ? makeQueryValues(i) : EMPTY_OBJECT,
           };
         });
       }
@@ -1388,12 +1414,7 @@ export class PgSelectStep<
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
-            identifierIndex != null
-              ? rawQueryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex].at(i);
-                  return val == null ? val : codec.toPg(val);
-                })
-              : EMPTY_ARRAY,
+            identifierIndex != null ? makeQueryValues(i) : EMPTY_OBJECT,
         };
       });
       const streams = (
@@ -3466,19 +3487,16 @@ function buildTheQuery<
        */
       const text = `\
 with ${identifiersAliasText} as materialized (
-  select ids.ordinality - 1 as idx${
-    queryValues.length > 0
-      ? `, ${queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}`
-      : ""
-  } from json_array_elements($${
-    rawSqlValues.length + 1
-  }::json) with ordinality as ids
+  ${
+    queryValues.length === 0
+      ? // We've just been instructed to repeat this N times, so generate_series should suffice
+        `select ids.idx from generate_series(0, json_array_length($${
+          rawSqlValues.length + 1
+        }::json) - 1) as ids(idx)`
+      : `select ids.ordinality - 1 as idx, ${queryValues.map((_, idx) => `ids.id${idx}`).join(", ")} from rows from (json_to_recordset($${rawSqlValues.length + 1}::json) as (${queryValues
+          .map((qv, idx) => `id${idx} ${sql.compile(qv.codec.sqlType).text}`)
+          .join(", ")})) with ordinality as ids`
+  }
 )
 select ${wrapperAliasText}.*
 from ${identifiersAliasText},

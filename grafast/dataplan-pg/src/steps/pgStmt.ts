@@ -14,6 +14,7 @@ import {
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
+import { TYPES } from "../codecs.ts";
 import type {
   PgCodec,
   PgGroupSpec,
@@ -30,6 +31,28 @@ export interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
   alreadyEncoded: boolean;
+}
+
+/**
+ * Encodes a value for inclusion in the JSON record passed to a batched query.
+ *
+ * JSON and JSONB values must remain JavaScript values so that serializing the
+ * enclosing record produces JSON values rather than JSON strings. Domains over
+ * JSON/JSONB behave the same way; arrays of either type do not.
+ */
+export function encodeQueryValueForJsonToRecordset(
+  codec: PgCodec,
+  value: unknown,
+  alreadyEncoded: boolean,
+): unknown {
+  let innerCodec = codec;
+  while (innerCodec.domainOfCodec) {
+    innerCodec = innerCodec.domainOfCodec;
+  }
+  if (innerCodec === TYPES.json || innerCodec === TYPES.jsonb) {
+    return alreadyEncoded ? JSON.parse(value as string) : value;
+  }
+  return alreadyEncoded ? value : codec.toPg(value);
 }
 
 /**
