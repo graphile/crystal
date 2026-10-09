@@ -62,6 +62,8 @@ export const encodeQueryValueForJsonToRecordset = isDev
     }
   : _encodeQueryValueForJsonToRecordset;
 
+// NOTE: Any edits to this function must also be reflected in
+// makeMakeQueryValues in pgSelect.ts
 function _encodeQueryValueForJsonToRecordset(
   qv: QueryValue,
   value: unknown,

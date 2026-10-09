@@ -4555,21 +4555,61 @@ function makeMakeQueryValues(
       };
     }
     case 1: {
+      // This is by far the most common call, so we're going to go further to
+      // fully optimize it by inlining the logic in encodeQueryValueForJsonToRecordset
       const qv0 = rawQueryValues[0];
       const values0 = values[qv0.dependencyIndex];
-      return function makeQueryValues1(i: number) {
-        const val0 = values0.at(i);
-        return {
-          id0:
-            val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
-        };
-      };
+      if (qv0.codecIsJsony) {
+        if (qv0.alreadyEncoded) {
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 == null ? null : JSON.parse(val0) };
+          };
+        } else {
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 ?? null };
+          };
+        }
+      } else {
+        if (qv0.alreadyEncoded) {
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 ?? null };
+          };
+        } else {
+          const codec0 = qv0.codec;
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 == null ? null : codec0.toPg(val0) };
+          };
+        }
+      }
     }
     case 2: {
       const qv0 = rawQueryValues[0];
       const values0 = values[qv0.dependencyIndex];
       const qv1 = rawQueryValues[1];
       const values1 = values[qv1.dependencyIndex];
+
+      if (
+        !qv0.codecIsJsony &&
+        !qv1.codecIsJsony &&
+        !qv0.alreadyEncoded &&
+        !qv1.alreadyEncoded
+      ) {
+        // This is the most common case for length = 2, so inline the encodeQueryValueForJsonToRecordset logic
+        const codec0 = qv0.codec;
+        const codec1 = qv1.codec;
+        return function makeQueryValues2(i: number) {
+          const val0 = values0.at(i);
+          const val1 = values1.at(i);
+          return {
+            id0: val0 == null ? null : codec0.toPg(val0),
+            id1: val1 == null ? null : codec1.toPg(val1),
+          };
+        };
+      }
 
       return function makeQueryValues2(i: number) {
         const val0 = values0.at(i);
