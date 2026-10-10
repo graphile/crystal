@@ -3,6 +3,5 @@
 "postgraphile": minor
 ---
 
-Add `PgArgumentDescriptionsPlugin`, loaded by default, to apply
-`@argNdescription` smart tags to SQL function arguments and mutation input
-fields.
+Introduce `@argNDescription` smart tag to allow documentation of PostgreSQL
+function arguments, where N is the zero-based index of the argument.
