@@ -70,6 +70,17 @@ const $$rootQuery = Symbol("PgCustomTypeFieldPluginRootQuerySources");
 const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
 const $$computed = Symbol("PgCustomTypeFieldPluginComputedSources");
 
+function tagToStrings(
+  tag: undefined | null | boolean | string | (string | boolean)[],
+): string[] {
+  if (!tag || (Array.isArray(tag) && tag.length === 0)) {
+    return [];
+  }
+  return (Array.isArray(tag) ? tag : [tag]).flatMap((entry) =>
+    typeof entry === "string" ? [entry] : [],
+  );
+}
+
 declare global {
   namespace GraphileConfig {
     interface Plugins {
@@ -1152,6 +1163,18 @@ function modFields(
   return procSources.reduce(
     (memo, resource) =>
       build.recoverable(memo, () => {
+        const applyToTypes = tagToStrings(
+          resource.extensions?.tags?.applyToType,
+        );
+        const shouldSkipForApplyToType =
+          isRootQuery || isRootMutation
+            ? false
+            : applyToTypes.length > 0
+              ? !applyToTypes.includes(SelfName)
+              : false;
+        if (shouldSkipForApplyToType) {
+          return memo;
+        }
         // "Computed attributes" skip a parameter
         const offset = isRootMutation || isRootQuery ? 0 : 1;
 
