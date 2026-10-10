@@ -1,4 +1,5 @@
 ---
+"@dataplan/pg": minor
 "graphile-build-pg": minor
 "postgraphile": minor
 ---

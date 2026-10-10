@@ -148,11 +148,6 @@ declare global {
    * extensions so we can easily use them with TypeScript.
    */
   namespace DataplanPg {
-    interface PgResourceParameterExtensions {
-      /** Description for the GraphQL argument or mutation input field. */
-      argDescription?: string;
-    }
-
     interface PgResourceExtensions {
       tags?: Partial<GraphileBuild.PgResourceTags>;
       singleOutputParameterName?: string;

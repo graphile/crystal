@@ -30,10 +30,7 @@ export const PgArgumentDescriptionsPlugin: GraphileConfig.Plugin = {
           const tag = tags[`arg${index}description`];
           const description = Array.isArray(tag) ? tag.join("\n") : tag;
           if (typeof description === "string") {
-            param.extensions = {
-              ...param.extensions,
-              argDescription: description,
-            };
+            param.description = description;
           }
         });
       },

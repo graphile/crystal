@@ -638,8 +638,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 graphqlArgName: argName,
                 pgCodec: param.codec,
                 inputType,
-                ...(param.extensions?.argDescription !== undefined
-                  ? { description: param.extensions.argDescription }
+                ...(param.description !== undefined
+                  ? { description: param.description }
                   : null),
                 ...(param.name ? { postgresArgName: param.name } : null),
                 ...(param.optional ? { optional: true } : null),

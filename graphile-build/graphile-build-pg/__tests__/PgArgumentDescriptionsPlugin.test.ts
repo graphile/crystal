@@ -58,7 +58,7 @@ test("maps SQL positions to inputs, preserving extensions and absent description
     {
       name: "first",
       codec: TYPES.text,
-      extensions: { argDescription: "Existing." },
+      description: "Existing.",
     },
     { name: "last", codec: TYPES.text, extensions: { variant: "input" } },
     { name: null, codec: TYPES.text },
@@ -73,11 +73,12 @@ test("maps SQL positions to inputs, preserving extensions and absent description
     },
     ["i", "o", "b", "i", "t"],
   );
-  expect(resource.parameters.map((param) => param.extensions)).toEqual([
-    { argDescription: "Existing." },
-    { variant: "input", argDescription: "The INOUT argument.\nSecond line." },
+  expect(resource.parameters.map((param) => param.description)).toEqual([
+    "Existing.",
+    "The INOUT argument.\nSecond line.",
     undefined,
   ]);
+  expect(resource.parameters[1].extensions).toEqual({ variant: "input" });
 });
 
 test("describes query arguments, computed arguments and mutation input fields", async () => {
@@ -91,6 +92,12 @@ test("describes query arguments, computed arguments and mutation input fields", 
   const query = makeFunction("greet", [
     { name: "person_name", codec: TYPES.text, optional: true },
     { name: "unlabelled", codec: TYPES.text, optional: true },
+    {
+      name: "documented",
+      codec: TYPES.text,
+      optional: true,
+      description: "Supplied directly.",
+    },
   ]);
   const computed = makeFunction("people_greet", [
     { name: "person", codec: rowCodec },
@@ -136,6 +143,7 @@ test("describes query arguments, computed arguments and mutation input fields", 
   expect(args.map(({ name, description }) => ({ name, description }))).toEqual([
     { name: "personName", description: "Name to greet.\nOptional." },
     { name: "unlabelled", description: undefined },
+    { name: "documented", description: "Supplied directly." },
   ]);
   expect(args[0].type).toBe(GraphQLString);
   const person = schema.getType("Person") as GraphQLObjectType;
@@ -148,6 +156,7 @@ test("describes query arguments, computed arguments and mutation input fields", 
   expect(input.getFields().personName.description).toBe("Mutation greeting.");
   expect(input.getFields().personName.type).toBe(GraphQLString);
   expect(input.getFields().unlabelled.description).toBeUndefined();
+  expect(input.getFields().documented.description).toBe("Supplied directly.");
   expect(input.getFields().clientMutationId.description).toContain(
     "An arbitrary string value with no semantic meaning.",
   );
