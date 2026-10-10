@@ -87,13 +87,13 @@
         name: "nodeId",
       },
       {
+        name: "meaningOfLife",
+      },
+      {
         name: "postAndDividerOnly",
       },
       {
         name: "postOnly",
-      },
-      {
-        name: "meaningOfLife",
       },
       {
         name: "topics",
@@ -293,10 +293,10 @@
         name: "nodeId",
       },
       {
-        name: "postAndDividerOnly",
+        name: "meaningOfLife",
       },
       {
-        name: "meaningOfLife",
+        name: "postAndDividerOnly",
       },
       {
         name: "topics",
