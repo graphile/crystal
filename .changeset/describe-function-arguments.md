@@ -1,5 +1,6 @@
 ---
 "graphile-build-pg": minor
+"postgraphile": minor
 ---
 
 Add `PgArgumentDescriptionsPlugin`, loaded by default, to apply
