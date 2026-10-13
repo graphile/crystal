@@ -1,10 +1,11 @@
 import { $$proxy } from "../constants.ts";
 import type {
+  AddDependencyOptions,
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.ts";
-import type { Step } from "../step.ts";
+import type { DepId, Step } from "../step.ts";
 import { UnbatchedStep } from "../step.ts";
 import { arrayOfLength } from "../utils.ts";
 
@@ -30,7 +31,9 @@ export class ProxyStep<T> extends UnbatchedStep<T> {
     return $dep.toString();
   }
   // Publicly expose this
-  public addDependency(step: Step): number {
+  public addDependency<TStep extends Step>(
+    step: TStep | AddDependencyOptions<TStep>,
+  ): DepId<TStep> {
     return super.addDependency(step);
   }
   execute({
@@ -121,6 +124,7 @@ export function proxy<TData, TStep extends Step<TData>>(
   $actualDep: Step = $step,
 ): TStep & { addDependency(step: Step): number } {
   const $proxy = new ProxyStep($step, $actualDep);
+  // @ts-ignore
   const proxy = new Proxy($proxy, makeProxyHandler($step)) as any; // Lie.
   $proxy[$$proxy] = proxy;
   return proxy;

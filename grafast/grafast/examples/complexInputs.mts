@@ -62,7 +62,7 @@ setTimeout(async () => {
 // Everything below this line will be output in the docs at
 // http://build.graphile.org/graphile-build/next/all-hooks
 /******************************************************************************/
-import type { ExecutionDetails, ExecutionValue, Maybe } from "grafast";
+import type { DepId, ExecutionDetails, Maybe } from "grafast";
 import { makeGrafastSchema, Modifier, Step } from "grafast";
 
 interface Filterable {
@@ -117,8 +117,8 @@ class SearchRequestStep extends Step<{
   sql: string;
   patchJSON: string;
 }> {
-  private readonly patchDepId: number;
-  private readonly applyDepIds: number[] = [];
+  private readonly patchDepId: DepId<Step<BakedUserPatch>>;
+  private readonly applyDepIds: DepId<Step<FilterCallbacks>>[] = [];
 
   constructor($patch: Step<BakedUserPatch>) {
     super();
@@ -130,9 +130,7 @@ class SearchRequestStep extends Step<{
   }
 
   execute(details: ExecutionDetails) {
-    const patchDep = details.values[
-      this.patchDepId
-    ] as ExecutionValue<BakedUserPatch>;
+    const patchDep = details.values.at(this.patchDepId);
 
     const clauses: string[] = [
       // Put any initial clauses here
@@ -140,7 +138,7 @@ class SearchRequestStep extends Step<{
 
     // Apply the callbacks
     const applyCallbacks = this.applyDepIds
-      .flatMap((id) => details.values[id].unaryValue() as FilterCallbacks)
+      .flatMap((id) => details.values.at(id).unaryValue())
       .filter((cb) => cb != null);
     const filterable: Filterable = {
       addClause: (clause) => void clauses.push(clause),
