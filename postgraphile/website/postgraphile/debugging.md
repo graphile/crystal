@@ -230,7 +230,9 @@ import * as pg from "pg";
 import { makePgService } from "postgraphile/adaptors/pg";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+pool.on("error", (error) => console.error(error));
 pool.on("connect", (client) => {
+  client.on("error", (error) => console.error(error));
   client.on("notice", (msg) => {
     console.dir(msg);
   });
