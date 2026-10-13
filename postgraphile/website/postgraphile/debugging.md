@@ -216,6 +216,40 @@ $env:DEBUG = "postgraphile:postgres*"; postgraphile
 
 -->
 
+### Viewing notices from PostgreSQL
+
+PostgreSQL notices (such as those raised via `raise notice` in PL/pgSQL
+functions) are not included in the GraphQL response, but they can be a useful
+debugging tool. The `pg` driver emits each notice via the `notice` event on
+the client that issued the statement; to see them, create your own `pg.Pool`,
+listen for its `connect` event, and attach a `notice` handler to each new
+client:
+
+```js title="graphile.config.mjs"
+import * as pg from "pg";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+pool.on("connect", (client) => {
+  client.on("notice", (msg) => {
+    console.dir(msg);
+  });
+});
+
+export default {
+  pgServices: [makePgService({ pool })],
+};
+```
+
+:::warning[Passing your own pool]
+
+When you pass `pool` to
+[`makePgService()`](./config/overview.mdx#makepgservice), the
+`connectionString` and `poolConfig` options are ignored and you are
+responsible for releasing the pool when your server shuts down.
+
+:::
+
 ## Something is in my GraphQL schema that shouldn't be
 
 This could be for a number of reasons...
