@@ -16,6 +16,11 @@ interface Application {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -30,6 +35,9 @@ interface Application {
 
     """Filter results to only those of the given types"""
     only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
   ): VulnerabilitiesConnection!
 }
 
@@ -4878,6 +4886,11 @@ interface RelationalItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -4889,6 +4902,9 @@ interface RelationalItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -4901,6 +4917,11 @@ interface RelationalItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -4912,6 +4933,9 @@ interface RelationalItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -4924,6 +4948,11 @@ interface RelationalItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -4935,6 +4964,9 @@ interface RelationalItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -4947,6 +4979,11 @@ interface RelationalItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -4958,6 +4995,9 @@ interface RelationalItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """Reads and enables pagination through a set of `RelationalItem`."""
@@ -4968,6 +5008,11 @@ interface RelationalItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -4979,6 +5024,9 @@ interface RelationalItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -6535,6 +6583,11 @@ interface SingleTableItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -6546,6 +6599,9 @@ interface SingleTableItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -6558,6 +6614,11 @@ interface SingleTableItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -6569,6 +6630,9 @@ interface SingleTableItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -6581,6 +6645,11 @@ interface SingleTableItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -6592,6 +6661,9 @@ interface SingleTableItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -6604,6 +6676,11 @@ interface SingleTableItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -6615,6 +6692,9 @@ interface SingleTableItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """Reads and enables pagination through a set of `SingleTableItem`."""
@@ -6625,6 +6705,11 @@ interface SingleTableItem {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -6636,6 +6721,9 @@ interface SingleTableItem {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
   type: ItemType!
   updatedAt: Datetime!
@@ -8001,6 +8089,11 @@ interface Vulnerability {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -8015,6 +8108,9 @@ interface Vulnerability {
 
     """Filter results to only those of the given types"""
     only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
   cvssScore: Float!
   id: Int!

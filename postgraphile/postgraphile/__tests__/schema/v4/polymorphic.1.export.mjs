@@ -4766,37 +4766,50 @@ const resourceByTypeName6 = {
   FirstPartyVulnerability: spec_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: spec_resource_third_party_vulnerabilitiesPgResource
 };
+const ApplicationCondition_nameApply = ($condition, val) => applyAttributeCondition("name", TYPES.text, $condition, val);
+const ApplicationCondition_lastDeployedApply = ($condition, val) => applyAttributeCondition("last_deployed", TYPES.timestamptz, $condition, val);
+const ApplicationsOrderBy_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "ASC"
+  });
+};
+const ApplicationsOrderBy_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "id",
+    direction: "DESC"
+  });
+};
+const ApplicationsOrderBy_NAME_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "name",
+    direction: "ASC"
+  });
+};
+const ApplicationsOrderBy_NAME_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "name",
+    direction: "DESC"
+  });
+};
+const ApplicationsOrderBy_LAST_DEPLOYED_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "last_deployed",
+    direction: "ASC"
+  });
+};
+const ApplicationsOrderBy_LAST_DEPLOYED_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "last_deployed",
+    direction: "DESC"
+  });
+};
 const resourceByTypeName7 = {
   __proto__: null,
   Organization: spec_resource_organizationsPgResource,
   Person: otherSource_peoplePgResource
 };
-const VulnerabilityCondition_nameApply = ($condition, val) => applyAttributeCondition("name", TYPES.text, $condition, val);
 const VulnerabilityCondition_cvssScoreApply = ($condition, val) => applyAttributeCondition("cvss_score", TYPES.float, $condition, val);
-const VulnerabilitiesOrderBy_ID_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "id",
-    direction: "ASC"
-  });
-};
-const VulnerabilitiesOrderBy_ID_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "id",
-    direction: "DESC"
-  });
-};
-const VulnerabilitiesOrderBy_NAME_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "name",
-    direction: "ASC"
-  });
-};
-const VulnerabilitiesOrderBy_NAME_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "name",
-    direction: "DESC"
-  });
-};
 const VulnerabilitiesOrderBy_CVSS_SCORE_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "cvss_score",
@@ -4806,19 +4819,6 @@ const VulnerabilitiesOrderBy_CVSS_SCORE_ASCApply = queryBuilder => {
 const VulnerabilitiesOrderBy_CVSS_SCORE_DESCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "cvss_score",
-    direction: "DESC"
-  });
-};
-const AwsApplicationCondition_lastDeployedApply = ($condition, val) => applyAttributeCondition("last_deployed", TYPES.timestamptz, $condition, val);
-const AwsApplicationsOrderBy_LAST_DEPLOYED_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "last_deployed",
-    direction: "ASC"
-  });
-};
-const AwsApplicationsOrderBy_LAST_DEPLOYED_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "last_deployed",
     direction: "DESC"
   });
 };
@@ -5050,36 +5050,36 @@ const RelationalItemRelation_relationalItemByChildIdPlan = $record => otherSourc
 const RelationalItemRelation_relationalItemByParentIdPlan = $record => otherSource_relational_itemsPgResource.get({
   id: $record.get("parent_id")
 });
+const RelationalItemRelationCondition_childIdApply = ($condition, val) => applyAttributeCondition("child_id", TYPES.int, $condition, val);
+const RelationalItemRelationsOrderBy_PARENT_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "parent_id",
+    direction: "ASC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const RelationalItemRelationsOrderBy_PARENT_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "parent_id",
+    direction: "DESC"
+  });
+  queryBuilder.setOrderIsUnique();
+};
+const RelationalItemRelationsOrderBy_CHILD_ID_ASCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "child_id",
+    direction: "ASC"
+  });
+};
+const RelationalItemRelationsOrderBy_CHILD_ID_DESCApply = queryBuilder => {
+  queryBuilder.orderBy({
+    attribute: "child_id",
+    direction: "DESC"
+  });
+};
 const SingleTableItemRelation_singleTableItemByChildIdPlan = $record => resource_single_table_itemsPgResource.get({
   id: $record.get("child_id")
 });
-const SingleTableItemRelationCondition_childIdApply = ($condition, val) => applyAttributeCondition("child_id", TYPES.int, $condition, val);
-const SingleTableItemRelationsOrderBy_PARENT_ID_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "parent_id",
-    direction: "ASC"
-  });
-  queryBuilder.setOrderIsUnique();
-};
-const SingleTableItemRelationsOrderBy_PARENT_ID_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "parent_id",
-    direction: "DESC"
-  });
-  queryBuilder.setOrderIsUnique();
-};
-const SingleTableItemRelationsOrderBy_CHILD_ID_ASCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "child_id",
-    direction: "ASC"
-  });
-};
-const SingleTableItemRelationsOrderBy_CHILD_ID_DESCApply = queryBuilder => {
-  queryBuilder.orderBy({
-    attribute: "child_id",
-    direction: "DESC"
-  });
-};
 const SingleTablePost_priorityIdPlan = $record => {
   return $record.get("priority_id");
 };
@@ -6461,6 +6461,14 @@ interface SingleTableItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """
@@ -6484,6 +6492,14 @@ interface SingleTableItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -6507,6 +6523,14 @@ interface SingleTableItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -6530,6 +6554,14 @@ interface SingleTableItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -6553,6 +6585,14 @@ interface SingleTableItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7054,8 +7094,16 @@ interface Application implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
     """Filter results to only those of the given types"""
     only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
   ): VulnerabilitiesConnection!
 
   """
@@ -7110,8 +7158,16 @@ interface Vulnerability implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
     """Filter results to only those of the given types"""
     only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
 
   """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
@@ -7159,9 +7215,35 @@ type PageInfo {
   endCursor: Cursor
 }
 
+"""
+A condition to be used against \`Application\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ApplicationCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+
+  """Checks for equality with the object’s \`lastDeployed\` field."""
+  lastDeployed: Datetime
+}
+
 enum ApplicationType {
   AwsApplication
   GcpApplication
+}
+
+"""Methods to use when ordering \`Application\`."""
+enum ApplicationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
 }
 
 """A connection to a list of \`PersonOrOrganization\` values."""
@@ -7198,11 +7280,6 @@ type VulnerabilitiesEdge {
   node: Vulnerability
 }
 
-enum VulnerabilityType {
-  FirstPartyVulnerability
-  ThirdPartyVulnerability
-}
-
 """
 A condition to be used against \`Vulnerability\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -7216,6 +7293,11 @@ input VulnerabilityCondition {
 
   """Checks for equality with the object’s \`cvssScore\` field."""
   cvssScore: Float
+}
+
+enum VulnerabilityType {
+  FirstPartyVulnerability
+  ThirdPartyVulnerability
 }
 
 """Methods to use when ordering \`Vulnerability\`."""
@@ -7573,6 +7655,14 @@ interface RelationalItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -7596,6 +7686,14 @@ interface RelationalItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -7619,6 +7717,14 @@ interface RelationalItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -7642,6 +7748,14 @@ interface RelationalItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -7665,111 +7779,15 @@ interface RelationalItem implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
-}
-
-"""A connection to a list of \`RelationalItemRelation\` values."""
-type RelationalItemRelationsConnection {
-  """A list of \`RelationalItemRelation\` objects."""
-  nodes: [RelationalItemRelation]!
-
-  """
-  A list of edges which contains the \`RelationalItemRelation\` and cursor to aid in pagination.
-  """
-  edges: [RelationalItemRelationsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalItemRelation\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type RelationalItemRelation implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  parentId: Int!
-  childId: Int!
-
-  """
-  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelation\`.
-  """
-  relationalItemByChildId: RelationalItem
-
-  """
-  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelation\`.
-  """
-  relationalItemByParentId: RelationalItem
-}
-
-"""A \`RelationalItemRelation\` edge in the connection."""
-type RelationalItemRelationsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalItemRelation\` at the end of the edge."""
-  node: RelationalItemRelation
-}
-
-"""A connection to a list of \`RelationalItemRelationCompositePk\` values."""
-type RelationalItemRelationCompositePksConnection {
-  """A list of \`RelationalItemRelationCompositePk\` objects."""
-  nodes: [RelationalItemRelationCompositePk]!
-
-  """
-  A list of edges which contains the \`RelationalItemRelationCompositePk\` and cursor to aid in pagination.
-  """
-  edges: [RelationalItemRelationCompositePksEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`RelationalItemRelationCompositePk\` you could get from the connection.
-  """
-  totalCount: Int!
-}
-
-type RelationalItemRelationCompositePk implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  parentId: Int!
-  childId: Int!
-
-  """
-  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelationCompositePk\`.
-  """
-  relationalItemByChildId: RelationalItem
-
-  """
-  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelationCompositePk\`.
-  """
-  relationalItemByParentId: RelationalItem
-}
-
-"""A \`RelationalItemRelationCompositePk\` edge in the connection."""
-type RelationalItemRelationCompositePksEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalItemRelationCompositePk\` at the end of the edge."""
-  node: RelationalItemRelationCompositePk
-}
-
-"""A \`RelationalItem\` edge in the connection."""
-type RelationalItemsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalItem\` at the end of the edge."""
-  node: RelationalItem
 }
 
 """
@@ -7835,30 +7853,159 @@ enum RelationalItemsOrderBy {
   ARCHIVED_AT_DESC
 }
 
+"""A connection to a list of \`RelationalItemRelation\` values."""
+type RelationalItemRelationsConnection {
+  """A list of \`RelationalItemRelation\` objects."""
+  nodes: [RelationalItemRelation]!
+
+  """
+  A list of edges which contains the \`RelationalItemRelation\` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemRelationsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`RelationalItemRelation\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type RelationalItemRelation implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  parentId: Int!
+  childId: Int!
+
+  """
+  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelation\`.
+  """
+  relationalItemByChildId: RelationalItem
+
+  """
+  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelation\`.
+  """
+  relationalItemByParentId: RelationalItem
+}
+
+"""A \`RelationalItemRelation\` edge in the connection."""
+type RelationalItemRelationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalItemRelation\` at the end of the edge."""
+  node: RelationalItemRelation
+}
+
 """
-A condition to be used against \`Application\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
+A condition to be used against \`RelationalItemRelation\` object types. All fields
+are tested for equality and combined with a logical ‘and.’
 """
-input ApplicationCondition {
+input RelationalItemRelationCondition {
   """Checks for equality with the object’s \`id\` field."""
   id: Int
 
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
 
-  """Checks for equality with the object’s \`lastDeployed\` field."""
-  lastDeployed: Datetime
+  """Checks for equality with the object’s \`childId\` field."""
+  childId: Int
 }
 
-"""Methods to use when ordering \`Application\`."""
-enum ApplicationsOrderBy {
+"""Methods to use when ordering \`RelationalItemRelation\`."""
+enum RelationalItemRelationsOrderBy {
   NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  NAME_ASC
-  NAME_DESC
-  LAST_DEPLOYED_ASC
-  LAST_DEPLOYED_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+}
+
+"""A connection to a list of \`RelationalItemRelationCompositePk\` values."""
+type RelationalItemRelationCompositePksConnection {
+  """A list of \`RelationalItemRelationCompositePk\` objects."""
+  nodes: [RelationalItemRelationCompositePk]!
+
+  """
+  A list of edges which contains the \`RelationalItemRelationCompositePk\` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemRelationCompositePksEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* \`RelationalItemRelationCompositePk\` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+type RelationalItemRelationCompositePk implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  parentId: Int!
+  childId: Int!
+
+  """
+  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelationCompositePk\`.
+  """
+  relationalItemByChildId: RelationalItem
+
+  """
+  Reads a single \`RelationalItem\` that is related to this \`RelationalItemRelationCompositePk\`.
+  """
+  relationalItemByParentId: RelationalItem
+}
+
+"""A \`RelationalItemRelationCompositePk\` edge in the connection."""
+type RelationalItemRelationCompositePksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalItemRelationCompositePk\` at the end of the edge."""
+  node: RelationalItemRelationCompositePk
+}
+
+"""
+A condition to be used against \`RelationalItemRelationCompositePk\` object types.
+All fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCompositePkCondition {
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`childId\` field."""
+  childId: Int
+}
+
+"""Methods to use when ordering \`RelationalItemRelationCompositePk\`."""
+enum RelationalItemRelationCompositePksOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+}
+
+"""A \`RelationalItem\` edge in the connection."""
+type RelationalItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalItem\` at the end of the edge."""
+  node: RelationalItem
 }
 
 """A connection to a list of \`SingleTableItemRelation\` values."""
@@ -7909,6 +8056,34 @@ type SingleTableItemRelationsEdge {
   node: SingleTableItemRelation
 }
 
+"""
+A condition to be used against \`SingleTableItemRelation\` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemRelationCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`childId\` field."""
+  childId: Int
+}
+
+"""Methods to use when ordering \`SingleTableItemRelation\`."""
+enum SingleTableItemRelationsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+}
+
 """A connection to a list of \`SingleTableItemRelationCompositePk\` values."""
 type SingleTableItemRelationCompositePksConnection {
   """A list of \`SingleTableItemRelationCompositePk\` objects."""
@@ -7954,34 +8129,6 @@ type SingleTableItemRelationCompositePksEdge {
 
   """The \`SingleTableItemRelationCompositePk\` at the end of the edge."""
   node: SingleTableItemRelationCompositePk
-}
-
-"""
-A condition to be used against \`SingleTableItemRelation\` object types. All
-fields are tested for equality and combined with a logical ‘and.’
-"""
-input SingleTableItemRelationCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`childId\` field."""
-  childId: Int
-}
-
-"""Methods to use when ordering \`SingleTableItemRelation\`."""
-enum SingleTableItemRelationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
 }
 
 """
@@ -9014,57 +9161,6 @@ type RelationalTopic implements Node & RelationalItem {
     """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
     orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
-}
-
-"""
-A condition to be used against \`RelationalItemRelation\` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input RelationalItemRelationCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`childId\` field."""
-  childId: Int
-}
-
-"""Methods to use when ordering \`RelationalItemRelation\`."""
-enum RelationalItemRelationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-}
-
-"""
-A condition to be used against \`RelationalItemRelationCompositePk\` object types.
-All fields are tested for equality and combined with a logical ‘and.’
-"""
-input RelationalItemRelationCompositePkCondition {
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`childId\` field."""
-  childId: Int
-}
-
-"""Methods to use when ordering \`RelationalItemRelationCompositePk\`."""
-enum RelationalItemRelationCompositePksOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
 }
 
 type RelationalPost implements Node & RelationalItem {
@@ -19794,8 +19890,8 @@ export const inputObjects = {
   ApplicationCondition: {
     plans: {
       id: LogEntryCondition_idApply,
-      lastDeployed: AwsApplicationCondition_lastDeployedApply,
-      name: VulnerabilityCondition_nameApply
+      lastDeployed: ApplicationCondition_lastDeployedApply,
+      name: ApplicationCondition_nameApply
     }
   },
   AwsApplicationCondition: {
@@ -19804,8 +19900,8 @@ export const inputObjects = {
         return applyAttributeCondition("aws_id", TYPES.text, $condition, val);
       },
       id: LogEntryCondition_idApply,
-      lastDeployed: AwsApplicationCondition_lastDeployedApply,
-      name: VulnerabilityCondition_nameApply,
+      lastDeployed: ApplicationCondition_lastDeployedApply,
+      name: ApplicationCondition_nameApply,
       organizationId: LogEntryCondition_organizationIdApply,
       personId: LogEntryCondition_personIdApply
     }
@@ -20141,7 +20237,7 @@ export const inputObjects = {
       id($condition, val) {
         return applyAttributeCondition("id", TYPES.text, $condition, val);
       },
-      name: VulnerabilityCondition_nameApply,
+      name: ApplicationCondition_nameApply,
       recommendations($condition, val) {
         return applyAttributeCondition("recommendations", TYPES.jsonb, $condition, val);
       },
@@ -20355,7 +20451,7 @@ export const inputObjects = {
     plans: {
       cvssScore: VulnerabilityCondition_cvssScoreApply,
       id: LogEntryCondition_idApply,
-      name: VulnerabilityCondition_nameApply,
+      name: ApplicationCondition_nameApply,
       teamName($condition, val) {
         return applyAttributeCondition("team_name", TYPES.text, $condition, val);
       }
@@ -20385,8 +20481,8 @@ export const inputObjects = {
         return applyAttributeCondition("gcp_id", TYPES.text, $condition, val);
       },
       id: LogEntryCondition_idApply,
-      lastDeployed: AwsApplicationCondition_lastDeployedApply,
-      name: VulnerabilityCondition_nameApply,
+      lastDeployed: ApplicationCondition_lastDeployedApply,
+      name: ApplicationCondition_nameApply,
       organizationId: LogEntryCondition_organizationIdApply,
       personId: LogEntryCondition_personIdApply
     }
@@ -20443,7 +20539,7 @@ export const inputObjects = {
   },
   OrganizationCondition: {
     plans: {
-      name: VulnerabilityCondition_nameApply,
+      name: ApplicationCondition_nameApply,
       organizationId: LogEntryCondition_organizationIdApply
     }
   },
@@ -20728,7 +20824,7 @@ export const inputObjects = {
   },
   RelationalItemRelationCompositePkCondition: {
     plans: {
-      childId: SingleTableItemRelationCondition_childIdApply,
+      childId: RelationalItemRelationCondition_childIdApply,
       parentId: SingleTableItemCondition_parentIdApply
     }
   },
@@ -20748,7 +20844,7 @@ export const inputObjects = {
   },
   RelationalItemRelationCondition: {
     plans: {
-      childId: SingleTableItemRelationCondition_childIdApply,
+      childId: RelationalItemRelationCondition_childIdApply,
       id: LogEntryCondition_idApply,
       parentId: SingleTableItemCondition_parentIdApply
     }
@@ -20937,7 +21033,7 @@ export const inputObjects = {
   },
   SingleTableItemRelationCompositePkCondition: {
     plans: {
-      childId: SingleTableItemRelationCondition_childIdApply,
+      childId: RelationalItemRelationCondition_childIdApply,
       parentId: SingleTableItemCondition_parentIdApply
     }
   },
@@ -20957,7 +21053,7 @@ export const inputObjects = {
   },
   SingleTableItemRelationCondition: {
     plans: {
-      childId: SingleTableItemRelationCondition_childIdApply,
+      childId: RelationalItemRelationCondition_childIdApply,
       id: LogEntryCondition_idApply,
       parentId: SingleTableItemCondition_parentIdApply
     }
@@ -20982,7 +21078,7 @@ export const inputObjects = {
     plans: {
       cvssScore: VulnerabilityCondition_cvssScoreApply,
       id: LogEntryCondition_idApply,
-      name: VulnerabilityCondition_nameApply,
+      name: ApplicationCondition_nameApply,
       vendorName($condition, val) {
         return applyAttributeCondition("vendor_name", TYPES.text, $condition, val);
       }
@@ -21166,13 +21262,13 @@ export const inputObjects = {
     plans: {
       cvssScore: VulnerabilityCondition_cvssScoreApply,
       id: LogEntryCondition_idApply,
-      name: VulnerabilityCondition_nameApply
+      name: ApplicationCondition_nameApply
     }
   },
   ZeroImplementationCondition: {
     plans: {
       id: LogEntryCondition_idApply,
-      name: VulnerabilityCondition_nameApply
+      name: ApplicationCondition_nameApply
     }
   }
 };
@@ -21226,12 +21322,12 @@ export const scalars = {
 export const enums = {
   ApplicationsOrderBy: {
     values: {
-      ID_ASC: VulnerabilitiesOrderBy_ID_ASCApply,
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
-      LAST_DEPLOYED_ASC: AwsApplicationsOrderBy_LAST_DEPLOYED_ASCApply,
-      LAST_DEPLOYED_DESC: AwsApplicationsOrderBy_LAST_DEPLOYED_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply
+      ID_ASC: ApplicationsOrderBy_ID_ASCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
+      LAST_DEPLOYED_ASC: ApplicationsOrderBy_LAST_DEPLOYED_ASCApply,
+      LAST_DEPLOYED_DESC: ApplicationsOrderBy_LAST_DEPLOYED_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply
     }
   },
   AwsApplicationsOrderBy: {
@@ -21250,10 +21346,10 @@ export const enums = {
       },
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      LAST_DEPLOYED_ASC: AwsApplicationsOrderBy_LAST_DEPLOYED_ASCApply,
-      LAST_DEPLOYED_DESC: AwsApplicationsOrderBy_LAST_DEPLOYED_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply,
+      LAST_DEPLOYED_ASC: ApplicationsOrderBy_LAST_DEPLOYED_ASCApply,
+      LAST_DEPLOYED_DESC: ApplicationsOrderBy_LAST_DEPLOYED_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply,
       ORGANIZATION_ID_ASC: LogEntriesOrderBy_ORGANIZATION_ID_ASCApply,
       ORGANIZATION_ID_DESC: LogEntriesOrderBy_ORGANIZATION_ID_DESCApply,
       PERSON_ID_ASC: LogEntriesOrderBy_PERSON_ID_ASCApply,
@@ -22496,8 +22592,8 @@ export const enums = {
       },
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         collectionsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -22538,8 +22634,8 @@ export const enums = {
       CVSS_SCORE_DESC: VulnerabilitiesOrderBy_CVSS_SCORE_DESCApply,
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -22588,10 +22684,10 @@ export const enums = {
       },
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      LAST_DEPLOYED_ASC: AwsApplicationsOrderBy_LAST_DEPLOYED_ASCApply,
-      LAST_DEPLOYED_DESC: AwsApplicationsOrderBy_LAST_DEPLOYED_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply,
+      LAST_DEPLOYED_ASC: ApplicationsOrderBy_LAST_DEPLOYED_ASCApply,
+      LAST_DEPLOYED_DESC: ApplicationsOrderBy_LAST_DEPLOYED_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply,
       ORGANIZATION_ID_ASC: LogEntriesOrderBy_ORGANIZATION_ID_ASCApply,
       ORGANIZATION_ID_DESC: LogEntriesOrderBy_ORGANIZATION_ID_DESCApply,
       PERSON_ID_ASC: LogEntriesOrderBy_PERSON_ID_ASCApply,
@@ -22795,7 +22891,7 @@ export const enums = {
           direction: "ASC"
         });
       },
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
@@ -22909,7 +23005,7 @@ export const enums = {
           direction: "ASC"
         });
       },
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
@@ -23035,7 +23131,7 @@ export const enums = {
           direction: "ASC"
         });
       },
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
@@ -23114,10 +23210,10 @@ export const enums = {
   },
   RelationalItemRelationCompositePksOrderBy: {
     values: {
-      CHILD_ID_ASC: SingleTableItemRelationsOrderBy_CHILD_ID_ASCApply,
-      CHILD_ID_DESC: SingleTableItemRelationsOrderBy_CHILD_ID_DESCApply,
-      PARENT_ID_ASC: SingleTableItemRelationsOrderBy_PARENT_ID_ASCApply,
-      PARENT_ID_DESC: SingleTableItemRelationsOrderBy_PARENT_ID_DESCApply,
+      CHILD_ID_ASC: RelationalItemRelationsOrderBy_CHILD_ID_ASCApply,
+      CHILD_ID_DESC: RelationalItemRelationsOrderBy_CHILD_ID_DESCApply,
+      PARENT_ID_ASC: RelationalItemRelationsOrderBy_PARENT_ID_ASCApply,
+      PARENT_ID_DESC: RelationalItemRelationsOrderBy_PARENT_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -23140,12 +23236,12 @@ export const enums = {
   },
   RelationalItemRelationsOrderBy: {
     values: {
-      CHILD_ID_ASC: SingleTableItemRelationsOrderBy_CHILD_ID_ASCApply,
-      CHILD_ID_DESC: SingleTableItemRelationsOrderBy_CHILD_ID_DESCApply,
+      CHILD_ID_ASC: RelationalItemRelationsOrderBy_CHILD_ID_ASCApply,
+      CHILD_ID_DESC: RelationalItemRelationsOrderBy_CHILD_ID_DESCApply,
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      PARENT_ID_ASC: SingleTableItemRelationsOrderBy_PARENT_ID_ASCApply,
-      PARENT_ID_DESC: SingleTableItemRelationsOrderBy_PARENT_ID_DESCApply,
+      PARENT_ID_ASC: RelationalItemRelationsOrderBy_PARENT_ID_ASCApply,
+      PARENT_ID_DESC: RelationalItemRelationsOrderBy_PARENT_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         relational_item_relationsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -23247,7 +23343,7 @@ export const enums = {
           direction: "ASC"
         });
       },
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
@@ -23363,7 +23459,7 @@ export const enums = {
           direction: "ASC"
         });
       },
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
@@ -23442,10 +23538,10 @@ export const enums = {
   },
   SingleTableItemRelationCompositePksOrderBy: {
     values: {
-      CHILD_ID_ASC: SingleTableItemRelationsOrderBy_CHILD_ID_ASCApply,
-      CHILD_ID_DESC: SingleTableItemRelationsOrderBy_CHILD_ID_DESCApply,
-      PARENT_ID_ASC: SingleTableItemRelationsOrderBy_PARENT_ID_ASCApply,
-      PARENT_ID_DESC: SingleTableItemRelationsOrderBy_PARENT_ID_DESCApply,
+      CHILD_ID_ASC: RelationalItemRelationsOrderBy_CHILD_ID_ASCApply,
+      CHILD_ID_DESC: RelationalItemRelationsOrderBy_CHILD_ID_DESCApply,
+      PARENT_ID_ASC: RelationalItemRelationsOrderBy_PARENT_ID_ASCApply,
+      PARENT_ID_DESC: RelationalItemRelationsOrderBy_PARENT_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -23468,12 +23564,12 @@ export const enums = {
   },
   SingleTableItemRelationsOrderBy: {
     values: {
-      CHILD_ID_ASC: SingleTableItemRelationsOrderBy_CHILD_ID_ASCApply,
-      CHILD_ID_DESC: SingleTableItemRelationsOrderBy_CHILD_ID_DESCApply,
+      CHILD_ID_ASC: RelationalItemRelationsOrderBy_CHILD_ID_ASCApply,
+      CHILD_ID_DESC: RelationalItemRelationsOrderBy_CHILD_ID_DESCApply,
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      PARENT_ID_ASC: SingleTableItemRelationsOrderBy_PARENT_ID_ASCApply,
-      PARENT_ID_DESC: SingleTableItemRelationsOrderBy_PARENT_ID_DESCApply,
+      PARENT_ID_ASC: RelationalItemRelationsOrderBy_PARENT_ID_ASCApply,
+      PARENT_ID_DESC: RelationalItemRelationsOrderBy_PARENT_ID_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -23542,8 +23638,8 @@ export const enums = {
       CVSS_SCORE_DESC: VulnerabilitiesOrderBy_CVSS_SCORE_DESCApply,
       ID_ASC: LogEntriesOrderBy_ID_ASCApply,
       ID_DESC: LogEntriesOrderBy_ID_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply,
       PRIMARY_KEY_ASC(queryBuilder) {
         third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -23580,18 +23676,18 @@ export const enums = {
     values: {
       CVSS_SCORE_ASC: VulnerabilitiesOrderBy_CVSS_SCORE_ASCApply,
       CVSS_SCORE_DESC: VulnerabilitiesOrderBy_CVSS_SCORE_DESCApply,
-      ID_ASC: VulnerabilitiesOrderBy_ID_ASCApply,
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply
+      ID_ASC: ApplicationsOrderBy_ID_ASCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply
     }
   },
   ZeroImplementationsOrderBy: {
     values: {
-      ID_ASC: VulnerabilitiesOrderBy_ID_ASCApply,
-      ID_DESC: VulnerabilitiesOrderBy_ID_DESCApply,
-      NAME_ASC: VulnerabilitiesOrderBy_NAME_ASCApply,
-      NAME_DESC: VulnerabilitiesOrderBy_NAME_DESCApply
+      ID_ASC: ApplicationsOrderBy_ID_ASCApply,
+      ID_DESC: ApplicationsOrderBy_ID_DESCApply,
+      NAME_ASC: ApplicationsOrderBy_NAME_ASCApply,
+      NAME_DESC: ApplicationsOrderBy_NAME_DESCApply
     }
   }
 };
