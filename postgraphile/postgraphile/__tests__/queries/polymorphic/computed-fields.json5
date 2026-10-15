@@ -1,0 +1,299 @@
+{
+  allRelationalItems: {
+    nodes: [
+      {
+        __typename: "RelationalTopic",
+        id: 1,
+        type: "TOPIC",
+        meaningOfLife: 42,
+        typeLabel: "TOPIC 1",
+      },
+      {
+        __typename: "RelationalTopic",
+        id: 2,
+        type: "TOPIC",
+        meaningOfLife: 42,
+        typeLabel: "TOPIC 2",
+      },
+      {
+        __typename: "RelationalDivider",
+        id: 3,
+        type: "DIVIDER",
+        meaningOfLife: 42,
+        typeLabel: "DIVIDER 3",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 4,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 4",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 5,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 5",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 6,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 6",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 7,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 7",
+      },
+      {
+        __typename: "RelationalDivider",
+        id: 8,
+        type: "DIVIDER",
+        meaningOfLife: 42,
+        typeLabel: "DIVIDER 8",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 9,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 9",
+      },
+      {
+        __typename: "RelationalTopic",
+        id: 10,
+        type: "TOPIC",
+        meaningOfLife: 42,
+        typeLabel: "TOPIC 10",
+      },
+      {
+        __typename: "RelationalTopic",
+        id: 11,
+        type: "TOPIC",
+        meaningOfLife: 42,
+        typeLabel: "TOPIC 11",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 12,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 12",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 13,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 13",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 14,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 14",
+      },
+      {
+        __typename: "RelationalPost",
+        id: 15,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 15",
+      },
+      {
+        __typename: "RelationalChecklist",
+        id: 16,
+        type: "CHECKLIST",
+        meaningOfLife: 42,
+        typeLabel: "CHECKLIST 16",
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 17,
+        type: "CHECKLIST_ITEM",
+        meaningOfLife: 42,
+        typeLabel: "CHECKLIST_ITEM 17",
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 18,
+        type: "CHECKLIST_ITEM",
+        meaningOfLife: 42,
+        typeLabel: "CHECKLIST_ITEM 18",
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 19,
+        type: "CHECKLIST_ITEM",
+        meaningOfLife: 42,
+        typeLabel: "CHECKLIST_ITEM 19",
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 20,
+        type: "CHECKLIST_ITEM",
+        meaningOfLife: 42,
+        typeLabel: "CHECKLIST_ITEM 20",
+      },
+      {
+        __typename: "RelationalChecklistItem",
+        id: 21,
+        type: "CHECKLIST_ITEM",
+        meaningOfLife: 42,
+        typeLabel: "CHECKLIST_ITEM 21",
+      },
+    ],
+  },
+  allRelationalPosts: {
+    nodes: [
+      {
+        id: 4,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 4",
+      },
+      {
+        id: 5,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 5",
+      },
+      {
+        id: 6,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 6",
+      },
+      {
+        id: 7,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 7",
+      },
+      {
+        id: 9,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 9",
+      },
+      {
+        id: 12,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 12",
+      },
+      {
+        id: 13,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 13",
+      },
+      {
+        id: 14,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 14",
+      },
+      {
+        id: 15,
+        type: "POST",
+        meaningOfLife: 42,
+        typeLabel: "POST 15",
+      },
+    ],
+  },
+  allSingleTableItems: {
+    nodes: [
+      {
+        __typename: "SingleTableTopic",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableTopic",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableDivider",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableDivider",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableTopic",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableTopic",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTablePost",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableChecklist",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableChecklistItem",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableChecklistItem",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableChecklistItem",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableChecklistItem",
+        meaningOfLife: 42,
+      },
+      {
+        __typename: "SingleTableChecklistItem",
+        meaningOfLife: 42,
+      },
+    ],
+  },
+}

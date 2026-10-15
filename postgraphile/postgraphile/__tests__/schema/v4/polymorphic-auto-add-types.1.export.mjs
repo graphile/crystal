@@ -2675,6 +2675,7 @@ const gcp_applications_resourceOptionsConfig = {
   uniques: gcp_applicationsUniques
 };
 const single_table_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_meaning_of_life");
+const relational_items_type_labelFunctionIdentifer = sql.identifier("polymorphic", "relational_items_type_label");
 const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
 const relational_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "relational_items_meaning_of_life");
 const single_table_itemsUniques = [{
@@ -3254,6 +3255,28 @@ const registryConfig = {
           serviceName: "main",
           schemaName: "polymorphic",
           name: "single_table_items_meaning_of_life"
+        }
+      },
+      isUnique: true
+    },
+    relational_items_type_label: {
+      executor: executor,
+      name: "relational_items_type_label",
+      identifier: "main.polymorphic.relational_items_type_label(polymorphic.relational_items)",
+      from(...args) {
+        return sql`${relational_items_type_labelFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "ri",
+        codec: relationalItemsCodec
+      }],
+      codec: TYPES.text,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_items_type_label"
         }
       },
       isUnique: true
@@ -4512,10 +4535,28 @@ const SingleTablePost_priorityByPriorityIdPlan = $record => otherSource_prioriti
 });
 const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
 const resource_relational_topics_parent_fnPgResource = registry.pgResources["relational_topics_parent_fn"];
+const resource_relational_items_type_labelPgResource = registry.pgResources["relational_items_type_label"];
+const relational_items_type_label_getSelectPlanFromParentAndArgs2 = ($in, args, _info) => {
+  return scalarComputed(resource_relational_items_type_labelPgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+};
+const rootRelationPath = ["relationalItemsByMyTopicItemId"];
+const resource_relational_items_meaning_of_lifePgResource = registry.pgResources["relational_items_meaning_of_life"];
+const relational_items_meaning_of_life_getSelectPlanFromParentAndArgs2 = ($in, args, _info) => {
+  return scalarComputed(resource_relational_items_meaning_of_lifePgResource, $in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+};
+const rootRelationPath2 = ["relationalItemsByMyTopicItemId"];
 const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
+const rootRelationPath3 = ["relationalItemsByMyPostItemId"];
+const rootRelationPath4 = ["relationalItemsByMyPostItemId"];
 const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
+const rootRelationPath5 = ["relationalItemsByMyDividerItemId"];
+const rootRelationPath6 = ["relationalItemsByMyDividerItemId"];
 const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
+const rootRelationPath7 = ["relationalItemsByMyChecklistItemId"];
+const rootRelationPath8 = ["relationalItemsByMyChecklistItemId"];
 const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
+const rootRelationPath9 = ["relationalItemsByMyChecklistItemItemId"];
+const rootRelationPath10 = ["relationalItemsByMyChecklistItemItemId"];
 const MovieCollection_col001Plan = $record => {
   return $record.get("col_001");
 };
@@ -5690,6 +5731,7 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
 }
 
 interface SingleTableItem {
+  meaningOfLife: Int
   id: Int!
   type: ItemType!
   parentId: Int
@@ -6216,6 +6258,8 @@ type RelationalItemsConnection {
 }
 
 interface RelationalItem {
+  typeLabel: String
+  meaningOfLife: Int
   id: Int!
   type: ItemType!
   parentId: Int
@@ -7607,6 +7651,8 @@ type SingleTableChecklistItem implements SingleTableItem {
 
 type RelationalTopic implements RelationalItem {
   parentFn: RelationalItem
+  typeLabel: String
+  meaningOfLife: Int
   title: String!
   id: Int!
   type: ItemType!
@@ -7867,6 +7913,8 @@ enum RelationalItemRelationCompositePksOrderBy {
 }
 
 type RelationalPost implements RelationalItem {
+  typeLabel: String
+  meaningOfLife: Int
   title: String!
   description: String
   note: String
@@ -8049,6 +8097,8 @@ type RelationalPost implements RelationalItem {
 }
 
 type RelationalDivider implements RelationalItem {
+  typeLabel: String
+  meaningOfLife: Int
   title: String
   color: String
   id: Int!
@@ -8230,6 +8280,8 @@ type RelationalDivider implements RelationalItem {
 }
 
 type RelationalChecklist implements RelationalItem {
+  typeLabel: String
+  meaningOfLife: Int
   title: String!
   id: Int!
   type: ItemType!
@@ -8410,6 +8462,8 @@ type RelationalChecklist implements RelationalItem {
 }
 
 type RelationalChecklistItem implements RelationalItem {
+  typeLabel: String
+  meaningOfLife: Int
   description: String!
   note: String
   id: Int!
@@ -12071,6 +12125,13 @@ export const objects = {
       authorId: SingleTableTopic_authorIdPlan,
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
+      meaningOfLife($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath8) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_meaning_of_life_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
@@ -12240,6 +12301,13 @@ export const objects = {
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
+      typeLabel($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath7) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_type_label_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     },
     planType($specifier) {
@@ -12257,6 +12325,13 @@ export const objects = {
       authorId: SingleTableTopic_authorIdPlan,
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
+      meaningOfLife($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath10) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_meaning_of_life_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
@@ -12426,6 +12501,13 @@ export const objects = {
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
+      typeLabel($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath9) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_type_label_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     },
     planType($specifier) {
@@ -12455,6 +12537,13 @@ export const objects = {
       authorId: SingleTableTopic_authorIdPlan,
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
+      meaningOfLife($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath6) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_meaning_of_life_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
@@ -12624,6 +12713,13 @@ export const objects = {
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
+      typeLabel($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath5) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_type_label_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     },
     planType($specifier) {
@@ -12697,6 +12793,13 @@ export const objects = {
       authorId: SingleTableTopic_authorIdPlan,
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
+      meaningOfLife($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath4) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_meaning_of_life_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       parentId: SingleTableTopic_parentIdPlan,
       personByAuthorId($record) {
         const $people = otherSource_peoplePgResource.find();
@@ -12866,6 +12969,13 @@ export const objects = {
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
+      typeLabel($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath3) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_type_label_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     },
     planType($specifier) {
@@ -12889,6 +12999,13 @@ export const objects = {
       authorId: SingleTableTopic_authorIdPlan,
       createdAt: SingleTableTopic_createdAtPlan,
       isExplicitlyArchived: SingleTableTopic_isExplicitlyArchivedPlan,
+      meaningOfLife($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath2) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_meaning_of_life_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       parentFn($in, args, _info) {
         const details = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
         return resource_relational_topics_parent_fnPgResource.execute(details.selectArgs);
@@ -13079,6 +13196,13 @@ export const objects = {
         return $relational_topics.single();
       },
       rootTopicId: SingleTableTopic_rootTopicIdPlan,
+      typeLabel($in, args, info) {
+        let $row = $in;
+        for (const relationName of rootRelationPath) {
+          $row = $row.singleRelation(relationName);
+        }
+        return relational_items_type_label_getSelectPlanFromParentAndArgs2($row, args, info);
+      },
       updatedAt: SingleTableTopic_updatedAtPlan
     },
     planType($specifier) {

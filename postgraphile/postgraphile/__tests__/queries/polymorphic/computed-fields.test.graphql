@@ -1,0 +1,40 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+## expect(data.allRelationalItems.nodes.length).toBeGreaterThan(0)
+## expect(data.allRelationalItems.nodes.every((n) => n.meaningOfLife === 42)).toBe(true)
+## expect(data.allRelationalItems.nodes.every((n) => n.typeLabel === `${n.type} ${n.id}`)).toBe(true)
+## expect(data.allRelationalPosts.nodes.length).toBeGreaterThan(0)
+## expect(data.allRelationalPosts.nodes.every((n) => n.meaningOfLife === 42)).toBe(true)
+## expect(data.allRelationalPosts.nodes.every((n) => n.typeLabel === `${n.type} ${n.id}`)).toBe(true)
+## expect(data.allSingleTableItems.nodes.length).toBeGreaterThan(0)
+## expect(data.allSingleTableItems.nodes.every((n) => n.meaningOfLife === 42)).toBe(true)
+
+# Computed fields (functions accepting the table's row) of a polymorphic table
+# are available on the interface as well as on its implementations. For
+# `mode:relational`, the implementations read them from the root's row.
+{
+  allRelationalItems {
+    nodes {
+      __typename
+      id
+      type
+      meaningOfLife
+      typeLabel
+    }
+  }
+  allRelationalPosts {
+    nodes {
+      id
+      type
+      meaningOfLife
+      typeLabel
+    }
+  }
+  allSingleTableItems {
+    nodes {
+      __typename
+      meaningOfLife
+    }
+  }
+}
