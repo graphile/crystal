@@ -6,6 +6,7 @@ import type {
   PgClassExpressionStep,
   PgClassSingleStep,
   PgCodec,
+  PgCodecWithAttributes,
   PgDeleteSingleStep,
   PgInsertSingleStep,
   PgResource,
@@ -1089,6 +1090,91 @@ const scalarComputed = EXPORTABLE(
   "scalarComputed",
 );
 
+/**
+ * The relational polymorphic roots (nearest first) that `codec` is an
+ * implementation of.
+ */
+function getRelationalRootCodecs(
+  build: GraphileBuild.Build,
+  codec: PgCodec,
+): PgCodec[] {
+  const roots: PgCodec[] = [];
+  let current: PgCodec | undefined = codec;
+  while (current) {
+    const rootCodecName: string | undefined =
+      current.extensions?.relationalInterfaceCodecName;
+    current = rootCodecName ? build.pgCodecs[rootCodecName] : undefined;
+    if (current) {
+      roots.push(current);
+    }
+  }
+  return roots;
+}
+
+type ComputedSources = Array<PgResource<any, any, any, any, any>>;
+
+/**
+ * The functions that are computed fields of `codec`: those that accept it as
+ * their first argument, and (for an implementation of a relational polymorphic
+ * root) those that accept one of its roots.
+ */
+function getComputedSources(
+  build: GraphileBuild.Build,
+  codec: PgCodec,
+): ComputedSources {
+  const own = build[$$computed].get(codec) ?? [];
+  const roots = getRelationalRootCodecs(build, codec);
+  if (roots.length === 0) {
+    return own;
+  }
+  const sources = [...own];
+  for (const rootCodec of roots) {
+    sources.push(...(build[$$computed].get(rootCodec) ?? []));
+  }
+  return sources;
+}
+
+/**
+ * The relations to follow, from a row of `codec`, to the row of the relational
+ * polymorphic root `rootCodec` that it implements.
+ */
+function getRelationPathToRoot(
+  build: GraphileBuild.Build,
+  codec: PgCodec,
+  rootCodec: PgCodec,
+): string[] {
+  const path: string[] = [];
+  let current = codec;
+  while (current !== rootCodec) {
+    const parentCodecName: string | undefined =
+      current.extensions?.relationalInterfaceCodecName;
+    const parentCodec = parentCodecName
+      ? build.pgCodecs[parentCodecName]
+      : undefined;
+    const relations = build
+      .pgTableResource(current as PgCodecWithAttributes)
+      ?.getRelations();
+    const relationName = parentCodec
+      ? Object.keys(relations ?? {}).find((name) => {
+          const relation = relations![name];
+          return (
+            relation.remoteResource.codec === parentCodec &&
+            relation.isUnique &&
+            !relation.isReferencee
+          );
+        })
+      : undefined;
+    if (!parentCodec || !relationName) {
+      throw new Error(
+        `Could not find the relation from '${current.name}' to the relational polymorphic root it implements`,
+      );
+    }
+    path.push(relationName);
+    current = parentCodec;
+  }
+  return path;
+}
+
 function modFields(
   fields: GraphileBuild.GrafastFieldConfigMap<any>,
   build: GraphileBuild.Build,
@@ -1134,21 +1220,18 @@ function modFields(
     ) {
       return fields;
     }
-    // TODO: remove this and fix issue where computed columns are not added to polymorphic types
-    return fields;
   } else {
     if (!(isPgClassType && pgCodec) && !isRootQuery && !isRootMutation) {
       return fields;
     }
   }
 
-  // TODO: factor in where computed column is added to `mode:relational` base (shared) table
   const procSources = isRootQuery
     ? build[$$rootQuery]
     : isRootMutation
       ? build[$$rootMutation]
       : pgCodec
-        ? (build[$$computed].get(pgCodec) ?? [])
+        ? getComputedSources(build, pgCodec)
         : [];
   if (procSources.length === 0) {
     return fields;
@@ -1166,59 +1249,92 @@ function modFields(
           offset,
         );
 
+        const getSelectPlanFromOwnerAndArgs: FieldPlanResolver<Step, any, any> =
+          isRootQuery
+            ? // Not computed
+              EXPORTABLE(
+                (makeArgs, resource) => ($root, args, _info) => {
+                  const selectArgs = makeArgs(args);
+                  return resource.execute(selectArgs);
+                },
+                [makeArgs, resource],
+                `${resource.name}_getSelectPlanFromParentAndArgs`,
+              )
+            : isRootMutation
+              ? // Mutation uses 'args.input' rather than 'args'
+                EXPORTABLE(
+                  (makeArgs, object, resource) => ($root, args, _info) => {
+                    const selectArgs = makeArgs(args, ["input"]);
+                    const $result = resource.execute(selectArgs, "mutation");
+                    return object({
+                      result: $result,
+                    });
+                  },
+                  [makeArgs, object, resource],
+                  `${resource.name}_getSelectPlanFromParentAndArgs`,
+                )
+              : // Otherwise computed:
+
+                // if it's a scalar computed expression, inline it:
+                resource.isUnique &&
+                  !resource.codec.attributes &&
+                  typeof resource.from === "function"
+                ? EXPORTABLE(
+                    (makeArgs, resource, scalarComputed) =>
+                      ($in, args, _info) => {
+                        return scalarComputed(resource, $in, makeArgs(args));
+                      },
+                    [makeArgs, resource, scalarComputed],
+                    `${resource.name}_getSelectPlanFromParentAndArgs`,
+                  )
+                : EXPORTABLE(
+                    (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
+                      ($in, args, _info) => {
+                        const details = pgFunctionArgumentsFromArgs(
+                          $in,
+                          makeArgs(args),
+                        );
+                        return resource.execute(details.selectArgs);
+                      },
+                    [makeArgs, pgFunctionArgumentsFromArgs, resource],
+                    `${resource.name}_getSelectPlanFromParentAndArgs`,
+                  );
+
+        // A computed field of a relational polymorphic root is also a field of
+        // each implementation, but the function accepts the root's row, so
+        // follow the relation(s) from the implementation's row to it first.
+        const ownerCodec = resource.parameters?.[0]?.codec as
+          | PgCodec
+          | undefined;
+        const rootRelationPath =
+          !isRootQuery &&
+          !isRootMutation &&
+          pgCodec &&
+          ownerCodec &&
+          pgCodec !== ownerCodec
+            ? getRelationPathToRoot(build, pgCodec, ownerCodec)
+            : [];
         const getSelectPlanFromParentAndArgs: FieldPlanResolver<
           Step,
           any,
           any
-        > = isRootQuery
-          ? // Not computed
-            EXPORTABLE(
-              (makeArgs, resource) => ($root, args, _info) => {
-                const selectArgs = makeArgs(args);
-                return resource.execute(selectArgs);
-              },
-              [makeArgs, resource],
-              `${resource.name}_getSelectPlanFromParentAndArgs`,
-            )
-          : isRootMutation
-            ? // Mutation uses 'args.input' rather than 'args'
-              EXPORTABLE(
-                (makeArgs, object, resource) => ($root, args, _info) => {
-                  const selectArgs = makeArgs(args, ["input"]);
-                  const $result = resource.execute(selectArgs, "mutation");
-                  return object({
-                    result: $result,
-                  });
-                },
-                [makeArgs, object, resource],
+        > =
+          rootRelationPath.length > 0
+            ? EXPORTABLE(
+                (getSelectPlanFromOwnerAndArgs, rootRelationPath) =>
+                  ($in, args, info) => {
+                    let $row = $in as PgSelectSingleStep;
+                    for (const relationName of rootRelationPath) {
+                      $row = $row.singleRelation(
+                        relationName,
+                      ) as PgSelectSingleStep;
+                    }
+                    return getSelectPlanFromOwnerAndArgs($row, args, info);
+                  },
+                [getSelectPlanFromOwnerAndArgs, rootRelationPath],
                 `${resource.name}_getSelectPlanFromParentAndArgs`,
               )
-            : // Otherwise computed:
-
-              // if it's a scalar computed expression, inline it:
-              resource.isUnique &&
-                !resource.codec.attributes &&
-                typeof resource.from === "function"
-              ? EXPORTABLE(
-                  (makeArgs, resource, scalarComputed) =>
-                    ($in, args, _info) => {
-                      return scalarComputed(resource, $in, makeArgs(args));
-                    },
-                  [makeArgs, resource, scalarComputed],
-                  `${resource.name}_getSelectPlanFromParentAndArgs`,
-                )
-              : EXPORTABLE(
-                  (makeArgs, pgFunctionArgumentsFromArgs, resource) =>
-                    ($in, args, _info) => {
-                      const details = pgFunctionArgumentsFromArgs(
-                        $in,
-                        makeArgs(args),
-                      );
-                      return resource.execute(details.selectArgs);
-                    },
-                  [makeArgs, pgFunctionArgumentsFromArgs, resource],
-                  `${resource.name}_getSelectPlanFromParentAndArgs`,
-                );
+            : getSelectPlanFromOwnerAndArgs;
 
         if (isRootMutation) {
           // mutation type
