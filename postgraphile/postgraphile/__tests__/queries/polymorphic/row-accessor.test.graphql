@@ -1,0 +1,27 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+## expect(data.topic.__typename).toEqual("RelationalTopic")
+## expect(data.topic.id).toEqual(11)
+## expect(data.checklist.__typename).toEqual("RelationalChecklist")
+## expect(data.missing).toBeNull()
+## expect(data.singleTable.__typename).toEqual("SingleTableTopic")
+
+# The row accessor of a polymorphic table's interface returns the concrete type
+{
+  topic: relationalItemById(id: 11) {
+    __typename
+    id
+  }
+  checklist: relationalItemById(id: 16) {
+    __typename
+    id
+  }
+  missing: relationalItemById(id: -1) {
+    __typename
+  }
+  singleTable: singleTableItemById(id: 1) {
+    __typename
+    id
+  }
+}

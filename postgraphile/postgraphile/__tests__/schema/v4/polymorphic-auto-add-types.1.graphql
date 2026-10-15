@@ -2085,6 +2085,9 @@ type Query {
     """The method to use when ordering `ZeroImplementation`."""
     orderBy: [ZeroImplementationsOrderBy!]
   ): ZeroImplementationsConnection
+
+  """Get a single `Collection`."""
+  collectionById(id: String!): Collection
   getSingleTableTopicById(id: Int): SingleTableTopic
 
   """Get a single `LogEntry`."""
@@ -2119,6 +2122,9 @@ type Query {
 
   """Get a single `RelationalDivider`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+
+  """Get a single `RelationalItem`."""
+  relationalItemById(id: Int!): RelationalItem
   relationalItemByIdFn(id: Int): RelationalItem
 
   """Get a single `RelationalItemRelation`."""
@@ -2136,6 +2142,9 @@ type Query {
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Get a single `SingleTableItem`."""
+  singleTableItemById(id: Int!): SingleTableItem
 
   """Get a single `SingleTableItemRelation`."""
   singleTableItemRelationById(id: Int!): SingleTableItemRelation

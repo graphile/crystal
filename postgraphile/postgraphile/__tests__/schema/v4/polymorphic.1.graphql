@@ -4408,6 +4408,9 @@ type Query implements Node {
   """Get a single `AwsApplication`."""
   awsApplicationById(id: Int!): AwsApplication
 
+  """Get a single `Collection`."""
+  collectionById(id: String!): Collection
+
   """
   Reads a single `FirstPartyVulnerability` using its globally unique `ID`.
   """
@@ -4536,6 +4539,9 @@ type Query implements Node {
 
   """Get a single `RelationalDivider`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+
+  """Get a single `RelationalItem`."""
+  relationalItemById(id: Int!): RelationalItem
   relationalItemByIdFn(id: Int): RelationalItem
 
   """
@@ -4623,6 +4629,9 @@ type Query implements Node {
     """
     nodeId: ID!
   ): SingleTableDivider
+
+  """Get a single `SingleTableItem`."""
+  singleTableItemById(id: Int!): SingleTableItem
 
   """
   Reads a single `SingleTableItemRelation` using its globally unique `ID`.

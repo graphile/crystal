@@ -10258,6 +10258,15 @@ type Query {
 
   """Get a single \`GcpApplication\`."""
   gcpApplicationByRowId(rowId: Int!): GcpApplication
+
+  """Get a single \`SingleTableItem\`."""
+  singleTableItemByRowId(rowId: Int!): SingleTableItem
+
+  """Get a single \`RelationalItem\`."""
+  relationalItemByRowId(rowId: Int!): RelationalItem
+
+  """Get a single \`Collection\`."""
+  collectionByRowId(rowId: String!): Collection
   relationalTopicByIdFn(id: Int): RelationalTopic
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
@@ -15675,6 +15684,13 @@ export const objects = {
           third_party_vulnerability_id: $thirdPartyVulnerabilityId
         });
       },
+      collectionByRowId(_$root, {
+        $rowId
+      }) {
+        return resource_collectionsPgResource.get({
+          id: $rowId
+        });
+      },
       firstPartyVulnerabilityByRowId(_$root, {
         $rowId
       }) {
@@ -15781,6 +15797,13 @@ export const objects = {
         const selectArgs = makeArgs_relational_item_by_id_fn(args);
         return resource_relational_item_by_id_fnPgResource.execute(selectArgs);
       },
+      relationalItemByRowId(_$root, {
+        $rowId
+      }) {
+        return otherSource_relational_itemsPgResource.get({
+          id: $rowId
+        });
+      },
       relationalItemRelationByParentIdAndChildId(_$root, {
         $parentId,
         $childId
@@ -15822,6 +15845,13 @@ export const objects = {
       }) {
         return resource_relational_topicsPgResource.get({
           topic_item_id: $topicItemId
+        });
+      },
+      singleTableItemByRowId(_$root, {
+        $rowId
+      }) {
+        return otherSource_single_table_itemsPgResource.get({
+          id: $rowId
         });
       },
       singleTableItemRelationByParentIdAndChildId(_$root, {

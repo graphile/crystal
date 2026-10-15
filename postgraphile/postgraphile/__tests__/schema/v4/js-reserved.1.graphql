@@ -3017,6 +3017,9 @@ type Query implements Node {
   """
   query: Query!
 
+  """Get a single `RelationalItem`."""
+  relationalItemById(id: Int!): RelationalItem
+
   """Reads a single `RelationalStatus` using its globally unique `ID`."""
   relationalStatus(
     """

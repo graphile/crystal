@@ -2503,6 +2503,9 @@ type Query implements Node {
 
   """Get a single \`Reserved\`."""
   reservedByNull(null: String!): Reserved
+
+  """Get a single \`RelationalItem\`."""
+  relationalItemById(id: Int!): RelationalItem
   await(yield: Int, _proto__: Int, constructor: Int, hasOwnProperty: Int): Int
   case(yield: Int, _proto__: Int, constructor: Int, hasOwnProperty: Int): Int
   valueOf(yield: Int, _proto__: Int, constructor: Int, hasOwnProperty: Int): Int
@@ -6933,6 +6936,13 @@ export const objects = {
       },
       query() {
         return constant(EMPTY_OBJECT2);
+      },
+      relationalItemById(_$root, {
+        $id
+      }) {
+        return relational_items_relational_itemsPgResource.get({
+          id: $id
+        });
       },
       relationalStatus(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
