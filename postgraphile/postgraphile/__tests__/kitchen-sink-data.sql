@@ -72,6 +72,10 @@ delete from js_reserved.yield cascade;
 delete from js_reserved.__proto__ cascade;
 delete from js_reserved.null cascade;
 delete from js_reserved.reserved cascade;
+delete from relational_root_refs.reviews cascade;
+delete from relational_root_refs.books cascade;
+delete from relational_root_refs.films cascade;
+delete from relational_root_refs.items cascade;
 
 delete from partitions.measurements cascade;
 delete from partitions.users cascade;
@@ -97,6 +101,13 @@ delete from issue_2212.orders cascade;
 delete from issue_2212.user_contacts cascade;
 delete from issue_2212.users cascade;
 delete from function_returning_enum.applicants cascade;
+delete from nested_polymorphism.inspections cascade;
+delete from nested_polymorphism.services cascade;
+delete from nested_polymorphism.box_trucks cascade;
+delete from nested_polymorphism.tankers cascade;
+delete from nested_polymorphism.cars cascade;
+delete from nested_polymorphism.trucks cascade;
+delete from nested_polymorphism.vehicles cascade;
 delete from cjk."期间" cascade;
 
 alter table b.types enable trigger user;
@@ -500,6 +511,20 @@ insert into enum_tables.referencing_table(enum_1, enum_2, enum_3, simple_enum) v
   (null, null, 'c3', 'Qux');
 
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+
+alter sequence relational_root_refs.items_id_seq restart with 1;
+alter sequence relational_root_refs.reviews_id_seq restart with 1;
+insert into relational_root_refs.items (type, name) values
+  ('BOOK', 'A book'),
+  ('FILM', 'A film');
+insert into relational_root_refs.books (id, pages) values (1, 100);
+insert into relational_root_refs.films (id, minutes) values (2, 90);
+insert into relational_root_refs.reviews (item_id, body) values
+  (1, 'A good book'),
+  (1, 'An ok book'),
+  (2, 'A nice film');
 
 alter sequence geometry.geom_id_seq restart with 101;
 insert into geometry.geom(
@@ -1208,6 +1233,29 @@ insert into function_returning_enum.applicants(
   (3, 'John', 'Lennon', 'round 1', 'CAT', 'CAR');
 
 --------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+
+alter sequence nested_polymorphism.vehicles_id_seq restart with 1;
+alter sequence nested_polymorphism.services_id_seq restart with 1;
+alter sequence nested_polymorphism.inspections_id_seq restart with 1;
+insert into nested_polymorphism.vehicles (type, name) values
+  ('CAR', 'A car'),
+  ('TRUCK', 'A box truck'),
+  ('TRUCK', 'A tanker');
+insert into nested_polymorphism.cars (id, doors) values (1, 4);
+insert into nested_polymorphism.trucks (id, truck_type, axles) values
+  (2, 'BOX', 3),
+  (3, 'TANKER', 2);
+insert into nested_polymorphism.box_trucks (id, volume) values (2, 30);
+insert into nested_polymorphism.tankers (id, litres) values (3, 5000);
+insert into nested_polymorphism.services (vehicle_id, note) values
+  (1, 'Car service'),
+  (2, 'Box truck service'),
+  (3, 'Tanker service');
+insert into nested_polymorphism.inspections (truck_id, note) values
+  (2, 'Box truck inspection'),
+  (3, 'Tanker inspection');
 
 insert into cjk."期间" (id, "期间") values
   (1, 21),

@@ -13,6 +13,7 @@ drop schema if exists
   large_bigint,
   network_types,
   named_query_builder,
+  relational_root_refs,
   enum_tables,
   geometry,
   function_returning_enum,
@@ -22,6 +23,7 @@ drop schema if exists
   js_reserved,
   nested_arrays,
   composite_domains,
+  nested_polymorphism,
   refs,
   space,
   issue_2210,
@@ -1203,6 +1205,33 @@ create table large_bigint.large_node_id (
   text text
 );
 
+-- A `@ref` on the root of a relational polymorphic structure
+create schema relational_root_refs;
+create table relational_root_refs.items (
+  id serial primary key,
+  type text not null,
+  name text not null
+);
+create table relational_root_refs.books (
+  id int primary key references relational_root_refs.items,
+  pages int
+);
+create table relational_root_refs.films (
+  id int primary key references relational_root_refs.items,
+  minutes int
+);
+create table relational_root_refs.reviews (
+  id serial primary key,
+  item_id int not null references relational_root_refs.items,
+  body text not null
+);
+comment on table relational_root_refs.items is $$
+  @interface mode:relational
+  @type BOOK references:relational_root_refs.books
+  @type FILM references:relational_root_refs.films
+  @ref reviewList to:Review plural via:(id)->relational_root_refs.reviews(item_id)
+  $$;
+
 create schema network_types;
 create table network_types.network (
   id serial primary key,
@@ -2158,6 +2187,52 @@ create table nested_arrays.t (
 );
 
 --------------------------------------------------------------------------------
+
+-- A relational polymorphic table (`trucks`) that is itself an implementation of
+-- another one (`vehicles`)
+create schema nested_polymorphism;
+create table nested_polymorphism.vehicles (
+  id serial primary key,
+  type text not null,
+  name text not null
+);
+create table nested_polymorphism.cars (
+  id int primary key references nested_polymorphism.vehicles,
+  doors int
+);
+create table nested_polymorphism.trucks (
+  id int primary key references nested_polymorphism.vehicles,
+  truck_type text not null,
+  axles int
+);
+create table nested_polymorphism.box_trucks (
+  id int primary key references nested_polymorphism.trucks,
+  volume int
+);
+create table nested_polymorphism.tankers (
+  id int primary key references nested_polymorphism.trucks,
+  litres int
+);
+create table nested_polymorphism.services (
+  id serial primary key,
+  vehicle_id int not null references nested_polymorphism.vehicles,
+  note text not null
+);
+create table nested_polymorphism.inspections (
+  id serial primary key,
+  truck_id int not null references nested_polymorphism.trucks,
+  note text not null
+);
+comment on table nested_polymorphism.vehicles is $$
+  @interface mode:relational
+  @type CAR references:nested_polymorphism.cars
+  @type TRUCK references:nested_polymorphism.trucks
+  $$;
+comment on table nested_polymorphism.trucks is $$
+  @interface mode:relational type:truck_type
+  @type BOX references:nested_polymorphism.box_trucks
+  @type TANKER references:nested_polymorphism.tankers
+  $$;
 
 create schema composite_domains;
 create type composite_domains._user_update_line_node_type as enum ('TEXT', 'MENTION');
