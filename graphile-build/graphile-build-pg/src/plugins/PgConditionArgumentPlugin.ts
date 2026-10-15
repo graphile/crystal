@@ -7,7 +7,12 @@ import type {
   PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
-import type { ConnectionStep, FieldArg, GrafastArgumentConfig } from "grafast";
+import type {
+  ConnectionStep,
+  FieldArg,
+  GrafastArgumentConfig,
+  GrafastFieldConfigArgumentMap,
+} from "grafast";
 import type { GraphQLInputObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -147,74 +152,82 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         return _;
       },
 
-      GraphQLObjectType_fields_field_args(args, build, context) {
-        const { scope, Self } = context;
-
-        const {
-          fieldName,
-          fieldBehaviorScope,
-          isPgFieldConnection,
-          isPgFieldSimpleCollection,
-          pgFieldResource: pgResource,
-          pgFieldCodec,
-        } = scope;
-
-        const shouldAddCondition =
-          isPgFieldConnection || isPgFieldSimpleCollection;
-
-        const codec = pgFieldCodec ?? pgResource?.codec;
-        const isSuitableSource =
-          pgResource && pgResource.codec.attributes && !pgResource.isUnique;
-        const isSuitableCodec =
-          codec &&
-          (isSuitableSource ||
-            (!pgResource && codec?.polymorphism?.mode === "union")) &&
-          codec.attributes;
-
-        if (!shouldAddCondition || !isSuitableCodec) {
-          return args;
-        }
-
-        const desiredBehavior = fieldBehaviorScope
-          ? (`${fieldBehaviorScope}:filter` as keyof GraphileBuild.BehaviorStrings)
-          : `filter`;
-        if (
-          pgResource
-            ? !build.behavior.pgResourceMatches(pgResource, desiredBehavior)
-            : codec
-              ? !build.behavior.pgCodecMatches(codec, desiredBehavior)
-              : true
-        ) {
-          return args;
-        }
-
-        const tableTypeName = build.inflection.tableType(codec);
-        const tableConditionTypeName =
-          build.inflection.conditionType(tableTypeName);
-        const tableConditionType = build.getTypeByName(
-          tableConditionTypeName,
-        ) as GraphQLInputObjectType | undefined;
-        if (!tableConditionType) {
-          return args;
-        }
-
-        return build.extend(
-          args,
-          {
-            condition: {
-              description: build.wrapDescription(
-                "A condition to be used in determining which values should be returned by the collection.",
-                "arg",
-              ),
-              type: tableConditionType,
-              applyPlan: isPgFieldConnection
-                ? applyConditionArgToConnection
-                : applyConditionArg,
-            } as GrafastArgumentConfig,
-          },
-          `Adding condition to connection field '${fieldName}' of '${Self.name}'`,
-        );
-      },
+      GraphQLObjectType_fields_field_args: addConditionArgument,
+      GraphQLInterfaceType_fields_field_args: addConditionArgument,
     },
   },
 };
+
+function addConditionArgument(
+  args: GrafastFieldConfigArgumentMap,
+  build: GraphileBuild.Build,
+  context:
+    | GraphileBuild.ContextObjectFieldsFieldArgs
+    | GraphileBuild.ContextInterfaceFieldsFieldArgs,
+) {
+  const { scope, Self } = context;
+
+  const {
+    fieldName,
+    isPgFieldConnection,
+    isPgFieldSimpleCollection,
+    pgFieldResource: pgResource,
+    pgFieldCodec,
+  } = scope;
+  // Only object fields currently have a `fieldBehaviorScope`
+  const { fieldBehaviorScope } = scope as GraphileBuild.ScopeObjectFieldsField;
+
+  const shouldAddCondition = isPgFieldConnection || isPgFieldSimpleCollection;
+
+  const codec = pgFieldCodec ?? pgResource?.codec;
+  const isSuitableSource =
+    pgResource && pgResource.codec.attributes && !pgResource.isUnique;
+  const isSuitableCodec =
+    codec &&
+    (isSuitableSource ||
+      (!pgResource && codec?.polymorphism?.mode === "union")) &&
+    codec.attributes;
+
+  if (!shouldAddCondition || !isSuitableCodec) {
+    return args;
+  }
+
+  const desiredBehavior = fieldBehaviorScope
+    ? (`${fieldBehaviorScope}:filter` as keyof GraphileBuild.BehaviorStrings)
+    : `filter`;
+  if (
+    pgResource
+      ? !build.behavior.pgResourceMatches(pgResource, desiredBehavior)
+      : codec
+        ? !build.behavior.pgCodecMatches(codec, desiredBehavior)
+        : true
+  ) {
+    return args;
+  }
+
+  const tableTypeName = build.inflection.tableType(codec);
+  const tableConditionTypeName = build.inflection.conditionType(tableTypeName);
+  const tableConditionType = build.getTypeByName(tableConditionTypeName) as
+    | GraphQLInputObjectType
+    | undefined;
+  if (!tableConditionType) {
+    return args;
+  }
+
+  return build.extend(
+    args,
+    {
+      condition: {
+        description: build.wrapDescription(
+          "A condition to be used in determining which values should be returned by the collection.",
+          "arg",
+        ),
+        type: tableConditionType,
+        applyPlan: isPgFieldConnection
+          ? applyConditionArgToConnection
+          : applyConditionArg,
+      } as GrafastArgumentConfig,
+    },
+    `Adding condition to connection field '${fieldName}' of '${Self.name}'`,
+  );
+}
