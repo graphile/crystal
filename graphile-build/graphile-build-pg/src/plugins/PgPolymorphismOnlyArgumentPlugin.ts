@@ -89,37 +89,10 @@ export const PgPolymorphismOnlyArgumentPlugin: GraphileConfig.Plugin = {
             );
           }
         }
-        for (const codec of build.allPgCodecs) {
-          if (codec.polymorphism) {
-            const enumTypeName = inflection.pgPolymorphismEnumType(codec);
-            switch (codec.polymorphism.mode) {
-              case "single": {
-                break;
-              }
-              case "relational": {
-                const { types } = codec.polymorphism;
-                build.registerEnumType(
-                  enumTypeName,
-                  {
-                    pgCodec: codec,
-                    pgPolymorphismEnumForRelationalTypes: types,
-                  },
-                  () => ({ values: Object.create(null) }),
-                  'Adding enum type for relational polymorphic type "' +
-                    codec.name +
-                    '" in PgPolymorphismOnlyArgumentPlugin',
-                );
-                break;
-              }
-              case "union": {
-                break;
-              }
-              default: {
-                break;
-              }
-            }
-          }
-        }
+        // Relational polymorphism is deliberately not registered here: no
+        // field uses an enum of its types (the `only` argument is only added
+        // to union polymorphism), and registering one reserves the name
+        // `<Root>Type`, which a `<root>_type` table needs for its own type.
         return _;
       },
 
