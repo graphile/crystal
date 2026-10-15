@@ -611,6 +611,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 // Skip over the polymorphic relations
                 if (polyRelationNames.includes(relationName)) continue;
 
+                // Skip over relations that the role cannot read; they are
+                // not added to the root either (PgRBACPlugin), and a field
+                // copied from one could never be queried
+                if (
+                  relationSpec.remoteResource.extensions?.canSelect === false
+                ) {
+                  continue;
+                }
+
                 // TODO: normally we wouldn't call `getBehavior` anywhere
                 // except in an entityBehavior definition... Should this be
                 // solved a different way?
