@@ -18,7 +18,8 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
