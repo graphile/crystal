@@ -10234,6 +10234,15 @@ type Query implements Node {
 
   """Get a single \`GcpApplication\`."""
   gcpApplicationById(id: Int!): GcpApplication
+
+  """Get a single \`SingleTableItem\`."""
+  singleTableItemById(id: Int!): SingleTableItem
+
+  """Get a single \`RelationalItem\`."""
+  relationalItemById(id: Int!): RelationalItem
+
+  """Get a single \`Collection\`."""
+  collectionById(id: String!): Collection
   relationalTopicByIdFn(id: Int): RelationalTopic
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
@@ -15665,6 +15674,13 @@ export const objects = {
           id: $id
         });
       },
+      collectionById(_$root, {
+        $id
+      }) {
+        return resource_collectionsPgResource.get({
+          id: $id
+        });
+      },
       firstPartyVulnerability(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
         return nodeFetcher_FirstPartyVulnerability($nodeId);
@@ -15796,6 +15812,13 @@ export const objects = {
           divider_item_id: $dividerItemId
         });
       },
+      relationalItemById(_$root, {
+        $id
+      }) {
+        return otherSource_relational_itemsPgResource.get({
+          id: $id
+        });
+      },
       relationalItemByIdFn($root, args, _info) {
         const selectArgs = makeArgs_relational_item_by_id_fn(args);
         return resource_relational_item_by_id_fnPgResource.execute(selectArgs);
@@ -15874,6 +15897,13 @@ export const objects = {
       singleTableDivider(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
         return nodeFetcher_SingleTableDivider($nodeId);
+      },
+      singleTableItemById(_$root, {
+        $id
+      }) {
+        return resource_single_table_itemsPgResource.get({
+          id: $id
+        });
       },
       singleTableItemRelation(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");

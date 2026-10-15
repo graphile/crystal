@@ -81,7 +81,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
-          graphql: { GraphQLNonNull, GraphQLObjectType },
+          graphql: { GraphQLNonNull, GraphQLObjectType, GraphQLInterfaceType },
         } = build;
         const {
           scope: { isRootQuery },
@@ -121,7 +121,19 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                   const type = build.getTypeByName(
                     build.inflection.tableType(resource.codec),
                   );
-                  if (!type || !(type instanceof GraphQLObjectType)) {
+                  // The type of a `mode:single` or `mode:relational`
+                  // polymorphic table is an interface; its rows can be fetched
+                  // like any other (its `planType` finds the concrete type).
+                  const polymorphismMode = resource.codec.polymorphism?.mode;
+                  if (
+                    !type ||
+                    !(
+                      type instanceof GraphQLObjectType ||
+                      (type instanceof GraphQLInterfaceType &&
+                        (polymorphismMode === "single" ||
+                          polymorphismMode === "relational"))
+                    )
+                  ) {
                     return memo;
                   }
 

@@ -5087,6 +5087,9 @@ type Query {
   """Get a single `AwsApplicationThirdPartyVulnerability`."""
   awsApplicationThirdPartyVulnerabilityByAwsApplicationIdAndThirdPartyVulnerabilityId(awsApplicationId: Int!, thirdPartyVulnerabilityId: Int!): AwsApplicationThirdPartyVulnerability
 
+  """Get a single `Collection`."""
+  collectionByRowId(rowId: String!): Collection
+
   """Get a single `FirstPartyVulnerability`."""
   firstPartyVulnerabilityByRowId(rowId: Int!): FirstPartyVulnerability
 
@@ -5134,6 +5137,9 @@ type Query {
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
   relationalItemByIdFn(id: Int): RelationalItem
 
+  """Get a single `RelationalItem`."""
+  relationalItemByRowId(rowId: Int!): RelationalItem
+
   """Get a single `RelationalItemRelation`."""
   relationalItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): RelationalItemRelation
 
@@ -5149,6 +5155,9 @@ type Query {
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Get a single `SingleTableItem`."""
+  singleTableItemByRowId(rowId: Int!): SingleTableItem
 
   """Get a single `SingleTableItemRelation`."""
   singleTableItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): SingleTableItemRelation

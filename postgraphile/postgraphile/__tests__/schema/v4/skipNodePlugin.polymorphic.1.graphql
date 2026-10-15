@@ -3939,6 +3939,9 @@ type Query {
   """Get a single `AwsApplication`."""
   awsApplicationById(id: Int!): AwsApplication
 
+  """Get a single `Collection`."""
+  collectionById(id: String!): Collection
+
   """Get a single `FirstPartyVulnerability`."""
   firstPartyVulnerabilityById(id: Int!): FirstPartyVulnerability
 
@@ -3978,6 +3981,9 @@ type Query {
 
   """Get a single `RelationalDivider`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+
+  """Get a single `RelationalItem`."""
+  relationalItemById(id: Int!): RelationalItem
   relationalItemByIdFn(id: Int): RelationalItem
 
   """Get a single `RelationalItemRelation`."""
@@ -3995,6 +4001,9 @@ type Query {
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Get a single `SingleTableItem`."""
+  singleTableItemById(id: Int!): SingleTableItem
 
   """Get a single `SingleTableItemRelation`."""
   singleTableItemRelationById(id: Int!): SingleTableItemRelation

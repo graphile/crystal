@@ -1,0 +1,15 @@
+{
+  topic: {
+    __typename: "RelationalTopic",
+    id: 11,
+  },
+  checklist: {
+    __typename: "RelationalChecklist",
+    id: 16,
+  },
+  missing: null,
+  singleTable: {
+    __typename: "SingleTableTopic",
+    id: 1,
+  },
+}

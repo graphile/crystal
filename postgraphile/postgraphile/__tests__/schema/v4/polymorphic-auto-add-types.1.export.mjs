@@ -8982,6 +8982,15 @@ type Query {
 
   """Get a single \`RelationalPost\`."""
   relationalPostByPostItemId(postItemId: Int!): RelationalPost
+
+  """Get a single \`SingleTableItem\`."""
+  singleTableItemById(id: Int!): SingleTableItem
+
+  """Get a single \`RelationalItem\`."""
+  relationalItemById(id: Int!): RelationalItem
+
+  """Get a single \`Collection\`."""
+  collectionById(id: String!): Collection
   relationalTopicByIdFn(id: Int): RelationalTopic
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
@@ -11361,6 +11370,13 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      collectionById(_$root, {
+        $id
+      }) {
+        return resource_collectionsPgResource.get({
+          id: $id
+        });
+      },
       getSingleTableTopicById($root, args, _info) {
         const selectArgs = makeArgs_get_single_table_topic_by_id(args);
         return resource_get_single_table_topic_by_idPgResource.execute(selectArgs);
@@ -11431,6 +11447,13 @@ export const objects = {
           divider_item_id: $dividerItemId
         });
       },
+      relationalItemById(_$root, {
+        $id
+      }) {
+        return otherSource_relational_itemsPgResource.get({
+          id: $id
+        });
+      },
       relationalItemByIdFn($root, args, _info) {
         const selectArgs = makeArgs_relational_item_by_id_fn(args);
         return resource_relational_item_by_id_fnPgResource.execute(selectArgs);
@@ -11476,6 +11499,13 @@ export const objects = {
       }) {
         return resource_relational_topicsPgResource.get({
           topic_item_id: $topicItemId
+        });
+      },
+      singleTableItemById(_$root, {
+        $id
+      }) {
+        return otherSource_single_table_itemsPgResource.get({
+          id: $id
         });
       },
       singleTableItemRelationById(_$root, {
