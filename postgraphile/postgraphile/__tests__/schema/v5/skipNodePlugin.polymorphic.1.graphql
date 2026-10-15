@@ -5168,6 +5168,7 @@ type RelationalChecklist implements RelationalItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `RelationalChecklist`."""
@@ -5340,6 +5341,7 @@ type RelationalChecklist implements RelationalItem {
   rowId: Int!
   title: String!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -5416,6 +5418,7 @@ type RelationalChecklistItem implements RelationalItem {
   createdAt: Datetime!
   description: String!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   note: String
   parentId: Int
 
@@ -5590,6 +5593,7 @@ type RelationalChecklistItem implements RelationalItem {
   rootTopicId: Int
   rowId: Int!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -5725,6 +5729,7 @@ type RelationalDivider implements RelationalItem {
   color: String
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `RelationalDivider`."""
@@ -5897,6 +5902,7 @@ type RelationalDivider implements RelationalItem {
   rowId: Int!
   title: String
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -6004,6 +6010,7 @@ interface RelationalItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `RelationalItem`."""
@@ -6135,6 +6142,7 @@ interface RelationalItem {
   rootTopicId: Int
   rowId: Int!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -6399,6 +6407,7 @@ type RelationalPost implements RelationalItem {
   createdAt: Datetime!
   description: String
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   note: String
   parentId: Int
 
@@ -6572,6 +6581,7 @@ type RelationalPost implements RelationalItem {
   rowId: Int!
   title: String!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -6682,6 +6692,7 @@ type RelationalTopic implements RelationalItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentFn: RelationalItem
   parentId: Int
 
@@ -6884,6 +6895,7 @@ type RelationalTopic implements RelationalItem {
   rowId: Int!
   title: String!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -7649,6 +7661,7 @@ interface SingleTableItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""

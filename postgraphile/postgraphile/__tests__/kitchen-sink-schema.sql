@@ -1548,6 +1548,10 @@ create function polymorphic.relational_items_meaning_of_life(ri polymorphic.rela
 select 42;
 $$ language sql stable;
 
+create function polymorphic.relational_items_type_label(ri polymorphic.relational_items) returns text as $$
+select ri.type::text || ' ' || ri.id::text;
+$$ language sql stable;
+
 CREATE FUNCTION polymorphic.custom_delete_relational_item("nodeId" polymorphic.relational_items)
 RETURNS boolean
 AS $$

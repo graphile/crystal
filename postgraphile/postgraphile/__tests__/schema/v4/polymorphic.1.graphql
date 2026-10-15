@@ -4689,6 +4689,7 @@ type RelationalChecklist implements Node & RelationalItem {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -4865,6 +4866,7 @@ type RelationalChecklist implements Node & RelationalItem {
   rootTopicId: Int
   title: String!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -4914,6 +4916,7 @@ type RelationalChecklistItem implements Node & RelationalItem {
   description: String!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -5092,6 +5095,7 @@ type RelationalChecklistItem implements Node & RelationalItem {
   relationalTopicByRootTopicId: RelationalTopic
   rootTopicId: Int
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -5260,6 +5264,7 @@ type RelationalDivider implements Node & RelationalItem {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -5436,6 +5441,7 @@ type RelationalDivider implements Node & RelationalItem {
   rootTopicId: Int
   title: String
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -5546,6 +5552,7 @@ interface RelationalItem implements Node {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -5681,6 +5688,7 @@ interface RelationalItem implements Node {
   relationalTopicByRootTopicId: RelationalTopic
   rootTopicId: Int
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -5958,6 +5966,7 @@ type RelationalPost implements Node & RelationalItem {
   description: String
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -6135,6 +6144,7 @@ type RelationalPost implements Node & RelationalItem {
   rootTopicId: Int
   title: String!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -6248,6 +6258,7 @@ type RelationalTopic implements Node & RelationalItem {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -6454,6 +6465,7 @@ type RelationalTopic implements Node & RelationalItem {
   rootTopicId: Int
   title: String!
   type: ItemType!
+  typeLabel: String
   updatedAt: Datetime!
 }
 
@@ -7242,6 +7254,7 @@ interface SingleTableItem implements Node {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
