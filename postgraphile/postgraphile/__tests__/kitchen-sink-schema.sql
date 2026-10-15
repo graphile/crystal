@@ -23,6 +23,7 @@ drop schema if exists
   js_reserved,
   nested_arrays,
   composite_domains,
+  nested_polymorphism,
   refs,
   space,
   issue_2210,
@@ -2186,6 +2187,52 @@ create table nested_arrays.t (
 );
 
 --------------------------------------------------------------------------------
+
+-- A relational polymorphic table (`trucks`) that is itself an implementation of
+-- another one (`vehicles`)
+create schema nested_polymorphism;
+create table nested_polymorphism.vehicles (
+  id serial primary key,
+  type text not null,
+  name text not null
+);
+create table nested_polymorphism.cars (
+  id int primary key references nested_polymorphism.vehicles,
+  doors int
+);
+create table nested_polymorphism.trucks (
+  id int primary key references nested_polymorphism.vehicles,
+  truck_type text not null,
+  axles int
+);
+create table nested_polymorphism.box_trucks (
+  id int primary key references nested_polymorphism.trucks,
+  volume int
+);
+create table nested_polymorphism.tankers (
+  id int primary key references nested_polymorphism.trucks,
+  litres int
+);
+create table nested_polymorphism.services (
+  id serial primary key,
+  vehicle_id int not null references nested_polymorphism.vehicles,
+  note text not null
+);
+create table nested_polymorphism.inspections (
+  id serial primary key,
+  truck_id int not null references nested_polymorphism.trucks,
+  note text not null
+);
+comment on table nested_polymorphism.vehicles is $$
+  @interface mode:relational
+  @type CAR references:nested_polymorphism.cars
+  @type TRUCK references:nested_polymorphism.trucks
+  $$;
+comment on table nested_polymorphism.trucks is $$
+  @interface mode:relational type:truck_type
+  @type BOX references:nested_polymorphism.box_trucks
+  @type TANKER references:nested_polymorphism.tankers
+  $$;
 
 create schema composite_domains;
 create type composite_domains._user_update_line_node_type as enum ('TEXT', 'MENTION');

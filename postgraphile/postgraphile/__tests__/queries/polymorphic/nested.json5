@@ -1,0 +1,76 @@
+{
+  allVehicles: {
+    nodes: [
+      {
+        __typename: "Car",
+        id: 1,
+        name: "A car",
+        doors: 4,
+      },
+      {
+        __typename: "BoxTruck",
+        id: 2,
+        name: "A box truck",
+        axles: 3,
+        volume: 30,
+      },
+      {
+        __typename: "Tanker",
+        id: 3,
+        name: "A tanker",
+        axles: 2,
+        litres: 5000,
+      },
+    ],
+  },
+  allTrucks: {
+    nodes: [
+      {
+        __typename: "BoxTruck",
+        id: 2,
+        name: "A box truck",
+        axles: 3,
+      },
+      {
+        __typename: "Tanker",
+        id: 3,
+        name: "A tanker",
+        axles: 2,
+      },
+    ],
+  },
+  allBoxTrucks: {
+    nodes: [
+      {
+        name: "A box truck",
+        servicesByVehicleId: {
+          nodes: [
+            {
+              note: "Box truck service",
+            },
+          ],
+        },
+        inspectionsByTruckId: {
+          nodes: [
+            {
+              note: "Box truck inspection",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  allTankers: {
+    nodes: [
+      {
+        servicesByVehicleId: {
+          nodes: [
+            {
+              note: "Tanker service",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}

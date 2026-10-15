@@ -1,0 +1,67 @@
+## expect(errors).toBeFalsy()
+#> schema: ["nested_polymorphism"]
+## expect(data.allVehicles.nodes.map((n) => n.__typename)).toEqual(["Car", "BoxTruck", "Tanker"])
+## expect(data.allVehicles.nodes[0].doors).toEqual(4)
+## expect(data.allVehicles.nodes[1].volume).toEqual(30)
+## expect(data.allVehicles.nodes[1].axles).toEqual(3)
+## expect(data.allVehicles.nodes[2].litres).toEqual(5000)
+## expect(data.allTrucks.nodes.map((n) => n.__typename)).toEqual(["BoxTruck", "Tanker"])
+## expect(data.allTrucks.nodes.map((n) => n.name)).toEqual(["A box truck", "A tanker"])
+## expect(data.allBoxTrucks.nodes[0].name).toEqual("A box truck")
+## expect(data.allBoxTrucks.nodes[0].servicesByVehicleId.nodes[0].note).toEqual("Box truck service")
+## expect(data.allBoxTrucks.nodes[0].inspectionsByTruckId.nodes[0].note).toEqual("Box truck inspection")
+## expect(data.allTankers.nodes[0].servicesByVehicleId.nodes[0].note).toEqual("Tanker service")
+
+{
+  allVehicles(orderBy: PRIMARY_KEY_ASC) {
+    nodes {
+      __typename
+      id
+      name
+      ... on Car {
+        doors
+      }
+      ... on Truck {
+        axles
+      }
+      ... on BoxTruck {
+        volume
+      }
+      ... on Tanker {
+        litres
+      }
+    }
+  }
+  allTrucks(orderBy: PRIMARY_KEY_ASC) {
+    nodes {
+      __typename
+      id
+      name
+      axles
+    }
+  }
+  allBoxTrucks {
+    nodes {
+      name
+      servicesByVehicleId {
+        nodes {
+          note
+        }
+      }
+      inspectionsByTruckId {
+        nodes {
+          note
+        }
+      }
+    }
+  }
+  allTankers {
+    nodes {
+      servicesByVehicleId {
+        nodes {
+          note
+        }
+      }
+    }
+  }
+}
