@@ -1,0 +1,98 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for queries/refs/union-ref-single-path"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 30, 11<br />2: PgSelect[8]<br />3: Connection[12]<br />4: ConnectionItems[14]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 11, 30<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 11, 30<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 11, 30<br /><br />ROOT PgSelectSingle{3}ᐸnotesᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[21]<br />ᐳ: 52, 25, 28, 29, 31, 32, 34, 35"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[34]<br />Deps: 34, 11, 35"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|Organization<br />Deps: 11, 35<br />ᐳOrganization<br /><br />1: PgSelect[36]<br />2: PgSelectRows[41]<br />ᐳ: First[40], PgSelectSingle[42]"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|Person<br />Deps: 11, 35<br />ᐳPerson<br /><br />1: PgSelect[44]<br />2: PgSelectRows[49]<br />ᐳ: 48, 50, 51"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5
+    Bucket5 --> Bucket6 & Bucket7
+
+    %% plan dependencies
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9 & Access10 --> Object11
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸnotesᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access9
+    __Value2 --> Access10
+    Connection12[["Connection[12∈0] ➊<br />ᐸ8ᐳ"]]:::plan
+    PgSelect8 --> Connection12
+    ConnectionItems14[["ConnectionItems[14∈0] ➊"]]:::plan
+    Connection12 --> ConnectionItems14
+    __Item17[/"__Item[17∈3]<br />ᐸ14ᐳ"\]:::itemplan
+    ConnectionItems14 ==> __Item17
+    PgSelectSingle18{{"PgSelectSingle[18∈3]<br />ᐸnotesᐳ"}}:::plan
+    __Item17 --> PgSelectSingle18
+    List31{{"List[31∈4]<br />ᐸ28,29,30ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[30]"}}:::plan
+    Access28{{"Access[28∈4]<br />ᐸ25.0ᐳ"}}:::plan
+    Access29{{"Access[29∈4]<br />ᐸ25.1ᐳ"}}:::plan
+    Access28 & Access29 --> List31
+    PgUnionAll21[["PgUnionAll[21∈4]<br />ᐸPersonᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__notes__.”person_id”ᐳ"}}:::plan
+    PgClassExpression20 --> PgUnionAll21
+    PgClassExpression19{{"PgClassExpression[19∈4]<br />ᐸ__notes__.”body”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression19
+    PgSelectSingle18 --> PgClassExpression20
+    First25{{"First[25∈4]"}}:::plan
+    Access52{{"Access[52∈4]<br />ᐸ21.itemsᐳ"}}:::plan
+    Access52 --> First25
+    First25 --> Access28
+    First25 --> Access29
+    Lambda32{{"Lambda[32∈4]<br />ᐸtoSpecifierᐳ"}}:::plan
+    List31 --> Lambda32
+    Access34{{"Access[34∈4]<br />ᐸ32.__typenameᐳ"}}:::plan
+    Lambda32 -->|rejectNull| Access34
+    Access35{{"Access[35∈4]<br />ᐸ32.idᐳ"}}:::plan
+    Lambda32 -->|rejectNull| Access35
+    PgUnionAll21 --> Access52
+    PgSelect36[["PgSelect[36∈6]<br />ᐸorganizationsᐳ<br />ᐳOrganization<br />More deps:<br />- Object[11]"]]:::plan
+    Access35 --> PgSelect36
+    First40{{"First[40∈6]^"}}:::plan
+    PgSelectRows41[["PgSelectRows[41∈6]^"]]:::plan
+    PgSelectRows41 --> First40
+    PgSelect36 --> PgSelectRows41
+    PgSelectSingle42{{"PgSelectSingle[42∈6]^<br />ᐸorganizationsᐳ"}}:::plan
+    First40 --> PgSelectSingle42
+    PgSelect44[["PgSelect[44∈7]<br />ᐸpeopleᐳ<br />ᐳPerson<br />More deps:<br />- Object[11]"]]:::plan
+    Access35 --> PgSelect44
+    First48{{"First[48∈7]^"}}:::plan
+    PgSelectRows49[["PgSelectRows[49∈7]^"]]:::plan
+    PgSelectRows49 --> First48
+    PgSelect44 --> PgSelectRows49
+    PgSelectSingle50{{"PgSelectSingle[50∈7]^<br />ᐸpeopleᐳ"}}:::plan
+    First48 --> PgSelectSingle50
+    PgClassExpression51{{"PgClassExpression[51∈7]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle50 --> PgClassExpression51
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,ConnectionItems14 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1 bucket1
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item17,PgSelectSingle18 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression19,PgClassExpression20,PgUnionAll21,First25,Access28,Access29,List31,Lambda32,Access34,Access35,Access52 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,PgSelect36,First40,PgSelectRows41,PgSelectSingle42 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgSelect44,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression51 bucket7
+

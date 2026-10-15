@@ -7,6 +7,7 @@ drop schema if exists
   inheritence,
   smart_comment_relations,
   ranges,
+  ref_to_union,
   index_expressions,
   simple_collections,
   live_test,
@@ -1150,6 +1151,29 @@ create unique index employee_name on index_expressions.employee ((first_name || 
 create index employee_lower_name on index_expressions.employee (lower(first_name));
 create index employee_first_name_idx on index_expressions.employee (first_name);
 
+
+-- A `@ref` that reaches a `@unionMember` union through a single `@refVia` path
+create schema ref_to_union;
+create table ref_to_union.people (
+  id serial primary key,
+  username text not null unique
+);
+comment on table ref_to_union.people is E'@unionMember Owner';
+create table ref_to_union.organizations (
+  id serial primary key,
+  name text not null unique
+);
+comment on table ref_to_union.organizations is E'@unionMember Owner';
+create table ref_to_union.notes (
+  id serial primary key,
+  person_id int references ref_to_union.people,
+  organization_id int references ref_to_union.organizations,
+  body text not null
+);
+comment on table ref_to_union.notes is $$
+  @ref owner to:Owner singular
+  @refVia owner via:people
+  $$;
 
 create schema simple_collections;
 
