@@ -661,6 +661,25 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 }
                 otherResourceOptions!.codec.refs[relationName] = ref;
               }
+
+              // The root's own refs (from `@ref`) are fields of the interface
+              // too, so every implementation must provide them: reach them
+              // from the implementation via the root.
+              for (const [refName, rootRef] of Object.entries(
+                (resource.codec.refs ?? {}) as Record<string, PgCodecRef>,
+              )) {
+                if (otherResourceOptions!.codec.refs?.[refName]) continue;
+                otherResourceOptions!.codec.refs ??= Object.create(
+                  null,
+                ) as Record<string, any>;
+                otherResourceOptions!.codec.refs[refName] = {
+                  definition: rootRef.definition,
+                  paths: rootRef.paths.map((path) => [
+                    { relationName: sharedRelationName },
+                    ...path,
+                  ]),
+                };
+              }
             }
           }
         }

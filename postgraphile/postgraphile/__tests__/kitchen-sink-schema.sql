@@ -13,6 +13,7 @@ drop schema if exists
   large_bigint,
   network_types,
   named_query_builder,
+  relational_root_refs,
   enum_tables,
   geometry,
   function_returning_enum,
@@ -1202,6 +1203,33 @@ create table large_bigint.large_node_id (
   id bigint primary key,
   text text
 );
+
+-- A `@ref` on the root of a relational polymorphic structure
+create schema relational_root_refs;
+create table relational_root_refs.items (
+  id serial primary key,
+  type text not null,
+  name text not null
+);
+create table relational_root_refs.books (
+  id int primary key references relational_root_refs.items,
+  pages int
+);
+create table relational_root_refs.films (
+  id int primary key references relational_root_refs.items,
+  minutes int
+);
+create table relational_root_refs.reviews (
+  id serial primary key,
+  item_id int not null references relational_root_refs.items,
+  body text not null
+);
+comment on table relational_root_refs.items is $$
+  @interface mode:relational
+  @type BOOK references:relational_root_refs.books
+  @type FILM references:relational_root_refs.films
+  @ref reviewList to:Review plural via:(id)->relational_root_refs.reviews(item_id)
+  $$;
 
 create schema network_types;
 create table network_types.network (
