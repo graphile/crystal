@@ -19,7 +19,7 @@
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
     "build": "tsc -b",
-    "test": "jest"
+    "test": "node --test --experimental-vm-modules"
   },
   "repository": {
     "type": "git",

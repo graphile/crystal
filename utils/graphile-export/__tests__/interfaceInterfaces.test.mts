@@ -1,4 +1,5 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import * as assert from "node:assert/strict";
+import { test } from "node:test";
 
 import {
   GraphQLInterfaceType,
@@ -8,7 +9,8 @@ import {
   printSchema,
 } from "grafast/graphql";
 
-import { exportSchemaAsString } from "../src/index.ts";
+import { exportSchemaAsString } from "../dist/index.js";
+import { runModule } from "./helpers.mts";
 
 // `Outer` is declared first and its field refers to `Inner`, so `Inner` is
 // declared while `Outer` is still being declared. `Inner` implements `Outer`.
@@ -32,15 +34,11 @@ const Query = new GraphQLObjectType({
 });
 const schema = new GraphQLSchema({ query: Query, types: [Outer, Inner, Leaf] });
 
-it("exports an interface that implements an interface declared after it", async () => {
-  const dir = await mkdtemp(`${__dirname}/tmp-`);
-  const file = `${dir}/schema.js`;
-  try {
-    const { code } = await exportSchemaAsString(schema, { mode: "graphql-js" });
-    await writeFile(file, code);
-    const { schema: imported } = await import(file);
-    expect(printSchema(imported)).toEqual(printSchema(schema));
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
+test("exports an interface that implements an interface declared after it", async () => {
+  const { code } = await exportSchemaAsString(schema, { mode: "graphql-js" });
+  const { schema: imported } = await runModule<{ schema: GraphQLSchema }>(
+    code,
+    "schema.mjs",
+  );
+  assert.equal(printSchema(imported), printSchema(schema));
 });
