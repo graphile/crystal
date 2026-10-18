@@ -220,10 +220,19 @@ $env:DEBUG = "postgraphile:postgres*"; postgraphile
 
 PostgreSQL notices (such as those raised via `raise notice` in PL/pgSQL
 functions) are not included in the GraphQL response, but they can be a useful
-debugging tool. The `pg` driver emits each notice via the `notice` event on
-the client that issued the statement; to see them, create your own `pg.Pool`,
-listen for its `connect` event, and attach a `notice` handler to each new
-client:
+debugging tool. The easiest way to see them is to set the `DEBUG` envvar to
+`@dataplan/pg:PgExecutor` (see [Other `DEBUG`
+envvars](#other-debug-envvars)); each executed SQL query is logged alongside
+its results and a `NOTICES` section listing any notices it raised:
+
+```bash
+# Bash (Linux, macOS, etc)
+export DEBUG="@dataplan/pg:PgExecutor"
+postgraphile
+```
+
+If you need to handle notices in code instead, create your own `pg.Pool` and
+attach a `notice` handler to each new client:
 
 ```js title="graphile.config.mjs"
 import * as pg from "pg";
@@ -233,9 +242,7 @@ const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 pool.on("error", (error) => console.error(error));
 pool.on("connect", (client) => {
   client.on("error", (error) => console.error(error));
-  client.on("notice", (msg) => {
-    console.dir(msg);
-  });
+  client.on("notice", (msg) => console.dir(msg));
 });
 
 export default {
