@@ -231,18 +231,27 @@ export DEBUG="@dataplan/pg:PgExecutor"
 postgraphile
 ```
 
-If you need to handle notices in code instead, create your own `pg.Pool` and
-attach a `notice` handler to each new client:
+If you need to handle notices in code and you are working with query results,
+each `PgClientResult` includes the notices its query raised in its `notices`
+property; this works with any adaptor. Otherwise, with the `pg` adaptor, create
+your own `pg.Pool` and attach a `notice` handler to each new client:
 
 ```js title="graphile.config.mjs"
 import * as pg from "pg";
 import { makePgService } from "postgraphile/adaptors/pg";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-pool.on("error", (error) => console.error(error));
+pool.on("error", (error) => {
+  console.error("Idle PostgreSQL client errored:", error);
+});
 pool.on("connect", (client) => {
-  client.on("error", (error) => console.error(error));
-  client.on("notice", (msg) => console.dir(msg));
+  client.on("error", (error) => {
+    console.error("PostgreSQL client errored:", error);
+  });
+  client.on("notice", (msg) => {
+    const where = msg.where ? ` (${msg.where})` : "";
+    console.log(`PostgreSQL ${msg.severity}: ${msg.message}${where}`);
+  });
 });
 
 export default {
