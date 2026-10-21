@@ -2,6 +2,6 @@
 "eslint-plugin-graphile-export": patch
 ---
 
-Use `context.filename` and `context.physicalFilename` instead of the deprecated
-`context.getFilename()` and `context.getPhysicalFilename()`, which were removed
-in ESLint 10.
+Read `context.filename` and `context.physicalFilename` when available, falling
+back to `context.getFilename()` and `context.getPhysicalFilename()` (removed in
+ESLint 10) on older ESLint versions.

@@ -5,6 +5,7 @@ import { basename } from "path";
 
 import { reportProblem } from "./common.ts";
 import { hasExportableParent } from "./NoNested.ts";
+import { getFilename } from "./utils.ts";
 
 interface CommonOptions {
   disableAutofix: boolean;
@@ -73,7 +74,7 @@ export const ExportSubclasses: Rule.RuleModule = {
 
         //const scope = scopeManager.acquire(node);
 
-        const isTypeScript = /\.[mc]?tsx?$/.test(context.filename);
+        const isTypeScript = /\.[mc]?tsx?$/.test(getFilename(context));
         const isGeneric = !!(node as unknown as ClassDeclaration)
           .typeParameters;
         const $$export = node.body.body.find(
@@ -172,7 +173,7 @@ export const ExportSubclasses: Rule.RuleModule = {
               fixer.replaceTextRange(
                 [node.body.range![0] + 1, node.body.range![0] + 1],
                 `\n  static $$export = { moduleName: /* TODO! */ ${JSON.stringify(
-                  `./${basename(context.filename)}`,
+                  `./${basename(getFilename(context))}`,
                 )}, exportName: "${className}" };\n`,
               ),
             ];
