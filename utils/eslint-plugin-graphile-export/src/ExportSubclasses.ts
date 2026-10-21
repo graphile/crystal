@@ -73,7 +73,7 @@ export const ExportSubclasses: Rule.RuleModule = {
 
         //const scope = scopeManager.acquire(node);
 
-        const isTypeScript = /\.[mc]?tsx?$/.test(context.getFilename());
+        const isTypeScript = /\.[mc]?tsx?$/.test(context.filename);
         const isGeneric = !!(node as unknown as ClassDeclaration)
           .typeParameters;
         const $$export = node.body.body.find(
@@ -172,7 +172,7 @@ export const ExportSubclasses: Rule.RuleModule = {
               fixer.replaceTextRange(
                 [node.body.range![0] + 1, node.body.range![0] + 1],
                 `\n  static $$export = { moduleName: /* TODO! */ ${JSON.stringify(
-                  `./${basename(context.getFilename())}`,
+                  `./${basename(context.filename)}`,
                 )}, exportName: "${className}" };\n`,
               ),
             ];

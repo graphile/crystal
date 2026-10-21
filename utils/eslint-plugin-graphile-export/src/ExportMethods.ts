@@ -244,7 +244,7 @@ function processNode(
           console.debug(
             `Spotted '${match}' on object defined at ${
               parentObject.loc
-                ? `${context.getPhysicalFilename()}:${
+                ? `${context.physicalFilename}:${
                     parentObject.loc.start.line
                   }:${parentObject.loc.start.column}`
                 : "unknown location"
