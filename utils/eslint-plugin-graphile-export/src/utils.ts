@@ -19,20 +19,20 @@ export function isEXPORTABLE(node: any): boolean {
  * ESLint 8.40 added `context.filename` and ESLint 10 removed
  * `context.getFilename()`; support both.
  */
-export function getFilename(context: {
-  filename?: string;
-  getFilename?(): string;
-}): string {
-  return context.filename ?? context.getFilename!();
+export function getFilename(
+  context: { filename: string } | { filename?: never; getFilename(): string },
+): string {
+  return context.filename ?? context.getFilename();
 }
 
 /**
  * ESLint 8.40 added `context.physicalFilename` and ESLint 10 removed
  * `context.getPhysicalFilename()`; support both.
  */
-export function getPhysicalFilename(context: {
-  physicalFilename?: string;
-  getPhysicalFilename?(): string;
-}): string {
-  return context.physicalFilename ?? context.getPhysicalFilename!();
+export function getPhysicalFilename(
+  context:
+    | { physicalFilename: string }
+    | { physicalFilename?: never; getPhysicalFilename(): string },
+): string {
+  return context.physicalFilename ?? context.getPhysicalFilename();
 }
