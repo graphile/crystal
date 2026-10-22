@@ -53,7 +53,7 @@ from "b"."types" as __types__
 order by __types__."id" asc;
 
 with __json_identity_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"json" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "json")) with ordinality as ids
 )
 select __json_identity_result__.*
 from __json_identity_identifiers__,

@@ -37,7 +37,7 @@ on TRUE
 order by __posts__."id" asc;
 
 with __frmcdc_user_update_content_line_node_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"composite_domains"."user_update_content_line_node"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "composite_domains"."user_update_content_line_node"[])) with ordinality as ids
 )
 select __frmcdc_user_update_content_line_node_result__.*
 from __frmcdc_user_update_content_line_node_identifiers__,
@@ -50,7 +50,7 @@ lateral (
 ) as __frmcdc_user_update_content_line_node_result__;
 
 with __frmcdc_user_update_content_line_node_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"composite_domains"."user_update_content_line_node"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "composite_domains"."user_update_content_line_node"[])) with ordinality as ids
 )
 select __frmcdc_user_update_content_line_node_result__.*
 from __frmcdc_user_update_content_line_node_identifiers__,
