@@ -1,4 +1,4 @@
-import { arraysMatch, isDev } from "grafast";
+import { isDev } from "grafast";
 import { orderedApply, sortedPlugins } from "graphile-config";
 
 type BehaviorScope = string[];
@@ -132,7 +132,7 @@ export class Behavior {
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
-      listCache: Map<number, any[][]>;
+      listCache: Map<number, EntityTrie>;
       inferredCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
@@ -159,6 +159,8 @@ export class Behavior {
   };
 
   public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
+
+  private checkedRegistrations = new Set<string>();
 
   private globalDefaultBehavior: ResolvedBehavior;
   private resolvedPreset: GraphileConfig.ResolvedPreset;
@@ -364,27 +366,34 @@ export class Behavior {
           },
         },
       };
-    } else if (
-      !Object.entries(this.behaviorRegistry).some(
-        ([bhv, { entities }]) =>
-          entities[entityType] && stringMatches(bhv, filter),
-      )
-    ) {
-      console.warn(
-        `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
-          this.behaviorRegistry[filter].entities,
-        ).join(
-          "', '",
-        )}'; if this usage is valid, register it within a plugin with \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
-          filter,
-        )}] = { description: "...", entities: [${JSON.stringify(
-          entityType,
-        )}] }\`.`,
-      );
-      // Register it so we don't see this warning again
-      this.behaviorRegistry[filter].entities[entityType] = {
-        registeredBy: [],
-      };
+    } else {
+      const registrationKey = `${entityType}\0${filter}`;
+      if (!this.checkedRegistrations.has(registrationKey)) {
+        this.checkedRegistrations.add(registrationKey);
+        const isRegistered =
+          !!this.behaviorRegistry[filter].entities[entityType] ||
+          Object.entries(this.behaviorRegistry).some(
+            ([bhv, { entities }]) =>
+              entities[entityType] && stringMatches(bhv, filter),
+          );
+        if (!isRegistered) {
+          console.warn(
+            `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
+              this.behaviorRegistry[filter].entities,
+            ).join(
+              "', '",
+            )}'; if this usage is valid, register it within a plugin with \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+              filter,
+            )}] = { description: "...", entities: [${JSON.stringify(
+              entityType,
+            )}] }\`.`,
+          );
+          // Register it so we don't see this warning again
+          this.behaviorRegistry[filter].entities[entityType] = {
+            registeredBy: [],
+          };
+        }
+      }
     }
     const finalString = this.getBehaviorForEntity(
       entityType,
@@ -865,33 +874,56 @@ interface ResolvedBehavior {
   toString(): string;
 }
 
+function trieChild<TKey>(parent: Map<TKey, EntityTrie>, key: TKey): EntityTrie {
+  let child = parent.get(key);
+  if (!child) {
+    child = new Map() as EntityTrie;
+    parent.set(key, child);
+  }
+  return child;
+}
+
+const $$entity = Symbol("entity");
+
+interface EntityTrie extends Map<unknown, EntityTrie> {
+  [$$entity]?: any[];
+}
+
 function getCachedEntity<T extends any[]>(
-  listCache: Map<number, any[][]>,
+  listCache: Map<number, EntityTrie>,
   entity: T,
 ): T {
-  const nList = listCache.get(entity.length);
-  if (!nList) {
-    const list = [entity];
-    listCache.set(entity.length, list);
-    return entity;
+  let node = trieChild(listCache, entity.length);
+  for (let i = 0, l = entity.length; i < l; i++) {
+    node = trieChild(node, entity[i]);
   }
-  for (const entry of nList) {
-    if (arraysMatch(entry, entity)) {
-      return entry as T;
-    }
+  const existing = node[$$entity];
+  if (existing) {
+    return existing as T;
   }
-  nList.push(entity);
+  node[$$entity] = entity;
   return entity;
 }
 
 const warned = new Set<string>();
 
+const specsCache = new Map<string, BehaviorSpec[]>();
+const scopeCache = new Map<string, BehaviorScope>();
+
 function stringMatches(
   behaviorString: string,
   filter: string,
 ): boolean | undefined {
-  const specs = parseSpecs(behaviorString);
-  const filterScope = parseScope(filter);
+  let specs = specsCache.get(behaviorString);
+  if (!specs) {
+    specs = parseSpecs(behaviorString);
+    specsCache.set(behaviorString, specs);
+  }
+  let filterScope = scopeCache.get(filter);
+  if (!filterScope) {
+    filterScope = parseScope(filter);
+    scopeCache.set(filter, filterScope);
+  }
   if (filterScope[filterScope.length - 1] === "create") {
     throw new Error(
       `'create' filter scope is forbidden; did you mean 'insert'?`,
