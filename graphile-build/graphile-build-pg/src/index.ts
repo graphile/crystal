@@ -2,6 +2,7 @@ import type { PgRegistry } from "@dataplan/pg";
 
 import type { PartitionExpose } from "./interfaces.ts";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.ts";
+export { PgArgumentDescriptionsPlugin } from "./plugins/PgArgumentDescriptionsPlugin.ts";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.ts";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.ts";
 export { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.ts";
