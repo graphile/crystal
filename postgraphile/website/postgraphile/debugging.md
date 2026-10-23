@@ -216,6 +216,58 @@ $env:DEBUG = "postgraphile:postgres*"; postgraphile
 
 -->
 
+### Viewing notices from PostgreSQL
+
+PostgreSQL notices (such as those raised via `raise notice` in PL/pgSQL
+functions) are not included in the GraphQL response, but they can be a useful
+debugging tool. The easiest way to see them is to set the `DEBUG` envvar to
+`@dataplan/pg:PgExecutor` (see [Other `DEBUG`
+envvars](#other-debug-envvars)); each executed SQL query is logged alongside
+its results and a `NOTICES` section listing any notices it raised:
+
+```bash
+# Bash (Linux, macOS, etc)
+export DEBUG="@dataplan/pg:PgExecutor"
+postgraphile
+```
+
+If you need to handle notices in code and you are working with query results,
+each `PgClientResult` includes the notices its query raised in its `notices`
+property; this works with any adaptor. Otherwise, with the `pg` adaptor, create
+your own `pg.Pool` and attach a `notice` handler to each new client:
+
+```js title="graphile.config.mjs"
+import * as pg from "pg";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+pool.on("error", (error) => {
+  console.error("Idle PostgreSQL client errored:", error);
+});
+pool.on("connect", (client) => {
+  client.on("error", (error) => {
+    console.error("PostgreSQL client errored:", error);
+  });
+  client.on("notice", (msg) => {
+    const where = msg.where ? ` (${msg.where})` : "";
+    console.log(`PostgreSQL ${msg.severity}: ${msg.message}${where}`);
+  });
+});
+
+export default {
+  pgServices: [makePgService({ pool })],
+};
+```
+
+:::warning[Passing your own pool]
+
+When you pass `pool` to
+[`makePgService()`](./config/overview.mdx#makepgservice), the
+`connectionString` and `poolConfig` options are ignored and you are
+responsible for releasing the pool when your server shuts down.
+
+:::
+
 ## Something is in my GraphQL schema that shouldn't be
 
 This could be for a number of reasons...
