@@ -105,14 +105,19 @@ select
     left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
     on TRUE
   )::text as "59",
-  __frmcdc_compound_type_4."a"::text as "60",
-  __frmcdc_compound_type_4."b" as "61",
-  __frmcdc_compound_type_4."c"::text as "62",
-  __frmcdc_compound_type_4."d" as "63",
-  __frmcdc_compound_type_4."e"::text as "64",
-  __frmcdc_compound_type_4."f"::text as "65",
-  __frmcdc_compound_type_4."foo_bar"::text as "66",
-  (not (__frmcdc_compound_type_4 is null))::text as "67",
+  (
+    select array[
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
+  )::text as "60",
   (
     select array[
       __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -139,9 +144,17 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
     on TRUE
-  )::text as "68",
-  __post_3."id"::text as "69",
-  __post_3."headline" as "70",
+  )::text as "61",
+  (
+    select array[
+      __post_3."id"::text,
+      __post_3."headline"
+    ]::text[]
+    from "a"."post" as __post_3
+    where (
+      __post_3."id" = __types__."id"
+    )
+  )::text as "62",
   (
     select array[
       __post_4."id"::text,
@@ -151,7 +164,7 @@ select
     where (
       __post_4."id" = __types__."smallint"
     )
-  )::text as "71",
+  )::text as "63",
   (
     select array[
       __frmcdc_compound_type_7."a"::text,
@@ -164,7 +177,7 @@ select
       (not (__frmcdc_compound_type_7 is null))::text
     ]::text[]
     from (select (__types__."compound_type").*) as __frmcdc_compound_type_7
-  )::text as "72",
+  )::text as "64",
   (
     select array[
       __frmcdc_nested_compound_type_3."baz_buz"::text,
@@ -191,7 +204,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
     on TRUE
-  )::text as "73",
+  )::text as "65",
   (
     select array[
       __frmcdc_compound_type_10."a"::text,
@@ -204,7 +217,7 @@ select
       (not (__frmcdc_compound_type_10 is null))::text
     ]::text[]
     from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_10
-  )::text as "74",
+  )::text as "66",
   (
     select array[
       __frmcdc_nested_compound_type_4."baz_buz"::text,
@@ -231,7 +244,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
     on TRUE
-  )::text as "75"
+  )::text as "67"
 from "b"."types" as __types__
 left outer join "a"."post" as __post__
 on (
@@ -245,13 +258,6 @@ on (
 ))
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join "a"."post" as __post_3
-on (
-/* WHERE becoming ON */ (
-  __post_3."id" = __types__."id"
-))
 order by __types__."id" asc;
 
 select
@@ -349,14 +355,19 @@ select
     left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
     on TRUE
   )::text as "58",
-  __frmcdc_compound_type_4."a"::text as "59",
-  __frmcdc_compound_type_4."b" as "60",
-  __frmcdc_compound_type_4."c"::text as "61",
-  __frmcdc_compound_type_4."d" as "62",
-  __frmcdc_compound_type_4."e"::text as "63",
-  __frmcdc_compound_type_4."f"::text as "64",
-  __frmcdc_compound_type_4."foo_bar"::text as "65",
-  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
+  )::text as "59",
   (
     select array[
       __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -383,7 +394,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
     on TRUE
-  )::text as "67"
+  )::text as "60"
 from "b"."types" as __types__
 left outer join "a"."post" as __post__
 on (
@@ -396,8 +407,6 @@ on (
   __post_2."id" = __types__."smallint"
 ))
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE
 where (
   __types__."id" = $1::"int4"
@@ -498,14 +507,19 @@ select
     left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
     on TRUE
   )::text as "58",
-  __frmcdc_compound_type_4."a"::text as "59",
-  __frmcdc_compound_type_4."b" as "60",
-  __frmcdc_compound_type_4."c"::text as "61",
-  __frmcdc_compound_type_4."d" as "62",
-  __frmcdc_compound_type_4."e"::text as "63",
-  __frmcdc_compound_type_4."f"::text as "64",
-  __frmcdc_compound_type_4."foo_bar"::text as "65",
-  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text
+    ]::text[]
+    from (select (__type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
+  )::text as "59",
   (
     select array[
       __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -532,7 +546,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
     on TRUE
-  )::text as "67"
+  )::text as "60"
 from "b"."type_function"($1::"int4") as __type_function__
 left outer join "a"."post" as __post__
 on (
@@ -545,8 +559,6 @@ on (
   __post_2."id" = __type_function__."smallint"
 ))
 left outer join lateral (select (__type_function__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE;
 
 select
@@ -644,14 +656,19 @@ select
     left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
     on TRUE
   )::text as "58",
-  __frmcdc_compound_type_4."a"::text as "59",
-  __frmcdc_compound_type_4."b" as "60",
-  __frmcdc_compound_type_4."c"::text as "61",
-  __frmcdc_compound_type_4."d" as "62",
-  __frmcdc_compound_type_4."e"::text as "63",
-  __frmcdc_compound_type_4."f"::text as "64",
-  __frmcdc_compound_type_4."foo_bar"::text as "65",
-  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text
+    ]::text[]
+    from (select (__type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_4
+  )::text as "59",
   (
     select array[
       __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -678,7 +695,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
     on TRUE
-  )::text as "67"
+  )::text as "60"
 from unnest("b"."type_function_list"()) as __type_function_list__
 left outer join "a"."post" as __post__
 on (
@@ -691,8 +708,6 @@ on (
   __post_2."id" = __type_function_list__."smallint"
 ))
 left outer join lateral (select (__type_function_list__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE;
 
 select
@@ -790,14 +805,19 @@ select
     left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
     on TRUE
   )::text as "58",
-  __frmcdc_compound_type_4."a"::text as "59",
-  __frmcdc_compound_type_4."b" as "60",
-  __frmcdc_compound_type_4."c"::text as "61",
-  __frmcdc_compound_type_4."d" as "62",
-  __frmcdc_compound_type_4."e"::text as "63",
-  __frmcdc_compound_type_4."f"::text as "64",
-  __frmcdc_compound_type_4."foo_bar"::text as "65",
-  (not (__frmcdc_compound_type_4 is null))::text as "66",
+  (
+    select array[
+      __frmcdc_compound_type_4."a"::text,
+      __frmcdc_compound_type_4."b",
+      __frmcdc_compound_type_4."c"::text,
+      __frmcdc_compound_type_4."d",
+      __frmcdc_compound_type_4."e"::text,
+      __frmcdc_compound_type_4."f"::text,
+      __frmcdc_compound_type_4."foo_bar"::text,
+      (not (__frmcdc_compound_type_4 is null))::text
+    ]::text[]
+    from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
+  )::text as "59",
   (
     select array[
       __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -824,7 +844,7 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
     on TRUE
-  )::text as "67"
+  )::text as "60"
 from "b"."types" as __types__
 left outer join "a"."post" as __post__
 on (
@@ -837,8 +857,6 @@ on (
   __post_2."id" = __types__."smallint"
 ))
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
 on TRUE
 order by __types__."id" asc;
 
@@ -972,14 +990,19 @@ select
     left outer join lateral (select (__frmcdc_nested_compound_type_2."b").*) as __frmcdc_compound_type_6
     on TRUE
   )::text as "64",
-  __frmcdc_compound_type_7."a"::text as "65",
-  __frmcdc_compound_type_7."b" as "66",
-  __frmcdc_compound_type_7."c"::text as "67",
-  __frmcdc_compound_type_7."d" as "68",
-  __frmcdc_compound_type_7."e"::text as "69",
-  __frmcdc_compound_type_7."f"::text as "70",
-  __frmcdc_compound_type_7."foo_bar"::text as "71",
-  (not (__frmcdc_compound_type_7 is null))::text as "72",
+  (
+    select array[
+      __frmcdc_compound_type_7."a"::text,
+      __frmcdc_compound_type_7."b",
+      __frmcdc_compound_type_7."c"::text,
+      __frmcdc_compound_type_7."d",
+      __frmcdc_compound_type_7."e"::text,
+      __frmcdc_compound_type_7."f"::text,
+      __frmcdc_compound_type_7."foo_bar"::text,
+      (not (__frmcdc_compound_type_7 is null))::text
+    ]::text[]
+    from (select (__type_function_connection__."compound_type").*) as __frmcdc_compound_type_7
+  )::text as "65",
   (
     select array[
       __frmcdc_nested_compound_type_3."baz_buz"::text,
@@ -1006,15 +1029,20 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
     on TRUE
-  )::text as "73",
-  __frmcdc_compound_type_10."a"::text as "74",
-  __frmcdc_compound_type_10."b" as "75",
-  __frmcdc_compound_type_10."c"::text as "76",
-  __frmcdc_compound_type_10."d" as "77",
-  __frmcdc_compound_type_10."e"::text as "78",
-  __frmcdc_compound_type_10."f"::text as "79",
-  __frmcdc_compound_type_10."foo_bar"::text as "80",
-  (not (__frmcdc_compound_type_10 is null))::text as "81",
+  )::text as "66",
+  (
+    select array[
+      __frmcdc_compound_type_10."a"::text,
+      __frmcdc_compound_type_10."b",
+      __frmcdc_compound_type_10."c"::text,
+      __frmcdc_compound_type_10."d",
+      __frmcdc_compound_type_10."e"::text,
+      __frmcdc_compound_type_10."f"::text,
+      __frmcdc_compound_type_10."foo_bar"::text,
+      (not (__frmcdc_compound_type_10 is null))::text
+    ]::text[]
+    from (select (__type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_10
+  )::text as "67",
   (
     select array[
       __frmcdc_nested_compound_type_4."baz_buz"::text,
@@ -1041,16 +1069,12 @@ select
     on TRUE
     left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
     on TRUE
-  )::text as "82",
-  (row_number() over (partition by 1))::text as "83"
+  )::text as "68",
+  (row_number() over (partition by 1))::text as "69"
 from "b"."type_function_connection"() as __type_function_connection__
 left outer join lateral (select (__type_function_connection__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
 left outer join lateral (select (__type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_4
-on TRUE
-left outer join lateral (select (__type_function_connection__."compound_type").*) as __frmcdc_compound_type_7
-on TRUE
-left outer join lateral (select (__type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_10
 on TRUE;
 
 select
@@ -1151,14 +1175,19 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
         on TRUE
       )::text,
-      __frmcdc_compound_type_4."a"::text,
-      __frmcdc_compound_type_4."b",
-      __frmcdc_compound_type_4."c"::text,
-      __frmcdc_compound_type_4."d",
-      __frmcdc_compound_type_4."e"::text,
-      __frmcdc_compound_type_4."f"::text,
-      __frmcdc_compound_type_4."foo_bar"::text,
-      (not (__frmcdc_compound_type_4 is null))::text,
+      (
+        select array[
+          __frmcdc_compound_type_4."a"::text,
+          __frmcdc_compound_type_4."b",
+          __frmcdc_compound_type_4."c"::text,
+          __frmcdc_compound_type_4."d",
+          __frmcdc_compound_type_4."e"::text,
+          __frmcdc_compound_type_4."f"::text,
+          __frmcdc_compound_type_4."foo_bar"::text,
+          (not (__frmcdc_compound_type_4 is null))::text
+        ]::text[]
+        from (select (__person_type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -1202,8 +1231,6 @@ select
       __post_2."id" = __person_type_function__."smallint"
     ))
     left outer join lateral (select (__person_type_function__."compound_type").*) as __frmcdc_compound_type__
-    on TRUE
-    left outer join lateral (select (__person_type_function__."nullable_compound_type").*) as __frmcdc_compound_type_4
     on TRUE
   )::text as "1",
   array(
@@ -1302,14 +1329,19 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
         on TRUE
       )::text,
-      __frmcdc_compound_type_10."a"::text,
-      __frmcdc_compound_type_10."b",
-      __frmcdc_compound_type_10."c"::text,
-      __frmcdc_compound_type_10."d",
-      __frmcdc_compound_type_10."e"::text,
-      __frmcdc_compound_type_10."f"::text,
-      __frmcdc_compound_type_10."foo_bar"::text,
-      (not (__frmcdc_compound_type_10 is null))::text,
+      (
+        select array[
+          __frmcdc_compound_type_10."a"::text,
+          __frmcdc_compound_type_10."b",
+          __frmcdc_compound_type_10."c"::text,
+          __frmcdc_compound_type_10."d",
+          __frmcdc_compound_type_10."e"::text,
+          __frmcdc_compound_type_10."f"::text,
+          __frmcdc_compound_type_10."foo_bar"::text,
+          (not (__frmcdc_compound_type_10 is null))::text
+        ]::text[]
+        from (select (__person_type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_10
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_4."baz_buz"::text,
@@ -1350,8 +1382,6 @@ select
       __post_4."id" = __person_type_function_list__."smallint"
     ))
     left outer join lateral (select (__person_type_function_list__."compound_type").*) as __frmcdc_compound_type_7
-    on TRUE
-    left outer join lateral (select (__person_type_function_list__."nullable_compound_type").*) as __frmcdc_compound_type_10
     on TRUE
   )::text as "2",
   array(
@@ -1485,14 +1515,19 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type_6."b").*) as __frmcdc_compound_type_18
         on TRUE
       )::text,
-      __frmcdc_compound_type_19."a"::text,
-      __frmcdc_compound_type_19."b",
-      __frmcdc_compound_type_19."c"::text,
-      __frmcdc_compound_type_19."d",
-      __frmcdc_compound_type_19."e"::text,
-      __frmcdc_compound_type_19."f"::text,
-      __frmcdc_compound_type_19."foo_bar"::text,
-      (not (__frmcdc_compound_type_19 is null))::text,
+      (
+        select array[
+          __frmcdc_compound_type_19."a"::text,
+          __frmcdc_compound_type_19."b",
+          __frmcdc_compound_type_19."c"::text,
+          __frmcdc_compound_type_19."d",
+          __frmcdc_compound_type_19."e"::text,
+          __frmcdc_compound_type_19."f"::text,
+          __frmcdc_compound_type_19."foo_bar"::text,
+          (not (__frmcdc_compound_type_19 is null))::text
+        ]::text[]
+        from (select (__person_type_function_connection__."compound_type").*) as __frmcdc_compound_type_19
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_7."baz_buz"::text,
@@ -1520,14 +1555,19 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type_7."b").*) as __frmcdc_compound_type_21
         on TRUE
       )::text,
-      __frmcdc_compound_type_22."a"::text,
-      __frmcdc_compound_type_22."b",
-      __frmcdc_compound_type_22."c"::text,
-      __frmcdc_compound_type_22."d",
-      __frmcdc_compound_type_22."e"::text,
-      __frmcdc_compound_type_22."f"::text,
-      __frmcdc_compound_type_22."foo_bar"::text,
-      (not (__frmcdc_compound_type_22 is null))::text,
+      (
+        select array[
+          __frmcdc_compound_type_22."a"::text,
+          __frmcdc_compound_type_22."b",
+          __frmcdc_compound_type_22."c"::text,
+          __frmcdc_compound_type_22."d",
+          __frmcdc_compound_type_22."e"::text,
+          __frmcdc_compound_type_22."f"::text,
+          __frmcdc_compound_type_22."foo_bar"::text,
+          (not (__frmcdc_compound_type_22 is null))::text
+        ]::text[]
+        from (select (__person_type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_22
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_8."baz_buz"::text,
@@ -1561,10 +1601,6 @@ select
     left outer join lateral (select (__person_type_function_connection__."compound_type").*) as __frmcdc_compound_type_13
     on TRUE
     left outer join lateral (select (__person_type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_16
-    on TRUE
-    left outer join lateral (select (__person_type_function_connection__."compound_type").*) as __frmcdc_compound_type_19
-    on TRUE
-    left outer join lateral (select (__person_type_function_connection__."nullable_compound_type").*) as __frmcdc_compound_type_22
     on TRUE
   )::text as "3",
   array(
@@ -1677,14 +1713,19 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type__."b").*) as __frmcdc_compound_type_3
         on TRUE
       )::text,
-      __frmcdc_compound_type_4."a"::text,
-      __frmcdc_compound_type_4."b",
-      __frmcdc_compound_type_4."c"::text,
-      __frmcdc_compound_type_4."d",
-      __frmcdc_compound_type_4."e"::text,
-      __frmcdc_compound_type_4."f"::text,
-      __frmcdc_compound_type_4."foo_bar"::text,
-      (not (__frmcdc_compound_type_4 is null))::text,
+      (
+        select array[
+          __frmcdc_compound_type_4."a"::text,
+          __frmcdc_compound_type_4."b",
+          __frmcdc_compound_type_4."c"::text,
+          __frmcdc_compound_type_4."d",
+          __frmcdc_compound_type_4."e"::text,
+          __frmcdc_compound_type_4."f"::text,
+          __frmcdc_compound_type_4."foo_bar"::text,
+          (not (__frmcdc_compound_type_4 is null))::text
+        ]::text[]
+        from (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_2."baz_buz"::text,
@@ -1725,8 +1766,6 @@ select
       __post_3."id" = __types__."smallint"
     ))
     left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
-    on TRUE
-    left outer join lateral (select (__types__."nullable_compound_type").*) as __frmcdc_compound_type_4
     on TRUE
     where (
       __types__."id" = __post__."id"
@@ -1832,14 +1871,19 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type_3."b").*) as __frmcdc_compound_type_9
         on TRUE
       )::text,
-      __frmcdc_compound_type_10."a"::text,
-      __frmcdc_compound_type_10."b",
-      __frmcdc_compound_type_10."c"::text,
-      __frmcdc_compound_type_10."d",
-      __frmcdc_compound_type_10."e"::text,
-      __frmcdc_compound_type_10."f"::text,
-      __frmcdc_compound_type_10."foo_bar"::text,
-      (not (__frmcdc_compound_type_10 is null))::text,
+      (
+        select array[
+          __frmcdc_compound_type_10."a"::text,
+          __frmcdc_compound_type_10."b",
+          __frmcdc_compound_type_10."c"::text,
+          __frmcdc_compound_type_10."d",
+          __frmcdc_compound_type_10."e"::text,
+          __frmcdc_compound_type_10."f"::text,
+          __frmcdc_compound_type_10."foo_bar"::text,
+          (not (__frmcdc_compound_type_10 is null))::text
+        ]::text[]
+        from (select (__types_2."nullable_compound_type").*) as __frmcdc_compound_type_10
+      )::text,
       (
         select array[
           __frmcdc_nested_compound_type_4."baz_buz"::text,
@@ -1867,8 +1911,16 @@ select
         left outer join lateral (select (__frmcdc_nested_compound_type_4."b").*) as __frmcdc_compound_type_12
         on TRUE
       )::text,
-      __post_6."id"::text,
-      __post_6."headline",
+      (
+        select array[
+          __post_6."id"::text,
+          __post_6."headline"
+        ]::text[]
+        from "a"."post" as __post_6
+        where (
+          __post_6."id" = __types_2."id"
+        )
+      )::text,
       (
         select array[
           __post_7."id"::text,
@@ -1973,13 +2025,6 @@ select
     ))
     left outer join lateral (select (__types_2."compound_type").*) as __frmcdc_compound_type_7
     on TRUE
-    left outer join lateral (select (__types_2."nullable_compound_type").*) as __frmcdc_compound_type_10
-    on TRUE
-    left outer join "a"."post" as __post_6
-    on (
-    /* WHERE becoming ON */ (
-      __post_6."id" = __types_2."id"
-    ))
     where (
       __types_2."smallint" = __post__."id"
     )
