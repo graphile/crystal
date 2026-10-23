@@ -1,0 +1,14 @@
+[
+  {
+    message: 'Expected wrapper failure',
+    locations: [
+      {
+        line: 8,
+        column: 3,
+      },
+    ],
+    path: [
+      'wrappedThrowingPerson',
+    ],
+  },
+]

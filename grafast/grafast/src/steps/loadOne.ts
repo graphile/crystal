@@ -81,6 +81,14 @@ export function loadOneLoader<
 const idByLoad = new WeakMap<LoadOneCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
+type LoadOneGetStep<
+  TData,
+  TAttr extends keyof Exclude<TData, null | undefined>,
+> = Step<
+  | Exclude<TData, null | undefined>[TAttr]
+  | (Extract<TData, null | undefined> extends never ? never : undefined)
+>;
+
 export class LoadOneStep<
   const TLookup extends Multistep,
   TItem,
@@ -244,10 +252,22 @@ export class LoadOneStep<
   }
 
   // Things that were originally in LoadedRecordStep
-  get(attr: keyof TItem & (string | number)) {
-    return this.cacheStep("get", attr, () => this._getInner(attr));
+  __inferGet?: {
+    [TAttr in keyof Exclude<TData, null | undefined> & string]: LoadOneGetStep<
+      TData,
+      TAttr
+    >;
+  };
+  get<TAttr extends keyof Exclude<TData, null | undefined> & (string | number)>(
+    attr: TAttr,
+  ): LoadOneGetStep<TData, TAttr> {
+    return this.cacheStep("get", attr, () =>
+      this._getInner(attr),
+    ) as LoadOneGetStep<TData, TAttr>;
   }
-  private _getInner(attr: keyof TItem & (string | number)) {
+  private _getInner<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     if (this.operationPlan.phase === "plan") {
       // Allow auto-collapsing of the waterfall by knowing keys are equivalent
       const accessMap = this.getAccessMap();
@@ -257,7 +277,7 @@ export class LoadOneStep<
       }
     }
 
-    this.attributes.add(attr);
+    this.attributes.add(attr as keyof TItem);
     return access(this, attr);
   }
 }

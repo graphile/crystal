@@ -588,6 +588,9 @@ key rules:
 
 1. Dependencies before dependents.
 2. Steps **implicitly** depend on the most recent side effect step, if any.
+   This preserves ordering and, by default, propagates side-effect errors. It
+   does not propagate inhibition: an inhibited side effect did not run.
+   Inhibition only propagates through explicit data dependencies.
 
 This can be surprising during mutations: steps created before a mutation might
 execute **after** the mutation unless one of the rules above says otherwise.

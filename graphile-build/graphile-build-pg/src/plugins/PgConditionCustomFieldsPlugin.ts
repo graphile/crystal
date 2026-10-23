@@ -25,7 +25,7 @@ declare global {
     }
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
-      pgFieldSource?: PgResource<any, any, any, any, any>;
+      pgFieldSource?: PgResource<any, any, any, any, any, any, any>;
     }
   }
 }

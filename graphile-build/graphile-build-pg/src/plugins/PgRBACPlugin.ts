@@ -257,7 +257,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
 
 function modBehaviorForResource(
   behavior: GraphileBuild.BehaviorString,
-  resource: PgResource<any, any, any, any, any>,
+  resource: PgResource<any, any, any, any, any, any, any>,
 ): GraphileBuild.BehaviorString[] {
   const newBehavior = [behavior];
   const {

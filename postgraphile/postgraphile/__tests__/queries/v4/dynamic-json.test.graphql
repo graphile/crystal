@@ -6,7 +6,9 @@
 #> subscriptions: true
 #> dynamicJson: true
 #> setofFunctionsContainNulls: null
-query {
+#> extends: ["../plugins/DynamicJson.ts:preset"]
+#> variableValues: {"jsonArray": [{"message": "json"}, {"message": "json"}]}
+query ($jsonArray: [JSON!]!) {
   a: jsonIdentity(json: true)
   b: jsonIdentity(json: false)
   c: jsonIdentity(json: 42)
@@ -25,4 +27,5 @@ query {
       jsonb
     }
   }
+  jsonIdentityBatch(jsonArray: $jsonArray)
 }

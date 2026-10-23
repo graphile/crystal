@@ -6,6 +6,14 @@ import { access } from "./access.ts";
 import { constant } from "./constant.ts";
 import { LoadManyStep } from "./loadMany.ts";
 
+type LoadedRecordGetStep<
+  TData,
+  TAttr extends keyof Exclude<TData, null | undefined>,
+> = Step<
+  | Exclude<TData, null | undefined>[TAttr]
+  | (Extract<TData, null | undefined> extends never ? never : undefined)
+>;
+
 /**
  * You shouldn't create instances of this yourself - use `loadOne` or `loadMany` instead.
  */
@@ -46,10 +54,20 @@ export class LoadedRecordStep<
   toStringMeta() {
     return this.sourceDescription ?? null;
   }
-  get(attr: keyof TItem & (string | number)) {
-    return this.cacheStep("get", attr, () => this._getInner(attr));
+  __inferGet?: {
+    [TAttr in keyof Exclude<TData, null | undefined> &
+      string]: LoadedRecordGetStep<TData, TAttr>;
+  };
+  get<TAttr extends keyof Exclude<TData, null | undefined> & (string | number)>(
+    attr: TAttr,
+  ): LoadedRecordGetStep<TData, TAttr> {
+    return this.cacheStep("get", attr, () =>
+      this._getInner(attr),
+    ) as LoadedRecordGetStep<TData, TAttr>;
   }
-  private _getInner(attr: keyof TItem & (string | number)) {
+  private _getInner<
+    TAttr extends keyof Exclude<TData, null | undefined> & (string | number),
+  >(attr: TAttr) {
     // Allow auto-collapsing of the waterfall by knowing keys are equivalent
     if (
       this.operationPlan.phase === "plan" &&
@@ -58,7 +76,7 @@ export class LoadedRecordStep<
       return this.ioEquivalence[attr as any];
     }
 
-    this.attributes.add(attr);
+    this.attributes.add(attr as keyof TItem);
     return access(this, attr);
   }
   setParam<TParamKey extends keyof TParams>(

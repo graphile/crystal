@@ -6,23 +6,6 @@ from "js_reserved"."constructor" as __constructor__
 order by __constructor__."id" asc;
 
 select
-  __constructor__."name" as "0",
-  __constructor__."id"::text as "1"
-from "js_reserved"."constructor" as __constructor__
-where (
-  __constructor__."export" = $1::"text"
-);
-
-select
-  __constructor__."export" as "0",
-  __constructor__."name" as "1",
-  __constructor__."id"::text as "2"
-from "js_reserved"."constructor" as __constructor__
-where (
-  __constructor__."id" = $1::"int4"
-);
-
-select
   __constructor__."export" as "0",
   __constructor__."id"::text as "1"
 from "js_reserved"."constructor" as __constructor__
@@ -108,4 +91,21 @@ select
 from "js_reserved"."null" as __null__
 where (
   __null__."id" = $1::"int4"
+);
+
+select
+  __constructor__."name" as "0",
+  __constructor__."id"::text as "1"
+from "js_reserved"."constructor" as __constructor__
+where (
+  __constructor__."export" = $1::"text"
+);
+
+select
+  __constructor__."export" as "0",
+  __constructor__."name" as "1",
+  __constructor__."id"::text as "2"
+from "js_reserved"."constructor" as __constructor__
+where (
+  __constructor__."id" = $1::"int4"
 );

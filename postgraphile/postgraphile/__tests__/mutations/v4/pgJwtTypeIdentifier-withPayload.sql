@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __authenticate_payload__."id"::text as "0",
   case when (__authenticate_payload__."jwt") is not distinct from null then null::text else json_build_array(
@@ -14,6 +16,8 @@ from "b"."authenticate_payload"(
   $2::"numeric",
   $3::"int8"
 ) as __authenticate_payload__;
+
+commit; /*fake*/
 
 select
   __person__."id"::text as "0",

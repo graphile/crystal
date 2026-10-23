@@ -188,6 +188,9 @@ describe("wrapping named plans", () => {
   it("can abort plan after", async () => {
     const wrapper: PlanWrapperFn = (plan) => {
       const $result = plan();
+      if ($result === null) {
+        return null;
+      }
       // eslint-disable-next-line no-constant-condition
       const $postCheck = lambda($result, async () => {
         await delay(10);

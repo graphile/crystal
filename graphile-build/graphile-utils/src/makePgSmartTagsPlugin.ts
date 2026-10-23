@@ -16,7 +16,10 @@ import type {
 import type {} from "graphile-config";
 import JSON5 from "json5";
 
-import { parseIdentifierParts } from "./parseIdentifierParts.ts";
+import {
+  type IdentifierPart,
+  parseIdentifierParts,
+} from "./parseIdentifierParts.ts";
 
 type PromiseOrDirect<T> = Promise<T> | T;
 type ThunkOrDirect<T> = (() => T) | T;
@@ -54,7 +57,142 @@ type PgSmartTagRules = {
 // Form a union of the options
 export type PgSmartTagRule<
   TKind extends PgSmartTagSupportedKinds = PgSmartTagSupportedKinds,
-> = PgSmartTagRules[keyof PgSmartTagRules] & { kind: TKind };
+> = PgSmartTagRules[TKind];
+
+type ScopedGatherPgIntrospection<
+  TScope extends keyof GraphileBuild.PluginScopes,
+> = GraphileBuild.PluginScopes[TScope] extends {
+  gather: { pgIntrospection: infer TPgIntrospection };
+}
+  ? TPgIntrospection
+  : never;
+
+type SmartTagClassMatches<TIntrospection> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends {
+          classes: infer TClasses;
+        }
+          ? {
+              [TClassName in keyof TClasses & string]:
+                | IdentifierPart<TClassName>
+                | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TClassName>}`;
+            }[keyof TClasses & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagAttributeOrConstraintMatches<
+  TIntrospection,
+  TKey extends "attributes" | "constraints",
+> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends {
+          classes: infer TClasses;
+        }
+          ? {
+              [TClassName in keyof TClasses &
+                string]: TClasses[TClassName] extends Record<
+                TKey,
+                infer TEntries
+              >
+                ? {
+                    [TEntryName in keyof TEntries & string]:
+                      | IdentifierPart<TEntryName>
+                      | `${IdentifierPart<TClassName>}.${IdentifierPart<TEntryName>}`
+                      | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TClassName>}.${IdentifierPart<TEntryName>}`;
+                  }[keyof TEntries & string]
+                : never;
+            }[keyof TClasses & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagSchemaEntryMatches<
+  TIntrospection,
+  TKey extends "functions" | "types",
+> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? {
+        [TSchemaName in keyof TSchemas &
+          string]: TSchemas[TSchemaName] extends Record<TKey, infer TEntries>
+          ? {
+              [TEntryName in keyof TEntries & string]:
+                | IdentifierPart<TEntryName>
+                | `${IdentifierPart<TSchemaName>}.${IdentifierPart<TEntryName>}`;
+            }[keyof TEntries & string]
+          : never;
+      }[keyof TSchemas & string]
+    : never;
+}[keyof TIntrospection & string];
+
+type SmartTagNamespaceMatches<TIntrospection> = {
+  [TServiceName in keyof TIntrospection &
+    string]: TIntrospection[TServiceName] extends {
+    schemas: infer TSchemas;
+  }
+    ? IdentifierPart<keyof TSchemas & string>
+    : never;
+}[keyof TIntrospection & string];
+
+type GeneratedSmartTagMatches<
+  TScope extends keyof GraphileBuild.PluginScopes,
+  TKind extends PgSmartTagSupportedKinds,
+> = [ScopedGatherPgIntrospection<TScope>] extends [never]
+  ? string
+  : TKind extends "class"
+    ? SmartTagClassMatches<ScopedGatherPgIntrospection<TScope>>
+    : TKind extends "attribute"
+      ? SmartTagAttributeOrConstraintMatches<
+          ScopedGatherPgIntrospection<TScope>,
+          "attributes"
+        >
+      : TKind extends "constraint"
+        ? SmartTagAttributeOrConstraintMatches<
+            ScopedGatherPgIntrospection<TScope>,
+            "constraints"
+          >
+        : TKind extends "procedure"
+          ? SmartTagSchemaEntryMatches<
+              ScopedGatherPgIntrospection<TScope>,
+              "functions"
+            >
+          : TKind extends "type"
+            ? SmartTagSchemaEntryMatches<
+                ScopedGatherPgIntrospection<TScope>,
+                "types"
+              >
+            : SmartTagNamespaceMatches<ScopedGatherPgIntrospection<TScope>>;
+
+type PgSmartTagRuleWithMatches<
+  TKind extends PgSmartTagSupportedKinds,
+  TMatches extends string,
+> = Omit<PgSmartTagRule<TKind>, "match"> & {
+  match: TMatches | PgSmartTagFilterFunction<PgEntityByKind[TKind]>;
+};
+
+export type ScopedPgSmartTagRule<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = {
+  [TKind in PgSmartTagSupportedKinds]: PgSmartTagRuleWithMatches<
+    TKind,
+    GeneratedSmartTagMatches<TScope, TKind>
+  >;
+}[PgSmartTagSupportedKinds];
 
 interface CompiledPgSmartTagRule<TKind extends PgSmartTagSupportedKinds> {
   serviceName?: string;
@@ -214,13 +352,18 @@ function rulesFrom(
   return [rawRules.map(compileRule), rawRules];
 }
 
-export type UpdatePgSmartTagRulesCallback = (
-  ruleOrRules: PgSmartTagRule | PgSmartTagRule[] | null,
+export type UpdatePgSmartTagRulesCallback<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (
+  ruleOrRules:
+    | ScopedPgSmartTagRule<TScope>
+    | ScopedPgSmartTagRule<TScope>[]
+    | null,
 ) => void;
 
-export type SubscribeToPgSmartTagUpdatesCallback = (
-  cb: UpdatePgSmartTagRulesCallback | null,
-) => PromiseOrDirect<void>;
+export type SubscribeToPgSmartTagUpdatesCallback<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (cb: UpdatePgSmartTagRulesCallback<TScope> | null) => PromiseOrDirect<void>;
 
 interface Cache {
   rulesPromise: PromiseOrDirect<PgSmartTagRule[]>;
@@ -245,11 +388,15 @@ async function resolveRules(
 }
 
 let counter = 0;
-export function pgSmartTags(
+export function pgSmartTags<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
   initialRules: ThunkOrDirect<
-    PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
+    PromiseOrDirect<
+      ScopedPgSmartTagRule<TScope> | ScopedPgSmartTagRule<TScope>[] | null
+    >
   >,
-  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback | null,
+  subscribeToUpdatesCallback?: SubscribeToPgSmartTagUpdatesCallback<TScope> | null,
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   const id = ++counter;
@@ -393,33 +540,38 @@ export function pgSmartTags(
  * }
  * ```
  */
-export type JSONPgSmartTags = {
-  version: 1;
-  config: {
-    [kind in PgSmartTagSupportedKinds]?: {
-      [identifier: string]: {
-        tags?: PgSmartTagTags;
-        description?: string;
-        attribute?: {
-          [attributeName: string]: {
-            tags?: PgSmartTagTags;
-            description?: string;
-          };
-        };
-        constraint?: {
-          [constraintName: string]: {
-            tags?: PgSmartTagTags;
-            description?: string;
-          };
-        };
-      };
+type JSONPgSmartTagSpec = {
+  tags?: PgSmartTagTags;
+  description?: string;
+  attribute?: {
+    [attributeName: string]: {
+      tags?: PgSmartTagTags;
+      description?: string;
+    };
+  };
+  constraint?: {
+    [constraintName: string]: {
+      tags?: PgSmartTagTags;
+      description?: string;
     };
   };
 };
 
-export function pgSmartTagRulesFromJSON(
-  json: JSONPgSmartTags | null,
-): PgSmartTagRule[] {
+export type JSONPgSmartTags<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = {
+  version: 1;
+  config: {
+    [TKind in PgSmartTagSupportedKinds]?: Partial<
+      Record<GeneratedSmartTagMatches<TScope, TKind>, JSONPgSmartTagSpec>
+    >;
+  };
+};
+
+/** @internal */
+export function pgSmartTagRulesFromJSON<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(json: JSONPgSmartTags<TScope> | null): ScopedPgSmartTagRule<TScope>[] {
   if (!json) {
     return [];
   }
@@ -494,7 +646,9 @@ export function pgSmartTagRulesFromJSON(
     const specByIdentifier = specByIdentifierByKind[kind];
     if (specByIdentifier) {
       for (const identifier of Object.keys(specByIdentifier)) {
-        const spec = specByIdentifier[identifier];
+        const spec = (specByIdentifier as Record<string, JSONPgSmartTagSpec>)[
+          identifier
+        ];
         const { tags, description, attribute, constraint, ...rest } = spec;
         if (Object.keys(rest).length > 0) {
           console.warn(
@@ -521,26 +675,28 @@ export function pgSmartTagRulesFromJSON(
     }
   }
 
-  return rules;
+  return rules as ScopedPgSmartTagRule<TScope>[];
 }
 
-export type UpdateJSONPgSmartTagsCallback = (
-  json: JSONPgSmartTags | null,
-) => void;
+export type UpdateJSONPgSmartTagsCallback<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (json: JSONPgSmartTags<TScope> | null) => void;
 
-export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
-  cb: UpdateJSONPgSmartTagsCallback | null,
-) => void | Promise<void>;
+export type SubscribeToJSONPgSmartTagsUpdatesCallback<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+> = (cb: UpdateJSONPgSmartTagsCallback<TScope> | null) => void | Promise<void>;
 
-export function jsonPgSmartTags(
-  jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
-  subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
+export function jsonPgSmartTags<
+  TScope extends keyof GraphileBuild.PluginScopes = "default",
+>(
+  jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags<TScope> | null>>,
+  subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback<TScope> | null,
   details?: { name?: string; description?: string; version?: string },
 ): GraphileConfig.Plugin {
   // Get rules from JSON
 
   // Wrap listener callback with JSON conversion
-  const subscribeToUpdatesCallback: SubscribeToPgSmartTagUpdatesCallback | null =
+  const subscribeToUpdatesCallback: SubscribeToPgSmartTagUpdatesCallback<TScope> | null =
     subscribeToJSONUpdatesCallback
       ? (cb) => {
           if (!cb) {
@@ -548,7 +704,7 @@ export function jsonPgSmartTags(
           } else {
             return subscribeToJSONUpdatesCallback((json) => {
               try {
-                const rules = pgSmartTagRulesFromJSON(json);
+                const rules = pgSmartTagRulesFromJSON<TScope>(json);
                 return cb(rules);
               } catch (e) {
                 console.error(e);
@@ -558,22 +714,24 @@ export function jsonPgSmartTags(
         }
       : null;
 
-  return pgSmartTags(
+  return pgSmartTags<TScope>(
     async () => {
       const json = await (typeof jsonOrThunk === "function"
         ? jsonOrThunk()
         : jsonOrThunk);
-      return pgSmartTagRulesFromJSON(json);
+      return pgSmartTagRulesFromJSON<TScope>(json);
     },
     subscribeToUpdatesCallback,
     details,
   );
 }
 
-export const pgSmartTagsFromFile = (
+export function pgSmartTagsFromFile(
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
   name?: keyof GraphileConfig.Plugins,
-): GraphileConfig.Plugin => {
+): GraphileConfig.Plugin {
+  // This function doesn't benefit from having a generic scope
+  type TScope = never;
   /*
    * We're wrapping the `smartTagsPlugin` defined below with a plugin wrapper
    * so that any errors from reading the smart tags file are thrown when the
@@ -586,10 +744,10 @@ export const pgSmartTagsFromFile = (
     );
   }
   let tagsListener: null | ((current: Stats, previous: Stats) => void) = null;
-  const plugin = jsonPgSmartTags(
+  const plugin = jsonPgSmartTags<TScope>(
     async () => {
       const contents = await readFile(tagsFile, "utf8");
-      return JSON5.parse(contents) as JSONPgSmartTags;
+      return JSON5.parse(contents) as JSONPgSmartTags<TScope>;
     },
     (updateJSON) => {
       if (tagsListener) {
@@ -626,7 +784,7 @@ export const pgSmartTagsFromFile = (
   );
 
   return plugin;
-};
+}
 
 export const TagsFilePlugin = pgSmartTagsFromFile(undefined, "TagsFilePlugin");
 

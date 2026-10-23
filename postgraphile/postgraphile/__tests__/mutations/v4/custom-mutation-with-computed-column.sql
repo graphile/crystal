@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __upsert_setting__."id"::text as "0",
   __upsert_setting__."username" as "1",
@@ -10,6 +12,8 @@ from "issue_2287"."upsert_setting"(
   $2::"text",
   $3::"text"
 ) as __upsert_setting__;
+
+commit; /*fake*/
 
 select
   "issue_2287"."users_setting"(

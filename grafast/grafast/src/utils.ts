@@ -447,7 +447,7 @@ export type ObjectTypeSpec<
         | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
-  planType?: ($specifier: Step) => TParentStep;
+  planType?: ($specifier: Step) => Step;
 };
 
 /**

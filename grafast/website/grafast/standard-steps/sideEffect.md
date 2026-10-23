@@ -26,6 +26,19 @@ issue.
 `sideEffect` does not perform batching; it is only intended for performing
 mutations, and mutations rarely batch.
 
+## Errors and inhibition
+
+Steps created after a side effect implicitly wait for it to complete. By
+default, if the side effect yields an error, the error prevents those later
+steps from running. However, if the side effect is inhibited then it did not
+run, so that inhibition does not propagate merely because a step was created
+later.
+
+To make inhibition propagate, create an explicit data dependency on the side
+effect, either directly or through other steps. This is appropriate when the
+later step needs the value represented by the side effect; otherwise, it only
+needs the ordering guarantee.
+
 :::tip[Mark any step as having side effects]
 
 Almost any step can be made to be treated as having side effects by setting

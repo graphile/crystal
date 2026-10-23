@@ -15,11 +15,6 @@ import {
 } from "../utils.ts";
 import { access } from "./access.ts";
 
-export const nextTick: (cb: () => void) => void =
-  typeof process !== "undefined" && typeof process.nextTick === "function"
-    ? (cb) => process.nextTick(cb)
-    : (cb) => setTimeout(cb, 0);
-
 export type IOEquivalence<TSpec> =
   | null
   | string
@@ -230,7 +225,7 @@ export function executeLoad<
       loadBatches = [loadBatch];
       meta.loadBatchesByLoad.set(load, loadBatches);
       // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
-      nextTick(() => {
+      queueMicrotask(() => {
         // Don't allow adding anything else to the batch
         meta.loadBatchesByLoad!.delete(load);
         void executeBatches(loadBatches!, loadInfo, load);

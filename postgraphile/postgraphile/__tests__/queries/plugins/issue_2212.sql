@@ -10,8 +10,11 @@ select user_id::text, phone from issue_2212.user_contacts where user_id = any($1
 
 select phone_e164, sum(amount_cents) as sum from issue_2212.orders where phone_e164 = any($1::text[]) group by phone_e164;
 
+with __orders_identifiers__ as materialized (
+  select ids.ordinality - 1 as idx, (ids.value->>0)::"text"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+)
 select __orders_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"text"[] as "id0" from json_array_elements($1::json) with ordinality as ids) as __orders_identifiers__,
+from __orders_identifiers__,
 lateral (
   select
     __orders__."id"::text as "0",

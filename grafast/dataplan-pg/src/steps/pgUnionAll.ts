@@ -150,7 +150,7 @@ export interface PgUnionAllStepConfig<
   TTypeNames extends string,
 > {
   resourceByTypeName: {
-    [typeName in TTypeNames]: PgResource<any, any, any, any, any>;
+    [typeName in TTypeNames]: PgResource<any, any, any, any, any, any, any>;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
@@ -165,6 +165,8 @@ export interface PgUnionAllStepConfig<
 
   /** @internal */
   _internalCloneSymbol?: symbol | string;
+  /** @internal */
+  _internalCloneExecutionAffinity?: symbol;
   /** @internal */
   _internalCloneAlias?: SQL;
 }
@@ -318,7 +320,7 @@ export class PgUnionAllSingleStep extends Step {
 function toSpecifier([__typename, pkValue, resourceByTypeName]: readonly [
   string,
   string,
-  Record<string, PgResource<any, any, any, any, any>>,
+  Record<string, PgResource<any, any, any, any, any, any, any>>,
 ]) {
   const resource = resourceByTypeName[__typename];
   if (!resource) return null;
@@ -489,6 +491,11 @@ export class PgUnionAllStep<
   private connectionDepId: number | null = null;
 
   public readonly mode: PgUnionAllMode;
+  /**
+   * Used to indicate that clones and related queries should execute via the
+   * same connection to encourage data consistency.
+   */
+  private executionAffinity: symbol | undefined;
 
   protected locker: PgLocker<this> = new PgLocker(this);
 
@@ -508,6 +515,9 @@ export class PgUnionAllStep<
     TAttributes extends string = string,
     TTypeNames extends string = string,
   >(cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>, mode = cloneFrom.mode) {
+    // Associate cloned steps to the same connection
+    cloneFrom.executionAffinity ??= Symbol(cloneFrom.spec.name);
+
     const cloneFromMatchingMode = cloneFrom?.mode === mode ? cloneFrom : null;
     const $clone = new PgUnionAllStep({
       ...cloneFrom.spec,
@@ -517,6 +527,7 @@ export class PgUnionAllStep<
 
       _internalCloneSymbol: cloneFrom.symbol,
       _internalCloneAlias: cloneFrom.alias,
+      _internalCloneExecutionAffinity: cloneFrom.executionAffinity,
     });
 
     if ($clone.dependencyCount !== 0) {
@@ -578,6 +589,7 @@ export class PgUnionAllStep<
         );
       }
       this.spec = spec;
+      this.executionAffinity = spec._internalCloneExecutionAffinity;
       // If the user doesn't specify members, we'll just build membership based
       // on the provided resources.
       const members =
@@ -586,7 +598,7 @@ export class PgUnionAllStep<
           Object.entries(spec.resourceByTypeName) as Array<
             [
               typeName: TTypeNames,
-              resource: PgResource<any, any, any, any, any>,
+              resource: PgResource<any, any, any, any, any, any, any>,
             ]
           >
         ).map(
@@ -1043,6 +1055,7 @@ on (${sql.indent(
       rawSqlValues,
       identifierIndex,
       name,
+      affinity: this.executionAffinity,
       eventEmitter,
       useTransaction: false,
     });
@@ -1768,20 +1781,23 @@ ${unionHaving}\
        * clause.
        */
       const text = `\
+with ${identifiersAliasText} as materialized (
+  select ids.ordinality - 1 as idx${
+    queryValues.length > 0
+      ? `, ${queryValues
+          .map(({ codec }, idx) => {
+            return `(ids.value->>${idx})::${
+              sql.compile(codec.sqlType).text
+            } as "id${idx}"`;
+          })
+          .join(", ")}`
+      : ""
+  } from json_array_elements($${
+    rawSqlValues.length + 1
+  }::json) with ordinality as ids
+)
 select ${wrapperAliasText}.*
-from (select ids.ordinality - 1 as idx${
-        queryValues.length > 0
-          ? `, ${queryValues
-              .map(({ codec }, idx) => {
-                return `(ids.value->>${idx})::${
-                  sql.compile(codec.sqlType).text
-                } as "id${idx}"`;
-              })
-              .join(", ")}`
-          : ""
-      } from json_array_elements($${
-        rawSqlValues.length + 1
-      }::json) with ordinality as ids) as ${identifiersAliasText},
+from ${identifiersAliasText},
 ${lateralText};`;
 
       return {
