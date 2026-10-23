@@ -1,5 +1,71 @@
 # pgl
 
+## 5.0.2
+
+### Patch Changes
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+- Updated dependencies
+  [[`8fc04f0`](https://github.com/graphile/crystal/commit/8fc04f0ecf8bfaac713992b494b94f61f942630b),
+  [`854e98a`](https://github.com/graphile/crystal/commit/854e98aa7f81bf85a879d7ac85ae30c807cfc7c3),
+  [`7c39592`](https://github.com/graphile/crystal/commit/7c39592b14290536d9db19ad811e89e7eef3388c),
+  [`85a3d1c`](https://github.com/graphile/crystal/commit/85a3d1c4610c4e74086d6cb1f05ed25e8904da02),
+  [`26a3fc4`](https://github.com/graphile/crystal/commit/26a3fc47952afe75eaafa647249f197ce06ee10e),
+  [`ead97bc`](https://github.com/graphile/crystal/commit/ead97bc8071b2f4272ba8faf9ae86e302408359a),
+  [`92978f3`](https://github.com/graphile/crystal/commit/92978f39316da4e18c619be255d775d0e29843f7),
+  [`f309fd7`](https://github.com/graphile/crystal/commit/f309fd716ebf1aaa21ef0b3c8ef0b25c7772953e),
+  [`80545aa`](https://github.com/graphile/crystal/commit/80545aa82b3c108f4738b61579bc5dbfbbd63917),
+  [`fac3cd3`](https://github.com/graphile/crystal/commit/fac3cd3d10c1501fc7decf55c634ff1dd79d10a2),
+  [`e991bd8`](https://github.com/graphile/crystal/commit/e991bd887243bb7cac6426e3e1c54e2ebb0ccc31),
+  [`631ed94`](https://github.com/graphile/crystal/commit/631ed94ec6a26c0016ef60fc561b612139b7460c),
+  [`e8709d1`](https://github.com/graphile/crystal/commit/e8709d1ed9cf883d0a434d36915a1e1b82291f0a),
+  [`c7dfb07`](https://github.com/graphile/crystal/commit/c7dfb072592ac0a706b2a2b2d27307fe4db3fbbe),
+  [`901c0d1`](https://github.com/graphile/crystal/commit/901c0d1e508f445b03bf848fdf38793aaff2194a),
+  [`061e9b2`](https://github.com/graphile/crystal/commit/061e9b22ed8bc4b514de6a1e670a131628a3f27c),
+  [`cfda9fa`](https://github.com/graphile/crystal/commit/cfda9fa6905a6f6eeca12e77bfb1f13024368283),
+  [`a531205`](https://github.com/graphile/crystal/commit/a531205c0022e45f39f16bc53018b6d0ee7fe1fa),
+  [`261078d`](https://github.com/graphile/crystal/commit/261078dc4839e00048e8bb6a8e27bb91374c56a0),
+  [`2ab53f8`](https://github.com/graphile/crystal/commit/2ab53f8e81e88206ee3f5d79f634d959bc4558d5),
+  [`90810f5`](https://github.com/graphile/crystal/commit/90810f52024bb2ab006864a5701b4df99be5e1a1),
+  [`03251c3`](https://github.com/graphile/crystal/commit/03251c370f5b7fa1c6e1573aa771033d3d09cb16),
+  [`0c73163`](https://github.com/graphile/crystal/commit/0c73163f8f543ec7ef709f177346341506d6daf7),
+  [`753ee63`](https://github.com/graphile/crystal/commit/753ee63dbf96d9eb536a67eede6a9f09f0f12e24),
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc),
+  [`0ea54a4`](https://github.com/graphile/crystal/commit/0ea54a423f7e2f3d802a2f98099427a7c24bd898),
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc),
+  [`bd44c67`](https://github.com/graphile/crystal/commit/bd44c67fd675a16d5c96d71be20604d2fe0c5ab9),
+  [`23fe156`](https://github.com/graphile/crystal/commit/23fe156e14ac3971ac71d33b230b6340252aa5fa),
+  [`6856d78`](https://github.com/graphile/crystal/commit/6856d7836d6b88d545b0f5b2b8c23bad2da937b1),
+  [`582e349`](https://github.com/graphile/crystal/commit/582e3497e2cb665f73be581da775d0b5e4577473),
+  [`92dbe1b`](https://github.com/graphile/crystal/commit/92dbe1b1d9acf696df84322f31ab05c77d09c578),
+  [`e529f24`](https://github.com/graphile/crystal/commit/e529f2454f5f899f29ff156ecb7f242ea43b7753),
+  [`4b948fc`](https://github.com/graphile/crystal/commit/4b948fc7a440887ee35f43e22fa0ae0f420ec3c1),
+  [`3953e87`](https://github.com/graphile/crystal/commit/3953e87e72096281bb6b0edb8b3c96b6c05a8961),
+  [`f0efc90`](https://github.com/graphile/crystal/commit/f0efc90930ffb1c43e3dab63c21a5b244bf2f94c),
+  [`f47ce6d`](https://github.com/graphile/crystal/commit/f47ce6d2a541e937713c930f69936d2ce66ff756),
+  [`56ae052`](https://github.com/graphile/crystal/commit/56ae0524d74b9162b433afb4cc32b23e69a97bd7),
+  [`92b3ddf`](https://github.com/graphile/crystal/commit/92b3ddfaac44b273757c263529b41fd7bd25aaeb),
+  [`a38b59f`](https://github.com/graphile/crystal/commit/a38b59fecdfef010aab86ece61c64d42f152a166),
+  [`18bbd00`](https://github.com/graphile/crystal/commit/18bbd00b85dd32b248e5832bafa5d2202402c96c)]:
+  - grafast@1.2.0
+  - postgraphile@5.2.0
+  - @dataplan/pg@1.2.0
+  - graphile-build-pg@5.2.0
+  - @dataplan/json@1.0.2
+  - @graphile/lru@5.0.1
+  - grafserv@1.0.3
+  - graphile-build@5.2.0
+  - graphile-config@1.1.2
+  - pg-introspection@1.0.2
+  - pg-sql2@5.0.2
+  - tamedevil@0.1.2
+
 ## 5.0.1
 
 ### Patch Changes

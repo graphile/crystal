@@ -1,6 +1,6 @@
 {
   "name": "graphql-codegen-grafast",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A GraphQL code generator plugin for Grafast schemas",
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
