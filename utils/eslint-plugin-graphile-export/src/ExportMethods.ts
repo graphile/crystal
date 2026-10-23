@@ -4,6 +4,7 @@ import type { Node as ESTreeNode } from "estree";
 
 import { reportProblem } from "./common.ts";
 import { hasExportableParent } from "./NoNested.ts";
+import { getPhysicalFilename } from "./utils.ts";
 
 const dev = process.env.GRAPHILE_ENV === "development";
 
@@ -244,7 +245,7 @@ function processNode(
           console.debug(
             `Spotted '${match}' on object defined at ${
               parentObject.loc
-                ? `${context.getPhysicalFilename()}:${
+                ? `${getPhysicalFilename(context)}:${
                     parentObject.loc.start.line
                   }:${parentObject.loc.start.column}`
                 : "unknown location"
