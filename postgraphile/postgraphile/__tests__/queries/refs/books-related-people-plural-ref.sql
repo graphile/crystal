@@ -5,7 +5,7 @@ from "refs"."books" as __books__
 order by __books__."id" asc;
 
 with __people_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from unnest($1::"int4"[]) with ordinality as ids(id0, ordinality)
 )
 select __people_result__.*
 from __people_identifiers__,

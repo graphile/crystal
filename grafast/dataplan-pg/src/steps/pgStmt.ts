@@ -701,6 +701,61 @@ export const EMPTY_OBJECT: Readonly<Record<string, never>> = Object.freeze(
   Object.create(null),
 );
 
+function unnestsToOneColumn(codec: PgCodec): boolean {
+  let innerCodec = codec;
+  while (innerCodec.domainOfCodec != null) {
+    innerCodec = innerCodec.domainOfCodec;
+  }
+  return innerCodec.arrayOfCodec == null && innerCodec.attributes == null;
+}
+
+/**
+ * How many typed arrays carry a batch's identifiers (one per identifier
+ * column), or null if they travel as JSON. Postgres estimates `unnest` of an
+ * array at its real length (10 in a generic plan) but `json_to_recordset` at
+ * 100 rows, which can tip it into scanning the whole table instead of probing
+ * its index. JSON-y, array and composite identifiers stay in JSON: `unnest`
+ * would flatten an array and expand a composite.
+ *
+ * @internal
+ */
+export function identifierArrayCount(
+  queryValues: readonly QueryValue[],
+): number | null {
+  if (queryValues.length === 0) return null;
+  for (const qv of queryValues) {
+    if (qv.codecIsJsony || !unnestsToOneColumn(qv.codec)) return null;
+  }
+  return queryValues.length;
+}
+
+/**
+ * The body of a batched query's identifiers CTE: one row per identifier
+ * record, with its `idx` and its typed `id0`, `id1`, ... columns. The
+ * identifiers are the placeholders from `$firstPlaceholder` onwards.
+ *
+ * @internal
+ */
+export function identifiersQuery(
+  queryValues: readonly QueryValue[],
+  firstPlaceholder: number,
+): string {
+  if (queryValues.length === 0) {
+    // We've just been instructed to repeat this N times, so generate_series should suffice
+    return `select ids.idx from generate_series(0, json_array_length($${firstPlaceholder}::json) - 1) as ids(idx)`;
+  }
+  const columns = queryValues.map((_, idx) => `id${idx}`);
+  const types = queryValues.map((qv) => sql.compile(qv.codec.sqlType).text);
+  if (identifierArrayCount(queryValues) !== null) {
+    return `select ids.ordinality - 1 as idx, ${columns.map((column) => `ids.${column}`).join(", ")} from unnest(${types
+      .map((type, idx) => `$${firstPlaceholder + idx}::${type}[]`)
+      .join(", ")}) with ordinality as ids(${columns.join(", ")}, ordinality)`;
+  }
+  return `select ids.ordinality - 1 as idx, ${columns.map((column) => `ids.${column}`).join(", ")} from rows from (json_to_recordset($${firstPlaceholder}::json) as (${columns
+    .map((column, idx) => `${column} ${types[idx]}`)
+    .join(", ")})) with ordinality as ids`;
+}
+
 export function makeMakeQueryValues(
   rawQueryValues: readonly QueryValue[],
   values: readonly ExecutionValue[],

@@ -167,6 +167,11 @@ export type PgExecutorOptions = {
   text: string;
   rawSqlValues: Array<SQLRawValue>;
   identifierIndex?: number | null;
+  /**
+   * When set, the query reads its identifiers from this many typed arrays,
+   * one per identifier column, rather than from one JSON array of records.
+   */
+  identifierArrays?: number | null;
   name?: string;
   /**
    * Execution requests that share the same affinity hint that they should be
@@ -208,6 +213,32 @@ type QueryQueueState = {
 
 function getSignature(text: string): string {
   return text; // TODO: make signature smarter
+}
+
+/**
+ * The SQL values for a batch's identifiers: one array per identifier column
+ * when the query unnests typed arrays (`identifierArrays`), otherwise one JSON
+ * array of the identifier records.
+ */
+function identifierSqlValues(
+  identifierArrays: number | null | undefined,
+  identifiersJSONs: readonly string[],
+  queryValuesList: ReadonlyArray<Record<string, unknown>>,
+): SQLRawValue[] {
+  if (identifierArrays == null) {
+    // Manual JSON-ing
+    return ["[" + identifiersJSONs.join(",") + "]"];
+  }
+  const arrays: SQLRawValue[][] = [];
+  for (let idx = 0; idx < identifierArrays; idx++) {
+    const key = `id${idx}`;
+    arrays.push(
+      queryValuesList.map(
+        (queryValues) => (queryValues[key] ?? null) as SQLRawValue,
+      ),
+    );
+  }
+  return arrays;
 }
 
 function queueMatches(
@@ -681,7 +712,8 @@ ${duration}
   ): Promise<{
     values: GrafastValuesList<ReadonlyArray<TOutput>>;
   }> {
-    const { rawSqlValues, identifierIndex, eventEmitter } = common;
+    const { rawSqlValues, identifierIndex, identifierArrays, eventEmitter } =
+      common;
 
     const publishExecute: PublishFunction | undefined = eventEmitter
       ? (text, name, explain) => {
@@ -765,6 +797,7 @@ ${duration}
            * The `identifiersJSON` (`JSON.stringify(queryValues)`) that don't exist in the cache currently.
            */
           const remaining: string[] = [];
+          const remainingQueryValues: Array<Record<string, unknown>> = [];
           const remainingDeferreds: Array<PromiseWithResolvers<any[]>> = [];
 
           try {
@@ -805,6 +838,7 @@ ${duration}
                 results[resultIndex] = pendingResult.promise;
                 scopedCache.set(identifiersJSON, pendingResult);
                 remaining.push(identifiersJSON);
+                remainingQueryValues.push(queryValues);
                 remainingDeferreds.push(pendingResult);
               }
             }
@@ -817,8 +851,11 @@ ${duration}
                   ? rawSqlValues
                   : [
                       ...rawSqlValues,
-                      // Manual JSON-ing
-                      "[" + remaining.join(",") + "]",
+                      ...identifierSqlValues(
+                        identifierArrays,
+                        remaining,
+                        remainingQueryValues,
+                      ),
                     ];
 
               // PERF: we could probably make this more efficient by grouping the
@@ -916,7 +953,7 @@ ${duration}
   ): Promise<{
     streams: Array<AsyncIterable<TOutput> | PromiseLike<never>>;
   }> {
-    const { text, rawSqlValues, identifierIndex } = common;
+    const { text, rawSqlValues, identifierIndex, identifierArrays } = common;
 
     const valuesCount = values.length;
     const streams: Array<AsyncIterable<TOutput> | Promise<never> | null> = [];
@@ -998,8 +1035,13 @@ ${duration}
             ? rawSqlValues
             : [
                 ...rawSqlValues,
-                // Manual JSON-ing
-                "[" + remaining.join(",") + "]",
+                ...identifierSqlValues(
+                  identifierArrays,
+                  remaining,
+                  batchIndexesByValueIndex.map(
+                    ([batchIndex]) => batch[batchIndex].queryValues,
+                  ),
+                ),
               ];
 
         // Maximum PostgreSQL identifier length is typically 63 bytes.

@@ -72,7 +72,7 @@ where
   );
 
 with __users_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "uuid")) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from unnest($1::"uuid"[]) with ordinality as ids(id0, ordinality)
 )
 select __users_result__.*
 from __users_identifiers__,

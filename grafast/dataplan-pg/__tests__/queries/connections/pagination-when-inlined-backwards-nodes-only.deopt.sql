@@ -10,7 +10,7 @@ order by __forums__."id" asc
 limit 2;
 
 with __messages_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from rows from (json_to_recordset($1::json) as (id0 "uuid", id1 "timestamptz")) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from unnest($1::"uuid"[], $2::"timestamptz"[]) with ordinality as ids(id0, id1, ordinality)
 )
 select __messages_result__.*
 from __messages_identifiers__,
@@ -32,7 +32,7 @@ lateral (
 ) as __messages_result__;
 
 with __messages_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from rows from (json_to_recordset($1::json) as (id0 "uuid", id1 "timestamptz")) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from unnest($1::"uuid"[], $2::"timestamptz"[]) with ordinality as ids(id0, id1, ordinality)
 )
 select __messages_result__.*
 from __messages_identifiers__,
@@ -50,7 +50,7 @@ lateral (
 ) as __messages_result__;
 
 with __users_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "uuid")) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from unnest($1::"uuid"[]) with ordinality as ids(id0, ordinality)
 )
 select __users_result__.*
 from __users_identifiers__,

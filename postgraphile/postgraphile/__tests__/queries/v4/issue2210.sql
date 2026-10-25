@@ -8,7 +8,7 @@ from "issue_2210"."some_messages"($1::"uuid") as __some_messages__
 limit 51;
 
 with __test_user_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "uuid")) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from unnest($1::"uuid"[]) with ordinality as ids(id0, ordinality)
 )
 select __test_user_result__.*
 from __test_user_identifiers__,

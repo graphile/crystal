@@ -95,6 +95,8 @@ import {
   EMPTY_OBJECT,
   encodeQueryValueForJsonToRecordset,
   getUnary,
+  identifierArrayCount,
+  identifiersQuery,
   makeMakeQueryValues,
   makeValues,
   PgStmtBaseStep,
@@ -1227,6 +1229,8 @@ export class PgSelectStep<
     }
     const context = values[this.contextId].unaryValue();
     const makeQueryValues = makeMakeQueryValues(rawQueryValues, values);
+    const identifierArrays =
+      identifierIndex == null ? null : identifierArrayCount(rawQueryValues);
 
     const isMutation = this.mode === "mutation";
     /**
@@ -1316,6 +1320,7 @@ export class PgSelectStep<
               text,
               rawSqlValues,
               identifierIndex,
+              identifierArrays,
               name,
               affinity: this.executionAffinity,
               eventEmitter,
@@ -1370,6 +1375,7 @@ export class PgSelectStep<
               text,
               rawSqlValues,
               identifierIndex,
+              identifierArrays,
               eventEmitter,
             })
           ).values
@@ -1388,6 +1394,7 @@ export class PgSelectStep<
           text: textForDeclare,
           rawSqlValues: rawSqlValuesForDeclare,
           identifierIndex,
+          identifierArrays,
           eventEmitter,
         })
       ).streams;
@@ -3453,16 +3460,7 @@ function buildTheQuery<
        */
       const text = `\
 with ${identifiersAliasText} as materialized (
-  ${
-    queryValues.length === 0
-      ? // We've just been instructed to repeat this N times, so generate_series should suffice
-        `select ids.idx from generate_series(0, json_array_length($${
-          rawSqlValues.length + 1
-        }::json) - 1) as ids(idx)`
-      : `select ids.ordinality - 1 as idx, ${queryValues.map((_, idx) => `ids.id${idx}`).join(", ")} from rows from (json_to_recordset($${rawSqlValues.length + 1}::json) as (${queryValues
-          .map((qv, idx) => `id${idx} ${sql.compile(qv.codec.sqlType).text}`)
-          .join(", ")})) with ordinality as ids`
-  }
+  ${identifiersQuery(queryValues, rawSqlValues.length + 1)}
 )
 select ${wrapperAliasText}.*
 from ${identifiersAliasText},
