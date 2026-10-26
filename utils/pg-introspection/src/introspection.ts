@@ -44,13 +44,18 @@ export type EntityType =
   | "stat_user_tables"
   | "am";
 
+export interface Options<TEntities extends EntityType = EntityType> {
+  onlyEntities?: TEntities[];
+}
+
 export interface EntityTypeConfig {
   tableName: string;
   alias: EntityType;
+  requires?: EntityType[];
   catalogName?: string;
   singular?: boolean;
   oids: boolean;
-  where: string | null;
+  where: string | ((options: Options) => string) | null;
   order: string | null;
   columns?: string[];
   extraColumns?: {
@@ -90,6 +95,7 @@ export const ENTITY_TYPES: {
   classes: {
     tableName: "pg_class",
     alias: "classes",
+    requires: ["namespaces"],
     oids: true,
     where:
       "relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
@@ -104,6 +110,7 @@ export const ENTITY_TYPES: {
   attributes: {
     tableName: "pg_attribute",
     alias: "attributes",
+    requires: ["classes"],
     oids: false,
     where: "attrelid in (select classes._id from classes) AND attnum > 0",
     order: "attrelid, attnum",
@@ -119,6 +126,7 @@ export const ENTITY_TYPES: {
   constraints: {
     tableName: "pg_constraint",
     alias: "constraints",
+    requires: ["namespaces"],
     oids: true,
     where:
       "connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
@@ -138,6 +146,7 @@ export const ENTITY_TYPES: {
   procs: {
     tableName: "pg_proc",
     alias: "procs",
+    requires: ["namespaces"],
     oids: true,
     where: `pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
     and prorettype operator(pg_catalog.<>) 2279`,
@@ -148,6 +157,7 @@ export const ENTITY_TYPES: {
   aggregates: {
     tableName: "pg_aggregate",
     alias: "aggregates",
+    requires: ["procs"],
     oids: false,
     where: "aggfnoid in (select procs._id from procs)",
     order: "aggfnoid",
@@ -162,6 +172,7 @@ export const ENTITY_TYPES: {
   db_role_settings: {
     tableName: "pg_db_role_setting",
     alias: "db_role_settings",
+    requires: ["database"],
     oids: false,
     where: "setdatabase in (select database._id from database)",
     order: "setdatabase, setrole",
@@ -169,6 +180,7 @@ export const ENTITY_TYPES: {
   auth_members: {
     tableName: "pg_auth_members",
     alias: "auth_members",
+    requires: ["roles"],
     oids: false,
     where: "roleid in (select roles._id from roles)",
     order: "roleid, member, grantor",
@@ -183,6 +195,7 @@ export const ENTITY_TYPES: {
   types: {
     tableName: "pg_type",
     alias: "types",
+    requires: ["namespaces"],
     oids: true,
     where: `(typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%'))
     or (typnamespace = 'pg_catalog'::regnamespace)`,
@@ -192,6 +205,7 @@ export const ENTITY_TYPES: {
   enums: {
     tableName: "pg_enum",
     alias: "enums",
+    requires: ["types"],
     oids: true,
     where: "enumtypid in (select types._id from types)",
     order: "enumtypid, enumsortorder",
@@ -220,6 +234,7 @@ export const ENTITY_TYPES: {
   foreign_servers: {
     tableName: "pg_foreign_server",
     alias: "foreign_servers",
+    requires: ["foreign_data_wrappers"],
     oids: true,
     where:
       "srvfdw in (select foreign_data_wrappers._id from foreign_data_wrappers)",
@@ -228,6 +243,7 @@ export const ENTITY_TYPES: {
   foreign_tables: {
     tableName: "pg_foreign_table",
     alias: "foreign_tables",
+    requires: ["foreign_servers"],
     oids: false,
     where: "ftserver in (select foreign_servers._id from foreign_servers)",
     order: "ftrelid, ftserver",
@@ -235,6 +251,7 @@ export const ENTITY_TYPES: {
   indexes: {
     tableName: "pg_index",
     alias: "indexes",
+    requires: ["classes"],
     oids: false,
     where: "indrelid in (select classes._id from classes)",
     order: "indrelid, indexrelid",
@@ -243,6 +260,7 @@ export const ENTITY_TYPES: {
   inherits: {
     tableName: "pg_inherits",
     alias: "inherits",
+    requires: ["classes"],
     oids: false,
     where: "inhrelid in (select classes._id from classes)",
     order: "inhrelid, inhseqno",
@@ -257,6 +275,7 @@ export const ENTITY_TYPES: {
   policies: {
     tableName: "pg_policy",
     alias: "policies",
+    requires: ["classes"],
     oids: false,
     where: "polrelid in (select classes._id from classes)",
     order: "polrelid, polname",
@@ -265,6 +284,7 @@ export const ENTITY_TYPES: {
   ranges: {
     tableName: "pg_range",
     alias: "ranges",
+    requires: ["types"],
     oids: false,
     where: "rngtypid in (select types._id from types)",
     order: "rngtypid",
@@ -272,6 +292,7 @@ export const ENTITY_TYPES: {
   rewrites: {
     tableName: "pg_rewrite",
     alias: "rewrites",
+    requires: ["classes"],
     oids: true,
     where: "ev_class in (select classes._id from classes)",
     order: "ev_class,ev_type,rulename",
@@ -280,6 +301,7 @@ export const ENTITY_TYPES: {
   triggers: {
     tableName: "pg_trigger",
     alias: "triggers",
+    requires: ["classes"],
     oids: true,
     where: "tgrelid in (select classes._id from classes where relkind = 'r')",
     order: "tgrelid, tgname",
@@ -289,40 +311,21 @@ export const ENTITY_TYPES: {
     tableName: "pg_depend",
     alias: "depends",
     oids: false,
-    where: `deptype IN ('a', 'e') and (
-      (classid = 'pg_catalog.pg_namespace'::regclass and objid in (select namespaces._id from namespaces))
-      or (classid = 'pg_catalog.pg_class'::regclass and objid in (select classes._id from classes))
-      or (classid = 'pg_catalog.pg_attribute'::regclass and objid in (select classes._id from classes) and objsubid > 0)
-      or (classid = 'pg_catalog.pg_constraint'::regclass and objid in (select constraints._id from constraints))
-      or (classid = 'pg_catalog.pg_proc'::regclass and objid in (select procs._id from procs))
-      or (classid = 'pg_catalog.pg_type'::regclass and objid in (select types._id from types))
-      or (classid = 'pg_catalog.pg_enum'::regclass and objid in (select enums._id from enums))
-      or (classid = 'pg_catalog.pg_extension'::regclass and objid in (select extensions._id from extensions))
-      or (classid = 'pg_catalog.pg_foreign_data_wrapper'::regclass and objid in (select foreign_data_wrappers._id from foreign_data_wrappers))
-      or (classid = 'pg_catalog.pg_foreign_server'::regclass and objid in (select foreign_servers._id from foreign_servers))
-      or (classid = 'pg_catalog.pg_rewrite'::regclass and objid in (select rewrites._id from rewrites))
-      or (classid = 'pg_catalog.pg_trigger'::regclass and objid in (select triggers._id from triggers))
-    )`,
+    where: (options) =>
+      `deptype IN ('a', 'e') and ${catalogObjectIsRelevant(
+        options,
+        "classid",
+        "objid",
+        "objsubid",
+      )}`,
     order: "classid, objid, objsubid, refclassid, refobjid, refobjsubid",
   },
   descriptions: {
     tableName: "pg_description",
     alias: "descriptions",
     oids: false,
-    where: `(
-      (classoid = 'pg_catalog.pg_namespace'::regclass and objoid in (select namespaces._id from namespaces))
-      or (classoid = 'pg_catalog.pg_class'::regclass and objoid in (select classes._id from classes))
-      or (classoid = 'pg_catalog.pg_attribute'::regclass and objoid in (select classes._id from classes) and objsubid > 0)
-      or (classoid = 'pg_catalog.pg_constraint'::regclass and objoid in (select constraints._id from constraints))
-      or (classoid = 'pg_catalog.pg_proc'::regclass and objoid in (select procs._id from procs))
-      or (classoid = 'pg_catalog.pg_type'::regclass and objoid in (select types._id from types))
-      or (classoid = 'pg_catalog.pg_enum'::regclass and objoid in (select enums._id from enums))
-      or (classoid = 'pg_catalog.pg_extension'::regclass and objoid in (select extensions._id from extensions))
-      or (classoid = 'pg_catalog.pg_foreign_data_wrapper'::regclass and objoid in (select foreign_data_wrappers._id from foreign_data_wrappers))
-      or (classoid = 'pg_catalog.pg_foreign_server'::regclass and objoid in (select foreign_servers._id from foreign_servers))
-      or (classoid = 'pg_catalog.pg_rewrite'::regclass and objoid in (select rewrites._id from rewrites))
-      or (classoid = 'pg_catalog.pg_trigger'::regclass and objoid in (select triggers._id from triggers))
-    )`,
+    where: (options) =>
+      catalogObjectIsRelevant(options, "classoid", "objoid", "objsubid"),
     order: "objoid, classoid, objsubid",
   },
   stat_user_tables: {
@@ -340,6 +343,95 @@ export const ENTITY_TYPES: {
     order: "amname",
   },
 };
+
+function catalogObjectIsRelevant(
+  options: Options,
+  catalogOidColumn: string,
+  objectOidColumn: string,
+  objectSubIdColumn: string,
+): string {
+  const { onlyEntities } = options;
+  const has = (alias: EntityType) => {
+    return onlyEntities ? onlyEntities.includes(alias) : true;
+  };
+  return (
+    "(\n      (" +
+    [
+      has("namespaces") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_namespace'::regclass and ${oidFilter(
+          objectOidColumn,
+          "namespaces",
+        )}`,
+      has("classes") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_class'::regclass and ${oidFilter(
+          objectOidColumn,
+          "classes",
+        )}`,
+      has("classes") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_attribute'::regclass and ${oidFilter(
+          objectOidColumn,
+          "classes",
+        )}` + (objectSubIdColumn ? ` and ${objectSubIdColumn} > 0` : ""),
+      has("constraints") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_constraint'::regclass and ${oidFilter(
+          objectOidColumn,
+          "constraints",
+        )}`,
+      has("procs") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_proc'::regclass and ${oidFilter(
+          objectOidColumn,
+          "procs",
+        )}`,
+      has("types") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_type'::regclass and ${oidFilter(
+          objectOidColumn,
+          "types",
+        )}`,
+      has("enums") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_enum'::regclass and ${oidFilter(
+          objectOidColumn,
+          "enums",
+        )}`,
+      has("extensions") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_extension'::regclass and ${oidFilter(
+          objectOidColumn,
+          "extensions",
+        )}`,
+      has("foreign_data_wrappers") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_foreign_data_wrapper'::regclass and ${oidFilter(
+          objectOidColumn,
+          "foreign_data_wrappers",
+        )}`,
+      has("foreign_servers") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_foreign_server'::regclass and ${oidFilter(
+          objectOidColumn,
+          "foreign_servers",
+        )}`,
+      has("rewrites") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_rewrite'::regclass and ${oidFilter(
+          objectOidColumn,
+          "rewrites",
+        )}`,
+      has("triggers") &&
+        `${catalogOidColumn} = 'pg_catalog.pg_trigger'::regclass and ${oidFilter(
+          objectOidColumn,
+          "triggers",
+        )}`,
+    ]
+      .filter(Boolean)
+      .join(")\n      or (") +
+    ")\n    )"
+  );
+}
+function oidFilter(
+  col: string,
+  collection: string,
+  additionalWhere?: string,
+): string {
+  return `${col} in (select ${collection}._id from ${collection}${
+    additionalWhere ? ` where ${additionalWhere}` : ""
+  })`;
+}
 
 /**
  * The catalog pg_database stores information about the available databases. Databases are created with the CREATE
