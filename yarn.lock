@@ -5893,6 +5893,72 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@localrepo/graphile-crystal@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@localrepo/graphile-crystal@workspace:."
+  dependencies:
+    "@babel/cli": "npm:^7.28.3"
+    "@babel/core": "npm:^7.29.6"
+    "@babel/eslint-parser": "npm:^7.28.5"
+    "@babel/plugin-syntax-object-rest-spread": "npm:^7.8.3"
+    "@babel/plugin-transform-modules-commonjs": "npm:^7.27.1"
+    "@babel/plugin-transform-runtime": "npm:^7.28.5"
+    "@babel/preset-env": "npm:^7.28.5"
+    "@babel/preset-react": "npm:^7.28.5"
+    "@babel/preset-typescript": "npm:^7.28.5"
+    "@changesets/changelog-github": "npm:^0.5.1"
+    "@changesets/cli": "npm:^2.29.7"
+    "@eslint/compat": "npm:^2.0.0"
+    "@eslint/eslintrc": "npm:^3.3.1"
+    "@eslint/js": "npm:^9.39.1"
+    "@graphql-codegen/visitor-plugin-common": "npm:^6.2.0"
+    "@graphql-eslint/eslint-plugin": "npm:^4.4.0"
+    "@localrepo/prettier2-for-jest": "npm:prettier@^2"
+    "@tsconfig/node22": "npm:^22.0.5"
+    "@types/jest": "npm:^30.0.0"
+    "@types/jscodeshift": "npm:^17.3.0"
+    "@types/mock-fs": "npm:4.13.4"
+    "@types/node": "npm:^22.19.1"
+    "@types/rimraf": "npm:^4.0.5"
+    "@types/ws": "npm:^8.18.1"
+    "@typescript-eslint/parser": "npm:^8.47.0"
+    babel-jest: "npm:^30.2.0"
+    babel-plugin-transform-import-meta: "npm:^2.3.3"
+    concurrently: "npm:^9.2.1"
+    eslint: "npm:^9.39.1"
+    eslint-config-prettier: "npm:^10.1.8"
+    eslint-import-resolver-typescript: "npm:^4.4.4"
+    eslint-plugin-import: "npm:^2.32.0"
+    eslint-plugin-jest: "npm:^28.14.0"
+    eslint-plugin-jsx-a11y: "npm:^6.10.2"
+    eslint-plugin-react: "npm:^7.37.5"
+    eslint-plugin-react-hooks: "npm:^5.2.0"
+    eslint-plugin-simple-import-sort: "npm:^12.1.1"
+    eslint-plugin-tsdoc: "npm:^0.5.0"
+    eslint_d: "npm:^14.3.0"
+    glob: "npm:^13.0.0"
+    globals: "npm:^16.5.0"
+    graphql: "npm:^16.9.0"
+    graphql-ws: "npm:^6.0.5"
+    jest: "npm:^30.2.0"
+    jscodeshift: "npm:^17.3.0"
+    mock-fs: "npm:^5.5.0"
+    pg: "npm:^8.16.3"
+    prettier: "npm:^3.6.2"
+    rimraf: "npm:^6.1.2"
+    typescript: "npm:^5.9.3"
+    typescript-eslint: "npm:^8.47.0"
+    webpack: "npm:^5.103.0"
+    ws: "npm:^8.21.1"
+    zx: "npm:^8.8.5"
+  dependenciesMeta:
+    sqlite3:
+      built: true
+    unrs-resolver:
+      built: true
+  languageName: unknown
+  linkType: soft
+
 "@localrepo/postgraphile-website@workspace:postgraphile/website":
   version: 0.0.0-use.local
   resolution: "@localrepo/postgraphile-website@workspace:postgraphile/website"
@@ -23194,72 +23260,6 @@ __metadata:
   checksum: 10c0/4ecd53649f1c2d49529c85518f2fa69ffb2f7a4453f7fd19c042421c7b4d76c3efb48bc1c740c8f7049346d7cb58cf08ee0c9adaae595cc23564d360adb1fde4
   languageName: node
   linkType: hard
-
-"root-workspace-0b6124@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "root-workspace-0b6124@workspace:."
-  dependencies:
-    "@babel/cli": "npm:^7.28.3"
-    "@babel/core": "npm:^7.29.6"
-    "@babel/eslint-parser": "npm:^7.28.5"
-    "@babel/plugin-syntax-object-rest-spread": "npm:^7.8.3"
-    "@babel/plugin-transform-modules-commonjs": "npm:^7.27.1"
-    "@babel/plugin-transform-runtime": "npm:^7.28.5"
-    "@babel/preset-env": "npm:^7.28.5"
-    "@babel/preset-react": "npm:^7.28.5"
-    "@babel/preset-typescript": "npm:^7.28.5"
-    "@changesets/changelog-github": "npm:^0.5.1"
-    "@changesets/cli": "npm:^2.29.7"
-    "@eslint/compat": "npm:^2.0.0"
-    "@eslint/eslintrc": "npm:^3.3.1"
-    "@eslint/js": "npm:^9.39.1"
-    "@graphql-codegen/visitor-plugin-common": "npm:^6.2.0"
-    "@graphql-eslint/eslint-plugin": "npm:^4.4.0"
-    "@localrepo/prettier2-for-jest": "npm:prettier@^2"
-    "@tsconfig/node22": "npm:^22.0.5"
-    "@types/jest": "npm:^30.0.0"
-    "@types/jscodeshift": "npm:^17.3.0"
-    "@types/mock-fs": "npm:4.13.4"
-    "@types/node": "npm:^22.19.1"
-    "@types/rimraf": "npm:^4.0.5"
-    "@types/ws": "npm:^8.18.1"
-    "@typescript-eslint/parser": "npm:^8.47.0"
-    babel-jest: "npm:^30.2.0"
-    babel-plugin-transform-import-meta: "npm:^2.3.3"
-    concurrently: "npm:^9.2.1"
-    eslint: "npm:^9.39.1"
-    eslint-config-prettier: "npm:^10.1.8"
-    eslint-import-resolver-typescript: "npm:^4.4.4"
-    eslint-plugin-import: "npm:^2.32.0"
-    eslint-plugin-jest: "npm:^28.14.0"
-    eslint-plugin-jsx-a11y: "npm:^6.10.2"
-    eslint-plugin-react: "npm:^7.37.5"
-    eslint-plugin-react-hooks: "npm:^5.2.0"
-    eslint-plugin-simple-import-sort: "npm:^12.1.1"
-    eslint-plugin-tsdoc: "npm:^0.5.0"
-    eslint_d: "npm:^14.3.0"
-    glob: "npm:^13.0.0"
-    globals: "npm:^16.5.0"
-    graphql: "npm:^16.9.0"
-    graphql-ws: "npm:^6.0.5"
-    jest: "npm:^30.2.0"
-    jscodeshift: "npm:^17.3.0"
-    mock-fs: "npm:^5.5.0"
-    pg: "npm:^8.16.3"
-    prettier: "npm:^3.6.2"
-    rimraf: "npm:^6.1.2"
-    typescript: "npm:^5.9.3"
-    typescript-eslint: "npm:^8.47.0"
-    webpack: "npm:^5.103.0"
-    ws: "npm:^8.21.1"
-    zx: "npm:^8.8.5"
-  dependenciesMeta:
-    sqlite3:
-      built: true
-    unrs-resolver:
-      built: true
-  languageName: unknown
-  linkType: soft
 
 "roughjs@npm:^4.6.6":
   version: 4.6.6
