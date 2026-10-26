@@ -1,7 +1,10 @@
-import type { Options } from "./interfaces.ts";
-import { ENTITY_TYPES, type EntityTypeConfig } from "./introspection.ts";
+import {
+  ENTITY_TYPES,
+  type EntityTypeConfig,
+  type Options,
+} from "./introspection.ts";
 
-export function makeIntrospectionQuery(options: Options = {}) {
+export function makeIntrospectionQuery(rawOptions: Options = {}) {
   const {
     onlyEntities = [
       "database",
@@ -24,7 +27,8 @@ export function makeIntrospectionQuery(options: Options = {}) {
       "policies",
       "am",
     ],
-  } = options;
+  } = rawOptions;
+  const options: Required<Options> = { onlyEntities };
   const withs: string[] = [];
   const jsons: string[] = [];
 
@@ -54,7 +58,7 @@ export function makeIntrospectionQuery(options: Options = {}) {
     from pg_catalog.${tbl}${
       where
         ? `
-    where ${where}`
+    where ${typeof where === "function" ? where(options) : where}`
         : ""
     }
   )`);
@@ -70,6 +74,14 @@ export function makeIntrospectionQuery(options: Options = {}) {
 
   for (const config of Object.values(ENTITY_TYPES)) {
     if (onlyEntities.includes(config.alias)) {
+      if (
+        config.requires &&
+        !config.requires.every((alias) => onlyEntities.includes(alias))
+      ) {
+        throw new Error(
+          `Entity type '${config.alias}' requires entity type(s) '${config.requires.join("', '")}' to be included`,
+        );
+      }
       add(config);
     }
   }

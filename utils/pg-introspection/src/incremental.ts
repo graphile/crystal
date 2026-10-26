@@ -1,5 +1,4 @@
-import type { Options } from "./interfaces";
-import type { EntityType, Introspection } from "./introspection";
+import type { EntityType, Introspection, Options } from "./introspection";
 import { makeIntrospectionQuery } from "./query";
 
 type RunQuery = (text: string, values: any[]) => Promise<string>;
