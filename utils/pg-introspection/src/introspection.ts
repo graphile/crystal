@@ -10,6 +10,337 @@ type PgAclItem = string;
 type PgXid = string;
 type TimestampTZ = string;
 
+export type EntityType =
+  | "database"
+  | "settings"
+  | "namespaces"
+  | "classes"
+  | "attributes"
+  | "attribute_defaults"
+  | "constraints"
+  | "sys_procs"
+  | "procs"
+  | "aggregates"
+  | "roles"
+  | "db_role_settings"
+  | "auth_members"
+  | "default_acls"
+  | "types"
+  | "enums"
+  | "event_triggers"
+  | "extensions"
+  | "foreign_data_wrappers"
+  | "foreign_servers"
+  | "foreign_tables"
+  | "indexes"
+  | "inherits"
+  | "languages"
+  | "policies"
+  | "ranges"
+  | "rewrites"
+  | "triggers"
+  | "depends"
+  | "descriptions"
+  | "stat_user_tables"
+  | "am";
+
+export interface EntityTypeConfig {
+  tableName: string;
+  alias: EntityType;
+  catalogName?: string;
+  singular?: boolean;
+  oids: boolean;
+  where: string | null;
+  order: string | null;
+  columns?: string[];
+  extraColumns?: {
+    [colName: string]: {
+      sql: string;
+      type: string;
+    };
+  };
+}
+
+export const ENTITY_TYPES: {
+  [alias in EntityType]: EntityTypeConfig;
+} = {
+  database: {
+    tableName: "pg_database",
+    alias: "database",
+    singular: true,
+    oids: true,
+    where: "datname = current_database()",
+    order: "datname",
+    extraColumns: {},
+  },
+  settings: {
+    tableName: "pg_settings",
+    alias: "settings",
+    oids: false,
+    where: "true",
+    order: "name",
+  },
+  namespaces: {
+    tableName: "pg_namespace",
+    alias: "namespaces",
+    oids: true,
+    where: "nspname <> 'information_schema'",
+    order: "nspname",
+  },
+  classes: {
+    tableName: "pg_class",
+    alias: "classes",
+    oids: true,
+    where:
+      "relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
+    order: "relnamespace, relname",
+    extraColumns: {
+      updatable_mask: {
+        sql: "pg_catalog.pg_relation_is_updatable(oid, true)::bit(8)::int4",
+        type: "int4",
+      },
+    },
+  },
+  attributes: {
+    tableName: "pg_attribute",
+    alias: "attributes",
+    oids: false,
+    where: "attrelid in (select classes._id from classes) AND attnum > 0",
+    order: "attrelid, attnum",
+  },
+  attribute_defaults: {
+    tableName: "pg_attrdef",
+    alias: "attribute_defaults",
+    oids: true,
+    where: "(adrelid, adnum) in (select attrelid, attnum from attributes)",
+    order: "adrelid, adnum",
+    extraColumns: {},
+  },
+  constraints: {
+    tableName: "pg_constraint",
+    alias: "constraints",
+    oids: true,
+    where:
+      "connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
+    order: "connamespace, conrelid, conname",
+    extraColumns: {},
+  },
+  sys_procs: {
+    tableName: "pg_proc",
+    alias: "sys_procs",
+    catalogName: "PgProcSys",
+    oids: true,
+    where: "pronamespace = 'pg_catalog'::regnamespace",
+    order:
+      "pronamespace, proname, pg_get_function_identity_arguments(sys_procs._id)",
+    columns: ["proname", "pronamespace"],
+  },
+  procs: {
+    tableName: "pg_proc",
+    alias: "procs",
+    oids: true,
+    where: `pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
+    and prorettype operator(pg_catalog.<>) 2279`,
+    order:
+      "pronamespace, proname, pg_get_function_identity_arguments(procs._id)",
+    extraColumns: {},
+  },
+  aggregates: {
+    tableName: "pg_aggregate",
+    alias: "aggregates",
+    oids: false,
+    where: "aggfnoid in (select procs._id from procs)",
+    order: "aggfnoid",
+  },
+  roles: {
+    tableName: "pg_roles",
+    alias: "roles",
+    oids: true,
+    where: null,
+    order: "rolname",
+  },
+  db_role_settings: {
+    tableName: "pg_db_role_setting",
+    alias: "db_role_settings",
+    oids: false,
+    where: "setdatabase in (select database._id from database)",
+    order: "setdatabase, setrole",
+  },
+  auth_members: {
+    tableName: "pg_auth_members",
+    alias: "auth_members",
+    oids: false,
+    where: "roleid in (select roles._id from roles)",
+    order: "roleid, member, grantor",
+  },
+  default_acls: {
+    tableName: "pg_default_acl",
+    alias: "default_acls",
+    oids: true,
+    where: null,
+    order: "defaclrole,defaclnamespace,defaclobjtype",
+  },
+  types: {
+    tableName: "pg_type",
+    alias: "types",
+    oids: true,
+    where: `(typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%'))
+    or (typnamespace = 'pg_catalog'::regnamespace)`,
+    order: "typnamespace, typname",
+    extraColumns: {},
+  },
+  enums: {
+    tableName: "pg_enum",
+    alias: "enums",
+    oids: true,
+    where: "enumtypid in (select types._id from types)",
+    order: "enumtypid, enumsortorder",
+  },
+  event_triggers: {
+    tableName: "pg_event_trigger",
+    alias: "event_triggers",
+    oids: false,
+    where: null,
+    order: "evtname",
+  },
+  extensions: {
+    tableName: "pg_extension",
+    alias: "extensions",
+    oids: true,
+    where: null,
+    order: "extname",
+  },
+  foreign_data_wrappers: {
+    tableName: "pg_foreign_data_wrapper",
+    alias: "foreign_data_wrappers",
+    oids: true,
+    where: null,
+    order: "fdwname",
+  },
+  foreign_servers: {
+    tableName: "pg_foreign_server",
+    alias: "foreign_servers",
+    oids: true,
+    where:
+      "srvfdw in (select foreign_data_wrappers._id from foreign_data_wrappers)",
+    order: "srvname",
+  },
+  foreign_tables: {
+    tableName: "pg_foreign_table",
+    alias: "foreign_tables",
+    oids: false,
+    where: "ftserver in (select foreign_servers._id from foreign_servers)",
+    order: "ftrelid, ftserver",
+  },
+  indexes: {
+    tableName: "pg_index",
+    alias: "indexes",
+    oids: false,
+    where: "indrelid in (select classes._id from classes)",
+    order: "indrelid, indexrelid",
+    extraColumns: {},
+  },
+  inherits: {
+    tableName: "pg_inherits",
+    alias: "inherits",
+    oids: false,
+    where: "inhrelid in (select classes._id from classes)",
+    order: "inhrelid, inhseqno",
+  },
+  languages: {
+    tableName: "pg_language",
+    alias: "languages",
+    oids: true,
+    where: null,
+    order: "lanname",
+  },
+  policies: {
+    tableName: "pg_policy",
+    alias: "policies",
+    oids: false,
+    where: "polrelid in (select classes._id from classes)",
+    order: "polrelid, polname",
+    extraColumns: {},
+  },
+  ranges: {
+    tableName: "pg_range",
+    alias: "ranges",
+    oids: false,
+    where: "rngtypid in (select types._id from types)",
+    order: "rngtypid",
+  },
+  rewrites: {
+    tableName: "pg_rewrite",
+    alias: "rewrites",
+    oids: true,
+    where: "ev_class in (select classes._id from classes)",
+    order: "ev_class,ev_type,rulename",
+    extraColumns: {},
+  },
+  triggers: {
+    tableName: "pg_trigger",
+    alias: "triggers",
+    oids: true,
+    where: "tgrelid in (select classes._id from classes where relkind = 'r')",
+    order: "tgrelid, tgname",
+    extraColumns: {},
+  },
+  depends: {
+    tableName: "pg_depend",
+    alias: "depends",
+    oids: false,
+    where: `deptype IN ('a', 'e') and (
+      (classid = 'pg_catalog.pg_namespace'::regclass and objid in (select namespaces._id from namespaces))
+      or (classid = 'pg_catalog.pg_class'::regclass and objid in (select classes._id from classes))
+      or (classid = 'pg_catalog.pg_attribute'::regclass and objid in (select classes._id from classes) and objsubid > 0)
+      or (classid = 'pg_catalog.pg_constraint'::regclass and objid in (select constraints._id from constraints))
+      or (classid = 'pg_catalog.pg_proc'::regclass and objid in (select procs._id from procs))
+      or (classid = 'pg_catalog.pg_type'::regclass and objid in (select types._id from types))
+      or (classid = 'pg_catalog.pg_enum'::regclass and objid in (select enums._id from enums))
+      or (classid = 'pg_catalog.pg_extension'::regclass and objid in (select extensions._id from extensions))
+      or (classid = 'pg_catalog.pg_foreign_data_wrapper'::regclass and objid in (select foreign_data_wrappers._id from foreign_data_wrappers))
+      or (classid = 'pg_catalog.pg_foreign_server'::regclass and objid in (select foreign_servers._id from foreign_servers))
+      or (classid = 'pg_catalog.pg_rewrite'::regclass and objid in (select rewrites._id from rewrites))
+      or (classid = 'pg_catalog.pg_trigger'::regclass and objid in (select triggers._id from triggers))
+    )`,
+    order: "classid, objid, objsubid, refclassid, refobjid, refobjsubid",
+  },
+  descriptions: {
+    tableName: "pg_description",
+    alias: "descriptions",
+    oids: false,
+    where: `(
+      (classoid = 'pg_catalog.pg_namespace'::regclass and objoid in (select namespaces._id from namespaces))
+      or (classoid = 'pg_catalog.pg_class'::regclass and objoid in (select classes._id from classes))
+      or (classoid = 'pg_catalog.pg_attribute'::regclass and objoid in (select classes._id from classes) and objsubid > 0)
+      or (classoid = 'pg_catalog.pg_constraint'::regclass and objoid in (select constraints._id from constraints))
+      or (classoid = 'pg_catalog.pg_proc'::regclass and objoid in (select procs._id from procs))
+      or (classoid = 'pg_catalog.pg_type'::regclass and objoid in (select types._id from types))
+      or (classoid = 'pg_catalog.pg_enum'::regclass and objoid in (select enums._id from enums))
+      or (classoid = 'pg_catalog.pg_extension'::regclass and objoid in (select extensions._id from extensions))
+      or (classoid = 'pg_catalog.pg_foreign_data_wrapper'::regclass and objoid in (select foreign_data_wrappers._id from foreign_data_wrappers))
+      or (classoid = 'pg_catalog.pg_foreign_server'::regclass and objoid in (select foreign_servers._id from foreign_servers))
+      or (classoid = 'pg_catalog.pg_rewrite'::regclass and objoid in (select rewrites._id from rewrites))
+      or (classoid = 'pg_catalog.pg_trigger'::regclass and objoid in (select triggers._id from triggers))
+    )`,
+    order: "objoid, classoid, objsubid",
+  },
+  stat_user_tables: {
+    tableName: "pg_stat_user_tables",
+    alias: "stat_user_tables",
+    oids: false,
+    where: "relid in (select _id from classes)",
+    order: "schemaname, relname",
+  },
+  am: {
+    tableName: "pg_am",
+    alias: "am",
+    oids: true,
+    where: "true",
+    order: "amname",
+  },
+};
+
 /**
  * The catalog pg_database stores information about the available databases. Databases are created with the CREATE
  * DATABASE command. Consult [managing-databases] for details about the meaning of some of the parameters.
@@ -134,6 +465,72 @@ export interface PgDatabase {
    * @remarks Only in 14.x, 13.x, 12.x, 11.x, 10.x
    */
   datlastsysoid?: PgOid | null | undefined;
+}
+
+/**
+ * The view pg_settings provides access to run-time parameters of the server. It is essentially an alternative
+ * interface to the SHOW and SET commands. It also provides access to some facts about each parameter that are not
+ * directly available from SHOW, such as minimum and maximum values.
+ */
+export interface PgSettings {
+  /** Run-time configuration parameter name */
+  name: string | null;
+
+  /** Current value of the parameter */
+  setting: string | null;
+
+  /** Implicit unit of the parameter */
+  unit: string | null;
+
+  /** Logical group of the parameter */
+  category: string | null;
+
+  /** A brief description of the parameter */
+  short_desc: string | null;
+
+  /** Additional, more detailed, description of the parameter */
+  extra_desc: string | null;
+
+  /** Context required to set the parameter's value (see below) */
+  context: string | null;
+
+  /** Parameter type (bool, enum, integer, real, or string) */
+  vartype: string | null;
+
+  /** Source of the current parameter value */
+  source: string | null;
+
+  /** Minimum allowed value of the parameter (null for non-numeric values) */
+  min_val: string | null;
+
+  /** Maximum allowed value of the parameter (null for non-numeric values) */
+  max_val: string | null;
+
+  /** Allowed values of an enum parameter (null for non-enum values) */
+  enumvals: ReadonlyArray<string> | null;
+
+  /** Parameter value assumed at server startup if the parameter is not otherwise set */
+  boot_val: string | null;
+
+  /** Value that RESET would reset the parameter to in the current session */
+  reset_val: string | null;
+
+  /**
+   * Configuration file the current value was set in (null for values set from sources other than configuration files, or
+   * when examined by a user who neither is a superuser nor has privileges of pg_read_all_settings); helpful when using
+   * include directives in configuration files
+   */
+  sourcefile: string | null;
+
+  /**
+   * Line number within the configuration file the current value was set at (null for values set from sources other than
+   * configuration files, or when examined by a user who neither is a superuser nor has privileges of
+   * pg_read_all_settings).
+   */
+  sourceline: number | null;
+
+  /** true if the value has been changed in the configuration file but needs a restart; or false otherwise. */
+  pending_restart: boolean | null;
 }
 
 /**
@@ -498,6 +895,39 @@ export interface PgAttribute {
 }
 
 /**
+ * The catalog pg_attrdef stores column default expressions and generation expressions. The main information about
+ * columns is stored in pg_attribute. Only columns for which a default expression or generation expression has been
+ * explicitly set will have an entry here.
+ */
+export interface PgAttrdef {
+  /* COMMON FIELDS */
+
+  /** Row identifier */
+  _id: PgOid;
+
+  /** The table this column belongs to */
+  adrelid: PgOid | null;
+
+  /** The number of the column */
+  adnum: number | null;
+
+  /**
+   * The column default or generation expression, in nodeToString() representation. Use pg_get_expr(adbin, adrelid) to
+   * convert it to an SQL expression.
+   */
+  adbin: string | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * A human-readable representation of the default value
+   *
+   * @remarks Only in 11.x, 10.x
+   */
+  adsrc?: string | null | undefined;
+}
+
+/**
  * The catalog pg_constraint stores check, not-null, primary key, unique, foreign key, and exclusion constraints on
  * tables. (Column constraints are not treated specially. Every column constraint is equivalent to some table
  * constraint.)
@@ -657,6 +1087,22 @@ export interface PgConstraint {
    * @remarks Only in 11.x, 10.x
    */
   consrc?: string | null | undefined;
+}
+
+/**
+ * The catalog pg_proc stores information about functions, procedures, aggregate functions, and window functions
+ * (collectively also known as routines). See [sql-createfunction], [sql-createprocedure], and [xfunc] for more
+ * information.
+ */
+export interface PgProcSys {
+  /** Row identifier */
+  _id: PgOid;
+
+  /** Name of the function */
+  proname: PgName;
+
+  /** The OID of the namespace that contains this function */
+  pronamespace: PgOid;
 }
 
 /**
@@ -838,6 +1284,107 @@ export interface PgProc {
 }
 
 /**
+ * The catalog pg_aggregate stores information about aggregate functions. An aggregate function is a function that
+ * operates on a set of values (typically one column from each row that matches a query condition) and returns a single
+ * value computed from all these values. Typical aggregate functions are sum, count, and max. Each entry in
+ * pg_aggregate is an extension of an entry in pg_proc. The pg_proc entry carries the aggregate's name, input and
+ * output data types, and other information that is similar to ordinary functions.
+ */
+export interface PgAggregate {
+  /* COMMON FIELDS */
+
+  /** pg_proc OID of the aggregate function */
+  aggfnoid: PgOid | null;
+
+  /** Aggregate kind: n for normal aggregates, o for ordered-set aggregates, or h for hypothetical-set aggregates */
+  aggkind: string | null;
+
+  /**
+   * Number of direct (non-aggregated) arguments of an ordered-set or hypothetical-set aggregate, counting a variadic
+   * array as one argument. If equal to pronargs, the aggregate must be variadic and the variadic array describes the
+   * aggregated arguments as well as the final direct arguments. Always zero for normal aggregates.
+   */
+  aggnumdirectargs: number | null;
+
+  /** Transition function */
+  aggtransfn: PgOid | null;
+
+  /** Final function (zero if none) */
+  aggfinalfn: PgOid | null;
+
+  /** Combine function (zero if none) */
+  aggcombinefn: PgOid | null;
+
+  /** Serialization function (zero if none) */
+  aggserialfn: PgOid | null;
+
+  /** Deserialization function (zero if none) */
+  aggdeserialfn: PgOid | null;
+
+  /** Forward transition function for moving-aggregate mode (zero if none) */
+  aggmtransfn: PgOid | null;
+
+  /** Inverse transition function for moving-aggregate mode (zero if none) */
+  aggminvtransfn: PgOid | null;
+
+  /** Final function for moving-aggregate mode (zero if none) */
+  aggmfinalfn: PgOid | null;
+
+  /** True to pass extra dummy arguments to aggfinalfn */
+  aggfinalextra: boolean | null;
+
+  /** True to pass extra dummy arguments to aggmfinalfn */
+  aggmfinalextra: boolean | null;
+
+  /** Associated sort operator (zero if none) */
+  aggsortop: PgOid | null;
+
+  /** Data type of the aggregate function's internal transition (state) data */
+  aggtranstype: PgOid | null;
+
+  /** Approximate average size (in bytes) of the transition state data, or zero to use a default estimate */
+  aggtransspace: number | null;
+
+  /** Data type of the aggregate function's internal transition (state) data for moving-aggregate mode (zero if none) */
+  aggmtranstype: PgOid | null;
+
+  /**
+   * Approximate average size (in bytes) of the transition state data for moving-aggregate mode, or zero to use a default
+   * estimate
+   */
+  aggmtransspace: number | null;
+
+  /**
+   * The initial value of the transition state. This is a text field containing the initial value in its external string
+   * representation. If this field is null, the transition state value starts out null.
+   */
+  agginitval: string | null;
+
+  /**
+   * The initial value of the transition state for moving-aggregate mode. This is a text field containing the initial
+   * value in its external string representation. If this field is null, the transition state value starts out null.
+   */
+  aggminitval: string | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * Whether aggfinalfn modifies the transition state value: r if it is read-only, s if the aggtransfn cannot be applied
+   * after the aggfinalfn, or w if it writes on the value
+   *
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   */
+  aggfinalmodify?: string | null | undefined;
+
+  /**
+   * Like aggfinalmodify, but for the aggmfinalfn
+   *
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x, 12.x, 11.x
+   */
+  aggmfinalmodify?: string | null | undefined;
+}
+
+/**
  * The view pg_roles provides access to information about database roles. This is simply a publicly readable view of
  * pg_authid that blanks out the password field.
  */
@@ -889,6 +1436,21 @@ export interface PgRoles {
 }
 
 /**
+ * The catalog pg_db_role_setting records the default values that have been set for run-time configuration variables,
+ * for each role and database combination.
+ */
+export interface PgDbRoleSetting {
+  /** The OID of the database the setting is applicable to, or zero if not database-specific */
+  setdatabase: PgOid | null;
+
+  /** The OID of the role the setting is applicable to, or zero if not role-specific */
+  setrole: PgOid | null;
+
+  /** Defaults for run-time configuration variables */
+  setconfig: ReadonlyArray<string> | null;
+}
+
+/**
  * The catalog pg_auth_members shows the membership relations between roles. Any non-circular set of relationships is
  * allowed.
  */
@@ -929,6 +1491,32 @@ export interface PgAuthMembers {
    * @remarks Only in 18.x, 17.x, 16.x
    */
   set_option?: boolean | null | undefined;
+}
+
+/** The catalog pg_default_acl stores initial privileges to be assigned to newly created objects. */
+export interface PgDefaultAcl {
+  /** Row identifier */
+  _id: PgOid;
+
+  /** The OID of the role associated with this entry */
+  defaclrole: PgOid | null;
+
+  /** The OID of the namespace associated with this entry, or zero if none */
+  defaclnamespace: PgOid | null;
+
+  /**
+   * Type of object this entry is for:
+   * - r = relation (table, view),
+   * - S = sequence,
+   * - f = function,
+   * - T = type,
+   * - n = schema,
+   * - L = large object
+   */
+  defaclobjtype: string | null;
+
+  /** Access privileges that this type of object should have on creation */
+  defaclacl: ReadonlyArray<PgAclItem> | null;
 }
 
 /**
@@ -1132,6 +1720,48 @@ export interface PgEnum {
   enumlabel: PgName;
 }
 
+/** The catalog pg_event_trigger stores event triggers. See [event-triggers] for more information. */
+export interface PgEventTrigger {
+  /* COMMON FIELDS */
+
+  /** Trigger name (must be unique) */
+  evtname: PgName | null;
+
+  /** Identifies the event for which this trigger fires */
+  evtevent: PgName | null;
+
+  /** Owner of the event trigger */
+  evtowner: PgOid | null;
+
+  /** The function to be called */
+  evtfoid: PgOid | null;
+
+  /**
+   * Controls in which [guc-session-replication-role] modes the event trigger fires.
+   * - O = trigger fires in origin and local modes,
+   * - D = trigger is disabled,
+   * - R = trigger fires in replica mode,
+   * - A = trigger fires always
+   * .
+   */
+  evtenabled: string | null;
+
+  /**
+   * Command tags for which this trigger will fire. If NULL, the firing of this trigger is not restricted on the basis of
+   * the command tag.
+   */
+  evttags: ReadonlyArray<string> | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * Row identifier
+   *
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x
+   */
+  _id?: PgOid | undefined;
+}
+
 /**
  * The catalog pg_extension stores information about the installed extensions. See [extend-extensions] for details
  * about extensions.
@@ -1160,6 +1790,86 @@ export interface PgExtension {
 
   /** Array of WHERE-clause filter conditions for the extension's configuration table(s), or NULL if none */
   extcondition: ReadonlyArray<string> | null;
+}
+
+/**
+ * The catalog pg_foreign_data_wrapper stores foreign-data wrapper definitions. A foreign-data wrapper is the mechanism
+ * by which external data, residing on foreign servers, is accessed.
+ */
+export interface PgForeignDataWrapper {
+  /** Row identifier */
+  _id: PgOid;
+
+  /** Name of the foreign-data wrapper */
+  fdwname: PgName | null;
+
+  /** Owner of the foreign-data wrapper */
+  fdwowner: PgOid | null;
+
+  /**
+   * References a handler function that is responsible for supplying execution routines for the foreign-data wrapper.
+   * Zero if no handler is provided
+   */
+  fdwhandler: PgOid | null;
+
+  /**
+   * References a validator function that is responsible for checking the validity of the options given to the
+   * foreign-data wrapper, as well as options for foreign servers and user mappings using the foreign-data wrapper. Zero
+   * if no validator is provided
+   */
+  fdwvalidator: PgOid | null;
+
+  /** Access privileges; see [ddl-priv] for details */
+  fdwacl: ReadonlyArray<PgAclItem> | null;
+
+  /** Foreign-data wrapper specific options, as keyword=value strings */
+  fdwoptions: ReadonlyArray<string> | null;
+}
+
+/**
+ * The catalog pg_foreign_server stores foreign server definitions. A foreign server describes a source of external
+ * data, such as a remote server. Foreign servers are accessed via foreign-data wrappers.
+ */
+export interface PgForeignServer {
+  /** Row identifier */
+  _id: PgOid;
+
+  /** Name of the foreign server */
+  srvname: PgName | null;
+
+  /** Owner of the foreign server */
+  srvowner: PgOid | null;
+
+  /** OID of the foreign-data wrapper of this foreign server */
+  srvfdw: PgOid | null;
+
+  /** Type of the server (optional) */
+  srvtype: string | null;
+
+  /** Version of the server (optional) */
+  srvversion: string | null;
+
+  /** Access privileges; see [ddl-priv] for details */
+  srvacl: ReadonlyArray<PgAclItem> | null;
+
+  /** Foreign server specific options, as keyword=value strings */
+  srvoptions: ReadonlyArray<string> | null;
+}
+
+/**
+ * The catalog pg_foreign_table contains auxiliary information about foreign tables. A foreign table is primarily
+ * represented by a pg_class entry, just like a regular table. Its pg_foreign_table entry contains the information that
+ * is pertinent only to foreign tables and not any other kind of relation.
+ */
+export interface PgForeignTable {
+  /** The OID of the pg_class entry for this foreign table */
+  ftrelid: PgOid | null;
+
+  /** OID of the foreign server for this foreign table */
+  ftserver: PgOid | null;
+
+  /** Foreign table options, as keyword=value strings */
+  ftoptions: ReadonlyArray<string> | null;
 }
 
 /** The catalog pg_index contains part of the information about indexes. The rest is mostly in pg_class. */
@@ -1430,6 +2140,122 @@ export interface PgRange {
   rngmultitypid?: PgOid | null | undefined;
 }
 
+/** The catalog pg_rewrite stores rewrite rules for tables and views. */
+export interface PgRewrite {
+  /** Row identifier */
+  _id: PgOid;
+
+  /** Rule name */
+  rulename: PgName | null;
+
+  /** The table this rule is for */
+  ev_class: PgOid | null;
+
+  /** Event type that the rule is for: 1 = [sql-select], 2 = [sql-update], 3 = [sql-insert], 4 = [sql-delete] */
+  ev_type: string | null;
+
+  /**
+   * Controls in which [guc-session-replication-role] modes the rule fires.
+   * - O = rule fires in origin and local modes,
+   * - D = rule is disabled,
+   * - R = rule fires in replica mode,
+   * - A = rule fires always
+   * .
+   */
+  ev_enabled: string | null;
+
+  /** True if the rule is an INSTEAD rule */
+  is_instead: boolean | null;
+
+  /** Expression tree (in the form of a nodeToString() representation) for the rule's qualifying condition */
+  ev_qual: string | null;
+
+  /** Query tree (in the form of a nodeToString() representation) for the rule's action */
+  ev_action: string | null;
+}
+
+/** The catalog pg_trigger stores triggers on tables and views. See [sql-createtrigger] for more information. */
+export interface PgTrigger {
+  /* COMMON FIELDS */
+
+  /** Row identifier */
+  _id: PgOid;
+
+  /** The table this trigger is on */
+  tgrelid: PgOid;
+
+  /** Trigger name (must be unique among triggers of same table) */
+  tgname: PgName;
+
+  /** The function to be called */
+  tgfoid: PgOid | null;
+
+  /** Bit mask identifying trigger firing conditions */
+  tgtype: number | null;
+
+  /**
+   * Controls in which [guc-session-replication-role] modes the trigger fires.
+   * - O = trigger fires in origin and local modes,
+   * - D = trigger is disabled,
+   * - R = trigger fires in replica mode,
+   * - A = trigger fires always
+   * .
+   */
+  tgenabled: string | null;
+
+  /** True if trigger is internally generated (usually, to enforce the constraint identified by tgconstraint) */
+  tgisinternal: boolean | null;
+
+  /**
+   * The table referenced by a referential integrity constraint (zero if trigger is not for a referential integrity
+   * constraint)
+   */
+  tgconstrrelid: PgOid | null;
+
+  /**
+   * The index supporting a unique, primary key, referential integrity, or exclusion constraint (zero if trigger is not
+   * for one of these types of constraint)
+   */
+  tgconstrindid: PgOid | null;
+
+  /** The pg_constraint entry associated with the trigger (zero if trigger is not for a constraint) */
+  tgconstraint: PgOid | null;
+
+  /** True if constraint trigger is deferrable */
+  tgdeferrable: boolean | null;
+
+  /** True if constraint trigger is initially deferred */
+  tginitdeferred: boolean | null;
+
+  /** Number of argument strings passed to trigger function */
+  tgnargs: number | null;
+
+  /** Column numbers, if trigger is column-specific; otherwise an empty array */
+  tgattr: ReadonlyArray<number> | null;
+
+  /** Argument strings to pass to trigger, each NULL-terminated */
+  tgargs: string | null;
+
+  /** Expression tree (in nodeToString() representation) for the trigger's WHEN condition, or null if none */
+  tgqual: string | null;
+
+  /** REFERENCING clause name for OLD TABLE, or null if none */
+  tgoldtable: PgName | null;
+
+  /** REFERENCING clause name for NEW TABLE, or null if none */
+  tgnewtable: PgName | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * Parent trigger that this trigger is cloned from (this happens when partitions are created or attached to a
+   * partitioned table); zero if not a clone
+   *
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x
+   */
+  tgparentid?: PgOid | null | undefined;
+}
+
 /**
  * The catalog pg_depend records the dependency relationships between database objects. This information allows DROP
  * commands to find which other objects must be dropped by DROP CASCADE or prevent dropping in the DROP RESTRICT case.
@@ -1485,6 +2311,143 @@ export interface PgDescription {
   description: string;
 }
 
+/**  */
+export interface PgStatUserTables {
+  /* COMMON FIELDS */
+
+  /** OID of a table */
+  relid: PgOid | null;
+
+  /** Name of the schema that this table is in */
+  schemaname: PgName | null;
+
+  /** Name of this table */
+  relname: PgName | null;
+
+  /** Number of sequential scans initiated on this table */
+  seq_scan: string | number | null;
+
+  /** Number of live rows fetched by sequential scans */
+  seq_tup_read: string | number | null;
+
+  /** Number of index scans initiated on this table */
+  idx_scan: string | number | null;
+
+  /** Number of live rows fetched by index scans */
+  idx_tup_fetch: string | number | null;
+
+  /** Total number of rows inserted */
+  n_tup_ins: string | number | null;
+
+  /**
+   * Total number of rows updated. (This includes row updates counted in n_tup_hot_upd and n_tup_newpage_upd, and
+   * remaining non-HOT updates.)
+   */
+  n_tup_upd: string | number | null;
+
+  /** Total number of rows deleted */
+  n_tup_del: string | number | null;
+
+  /** Number of rows HOT updated. These are updates where no successor versions are required in indexes. */
+  n_tup_hot_upd: string | number | null;
+
+  /** Estimated number of live rows */
+  n_live_tup: string | number | null;
+
+  /** Estimated number of dead rows */
+  n_dead_tup: string | number | null;
+
+  /** Estimated number of rows modified since this table was last analyzed */
+  n_mod_since_analyze: string | number | null;
+
+  /** Last time at which this table was manually vacuumed (not counting VACUUM FULL) */
+  last_vacuum: TimestampTZ | null;
+
+  /** Last time at which this table was vacuumed by the autovacuum daemon */
+  last_autovacuum: TimestampTZ | null;
+
+  /** Last time at which this table was manually analyzed */
+  last_analyze: TimestampTZ | null;
+
+  /** Last time at which this table was analyzed by the autovacuum daemon */
+  last_autoanalyze: TimestampTZ | null;
+
+  /** Number of times this table has been manually vacuumed (not counting VACUUM FULL) */
+  vacuum_count: string | number | null;
+
+  /** Number of times this table has been vacuumed by the autovacuum daemon */
+  autovacuum_count: string | number | null;
+
+  /** Number of times this table has been manually analyzed */
+  analyze_count: string | number | null;
+
+  /** Number of times this table has been analyzed by the autovacuum daemon */
+  autoanalyze_count: string | number | null;
+
+  /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
+
+  /**
+   * The time of the last sequential scan on this table, based on the most recent transaction stop time
+   *
+   * @remarks Only in 18.x, 17.x, 16.x
+   */
+  last_seq_scan?: TimestampTZ | null | undefined;
+
+  /**
+   * The time of the last index scan on this table, based on the most recent transaction stop time
+   *
+   * @remarks Only in 18.x, 17.x, 16.x
+   */
+  last_idx_scan?: TimestampTZ | null | undefined;
+
+  /**
+   * Number of rows updated where the successor version goes onto a new heap page, leaving behind an original version
+   * with a t_ctid field that points to a different heap page. These are always non-HOT updates.
+   *
+   * @remarks Only in 18.x, 17.x, 16.x
+   */
+  n_tup_newpage_upd?: string | number | null | undefined;
+
+  /**
+   * Estimated number of rows inserted since this table was last vacuumed (not counting VACUUM FULL)
+   *
+   * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x
+   */
+  n_ins_since_vacuum?: string | number | null | undefined;
+
+  /**
+   * Total time this table has been manually vacuumed, in milliseconds (not counting VACUUM FULL). (This includes the
+   * time spent sleeping due to cost-based delays.)
+   *
+   * @remarks Only in 18.x
+   */
+  total_vacuum_time?: number | null | undefined;
+
+  /**
+   * Total time this table has been vacuumed by the autovacuum daemon, in milliseconds. (This includes the time spent
+   * sleeping due to cost-based delays.)
+   *
+   * @remarks Only in 18.x
+   */
+  total_autovacuum_time?: number | null | undefined;
+
+  /**
+   * Total time this table has been manually analyzed, in milliseconds. (This includes the time spent sleeping due to
+   * cost-based delays.)
+   *
+   * @remarks Only in 18.x
+   */
+  total_analyze_time?: number | null | undefined;
+
+  /**
+   * Total time this table has been analyzed by the autovacuum daemon, in milliseconds. (This includes the time spent
+   * sleeping due to cost-based delays.)
+   *
+   * @remarks Only in 18.x
+   */
+  total_autoanalyze_time?: number | null | undefined;
+}
+
 /**
  * The catalog pg_am stores information about relation access methods. There is one row for each access method
  * supported by the system. Currently, only tables and indexes have access methods. The requirements for table and
@@ -1509,23 +2472,36 @@ export interface PgAm {
  */
 export interface Introspection {
   database: PgDatabase;
+  settings: Array<PgSettings>;
   namespaces: Array<PgNamespace>;
   classes: Array<PgClass>;
   attributes: Array<PgAttribute>;
+  attribute_defaults: Array<PgAttrdef>;
   constraints: Array<PgConstraint>;
+  sys_procs: Array<PgProcSys>;
   procs: Array<PgProc>;
+  aggregates: Array<PgAggregate>;
   roles: Array<PgRoles>;
+  db_role_settings: Array<PgDbRoleSetting>;
   auth_members: Array<PgAuthMembers>;
+  default_acls: Array<PgDefaultAcl>;
   types: Array<PgType>;
   enums: Array<PgEnum>;
+  event_triggers: Array<PgEventTrigger>;
   extensions: Array<PgExtension>;
+  foreign_data_wrappers: Array<PgForeignDataWrapper>;
+  foreign_servers: Array<PgForeignServer>;
+  foreign_tables: Array<PgForeignTable>;
   indexes: Array<PgIndex>;
   inherits: Array<PgInherits>;
   languages: Array<PgLanguage>;
   policies: Array<PgPolicy>;
   ranges: Array<PgRange>;
+  rewrites: Array<PgRewrite>;
+  triggers: Array<PgTrigger>;
   depends: Array<PgDepend>;
   descriptions: Array<PgDescription>;
+  stat_user_tables: Array<PgStatUserTables>;
   am: Array<PgAm>;
 
   /**
@@ -1551,237 +2527,34 @@ export interface Introspection {
  */
 export type PgEntity =
   | PgDatabase
+  | PgSettings
   | PgNamespace
   | PgClass
   | PgAttribute
+  | PgAttrdef
   | PgConstraint
+  | PgProcSys
   | PgProc
+  | PgAggregate
   | PgRoles
+  | PgDbRoleSetting
   | PgAuthMembers
+  | PgDefaultAcl
   | PgType
   | PgEnum
+  | PgEventTrigger
   | PgExtension
+  | PgForeignDataWrapper
+  | PgForeignServer
+  | PgForeignTable
   | PgIndex
   | PgInherits
   | PgLanguage
   | PgPolicy
   | PgRange
+  | PgRewrite
+  | PgTrigger
   | PgDepend
   | PgDescription
+  | PgStatUserTables
   | PgAm;
-
-// We might want this to take options in future, so we've made it a function.
-/**
- * Builds a PostgreSQL introspection SQL query to return an object with the same shape as `Introspection` above.
- */
-export const makeIntrospectionQuery = () => `\
-with
-  database as (
-    select pg_database.oid as _id, *
-    from pg_catalog.pg_database
-    where datname = current_database()
-  ),
-
-  namespaces as (
-    select pg_namespace.oid as _id, *
-    from pg_catalog.pg_namespace
-    where nspname <> 'information_schema'
-  ),
-
-  classes as (
-    select pg_class.oid as _id, *,
-      pg_catalog.pg_relation_is_updatable(oid, true)::bit(8)::int4 as "updatable_mask"
-    from pg_catalog.pg_class
-    where relnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
-  ),
-
-  attributes as (
-    select *
-    from pg_catalog.pg_attribute
-    where attrelid in (select classes._id from classes) AND attnum > 0
-  ),
-
-  constraints as (
-    select pg_constraint.oid as _id, *
-    from pg_catalog.pg_constraint
-    where connamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
-  ),
-
-  procs as (
-    select pg_proc.oid as _id, *
-    from pg_catalog.pg_proc
-    where pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
-    and prorettype operator(pg_catalog.<>) 2279
-  ),
-
-  roles as (
-    select pg_roles.oid as _id, *
-    from pg_catalog.pg_roles
-  ),
-
-  auth_members as (
-    select *
-    from pg_catalog.pg_auth_members
-    where roleid in (select roles._id from roles)
-  ),
-
-  types as (
-    select pg_type.oid as _id, *
-    from pg_catalog.pg_type
-    where (typnamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%'))
-    or (typnamespace = 'pg_catalog'::regnamespace)
-  ),
-
-  enums as (
-    select pg_enum.oid as _id, *
-    from pg_catalog.pg_enum
-    where enumtypid in (select types._id from types)
-  ),
-
-  extensions as (
-    select pg_extension.oid as _id, *
-    from pg_catalog.pg_extension
-  ),
-
-  indexes as (
-    select *
-    from pg_catalog.pg_index
-    where indrelid in (select classes._id from classes)
-  ),
-
-  inherits as (
-    select *
-    from pg_catalog.pg_inherits
-    where inhrelid in (select classes._id from classes)
-  ),
-
-  languages as (
-    select pg_language.oid as _id, *
-    from pg_catalog.pg_language
-  ),
-
-  policies as (
-    select *
-    from pg_catalog.pg_policy
-    where polrelid in (select classes._id from classes)
-  ),
-
-  ranges as (
-    select *
-    from pg_catalog.pg_range
-    where rngtypid in (select types._id from types)
-  ),
-
-  depends as (
-    select *
-    from pg_catalog.pg_depend
-    where deptype IN ('a', 'e') and (
-      (classid = 'pg_catalog.pg_namespace'::regclass and objid in (select namespaces._id from namespaces))
-      or (classid = 'pg_catalog.pg_class'::regclass and objid in (select classes._id from classes))
-      or (classid = 'pg_catalog.pg_attribute'::regclass and objid in (select classes._id from classes) and objsubid > 0)
-      or (classid = 'pg_catalog.pg_constraint'::regclass and objid in (select constraints._id from constraints))
-      or (classid = 'pg_catalog.pg_proc'::regclass and objid in (select procs._id from procs))
-      or (classid = 'pg_catalog.pg_type'::regclass and objid in (select types._id from types))
-      or (classid = 'pg_catalog.pg_enum'::regclass and objid in (select enums._id from enums))
-      or (classid = 'pg_catalog.pg_extension'::regclass and objid in (select extensions._id from extensions))
-    )
-  ),
-
-  descriptions as (
-    select *
-    from pg_catalog.pg_description
-    where (
-      (classoid = 'pg_catalog.pg_namespace'::regclass and objoid in (select namespaces._id from namespaces))
-      or (classoid = 'pg_catalog.pg_class'::regclass and objoid in (select classes._id from classes))
-      or (classoid = 'pg_catalog.pg_attribute'::regclass and objoid in (select classes._id from classes) and objsubid > 0)
-      or (classoid = 'pg_catalog.pg_constraint'::regclass and objoid in (select constraints._id from constraints))
-      or (classoid = 'pg_catalog.pg_proc'::regclass and objoid in (select procs._id from procs))
-      or (classoid = 'pg_catalog.pg_type'::regclass and objoid in (select types._id from types))
-      or (classoid = 'pg_catalog.pg_enum'::regclass and objoid in (select enums._id from enums))
-      or (classoid = 'pg_catalog.pg_extension'::regclass and objoid in (select extensions._id from extensions))
-    )
-  ),
-
-  am as (
-    select pg_am.oid as _id, *
-    from pg_catalog.pg_am
-    where true
-  )
-select json_build_object(
-  'database',
-  (select row_to_json(database) from database),
-
-  'namespaces',
-  (select coalesce((select json_agg(row_to_json(namespaces) order by nspname) from namespaces), '[]'::json)),
-
-  'classes',
-  (select coalesce((select json_agg(row_to_json(classes) order by relnamespace, relname) from classes), '[]'::json)),
-
-  'attributes',
-  (select coalesce((select json_agg(row_to_json(attributes) order by attrelid, attnum) from attributes), '[]'::json)),
-
-  'constraints',
-  (select coalesce((select json_agg(row_to_json(constraints) order by connamespace, conrelid, conname) from constraints), '[]'::json)),
-
-  'procs',
-  (select coalesce((select json_agg(row_to_json(procs) order by pronamespace, proname, pg_get_function_identity_arguments(procs._id)) from procs), '[]'::json)),
-
-  'roles',
-  (select coalesce((select json_agg(row_to_json(roles) order by rolname) from roles), '[]'::json)),
-
-  'auth_members',
-  (select coalesce((select json_agg(row_to_json(auth_members) order by roleid, member, grantor) from auth_members), '[]'::json)),
-
-  'types',
-  (select coalesce((select json_agg(row_to_json(types) order by typnamespace, typname) from types), '[]'::json)),
-
-  'enums',
-  (select coalesce((select json_agg(row_to_json(enums) order by enumtypid, enumsortorder) from enums), '[]'::json)),
-
-  'extensions',
-  (select coalesce((select json_agg(row_to_json(extensions) order by extname) from extensions), '[]'::json)),
-
-  'indexes',
-  (select coalesce((select json_agg(row_to_json(indexes) order by indrelid, indexrelid) from indexes), '[]'::json)),
-
-  'inherits',
-  (select coalesce((select json_agg(row_to_json(inherits) order by inhrelid, inhseqno) from inherits), '[]'::json)),
-
-  'languages',
-  (select coalesce((select json_agg(row_to_json(languages) order by lanname) from languages), '[]'::json)),
-
-  'policies',
-  (select coalesce((select json_agg(row_to_json(policies) order by polrelid, polname) from policies), '[]'::json)),
-
-  'ranges',
-  (select coalesce((select json_agg(row_to_json(ranges) order by rngtypid) from ranges), '[]'::json)),
-
-  'depends',
-  (select coalesce((select json_agg(row_to_json(depends) order by classid, objid, objsubid, refclassid, refobjid, refobjsubid) from depends), '[]'::json)),
-
-  'descriptions',
-  (select coalesce((select json_agg(row_to_json(descriptions) order by objoid, classoid, objsubid) from descriptions), '[]'::json)),
-
-  'am',
-  (select coalesce((select json_agg(row_to_json(am) order by amname) from am), '[]'::json)),
-
-  'catalog_by_oid',
-  (
-    select json_object_agg(oid::text, relname order by relname asc)
-    from pg_class
-    where relnamespace = (
-      select oid
-      from pg_namespace
-      where nspname = 'pg_catalog'
-    )
-    and relkind = 'r'
-  ),
-
-  'current_user',
-  current_user,
-  'pg_version',
-  version(),
-  'introspection_version',
-  1
-)::text as introspection
-`;
