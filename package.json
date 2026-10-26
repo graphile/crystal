@@ -1,4 +1,5 @@
 {
+  "name": "@localrepo/graphile-crystal",
   "private": true,
   "scripts": {
     "fwd:update": "node ./scripts/fwd.mjs",
