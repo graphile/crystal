@@ -59,7 +59,7 @@
   "dependencies": {
     "@dataplan/json": "workspace:^",
     "@graphile/lru": "workspace:^",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.x || 24.x || 26.x",
     "chalk": "^4.1.2",
     "debug": "^4.4.3",
     "eventemitter3": "^5.0.1",

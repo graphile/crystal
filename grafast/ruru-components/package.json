@@ -45,7 +45,7 @@
     "@graphiql/plugin-history": "^0.4.1",
     "@graphiql/react": "^0.37.2",
     "@graphiql/toolkit": "^0.11.3",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.x || 24.x || 26.x",
     "grafast": "workspace:^",
     "graphiql": "^5.2.1",
     "graphql-ws": "^6.0.5",

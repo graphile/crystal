@@ -2801,7 +2801,7 @@ __metadata:
     "@types/jest": "npm:^30.0.0"
     "@types/json5": "npm:^2.2.0"
     "@types/license-checker-webpack-plugin": "npm:^0.2.5"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     "@types/nodemon": "npm:^3.1.1"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.3"
@@ -8229,35 +8229,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
-  version: 24.10.1
-  resolution: "@types/node@npm:24.10.1"
-  dependencies:
-    undici-types: "npm:~7.16.0"
-  checksum: 10c0/d6bca7a78f550fbb376f236f92b405d676003a8a09a1b411f55920ef34286ee3ee51f566203920e835478784df52662b5b2af89159d9d319352e9ea21801c002
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^12.7.1":
-  version: 12.20.55
-  resolution: "@types/node@npm:12.20.55"
-  checksum: 10c0/3b190bb0410047d489c49bbaab592d2e6630de6a50f00ba3d7d513d59401d279972a8f5a598b5bb8ddc1702f8a2f4ec57a65d93852f9c329639738e7053637d1
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^17.0.5":
-  version: 17.0.45
-  resolution: "@types/node@npm:17.0.45"
-  checksum: 10c0/0db377133d709b33a47892581a21a41cd7958f22723a3cc6c71d55ac018121382de42fbfc7970d5ae3e7819dbe5f40e1c6a5174aedf7e7964e9cb8fa72b580b0
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22.19.1":
-  version: 22.19.1
-  resolution: "@types/node@npm:22.19.1"
+"@types/node@npm:22.x":
+  version: 22.20.5
+  resolution: "@types/node@npm:22.20.5"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/6edd93aea86da740cb7872626839cd6f4a67a049d3a3a6639cb592c620ec591408a30989ab7410008d1a0b2d4985ce50f1e488e79c033e4476d3bec6833b0a2f
+  checksum: 10c0/0cf61a89c6a69917ab49f976a6bb11a29e3b348a6ae19f5827ceb91d3ade781faab58dcf3b8fa625f975f5d7536b9166ff94e8250c29272c667164f77c28fa88
   languageName: node
   linkType: hard
 
@@ -14902,7 +14879,7 @@ __metadata:
     "@types/express": "npm:^4.17.25"
     "@types/jest": "npm:^30.0.0"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.3"
     express: "npm:^4.21.2"
@@ -14945,7 +14922,7 @@ __metadata:
   dependencies:
     "@types/debug": "npm:^4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     "@types/pluralize": "npm:^0.0.33"
     "@types/semver": "npm:^7.7.1"
     chalk: "npm:^4.1.2"
@@ -15004,7 +14981,7 @@ __metadata:
     "@types/babel__generator": "npm:^7.27.0"
     "@types/babel__template": "npm:^7.4.4"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     "@types/prettier": "npm:^3.0.0"
     jest: "npm:^30.2.0"
     prettier: "npm:^3.6.2"
@@ -20730,7 +20707,7 @@ __metadata:
     "@types/express": "npm:^4.17.25"
     "@types/jest": "npm:^30.0.0"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     "@types/nodemon": "npm:^3.1.1"
     "@types/pg": "npm:^8.15.6"
     debug: "npm:^4.4.3"
@@ -21884,7 +21861,7 @@ __metadata:
     "@types/express": "npm:^4.17.25"
     "@types/jest": "npm:^30.0.0"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     "@types/nodemon": "npm:^3.1.1"
     "@types/pg": "npm:^8.15.6"
     debug: "npm:^4.4.3"
@@ -23338,7 +23315,7 @@ __metadata:
     "@types/codemirror": "npm:^5.60.17"
     "@types/debug": "npm:^4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^22.19.1"
+    "@types/node": "npm:22.x || 24.x || 26.x"
     "@types/nodemon": "npm:^3.1.1"
     "@types/react": "npm:^19.2.7"
     "@types/react-dom": "npm:^19.2.3"
@@ -25577,13 +25554,6 @@ __metadata:
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
   checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~7.16.0":
-  version: 7.16.0
-  resolution: "undici-types@npm:7.16.0"
-  checksum: 10c0/3033e2f2b5c9f1504bdc5934646cb54e37ecaca0f9249c983f7b1fc2e87c6d18399ebb05dc7fd5419e02b2e915f734d872a65da2e3eeed1813951c427d33cc9a
   languageName: node
   linkType: hard
 
