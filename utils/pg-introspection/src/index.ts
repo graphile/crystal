@@ -21,7 +21,7 @@ import type {
   PgRoles,
   PgType,
 } from "./introspection.ts";
-export { makeIntrospectionQuery } from "./introspection.ts";
+export { makeIntrospectionQuery } from "./query.ts";
 import type { AclObject } from "./acl.ts";
 import {
   aclContainsRole,

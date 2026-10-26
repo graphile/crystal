@@ -1,0 +1,102 @@
+import type { Options } from "./interfaces.ts";
+import { ENTITY_TYPES, type EntityTypeConfig } from "./introspection.ts";
+
+export function makeIntrospectionQuery(options: Options = {}) {
+  const {
+    onlyEntities = [
+      "database",
+      "namespaces",
+      "classes",
+      "attributes",
+      "constraints",
+      "procs",
+      "roles",
+      "auth_members",
+      "types",
+      "enums",
+      "extensions",
+      "indexes",
+      "languages",
+      "ranges",
+      "depends",
+      "descriptions",
+      "inherits",
+      "policies",
+      "am",
+    ],
+  } = options;
+  const withs: string[] = [];
+  const jsons: string[] = [];
+
+  function add(entityType: EntityTypeConfig) {
+    const {
+      tableName: tbl,
+      alias,
+      oids,
+      where,
+      order,
+      singular,
+      columns,
+      extraColumns,
+    } = entityType;
+    let additionalSelect = "";
+    if (extraColumns != null) {
+      for (const colName in extraColumns) {
+        const { sql } = extraColumns[colName];
+        additionalSelect += `,\n      ${sql} as "${colName}"`;
+      }
+    }
+    withs.push(`\
+  ${alias} as (
+    select ${oids ? `${tbl}.oid as _id, ` : ""}${
+      columns ? columns.join(", ") : "*"
+    }${additionalSelect}
+    from pg_catalog.${tbl}${
+      where
+        ? `
+    where ${where}`
+        : ""
+    }
+  )`);
+    const val = singular
+      ? `(select row_to_json(${alias}) from ${alias})`
+      : `(select coalesce((select json_agg(row_to_json(${alias}) ${
+          order ? `order by ${order}` : ""
+        }) from ${alias}), '[]'::json))`;
+    jsons.push(`\
+  '${alias}',
+  ${val}`);
+  }
+
+  for (const config of Object.values(ENTITY_TYPES)) {
+    if (onlyEntities.includes(config.alias)) {
+      add(config);
+    }
+  }
+
+  return `with
+${withs.join(",\n\n")}
+select json_build_object(
+${jsons.join(",\n\n")},
+
+  'catalog_by_oid',
+  (
+    select json_object_agg(oid::text, relname order by relname asc)
+    from pg_class
+    where relnamespace = (
+      select oid
+      from pg_namespace
+      where nspname = 'pg_catalog'
+    )
+    and relkind = 'r'
+  ),
+
+  'current_user',
+  current_user,
+  'pg_version',
+  version(),
+  'introspection_version',
+  1
+)::text as introspection
+`;
+}
