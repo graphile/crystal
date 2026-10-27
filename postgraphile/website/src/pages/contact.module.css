@@ -43,19 +43,18 @@
   overflow-wrap: anywhere;
 }
 
-.cardHeader {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-}
-
 .contactCards h2 {
   font-size: var(--ifm-h3-font-size);
   margin-bottom: 0.75rem;
 }
 
 .icon {
-  flex: 0 0 auto;
+  margin-right: 0.35rem;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
 }
 
 .person {
