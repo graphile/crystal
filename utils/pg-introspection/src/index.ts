@@ -1,5 +1,8 @@
 import type {
-  PgAm,
+  DefaultEntities,
+  Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -33,12 +36,6 @@ import {
   augmentIntrospection,
   augmentIntrospectionData,
 } from "./augmentIntrospection.ts";
-import type {
-  DefaultEntities,
-  Introspection,
-  IntrospectionDataForEntities,
-  IntrospectOptions,
-} from "./interfaces.ts";
 import type {
   PgSmartTagsAndDescription,
   PgSmartTagsDict,
@@ -87,5 +84,3 @@ export function parseIntrospectionResults(
 }
 
 export type { PgSmartTagsAndDescription, PgSmartTagsDict };
-
-export type * from "./introspection.ts";

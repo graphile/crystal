@@ -7,6 +7,7 @@ import {
   OBJECT_TABLE,
   parseAcls,
 } from "./acl.ts";
+import { assertExists } from "./assertExists.ts";
 import type {
   Introspection,
   IntrospectionLookups,
@@ -38,32 +39,36 @@ import type {
   PgRangeData,
   PgTypeData,
 } from "./introspection.ts";
-import { assertExists } from "./assertExists.ts";
 import type { PgSmartTagsAndDescription } from "./smartComments.ts";
 import { parseSmartComment } from "./smartComments.ts";
 
-function memo<TThis, TResult>(
+export function memo<TThis, TResult>(
   fn: (this: TThis) => TResult,
 ): (this: TThis) => TResult {
   let cache: TResult;
   let called = false;
   return function (this: TThis) {
-    if (!called) {
+    if (called) {
+      return cache;
+    } else {
       cache = fn.call(this);
       called = true;
+      return cache;
     }
-    return cache!;
   };
 }
-function descriptionKey(
+
+export function descriptionKey(
   spec: Pick<PgDescription, "classoid" | "objoid" | "objsubid">,
 ) {
   return `${spec.classoid}|${spec.objoid}|${spec.objsubid}`;
 }
-function namespaceNameKey(namespaceId: string, name: string | null) {
+
+export function namespaceNameKey(namespaceId: string, name: string | null) {
   return `${namespaceId}|${name}`;
 }
-function attributeRelNumKey(relid: string, attnum: number) {
+
+export function attributeRelNumKey(relid: string, attnum: number) {
   return `${relid}|${attnum}`;
 }
 
@@ -303,11 +308,7 @@ export function createEntityMethods(
       },
       getInherited: memo(function (this: PgClass) {
         const inherits = getIntrospection().inherits;
-        if (!inherits) {
-          throw new Error(
-            "Introspection collection 'inherits' is required but was not included",
-          );
-        }
+        assertExists(inherits, "inherits");
         return inherits.filter((inh) => inh.inhrelid === this._id);
       }),
       getAccessMethod: memo(function (this: PgClass) {
@@ -498,7 +499,7 @@ export function createEntityMethods(
           proargmodes,
           // Null if no names
           proargnames,
-          // Only input typeById
+          // Only input types
           proargtypes,
           // Null if no arg defaults, length = pronargdefaults
           // proargdefaults,
@@ -613,6 +614,8 @@ export function createEntityMethods(
       getType: memo(function (this: PgEnum) {
         return getType(this.enumtypid);
       }),
+      // Postgres doesn't support comments on enum values right now, but we
+      // still want to be able to add tags/description so we fake it.
       getTagsAndDescription: memo(function (this: PgEnum) {
         return {
           tags: Object.create(null),

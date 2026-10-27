@@ -1,7 +1,7 @@
+import type { AclObject } from "./acl.ts";
 import type {
   EntityType,
   IntrospectionData,
-  PgEntityData,
   PgAmData,
   PgAttributeData,
   PgAuthMembersData,
@@ -10,6 +10,7 @@ import type {
   PgDatabaseData,
   PgDependData,
   PgDescriptionData,
+  PgEntityData,
   PgEnumData,
   PgExtensionData,
   PgIndexData,
@@ -22,7 +23,6 @@ import type {
   PgTypeData,
 } from "./introspection.ts";
 import type { defaultEntities } from "./query.ts";
-import type { AclObject } from "./acl.ts";
 import type {
   PgSmartTagsAndDescription,
   PgSmartTagsDict,

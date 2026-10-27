@@ -1,5 +1,12 @@
 import { PUBLIC_ROLE } from "./acl.ts";
-import { createEntityMethods } from "./entityMethods.ts";
+import { assertExists } from "./assertExists.ts";
+import {
+  attributeRelNumKey,
+  createEntityMethods,
+  descriptionKey,
+  memo,
+  namespaceNameKey,
+} from "./entityMethods.ts";
 import type {
   DefaultEntities,
   Introspection,
@@ -7,10 +14,8 @@ import type {
   IntrospectionLookups,
   IntrospectOptions,
 } from "./interfaces.ts";
-import type { PgDescription } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
 import { defaultEntities } from "./query.ts";
-import { assertExists } from "./assertExists.ts";
 
 function del<T extends Record<string, any>, TKey extends keyof T>(
   toDelete: Set<string>,
@@ -24,20 +29,6 @@ function del<T extends Record<string, any>, TKey extends keyof T>(
       collection.splice(i, 1);
     }
   }
-}
-
-function descriptionKey(
-  spec: Pick<PgDescription, "classoid" | "objoid" | "objsubid">,
-) {
-  return `${spec.classoid}|${spec.objoid}|${spec.objsubid}`;
-}
-
-function namespaceNameKey(namespaceId: string, name: string | null) {
-  return `${namespaceId}|${name}`;
-}
-
-function attributeRelNumKey(relid: string, attnum: number) {
-  return `${relid}|${attnum}`;
 }
 
 function populateLookups<TEntities extends EntityType = DefaultEntities>(
@@ -360,6 +351,7 @@ export function augmentIntrospectionData<
     lookups.oidByCatalog[catalog] = oid;
   }
 
+  // eslint-disable-next-line prefer-const
   let result: Introspection<TEntities>;
   const methods = createEntityMethods(() => result, lookups);
   const {
@@ -425,10 +417,10 @@ export function augmentIntrospectionData<
     }),
     _lookups: lookups,
     _caches: createCaches(options),
-    getCurrentUser: () => {
+    getCurrentUser: memo(() => {
       assertExists(lookups.roleByName, "roles");
       return lookups.roleByName[introspectionData.current_user];
-    },
+    }),
     getNamespace: (by: { id: string } | { name: string }) => {
       assertExists(lookups.namespaceById, "namespaces");
       assertExists(lookups.namespaceByName, "namespaces");

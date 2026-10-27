@@ -1,7 +1,6 @@
-import type { DefaultEntities, Introspection } from "./interfaces.ts";
-import type { PgEntity, PgRoles } from "./interfaces.ts";
-import type { EntityType } from "./introspection.ts";
 import { assertExists } from "./assertExists.ts";
+import type { Introspection, PgEntity, PgRoles } from "./interfaces.ts";
+import type { EntityType } from "./introspection.ts";
 
 export const OBJECT_COLUMN = "OBJECT_COLUMN";
 export const OBJECT_TABLE = "OBJECT_TABLE";
