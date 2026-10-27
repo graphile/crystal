@@ -1,5 +1,4 @@
 import type {
-  Introspection,
   PgAm,
   PgAttribute,
   PgAuthMembers,
@@ -21,6 +20,7 @@ import type {
   PgRoles,
   PgType,
 } from "./introspection.ts";
+export { introspect, introspectRaw } from "./incremental.ts";
 export { makeIntrospectionQuery } from "./query.ts";
 import type { AclObject } from "./acl.ts";
 import {
@@ -29,7 +29,16 @@ import {
   expandRoles,
   resolvePermissions,
 } from "./acl.ts";
-import { augmentIntrospection } from "./augmentIntrospection.ts";
+import {
+  augmentIntrospection,
+  augmentIntrospectionData,
+} from "./augmentIntrospection.ts";
+import type {
+  DefaultEntities,
+  Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
+} from "./interfaces.ts";
 import type {
   PgSmartTagsAndDescription,
   PgSmartTagsDict,
@@ -38,8 +47,13 @@ import type {
 export { default as reservedWords } from "./reservedWords.ts";
 export { parseSmartComment } from "./smartComments.ts";
 
+export { augmentIntrospectionData };
+
 export type {
+  DefaultEntities,
   Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -64,81 +78,17 @@ export type {
 export type { AclObject };
 export { aclContainsRole, entityPermissions, expandRoles, resolvePermissions };
 
+/** @deprecated Use introspect or introspectRaw */
 export function parseIntrospectionResults(
   introspectionResults: string,
   includeExtensionResources = false,
-): Introspection {
+): Introspection<DefaultEntities> {
   return augmentIntrospection(introspectionResults, includeExtensionResources);
 }
 
 export type { PgSmartTagsAndDescription, PgSmartTagsDict };
 
-interface IntrospectionLookups {
-  oidByCatalog: Record<string, string>;
-  roleById: Map<string, PgRoles>;
-  roleByName: Record<string, PgRoles>;
-  authMembersByMemberId: Map<string, Set<PgAuthMembers>>;
-  namespaceById: Map<string, PgNamespace>;
-  namespaceByName: Map<string, PgNamespace>;
-  typeById: Map<string, PgType>;
-  classById: Map<string, PgClass>;
-  classByNamespaceName: Map<string, PgClass>;
-  rangeByTypid: Map<string, PgRange>;
-  attributesByRelId: Map<string, PgAttribute[]>;
-  attributeByRelIdAndNum: Map<string, PgAttribute>;
-  constraintById: Map<string, PgConstraint>;
-  constraintsByRelid: Map<string, PgConstraint[]>;
-  constraintByNamespaceName: Map<string, PgConstraint>;
-  foreignConstraintsByRelid: Map<string, PgConstraint[]>;
-  enumById: Map<string, PgEnum>;
-  enumsByTypid: Map<string, PgEnum[]>;
-  indexById: Map<string, PgIndex>;
-  indexesByRelid: Map<string, PgIndex[]>;
-  descriptionByDescriptionKey: Map<string, PgDescription>;
-  procById: Map<string, PgProc>;
-  procsByNamespaceName: Map<string, PgProc[]>;
-  extensionById: Map<string, PgExtension>;
-  languageById: Map<string, PgLanguage>;
-  accessMethodById: Map<string, PgAm>;
-}
-interface IntrospectionCaches {
-  expandRoles: Map<string, PgRoles[]>;
-}
-
 declare module "./introspection.js" {
-  interface Introspection {
-    /**
-     * Use Record/Map to turn O(N) lookups into O(1) lookups. Populated at
-     * startup.
-     *
-     * @internal
-     */
-    _lookups: IntrospectionLookups;
-
-    /**
-     * For calculated values that should not be pre-computed (since they may
-     * not be needed), add caches here to avoid needing WeakMap.
-     *
-     * @internal
-     */
-    _caches: IntrospectionCaches;
-
-    getCurrentUser(): PgRoles | undefined;
-
-    getNamespace(
-      by: { id: string } | { name: string },
-    ): PgNamespace | undefined;
-    getClass(by: { id: string }): PgClass | undefined;
-    getConstraint(by: { id: string }): PgConstraint | undefined;
-    getProc(by: { id: string }): PgProc | undefined;
-    getRoles(by: { id: string }): PgRoles | undefined;
-    getType(by: { id: string }): PgType | undefined;
-    getEnum(by: { id: string }): PgEnum | undefined;
-    getExtension(by: { id: string }): PgExtension | undefined;
-    getIndex(by: { id: string }): PgIndex | undefined;
-    getLanguage(by: { id: string }): PgLanguage | undefined;
-  }
-
   interface PgProcArgument {
     isIn: boolean;
     isOut: boolean;

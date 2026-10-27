@@ -8,9 +8,10 @@ import {
   PUBLIC_ROLE,
   resolvePermissions,
 } from "../src/acl.ts";
-import { augmentIntrospectionParsed } from "../src/augmentIntrospection.ts";
+import { augmentIntrospectionData } from "../src/augmentIntrospection.ts";
+import type { Introspection } from "../src/interfaces.ts";
 import type {
-  Introspection,
+  IntrospectionData,
   PgAuthMembers,
   PgRoles,
 } from "../src/introspection.ts";
@@ -34,7 +35,7 @@ function fakeIntrospection(
   roles: PgRoles[],
   authMembers: Pick<PgAuthMembers, "member" | "roleid">[] = [],
 ): Introspection {
-  return augmentIntrospectionParsed({
+  return augmentIntrospectionData({}, {
     ...rawIntrospectionResults,
     roles,
     auth_members: authMembers.map((am) => ({
@@ -42,7 +43,7 @@ function fakeIntrospection(
       admin_option: false,
       grantor: "0",
     })),
-  } as Introspection);
+  } as IntrospectionData);
 }
 
 describe("expandRoles", () => {
