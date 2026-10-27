@@ -7,8 +7,13 @@ hide_table_of_contents: true
 import Link from "@docusaurus/Link";
 import AuthorSocials from "@theme/Blog/Components/Author/Socials";
 import styles from "./contact.module.css";
+import commonStyles from "@site/src/css/common.module.css";
 
-# The people behind Graphile
+<div className={styles.headingContainer}>
+  <h1 className={commonStyles.instructionSponsor}>
+    {"The people behind Graphile"}
+  </h1>
+</div>
 
 Graphile is the team behind PostGraphile, <Grafast />, Graphile Worker and the wider
 Graphile suite of open-source tools. We build and maintain these projects with
@@ -19,7 +24,7 @@ consultancy and [development support](/support).
   <div className={styles.profile}>
     <img
       className={styles.avatar}
-      src="https://github.com/benjie.png"
+      src="/img/team/benjie.jpg"
       alt="Benjie"
       width="96"
       height="96"
@@ -55,7 +60,7 @@ consultancy and [development support](/support).
   <div className={styles.profile}>
     <img
       className={styles.avatar}
-      src="https://github.com/jemgillam.png"
+      src="/img/team/jem.jpg"
       alt="Jem"
       width="96"
       height="96"
@@ -88,14 +93,16 @@ consultancy and [development support](/support).
 
 <div className={styles.contactSection}>
 
-# Get in touch
+<div className={styles.headingContainer}>
+  <h1 className={commonStyles.instructionSponsor}>{"Get in touch"}</h1>
+</div>
 
 Have a question about <Grafast />, interested in sponsoring development, or want
 to discuss working with us? We'd love to hear from you.
 
 <div className={styles.contactCards}>
   <section className={styles.contactCard}>
-    <div className="padding-horiz--md padding-top--lg">
+    <div>
       <h2>
         <span className={styles.icon} aria-hidden="true">
           <svg
@@ -115,13 +122,13 @@ to discuss working with us? We'd love to hear from you.
         {"Enquiries & sponsorship"}
       </h2>
     </div>
-    <div className="padding-horiz--md">
+    <div>
       <p>
         For consultancy, support contracts, licensing, sponsorship, or funding
         specific development work, please email us.
       </p>
     </div>
-    <div className="padding-horiz--md padding-bottom--lg">
+    <div>
       <Link
         className={`button button--primary ${styles.button}`}
         to="mailto:team@graphile.org"
@@ -131,7 +138,7 @@ to discuss working with us? We'd love to hear from you.
     </div>
   </section>
   <section className={styles.contactCard}>
-    <div className="padding-horiz--md padding-top--lg">
+    <div>
       <h2>
         <span className={styles.icon} aria-hidden="true">
           <svg
@@ -150,13 +157,13 @@ to discuss working with us? We'd love to hear from you.
         {"Community discussions"}
       </h2>
     </div>
-    <div className="padding-horiz--md">
+    <div>
       <p>
         Join our Discord community to ask questions, discuss <Grafast />, share
         what you're building, and connect with other developers.
       </p>
     </div>
-    <div className="padding-horiz--md padding-bottom--lg">
+    <div>
       <Link
         className={`button button--primary ${styles.button}`}
         to="https://discord.gg/graphile"

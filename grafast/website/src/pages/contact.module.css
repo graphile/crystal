@@ -16,9 +16,20 @@
 }
 
 .contactCard {
-  border: 1px solid var(--ifm-color-primary-lighter);
+  --contact-accent: var(--grafast-color-purple);
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  font-weight: normal;
+  font-size: 0.9rem;
+  padding: 1rem;
+  border: 2px solid var(--contact-accent);
+  border-radius: 12px;
+}
+
+.contactCard:nth-child(2) {
+  --contact-accent: var(--grafast-color-pink);
+  border-width: 3px;
 }
 
 .contactCard > :last-child {
@@ -26,7 +37,14 @@
   text-align: center;
 }
 
+.button {
+  composes: comicFont from "@site/src/css/common.module.css";
+}
+
 .contactCard .button {
+  --ifm-button-background-color: var(--contact-accent);
+  --ifm-button-border-color: var(--contact-accent);
+  --ifm-button-color: white;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -41,6 +59,11 @@
   border: none;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.contactCard .button:hover {
+  --ifm-button-background-color: var(--ifm-color-primary-darkest);
+  --ifm-button-border-color: var(--ifm-color-primary-darkest);
 }
 
 .contactCards h2 {
@@ -112,4 +135,7 @@
     width: 3rem;
     height: 3rem;
   }
+}
+.headingContainer {
+  padding: 0.8rem 0;
 }
