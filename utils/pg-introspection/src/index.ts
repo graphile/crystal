@@ -24,7 +24,6 @@ import type {
   PgType,
 } from "./interfaces.ts";
 export { introspect, introspectRaw } from "./incremental.ts";
-export { makeIntrospectionQuery } from "./query.ts";
 import type { AclObject } from "./acl.ts";
 import {
   aclContainsRole,
@@ -36,10 +35,21 @@ import {
   augmentIntrospection,
   augmentIntrospectionData,
 } from "./augmentIntrospection.ts";
+import {
+  defaultEntities,
+  makeIntrospectionQuery as internalMakeIntrospectionQuery,
+} from "./query.ts";
 import type {
   PgSmartTagsAndDescription,
   PgSmartTagsDict,
 } from "./smartComments.ts";
+
+/** @deprecated Use introspect or introspectRaw */
+export function makeIntrospectionQuery() {
+  return internalMakeIntrospectionQuery({
+    onlyEntities: [...defaultEntities],
+  });
+}
 
 export { default as reservedWords } from "./reservedWords.ts";
 export { parseSmartComment } from "./smartComments.ts";
