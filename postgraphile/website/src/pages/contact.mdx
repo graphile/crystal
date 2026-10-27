@@ -1,0 +1,143 @@
+---
+title: Contact
+description: Contact Graphile for commercial enquiries, sponsorship and community discussions.
+hide_table_of_contents: true
+---
+
+import Link from "@docusaurus/Link";
+import AuthorSocials from "@theme/Blog/Components/Author/Socials";
+import styles from "./contact.module.css";
+
+# The people behind Graphile
+
+Graphile is the team behind PostGraphile, Gra*fast*, Graphile Worker and the wider
+Graphile suite of open-source tools. We build and maintain these projects with
+funding from [sponsorship](/sponsor) and commercial services, including
+consultancy and [development support](/support).
+
+<div className={styles.person}>
+  <div className={styles.profile}>
+    <img
+      className={styles.avatar}
+      src="https://github.com/benjie.png"
+      alt="Benjie"
+      width="96"
+      height="96"
+    />
+    <div className={styles.socials}>
+      <AuthorSocials
+        author={{
+          socials: {
+            github: "https://github.com/benjie",
+            bluesky: "https://bsky.app/profile/benjie.dev",
+            linkedin: "https://www.linkedin.com/in/benjiegillam",
+            website: "https://benjie.dev",
+          },
+        }}
+      />
+    </div>
+  </div>
+  <div>
+    <h4>Benjie — Graphile maintainer and GraphQL TSC member</h4>
+
+    <p>
+      Creator of PostGraphile and Gra*fast*, Benjie is a long-standing
+      contributor to the GraphQL ecosystem and a member of the GraphQL Technical
+      Steering Committee. He leads Graphile's software development, bringing
+      deep expertise in GraphQL, PostgreSQL and software architecture to the
+      open-source projects and the companies that rely on them.
+    </p>
+
+  </div>
+</div>
+
+<div className={styles.person}>
+  <div className={styles.profile}>
+    <img
+      className={styles.avatar}
+      src="https://github.com/jemgillam.png"
+      alt="Jem"
+      width="96"
+      height="96"
+    />
+    <div className={styles.socials}>
+      <AuthorSocials
+        author={{
+          socials: {
+            github: "https://github.com/jemgillam",
+            bluesky: "https://bsky.app/profile/jem.graphile.org",
+            linkedin: "https://www.linkedin.com/in/jem-gillam-92063b14",
+          },
+        }}
+      />
+    </div>
+  </div>
+  <div>
+    <h4>Jem — Operations and community</h4>
+
+    <p>
+      Jem leads Graphile's business operations, commercial relationships and
+      software testing. Beyond Graphile, they work with the GraphQL Foundation,
+      leading its Ambassador and Locals programs and supporting the organizers,
+      speakers and community leaders who bring people together across the global
+      GraphQL ecosystem.
+    </p>
+
+  </div>
+</div>
+
+<div className={styles.contactSection}>
+
+# Get in touch
+
+Have a question about PostGraphile, interested in sponsoring development, or want
+to discuss working with us? We'd love to hear from you.
+
+<div className={styles.contactCards}>
+  <section className={styles.contactCard}>
+    <div className={`padding-horiz--md padding-top--lg ${styles.cardHeader}`}>
+      <span className={styles.icon} aria-hidden="true">
+        <Icon icon="fa-solid fa-envelope" />
+      </span>
+      <h2>Commercial enquiries and sponsorship</h2>
+    </div>
+    <div className="padding-horiz--md">
+      <p>
+        For consultancy, support contracts, licensing, sponsorship, or funding
+        specific development work, please email us.
+      </p>
+    </div>
+    <div className="padding-horiz--md padding-bottom--lg">
+      <Link
+        className={`button button--primary ${styles.button}`}
+        to="mailto:team@graphile.org"
+      >
+        {"team@graphile.org"}
+      </Link>
+    </div>
+  </section>
+  <section className={styles.contactCard}>
+    <div className={`padding-horiz--md padding-top--lg ${styles.cardHeader}`}>
+      <span className={styles.icon} aria-hidden="true">
+        <Icon icon="fa-solid fa-comments" />
+      </span>
+      <h2>Community and technical discussions</h2>
+    </div>
+    <div className="padding-horiz--md">
+      <p>
+        Join our Discord community to ask questions, discuss PostGraphile, share
+        what you're building, and connect with other developers.
+      </p>
+    </div>
+    <div className="padding-horiz--md padding-bottom--lg">
+      <Link
+        className={`button button--primary ${styles.button}`}
+        to="https://discord.gg/graphile"
+      >
+        {"Join our Discord community"}
+      </Link>
+    </div>
+  </section>
+</div>
+
+</div>
