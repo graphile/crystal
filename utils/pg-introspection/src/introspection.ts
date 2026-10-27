@@ -437,7 +437,7 @@ function oidFilter(
  * The catalog pg_database stores information about the available databases. Databases are created with the CREATE
  * DATABASE command. Consult [managing-databases] for details about the meaning of some of the parameters.
  */
-export interface PgDatabase {
+export interface PgDatabaseData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -564,7 +564,7 @@ export interface PgDatabase {
  * interface to the SHOW and SET commands. It also provides access to some facts about each parameter that are not
  * directly available from SHOW, such as minimum and maximum values.
  */
-export interface PgSettings {
+export interface PgSettingsData {
   /** Run-time configuration parameter name */
   name: string | null;
 
@@ -629,7 +629,7 @@ export interface PgSettings {
  * The catalog pg_namespace stores namespaces. A namespace is the structure underlying SQL schemas: each namespace can
  * have a separate collection of relations, types, etc. without name conflicts.
  */
-export interface PgNamespace {
+export interface PgNamespaceData {
   /** Row identifier */
   _id: PgOid;
 
@@ -649,7 +649,7 @@ export interface PgNamespace {
  * types, and TOAST tables; see relkind. Below, when we mean all of these kinds of objects we speak of relations. Not
  * all of pg_class's columns are meaningful for all relation kinds.
  */
-export interface PgClass {
+export interface PgClassData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -851,7 +851,7 @@ export interface PgClass {
  * every column in every table in the database. (There will also be attribute entries for indexes, and indeed all
  * objects that have pg_class entries.)
  */
-export interface PgAttribute {
+export interface PgAttributeData {
   /* COMMON FIELDS */
 
   /** The table this column belongs to */
@@ -991,7 +991,7 @@ export interface PgAttribute {
  * columns is stored in pg_attribute. Only columns for which a default expression or generation expression has been
  * explicitly set will have an entry here.
  */
-export interface PgAttrdef {
+export interface PgAttrdefData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -1024,7 +1024,7 @@ export interface PgAttrdef {
  * tables. (Column constraints are not treated specially. Every column constraint is equivalent to some table
  * constraint.)
  */
-export interface PgConstraint {
+export interface PgConstraintData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -1186,7 +1186,7 @@ export interface PgConstraint {
  * (collectively also known as routines). See [sql-createfunction], [sql-createprocedure], and [xfunc] for more
  * information.
  */
-export interface PgProcSys {
+export interface PgProcSysData {
   /** Row identifier */
   _id: PgOid;
 
@@ -1202,7 +1202,7 @@ export interface PgProcSys {
  * (collectively also known as routines). See [sql-createfunction], [sql-createprocedure], and [xfunc] for more
  * information.
  */
-export interface PgProc {
+export interface PgProcData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -1382,7 +1382,7 @@ export interface PgProc {
  * pg_aggregate is an extension of an entry in pg_proc. The pg_proc entry carries the aggregate's name, input and
  * output data types, and other information that is similar to ordinary functions.
  */
-export interface PgAggregate {
+export interface PgAggregateData {
   /* COMMON FIELDS */
 
   /** pg_proc OID of the aggregate function */
@@ -1480,7 +1480,7 @@ export interface PgAggregate {
  * The view pg_roles provides access to information about database roles. This is simply a publicly readable view of
  * pg_authid that blanks out the password field.
  */
-export interface PgRoles {
+export interface PgRolesData {
   /** Role name */
   rolname: PgName;
 
@@ -1531,7 +1531,7 @@ export interface PgRoles {
  * The catalog pg_db_role_setting records the default values that have been set for run-time configuration variables,
  * for each role and database combination.
  */
-export interface PgDbRoleSetting {
+export interface PgDbRoleSettingData {
   /** The OID of the database the setting is applicable to, or zero if not database-specific */
   setdatabase: PgOid | null;
 
@@ -1546,7 +1546,7 @@ export interface PgDbRoleSetting {
  * The catalog pg_auth_members shows the membership relations between roles. Any non-circular set of relationships is
  * allowed.
  */
-export interface PgAuthMembers {
+export interface PgAuthMembersData {
   /* COMMON FIELDS */
 
   /** ID of a role that has a member */
@@ -1586,7 +1586,7 @@ export interface PgAuthMembers {
 }
 
 /** The catalog pg_default_acl stores initial privileges to be assigned to newly created objects. */
-export interface PgDefaultAcl {
+export interface PgDefaultAclData {
   /** Row identifier */
   _id: PgOid;
 
@@ -1617,7 +1617,7 @@ export interface PgDefaultAcl {
  * database, to represent the row structure of the table. It is also possible to create composite types with CREATE
  * TYPE AS.
  */
-export interface PgType {
+export interface PgTypeData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -1798,7 +1798,7 @@ export interface PgType {
  * The pg_enum catalog contains entries showing the values and labels for each enum type. The internal representation
  * of a given enum value is actually the OID of its associated row in pg_enum.
  */
-export interface PgEnum {
+export interface PgEnumData {
   /** Row identifier */
   _id: PgOid;
 
@@ -1813,7 +1813,7 @@ export interface PgEnum {
 }
 
 /** The catalog pg_event_trigger stores event triggers. See [event-triggers] for more information. */
-export interface PgEventTrigger {
+export interface PgEventTriggerData {
   /* COMMON FIELDS */
 
   /** Trigger name (must be unique) */
@@ -1858,7 +1858,7 @@ export interface PgEventTrigger {
  * The catalog pg_extension stores information about the installed extensions. See [extend-extensions] for details
  * about extensions.
  */
-export interface PgExtension {
+export interface PgExtensionData {
   /** Row identifier */
   _id: PgOid;
 
@@ -1888,7 +1888,7 @@ export interface PgExtension {
  * The catalog pg_foreign_data_wrapper stores foreign-data wrapper definitions. A foreign-data wrapper is the mechanism
  * by which external data, residing on foreign servers, is accessed.
  */
-export interface PgForeignDataWrapper {
+export interface PgForeignDataWrapperData {
   /** Row identifier */
   _id: PgOid;
 
@@ -1922,7 +1922,7 @@ export interface PgForeignDataWrapper {
  * The catalog pg_foreign_server stores foreign server definitions. A foreign server describes a source of external
  * data, such as a remote server. Foreign servers are accessed via foreign-data wrappers.
  */
-export interface PgForeignServer {
+export interface PgForeignServerData {
   /** Row identifier */
   _id: PgOid;
 
@@ -1953,7 +1953,7 @@ export interface PgForeignServer {
  * represented by a pg_class entry, just like a regular table. Its pg_foreign_table entry contains the information that
  * is pertinent only to foreign tables and not any other kind of relation.
  */
-export interface PgForeignTable {
+export interface PgForeignTableData {
   /** The OID of the pg_class entry for this foreign table */
   ftrelid: PgOid | null;
 
@@ -1965,7 +1965,7 @@ export interface PgForeignTable {
 }
 
 /** The catalog pg_index contains part of the information about indexes. The rest is mostly in pg_class. */
-export interface PgIndex {
+export interface PgIndexData {
   /* COMMON FIELDS */
 
   /** The OID of the pg_class entry for this index */
@@ -2083,7 +2083,7 @@ export interface PgIndex {
  * each direct parent-child table or index relationship in the database. (Indirect inheritance can be determined by
  * following chains of entries.)
  */
-export interface PgInherits {
+export interface PgInheritsData {
   /* COMMON FIELDS */
 
   /** The OID of the child table or index */
@@ -2112,7 +2112,7 @@ export interface PgInherits {
  * The catalog pg_language registers languages in which you can write functions or stored procedures. See
  * [sql-createlanguage] and [xplang] for more information about language handlers.
  */
-export interface PgLanguage {
+export interface PgLanguageData {
   /** Row identifier */
   _id: PgOid;
 
@@ -2163,7 +2163,7 @@ export interface PgLanguage {
  * qualification to queries that include the table, and the expression to be added as a WITH CHECK option for queries
  * that attempt to add new records to the table.
  */
-export interface PgPolicy {
+export interface PgPolicyData {
   /* COMMON FIELDS */
 
   /** The name of the policy */
@@ -2201,7 +2201,7 @@ export interface PgPolicy {
 }
 
 /** The catalog pg_range stores information about range types. This is in addition to the types' entries in pg_type. */
-export interface PgRange {
+export interface PgRangeData {
   /* COMMON FIELDS */
 
   /** OID of the range type */
@@ -2233,7 +2233,7 @@ export interface PgRange {
 }
 
 /** The catalog pg_rewrite stores rewrite rules for tables and views. */
-export interface PgRewrite {
+export interface PgRewriteData {
   /** Row identifier */
   _id: PgOid;
 
@@ -2267,7 +2267,7 @@ export interface PgRewrite {
 }
 
 /** The catalog pg_trigger stores triggers on tables and views. See [sql-createtrigger] for more information. */
-export interface PgTrigger {
+export interface PgTriggerData {
   /* COMMON FIELDS */
 
   /** Row identifier */
@@ -2352,7 +2352,7 @@ export interface PgTrigger {
  * The catalog pg_depend records the dependency relationships between database objects. This information allows DROP
  * commands to find which other objects must be dropped by DROP CASCADE or prevent dropping in the DROP RESTRICT case.
  */
-export interface PgDepend {
+export interface PgDependData {
   /** The OID of the system catalog the dependent object is in */
   classid: PgOid;
 
@@ -2386,7 +2386,7 @@ export interface PgDepend {
  * manipulated with the COMMENT command and viewed with psql's `\d` commands. Descriptions of many built-in system
  * objects are provided in the initial contents of pg_description.
  */
-export interface PgDescription {
+export interface PgDescriptionData {
   /** The OID of the object this description pertains to */
   objoid: PgOid;
 
@@ -2404,7 +2404,7 @@ export interface PgDescription {
 }
 
 /**  */
-export interface PgStatUserTables {
+export interface PgStatUserTablesData {
   /* COMMON FIELDS */
 
   /** OID of a table */
@@ -2545,7 +2545,7 @@ export interface PgStatUserTables {
  * supported by the system. Currently, only tables and indexes have access methods. The requirements for table and
  * index access methods are discussed in detail in [tableam] and [indexam] respectively.
  */
-export interface PgAm {
+export interface PgAmData {
   /** Row identifier */
   _id: PgOid;
 
@@ -2563,38 +2563,38 @@ export interface PgAm {
  * This type contains a description of everything we care about in the database.
  */
 export interface IntrospectionData {
-  database: PgDatabase;
-  settings: Array<PgSettings>;
-  namespaces: Array<PgNamespace>;
-  classes: Array<PgClass>;
-  attributes: Array<PgAttribute>;
-  attribute_defaults: Array<PgAttrdef>;
-  constraints: Array<PgConstraint>;
-  sys_procs: Array<PgProcSys>;
-  procs: Array<PgProc>;
-  aggregates: Array<PgAggregate>;
-  roles: Array<PgRoles>;
-  db_role_settings: Array<PgDbRoleSetting>;
-  auth_members: Array<PgAuthMembers>;
-  default_acls: Array<PgDefaultAcl>;
-  types: Array<PgType>;
-  enums: Array<PgEnum>;
-  event_triggers: Array<PgEventTrigger>;
-  extensions: Array<PgExtension>;
-  foreign_data_wrappers: Array<PgForeignDataWrapper>;
-  foreign_servers: Array<PgForeignServer>;
-  foreign_tables: Array<PgForeignTable>;
-  indexes: Array<PgIndex>;
-  inherits: Array<PgInherits>;
-  languages: Array<PgLanguage>;
-  policies: Array<PgPolicy>;
-  ranges: Array<PgRange>;
-  rewrites: Array<PgRewrite>;
-  triggers: Array<PgTrigger>;
-  depends: Array<PgDepend>;
-  descriptions: Array<PgDescription>;
-  stat_user_tables: Array<PgStatUserTables>;
-  am: Array<PgAm>;
+  database: PgDatabaseData;
+  settings: Array<PgSettingsData>;
+  namespaces: Array<PgNamespaceData>;
+  classes: Array<PgClassData>;
+  attributes: Array<PgAttributeData>;
+  attribute_defaults: Array<PgAttrdefData>;
+  constraints: Array<PgConstraintData>;
+  sys_procs: Array<PgProcSysData>;
+  procs: Array<PgProcData>;
+  aggregates: Array<PgAggregateData>;
+  roles: Array<PgRolesData>;
+  db_role_settings: Array<PgDbRoleSettingData>;
+  auth_members: Array<PgAuthMembersData>;
+  default_acls: Array<PgDefaultAclData>;
+  types: Array<PgTypeData>;
+  enums: Array<PgEnumData>;
+  event_triggers: Array<PgEventTriggerData>;
+  extensions: Array<PgExtensionData>;
+  foreign_data_wrappers: Array<PgForeignDataWrapperData>;
+  foreign_servers: Array<PgForeignServerData>;
+  foreign_tables: Array<PgForeignTableData>;
+  indexes: Array<PgIndexData>;
+  inherits: Array<PgInheritsData>;
+  languages: Array<PgLanguageData>;
+  policies: Array<PgPolicyData>;
+  ranges: Array<PgRangeData>;
+  rewrites: Array<PgRewriteData>;
+  triggers: Array<PgTriggerData>;
+  depends: Array<PgDependData>;
+  descriptions: Array<PgDescriptionData>;
+  stat_user_tables: Array<PgStatUserTablesData>;
+  am: Array<PgAmData>;
 
   /**
    * Catalogs such as pg_class, pg_attribute, etc have oids; this loopup lets us
@@ -2617,36 +2617,36 @@ export interface IntrospectionData {
  * A PG entity can be any entity represented in a system catalog: a table, view,
  * column, function, index, etc.
  */
-export type PgEntity =
-  | PgDatabase
-  | PgSettings
-  | PgNamespace
-  | PgClass
-  | PgAttribute
-  | PgAttrdef
-  | PgConstraint
-  | PgProcSys
-  | PgProc
-  | PgAggregate
-  | PgRoles
-  | PgDbRoleSetting
-  | PgAuthMembers
-  | PgDefaultAcl
-  | PgType
-  | PgEnum
-  | PgEventTrigger
-  | PgExtension
-  | PgForeignDataWrapper
-  | PgForeignServer
-  | PgForeignTable
-  | PgIndex
-  | PgInherits
-  | PgLanguage
-  | PgPolicy
-  | PgRange
-  | PgRewrite
-  | PgTrigger
-  | PgDepend
-  | PgDescription
-  | PgStatUserTables
-  | PgAm;
+export type PgEntityData =
+  | PgDatabaseData
+  | PgSettingsData
+  | PgNamespaceData
+  | PgClassData
+  | PgAttributeData
+  | PgAttrdefData
+  | PgConstraintData
+  | PgProcSysData
+  | PgProcData
+  | PgAggregateData
+  | PgRolesData
+  | PgDbRoleSettingData
+  | PgAuthMembersData
+  | PgDefaultAclData
+  | PgTypeData
+  | PgEnumData
+  | PgEventTriggerData
+  | PgExtensionData
+  | PgForeignDataWrapperData
+  | PgForeignServerData
+  | PgForeignTableData
+  | PgIndexData
+  | PgInheritsData
+  | PgLanguageData
+  | PgPolicyData
+  | PgRangeData
+  | PgRewriteData
+  | PgTriggerData
+  | PgDependData
+  | PgDescriptionData
+  | PgStatUserTablesData
+  | PgAmData;
