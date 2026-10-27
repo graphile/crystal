@@ -58,7 +58,7 @@ export type Introspection<TEntities extends EntityType = DefaultEntities> =
        *
        * @internal
        */
-      _lookups: IntrospectionLookups;
+      _lookups: IntrospectionLookups<TEntities>;
 
       /**
        * For calculated values that should not be pre-computed (since they may
@@ -84,7 +84,7 @@ export type Introspection<TEntities extends EntityType = DefaultEntities> =
       getLanguage(by: { id: string }): PgLanguage | undefined;
     };
 
-export interface IntrospectionLookups {
+interface AllIntrospectionLookups {
   oidByCatalog: Record<string, string>;
   roleById: Map<string, PgRoles>;
   roleByName: Record<string, PgRoles>;
@@ -112,6 +112,52 @@ export interface IntrospectionLookups {
   languageById: Map<string, PgLanguage>;
   accessMethodById: Map<string, PgAm>;
 }
+type CheckLookupEntities<
+  T extends Record<
+    Exclude<keyof AllIntrospectionLookups, "oidByCatalog">,
+    EntityType
+  >,
+> = T;
+
+type LookupEntities = CheckLookupEntities<{
+  roleById: "roles";
+  roleByName: "roles";
+  authMembersByMemberId: "auth_members";
+  namespaceById: "namespaces";
+  namespaceByName: "namespaces";
+  typeById: "types";
+  classById: "classes";
+  classByNamespaceName: "classes";
+  rangeByTypid: "ranges";
+  attributesByRelId: "attributes";
+  attributeByRelIdAndNum: "attributes";
+  constraintById: "constraints";
+  constraintsByRelid: "constraints";
+  constraintByNamespaceName: "constraints";
+  foreignConstraintsByRelid: "constraints";
+  enumById: "enums";
+  enumsByTypid: "enums";
+  indexById: "indexes";
+  indexesByRelid: "indexes";
+  descriptionByDescriptionKey: "descriptions";
+  procById: "procs";
+  procsByNamespaceName: "procs";
+  extensionById: "extensions";
+  languageById: "languages";
+  accessMethodById: "am";
+}>;
+
+type LookupKeysForEntities<TEntities extends EntityType> = {
+  [K in keyof LookupEntities]: LookupEntities[K] extends TEntities ? K : never;
+}[keyof LookupEntities];
+
+export type IntrospectionLookups<TEntities extends EntityType = never> = Pick<
+  AllIntrospectionLookups,
+  "oidByCatalog"
+> &
+  Partial<Omit<AllIntrospectionLookups, "oidByCatalog">> &
+  Pick<AllIntrospectionLookups, LookupKeysForEntities<TEntities>>;
+
 interface IntrospectionCaches {
   expandRoles: Map<string, PgRoles[]>;
 }

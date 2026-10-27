@@ -10,6 +10,7 @@ import type {
 import type { PgDescription } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
 import { defaultEntities } from "./query.ts";
+import { assertExists } from "./assertExists.ts";
 
 function del<T extends Record<string, any>, TKey extends keyof T>(
   toDelete: Set<string>,
@@ -39,38 +40,7 @@ function attributeRelNumKey(relid: string, attnum: number) {
   return `${relid}|${attnum}`;
 }
 
-function createEmptyLookups(): IntrospectionLookups {
-  return {
-    oidByCatalog: Object.create(null),
-    roleById: new Map(),
-    roleByName: Object.create(null),
-    authMembersByMemberId: new Map(),
-    namespaceById: new Map(),
-    namespaceByName: new Map(),
-    typeById: new Map(),
-    classById: new Map(),
-    classByNamespaceName: new Map(),
-    rangeByTypid: new Map(),
-    attributesByRelId: new Map(),
-    attributeByRelIdAndNum: new Map(),
-    constraintById: new Map(),
-    constraintsByRelid: new Map(),
-    constraintByNamespaceName: new Map(),
-    foreignConstraintsByRelid: new Map(),
-    enumById: new Map(),
-    enumsByTypid: new Map(),
-    indexById: new Map(),
-    indexesByRelid: new Map(),
-    descriptionByDescriptionKey: new Map(),
-    procById: new Map(),
-    procsByNamespaceName: new Map(),
-    extensionById: new Map(),
-    languageById: new Map(),
-    accessMethodById: new Map(),
-  };
-}
-
-function createLookups<TEntities extends EntityType = DefaultEntities>(
+function populateLookups<TEntities extends EntityType = DefaultEntities>(
   introspection: Introspection<TEntities>,
   lookups: IntrospectionLookups,
 ) {
@@ -103,17 +73,22 @@ function createLookups<TEntities extends EntityType = DefaultEntities>(
   } = lookups;
 
   if (introspection.namespaces) {
+    assertExists(namespaceById, "namespaces");
+    assertExists(namespaceByName, "namespaces");
     for (const entity of introspection.namespaces) {
       namespaceById.set(entity._id, entity);
       namespaceByName.set(entity.nspname, entity);
     }
   }
   if (introspection.types) {
+    assertExists(typeById, "types");
     for (const entity of introspection.types) {
       typeById.set(entity._id, entity);
     }
   }
   if (introspection.classes) {
+    assertExists(classById, "classes");
+    assertExists(classByNamespaceName, "classes");
     for (const entity of introspection.classes) {
       classById.set(entity._id, entity);
       classByNamespaceName.set(
@@ -123,6 +98,8 @@ function createLookups<TEntities extends EntityType = DefaultEntities>(
     }
   }
   if (introspection.procs) {
+    assertExists(procById, "procs");
+    assertExists(procsByNamespaceName, "procs");
     for (const entity of introspection.procs) {
       procById.set(entity._id, entity);
       addListItem(
@@ -133,27 +110,32 @@ function createLookups<TEntities extends EntityType = DefaultEntities>(
     }
   }
   if (introspection.extensions) {
+    assertExists(extensionById, "extensions");
     for (const entity of introspection.extensions) {
       extensionById.set(entity._id, entity);
     }
   }
   if (introspection.languages) {
+    assertExists(languageById, "languages");
     for (const entity of introspection.languages) {
       languageById.set(entity._id, entity);
     }
   }
   if (introspection.am) {
+    assertExists(accessMethodById, "am");
     for (const entity of introspection.am) {
       accessMethodById.set(entity._id, entity);
     }
   }
   if (introspection.ranges) {
+    assertExists(rangeByTypid, "ranges");
     for (const entity of introspection.ranges) {
       if (entity.rngtypid == null) continue;
       rangeByTypid.set(entity.rngtypid, entity);
     }
   }
   if (introspection.descriptions) {
+    assertExists(descriptionByDescriptionKey, "descriptions");
     for (const entity of introspection.descriptions) {
       descriptionByDescriptionKey.set(descriptionKey(entity), entity);
     }
@@ -174,6 +156,10 @@ function createLookups<TEntities extends EntityType = DefaultEntities>(
 
   // Constraints (sorted)
   if (introspection.constraints) {
+    assertExists(constraintById, "constraints");
+    assertExists(constraintsByRelid, "constraints");
+    assertExists(constraintByNamespaceName, "constraints");
+    assertExists(foreignConstraintsByRelid, "constraints");
     for (const entity of introspection.constraints) {
       constraintById.set(entity._id, entity);
       constraintByNamespaceName.set(
@@ -188,12 +174,16 @@ function createLookups<TEntities extends EntityType = DefaultEntities>(
       }
     }
   }
-  for (const list of constraintsByRelid.values()) {
-    list.sort((a, z) => a.conname.localeCompare(z.conname, "en-US"));
+  if (constraintsByRelid) {
+    for (const list of constraintsByRelid.values()) {
+      list.sort((a, z) => a.conname.localeCompare(z.conname, "en-US"));
+    }
   }
 
   // Attributes (sorted)
   if (introspection.attributes) {
+    assertExists(attributesByRelId, "attributes");
+    assertExists(attributeByRelIdAndNum, "attributes");
     for (const entity of introspection.attributes) {
       addListItem(attributesByRelId, entity.attrelid, entity);
       attributeByRelIdAndNum.set(
@@ -202,40 +192,57 @@ function createLookups<TEntities extends EntityType = DefaultEntities>(
       );
     }
   }
-  for (const list of attributesByRelId.values()) {
-    list.sort((a, z) => a.attnum - z.attnum);
+  if (attributesByRelId) {
+    for (const list of attributesByRelId.values()) {
+      list.sort((a, z) => a.attnum - z.attnum);
+    }
   }
 
   // Enums (sorted)
   if (introspection.enums) {
+    assertExists(enumById, "enums");
+    assertExists(enumsByTypid, "enums");
     for (const entity of introspection.enums) {
       enumById.set(entity._id, entity);
       addListItem(enumsByTypid, entity.enumtypid, entity);
     }
   }
-  for (const list of enumsByTypid.values()) {
-    list.sort((a, z) => a.enumsortorder - z.enumsortorder);
+  if (enumsByTypid) {
+    for (const list of enumsByTypid.values()) {
+      list.sort((a, z) => a.enumsortorder - z.enumsortorder);
+    }
   }
 
   if (introspection.indexes) {
+    assertExists(indexById, "indexes");
+    assertExists(indexesByRelid, "indexes");
     for (const entity of introspection.indexes) {
       indexById.set(entity.indexrelid, entity);
       addListItem(indexesByRelid, entity.indrelid, entity);
     }
   }
 
-  roleById.set(PUBLIC_ROLE._id, PUBLIC_ROLE);
-  roleByName[PUBLIC_ROLE.rolname] = PUBLIC_ROLE;
-  authMembersByMemberId.set(PUBLIC_ROLE._id, new Set());
   if (introspection.roles) {
+    assertExists(roleById, "roles");
+    assertExists(roleByName, "roles");
+    roleById.set(PUBLIC_ROLE._id, PUBLIC_ROLE);
+    roleByName[PUBLIC_ROLE.rolname] = PUBLIC_ROLE;
     for (const role of introspection.roles) {
       roleById.set(role._id, role);
       roleByName[role.rolname] = role;
-      authMembersByMemberId.set(role._id, new Set());
+    }
+  }
+  if (authMembersByMemberId) {
+    authMembersByMemberId.set(PUBLIC_ROLE._id, new Set());
+    if (introspection.roles) {
+      for (const role of introspection.roles) {
+        authMembersByMemberId.set(role._id, new Set());
+      }
     }
   }
 
   if (introspection.auth_members) {
+    assertExists(authMembersByMemberId, "auth_members");
     for (const am of introspection.auth_members) {
       const set = authMembersByMemberId.get(am.member);
       if (!set) {
@@ -278,6 +285,12 @@ export function augmentIntrospection(
   );
 }
 
+/**
+ * Adds navigation and other helpers to raw introspection data.
+ *
+ * `options` must be the exact same options passed to `introspectRaw` when
+ * obtaining `introspectionData`.
+ */
 export function augmentIntrospectionData<
   TEntities extends EntityType = DefaultEntities,
 >(
@@ -285,7 +298,62 @@ export function augmentIntrospectionData<
   introspectionData: IntrospectionDataForEntities<TEntities>,
 ): Introspection<TEntities> {
   const { includeExtensionResources } = options;
-  const lookups = createEmptyLookups();
+  // Lookups exist only when their corresponding collection was supplied.
+  const lookups: IntrospectionLookups = {
+    oidByCatalog: Object.create(null),
+    ...(introspectionData.roles && {
+      roleById: new Map(),
+      roleByName: Object.create(null),
+    }),
+    ...(introspectionData.auth_members && {
+      authMembersByMemberId: new Map(),
+    }),
+    ...(introspectionData.namespaces && {
+      namespaceById: new Map(),
+      namespaceByName: new Map(),
+    }),
+    ...(introspectionData.types && { typeById: new Map() }),
+    ...(introspectionData.classes && {
+      classById: new Map(),
+      classByNamespaceName: new Map(),
+    }),
+    ...(introspectionData.ranges && { rangeByTypid: new Map() }),
+    ...(introspectionData.attributes && {
+      attributesByRelId: new Map(),
+      attributeByRelIdAndNum: new Map(),
+    }),
+    ...(introspectionData.constraints && {
+      constraintById: new Map(),
+      constraintsByRelid: new Map(),
+      constraintByNamespaceName: new Map(),
+      foreignConstraintsByRelid: new Map(),
+    }),
+    ...(introspectionData.enums && {
+      enumById: new Map(),
+      enumsByTypid: new Map(),
+    }),
+    ...(introspectionData.indexes && {
+      indexById: new Map(),
+      indexesByRelid: new Map(),
+    }),
+    ...(introspectionData.descriptions && {
+      descriptionByDescriptionKey: new Map(),
+    }),
+    ...(introspectionData.procs && {
+      procById: new Map(),
+      procsByNamespaceName: new Map(),
+    }),
+    ...(introspectionData.extensions && {
+      extensionById: new Map(),
+    }),
+    ...(introspectionData.languages && {
+      languageById: new Map(),
+    }),
+    ...(introspectionData.am && {
+      accessMethodById: new Map(),
+    }),
+  };
+
   for (const [oid, catalog] of Object.entries(
     introspectionData.catalog_by_oid,
   )) {
@@ -357,22 +425,55 @@ export function augmentIntrospectionData<
     }),
     _lookups: lookups,
     _caches: createCaches(options),
-    getCurrentUser: () => lookups.roleByName[introspectionData.current_user],
-    getNamespace: (by: { id: string } | { name: string }) =>
-      "id" in by && by.id
+    getCurrentUser: () => {
+      assertExists(lookups.roleByName, "roles");
+      return lookups.roleByName[introspectionData.current_user];
+    },
+    getNamespace: (by: { id: string } | { name: string }) => {
+      assertExists(lookups.namespaceById, "namespaces");
+      assertExists(lookups.namespaceByName, "namespaces");
+      return "id" in by && by.id
         ? lookups.namespaceById.get(by.id)
         : "name" in by && by.name
           ? lookups.namespaceByName.get(by.name)
-          : undefined,
-    getClass: (by: { id: string }) => lookups.classById.get(by.id),
-    getConstraint: (by: { id: string }) => lookups.constraintById.get(by.id),
-    getProc: (by: { id: string }) => lookups.procById.get(by.id),
-    getRoles: (by: { id: string }) => lookups.roleById.get(by.id),
-    getType: (by: { id: string }) => lookups.typeById.get(by.id),
-    getEnum: (by: { id: string }) => lookups.enumById.get(by.id),
-    getExtension: (by: { id: string }) => lookups.extensionById.get(by.id),
-    getIndex: (by: { id: string }) => lookups.indexById.get(by.id),
-    getLanguage: (by: { id: string }) => lookups.languageById.get(by.id),
+          : undefined;
+    },
+    getClass: (by: { id: string }) => {
+      assertExists(lookups.classById, "classes");
+      return lookups.classById.get(by.id);
+    },
+    getConstraint: (by: { id: string }) => {
+      assertExists(lookups.constraintById, "constraints");
+      return lookups.constraintById.get(by.id);
+    },
+    getProc: (by: { id: string }) => {
+      assertExists(lookups.procById, "procs");
+      return lookups.procById.get(by.id);
+    },
+    getRoles: (by: { id: string }) => {
+      assertExists(lookups.roleById, "roles");
+      return lookups.roleById.get(by.id);
+    },
+    getType: (by: { id: string }) => {
+      assertExists(lookups.typeById, "types");
+      return lookups.typeById.get(by.id);
+    },
+    getEnum: (by: { id: string }) => {
+      assertExists(lookups.enumById, "enums");
+      return lookups.enumById.get(by.id);
+    },
+    getExtension: (by: { id: string }) => {
+      assertExists(lookups.extensionById, "extensions");
+      return lookups.extensionById.get(by.id);
+    },
+    getIndex: (by: { id: string }) => {
+      assertExists(lookups.indexById, "indexes");
+      return lookups.indexById.get(by.id);
+    },
+    getLanguage: (by: { id: string }) => {
+      assertExists(lookups.languageById, "languages");
+      return lookups.languageById.get(by.id);
+    },
   } satisfies Introspection<never>;
   // Each selected collection is present in the input and retained above, but
   // TypeScript cannot follow that relationship through generic object spreads.
@@ -381,7 +482,7 @@ export function augmentIntrospectionData<
     augmented,
   ) as Introspection<TEntities>;
   const introspection = result;
-  createLookups(introspection, lookups);
+  populateLookups(introspection, lookups);
   const { oidByCatalog } = lookups;
 
   if (!includeExtensionResources) {
