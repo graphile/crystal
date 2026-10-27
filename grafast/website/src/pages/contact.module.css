@@ -66,8 +66,10 @@
   --ifm-button-border-color: var(--ifm-color-primary-darkest);
 }
 
-.contactCards h2 {
-  font-size: var(--ifm-h3-font-size);
+.cardTitle {
+  composes: comicFont from "@site/src/css/common.module.css";
+  color: var(--contact-accent);
+  font-size: var(--ifm-h2-font-size);
   margin-bottom: 0.75rem;
 }
 
