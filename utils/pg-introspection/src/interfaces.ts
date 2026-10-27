@@ -1,23 +1,32 @@
 import type {
   EntityType,
   IntrospectionData,
-  PgAm,
-  PgAttribute,
-  PgAuthMembers,
-  PgClass,
-  PgConstraint,
-  PgDescription,
-  PgEnum,
-  PgExtension,
-  PgIndex,
-  PgLanguage,
-  PgNamespace,
-  PgProc,
-  PgRange,
-  PgRoles,
-  PgType,
-} from "./introspection";
-import type { defaultEntities } from "./query";
+  PgEntityData,
+  PgAmData,
+  PgAttributeData,
+  PgAuthMembersData,
+  PgClassData,
+  PgConstraintData,
+  PgDatabaseData,
+  PgDependData,
+  PgDescriptionData,
+  PgEnumData,
+  PgExtensionData,
+  PgIndexData,
+  PgInheritsData,
+  PgLanguageData,
+  PgNamespaceData,
+  PgProcData,
+  PgRangeData,
+  PgRolesData,
+  PgTypeData,
+} from "./introspection.ts";
+import type { defaultEntities } from "./query.ts";
+import type { AclObject } from "./acl.ts";
+import type {
+  PgSmartTagsAndDescription,
+  PgSmartTagsDict,
+} from "./smartComments.ts";
 
 export type DefaultEntities = (typeof defaultEntities)[number];
 
@@ -29,7 +38,6 @@ export interface IntrospectOptions<
   includeExtensionResources?: boolean;
 }
 
-// TODO: represent introspection data and augmented introspection separately
 export type IntrospectionDataForEntities<
   TEntities extends EntityType = DefaultEntities,
 > = Partial<IntrospectionData> &
@@ -42,40 +50,41 @@ type FixedIntrospectionKeys =
   | "introspection_version";
 
 export type Introspection<TEntities extends EntityType = DefaultEntities> =
-  IntrospectionDataForEntities<TEntities> & {
-    /**
-     * Use Record/Map to turn O(N) lookups into O(1) lookups. Populated at
-     * startup.
-     *
-     * @internal
-     */
-    _lookups: IntrospectionLookups;
+  Partial<AugmentedIntrospectionData> &
+    Pick<AugmentedIntrospectionData, TEntities | FixedIntrospectionKeys> & {
+      /**
+       * Use Record/Map to turn O(N) lookups into O(1) lookups. Populated at
+       * startup.
+       *
+       * @internal
+       */
+      _lookups: IntrospectionLookups;
 
-    /**
-     * For calculated values that should not be pre-computed (since they may
-     * not be needed), add caches here to avoid needing WeakMap.
-     *
-     * @internal
-     */
-    _caches: IntrospectionCaches;
+      /**
+       * For calculated values that should not be pre-computed (since they may
+       * not be needed), add caches here to avoid needing WeakMap.
+       *
+       * @internal
+       */
+      _caches: IntrospectionCaches;
 
-    getCurrentUser(): PgRoles | undefined;
+      getCurrentUser(): PgRoles | undefined;
 
-    getNamespace(
-      by: { id: string } | { name: string },
-    ): PgNamespace | undefined;
-    getClass(by: { id: string }): PgClass | undefined;
-    getConstraint(by: { id: string }): PgConstraint | undefined;
-    getProc(by: { id: string }): PgProc | undefined;
-    getRoles(by: { id: string }): PgRoles | undefined;
-    getType(by: { id: string }): PgType | undefined;
-    getEnum(by: { id: string }): PgEnum | undefined;
-    getExtension(by: { id: string }): PgExtension | undefined;
-    getIndex(by: { id: string }): PgIndex | undefined;
-    getLanguage(by: { id: string }): PgLanguage | undefined;
-  };
+      getNamespace(
+        by: { id: string } | { name: string },
+      ): PgNamespace | undefined;
+      getClass(by: { id: string }): PgClass | undefined;
+      getConstraint(by: { id: string }): PgConstraint | undefined;
+      getProc(by: { id: string }): PgProc | undefined;
+      getRoles(by: { id: string }): PgRoles | undefined;
+      getType(by: { id: string }): PgType | undefined;
+      getEnum(by: { id: string }): PgEnum | undefined;
+      getExtension(by: { id: string }): PgExtension | undefined;
+      getIndex(by: { id: string }): PgIndex | undefined;
+      getLanguage(by: { id: string }): PgLanguage | undefined;
+    };
 
-interface IntrospectionLookups {
+export interface IntrospectionLookups {
   oidByCatalog: Record<string, string>;
   roleById: Map<string, PgRoles>;
   roleByName: Record<string, PgRoles>;
@@ -106,3 +115,202 @@ interface IntrospectionLookups {
 interface IntrospectionCaches {
   expandRoles: Map<string, PgRoles[]>;
 }
+
+export type PgAm = PgAmData;
+export type PgAuthMembers = PgAuthMembersData;
+export type PgDepend = PgDependData;
+export type PgDescription = PgDescriptionData;
+export type PgExtension = PgExtensionData;
+export type PgLanguage = PgLanguageData;
+export type PgRoles = PgRolesData;
+
+export interface PgProcArgument {
+  isIn: boolean;
+  isOut: boolean;
+  isVariadic: boolean;
+  hasDefault: boolean;
+  type: PgType;
+  name: string | null;
+}
+
+export interface PgDatabase extends PgDatabaseData {
+  _type: "PgDatabase";
+  /** @deprecated Use getOwner instead */
+  getDba(): PgRoles | undefined;
+  getOwner(): PgRoles | undefined;
+  getACL(): AclObject[];
+}
+export interface PgNamespace extends PgNamespaceData {
+  _type: "PgNamespace";
+  getOwner(): PgRoles | undefined;
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+  getACL(): AclObject[];
+
+  getClass(by: { name: string }): PgClass | undefined;
+  getConstraint(by: { name: string }): PgConstraint | undefined;
+  getProcs(by: { name: string }): PgProc[] | undefined;
+}
+export interface PgClass extends PgClassData {
+  _type: "PgClass";
+  getNamespace(): PgNamespace | undefined;
+  getType(): PgType | undefined;
+  getOfType(): PgType | undefined;
+  getOwner(): PgRoles | undefined;
+  getAttributes(): PgAttribute[];
+  getAttribute(
+    by: { number: number } | { name: string },
+  ): PgAttribute | undefined;
+  getConstraints(): PgConstraint[];
+  getForeignConstraints(): PgConstraint[];
+  getIndexes(): PgIndex[];
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+  getACL(): AclObject[];
+  getInherited(): PgInherits[];
+  getAccessMethod(): PgAm | undefined;
+}
+export interface PgIndex extends PgIndexData {
+  _type: "PgIndex";
+  /**
+   * Get the class that represents this index.
+   */
+  getIndexClass(): PgClass | undefined;
+  /**
+   * Get the class (typically table) this index is for.
+   */
+  getClass(): PgClass | undefined;
+  /**
+   * The PgAttributes that are in this index; a null indicates that the entry
+   * is an expression rather than a column.
+   */
+  getKeys(): Array<PgAttribute | null>;
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+}
+export interface PgAttribute extends PgAttributeData {
+  _type: "PgAttribute";
+  getClass(): PgClass | undefined;
+  getType(): PgType | undefined;
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+  getACL(): AclObject[];
+}
+export interface PgConstraint extends PgConstraintData {
+  _type: "PgConstraint";
+  getNamespace(): PgNamespace | undefined;
+  getClass(): PgClass | undefined;
+  getAttributes(): PgAttribute[] | undefined;
+  getType(): PgType | undefined;
+  getForeignClass(): PgClass | undefined;
+  getForeignAttributes(): PgAttribute[] | undefined;
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+}
+export interface PgProc extends PgProcData {
+  _type: "PgProc";
+  getNamespace(): PgNamespace | undefined;
+  getOwner(): PgRoles | undefined;
+  getReturnType(): PgType | undefined;
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+  getArguments(): PgProcArgument[];
+  getACL(): AclObject[];
+}
+export interface PgType extends PgTypeData {
+  _type: "PgType";
+  getNamespace(): PgNamespace | undefined;
+  getOwner(): PgRoles | undefined;
+  getClass(): PgClass | undefined;
+  getElemType(): PgType | undefined;
+  getArrayType(): PgType | undefined;
+  getEnumValues(): PgEnum[] | undefined;
+  getRange(): PgRange | undefined;
+  getDescription(): string | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+}
+export interface PgEnum extends PgEnumData {
+  _type: "PgEnum";
+  getType(): PgType | undefined;
+  getTagsAndDescription(): PgSmartTagsAndDescription;
+  /** Convenience method for getTagsAndDescription().tags */
+  getTags(): PgSmartTagsDict;
+}
+export interface PgRange extends PgRangeData {
+  _type: "PgRange";
+  getType(): PgType | undefined;
+  getSubType(): PgType | undefined;
+}
+export interface PgInherits extends PgInheritsData {
+  getParent(): PgClass | undefined;
+  getChild(): PgClass | undefined;
+}
+
+interface AugmentedIntrospectionData
+  extends Omit<
+    IntrospectionData,
+    | "database"
+    | "namespaces"
+    | "classes"
+    | "attributes"
+    | "constraints"
+    | "procs"
+    | "types"
+    | "enums"
+    | "indexes"
+    | "inherits"
+    | "ranges"
+  > {
+  database: PgDatabase;
+  namespaces: PgNamespace[];
+  classes: PgClass[];
+  attributes: PgAttribute[];
+  constraints: PgConstraint[];
+  procs: PgProc[];
+  types: PgType[];
+  enums: PgEnum[];
+  indexes: PgIndex[];
+  inherits: PgInherits[];
+  ranges: PgRange[];
+}
+
+export type PgEntity =
+  | Exclude<
+      PgEntityData,
+      | PgDatabaseData
+      | PgNamespaceData
+      | PgClassData
+      | PgIndexData
+      | PgAttributeData
+      | PgConstraintData
+      | PgProcData
+      | PgTypeData
+      | PgEnumData
+      | PgRangeData
+      | PgInheritsData
+    >
+  | PgDatabase
+  | PgNamespace
+  | PgClass
+  | PgIndex
+  | PgAttribute
+  | PgConstraint
+  | PgProc
+  | PgType
+  | PgEnum
+  | PgRange
+  | PgInherits;
