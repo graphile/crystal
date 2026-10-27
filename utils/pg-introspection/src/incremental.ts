@@ -4,7 +4,7 @@ import type {
   Introspection,
   IntrospectionDataForEntities,
   IntrospectOptions,
-} from "./interfaces";
+} from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
 import { makeIntrospectionQuery } from "./query.ts";
 
