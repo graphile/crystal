@@ -9,13 +9,13 @@ import AuthorSocials from "@theme/Blog/Components/Author/Socials";
 import styles from "./contact.module.css";
 import commonStyles from "@site/src/css/common.module.css";
 
-<div className={styles.headingContainer}>
+<div className={commonStyles.mainSectionInstructionContainer}>
   <h1 className={commonStyles.instructionSponsor}>
     {"The people behind Graphile"}
   </h1>
 </div>
 
-Graphile is the team behind PostGraphile, <Grafast />, Graphile Worker and the wider
+Graphile is the team behind <Grafast />, PostGraphile, Graphile Worker and the wider
 Graphile suite of open-source tools. We build and maintain these projects with
 funding from [sponsorship](/sponsor) and commercial services, including
 consultancy and [development support](/support).
@@ -46,9 +46,9 @@ consultancy and [development support](/support).
     <h4>Benjie — Graphile maintainer and GraphQL TSC member</h4>
 
     <p>
-      Creator of PostGraphile and <Grafast />, Benjie is a long-standing
+      Creator of <Grafast /> and PostGraphile, Benjie is a long-standing
       contributor to the GraphQL ecosystem and a member of the GraphQL Technical
-      Steering Committee. He leads Graphile's software development, bringing
+      Steering Committee. He leads Graphile’s software development, bringing
       deep expertise in GraphQL, PostgreSQL and software architecture to the
       open-source projects and the companies that rely on them.
     </p>
@@ -81,7 +81,7 @@ consultancy and [development support](/support).
     <h4>Jem — Operations and community</h4>
 
     <p>
-      Jem leads Graphile's business operations, commercial relationships and
+      Jem leads Graphile’s business operations, commercial relationships and
       software testing. Beyond Graphile, they work with the GraphQL Foundation,
       leading its Ambassador and Locals programs and supporting the organizers,
       speakers and community leaders who bring people together across the global
@@ -91,14 +91,14 @@ consultancy and [development support](/support).
   </div>
 </div>
 
-<div className={styles.contactSection}>
-
-<div className={styles.headingContainer}>
+<div
+  className={`${commonStyles.mainSectionInstructionContainer} ${styles.contactSection}`}
+>
   <h1 className={commonStyles.instructionSponsor}>{"Get in touch"}</h1>
 </div>
 
-Have a question about <Grafast />, interested in sponsoring development, or want
-to discuss working with us? We'd love to hear from you.
+Have a question about Gra*fast*, interested in sponsoring development, or want
+to discuss working with us? We’d love to hear from you.
 
 <div className={styles.contactCards}>
   <section className={styles.contactCard}>
@@ -130,7 +130,7 @@ to discuss working with us? We'd love to hear from you.
     </div>
     <div>
       <Link
-        className={`button button--primary ${styles.button}`}
+        className={`button button--primary button--lg ${styles.button}`}
         to="mailto:team@graphile.org"
       >
         {"team@graphile.org"}
@@ -159,19 +159,17 @@ to discuss working with us? We'd love to hear from you.
     </div>
     <div>
       <p>
-        Join our Discord community to ask questions, discuss <Grafast />, share
-        what you're building, and connect with other developers.
+        Join our Discord community to ask questions, discuss Gra*fast*, share
+        what you’re building, and connect with other developers.
       </p>
     </div>
     <div>
       <Link
-        className={`button button--primary ${styles.button}`}
+        className={`button button--primary button--lg ${styles.button}`}
         to="https://discord.gg/graphile"
       >
         {"Join our Discord community"}
       </Link>
     </div>
   </section>
-</div>
-
 </div>

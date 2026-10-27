@@ -1,9 +1,9 @@
 .contactSection {
-  padding-top: 4rem;
-  padding-bottom: 2rem;
+  margin-top: 4rem;
 }
 
 .contactCards {
+  composes: wide from global;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2rem;
@@ -51,7 +51,7 @@
   max-width: 100%;
   min-height: 2.5rem;
   line-height: 1.5;
-  font-size: 0.8rem;
+  font-weight: 700;
   border-radius: 7px;
   letter-spacing: 0.1rem;
   text-transform: uppercase;
@@ -135,7 +135,4 @@
     width: 3rem;
     height: 3rem;
   }
-}
-.headingContainer {
-  padding: 0.8rem 0;
 }

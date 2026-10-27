@@ -8,7 +8,7 @@ import Link from "@docusaurus/Link";
 import AuthorSocials from "@theme/Blog/Components/Author/Socials";
 import styles from "./contact.module.css";
 
-# The people behind Graphile
+## The people behind Graphile
 
 Graphile is the team behind PostGraphile, Gra*fast*, Graphile Worker and the wider
 Graphile suite of open-source tools. We build and maintain these projects with
@@ -43,7 +43,7 @@ consultancy and [development support](/support).
     <p>
       Creator of PostGraphile and Gra*fast*, Benjie is a long-standing
       contributor to the GraphQL ecosystem and a member of the GraphQL Technical
-      Steering Committee. He leads Graphile's software development, bringing
+      Steering Committee. He leads Graphile’s software development, bringing
       deep expertise in GraphQL, PostgreSQL and software architecture to the
       open-source projects and the companies that rely on them.
     </p>
@@ -76,7 +76,7 @@ consultancy and [development support](/support).
     <h4>Jem — Operations and community</h4>
 
     <p>
-      Jem leads Graphile's business operations, commercial relationships and
+      Jem leads Graphile’s business operations, commercial relationships and
       software testing. Beyond Graphile, they work with the GraphQL Foundation,
       leading its Ambassador and Locals programs and supporting the organizers,
       speakers and community leaders who bring people together across the global
@@ -88,60 +88,62 @@ consultancy and [development support](/support).
 
 <div className={styles.contactSection}>
 
-# Get in touch
+## Get in touch
 
-Have a question about PostGraphile, interested in sponsoring development, or want
-to discuss working with us? We'd love to hear from you.
-
-<div className={styles.contactCards}>
-  <section className={styles.contactCard}>
-    <div className="padding-horiz--md padding-top--lg">
-      <h2>
-        <span className={styles.icon} aria-hidden="true">
-          <Icon icon="fa-solid fa-envelope" />
-        </span>{" "}
-        {"Enquiries & sponsorship"}
-      </h2>
-    </div>
-    <div className="padding-horiz--md">
-      <p>
-        For consultancy, support contracts, licensing, sponsorship, or funding
-        specific development work, please email us.
-      </p>
-    </div>
-    <div className="padding-horiz--md padding-bottom--lg">
-      <Link
-        className={`button button--primary ${styles.button}`}
-        to="mailto:team@graphile.org"
-      >
-        {"team@graphile.org"}
-      </Link>
-    </div>
-  </section>
-  <section className={styles.contactCard}>
-    <div className="padding-horiz--md padding-top--lg">
-      <h2>
-        <span className={styles.icon} aria-hidden="true">
-          <Icon icon="fa-solid fa-comments" />
-        </span>{" "}
-        {"Community discussions"}
-      </h2>
-    </div>
-    <div className="padding-horiz--md">
-      <p>
-        Join our Discord community to ask questions, discuss PostGraphile, share
-        what you're building, and connect with other developers.
-      </p>
-    </div>
-    <div className="padding-horiz--md padding-bottom--lg">
-      <Link
-        className={`button button--primary ${styles.button}`}
-        to="https://discord.gg/graphile"
-      >
-        {"Join our Discord community"}
-      </Link>
-    </div>
-  </section>
 </div>
 
+Have a question about PostGraphile, interested in sponsoring development, or want
+to discuss working with us? We’d love to hear from you.
+
+<div className={styles.cardLayout}>
+  <div className={styles.contactCards}>
+    <section className={styles.contactCard}>
+      <div>
+        <h2>
+          <span className={styles.icon} aria-hidden="true">
+            <Icon icon="fa-solid fa-envelope" />
+          </span>{" "}
+          {"Enquiries & sponsorship"}
+        </h2>
+      </div>
+      <div>
+        <p>
+          For consultancy, support contracts, licensing, sponsorship, or funding
+          specific development work, please email us.
+        </p>
+      </div>
+      <div>
+        <Link
+          className={`button button--primary button--lg ${styles.button}`}
+          to="mailto:team@graphile.org"
+        >
+          {"team@graphile.org"}
+        </Link>
+      </div>
+    </section>
+    <section className={styles.contactCard}>
+      <div>
+        <h2>
+          <span className={styles.icon} aria-hidden="true">
+            <Icon icon="fa-solid fa-comments" />
+          </span>{" "}
+          {"Community discussions"}
+        </h2>
+      </div>
+      <div>
+        <p>
+          Join our Discord community to ask questions, discuss PostGraphile,
+          share what you’re building, and connect with other developers.
+        </p>
+      </div>
+      <div>
+        <Link
+          className={`button button--primary button--lg ${styles.button}`}
+          to="https://discord.gg/graphile"
+        >
+          {"Join our Discord community"}
+        </Link>
+      </div>
+    </section>
+  </div>
 </div>
