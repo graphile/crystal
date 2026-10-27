@@ -1,6 +1,7 @@
 import type { DefaultEntities, Introspection } from "./interfaces.ts";
 import type { PgEntity, PgRoles } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
+import { assertExists } from "./assertExists.ts";
 
 export const OBJECT_COLUMN = "OBJECT_COLUMN";
 export const OBJECT_TABLE = "OBJECT_TABLE";
@@ -101,6 +102,7 @@ function getRole<TEntities extends EntityType>(
   if (oid === "0") {
     return PUBLIC_ROLE;
   }
+  assertExists(introspection._lookups.roleById, "roles");
   const role = introspection._lookups.roleById.get(oid);
   if (!role) {
     throw new Error(`Could not find role with identifier '${oid}'`);
@@ -111,10 +113,14 @@ function getRole<TEntities extends EntityType>(
 /**
  * Gets a role given its name; throws an error if the role is not found.
  */
-function getRoleByName(introspection: Introspection, name: string): PgRoles {
+function getRoleByName(
+  introspection: Introspection<never>,
+  name: string,
+): PgRoles {
   if (name === "public") {
     return PUBLIC_ROLE;
   }
+  assertExists(introspection._lookups.roleByName, "roles");
   const role = introspection._lookups.roleByName[name];
   if (!role) {
     throw new Error(`Could not find role with name '${name}'`);
@@ -472,10 +478,12 @@ export const Permission = {
  * respecting `NOINHERIT`.
  */
 export function expandRoles(
-  introspection: Introspection,
+  introspection: Introspection<never>,
   roles: PgRoles[],
   includeNoInherit = false,
 ): PgRoles[] {
+  assertExists(introspection._lookups.roleById, "roles");
+  assertExists(introspection._lookups.authMembersByMemberId, "auth_members");
   // To avoid potential memory exhaustion, we only cache the common case, where
   // `roles` is an array of size 1.
   if (roles.length === 1) {
@@ -493,12 +501,13 @@ export function expandRoles(
 }
 
 function _expandRolesUncached(
-  introspection: Introspection,
+  introspection: Introspection<never>,
   roles: PgRoles[],
   includeNoInherit: boolean,
 ): PgRoles[] {
   const allRoles = new Set([PUBLIC_ROLE]);
   const { authMembersByMemberId } = introspection._lookups;
+  assertExists(authMembersByMemberId, "auth_members");
 
   const addRole = (member: PgRoles) => {
     if (!allRoles.has(member)) {
@@ -532,7 +541,7 @@ function _expandRolesUncached(
  * the acl.role.
  */
 export function aclContainsRole(
-  introspection: Introspection,
+  introspection: Introspection<never>,
   acl: AclObject,
   role: PgRoles,
   includeNoInherit = false,
@@ -547,7 +556,7 @@ export function aclContainsRole(
  * the `OR` of all the permissions to see what permissions the role has.
  */
 export function resolvePermissions(
-  introspection: Introspection,
+  introspection: Introspection<never>,
   acls: AclObject[],
   role: PgRoles,
   includeNoInherit = false,
@@ -638,7 +647,7 @@ export function resolvePermissions(
 }
 
 export function entityPermissions(
-  introspection: Introspection,
+  introspection: Introspection<never>,
   entity: Extract<PgEntity, { getACL(): readonly AclObject[] }>,
   role: PgRoles,
   includeNoInherit = false,

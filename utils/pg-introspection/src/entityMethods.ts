@@ -38,6 +38,7 @@ import type {
   PgRangeData,
   PgTypeData,
 } from "./introspection.ts";
+import { assertExists } from "./assertExists.ts";
 import type { PgSmartTagsAndDescription } from "./smartComments.ts";
 import { parseSmartComment } from "./smartComments.ts";
 
@@ -89,26 +90,46 @@ export function createEntityMethods(
     procsByNamespaceName,
     accessMethodById,
   } = lookups;
-  const getRole = (id: string | null): PgRoles | undefined =>
-    id != null ? roleById.get(id) : undefined;
-  const getNamespace = (id: string | null): PgNamespace | undefined =>
-    id != null ? namespaceById.get(id) : undefined;
-  const getType = (id: string | null): PgType | undefined =>
-    id != null ? typeById.get(id) : undefined;
-  const getClass = (id: string | null): PgClass | undefined =>
-    id != null ? classById.get(id) : undefined;
-  const getRange = (id: string | null): PgRange | undefined =>
-    id != null ? rangeByTypid.get(id) : undefined;
-  const getAttributes = (id: string | null): PgAttribute[] =>
-    id != null ? (attributesByRelId.get(id) ?? []) : [];
-  const getConstraints = (id: string | null): PgConstraint[] =>
-    id != null ? (constraintsByRelid.get(id) ?? []) : [];
-  const getForeignConstraints = (id: string | null): PgConstraint[] =>
-    id != null ? (foreignConstraintsByRelid.get(id) ?? []) : [];
-  const getEnums = (id: string | null): PgEnum[] =>
-    id != null ? (enumsByTypid.get(id) ?? []) : [];
-  const getIndexes = (id: string | null): PgIndex[] =>
-    id != null ? (indexesByRelid.get(id) ?? []) : [];
+  const getRole = (id: string | null): PgRoles | undefined => {
+    assertExists(roleById, "roles");
+    return id != null ? roleById.get(id) : undefined;
+  };
+  const getNamespace = (id: string | null): PgNamespace | undefined => {
+    assertExists(namespaceById, "namespaces");
+    return id != null ? namespaceById.get(id) : undefined;
+  };
+  const getType = (id: string | null): PgType | undefined => {
+    assertExists(typeById, "types");
+    return id != null ? typeById.get(id) : undefined;
+  };
+  const getClass = (id: string | null): PgClass | undefined => {
+    assertExists(classById, "classes");
+    return id != null ? classById.get(id) : undefined;
+  };
+  const getRange = (id: string | null): PgRange | undefined => {
+    assertExists(rangeByTypid, "ranges");
+    return id != null ? rangeByTypid.get(id) : undefined;
+  };
+  const getAttributes = (id: string | null): PgAttribute[] => {
+    assertExists(attributesByRelId, "attributes");
+    return id != null ? (attributesByRelId.get(id) ?? []) : [];
+  };
+  const getConstraints = (id: string | null): PgConstraint[] => {
+    assertExists(constraintsByRelid, "constraints");
+    return id != null ? (constraintsByRelid.get(id) ?? []) : [];
+  };
+  const getForeignConstraints = (id: string | null): PgConstraint[] => {
+    assertExists(foreignConstraintsByRelid, "constraints");
+    return id != null ? (foreignConstraintsByRelid.get(id) ?? []) : [];
+  };
+  const getEnums = (id: string | null): PgEnum[] => {
+    assertExists(enumsByTypid, "enums");
+    return id != null ? (enumsByTypid.get(id) ?? []) : [];
+  };
+  const getIndexes = (id: string | null): PgIndex[] => {
+    assertExists(indexesByRelid, "indexes");
+    return id != null ? (indexesByRelid.get(id) ?? []) : [];
+  };
 
   const PG_NAMESPACE = oidByCatalog["pg_namespace"];
   const PG_CLASS = oidByCatalog["pg_class"];
@@ -134,10 +155,12 @@ export function createEntityMethods(
     classoid: string,
     objoid: string,
     objsubid = 0,
-  ): string | undefined =>
-    descriptionByDescriptionKey.get(
+  ): string | undefined => {
+    assertExists(descriptionByDescriptionKey, "descriptions");
+    return descriptionByDescriptionKey.get(
       descriptionKey({ classoid, objoid, objsubid }),
     )?.description;
+  };
 
   const getTagsAndDescription = (
     classoid: string,
@@ -162,7 +185,7 @@ export function createEntityMethods(
 
   function PgDatabaseMethods(): Omit<PgDatabase, keyof PgDatabaseData> {
     const getOwner = memo(function (this: PgDatabase) {
-      return roleById.get(this.datdba);
+      return getRole(this.datdba);
     });
     return {
       _type: "PgDatabase",
@@ -203,14 +226,17 @@ export function createEntityMethods(
         );
       }),
       getClass: function (this: PgNamespace, by) {
+        assertExists(classByNamespaceName, "classes");
         return classByNamespaceName.get(namespaceNameKey(this._id, by.name));
       },
       getConstraint: function (this: PgNamespace, by) {
+        assertExists(constraintByNamespaceName, "constraints");
         return constraintByNamespaceName.get(
           namespaceNameKey(this._id, by.name),
         );
       },
       getProcs: function (this: PgNamespace, by) {
+        assertExists(procsByNamespaceName, "procs");
         return (
           procsByNamespaceName.get(namespaceNameKey(this._id, by.name)) ?? []
         );
@@ -279,12 +305,13 @@ export function createEntityMethods(
         const inherits = getIntrospection().inherits;
         if (!inherits) {
           throw new Error(
-            "Can't getInherited if inherits is not included in introspection",
+            "Introspection collection 'inherits' is required but was not included",
           );
         }
         return inherits.filter((inh) => inh.inhrelid === this._id);
       }),
       getAccessMethod: memo(function (this: PgClass) {
+        assertExists(accessMethodById, "am");
         return this.relam != null
           ? accessMethodById.get(this.relam)
           : undefined;
@@ -302,6 +329,7 @@ export function createEntityMethods(
         return getClass(this.indrelid);
       }),
       getKeys: memo(function (this: PgIndex) {
+        assertExists(attributeByRelIdAndNum, "attributes");
         const owner = getClass(this.indrelid);
         const keys = this.indkey;
         return keys.map((key) =>
@@ -366,6 +394,7 @@ export function createEntityMethods(
         return getClass(this.conrelid);
       }),
       getAttributes: memo(function (this: PgConstraint) {
+        assertExists(attributeByRelIdAndNum, "attributes");
         const klass = getClass(this.conrelid);
         if (!klass) {
           console.error(
@@ -395,6 +424,7 @@ export function createEntityMethods(
         return getClass(this.confrelid);
       }),
       getForeignAttributes: memo(function (this: PgConstraint) {
+        assertExists(attributeByRelIdAndNum, "attributes");
         if (this.confrelid == null) {
           if (this.contype === "f") {
             console.error(
@@ -461,13 +491,14 @@ export function createEntityMethods(
         return this.getTagsAndDescription().tags;
       }),
       getArguments: memo(function (this: PgProc) {
+        assertExists(typeById, "types");
         const args: PgProcArgument[] = [];
         const {
           // Null if everything 'in'. i: IN, o: OUT, b: INOUT, v: VARIADIC, t: TABLE
           proargmodes,
           // Null if no names
           proargnames,
-          // Only input types
+          // Only input typeById
           proargtypes,
           // Null if no arg defaults, length = pronargdefaults
           // proargdefaults,
@@ -609,9 +640,11 @@ export function createEntityMethods(
   function PgInheritsMethods(): Omit<PgInherits, keyof PgInheritsData> {
     return {
       getParent: function (this: PgInherits) {
+        assertExists(classById, "classes");
         return classById.get(this.inhparent);
       },
       getChild: function (this: PgInherits) {
+        assertExists(classById, "classes");
         return classById.get(this.inhrelid);
       },
     };
