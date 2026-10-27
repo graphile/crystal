@@ -26,9 +26,10 @@ export const defaultEntities = Object.freeze([
   "am",
 ] as const);
 
-export function makeIntrospectionQuery(rawOptions: Options = {}) {
-  const onlyEntities = rawOptions.onlyEntities ?? [...defaultEntities];
-  const options: Required<Options> = { onlyEntities };
+/** @deprecated Use introspect or introspectRaw instead */
+export function makeIntrospectionQuery() {
+  const options: Required<Options> = { onlyEntities: [...defaultEntities] };
+  const { onlyEntities } = options;
   const withs: string[] = [];
   const jsons: string[] = [];
 
