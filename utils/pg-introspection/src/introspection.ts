@@ -2562,7 +2562,7 @@ export interface PgAm {
 /**
  * This type contains a description of everything we care about in the database.
  */
-export interface Introspection {
+export interface IntrospectionData {
   database: PgDatabase;
   settings: Array<PgSettings>;
   namespaces: Array<PgNamespace>;

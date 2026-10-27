@@ -3,7 +3,10 @@ import type { PromiseOrDirect, Step } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
+  DefaultEntities,
   Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -21,10 +24,8 @@ import type {
   PgRoles,
   PgType,
 } from "pg-introspection";
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
+import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
+import { defaultEntities } from "pg-introspection/src/query.ts";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
@@ -241,11 +242,12 @@ declare global {
 
 type RawIntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspectionText: string;
+  options: IntrospectOptions<DefaultEntities>;
+  introspectionData: IntrospectionDataForEntities<DefaultEntities>;
 }>;
 type IntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspection: Introspection;
+  introspection: Introspection<DefaultEntities>;
 }>;
 
 interface Cache {
@@ -275,7 +277,8 @@ async function getDb(
 }
 
 function makeGetEntity<
-  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
+  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>> &
+    keyof Introspection,
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
@@ -300,7 +303,8 @@ function makeGetEntity<
 }
 
 function makeGetEntities<
-  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
+  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>> &
+    keyof Introspection,
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
@@ -559,11 +563,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             const rawIntrospections = await introspectionPromise;
 
             const introspections: IntrospectionResults = rawIntrospections.map(
-              ({ pgService, introspectionText }) => ({
-                pgService,
-                // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
-                introspection: parseIntrospectionResults(introspectionText),
-              }),
+              ({ pgService, introspectionData, options }) => {
+                const clonedData = structuredClone(introspectionData);
+                return {
+                  pgService,
+                  // IMPORTANT: augmentIntrospectionData must NOT be cached, because other plugins mutate it.
+                  introspection: augmentIntrospectionData(options, clonedData),
+                };
+              },
             );
 
             // Store the resolved state, so access during announcements doesn't cause the system to hang
@@ -852,23 +859,28 @@ function introspectPgServices(
         }
         seenPgSettingsKeys.set(pgSettingsKey, i);
       }
+      const options: IntrospectOptions<DefaultEntities> = {
+        schemas: pgService.schemas ?? ["public"],
+        onlyEntities: [...defaultEntities],
+      };
 
       // Do the introspection
-      const introspectionQuery = makeIntrospectionQuery();
-      const {
-        rows: [row],
-      } = await withPgClientFromPgService(
+      const introspectionData = await withPgClientFromPgService(
         pgService,
         pgService.pgSettingsForIntrospection ?? null,
         (client) =>
-          client.query<{ introspection: string }>({
-            text: introspectionQuery,
+          introspectRaw(options, async (text, values) => {
+            const {
+              rows: [row],
+            } = await client.query<[string]>({
+              text,
+              values,
+              arrayMode: true,
+            });
+            return row?.[0];
           }),
       );
-      if (!row) {
-        throw new Error("Introspection failed");
-      }
-      return { pgService, introspectionText: row.introspection };
+      return { pgService, introspectionData, options };
     }),
   );
 }

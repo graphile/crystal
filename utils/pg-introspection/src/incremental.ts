@@ -1,26 +1,39 @@
-import type { EntityType, Introspection, Options } from "./introspection";
-import { makeIntrospectionQuery } from "./query";
+import { augmentIntrospectionData } from "./augmentIntrospection.ts";
+import type {
+  DefaultEntities,
+  Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
+} from "./interfaces";
+import type { EntityType } from "./introspection.ts";
+import { makeIntrospectionQuery } from "./query.ts";
 
 type RunQuery = (text: string, values: any[]) => Promise<string>;
 
-type FixedIntrospectionKeys =
-  | "catalog_by_oid"
-  | "current_user"
-  | "pg_version"
-  | "introspection_version";
-
-export async function introspect<TEntities extends EntityType>(
-  options: Options<TEntities>,
+export async function introspectRaw<
+  TEntities extends EntityType = DefaultEntities,
+>(
+  options: IntrospectOptions<TEntities>,
   runQuery: RunQuery,
-): Promise<Pick<Introspection, TEntities | FixedIntrospectionKeys>> {
+): Promise<IntrospectionDataForEntities<TEntities>> {
   // incremental
   const query = makeIntrospectionQuery(options);
   // Run query
-  const result: Pick<Introspection, TEntities | FixedIntrospectionKeys> =
-    JSON.parse(await runQuery(query, []));
+  const result: IntrospectionDataForEntities<TEntities> = JSON.parse(
+    await runQuery(query, []),
+  );
 
   // TODO: Find things we can't reach
   // TODO: Recursively run those and merge into `result`
 
   return result;
+}
+export async function introspect<
+  TEntities extends EntityType = DefaultEntities,
+>(
+  options: IntrospectOptions<TEntities>,
+  runQuery: RunQuery,
+): Promise<Introspection<TEntities>> {
+  const result = await introspectRaw(options, runQuery);
+  return augmentIntrospectionData<TEntities>(options, result);
 }
