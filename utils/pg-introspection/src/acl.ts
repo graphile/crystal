@@ -1,4 +1,5 @@
-import type { Introspection, PgEntity, PgRoles } from "./introspection.ts";
+import type { DefaultEntities, Introspection } from "./interfaces.ts";
+import type { EntityType, PgEntity, PgRoles } from "./introspection.ts";
 
 export const OBJECT_COLUMN = "OBJECT_COLUMN";
 export const OBJECT_TABLE = "OBJECT_TABLE";
@@ -92,7 +93,10 @@ export const PUBLIC_ROLE: PgRoles = Object.freeze({
 /**
  * Gets a role given an OID; throws an error if the role is not found.
  */
-function getRole(introspection: Introspection, oid: string): PgRoles {
+function getRole<TEntities extends EntityType>(
+  introspection: Introspection<TEntities>,
+  oid: string,
+): PgRoles {
   if (oid === "0") {
     return PUBLIC_ROLE;
   }
@@ -349,8 +353,8 @@ export const emptyAclObject = parseAcl("=/postgres");
  *
  * https://github.com/postgres/postgres/blob/fb3b098fe88441f9531a5169008ea17eac01301f/src/include/utils/acl.h#L153-L167
  */
-export function parseAcls(
-  introspection: Introspection,
+export function parseAcls<TEntities extends EntityType>(
+  introspection: Introspection<TEntities>,
   inAcls: readonly string[] | null,
   ownerId: string,
   objtype: AclDefaultObjectType,

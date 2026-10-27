@@ -4,30 +4,30 @@ import {
   type Options,
 } from "./introspection.ts";
 
+export const defaultEntities = Object.freeze([
+  "database",
+  "namespaces",
+  "classes",
+  "attributes",
+  "constraints",
+  "procs",
+  "roles",
+  "auth_members",
+  "types",
+  "enums",
+  "extensions",
+  "indexes",
+  "languages",
+  "ranges",
+  "depends",
+  "descriptions",
+  "inherits",
+  "policies",
+  "am",
+] as const);
+
 export function makeIntrospectionQuery(rawOptions: Options = {}) {
-  const {
-    onlyEntities = [
-      "database",
-      "namespaces",
-      "classes",
-      "attributes",
-      "constraints",
-      "procs",
-      "roles",
-      "auth_members",
-      "types",
-      "enums",
-      "extensions",
-      "indexes",
-      "languages",
-      "ranges",
-      "depends",
-      "descriptions",
-      "inherits",
-      "policies",
-      "am",
-    ],
-  } = rawOptions;
+  const onlyEntities = rawOptions.onlyEntities ?? [...defaultEntities];
   const options: Required<Options> = { onlyEntities };
   const withs: string[] = [];
   const jsons: string[] = [];
