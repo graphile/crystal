@@ -1,4 +1,5 @@
 /// <reference lib="es2023" />
+import { glob, readFile } from "node:fs/promises";
 import { builtinModules } from "node:module";
 
 import babelParser from "@babel/eslint-parser";
@@ -7,7 +8,7 @@ import js from "@eslint/js";
 import graphql from "@graphql-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import type { TSESTree } from "@typescript-eslint/types";
-import type { Rule } from "eslint";
+import type { JSSyntaxElement, Rule } from "eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 import prettier from "eslint-config-prettier";
 import graphileExport from "eslint-plugin-graphile-export";
@@ -17,6 +18,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tsdoc from "eslint-plugin-tsdoc";
+import type * as ESTree from "estree";
 import fs from "fs";
 import globals from "globals";
 import path from "path";
@@ -97,6 +99,89 @@ const graphileCliImportsRule: Rule.RuleModule = {
   },
 };
 
+const workspaceExports = new Map<string, Set<string>>();
+const packageJson = JSON.parse(await readFile("package.json", "utf8"));
+const workspaces = packageJson.workspaces as string[];
+const modulePackageJsons = workspaces.map((w) => w + "/package.json");
+for await (const manifest of glob(modulePackageJsons)) {
+  const pkg = JSON.parse(await readFile(manifest, "utf8"));
+  if (pkg.name) {
+    const subpaths = new Set<string>();
+    if (pkg.exports && typeof pkg.exports === "object") {
+      for (const [key, target] of Object.entries(pkg.exports)) {
+        if (key.includes("*")) {
+          throw new Error(
+            `Wildcard exports are not supported: ${pkg.name}/${key}`,
+          );
+        }
+        if (key.startsWith("./") && target != null) {
+          subpaths.add(`${pkg.name}/${key.substring(2)}`);
+        }
+      }
+    }
+    workspaceExports.set(pkg.name, subpaths);
+  }
+}
+
+const workspaceExportsRule: Rule.RuleModule = {
+  meta: { type: "problem", schema: [] },
+  create(context) {
+    function check(node: JSSyntaxElement, sourceNode: ESTree.Literal) {
+      const source = sourceNode.value;
+      if (typeof source !== "string") return;
+      if (source.startsWith(".") || source.startsWith("/")) {
+        // Absolute/relative path, not module name, ignore
+        return;
+      }
+
+      // `@foo/bar` vs `baz`
+      const moduleName = source.startsWith("@")
+        ? source.split("/").slice(0, 2).join("/")
+        : source.split("/")[0];
+
+      if (source === moduleName) {
+        // Direct import of dependency
+        return;
+      }
+
+      const subpaths = workspaceExports.get(moduleName);
+      if (!subpaths) {
+        // Not one of our modules
+        return;
+      } else if (!subpaths.has(source)) {
+        context.report({
+          node,
+          message: "Workspace package subpath '{{source}}' is not exported.",
+          data: { source },
+        });
+      }
+    }
+    return {
+      ImportDeclaration(node) {
+        check(node, node.source);
+      },
+      ExportNamedDeclaration(node) {
+        if (node.source) check(node, node.source);
+      },
+      ExportAllDeclaration(node) {
+        check(node, node.source);
+      },
+      ImportExpression(node) {
+        if (node.source.type === "Literal") check(node, node.source);
+      },
+      CallExpression(node) {
+        if (
+          node.callee.type === "Identifier" &&
+          node.callee.name === "require" &&
+          node.arguments[0]?.type === "Literal"
+        ) {
+          check(node, node.arguments[0]);
+        }
+      },
+    };
+  },
+};
+
 const globalIgnoresFromFile = fs
   .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
   .split("\n")
@@ -144,6 +229,7 @@ const config: ConfigWithExtends = {
     crystal: {
       rules: {
         "graphile-cli-imports": graphileCliImportsRule,
+        "workspace-exports": workspaceExportsRule,
       },
     },
     jest,
@@ -228,6 +314,7 @@ const config: ConfigWithExtends = {
     // note you must disable the base rule as it can report incorrect errors
     "no-duplicate-imports": "off",
     "import/no-duplicates": "error",
+    "crystal/workspace-exports": "error",
   },
 };
 
