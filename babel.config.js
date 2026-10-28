@@ -17,7 +17,7 @@ module.exports = {
     test: {
       plugins: [
         "babel-plugin-transform-import-meta",
-        // The import-meta plugin doesn't yet handle Node's `main` property.
+        // Add support for `import.meta.main` in jest
         function transformImportMetaMain({ types: t }) {
           return {
             visitor: {
