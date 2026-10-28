@@ -149,8 +149,8 @@ export const ENTITY_TYPES: {
     alias: "procs",
     requires: ["namespaces"],
     oids: true,
-    where: `pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')
-    and prorettype operator(pg_catalog.<>) 2279`,
+    where:
+      "pronamespace in (select namespaces._id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')",
     order:
       "pronamespace, proname, pg_get_function_identity_arguments(procs._id)",
     extraColumns: {},
