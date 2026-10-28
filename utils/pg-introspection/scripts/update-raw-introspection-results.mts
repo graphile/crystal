@@ -33,7 +33,7 @@ for (let attempts = 0; attempts < 100; attempts++) {
   }
 }
 if (lastError) {
-  await $({ nothrow: true })`docker logs ${CONTAINER_NAME}`;
+  await $({ nothrow: true, stdio: "inherit" })`docker logs ${CONTAINER_NAME}`;
   throw lastError;
 }
 
