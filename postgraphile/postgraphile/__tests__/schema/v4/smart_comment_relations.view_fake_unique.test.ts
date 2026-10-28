@@ -1,4 +1,4 @@
-import { assertObjectType, isObjectType } from "graphql";
+import { assertObjectType } from "graphql";
 
 import * as core from "./core.ts";
 
