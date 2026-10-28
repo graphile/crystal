@@ -1,4 +1,4 @@
-import { PgMinifySchemaPreset } from "../../../src/presets/minify.ts";
+import { PgMinifySchemaPreset } from "../../../dist/presets/minify.js";
 import * as core from "./core.ts";
 
 test(

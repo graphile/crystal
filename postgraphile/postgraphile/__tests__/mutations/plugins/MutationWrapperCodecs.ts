@@ -1,7 +1,16 @@
 import "graphile-config";
 
-import { pgDeleteSingle, pgInsertSingle, pgUpdateSingle } from "@dataplan/pg";
+import {
+  pgDeleteSingle,
+  PgDeleteSingleQueryBuilder,
+  pgInsertSingle,
+  PgInsertSingleQueryBuilder,
+  PgResource,
+  pgUpdateSingle,
+  PgWrapCallback,
+} from "@dataplan/pg";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
+import { FieldArgs } from "grafast";
 
 const attributes = [
   "enabled",
@@ -13,7 +22,11 @@ const attributes = [
   "nullable_json",
 ] as const;
 
-const captureResult = EXPORTABLE(
+const captureResult: PgWrapCallback<
+  PgInsertSingleQueryBuilder | PgDeleteSingleQueryBuilder,
+  any,
+  any
+> = EXPORTABLE(
   () =>
     async function captureResult(run, pgClient, _dependencies, queryBuilder) {
       const result = await run(pgClient);
@@ -24,7 +37,8 @@ const captureResult = EXPORTABLE(
 );
 
 const plugin = extendSchema((build) => {
-  const { codec_values: resource } = build.input.pgRegistry.pgResources;
+  const resource = build.input.pgRegistry.pgResources
+    .codec_values as PgResource<any, any, any, any, any, any, any>;
   const { constant } = build.grafast;
 
   return {
@@ -51,7 +65,10 @@ const plugin = extendSchema((build) => {
         ),
         wrappedUpdateCodecValues: EXPORTABLE(
           (attributes, captureResult, constant, pgUpdateSingle, resource) =>
-            function wrappedUpdateCodecValues(_$root, { $enabled }) {
+            function wrappedUpdateCodecValues(
+              _$root: any,
+              { $enabled }: FieldArgs<{ enabled: boolean }>,
+            ) {
               const $row = pgUpdateSingle(
                 resource,
                 { id: constant(1) },

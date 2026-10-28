@@ -226,7 +226,7 @@
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
     "graphile": "node ../../utils/graphile/dist/cli-run.js",
-    "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
+    "test": "tsc -b tsconfig.test.json && yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
     "test:operations-exports": "yarn test:operations-exports:typeDefs",

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.tests.json",
+  "compilerOptions": {
+    "composite": true,
+    "rewriteRelativeImportExtensions": false,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "__tests__/**/*",
+    "../../grafast/dataplan-pg/__tests__/sharedHelpers.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.build.json"
+    }
+  ]
+}

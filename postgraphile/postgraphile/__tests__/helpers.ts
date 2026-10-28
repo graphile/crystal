@@ -56,9 +56,9 @@ import {
   dropTestDatabase,
   withTestWithPgClient,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
-import { makeSchema } from "../src/index.ts";
-import AmberPreset from "../src/presets/amber.ts";
-import { makeV4Preset } from "../src/presets/v4.ts";
+import { makeSchema } from "../dist/index.js";
+import AmberPreset from "../dist/presets/amber.js";
+import { makeV4Preset } from "../dist/presets/v4.js";
 
 export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
   name: "SwallowAllErrorsPlugin",
@@ -356,7 +356,7 @@ export async function runTestQuery(
               }
             : null,
         pgSettings: pgSettings
-          ? () => pgSettings
+          ? () => pgSettings as Record<string, string | undefined>
           : config.ignoreRBAC === false
             ? () => ({
                 role: "postgraphile_test_visitor",
@@ -422,7 +422,7 @@ export async function runTestQuery(
       queries,
       Boolean(config.directPg),
       async (withPgClient) => {
-        const pgSubscriber = new PgSubscriber(pgPool);
+        const pgSubscriber = new PgSubscriber(pgPool!);
         try {
           const document = parse(source);
           const args: ExecutionArgs = {
@@ -746,7 +746,7 @@ function makeResultSnapshotSafe(
       ? replacements.uuid.get(data)
       : replacements.uuidCounter++;
     if (!replacements.uuid.has(data)) {
-      replacements.uuid.set(data, uuidNumber);
+      replacements.uuid.set(data, uuidNumber!);
     }
     return `<UUID ${uuidNumber}>`;
   } else {
@@ -842,7 +842,7 @@ export const assertSnapshotsMatch = async (
     const processedErrors = errors
       ? makeResultSnapshotSafe(errors, replacements).sort(
           (e1: GraphQLError, e2: GraphQLError) => {
-            return pathCompare(e1.path, e2.path);
+            return pathCompare(e1.path!, e2.path!);
           },
         )
       : null;
@@ -863,7 +863,7 @@ export const assertSnapshotsMatch = async (
     await snapshot(formattedQueries, sqlFileName);
   } else if (only === "mermaid") {
     const planOp = extensions?.explain?.operations?.find(
-      (op) => op.type === "plan",
+      (op: any) => op.type === "plan",
     );
 
     const graphString = planOp ? planToMermaid(planOp.plan) : undefined;

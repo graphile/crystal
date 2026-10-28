@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import type { FieldArgs } from "grafast";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
 const arrayLength = EXPORTABLE(
@@ -25,14 +26,20 @@ const plugin = extendSchema((build) => {
       Query: {
         personIdByNullableIdentifier: EXPORTABLE(
           (people) =>
-            function personIdByNullableIdentifier(_$root, { $id }) {
+            function personIdByNullableIdentifier(
+              _$root: any,
+              { $id }: FieldArgs<{ id: number | null }>,
+            ) {
               return people.get({ id: $id }).get("id");
             },
           [people],
         ),
         peopleCountByNullableIdentifiers: EXPORTABLE(
           (arrayLength, lambda, people) =>
-            function peopleCountByNullableIdentifiers(_$root, { $id, $email }) {
+            function peopleCountByNullableIdentifiers(
+              _$root: any,
+              { $id, $email }: FieldArgs<{ id: number | null; email: string }>,
+            ) {
               const $people = people.find({ id: $id, email: $email });
               return lambda($people.items(), arrayLength, true);
             },
