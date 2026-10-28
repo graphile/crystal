@@ -6,6 +6,7 @@ import type {
   PromiseOrDirect,
   Setter,
   SetterCapable,
+  Thunk,
 } from "grafast";
 import { access, exportAs, inspect, multistep, setter, Step } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
@@ -354,7 +355,7 @@ export class PgInsertSingleStep<
     TDependencies extends Multistep,
     const TAttributes extends keyof TResource["codec"]["attributes"] & string,
   >(
-    $deps: TDependencies,
+    $deps: Thunk<TDependencies>,
     attributes: ReadonlyArray<TAttributes>,
     callback: PgWrapCallback<
       PgInsertSingleQueryBuilder,
