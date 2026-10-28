@@ -25,7 +25,6 @@ import type {
   PgType,
 } from "pg-introspection";
 import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
-import { defaultEntities } from "pg-introspection/src/query.ts";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
@@ -861,7 +860,27 @@ function introspectPgServices(
       }
       const options: IntrospectOptions<DefaultEntities> = {
         schemas: pgService.schemas ?? ["public"],
-        onlyEntities: [...defaultEntities],
+        onlyEntities: [
+          "database",
+          "namespaces",
+          "classes",
+          "attributes",
+          "constraints",
+          "procs",
+          "roles",
+          "auth_members",
+          "types",
+          "enums",
+          "extensions",
+          "indexes",
+          "languages",
+          "ranges",
+          "depends",
+          "descriptions",
+          "inherits",
+          "policies",
+          "am",
+        ],
       };
 
       // Do the introspection
