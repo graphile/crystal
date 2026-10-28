@@ -356,74 +356,70 @@ function catalogObjectIsRelevant(
   const has = (alias: EntityType) => {
     return onlyEntities ? onlyEntities.includes(alias) : true;
   };
-  return (
-    "(\n      (" +
-    [
-      has("namespaces") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_namespace'::regclass and ${oidFilter(
-          objectOidColumn,
-          "namespaces",
-        )}`,
-      has("classes") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_class'::regclass and ${oidFilter(
-          objectOidColumn,
-          "classes",
-        )}`,
-      has("classes") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_attribute'::regclass and ${oidFilter(
-          objectOidColumn,
-          "classes",
-        )}` + (objectSubIdColumn ? ` and ${objectSubIdColumn} > 0` : ""),
-      has("constraints") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_constraint'::regclass and ${oidFilter(
-          objectOidColumn,
-          "constraints",
-        )}`,
-      has("procs") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_proc'::regclass and ${oidFilter(
-          objectOidColumn,
-          "procs",
-        )}`,
-      has("types") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_type'::regclass and ${oidFilter(
-          objectOidColumn,
-          "types",
-        )}`,
-      has("enums") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_enum'::regclass and ${oidFilter(
-          objectOidColumn,
-          "enums",
-        )}`,
-      has("extensions") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_extension'::regclass and ${oidFilter(
-          objectOidColumn,
-          "extensions",
-        )}`,
-      has("foreign_data_wrappers") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_foreign_data_wrapper'::regclass and ${oidFilter(
-          objectOidColumn,
-          "foreign_data_wrappers",
-        )}`,
-      has("foreign_servers") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_foreign_server'::regclass and ${oidFilter(
-          objectOidColumn,
-          "foreign_servers",
-        )}`,
-      has("rewrites") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_rewrite'::regclass and ${oidFilter(
-          objectOidColumn,
-          "rewrites",
-        )}`,
-      has("triggers") &&
-        `${catalogOidColumn} = 'pg_catalog.pg_trigger'::regclass and ${oidFilter(
-          objectOidColumn,
-          "triggers",
-        )}`,
-    ]
-      .filter(Boolean)
-      .join(")\n      or (") +
-    ")\n    )"
-  );
+  const filters = [
+    has("namespaces") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_namespace'::regclass and ${oidFilter(
+        objectOidColumn,
+        "namespaces",
+      )}`,
+    has("classes") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_class'::regclass and ${oidFilter(
+        objectOidColumn,
+        "classes",
+      )}`,
+    has("classes") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_attribute'::regclass and ${oidFilter(
+        objectOidColumn,
+        "classes",
+      )}` + (objectSubIdColumn ? ` and ${objectSubIdColumn} > 0` : ""),
+    has("constraints") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_constraint'::regclass and ${oidFilter(
+        objectOidColumn,
+        "constraints",
+      )}`,
+    has("procs") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_proc'::regclass and ${oidFilter(
+        objectOidColumn,
+        "procs",
+      )}`,
+    has("types") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_type'::regclass and ${oidFilter(
+        objectOidColumn,
+        "types",
+      )}`,
+    has("enums") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_enum'::regclass and ${oidFilter(
+        objectOidColumn,
+        "enums",
+      )}`,
+    has("extensions") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_extension'::regclass and ${oidFilter(
+        objectOidColumn,
+        "extensions",
+      )}`,
+    has("foreign_data_wrappers") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_foreign_data_wrapper'::regclass and ${oidFilter(
+        objectOidColumn,
+        "foreign_data_wrappers",
+      )}`,
+    has("foreign_servers") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_foreign_server'::regclass and ${oidFilter(
+        objectOidColumn,
+        "foreign_servers",
+      )}`,
+    has("rewrites") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_rewrite'::regclass and ${oidFilter(
+        objectOidColumn,
+        "rewrites",
+      )}`,
+    has("triggers") &&
+      `${catalogOidColumn} = 'pg_catalog.pg_trigger'::regclass and ${oidFilter(
+        objectOidColumn,
+        "triggers",
+      )}`,
+  ].filter(Boolean);
+  if (filters.length === 0) return "false";
+  return "(\n      (" + filters.join(")\n      or (") + ")\n    )";
 }
 function oidFilter(
   col: string,
