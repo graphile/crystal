@@ -1,8 +1,15 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.test.json",
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["__tests__"],
-  "references": [{ "path": "./tsconfig.json" }]
+  "include": [
+    "__tests__",
+    "scripts/**/*"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.json"
+    }
+  ]
 }

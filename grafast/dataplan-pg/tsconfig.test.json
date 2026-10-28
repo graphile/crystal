@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.tests.json",
+  "extends": "../../tsconfig.test.json",
   "compilerOptions": {
     "composite": true,
     "rewriteRelativeImportExtensions": false,
@@ -8,7 +8,8 @@
   "include": [
     "__tests__/**/*",
     "../../grafast/dataplan-pg/__tests__/sharedHelpers.ts",
-    "src/examples/exampleSchema.ts"
+    "src/examples/exampleSchema.ts",
+    "scripts/**/*"
   ],
   "references": [
     {

@@ -213,7 +213,10 @@ import {
 } from "./steps/withPgClient.ts";
 import { assertPgClassSingleStep } from "./utils.ts";
 
+import type { PgWrapCallback } from "./steps/pgMutationWrapper.ts";
+
 export type {
+  PgWrapCallback,
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,

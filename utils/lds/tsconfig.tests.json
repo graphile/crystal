@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig.tests.json",
-  "include": [
-    "__tests__/**/*",
-    "scripts/**/*",
-    "src/**/*"
-  ]
-}

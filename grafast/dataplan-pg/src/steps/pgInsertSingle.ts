@@ -355,7 +355,7 @@ export class PgInsertSingleStep<
     TDependencies extends Multistep,
     const TAttributes extends keyof TResource["codec"]["attributes"] & string,
   >(
-    $deps: Thunk<TDependencies>,
+    $deps: TDependencies,
     attributes: ReadonlyArray<TAttributes>,
     callback: PgWrapCallback<
       PgInsertSingleQueryBuilder,
