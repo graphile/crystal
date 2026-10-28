@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import { expandRoles } from "../src/acl.ts";
-import { augmentIntrospectionData } from "../src/augmentIntrospection.ts";
-import { parseIntrospectionResults } from "../src/index.ts";
+import { expandRoles } from "../dist/acl.js";
+import { augmentIntrospectionData } from "../dist/augmentIntrospection.js";
+import { parseIntrospectionResults } from "../dist/index.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 it("provides navigation helpers for selected entities", () => {
