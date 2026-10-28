@@ -4,8 +4,9 @@
  * DO NOT EDIT!
  */
 
+import { dependencyWhere, descriptionWhere } from "./introspectionHelpers.ts";
+
 type PgOid = string;
-type PgName = string;
 type PgAclItem = string;
 type PgXid = string;
 type TimestampTZ = string;
@@ -50,10 +51,13 @@ export interface Options<TEntities extends EntityType = EntityType> {
 
 export interface EntityTypeConfig {
   tableName: string;
+  /** Ordered attribute names and PostgreSQL types imported from the docs. */
+  attributes: Readonly<Record<string, string>>;
   alias: EntityType;
   requires?: EntityType[];
   catalogName?: string;
   singular?: boolean;
+  /** Preserve the legacy _id alias used to select hidden OIDs alongside *. */
   oids: boolean;
   where: string | ((options: Options) => string) | null;
   order: string | null;
@@ -70,6 +74,28 @@ export const ENTITY_TYPES: {
   [alias in EntityType]: EntityTypeConfig;
 } = {
   database: {
+    attributes: {
+      oid: "oid",
+      datname: "name",
+      datdba: "oid",
+      encoding: "int4",
+      datlocprovider: "char",
+      datistemplate: "bool",
+      datallowconn: "bool",
+      dathasloginevt: "bool",
+      datconnlimit: "int4",
+      datfrozenxid: "xid",
+      datminmxid: "xid",
+      dattablespace: "oid",
+      datcollate: "text",
+      datctype: "text",
+      datlocale: "text",
+      daticurules: "text",
+      datcollversion: "text",
+      datacl: "aclitem[]",
+      daticulocale: "text",
+      datlastsysoid: "oid",
+    },
     tableName: "pg_database",
     alias: "database",
     singular: true,
@@ -79,6 +105,25 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   settings: {
+    attributes: {
+      name: "text",
+      setting: "text",
+      unit: "text",
+      category: "text",
+      short_desc: "text",
+      extra_desc: "text",
+      context: "text",
+      vartype: "text",
+      source: "text",
+      min_val: "text",
+      max_val: "text",
+      enumvals: "text[]",
+      boot_val: "text",
+      reset_val: "text",
+      sourcefile: "text",
+      sourceline: "int4",
+      pending_restart: "bool",
+    },
     tableName: "pg_settings",
     alias: "settings",
     oids: false,
@@ -86,6 +131,12 @@ export const ENTITY_TYPES: {
     order: "name",
   },
   namespaces: {
+    attributes: {
+      oid: "oid",
+      nspname: "name",
+      nspowner: "oid",
+      nspacl: "aclitem[]",
+    },
     tableName: "pg_namespace",
     alias: "namespaces",
     oids: true,
@@ -93,6 +144,44 @@ export const ENTITY_TYPES: {
     order: "nspname",
   },
   classes: {
+    attributes: {
+      oid: "oid",
+      relname: "name",
+      relnamespace: "oid",
+      reltype: "oid",
+      reloftype: "oid",
+      relowner: "oid",
+      relam: "oid",
+      relfilenode: "oid",
+      reltablespace: "oid",
+      relpages: "int4",
+      reltuples: "float4",
+      relallvisible: "int4",
+      relallfrozen: "int4",
+      reltoastrelid: "oid",
+      relhasindex: "bool",
+      relisshared: "bool",
+      relpersistence: "char",
+      relkind: "char",
+      relnatts: "int2",
+      relchecks: "int2",
+      relhasrules: "bool",
+      relhastriggers: "bool",
+      relhassubclass: "bool",
+      relrowsecurity: "bool",
+      relforcerowsecurity: "bool",
+      relispopulated: "bool",
+      relreplident: "char",
+      relispartition: "bool",
+      relrewrite: "oid",
+      relfrozenxid: "xid",
+      relminmxid: "xid",
+      relacl: "aclitem[]",
+      reloptions: "text[]",
+      relpartbound: "pg_node_tree",
+      relhasoids: "bool",
+      relhaspkey: "bool",
+    },
     tableName: "pg_class",
     alias: "classes",
     requires: ["namespaces"],
@@ -108,6 +197,34 @@ export const ENTITY_TYPES: {
     },
   },
   attributes: {
+    attributes: {
+      attrelid: "oid",
+      attname: "name",
+      atttypid: "oid",
+      attlen: "int2",
+      attnum: "int2",
+      atttypmod: "int4",
+      attndims: "int2",
+      attbyval: "bool",
+      attalign: "char",
+      attstorage: "char",
+      attcompression: "char",
+      attnotnull: "bool",
+      atthasdef: "bool",
+      atthasmissing: "bool",
+      attidentity: "char",
+      attgenerated: "char",
+      attisdropped: "bool",
+      attislocal: "bool",
+      attinhcount: "int2",
+      attcollation: "oid",
+      attstattarget: "int2",
+      attacl: "aclitem[]",
+      attoptions: "text[]",
+      attfdwoptions: "text[]",
+      attmissingval: "anyarray",
+      attcacheoff: "int4",
+    },
     tableName: "pg_attribute",
     alias: "attributes",
     requires: ["classes"],
@@ -116,6 +233,13 @@ export const ENTITY_TYPES: {
     order: "attrelid, attnum",
   },
   attribute_defaults: {
+    attributes: {
+      oid: "oid",
+      adrelid: "oid",
+      adnum: "int2",
+      adbin: "pg_node_tree",
+      adsrc: "text",
+    },
     tableName: "pg_attrdef",
     alias: "attribute_defaults",
     requires: ["attributes"],
@@ -125,6 +249,37 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   constraints: {
+    attributes: {
+      oid: "oid",
+      conname: "name",
+      connamespace: "oid",
+      contype: "char",
+      condeferrable: "bool",
+      condeferred: "bool",
+      conenforced: "bool",
+      convalidated: "bool",
+      conrelid: "oid",
+      contypid: "oid",
+      conindid: "oid",
+      conparentid: "oid",
+      confrelid: "oid",
+      confupdtype: "char",
+      confdeltype: "char",
+      confmatchtype: "char",
+      conislocal: "bool",
+      coninhcount: "int2",
+      connoinherit: "bool",
+      conperiod: "bool",
+      conkey: "int2[]",
+      confkey: "int2[]",
+      conpfeqop: "oid[]",
+      conppeqop: "oid[]",
+      conffeqop: "oid[]",
+      confdelsetcols: "int2[]",
+      conexclop: "oid[]",
+      conbin: "pg_node_tree",
+      consrc: "text",
+    },
     tableName: "pg_constraint",
     alias: "constraints",
     requires: ["namespaces"],
@@ -135,6 +290,7 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   sys_procs: {
+    attributes: { oid: "oid", proname: "name", pronamespace: "oid" },
     tableName: "pg_proc",
     alias: "sys_procs",
     catalogName: "PgProcSys",
@@ -145,6 +301,41 @@ export const ENTITY_TYPES: {
     columns: ["proname", "pronamespace"],
   },
   procs: {
+    attributes: {
+      oid: "oid",
+      proname: "name",
+      pronamespace: "oid",
+      proowner: "oid",
+      prolang: "oid",
+      procost: "float4",
+      prorows: "float4",
+      provariadic: "oid",
+      prosupport: "regproc",
+      prokind: "char",
+      prosecdef: "bool",
+      proleakproof: "bool",
+      proisstrict: "bool",
+      proretset: "bool",
+      provolatile: "char",
+      proparallel: "char",
+      pronargs: "int2",
+      pronargdefaults: "int2",
+      prorettype: "oid",
+      proargtypes: "oidvector",
+      proallargtypes: "oid[]",
+      proargmodes: "char[]",
+      proargnames: "text[]",
+      proargdefaults: "pg_node_tree",
+      protrftypes: "oid[]",
+      prosrc: "text",
+      probin: "text",
+      prosqlbody: "pg_node_tree",
+      proconfig: "text[]",
+      proacl: "aclitem[]",
+      protransform: "regproc",
+      proisagg: "bool",
+      proiswindow: "bool",
+    },
     tableName: "pg_proc",
     alias: "procs",
     requires: ["namespaces"],
@@ -156,6 +347,30 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   aggregates: {
+    attributes: {
+      aggfnoid: "regproc",
+      aggkind: "char",
+      aggnumdirectargs: "int2",
+      aggtransfn: "regproc",
+      aggfinalfn: "regproc",
+      aggcombinefn: "regproc",
+      aggserialfn: "regproc",
+      aggdeserialfn: "regproc",
+      aggmtransfn: "regproc",
+      aggminvtransfn: "regproc",
+      aggmfinalfn: "regproc",
+      aggfinalextra: "bool",
+      aggmfinalextra: "bool",
+      aggfinalmodify: "char",
+      aggmfinalmodify: "char",
+      aggsortop: "oid",
+      aggtranstype: "oid",
+      aggtransspace: "int4",
+      aggmtranstype: "oid",
+      aggmtransspace: "int4",
+      agginitval: "text",
+      aggminitval: "text",
+    },
     tableName: "pg_aggregate",
     alias: "aggregates",
     requires: ["procs"],
@@ -164,6 +379,21 @@ export const ENTITY_TYPES: {
     order: "aggfnoid",
   },
   roles: {
+    attributes: {
+      rolname: "name",
+      rolsuper: "bool",
+      rolinherit: "bool",
+      rolcreaterole: "bool",
+      rolcreatedb: "bool",
+      rolcanlogin: "bool",
+      rolreplication: "bool",
+      rolconnlimit: "int4",
+      rolpassword: "text",
+      rolvaliduntil: "timestamptz",
+      rolbypassrls: "bool",
+      rolconfig: "text[]",
+      oid: "oid",
+    },
     tableName: "pg_roles",
     alias: "roles",
     oids: true,
@@ -171,14 +401,25 @@ export const ENTITY_TYPES: {
     order: "rolname",
   },
   db_role_settings: {
+    attributes: { setdatabase: "oid", setrole: "oid", setconfig: "text[]" },
     tableName: "pg_db_role_setting",
     alias: "db_role_settings",
     requires: ["database"],
     oids: false,
-    where: "setdatabase in (select database._id from database)",
+    where:
+      "setdatabase = 0 or setdatabase in (select database._id from database)",
     order: "setdatabase, setrole",
   },
   auth_members: {
+    attributes: {
+      oid: "oid",
+      roleid: "oid",
+      member: "oid",
+      grantor: "oid",
+      admin_option: "bool",
+      inherit_option: "bool",
+      set_option: "bool",
+    },
     tableName: "pg_auth_members",
     alias: "auth_members",
     requires: ["roles"],
@@ -187,6 +428,13 @@ export const ENTITY_TYPES: {
     order: "roleid, member, grantor",
   },
   default_acls: {
+    attributes: {
+      oid: "oid",
+      defaclrole: "oid",
+      defaclnamespace: "oid",
+      defaclobjtype: "char",
+      defaclacl: "aclitem[]",
+    },
     tableName: "pg_default_acl",
     alias: "default_acls",
     oids: true,
@@ -194,6 +442,40 @@ export const ENTITY_TYPES: {
     order: "defaclrole,defaclnamespace,defaclobjtype",
   },
   types: {
+    attributes: {
+      oid: "oid",
+      typname: "name",
+      typnamespace: "oid",
+      typowner: "oid",
+      typlen: "int2",
+      typbyval: "bool",
+      typtype: "char",
+      typcategory: "char",
+      typispreferred: "bool",
+      typisdefined: "bool",
+      typdelim: "char",
+      typrelid: "oid",
+      typsubscript: "regproc",
+      typelem: "oid",
+      typarray: "oid",
+      typinput: "regproc",
+      typoutput: "regproc",
+      typreceive: "regproc",
+      typsend: "regproc",
+      typmodin: "regproc",
+      typmodout: "regproc",
+      typanalyze: "regproc",
+      typalign: "char",
+      typstorage: "char",
+      typnotnull: "bool",
+      typbasetype: "oid",
+      typtypmod: "int4",
+      typndims: "int4",
+      typcollation: "oid",
+      typdefaultbin: "pg_node_tree",
+      typdefault: "text",
+      typacl: "aclitem[]",
+    },
     tableName: "pg_type",
     alias: "types",
     requires: ["namespaces"],
@@ -204,6 +486,12 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   enums: {
+    attributes: {
+      oid: "oid",
+      enumtypid: "oid",
+      enumsortorder: "float4",
+      enumlabel: "name",
+    },
     tableName: "pg_enum",
     alias: "enums",
     requires: ["types"],
@@ -212,6 +500,15 @@ export const ENTITY_TYPES: {
     order: "enumtypid, enumsortorder",
   },
   event_triggers: {
+    attributes: {
+      oid: "oid",
+      evtname: "name",
+      evtevent: "name",
+      evtowner: "oid",
+      evtfoid: "oid",
+      evtenabled: "char",
+      evttags: "text[]",
+    },
     tableName: "pg_event_trigger",
     alias: "event_triggers",
     oids: false,
@@ -219,6 +516,16 @@ export const ENTITY_TYPES: {
     order: "evtname",
   },
   extensions: {
+    attributes: {
+      oid: "oid",
+      extname: "name",
+      extowner: "oid",
+      extnamespace: "oid",
+      extrelocatable: "bool",
+      extversion: "text",
+      extconfig: "oid[]",
+      extcondition: "text[]",
+    },
     tableName: "pg_extension",
     alias: "extensions",
     oids: true,
@@ -226,6 +533,15 @@ export const ENTITY_TYPES: {
     order: "extname",
   },
   foreign_data_wrappers: {
+    attributes: {
+      oid: "oid",
+      fdwname: "name",
+      fdwowner: "oid",
+      fdwhandler: "oid",
+      fdwvalidator: "oid",
+      fdwacl: "aclitem[]",
+      fdwoptions: "text[]",
+    },
     tableName: "pg_foreign_data_wrapper",
     alias: "foreign_data_wrappers",
     oids: true,
@@ -233,6 +549,16 @@ export const ENTITY_TYPES: {
     order: "fdwname",
   },
   foreign_servers: {
+    attributes: {
+      oid: "oid",
+      srvname: "name",
+      srvowner: "oid",
+      srvfdw: "oid",
+      srvtype: "text",
+      srvversion: "text",
+      srvacl: "aclitem[]",
+      srvoptions: "text[]",
+    },
     tableName: "pg_foreign_server",
     alias: "foreign_servers",
     requires: ["foreign_data_wrappers"],
@@ -242,6 +568,7 @@ export const ENTITY_TYPES: {
     order: "srvname",
   },
   foreign_tables: {
+    attributes: { ftrelid: "oid", ftserver: "oid", ftoptions: "text[]" },
     tableName: "pg_foreign_table",
     alias: "foreign_tables",
     requires: ["foreign_servers"],
@@ -250,6 +577,29 @@ export const ENTITY_TYPES: {
     order: "ftrelid, ftserver",
   },
   indexes: {
+    attributes: {
+      indexrelid: "oid",
+      indrelid: "oid",
+      indnatts: "int2",
+      indnkeyatts: "int2",
+      indisunique: "bool",
+      indnullsnotdistinct: "bool",
+      indisprimary: "bool",
+      indisexclusion: "bool",
+      indimmediate: "bool",
+      indisclustered: "bool",
+      indisvalid: "bool",
+      indcheckxmin: "bool",
+      indisready: "bool",
+      indislive: "bool",
+      indisreplident: "bool",
+      indkey: "int2vector",
+      indcollation: "oidvector",
+      indclass: "oidvector",
+      indoption: "int2vector",
+      indexprs: "pg_node_tree",
+      indpred: "pg_node_tree",
+    },
     tableName: "pg_index",
     alias: "indexes",
     requires: ["classes"],
@@ -259,6 +609,12 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   inherits: {
+    attributes: {
+      inhrelid: "oid",
+      inhparent: "oid",
+      inhseqno: "int4",
+      inhdetachpending: "bool",
+    },
     tableName: "pg_inherits",
     alias: "inherits",
     requires: ["classes"],
@@ -267,6 +623,17 @@ export const ENTITY_TYPES: {
     order: "inhrelid, inhseqno",
   },
   languages: {
+    attributes: {
+      oid: "oid",
+      lanname: "name",
+      lanowner: "oid",
+      lanispl: "bool",
+      lanpltrusted: "bool",
+      lanplcallfoid: "oid",
+      laninline: "oid",
+      lanvalidator: "oid",
+      lanacl: "aclitem[]",
+    },
     tableName: "pg_language",
     alias: "languages",
     oids: true,
@@ -274,6 +641,16 @@ export const ENTITY_TYPES: {
     order: "lanname",
   },
   policies: {
+    attributes: {
+      oid: "oid",
+      polname: "name",
+      polrelid: "oid",
+      polcmd: "char",
+      polpermissive: "bool",
+      polroles: "oid[]",
+      polqual: "pg_node_tree",
+      polwithcheck: "pg_node_tree",
+    },
     tableName: "pg_policy",
     alias: "policies",
     requires: ["classes"],
@@ -283,6 +660,15 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   ranges: {
+    attributes: {
+      rngtypid: "oid",
+      rngsubtype: "oid",
+      rngmultitypid: "oid",
+      rngcollation: "oid",
+      rngsubopc: "oid",
+      rngcanonical: "regproc",
+      rngsubdiff: "regproc",
+    },
     tableName: "pg_range",
     alias: "ranges",
     requires: ["types"],
@@ -291,6 +677,16 @@ export const ENTITY_TYPES: {
     order: "rngtypid",
   },
   rewrites: {
+    attributes: {
+      oid: "oid",
+      rulename: "name",
+      ev_class: "oid",
+      ev_type: "char",
+      ev_enabled: "char",
+      is_instead: "bool",
+      ev_qual: "pg_node_tree",
+      ev_action: "pg_node_tree",
+    },
     tableName: "pg_rewrite",
     alias: "rewrites",
     requires: ["classes"],
@@ -300,6 +696,27 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   triggers: {
+    attributes: {
+      oid: "oid",
+      tgrelid: "oid",
+      tgparentid: "oid",
+      tgname: "name",
+      tgfoid: "oid",
+      tgtype: "int2",
+      tgenabled: "char",
+      tgisinternal: "bool",
+      tgconstrrelid: "oid",
+      tgconstrindid: "oid",
+      tgconstraint: "oid",
+      tgdeferrable: "bool",
+      tginitdeferred: "bool",
+      tgnargs: "int2",
+      tgattr: "int2vector",
+      tgargs: "bytea",
+      tgqual: "pg_node_tree",
+      tgoldtable: "name",
+      tgnewtable: "name",
+    },
     tableName: "pg_trigger",
     alias: "triggers",
     requires: ["classes"],
@@ -309,27 +726,67 @@ export const ENTITY_TYPES: {
     extraColumns: {},
   },
   depends: {
+    attributes: {
+      classid: "oid",
+      objid: "oid",
+      objsubid: "int4",
+      refclassid: "oid",
+      refobjid: "oid",
+      refobjsubid: "int4",
+      deptype: "char",
+    },
     tableName: "pg_depend",
     alias: "depends",
     oids: false,
-    where: (options) =>
-      `deptype IN ('a', 'e') and ${catalogObjectIsRelevant(
-        options,
-        "classid",
-        "objid",
-        "objsubid",
-      )}`,
+    where: dependencyWhere,
     order: "classid, objid, objsubid, refclassid, refobjid, refobjsubid",
   },
   descriptions: {
+    attributes: {
+      objoid: "oid",
+      classoid: "oid",
+      objsubid: "int4",
+      description: "text",
+    },
     tableName: "pg_description",
     alias: "descriptions",
     oids: false,
-    where: (options) =>
-      catalogObjectIsRelevant(options, "classoid", "objoid", "objsubid"),
+    where: descriptionWhere,
     order: "objoid, classoid, objsubid",
   },
   stat_user_tables: {
+    attributes: {
+      relid: "oid",
+      schemaname: "name",
+      relname: "name",
+      seq_scan: "bigint",
+      last_seq_scan: "timestamp with time zone",
+      seq_tup_read: "bigint",
+      idx_scan: "bigint",
+      last_idx_scan: "timestamp with time zone",
+      idx_tup_fetch: "bigint",
+      n_tup_ins: "bigint",
+      n_tup_upd: "bigint",
+      n_tup_del: "bigint",
+      n_tup_hot_upd: "bigint",
+      n_tup_newpage_upd: "bigint",
+      n_live_tup: "bigint",
+      n_dead_tup: "bigint",
+      n_mod_since_analyze: "bigint",
+      n_ins_since_vacuum: "bigint",
+      last_vacuum: "timestamp with time zone",
+      last_autovacuum: "timestamp with time zone",
+      last_analyze: "timestamp with time zone",
+      last_autoanalyze: "timestamp with time zone",
+      vacuum_count: "bigint",
+      autovacuum_count: "bigint",
+      analyze_count: "bigint",
+      autoanalyze_count: "bigint",
+      total_vacuum_time: "double precision",
+      total_autovacuum_time: "double precision",
+      total_analyze_time: "double precision",
+      total_autoanalyze_time: "double precision",
+    },
     tableName: "pg_stat_user_tables",
     alias: "stat_user_tables",
     requires: ["classes"],
@@ -338,6 +795,12 @@ export const ENTITY_TYPES: {
     order: "schemaname, relname",
   },
   am: {
+    attributes: {
+      oid: "oid",
+      amname: "name",
+      amhandler: "regproc",
+      amtype: "char",
+    },
     tableName: "pg_am",
     alias: "am",
     oids: true,
@@ -345,91 +808,6 @@ export const ENTITY_TYPES: {
     order: "amname",
   },
 };
-
-function catalogObjectIsRelevant(
-  options: Options,
-  catalogOidColumn: string,
-  objectOidColumn: string,
-  objectSubIdColumn: string,
-): string {
-  const { onlyEntities } = options;
-  const has = (alias: EntityType) => {
-    return onlyEntities ? onlyEntities.includes(alias) : true;
-  };
-  const filters = [
-    has("namespaces") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_namespace'::regclass and ${oidFilter(
-        objectOidColumn,
-        "namespaces",
-      )}`,
-    has("classes") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_class'::regclass and ${oidFilter(
-        objectOidColumn,
-        "classes",
-      )}`,
-    has("classes") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_attribute'::regclass and ${oidFilter(
-        objectOidColumn,
-        "classes",
-      )}` + (objectSubIdColumn ? ` and ${objectSubIdColumn} > 0` : ""),
-    has("constraints") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_constraint'::regclass and ${oidFilter(
-        objectOidColumn,
-        "constraints",
-      )}`,
-    has("procs") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_proc'::regclass and ${oidFilter(
-        objectOidColumn,
-        "procs",
-      )}`,
-    has("types") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_type'::regclass and ${oidFilter(
-        objectOidColumn,
-        "types",
-      )}`,
-    has("enums") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_enum'::regclass and ${oidFilter(
-        objectOidColumn,
-        "enums",
-      )}`,
-    has("extensions") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_extension'::regclass and ${oidFilter(
-        objectOidColumn,
-        "extensions",
-      )}`,
-    has("foreign_data_wrappers") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_foreign_data_wrapper'::regclass and ${oidFilter(
-        objectOidColumn,
-        "foreign_data_wrappers",
-      )}`,
-    has("foreign_servers") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_foreign_server'::regclass and ${oidFilter(
-        objectOidColumn,
-        "foreign_servers",
-      )}`,
-    has("rewrites") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_rewrite'::regclass and ${oidFilter(
-        objectOidColumn,
-        "rewrites",
-      )}`,
-    has("triggers") &&
-      `${catalogOidColumn} = 'pg_catalog.pg_trigger'::regclass and ${oidFilter(
-        objectOidColumn,
-        "triggers",
-      )}`,
-  ].filter(Boolean);
-  if (filters.length === 0) return "false";
-  return "(\n      (" + filters.join(")\n      or (") + ")\n    )";
-}
-function oidFilter(
-  col: string,
-  collection: string,
-  additionalWhere?: string,
-): string {
-  return `${col} in (select ${collection}._id from ${collection}${
-    additionalWhere ? ` where ${additionalWhere}` : ""
-  })`;
-}
 
 /**
  * The catalog pg_database stores information about the available databases. Databases are created with the CREATE
@@ -442,7 +820,7 @@ export interface PgDatabaseData {
   _id: PgOid;
 
   /** Database name */
-  datname: PgName;
+  datname: string;
 
   /** Owner of the database, usually the user who created it */
   datdba: PgOid;
@@ -632,7 +1010,7 @@ export interface PgNamespaceData {
   _id: PgOid;
 
   /** Name of the namespace */
-  nspname: PgName;
+  nspname: string;
 
   /** Owner of the namespace */
   nspowner: PgOid;
@@ -654,7 +1032,7 @@ export interface PgClassData {
   _id: PgOid;
 
   /** Name of the table, index, view, etc. */
-  relname: PgName;
+  relname: string;
 
   /** The OID of the namespace that contains this relation */
   relnamespace: PgOid;
@@ -856,7 +1234,7 @@ export interface PgAttributeData {
   attrelid: PgOid;
 
   /** The column name */
-  attname: PgName;
+  attname: string;
 
   /** The data type of this column (zero for a dropped column) */
   atttypid: PgOid;
@@ -1029,7 +1407,7 @@ export interface PgConstraintData {
   _id: PgOid;
 
   /** Constraint name (not necessarily unique!) */
-  conname: PgName;
+  conname: string;
 
   /** The OID of the namespace that contains this constraint */
   connamespace: PgOid;
@@ -1189,7 +1567,7 @@ export interface PgProcSysData {
   _id: PgOid;
 
   /** Name of the function */
-  proname: PgName;
+  proname: string;
 
   /** The OID of the namespace that contains this function */
   pronamespace: PgOid;
@@ -1207,7 +1585,7 @@ export interface PgProcData {
   _id: PgOid;
 
   /** Name of the function */
-  proname: PgName;
+  proname: string;
 
   /** The OID of the namespace that contains this function */
   pronamespace: PgOid;
@@ -1480,7 +1858,7 @@ export interface PgAggregateData {
  */
 export interface PgRolesData {
   /** Role name */
-  rolname: PgName;
+  rolname: string;
 
   /** Role has superuser privileges */
   rolsuper: boolean | null;
@@ -1622,7 +2000,7 @@ export interface PgTypeData {
   _id: PgOid;
 
   /** Data type name */
-  typname: PgName;
+  typname: string;
 
   /** The OID of the namespace that contains this type */
   typnamespace: PgOid;
@@ -1807,7 +2185,7 @@ export interface PgEnumData {
   enumsortorder: number;
 
   /** The textual label for this enum value */
-  enumlabel: PgName;
+  enumlabel: string;
 }
 
 /** The catalog pg_event_trigger stores event triggers. See [event-triggers] for more information. */
@@ -1815,10 +2193,10 @@ export interface PgEventTriggerData {
   /* COMMON FIELDS */
 
   /** Trigger name (must be unique) */
-  evtname: PgName | null;
+  evtname: string | null;
 
   /** Identifies the event for which this trigger fires */
-  evtevent: PgName | null;
+  evtevent: string | null;
 
   /** Owner of the event trigger */
   evtowner: PgOid | null;
@@ -1861,7 +2239,7 @@ export interface PgExtensionData {
   _id: PgOid;
 
   /** Name of the extension */
-  extname: PgName;
+  extname: string;
 
   /** Owner of the extension */
   extowner: PgOid;
@@ -1891,7 +2269,7 @@ export interface PgForeignDataWrapperData {
   _id: PgOid;
 
   /** Name of the foreign-data wrapper */
-  fdwname: PgName | null;
+  fdwname: string | null;
 
   /** Owner of the foreign-data wrapper */
   fdwowner: PgOid | null;
@@ -1925,7 +2303,7 @@ export interface PgForeignServerData {
   _id: PgOid;
 
   /** Name of the foreign server */
-  srvname: PgName | null;
+  srvname: string | null;
 
   /** Owner of the foreign server */
   srvowner: PgOid | null;
@@ -2115,7 +2493,7 @@ export interface PgLanguageData {
   _id: PgOid;
 
   /** Name of the language */
-  lanname: PgName | null;
+  lanname: string | null;
 
   /** Owner of the language */
   lanowner: PgOid | null;
@@ -2165,7 +2543,7 @@ export interface PgPolicyData {
   /* COMMON FIELDS */
 
   /** The name of the policy */
-  polname: PgName;
+  polname: string;
 
   /** The table to which the policy applies */
   polrelid: PgOid;
@@ -2236,7 +2614,7 @@ export interface PgRewriteData {
   _id: PgOid;
 
   /** Rule name */
-  rulename: PgName | null;
+  rulename: string | null;
 
   /** The table this rule is for */
   ev_class: PgOid | null;
@@ -2275,7 +2653,7 @@ export interface PgTriggerData {
   tgrelid: PgOid;
 
   /** Trigger name (must be unique among triggers of same table) */
-  tgname: PgName;
+  tgname: string;
 
   /** The function to be called */
   tgfoid: PgOid | null;
@@ -2330,10 +2708,10 @@ export interface PgTriggerData {
   tgqual: string | null;
 
   /** REFERENCING clause name for OLD TABLE, or null if none */
-  tgoldtable: PgName | null;
+  tgoldtable: string | null;
 
   /** REFERENCING clause name for NEW TABLE, or null if none */
-  tgnewtable: PgName | null;
+  tgnewtable: string | null;
 
   /* FIELDS THAT AREN'T AVAILABLE IN ALL VERSIONS */
 
@@ -2409,10 +2787,10 @@ export interface PgStatUserTablesData {
   relid: PgOid | null;
 
   /** Name of the schema that this table is in */
-  schemaname: PgName | null;
+  schemaname: string | null;
 
   /** Name of this table */
-  relname: PgName | null;
+  relname: string | null;
 
   /** Number of sequential scans initiated on this table */
   seq_scan: string | number | null;
@@ -2548,7 +2926,7 @@ export interface PgAmData {
   _id: PgOid;
 
   /** Name of the access method */
-  amname: PgName | null;
+  amname: string | null;
 
   /** OID of a handler function that is responsible for supplying information about the access method */
   amhandler: PgOid | null;
