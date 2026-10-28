@@ -1,8 +1,5 @@
 {
   "extends": "../../tsconfig.test.json",
-  "compilerOptions": {
-    "noEmit": true
-  },
   "include": ["__tests__", "scripts/**/*"],
   "references": [
     {
