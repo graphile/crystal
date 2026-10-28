@@ -1,10 +1,13 @@
-// @ts-check
+/// <reference lib="es2023" />
 import { builtinModules } from "node:module";
 
 import babelParser from "@babel/eslint-parser";
+import type { ConfigWithExtends, Plugin } from "@eslint/config-helpers";
 import js from "@eslint/js";
 import graphql from "@graphql-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
+import type { TSESTree } from "@typescript-eslint/types";
+import type { Rule } from "eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 import prettier from "eslint-config-prettier";
 import graphileExport from "eslint-plugin-graphile-export";
@@ -28,16 +31,16 @@ const builtinModuleNames = new Set(
   ),
 );
 
-function normalizePath(filePath) {
+function normalizePath(filePath: string) {
   return filePath.replaceAll(path.sep, "/");
 }
 
-function isGraphileCliFile(filename) {
+function isGraphileCliFile(filename: string) {
   const normalized = normalizePath(filename);
   return normalized.includes(graphileCliRoot) && normalized.endsWith("/cli.ts");
 }
 
-function resolvesToAllowedRelativeImport(filename, source) {
+function resolvesToAllowedRelativeImport(filename: string, source: string) {
   if (!source.startsWith(".")) {
     return false;
   }
@@ -45,19 +48,20 @@ function resolvesToAllowedRelativeImport(filename, source) {
   return resolved.endsWith("/cli.ts") || resolved.endsWith(stripAnsiPath);
 }
 
-const graphileCliImportsRule = {
+const graphileCliImportsRule: Rule.RuleModule = {
   meta: {
     type: "problem",
     schema: [],
   },
   create(context) {
-    const filename = context.filename ?? context.getFilename();
+    const filename = context.filename;
     if (!isGraphileCliFile(filename)) {
       return {};
     }
 
     return {
-      ImportDeclaration(node) {
+      ImportDeclaration(rawNode) {
+        const node = rawNode as TSESTree.ImportDeclaration;
         if (node.importKind === "type") {
           return;
         }
@@ -105,8 +109,7 @@ const globalIgnoresFromFile = fs
     return text;
   });
 
-/** @type {import('@eslint/config-helpers').ConfigWithExtends} */
-const config = {
+const config: ConfigWithExtends = {
   linterOptions: {
     reportUnusedDisableDirectives: false,
   },
@@ -144,7 +147,7 @@ const config = {
       },
     },
     jest,
-    "@graphql-eslint": graphql,
+    "@graphql-eslint": graphql as Plugin,
     tsdoc,
     "simple-import-sort": simpleImportSort,
     react,
@@ -231,10 +234,8 @@ const config = {
 /**
  * This object only exists to make our new eslint.config.js look more like the
  * old .eslintrc.js
- *
- * @type {{overrides: ReadonlyArray<import('@eslint/config-helpers').ConfigWithExtends>}}
  */
-const oldConfig = {
+const oldConfig: { overrides: ReadonlyArray<ConfigWithExtends> } = {
   overrides: [
     // Rules for core plugins
     {

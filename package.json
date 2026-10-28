@@ -24,7 +24,7 @@
     "website:star": "cd utils/website && yarn start",
     "websites:deploy": "./publish-websites.sh",
     "-----": "-----",
-    "eslint": "node --max-old-space-size=16384 node_modules/.bin/eslint --ext .js,.jsx,.ts,.tsx",
+    "eslint": "node --max-old-space-size=16384 node_modules/.bin/eslint --ext .js,.jsx,.ts,.tsx --flag unstable_native_nodejs_ts_config",
     "prettier": "prettier --cache --ignore-path ./.lintignore",
     "prettier:all": "yarn prettier '**/*.{json,md,mdx,html,js,jsx,ts,tsx,yml}'",
     "prettier:fix": "yarn prettier:all --write",
