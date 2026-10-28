@@ -9,12 +9,12 @@ import {
   resolvePermissions,
 } from "../dist/acl.js";
 import { augmentIntrospectionData } from "../dist/augmentIntrospection.js";
-import type { Introspection } from "../dist/interfaces.js";
 import type {
-  IntrospectionData,
+  Introspection,
   PgAuthMembers,
   PgRoles,
-} from "../dist/introspection.js";
+} from "../dist/interfaces.js";
+import type { IntrospectionData } from "../dist/introspection.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 function makeRole(
