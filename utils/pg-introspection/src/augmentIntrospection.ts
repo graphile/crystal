@@ -290,6 +290,7 @@ export function augmentIntrospectionData<
 ): Introspection<TEntities> {
   const { includeExtensionResources } = options;
   // Lookups exist only when their corresponding collection was supplied.
+
   const lookups: IntrospectionLookups = {
     oidByCatalog: Object.create(null),
     ...(introspectionData.roles && {

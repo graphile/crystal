@@ -2,24 +2,17 @@ import type { AclObject } from "./acl.ts";
 import type {
   EntityType,
   IntrospectionData,
-  PgAmData,
   PgAttributeData,
-  PgAuthMembersData,
   PgClassData,
   PgConstraintData,
   PgDatabaseData,
-  PgDependData,
-  PgDescriptionData,
   PgEntityData,
   PgEnumData,
-  PgExtensionData,
   PgIndexData,
   PgInheritsData,
-  PgLanguageData,
   PgNamespaceData,
   PgProcData,
   PgRangeData,
-  PgRolesData,
   PgTypeData,
 } from "./introspection.ts";
 import type { defaultEntities } from "./query.ts";
@@ -162,13 +155,13 @@ interface IntrospectionCaches {
   expandRoles: Map<string, PgRoles[]>;
 }
 
-export type PgAm = PgAmData;
-export type PgAuthMembers = PgAuthMembersData;
-export type PgDepend = PgDependData;
-export type PgDescription = PgDescriptionData;
-export type PgExtension = PgExtensionData;
-export type PgLanguage = PgLanguageData;
-export type PgRoles = PgRolesData;
+export type PgAm = IntrospectionData["am"][number];
+export type PgAuthMembers = IntrospectionData["auth_members"][number];
+export type PgDepend = IntrospectionData["depends"][number];
+export type PgDescription = IntrospectionData["descriptions"][number];
+export type PgExtension = IntrospectionData["extensions"][number];
+export type PgLanguage = IntrospectionData["languages"][number];
+export type PgRoles = IntrospectionData["roles"][number];
 
 export interface PgProcArgument {
   isIn: boolean;

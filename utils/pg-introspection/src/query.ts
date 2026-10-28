@@ -1,3 +1,4 @@
+import { catalogProjection } from "./introspectionHelpers.ts";
 import {
   ENTITY_TYPES,
   type EntityTypeConfig,
@@ -39,7 +40,7 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
       oids,
       order,
       singular,
-      columns,
+      attributes,
       extraColumns,
     } = entityType;
     let additionalSelect = "";
@@ -62,17 +63,24 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
       wheres.push("prorettype operator(pg_catalog.<>) 2279");
     }
 
+    const { select, fallback } = catalogProjection(attributes, oids);
     withs.push(`\
   ${alias} as (
-    select ${oids ? `${tbl}.oid as _id, ` : ""}${
-      columns ? columns.join(", ") : "*"
-    }${additionalSelect}
-    from pg_catalog.${tbl}${
+    select projected.*
+    from (select
+        ${fallback}
+    ) fallback
+    cross join lateral (
+      select ${
+        oids ? `oid::pg_catalog.oid as _id, ` : ""
+      }${select}${additionalSelect}
+      from pg_catalog.${tbl}${
       wheres.length > 0
         ? `
     where (${wheres.join(") and (")})`
         : ""
     }
+    ) projected
   )`);
     const val = singular
       ? `(select row_to_json(${alias}) from ${alias})`
@@ -91,7 +99,11 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
         !config.requires.every((alias) => onlyEntities.includes(alias))
       ) {
         throw new Error(
-          `Entity type '${config.alias}' requires entity type(s) '${config.requires.join("', '")}' to be included`,
+          `Entity type '${
+            config.alias
+          }' requires entity type(s) '${config.requires.join(
+            "', '",
+          )}' to be included`,
         );
       }
       add(config);
