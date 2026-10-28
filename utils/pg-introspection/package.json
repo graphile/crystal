@@ -8,7 +8,7 @@
     "update-raw-introspection-results": "node scripts/update-raw-introspection-results.mts",
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
-    "test": "node --experimental-strip-types --test",
+    "test": "tsc -b tsconfig.test.json && node --experimental-strip-types --test",
     "build": "tsc -b"
   },
   "repository": {
