@@ -118,6 +118,7 @@ export const ENTITY_TYPES: {
   attribute_defaults: {
     tableName: "pg_attrdef",
     alias: "attribute_defaults",
+    requires: ["attributes"],
     oids: true,
     where: "(adrelid, adnum) in (select attrelid, attnum from attributes)",
     order: "adrelid, adnum",
@@ -331,6 +332,7 @@ export const ENTITY_TYPES: {
   stat_user_tables: {
     tableName: "pg_stat_user_tables",
     alias: "stat_user_tables",
+    requires: ["classes"],
     oids: false,
     where: "relid in (select _id from classes)",
     order: "schemaname, relname",
