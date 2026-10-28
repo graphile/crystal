@@ -46,7 +46,7 @@ close __SNAPSHOT_CURSOR_0__
 commit; /*fake*/
 
 with __users_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"uuid" as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __users_result__.*
 from __users_identifiers__,

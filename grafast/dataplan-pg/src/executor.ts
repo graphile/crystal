@@ -210,6 +210,22 @@ function getSignature(text: string): string {
   return text; // TODO: make signature smarter
 }
 
+function identifierSqlValues(
+  queryValuesList: ReadonlyArray<ReadonlyArray<unknown>>,
+): SQLRawValue[] {
+  const columnCount = queryValuesList[0].length;
+  if (columnCount === 0) {
+    return [queryValuesList.length];
+  }
+  const columns: SQLRawValue[] = [];
+  for (let idx = 0; idx < columnCount; idx++) {
+    columns.push(
+      queryValuesList.map((queryValues) => queryValues[idx]) as SQLRawValue[],
+    );
+  }
+  return columns;
+}
+
 function queueMatches(
   queue: QueryQueue,
   item: Pick<QueuedQuery, "name" | "signature" | "affinity">,
@@ -765,6 +781,7 @@ ${duration}
            * The `identifiersJSON` (`JSON.stringify(queryValues)`) that don't exist in the cache currently.
            */
           const remaining: string[] = [];
+          const remainingQueryValues: Array<ReadonlyArray<unknown>> = [];
           const remainingDeferreds: Array<PromiseWithResolvers<any[]>> = [];
 
           try {
@@ -805,6 +822,7 @@ ${duration}
                 results[resultIndex] = pendingResult.promise;
                 scopedCache.set(identifiersJSON, pendingResult);
                 remaining.push(identifiersJSON);
+                remainingQueryValues.push(queryValues);
                 remainingDeferreds.push(pendingResult);
               }
             }
@@ -817,8 +835,7 @@ ${duration}
                   ? rawSqlValues
                   : [
                       ...rawSqlValues,
-                      // Manual JSON-ing
-                      "[" + remaining.join(",") + "]",
+                      ...identifierSqlValues(remainingQueryValues),
                     ];
 
               // PERF: we could probably make this more efficient by grouping the
@@ -986,7 +1003,6 @@ ${duration}
           );
         }
 
-        const remaining = [...batchIndexesByIdentifiersJSON.keys()];
         const batchIndexesByValueIndex = [
           ...batchIndexesByIdentifiersJSON.values(),
         ];
@@ -998,8 +1014,11 @@ ${duration}
             ? rawSqlValues
             : [
                 ...rawSqlValues,
-                // Manual JSON-ing
-                "[" + remaining.join(",") + "]",
+                ...identifierSqlValues(
+                  batchIndexesByValueIndex.map(
+                    ([batchIndex]) => batch[batchIndex].queryValues,
+                  ),
+                ),
               ];
 
         // Maximum PostgreSQL identifier length is typically 63 bytes.

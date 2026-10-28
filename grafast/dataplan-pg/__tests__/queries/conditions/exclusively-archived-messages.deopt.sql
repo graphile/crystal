@@ -9,7 +9,7 @@ where (
 order by __forums__."id" asc;
 
 with __messages_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"uuid" as "id0", ids.id1::"timestamptz" as "id1" from unnest($1::text[], $2::text[]) with ordinality as ids(id0, id1, ordinality)
 )
 select __messages_result__.*
 from __messages_identifiers__,
@@ -31,7 +31,7 @@ lateral (
 ) as __messages_result__;
 
 with __messages_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0", (ids.value->>1)::"timestamptz" as "id1" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"uuid" as "id0", ids.id1::"timestamptz" as "id1" from unnest($1::text[], $2::text[]) with ordinality as ids(id0, id1, ordinality)
 )
 select __messages_result__.*
 from __messages_identifiers__,
@@ -49,7 +49,7 @@ lateral (
 ) as __messages_result__;
 
 with __users_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"uuid" as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __users_result__.*
 from __users_identifiers__,

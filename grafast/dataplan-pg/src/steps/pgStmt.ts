@@ -640,3 +640,25 @@ export function makeValues(
     handlePlaceholder,
   };
 }
+
+/**
+ * Each identifier column arrives as a `text[]`, which keeps array and composite
+ * identifiers whole and, unlike JSON (always estimated at 100 rows), lets
+ * Postgres estimate the batch at its real size.
+ */
+export function identifiersQuery(
+  queryValues: readonly QueryValue[],
+  firstPlaceholder: number,
+): string {
+  if (queryValues.length === 0) {
+    // We've just been instructed to repeat this N times, so generate_series should suffice
+    return `select ids.idx from generate_series(0, $${firstPlaceholder}::int - 1) as ids(idx)`;
+  }
+  const columns = queryValues.map((_, idx) => `id${idx}`);
+  const casts = queryValues.map(
+    ({ codec }, idx) =>
+      `ids.${columns[idx]}::${sql.compile(codec.sqlType).text} as "${columns[idx]}"`,
+  );
+  const arrays = columns.map((_, idx) => `$${firstPlaceholder + idx}::text[]`);
+  return `select ids.ordinality - 1 as idx, ${casts.join(", ")} from unnest(${arrays.join(", ")}) with ordinality as ids(${columns.join(", ")}, ordinality)`;
+}

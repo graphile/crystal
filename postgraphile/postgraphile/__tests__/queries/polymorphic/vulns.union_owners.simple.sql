@@ -45,7 +45,7 @@ from (
 
 
 with __first_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"int4" as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __first_party_vulnerabilities_result__.*
 from __first_party_vulnerabilities_identifiers__,
@@ -61,7 +61,7 @@ lateral (
 ) as __first_party_vulnerabilities_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"int4" as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __union_result__.*
 from __union_identifiers__,
@@ -181,7 +181,7 @@ lateral (
 ) as __union_result__;
 
 with __organizations_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"int4" as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __organizations_result__.*
 from __organizations_identifiers__,
@@ -197,7 +197,7 @@ lateral (
 ) as __organizations_result__;
 
 with __people_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"int4" as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __people_result__.*
 from __people_identifiers__,

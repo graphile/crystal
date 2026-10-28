@@ -5,7 +5,7 @@ from "nested_arrays"."t" as __t__
 order by __t__."k" asc;
 
 with __frmcdc_work_hour_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"nested_arrays"."work_hour"[] as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0::"nested_arrays"."work_hour"[] as "id0" from unnest($1::text[]) with ordinality as ids(id0, ordinality)
 )
 select __frmcdc_work_hour_result__.*
 from __frmcdc_work_hour_identifiers__,

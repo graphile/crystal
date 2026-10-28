@@ -95,6 +95,7 @@ import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
   getUnary,
+  identifiersQuery,
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.ts";
@@ -3466,19 +3467,7 @@ function buildTheQuery<
        */
       const text = `\
 with ${identifiersAliasText} as materialized (
-  select ids.ordinality - 1 as idx${
-    queryValues.length > 0
-      ? `, ${queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}`
-      : ""
-  } from json_array_elements($${
-    rawSqlValues.length + 1
-  }::json) with ordinality as ids
+  ${identifiersQuery(queryValues, rawSqlValues.length + 1)}
 )
 select ${wrapperAliasText}.*
 from ${identifiersAliasText},
