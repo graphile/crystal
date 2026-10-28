@@ -5,8 +5,7 @@ module.exports = {
   testMatch: [...rootConfig.testMatch, "**/*.test.graphql"],
   transform: {
     ...rootConfig.transform,
-    "^.+\\.mts$": "<rootDir>/../../.jest-babel-transform.js",
     "^.+\\.graphql$": "<rootDir>/__tests__/transform-graphql.js",
   },
-  moduleFileExtensions: [...rootConfig.moduleFileExtensions, "mts", "graphql"],
+  moduleFileExtensions: [...rootConfig.moduleFileExtensions, "graphql"],
 };
