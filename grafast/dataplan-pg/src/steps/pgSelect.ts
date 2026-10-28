@@ -69,10 +69,7 @@ import type {
   RuntimeEmbeddable,
   RuntimeSQLThunk,
 } from "../utils.ts";
-import {
-  getSameLengthArraysMatchFunction,
-  runtimeScopedSQL,
-} from "../utils.ts";
+import { runtimeScopedSQL } from "../utils.ts";
 import { PgClassExpressionStep } from "./pgClassExpression.ts";
 import type {
   PgHavingConditionSpec,
@@ -89,12 +86,16 @@ import type {
   PgStmtCompileQueryInfo,
   PgStmtDeferredPlaceholder,
   PgStmtDeferredSQL,
+  QueryValue,
   ResolvedPgStmtCommonQueryInfo,
 } from "./pgStmt.ts";
 import {
   applyCommonPaginationStuff,
   calculateLimitAndOffsetSQLFromInfo,
+  EMPTY_OBJECT,
+  encodeQueryValueForJsonToRecordset,
   getUnary,
+  makeMakeQueryValues,
   makeValues,
   PgStmtBaseStep,
 } from "./pgStmt.ts";
@@ -202,12 +203,6 @@ interface PgSelectArgumentDepId extends PgSelectArgumentBasics {
 export interface PgSelectArgumentRuntimeValue extends PgSelectArgumentBasics {
   placeholder?: never;
   value: unknown;
-}
-
-interface QueryValue {
-  dependencyIndex: number;
-  codec: PgCodec;
-  alreadyEncoded: boolean;
 }
 
 function assertSensible(step: Step): void {
@@ -1231,6 +1226,7 @@ export class PgSelectStep<
       return arrayOfLength(count, NO_ROWS);
     }
     const context = values[this.contextId].unaryValue();
+    const makeQueryValues = makeMakeQueryValues(rawQueryValues, values);
 
     const isMutation = this.mode === "mutation";
     /**
@@ -1249,7 +1245,7 @@ export class PgSelectStep<
         if (isMutation) {
           // Run them all
           resultIndexes = indexMap(
-            (_i) => specs.push({ context, queryValues: EMPTY_ARRAY }) - 1,
+            (_i) => specs.push({ context, queryValues: EMPTY_OBJECT }) - 1,
           );
         } else {
           // We'll add at most one spec
@@ -1265,7 +1261,8 @@ export class PgSelectStep<
               return null;
             } else {
               if (specIdx === null) {
-                specIdx = specs.push({ context, queryValues: EMPTY_ARRAY }) - 1;
+                specIdx =
+                  specs.push({ context, queryValues: EMPTY_OBJECT }) - 1;
               }
               return specIdx;
             }
@@ -1273,17 +1270,17 @@ export class PgSelectStep<
         }
       } else {
         let hasSpec = false;
-        const queryValuesMatch =
-          getSameLengthArraysMatchFunction(queryValuesLength);
+        const queryValuesMatch = getQueryValuesMatchFunction(queryValuesLength);
         resultIndexes = indexMap<number | null>((i) => {
-          const queryValues: unknown[] = [];
-          for (const { dependencyIndex, codec } of rawQueryValues) {
+          const queryValues: Record<string, unknown> = Object.create(null);
+          for (let idx = 0; idx < queryValuesLength; idx++) {
+            const qv = rawQueryValues[idx];
+            const val = values[qv.dependencyIndex].at(i);
             let result: unknown;
-            const val = values[dependencyIndex].at(i);
             if (val == null) {
               if (
                 isSkippable &&
-                this.identifierDepIds.includes(dependencyIndex)
+                this.identifierDepIds.includes(qv.dependencyIndex)
               ) {
                 // We're using `WHERE foo = $1` and we know `$1` is null, so we know the result
                 // will yield no rows.
@@ -1291,9 +1288,9 @@ export class PgSelectStep<
               }
               result = null;
             } else {
-              result = codec.toPg(val);
+              result = encodeQueryValueForJsonToRecordset(qv, val);
             }
-            queryValues.push(result);
+            queryValues[`id${idx}`] = result;
           }
           if (!isMutation && hasSpec) {
             // Dedupe
@@ -1363,12 +1360,7 @@ export class PgSelectStep<
             // The context is how we'd handle different connections with different claims
             context,
             queryValues:
-              identifierIndex != null
-                ? rawQueryValues.map(({ dependencyIndex, codec }) => {
-                    const val = values[dependencyIndex].at(i);
-                    return val == null ? null : codec.toPg(val);
-                  })
-                : EMPTY_ARRAY,
+              identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i),
           };
         });
       }
@@ -1388,12 +1380,7 @@ export class PgSelectStep<
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
-            identifierIndex != null
-              ? rawQueryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex].at(i);
-                  return val == null ? val : codec.toPg(val);
-                })
-              : EMPTY_ARRAY,
+            identifierIndex == null ? EMPTY_OBJECT : makeQueryValues(i),
         };
       });
       const streams = (
@@ -3466,19 +3453,16 @@ function buildTheQuery<
        */
       const text = `\
 with ${identifiersAliasText} as materialized (
-  select ids.ordinality - 1 as idx${
-    queryValues.length > 0
-      ? `, ${queryValues
-          .map(({ codec }, idx) => {
-            return `(ids.value->>${idx})::${
-              sql.compile(codec.sqlType).text
-            } as "id${idx}"`;
-          })
-          .join(", ")}`
-      : ""
-  } from json_array_elements($${
-    rawSqlValues.length + 1
-  }::json) with ordinality as ids
+  ${
+    queryValues.length === 0
+      ? // We've just been instructed to repeat this N times, so generate_series should suffice
+        `select ids.idx from generate_series(0, json_array_length($${
+          rawSqlValues.length + 1
+        }::json) - 1) as ids(idx)`
+      : `select ids.ordinality - 1 as idx, ${queryValues.map((_, idx) => `ids.id${idx}`).join(", ")} from rows from (json_to_recordset($${rawSqlValues.length + 1}::json) as (${queryValues
+          .map((qv, idx) => `id${idx} ${sql.compile(qv.codec.sqlType).text}`)
+          .join(", ")})) with ordinality as ids`
+  }
 )
 select ${wrapperAliasText}.*
 from ${identifiersAliasText},
@@ -4512,3 +4496,47 @@ const validateOrderSpec: (orderSpec: PgOrderSpec) => PgOrderSpec = isDev
       return orderSpec;
     }
   : (orderSpec) => orderSpec;
+
+function compareQv0<T extends Record<string, any>>(_a: T, _b: T) {
+  return true;
+}
+function compareQv1<T extends Record<string, any>>(a: T, b: T) {
+  return a.id0 === b.id0;
+}
+function compareQv2<T extends Record<string, any>>(a: T, b: T) {
+  return a.id0 === b.id0 && a.id1 === b.id1;
+}
+function compareQv3<T extends Record<string, any>>(a: T, b: T) {
+  return a.id0 === b.id0 && a.id1 === b.id1 && a.id2 === b.id2;
+}
+function compareQv4<T extends Record<string, any>>(a: T, b: T) {
+  return (
+    a.id0 === b.id0 && a.id1 === b.id1 && a.id2 === b.id2 && a.id3 === b.id3
+  );
+}
+
+function getQueryValuesMatchFunction(length: number) {
+  switch (length) {
+    case 0:
+      return compareQv0;
+    case 1:
+      return compareQv1;
+    case 2:
+      return compareQv2;
+    case 3:
+      return compareQv3;
+    case 4:
+      return compareQv4;
+    default:
+      return function queryValuesMatch<T extends Record<string, any>>(
+        qv1: T,
+        qv2: T,
+      ) {
+        for (let i = 0; i < length; i++) {
+          const key = `id${i}`;
+          if (qv1[key] !== qv2[key]) return false;
+        }
+        return true;
+      };
+  }
+}

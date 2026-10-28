@@ -1742,3 +1742,12 @@ export function sqlValueWithCodec(value: unknown, codec: PgCodec) {
     codec.sqlType
   }`;
 }
+
+/** @internal */
+export function isJsony(codec: PgCodec): boolean {
+  let innerCodec = codec;
+  while (innerCodec.domainOfCodec != null) {
+    innerCodec = innerCodec.domainOfCodec;
+  }
+  return innerCodec === TYPES.json || innerCodec === TYPES.jsonb;
+}

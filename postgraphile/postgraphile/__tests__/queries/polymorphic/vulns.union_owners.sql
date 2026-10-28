@@ -45,7 +45,7 @@ from (
 
 
 with __first_party_vulnerabilities_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __first_party_vulnerabilities_result__.*
 from __first_party_vulnerabilities_identifiers__,
@@ -61,7 +61,7 @@ lateral (
 ) as __first_party_vulnerabilities_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __union_result__.*
 from __union_identifiers__,
@@ -121,7 +121,7 @@ lateral (
 ) as __union_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __union_result__.*
 from __union_identifiers__,
@@ -241,7 +241,7 @@ lateral (
 ) as __union_result__;
 
 with __aws_applications_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __aws_applications_result__.*
 from __aws_applications_identifiers__,
@@ -259,7 +259,7 @@ lateral (
 ) as __aws_applications_result__;
 
 with __people_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __people_result__.*
 from __people_identifiers__,
@@ -275,7 +275,7 @@ lateral (
 ) as __people_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from rows from (json_to_recordset($1::json) as (id0 "int4", id1 "int4")) with ordinality as ids
 )
 select __union_result__.*
 from __union_identifiers__,
@@ -327,7 +327,7 @@ lateral (
 ) as __union_result__;
 
 with __gcp_applications_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __gcp_applications_result__.*
 from __gcp_applications_identifiers__,
@@ -345,7 +345,7 @@ lateral (
 ) as __gcp_applications_result__;
 
 with __organizations_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __organizations_result__.*
 from __organizations_identifiers__,
@@ -361,7 +361,7 @@ lateral (
 ) as __organizations_result__;
 
 with __union_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0", (ids.value->>1)::"int4" as "id1" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0, ids.id1 from rows from (json_to_recordset($1::json) as (id0 "int4", id1 "int4")) with ordinality as ids
 )
 select __union_result__.*
 from __union_identifiers__,

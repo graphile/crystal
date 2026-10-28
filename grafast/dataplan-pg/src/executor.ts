@@ -160,7 +160,7 @@ export type PgExecutorContextPlans<
 export type PgExecutorInput<TInput> = {
   /** The context is how we'd handle different connections with different claims */
   context: PgExecutorContext;
-  queryValues: ReadonlyArray<TInput>;
+  queryValues: TInput;
 };
 
 export type PgExecutorOptions = {
@@ -711,7 +711,7 @@ ${duration}
         const groupMap = new Map<
           PgExecutorContext,
           Array<{
-            queryValues: readonly any[];
+            queryValues: any;
             resultIndex: number;
           }>
         >();
@@ -925,7 +925,7 @@ ${duration}
     const groupMap = new Map<
       PgExecutorContext,
       Array<{
-        queryValues: readonly any[];
+        queryValues: any;
         resultIndex: number;
       }>
     >();
