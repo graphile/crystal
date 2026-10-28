@@ -1,9 +1,5 @@
 {
   "extends": "../../tsconfig.test.json",
   "include": ["__tests__", "scripts/**/*"],
-  "references": [
-    {
-      "path": "./tsconfig.json"
-    }
-  ]
+  "references": [{ "path": "./tsconfig.json" }]
 }

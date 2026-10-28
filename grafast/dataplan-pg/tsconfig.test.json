@@ -6,9 +6,5 @@
     "scripts/**/*",
     "serve-example-schema.mts"
   ],
-  "references": [
-    {
-      "path": "./tsconfig.json"
-    }
-  ]
+  "references": [{ "path": "./tsconfig.json" }]
 }
