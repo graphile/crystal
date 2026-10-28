@@ -7,15 +7,12 @@
     "moduleResolution": "nodenext"
   },
   "include": [
-    "scripts/**/*",
-    "utils/*/scripts/**/*",
-    "grafast/*/scripts/**/*",
-    "graphile-build/*/scripts/**/*",
-    "postgraphile/*/scripts/**/*",
-    "utils/*/__tests__/**/*",
-    "grafast/*/__tests__/**/*",
-    "graphile-build/*/__tests__/**/*",
-    "postgraphile/*/__tests__/**/*"
+    "scripts/**/*"
   ],
-  "exclude": ["**/node_modules", "**/dist", "**/release", "**/versioned_docs", "**/dcc/dcc-types.ts"]
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "**/release",
+    "**/versioned_docs"
+  ]
 }
