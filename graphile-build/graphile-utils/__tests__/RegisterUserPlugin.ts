@@ -1,7 +1,6 @@
 import { withPgClient } from "@dataplan/pg";
 import type { Step } from "grafast";
 import {
-  access,
   constant,
   ExecutableStep,
   get,

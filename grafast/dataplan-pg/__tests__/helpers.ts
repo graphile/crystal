@@ -175,7 +175,7 @@ export async function runTestQuery(
   extensions?: any;
 }> {
   const { variableValues, checkErrorSnapshots, runTimes = 1 } = config;
-  const { path, outputDataAsString, deoptimize } = options;
+  const { outputDataAsString, deoptimize } = options;
   await resetSequences();
 
   const queries: PgClientQuery[] = [];
@@ -317,7 +317,6 @@ export async function runTestQuery(
             payload2: ExecutionPatchResult,
           ): number => {
             const ONE_AFTER_TWO = 1;
-            const ONE_BEFORE_TWO = -1;
             if (!payload1.path) {
               return 0;
             }

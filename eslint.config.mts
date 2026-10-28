@@ -432,7 +432,15 @@ const oldConfig: { overrides: ReadonlyArray<ConfigWithExtends> } = {
         "prefer-const": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-unused-expressions": "off",
-        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            args: "none",
+            caughtErrors: "none",
+            varsIgnorePattern: "^_",
+            ignoreRestSiblings: true,
+          },
+        ],
         "@typescript-eslint/explicit-function-return-type": "off",
 
         // We don't normally care about race conditions in tests

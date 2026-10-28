@@ -564,7 +564,6 @@ export async function runTestQuery(
               payload2: ExecutionPatchResult,
             ): number => {
               const ONE_AFTER_TWO = 1;
-              const ONE_BEFORE_TWO = -1;
               if (!payload1.path) {
                 return 0;
               }

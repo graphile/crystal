@@ -50,7 +50,7 @@ declare global {
   /* eslint-enable @typescript-eslint/no-empty-object-type */
 }
 
-function typecheckScopedJsonPgSmartTags(): void {
+function _typecheckScopedJsonPgSmartTags(): void {
   pgSmartTagRulesFromJSON<"pgSmartTagsTypecheck">({
     version: 1,
     config: {

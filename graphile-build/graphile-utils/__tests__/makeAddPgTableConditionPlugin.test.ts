@@ -15,29 +15,6 @@ import {
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { makeAddPgTableConditionPlugin } from "../dist/index.js";
 
-const clean = (data: any): any => {
-  if (Array.isArray(data)) {
-    return data.map(clean);
-  } else if (data && typeof data === "object") {
-    return Object.keys(data).reduce(
-      (memo, key) => {
-        const value = data[key];
-        if (key === "id" && typeof value === "number") {
-          memo[key] = "[id]";
-        } else if (key === "nodeId" && typeof value === "string") {
-          memo[key] = "[nodeId]";
-        } else {
-          memo[key] = clean(value);
-        }
-        return memo;
-      },
-      Object.create(null) as Record<string, string>,
-    );
-  } else {
-    return data;
-  }
-};
-
 let pgPool: Pool | null = null;
 let connectionString = "";
 let databaseName = "";
