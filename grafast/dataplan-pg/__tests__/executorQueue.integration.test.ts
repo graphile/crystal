@@ -7,7 +7,6 @@ import sql from "pg-sql2";
 
 import { makePgAdaptorWithPgClient } from "../dist/adaptors/pg.js";
 import { EXPORTABLE } from "../dist/datasource.js";
-import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 import { PgExecutor } from "../dist/executor.js";
 import type {
   PgClientQuery,
@@ -21,6 +20,7 @@ import {
   pgSelect,
   TYPES,
 } from "../dist/index.js";
+import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 import {
   createTestDatabase,
   dropTestDatabase,

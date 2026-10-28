@@ -5,10 +5,7 @@
     "rewriteRelativeImportExtensions": false,
     "allowImportingTsExtensions": true
   },
-  "include": [
-    "__tests__/**/*",
-    "scripts/**/*"
-  ],
+  "include": ["__tests__/**/*", "scripts/**/*"],
   "references": [
     {
       "path": "./tsconfig.json"

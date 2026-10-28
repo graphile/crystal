@@ -150,6 +150,7 @@ import type { PgDeleteSingleQueryBuilder } from "./steps/pgDeleteSingle.ts";
 import { pgDeleteSingle, PgDeleteSingleStep } from "./steps/pgDeleteSingle.ts";
 import type { PgInsertSingleQueryBuilder } from "./steps/pgInsertSingle.ts";
 import { pgInsertSingle, PgInsertSingleStep } from "./steps/pgInsertSingle.ts";
+import type { PgWrapCallback } from "./steps/pgMutationWrapper.ts";
 import type {
   PgGroupDetails,
   PgRootStep,
@@ -213,10 +214,7 @@ import {
 } from "./steps/withPgClient.ts";
 import { assertPgClassSingleStep } from "./utils.ts";
 
-import type { PgWrapCallback } from "./steps/pgMutationWrapper.ts";
-
 export type {
-  PgWrapCallback,
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,
@@ -330,6 +328,7 @@ export type {
   PgUnionAllStepOrder,
   PgUpdateSingleQueryBuilder,
   PgWhereConditionSpec,
+  PgWrapCallback,
   PlanByUniques,
   SideEffectWithPgClientStepCallback,
   WithPgClient,

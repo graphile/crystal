@@ -1,6 +1,3 @@
 import * as core from "./core.ts";
 
-test(
-  "prints a schema for geometry",
-  core.test(__filename, ["geometry"]),
-);
+test("prints a schema for geometry", core.test(__filename, ["geometry"]));

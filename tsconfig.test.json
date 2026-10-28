@@ -6,13 +6,6 @@
     "module": "nodenext",
     "moduleResolution": "nodenext"
   },
-  "include": [
-    "scripts/**/*"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "**/dist",
-    "**/release",
-    "**/versioned_docs"
-  ]
+  "include": ["scripts/**/*"],
+  "exclude": ["**/node_modules", "**/dist", "**/release", "**/versioned_docs"]
 }

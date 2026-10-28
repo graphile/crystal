@@ -37,9 +37,9 @@ import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
 import { PgSubscriber } from "../dist/adaptors/pg.js";
-import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 //import prettier from "prettier";
 import type { PgClientQuery } from "../dist/index.js";
+import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
 import {
   createTestDatabase,
   dropTestDatabase,

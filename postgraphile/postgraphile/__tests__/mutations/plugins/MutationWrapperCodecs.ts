@@ -9,8 +9,8 @@ import {
   pgUpdateSingle,
   PgWrapCallback,
 } from "@dataplan/pg";
-import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 import { FieldArgs } from "grafast";
+import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
 const attributes = [
   "enabled",
