@@ -1,0 +1,177 @@
+---
+title: Contact
+description: Contact Graphile for commercial enquiries, sponsorship and community discussions.
+hide_table_of_contents: true
+---
+
+import Link from "@docusaurus/Link";
+import AuthorSocials from "@theme/Blog/Components/Author/Socials";
+import styles from "./contact.module.css";
+import commonStyles from "@site/src/css/common.module.css";
+
+<div className={commonStyles.mainSectionInstructionContainer}>
+  <h1 className={commonStyles.instructionSponsor}>
+    {"The people behind Graphile"}
+  </h1>
+</div>
+
+Graphile is the team behind <Grafast />, PostGraphile, Graphile Worker and the wider
+Graphile suite of open-source tools. We build and maintain these projects with
+funding from [sponsorship](/sponsor) and commercial services, including
+consultancy and [development support](/support).
+
+<div className={styles.person}>
+  <div className={styles.profile}>
+    <img
+      className={styles.avatar}
+      src="/img/team/benjie.jpg"
+      alt="Benjie"
+      width="96"
+      height="96"
+    />
+    <div className={styles.socials}>
+      <AuthorSocials
+        author={{
+          socials: {
+            github: "https://github.com/benjie",
+            bluesky: "https://bsky.app/profile/benjie.dev",
+            linkedin: "https://www.linkedin.com/in/benjiegillam",
+            website: "https://benjie.dev",
+          },
+        }}
+      />
+    </div>
+  </div>
+  <div>
+    <h4>Benjie — Graphile maintainer and GraphQL TSC member</h4>
+
+    <p>
+      Creator of <Grafast /> and PostGraphile, Benjie is a long-standing
+      contributor to the GraphQL ecosystem and a member of the GraphQL Technical
+      Steering Committee. He leads Graphile’s software development, bringing
+      deep expertise in GraphQL, PostgreSQL and software architecture to the
+      open-source projects and the companies that rely on them.
+    </p>
+
+  </div>
+</div>
+
+<div className={styles.person}>
+  <div className={styles.profile}>
+    <img
+      className={styles.avatar}
+      src="/img/team/jem.jpg"
+      alt="Jem"
+      width="96"
+      height="96"
+    />
+    <div className={styles.socials}>
+      <AuthorSocials
+        author={{
+          socials: {
+            github: "https://github.com/jemgillam",
+            bluesky: "https://bsky.app/profile/jem.graphile.org",
+            linkedin: "https://www.linkedin.com/in/jem-gillam-92063b14",
+          },
+        }}
+      />
+    </div>
+  </div>
+  <div>
+    <h4>Jem — Operations and community</h4>
+
+    <p>
+      Jem leads Graphile’s business operations, commercial relationships and
+      software testing. Beyond Graphile, they work with the GraphQL Foundation,
+      leading its Ambassador and Locals programs and supporting the organizers,
+      speakers and community leaders who bring people together across the global
+      GraphQL ecosystem.
+    </p>
+
+  </div>
+</div>
+
+<div
+  className={`${commonStyles.mainSectionInstructionContainer} ${styles.contactSection}`}
+>
+  <h1 className={commonStyles.instructionSponsor}>{"Get in touch"}</h1>
+</div>
+
+Have a question about Gra*fast*, interested in sponsoring development, or want
+to discuss working with us? We’d love to hear from you.
+
+<div className={styles.contactCards}>
+  <section className={styles.contactCard}>
+    <div>
+      <h2 className={styles.cardTitle}>
+        <span className={styles.icon} aria-hidden="true">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="m3 7 9 6 9-6" />
+          </svg>
+        </span>{" "}
+        {"Enquiries & sponsorship"}
+      </h2>
+    </div>
+    <div>
+      <p>
+        For consultancy, support contracts, licensing, sponsorship, or funding
+        specific development work, please email us. If you don’t hear anything
+        after a week, please ping us on Discord as your email may have got
+        caught by a filter!
+      </p>
+    </div>
+    <div>
+      <Link
+        className={`button button--primary button--lg ${styles.button}`}
+        to="mailto:team@graphile.com"
+      >
+        {"team@graphile.com"}
+      </Link>
+    </div>
+  </section>
+  <section className={styles.contactCard}>
+    <div>
+      <h2 className={styles.cardTitle}>
+        <span className={styles.icon} aria-hidden="true">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z" />
+          </svg>
+        </span>{" "}
+        {"Community discussions"}
+      </h2>
+    </div>
+    <div>
+      <p>
+        Join our Discord community to ask questions, discuss Gra*fast*, share
+        what you’re building, and connect with other developers.
+      </p>
+    </div>
+    <div>
+      <Link
+        className={`button button--primary button--lg ${styles.button}`}
+        to="https://discord.gg/graphile"
+      >
+        {"Join our Discord community"}
+      </Link>
+    </div>
+  </section>
+</div>
