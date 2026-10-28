@@ -2,9 +2,9 @@
   "extends": "../../tsconfig.test.json",
   "include": [
     "__tests__/**/*",
-    "examples/exampleSchema.mts",
+    "examples/**/*",
     "scripts/**/*",
-    "serve-example-schema.mts"
+    "*.mts"
   ],
   "references": [{ "path": "./tsconfig.json" }]
 }
