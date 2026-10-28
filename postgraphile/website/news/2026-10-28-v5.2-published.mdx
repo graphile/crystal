@@ -1,0 +1,107 @@
+---
+title: "PostGraphile V5.2 — A great time to upgrade!"
+description: "PostGraphile V5.2 brings major performance and type safety improvements following six months of refinement and production input."
+slug: 2026-10-28-v5.2-published
+authors: [benjie, jem]
+tags: [releases, v5]
+---
+
+import Link from "@docusaurus/Link";
+import styles from "@site/src/css/common.module.css";
+
+<div className={styles.intro}>
+
+Six months ago we published PostGraphile V5: the culmination of several years' work redesigning almost every layer of the project, powered by the new Grafast planning and execution engine. It was by far the biggest release in PostGraphile's history, bringing major improvements to performance, extensibility, maintainability and developer experience.
+
+Since then, we've continued to refine V5 in response to feedback from early adopters and production deployments.
+
+If you've been waiting to upgrade from V4, we think now is a great time!
+
+## Easy upgrade
+
+We have a [V4 -> V5 migration guide](/postgraphile/5/migrating-from-v4/) available for those who have been waiting; the [`makeV4Preset`](/postgraphile/5/migrating-from-v4/#makev4preset) means users can update to the new engine while keeping much of the V4 behavior.
+
+**Now available: in collaboration with our sponsor Steelhead, we are making codemods available to sponsors to automate some of the work involved, see [Codemods available]() for more detail and how to access them.**
+
+</div>
+
+{/* truncate */}
+
+## Six months of refinement, with production input
+
+Since V5.0 we've shipped a steady stream of improvements across PostGraphile and the underlying Gra*fast* engine. Among many smaller improvements were better planning performance for large schemas, fixes around subscriptions and watch mode, simpler `pgServices` configuration, and improved compatibility with more complex PostgreSQL schemas. The result is a noticeably more polished platform without changing the fundamental architecture that shipped in V5.
+
+Today we're excited to announce PostGraphile 5.2 and Gra*fast* 1.2; this is a massive release, the culmination of [3 months of work](https://github.com/graphile/crystal/pull/3127). You can see [the changelogs](https://github.com/graphile/crystal/releases) for full details, but we've attempted to summarize some of the key elements below:
+
+### Performance
+
+- Users who were suffering performance regressions after moving to V5, rejoice! The cause was tracked down to poor PostgreSQL planning decisions caused by the combination of V5's new leaner SQL combined with suboptimal RLS policy design, and fixed through the use of materialized CTEs. _Remember: [don't pass row data to functions in RLS policies](/postgraphile/5/required-knowledge#writing-performant-rls-policies), this is by far and away the most common reason that users suffer performance issues with RLS._
+- Database connections, roundtrips, and transactions have all been reduced by grouping similar SQL queries into the same PostgreSQL adaptor; this also made better use of prepared statements, yielding further speedups.
+- `PgSelectStep` now automatically deduplicates queries where possible, resulting in fewer roundtrips to the database.
+- `PgSelectStep` now automatically skips fetches when no rows can be returned due to `WHERE some_column = null` (which is always falsy).
+- `PgSelectStep` now switches from `left join` to subqueries when too many children request to be inlined. This reduces PostgreSQL planning time, and can also improve performance when poorly performing RLS policies are present.
+- A new experimental Gra*fast* `prepare()` method allows "warming" of plans before the server becomes available, avoiding planning pauses.
+- `connection()` no longer performs an unnecessary second database fetch for queries that didn't request row data, such as `someField(first: 1) { totalCount }`. Previously, it fetched the collection twice: once for the `totalCount` aggregate and once for the `first: 1` rows, even though those rows weren't needed.
+- PgSelectStep now allows developers to indicate whether a left join or subquery is preferred for a certain step, or children of that step, via the `setInliningStrategy(...)` and `setChildInliningStrategy(...)` methods.
+- Further optimizations throughout the stack.
+
+### Type safety
+
+- 🌟**New**: `@graphile-pro/postgraphile` generates types from your database and GraphQL schema(s) to make plugin authoring a breeze: autocompletion in your editor, and type safety providing much stronger guardrails for agents. (**Interested in early access? This is only available to Sponsors, [get in touch to get started](/contact).**)
+- Significant improvements to TypeScript types throughout.
+- `wrapPlans()` now receives the full `GraphileBuild.Build` type, rather than a partial type.
+- `build.getTypeMetaByName` now supports type narrowing on the `.kind` attribute, making `typeMeta.scope` strongly typed.
+- If you were assuming a Postgres record type was definitely a `PgSelectSingleStep`, you were assuming wrong… And might face planning failures under certain circumstances (typically relating to mutations). Use `PgClassSingleStep` instead, and we've added a helper in case not having a `PgSelectSingleStep` is causing you issues: `$record.toSelectSingle()`.
+- `PgResource.execute()` can now infer the result type from the function signature when available, rather than using the full union type.
+
+### Extensibility
+
+- The `PgInsertSingleStep`, `PgUpdateSingleStep` and `PgDeleteSingleStep` step classes now support an experimental `.wrap(...)` method allowing custom logic to run before and after an operation within the same transaction. This is particularly useful for `wrapPlans()` users.
+- Experimental support for type modifiers in PostgreSQL lays the groundwork for PostGIS and similar plugin expansion.
+- Higher quality support for custom Postgres adaptors: `GraphileConfig.DataplanPgClient` now reflects the chosen adaptor, including its custom methods/properties. This is particularly useful when writing custom `extendSchema()` or `wrapPlans()` plugins.
+- `orderByAscDesc` now supports providing a list of expressions.
+- More scope values added in various places to make schema extension easier.
+
+### Ergonomics
+
+- `addPgTableCondition` and `addPgTableOrderBy` now support a more ergonomic expression of the target: `"my_schema.my_table"` rather than `{schemaName: "my_schema", tableName: "my_table"}`. This target also benefits from autocompletion and type checking for users of `@graphile-pro/postgraphile` type generation.
+- [Multistep](https://grafast.org/grafast/standard-steps/multistep/) syntax, which is often more efficient than passing `object({...})` or `list([...])` to certain steps, is now supported in more places.
+- New `PgExecutor.executePositional` and `PgExecutor.executeNamed` variants of the execute method offer better ergonomics.
+- Certain patterns of user planning code that might lead to deadlock are now blocked up front.
+- GraphQL schema ordering is now slightly more stable.
+
+### Fixes
+
+- `PgUpdateSingleStep` no longer throws an error when no values are provided for an update; instead it simply exits having changed no rows.
+- Gra*fast* now handles inhibited steps more reliably, preventing over-inhibition, particularly in relation to custom `sideEffect()` steps.
+- Various fixes to V4 compatibility.
+- Various minor fixes and improvements including marking up more plugins for ordering, fixies to some smart tag behaviors, fixes to some descriptions in the GraphQL schema, and support for empty PostgreSQL ranges, etc
+
+For more details, see the [PostGraphile V5.2 changelog](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#520) and [Gra*fast* V1.2 changelog](https://github.com/graphile/crystal/blob/main/grafast/grafast/CHANGELOG.md#120).
+
+## Help us reduce V5’s memory usage
+
+We don't normally reveal our roadmap, but we are sharing that our next focus is going to be on reducing memory usage of PostGraphile V5 and Gra*fast*. With the launch of V5 we've successfully offloaded a lot of the work from the database to the JS layer, helping you scale further; but the JS layer is a lot more memory hungry than it needs to be, and we have plans to fix this.
+
+How much of an improvement we can make really depends on how much support we get. A couple of our sponsors have put forward an investment into this work, funding the reduction of memory usage by introspection, and reducing the memory usage of retained Gra*fast* plans. **Their funding gives us a starting point, and we’re looking for more sponsors to help us take this work further.**
+
+With additional funding, we could extend the work to include:
+
+- Improving startup time of the PostGraphile process, particularly relevant to development experience and CI duration/agent loop delays.
+- Improving the exported executable schema, particularly relevant to folks running PostGraphile in serverless environments
+- Further reducing memory usage and improving performance.
+- Enabling new capabilities, such as performing operation planning off of the main runloop to reduce runloop stalls and the related latency impact.
+
+The scope of this additional work will depend on the funding we receive. If your business would benefit from these improvements, please get in touch about making a one-off contribution to the crowdfund.
+
+<div className="text--center">
+  <Link className="button button--primary button--lg" to="/contact">
+    {"Get in contact to donate to the crowdfund"}
+  </Link>
+</div>
+
+<figure>
+
+![Thank you](../static/img/news/thank-you.svg)
+
+</figure>
