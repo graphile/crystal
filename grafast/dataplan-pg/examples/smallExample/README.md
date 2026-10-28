@@ -50,5 +50,5 @@ documentation.
 You can run this code using Node 24+ from the `grafast/dataplan-pg` folder, as:
 
 ```
-node --experimental-strip-types src/examples/smallExample/index.mts
+node --experimental-strip-types examples/smallExample/index.mts
 ```

@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import type { FieldArgs, Step } from "grafast";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
 const withDifferentVarchar = EXPORTABLE(
@@ -24,8 +25,11 @@ const plugin = extendSchema((build) => {
       Query: {
         typeIdentityBatch: EXPORTABLE(
           (each, first, lambda, list, typeIdentity, withDifferentVarchar) =>
-            function typeIdentityBatch(_$root, args) {
-              const $type = first(args.getBaked("types"));
+            function typeIdentityBatch(
+              _$root: any,
+              args: FieldArgs<{ types: any[] }>,
+            ) {
+              const $type = first(args.getBaked("types")) as Step<any>;
               const $types = list([
                 $type,
                 lambda($type, withDifferentVarchar, true),

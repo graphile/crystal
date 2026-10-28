@@ -18,11 +18,11 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
-import { jsonPgSmartTags, pgSmartTags } from "../src/index.ts";
+import { jsonPgSmartTags, pgSmartTags } from "../dist/index.js";
 import {
   type PgSmartTagRule,
   pgSmartTagRulesFromJSON,
-} from "../src/makePgSmartTagsPlugin.ts";
+} from "../dist/makePgSmartTagsPlugin.js";
 
 declare global {
   /* eslint-disable @typescript-eslint/no-empty-object-type */
@@ -50,7 +50,7 @@ declare global {
   /* eslint-enable @typescript-eslint/no-empty-object-type */
 }
 
-function typecheckScopedJsonPgSmartTags(): void {
+function _typecheckScopedJsonPgSmartTags(): void {
   pgSmartTagRulesFromJSON<"pgSmartTagsTypecheck">({
     version: 1,
     config: {

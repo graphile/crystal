@@ -1,3 +1,5 @@
+import { assertObjectType } from "graphql";
+
 import * as core from "./core.ts";
 
 test(
@@ -17,11 +19,11 @@ comment on view smart_comment_relations.offer_view is E'@name offers
 @foreignKey (post_id) references post_view(id)';`,
       ),
     (schema) => {
-      const Offer = schema.getType("Offer");
+      const Offer = assertObjectType(schema.getType("Offer"));
       const fields = Offer.getFields();
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postByPostId).toBeTruthy();
-      const Query = schema.getType("Query");
+      const Query = assertObjectType(schema.getType("Query"));
       const queryFields = Query.getFields();
       expect(queryFields.postById).toBeTruthy();
     },

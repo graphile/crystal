@@ -80,7 +80,7 @@
     "build-package": "yarn build",
     "graphile": "node ../../utils/graphile/dist/cli-run.js",
     "build": "tsc -b",
-    "test": "jest",
+    "test": "tsc -b tsconfig.test.json && jest",
     "posttest": "yarn playwright install chromium && node --experimental-strip-types scripts/smoke-examples.mts"
   },
   "repository": {

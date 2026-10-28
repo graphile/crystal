@@ -10,6 +10,14 @@ afterEach(() => {
   server?.release();
 });
 
+declare global {
+  namespace Grafast {
+    interface Context {
+      fromGrafastContext?: boolean;
+    }
+  }
+}
+
 const sharedConfig: GraphileConfig.Preset = {
   grafserv: {
     graphqlOverGET: true,
