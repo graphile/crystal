@@ -304,7 +304,7 @@ export const ENTITY_TYPES: {
     alias: "triggers",
     requires: ["classes"],
     oids: true,
-    where: "tgrelid in (select classes._id from classes where relkind = 'r')",
+    where: "tgrelid in (select classes._id from classes)",
     order: "tgrelid, tgname",
     extraColumns: {},
   },
