@@ -1,7 +1,6 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["geometry"]
 #> subscriptions: true
-#> graphileBuildOptions: { pgGeometricTypes: true }
 
 {
   allGeoms {
