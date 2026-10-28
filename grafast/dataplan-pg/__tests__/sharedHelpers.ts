@@ -4,8 +4,8 @@ import { randomBytes } from "crypto";
 import type { Pool } from "pg";
 import { Client } from "pg";
 
-import { createWithPgClient } from "../src/adaptors/pg.ts";
-import type { PgClientQuery, WithPgClient } from "../src/index.ts";
+import { createWithPgClient } from "../dist/adaptors/pg.js";
+import type { PgClientQuery, WithPgClient } from "../dist/index.js";
 
 function noop() {}
 
@@ -51,7 +51,7 @@ export async function withTestWithPgClient<T>(
 ): Promise<T> {
   const poolClient = await testPool.connect();
   const oldQuery = poolClient.query;
-  poolClient.query = function (...args: any[]) {
+  poolClient.query = (function (this: typeof poolClient, ...args: any[]) {
     const opts = typeof args[0] === "string" ? { text: args[0] } : args[0];
     if (!opts.text.includes("--ignore--")) {
       if (direct) {
@@ -79,8 +79,8 @@ export async function withTestWithPgClient<T>(
         }
       }
     }
-    return oldQuery.apply(this, args);
-  };
+    return (oldQuery as (...args: any[]) => unknown).apply(this, args);
+  }) as typeof poolClient.query;
   try {
     if (direct) {
       const withPgClient = createWithPgClient({

@@ -27,7 +27,7 @@
     "build-package": "yarn build",
     "codegen": "yarn graphql-codegen -c codegen-examples-smallExample.ts",
     "update-schema": "ts-node ./src/examples/exampleSchema.ts",
-    "test": "GRAPHILE_ENV=test jest",
+    "test": "tsc -b tsconfig.test.json && GRAPHILE_ENV=test jest",
     "posttest": "yarn test:exportSchema:graphql-js && yarn test:exportSchema:typeDefs",
     "test:exportSchema:graphql-js": "ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
     "test:exportSchema:typeDefs": "ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",

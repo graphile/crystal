@@ -137,7 +137,7 @@ async function main() {
       },
       {
         // explain: ["plan"],
-      },
+      } as never,
     );
 
     console.log("GraphQL result:");
