@@ -1,11 +1,7 @@
 import "graphile-config";
 
 import type { PgResource, PgWrapCallback } from "@dataplan/pg";
-import {
-  pgDeleteSingle,
-  pgInsertSingle,
-  pgUpdateSingle,
-} from "@dataplan/pg";
+import { pgDeleteSingle, pgInsertSingle, pgUpdateSingle } from "@dataplan/pg";
 import type { FieldArgs, Step } from "grafast";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 

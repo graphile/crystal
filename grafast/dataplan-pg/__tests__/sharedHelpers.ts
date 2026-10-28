@@ -51,7 +51,7 @@ export async function withTestWithPgClient<T>(
 ): Promise<T> {
   const poolClient = await testPool.connect();
   const oldQuery = poolClient.query;
-  poolClient.query = (function (this: typeof poolClient, ...args: any[]) {
+  poolClient.query = function (this: typeof poolClient, ...args: any[]) {
     const opts = typeof args[0] === "string" ? { text: args[0] } : args[0];
     if (!opts.text.includes("--ignore--")) {
       if (direct) {
@@ -80,7 +80,7 @@ export async function withTestWithPgClient<T>(
       }
     }
     return (oldQuery as (...args: any[]) => unknown).apply(this, args);
-  }) as typeof poolClient.query;
+  } as typeof poolClient.query;
   try {
     if (direct) {
       const withPgClient = createWithPgClient({
