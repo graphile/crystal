@@ -118,7 +118,7 @@ it("reports missing collections for entity relationships and permissions", () =>
         "inherits",
       ],
     },
-    data,
+    data as never,
   );
   const table = result.classes[0];
   assert.throws(() => result.database.getOwner(), /roles/);

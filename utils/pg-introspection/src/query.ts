@@ -37,7 +37,6 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
       tableName: tbl,
       alias,
       oids,
-      where,
       order,
       singular,
       columns,
@@ -50,15 +49,28 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
         additionalSelect += `,\n      ${sql} as "${colName}"`;
       }
     }
+    const wheres: string[] = [];
+
+    const baseWhere =
+      typeof entityType.where === "function"
+        ? entityType.where(options)
+        : entityType.where;
+    if (baseWhere != null) wheres.push(baseWhere);
+
+    if (alias === "procs" && !onlyEntities.includes("triggers")) {
+      // Exclude triggers
+      wheres.push("prorettype operator(pg_catalog.<>) 2279");
+    }
+
     withs.push(`\
   ${alias} as (
     select ${oids ? `${tbl}.oid as _id, ` : ""}${
       columns ? columns.join(", ") : "*"
     }${additionalSelect}
     from pg_catalog.${tbl}${
-      where
+      wheres.length > 0
         ? `
-    where ${typeof where === "function" ? where(options) : where}`
+    where (${wheres.join(") and (")})`
         : ""
     }
   )`);
@@ -86,11 +98,9 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
     }
   }
 
-  return `with
-${withs.join(",\n\n")}
+  return `${withs.length > 0 ? `with\n${withs.join(",\n\n")}\n` : ""}\
 select json_build_object(
-${jsons.join(",\n\n")},
-
+${jsons.length > 0 ? `${jsons.join(",\n\n")},\n\n` : ""}\
   'catalog_by_oid',
   (
     select json_object_agg(oid::text, relname order by relname asc)
@@ -105,8 +115,10 @@ ${jsons.join(",\n\n")},
 
   'current_user',
   current_user,
+
   'pg_version',
   version(),
+
   'introspection_version',
   1
 )::text as introspection
