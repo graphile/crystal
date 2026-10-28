@@ -20,7 +20,7 @@ import {
   pgSelect,
   TYPES,
 } from "../dist/index.js";
-import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
+import { makeExampleSchema } from "../examples/exampleSchema.mts";
 import {
   createTestDatabase,
   dropTestDatabase,
@@ -107,7 +107,7 @@ test("concurrent identical reads with different pgSettings stay isolated", async
         source,
         variableValues,
         resolvedPreset,
-        requestContext: { userId },
+        requestContext: { userId } as never,
       });
 
     const [first, second] = await Promise.all([run("101"), run("202")]);

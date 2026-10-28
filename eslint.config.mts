@@ -477,7 +477,7 @@ const oldConfig: { overrides: ReadonlyArray<ConfigWithExtends> } = {
         "grafast/grafast/__tests__/**",
         "grafast/grafserv/__tests__/**",
         "grafast/grafserv/examples/**",
-        "grafast/dataplan-pg/src/examples/**",
+        "grafast/dataplan-pg/examples/**",
         "graphile-build/graphile-utils/__tests__/**",
       ],
       rules: {

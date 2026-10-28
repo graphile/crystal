@@ -1,7 +1,9 @@
-const { makeExampleSchema } = require("./dist/examples/exampleSchema");
-const { grafserv } = require("grafserv/node");
-const { createServer } = require("node:http");
-const { createWithPgClient } = require("./dist/adaptors/pg");
+import { createServer } from "node:http";
+
+import { grafserv } from "grafserv/node";
+
+import { createWithPgClient } from "./dist/adaptors/pg.js";
+import { makeExampleSchema } from "./examples/exampleSchema.mts";
 
 const schema = makeExampleSchema();
 const withPgClient = createWithPgClient({

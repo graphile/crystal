@@ -10,10 +10,14 @@
  * interested in might be useful.
  */
 
+import { fileURLToPath } from "node:url";
+
 import { jsonParse, JSONParseStep } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
+  __InputObjectStepWithDollars,
+  __TrackedValueStepWithDollars,
   AccessStep,
   BaseGraphQLRootValue,
   GrafastArgumentConfig,
@@ -23,11 +27,9 @@ import type {
 } from "grafast";
 import {
   __InputObjectStep,
-  __InputObjectStepWithDollars,
   __InputStaticLeafStep,
   __ListTransformStep,
   __TrackedValueStep,
-  __TrackedValueStepWithDollars,
   __ValueStep,
   bakedInput,
   connection,
@@ -74,15 +76,15 @@ import {
 } from "grafast/graphql";
 import { specifiedDirectives } from "graphql";
 import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
-import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.ts";
-import { listOfCodec, sqlValueWithCodec } from "../codecs.ts";
+import type { NodePostgresPgClient, PgSubscriber } from "../dist/adaptors/pg.js";
+import { listOfCodec, sqlValueWithCodec } from "../dist/codecs.js";
 import {
   makeRegistry,
   makeRegistryBuilder,
   pgResourceOptions,
-} from "../datasource.ts";
+} from "../dist/datasource.js";
 //import prettier from "prettier";
 import type {
   GetPgResourceRelations,
@@ -93,7 +95,7 @@ import type {
   PgInsertSingleStep,
   PgSelectStep,
   WithPgClient,
-} from "../index.ts";
+} from "../dist/index.js";
 import {
   enumCodec,
   PgBooleanFilter,
@@ -112,24 +114,24 @@ import {
   PgUpdateSingleStep,
   recordCodec,
   TYPES,
-} from "../index.ts";
+} from "../dist/index.js";
 import type {
   GetPgResourceAttributes,
   PgCodec,
   PgSelectQueryBuilderCallback,
-} from "../interfaces.ts";
-import type { PgSelectQueryBuilder } from "../steps/pgSelect.ts";
-import { sqlFromArgDigests } from "../steps/pgSelect.ts";
+} from "../dist/interfaces.js";
+import type { PgSelectQueryBuilder } from "../dist/steps/pgSelect.js";
+import { sqlFromArgDigests } from "../dist/steps/pgSelect.js";
 import type {
   PgUnionAllQueryBuilder,
   PgUnionAllSingleStep,
   PgUnionAllStep,
-} from "../steps/pgUnionAll.ts";
-import { pgUnionAll } from "../steps/pgUnionAll.ts";
+} from "../dist/steps/pgUnionAll.js";
+import { pgUnionAll } from "../dist/steps/pgUnionAll.js";
 import {
   SideEffectWithPgClientStep,
   sideEffectWithPgClientTransaction,
-} from "../steps/withPgClient.ts";
+} from "../dist/steps/withPgClient.js";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const EMPTY_OBJECT = Object.freeze({});
@@ -5519,7 +5521,7 @@ export function makeExampleSchema(
 }
 
 async function main() {
-  const filePath = `${__dirname}/../../__tests__/schema.graphql`;
+  const filePath = fileURLToPath(new URL("../__tests__/schema.graphql", import.meta.url));
   const schema = makeExampleSchema();
   writeFileSync(
     filePath,
@@ -5532,7 +5534,7 @@ async function main() {
   );
 }
 
-if (require.main === module) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   main().catch((e) => {
     console.error(e);
     process.exit(1);
