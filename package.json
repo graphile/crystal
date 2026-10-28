@@ -30,7 +30,7 @@
     "prettier:fix": "yarn prettier:all --write",
     "prettier:check": "yarn prettier:all --list-different",
     "typecheck:tests": "bash -c 'status=0; for config in tsconfig.test.json {utils,grafast,graphile-build,postgraphile}/*/tsconfig.test.json; do yarn tsc -b \"$config\" || status=1; done; exit \"$status\"'",
-    "prepush": "concurrently \"yarn test\" \"yarn lint:fix\" && yarn typecheck:tests"
+    "prepush": "yarn typecheck:tests && yarn lint:fix && yarn test"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
