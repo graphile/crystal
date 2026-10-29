@@ -1,0 +1,20 @@
+{
+  postType: {
+    fields: "<MASKED-0>",
+  },
+  topicType: {
+    fields: "<MASKED-1>",
+  },
+  allForeignKeyReturnTypeTests: {
+    nodes: [
+      {
+        id: 4,
+        topicByReturnType: {
+          __typename: "SingleTableTopic",
+          id: 1,
+          title: "PostGraphile version 5",
+        },
+      },
+    ],
+  },
+}
