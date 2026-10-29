@@ -12,7 +12,7 @@ import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
 
-Six months ago we published PostGraphile V5: the culmination of several years' work redesigning almost every layer of the project, powered by the new Grafast planning and execution engine. It was by far the biggest release in PostGraphile's history, bringing major improvements to performance, extensibility, maintainability and developer experience.
+Six months ago we published PostGraphile V5: the culmination of several years' work redesigning almost every layer of the project, powered by the new Gra*fast* planning and execution engine. It was by far the biggest release in PostGraphile's history, bringing major improvements to performance, extensibility, maintainability and developer experience.
 
 Since then, we've continued to refine V5 in response to feedback from early adopters and production deployments.
 
@@ -22,7 +22,7 @@ If you've been waiting to upgrade from V4, we think now is a great time!
 
 We have a [V4 -> V5 migration guide](/postgraphile/5/migrating-from-v4/) available for those who have been waiting; the [`makeV4Preset`](/postgraphile/5/migrating-from-v4/#makev4preset) means users can update to the new engine while keeping much of the V4 behavior.
 
-**Now available: in collaboration with our sponsor Steelhead, we are making codemods available to sponsors to automate some of the work involved, see [Codemods available]() for more detail and how to access them.**
+**Now available: in collaboration with our sponsor Steelhead, we are making codemods available to sponsors to automate some of the work involved, see [V4→V5 codemods early access](/postgraphile/news2026-10-28-codemods-early-access) for more detail and how to access them.**
 
 </div>
 
@@ -41,7 +41,7 @@ Today we're excited to announce PostGraphile 5.2 and Gra*fast* 1.2; this is a ma
 - `PgSelectStep` now automatically deduplicates queries where possible, resulting in fewer roundtrips to the database.
 - `PgSelectStep` now automatically skips fetches when no rows can be returned due to `WHERE some_column = null` (which is always falsy).
 - `PgSelectStep` now switches from `left join` to subqueries when too many children request to be inlined. This reduces PostgreSQL planning time, and can also improve performance when poorly performing RLS policies are present.
-- A new experimental Gra*fast* `prepare()` method allows "warming" of plans before the server becomes available, avoiding planning pauses.
+- A new experimental Gra*fast* `prepare()` method allows "warming" of plans before the server becomes available, avoiding planning pauses at runtime. This will be more impactful in a future release when we reduce plans’ retained memory (see “What’s next?”).
 - `connection()` no longer performs an unnecessary second database fetch for queries that didn't request row data, such as `someField(first: 1) { totalCount }`. Previously, it fetched the collection twice: once for the `totalCount` aggregate and once for the `first: 1` rows, even though those rows weren't needed.
 - PgSelectStep now allows developers to indicate whether a left join or subquery is preferred for a certain step, or children of that step, via the `setInliningStrategy(...)` and `setChildInliningStrategy(...)` methods.
 - Further optimizations throughout the stack.
@@ -76,11 +76,11 @@ Today we're excited to announce PostGraphile 5.2 and Gra*fast* 1.2; this is a ma
 - `PgUpdateSingleStep` no longer throws an error when no values are provided for an update; instead it simply exits having changed no rows.
 - Gra*fast* now handles inhibited steps more reliably, preventing over-inhibition, particularly in relation to custom `sideEffect()` steps.
 - Various fixes to V4 compatibility.
-- Various minor fixes and improvements including marking up more plugins for ordering, fixies to some smart tag behaviors, fixes to some descriptions in the GraphQL schema, and support for empty PostgreSQL ranges, etc
+- Various minor fixes and improvements including marking up more plugins for ordering, fixes to some smart tag behaviors, fixes to some descriptions in the GraphQL schema, and support for empty PostgreSQL ranges, etc
 
 For more details, see the [PostGraphile V5.2 changelog](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#520) and [Gra*fast* V1.2 changelog](https://github.com/graphile/crystal/blob/main/grafast/grafast/CHANGELOG.md#120).
 
-## Help us reduce V5’s memory usage
+## Help us improve V5 DX and performance
 
 We don't normally reveal our roadmap, but we are sharing that our next focus is going to be on reducing memory usage of PostGraphile V5 and Gra*fast*. With the launch of V5 we've successfully offloaded a lot of the work from the database to the JS layer, helping you scale further; but the JS layer is a lot more memory hungry than it needs to be, and we have plans to fix this.
 
@@ -93,7 +93,7 @@ With additional funding, we could extend the work to include:
 - Further reducing memory usage and improving performance.
 - Enabling new capabilities, such as performing operation planning off of the main runloop to reduce runloop stalls and the related latency impact.
 
-The scope of this additional work will depend on the funding we receive. If your business would benefit from these improvements, please get in touch about making a one-off contribution to the crowdfund.
+The scope of this additional work will depend on the funding we receive. If your business would benefit from these improvements, please get in touch, or [sponsor us/make a one-off contribution via GitHub Sponsors](https://github.com/sponsors/benjie).
 
 <div className="text--center">
   <Link className="button button--primary button--lg" to="/contact">

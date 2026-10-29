@@ -1,7 +1,7 @@
 ---
-title: "Migrating to PostGraphile V5 the easy way: codemods now available!"
+title: "V4→V5 codemods early access"
 description: ""
-slug: 2026-10-28-codemods-now-available
+slug: 2026-10-28-codemods-early-access
 authors: [benjie, jem]
 tags: [releases, v5]
 date: 2026-10-28T01:00:00
@@ -31,7 +31,11 @@ These codemods will not normally result in full migration, but they will do the 
 
 This project is thanks primarily to one of our long-standing sponsors, Steelhead, who found the codemods were pivotal for the transition of their well-established production codebase to PostGraphile V5. We’d like to thank Steelhead for sponsoring this work and allowing us to turn tooling developed for a real migration into something the wider community can benefit from. Sponsors can have access to these codemods today in the Graphile sponsors-only GitHub repository, we plan to make them publicly available once we have had time to improve their documentation and smooth any rough edges.
 
-Between the codemods, the migration guide, and six months of real-world experience behind the release, upgrading to V5 is even smoother today than it was on launch day.
+Normally we review every line of code, but the codemods being a one-time code transformer with almost no I/O (jscodeshift handles that, mostly) meant that we were not so concerned about security or performance ramifications (a quick scan could determine nothing funky was going on), allowing us to expand the codemods beyond what we could normally build limited by the time intensive act of code review. This is compensated for by the vast array of test cases, so when running the codemods against your own codebase we recommend extending the tests with any problematic patterns from your own codebase and having your agent update the codemods to match. You’ll then need to replay the codemods from clean again, they aren’t designed to run twice in a row.
+
+Once the codemods complete, commit the changes and an agent should be able to help you tidy up the rough edges and get your PR passing again. One reason to perform this transition with codemods rather than agents is that the codemods are deterministic, replayable (e.g. on rebase), and are governed by my own preferences and insights of how code should be transformed, allowing you to benefit from more of the V5 improvements such as batching and more straightforward code.
+
+Between the codemods, the migration guide, and six months of real-world experience behind the release, upgrading to V5 is even smoother today than it was on launch day. But, if you need help, guidance, a code pair, or even to outsource the work to the experts, we have a range of support options available: from a single call right up to a support and development contract. [Get in touch](/contact), we’d love to hear from you.
 
 <div className="text--center">
   <Link className="button button--primary button--lg" to="/sponsor">
