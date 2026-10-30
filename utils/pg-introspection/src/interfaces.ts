@@ -26,6 +26,7 @@ export type DefaultEntities = (typeof defaultEntities)[number];
 export interface IntrospectOptions<
   TEntities extends EntityType = DefaultEntities,
 > {
+  /** @experimental */
   onlyEntities?: TEntities[];
   schemas?: string[];
   includeExtensionResources?: boolean;
