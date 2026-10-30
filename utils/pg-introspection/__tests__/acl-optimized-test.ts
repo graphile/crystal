@@ -8,12 +8,13 @@ import {
   PUBLIC_ROLE,
   resolvePermissions,
 } from "../dist/acl.js";
-import { augmentIntrospectionParsed } from "../dist/augmentIntrospection.js";
+import { augmentIntrospectionData } from "../dist/augmentIntrospection.js";
 import type {
   Introspection,
   PgAuthMembers,
   PgRoles,
-} from "../dist/introspection.js";
+} from "../dist/interfaces.js";
+import type { IntrospectionData } from "../dist/introspection.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 function makeRole(
@@ -34,7 +35,7 @@ function fakeIntrospection(
   roles: PgRoles[],
   authMembers: Pick<PgAuthMembers, "member" | "roleid">[] = [],
 ): Introspection {
-  return augmentIntrospectionParsed({
+  return augmentIntrospectionData({}, {
     ...rawIntrospectionResults,
     roles,
     auth_members: authMembers.map((am) => ({
@@ -42,7 +43,7 @@ function fakeIntrospection(
       admin_option: false,
       grantor: "0",
     })),
-  } as Introspection);
+  } as IntrospectionData);
 }
 
 describe("expandRoles", () => {
