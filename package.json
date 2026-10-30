@@ -54,7 +54,7 @@
     "@types/mock-fs": "4.13.4",
     "@types/node": "^22.19.1",
     "@types/rimraf": "^4.0.5",
-    "@types/ws": "^8.18.1",
+    "@types/ws": "^8.18.2",
     "@typescript-eslint/parser": "^8.47.0",
     "babel-jest": "^30.2.0",
     "babel-plugin-transform-import-meta": "^2.3.3",
@@ -83,7 +83,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.47.0",
     "webpack": "^5.103.0",
-    "ws": "^8.21.1",
+    "ws": "^8.22.0",
     "zx": "^8.8.5"
   },
   "workspaces": [
