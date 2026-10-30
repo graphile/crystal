@@ -1,4 +1,4 @@
-import { PgIntrospectionPlugin } from "../src/plugins/PgIntrospectionPlugin.ts";
+import { PgIntrospectionPlugin } from "../dist/plugins/PgIntrospectionPlugin.js";
 
 test("looks up an index by its identifier", async () => {
   const indexes = [{ indexrelid: "1" }, { indexrelid: "2" }];
