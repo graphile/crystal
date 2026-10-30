@@ -1944,7 +1944,7 @@ export interface PgAuthMembersData {
    *
    * @remarks Only in 18.x, 17.x, 16.x
    */
-  _id?: PgOid | undefined;
+  oid?: PgOid | undefined;
 
   /**
    * True if the member automatically inherits the privileges of the granted role
@@ -2227,7 +2227,7 @@ export interface PgEventTriggerData {
    *
    * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x
    */
-  _id?: PgOid | undefined;
+  oid?: PgOid | undefined;
 }
 
 /**
@@ -2573,7 +2573,7 @@ export interface PgPolicyData {
    *
    * @remarks Only in 18.x, 17.x, 16.x, 15.x, 14.x, 13.x
    */
-  _id?: PgOid | undefined;
+  oid?: PgOid | undefined;
 }
 
 /** The catalog pg_range stores information about range types. This is in addition to the types' entries in pg_type. */
