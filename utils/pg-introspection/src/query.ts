@@ -1,9 +1,9 @@
-import { catalogProjection } from "./introspectionHelpers.ts";
 import {
   ENTITY_TYPES,
   type EntityTypeConfig,
   type Options,
 } from "./introspection.ts";
+import { catalogProjection } from "./introspectionHelpers.ts";
 
 export const defaultEntities = Object.freeze([
   "database",
@@ -75,11 +75,11 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
         oids ? `oid::pg_catalog.oid as _id, ` : ""
       }${select}${additionalSelect}
       from pg_catalog.${tbl}${
-      wheres.length > 0
-        ? `
+        wheres.length > 0
+          ? `
     where (${wheres.join(") and (")})`
-        : ""
-    }
+          : ""
+      }
     ) projected
   )`);
     const val = singular

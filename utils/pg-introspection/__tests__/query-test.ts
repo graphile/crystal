@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
+import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
   dependencyWhere,
   descriptionWhere,
 } from "../dist/introspectionHelpers.js";
-import { ENTITY_TYPES } from "../dist/introspection.js";
 import { makeIntrospectionQuery } from "../dist/query.js";
 
 it("uses shared predicate exports instead of copied function bodies", () => {
@@ -23,7 +23,10 @@ it("requires an explicit policy for new catalog types", () => {
 
 it("uses docs-generated explicit projections and fallbacks for every entity", () => {
   for (const entity of Object.values(ENTITY_TYPES)) {
-    const { select, fallback } = catalogProjection(entity.attributes, entity.oids);
+    const { select, fallback } = catalogProjection(
+      entity.attributes,
+      entity.oids,
+    );
     assert.ok(Object.keys(entity.attributes).length > 0);
     assert.ok(select.length > 0);
     assert.ok(fallback.length > 0);
