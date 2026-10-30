@@ -1,58 +1,49 @@
 # Sponsors
 
-These individuals and companies sponsor ongoing development of projects in
-the Graphile ecosystem. Find out [how you can become a
-sponsor](https://graphile.org/sponsor/).
+These individuals and companies sponsor ongoing development of projects in the
+Graphile ecosystem. Find out
+[how you can become a sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 
-- The Guild
 - Steelhead
 - Outbank
+- Constructive
 
 ## Leaders
 
-- Robert Claypool
-- nigelrmtaylor
 - Principia Mentis
 - Axinom
 - Taiste
-- Trigger.dev
-- Cintra
 - Apollo
-- BairesDev
 - Two Bit Solutions
 - Dimply
 - Ndustrial
+- Cintra
 - Beacon
-- Ravio
 - prodready
-- Carvajal Consultants, Inc.
+- Seaber
 
 ## Supporters
 
 - HR-ON
 - stlbucket
 - Simon Elliott
+- nullachtvierzehn
 - Keith Layne
 - Alvin Ali Khaled
-- nullachtvierzehn
-- Zymego
 - garpulon
+- Zymego
 - Vizcom
-- Ether
-- Charlie Hadden
-- The Outbound Collective
-- Kiron Open Higher Education
 - Andrew Joseph
+- Ether
+- WorkOS
 - Peter C. Romano
-- mateo
 - Jody Hoon-Starr
 - kontakto-fi
 - Tailos, Inc.
 - Justin Carrus
-- WorkOS
-- Malachi Bergman
-- ProbablyBrianBurgess
 - Keweiqu
 - jjcroftiv
+- Mobly
+- ChilliCream
