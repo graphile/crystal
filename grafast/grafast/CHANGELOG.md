@@ -1,5 +1,112 @@
 # grafast
 
+## 1.2.0
+
+### Minor Changes
+
+- [#3156](https://github.com/graphile/crystal/pull/3156)
+  [`7c39592`](https://github.com/graphile/crystal/commit/7c39592b14290536d9db19ad811e89e7eef3388c)
+  Thanks [@benjie](https://github.com/benjie)! - Overhauls flag handling in
+  grafast internals, fixing consistency and aligning with expectations when
+  combining `sideEffect()`, `trap()`, `inhibitOnNull()` and related steps
+  through implicit (rather than explicit) dependencies in a plan resolver. Fixes
+  bug in `inhibitOnNull()` where errors from an implicit side effect would be
+  captured and consumed. Fixes bug where a side effect step that was inhibited
+  would incorrectly cause steps that followed it to be inhibited even if they
+  didn't depend on it. Optimizes layer plans: nullableBoundary now prevents
+  further propagation of side effects.
+
+- [#3122](https://github.com/graphile/crystal/pull/3122)
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc)
+  Thanks [@benjie](https://github.com/benjie)! - Improves types in
+  `@dataplan/pg` around codecs, resources, nullability, range values, and
+  resource execution arguments. Adds support for PostGraphile Pro (V5) type
+  generation.
+
+  **NOTE**: `pgResource.execute(...)` no longer accepts `pgCodec` in the
+  arguments; it was always ignored internally because the parameter codec was
+  used, now we explicitly don't accept it. `{ step, name?, pgCodec }` &rarr;
+  `{ step, name? }`
+
+  The new PostGraphile Pro (V5) plugin can generate registry, plan resolver,
+  introspection (for smart tags) and other related types, and even supports
+  correct types across multiple PostGraphile schemas in the same TypeScript
+  environment. The generated-schema-aware types provide checked schema names,
+  tables, fields, arguments, nullability, and PostgreSQL resource types where
+  available, while preserving broad fallbacks when they are not.
+
+  With this plugin, many of the standard PostGraphile APIs can become more
+  strongly typed with minimal user input. If you only have one PostGraphile
+  instance then using the default generation should be picked up automatically
+  by most plugin helpers -- `extendSchema()`, `wrapPlans()` (for the
+  filter-based form of `wrapPlans()`, pass the `scope` property to options
+  rather than adding a generic, this allows the filter return type to still be
+  inferred automatically), `pgSmartTags()`, `changeNullability()`,
+  `addPgTableCondition()`, `addPgTableOrderBy()` -- and for manual plugins you
+  can use the `scopedPlugin(...)` helper to define your plugin. If you run
+  multiple schemas then you can pass a generic (e.g.
+  `extendSchema<"public-api">(...)`) to indicate the types to use.
+
+- [#3188](https://github.com/graphile/crystal/pull/3188)
+  [`a38b59f`](https://github.com/graphile/crystal/commit/a38b59fecdfef010aab86ece61c64d42f152a166)
+  Thanks [@benjie](https://github.com/benjie)! - Expose `prepare` function that
+  performs operation planning but does not execute the operation. Useful for
+  pre-warming the operation plan cache on server start.
+
+### Patch Changes
+
+- [#3161](https://github.com/graphile/crystal/pull/3161)
+  [`8fc04f0`](https://github.com/graphile/crystal/commit/8fc04f0ecf8bfaac713992b494b94f61f942630b)
+  Thanks [@benjie](https://github.com/benjie)! - Microoptimization of flagged
+  value detection.
+
+- [#3192](https://github.com/graphile/crystal/pull/3192)
+  [`85a3d1c`](https://github.com/graphile/crystal/commit/85a3d1c4610c4e74086d6cb1f05ed25e8904da02)
+  Thanks [@benjie](https://github.com/benjie)! - Use queueMicrotask for easy
+  cross-platform compatibility
+
+- [#3179](https://github.com/graphile/crystal/pull/3179)
+  [`26a3fc4`](https://github.com/graphile/crystal/commit/26a3fc47952afe75eaafa647249f197ce06ee10e)
+  Thanks [@benjie](https://github.com/benjie)! - Minor optimization around
+  bakedInput() and lists.
+
+- [#3163](https://github.com/graphile/crystal/pull/3163)
+  [`92978f3`](https://github.com/graphile/crystal/commit/92978f39316da4e18c619be255d775d0e29843f7)
+  Thanks [@benjie](https://github.com/benjie)! - Fix types for loadOne/loadMany
+  for use with `get($loadOne, '...')` and `$loadOne.get('...')`
+
+- [#3166](https://github.com/graphile/crystal/pull/3166)
+  [`631ed94`](https://github.com/graphile/crystal/commit/631ed94ec6a26c0016ef60fc561b612139b7460c)
+  Thanks [@benjie](https://github.com/benjie)! - Experimental: add `fieldNodes`
+  to `FieldInfo`.
+
+- [#3189](https://github.com/graphile/crystal/pull/3189)
+  [`0c73163`](https://github.com/graphile/crystal/commit/0c73163f8f543ec7ef709f177346341506d6daf7)
+  Thanks [@benjie](https://github.com/benjie)! - Avoid constraint compatibility
+  checks when an operation plan has no constraints.
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+
+- [#3194](https://github.com/graphile/crystal/pull/3194)
+  [`4b948fc`](https://github.com/graphile/crystal/commit/4b948fc7a440887ee35f43e22fa0ae0f420ec3c1)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug in `connection()`
+  where adding pagination arguments (e.g. `first: 0`) for a connection over a
+  full-pagination-support step would force the underlying collection to fetch
+  even when none of the data was needed for rendering (e.g. no
+  `nodes`/`edges`/`pageInfo` requested). This is particularly relevant to
+  PostGraphile queries such as `{ allRows(first: 0) { totalCount } }` which
+  would incorrectly issue two SQL queries instead of one.
+- Updated dependencies
+  [[`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)]:
+  - @graphile/lru@5.0.1
+  - graphile-config@1.1.2
+
 ## 1.1.4
 
 ### Patch Changes
