@@ -100,9 +100,38 @@ it("reports missing collections for entity relationships and permissions", () =>
     introspection_version: source.introspection_version,
     database: source.database,
     namespaces: source.namespaces,
-    classes: [{ relkind: "r", relowner: "10", reltype: "0", _id: "1", relnamespace: "2200", relname: "example" }],
-    constraints: [{ conrelid: "1", contypid: "0", conindid: "0", confrelid: "0", contype: "c", _id: "2", connamespace: "2200", conname: "example" }],
-    procs: [{ proowner: "10", prorettype: "23", proretset: false, _id: "3", pronamespace: "2200", proname: "example" }],
+    classes: [
+      {
+        relkind: "r",
+        relowner: "10",
+        reltype: "0",
+        _id: "1",
+        relnamespace: "2200",
+        relname: "example",
+      },
+    ],
+    constraints: [
+      {
+        conrelid: "1",
+        contypid: "0",
+        conindid: "0",
+        confrelid: "0",
+        contype: "c",
+        _id: "2",
+        connamespace: "2200",
+        conname: "example",
+      },
+    ],
+    procs: [
+      {
+        proowner: "10",
+        prorettype: "23",
+        proretset: false,
+        _id: "3",
+        pronamespace: "2200",
+        proname: "example",
+      },
+    ],
     indexes: [{ indexrelid: "4", indrelid: "1", indkey: [] }],
     inherits: [{ inhparent: "1", inhrelid: "1" }],
   };
