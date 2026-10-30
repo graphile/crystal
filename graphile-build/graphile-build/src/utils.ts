@@ -373,8 +373,9 @@ export function gatherConfig<
   const TNamespace extends keyof GraphileConfig.GatherHelpers,
   const TState extends { [key: string]: any } = { [key: string]: any },
   const TCache extends { [key: string]: any } = { [key: string]: any },
+  TScope extends keyof GraphileBuild.PluginScopes = never,
 >(
-  config: GraphileConfig.PluginGatherConfig<TNamespace, TState, TCache>,
-): GraphileConfig.PluginGatherConfig<TNamespace, TState, TCache> {
+  config: GraphileConfig.PluginGatherConfig<TNamespace, TState, TCache, TScope>,
+): GraphileConfig.PluginGatherConfig<TNamespace, TState, TCache, TScope> {
   return config;
 }

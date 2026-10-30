@@ -28,7 +28,7 @@ declare global {
        */
       _allRows(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
       /**
        * The field name for a Cursor Connection field that returns all rows
@@ -36,7 +36,7 @@ declare global {
        */
       allRowsConnection(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
 
       /**
@@ -45,7 +45,7 @@ declare global {
        */
       allRowsList(
         this: Inflection,
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
       ): string;
     }
   }

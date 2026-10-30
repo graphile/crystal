@@ -9,10 +9,10 @@ graph TD
 
     subgraph "Buckets for mutations/v4/relay.updateLeftArm.withoutPersonId"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 14, 20, 2, 22, 37<br /><br />1: PgUpdateSingle[16]<br />2: <br />ᐳ: Object[21]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 2, 16, 21, 22, 37<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 22, 31, 37<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;)ᐳ[16]<br />1: <br />ᐳ: 24, 23, 25, 26, 27, 35, 36<br />2: PgSelect[28]<br />3: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 34, 16, 37<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[34]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 19, 14, 20, 22, 37<br /><br />1: PgUpdateSingle[16]<br />2: <br />ᐳ: Object[21]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 16, 22, 19, 37<br /><br />ROOT Object{1}ᐸ{result}ᐳ[21]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 22, 19, 37<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;)ᐳ[16]<br />1: <br />ᐳ: 24, 23, 25, 26, 27, 35, 36<br />2: PgSelect[28]<br />3: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 34, 37<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[34]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -23,31 +23,29 @@ graph TD
     __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ[41]"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸ0.71ᐳ[42]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject9 --> __InputObject6
-    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
-    Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
     Lambda13{{"Lambda[13∈0] ➊<br />ᐸdecodeNodeIdWithHandlerᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[43]"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ13.1ᐳ"}}:::plan
     Lambda13 --> Access14
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access17
+    __Value2 --> Access18
     ApplyInput20{{"ApplyInput[20∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput20
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
-    PgUpdateSingle16[["PgUpdateSingle[16∈1] ➊<br />ᐸleft_arm(id;)ᐳ"]]:::sideeffectplan
+    PgUpdateSingle16[["PgUpdateSingle[16∈1] ➊<br />ᐸleft_arm(id;)ᐳ<br />More deps:<br />- Object[19]"]]:::sideeffectplan
     Access14 -->|rejectNull| PgUpdateSingle16
-    Object19 & ApplyInput20 --> PgUpdateSingle16
+    ApplyInput20 --> PgUpdateSingle16
     Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle16 --> Object21
-    Object31{{"Object[31∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access29{{"Access[29∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
-    Access30{{"Access[30∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
-    Access29 & Access30 --> Object31
     List25{{"List[25∈3] ➊<br />ᐸ22,23ᐳ<br />More deps:<br />- Constantᐸ'left_arms'ᐳ[22]"}}:::plan
     PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     PgClassExpression23 --> List25
-    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[19]"]]:::plan
     PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    Object31 & PgClassExpression27 --> PgSelect28
+    PgClassExpression27 --> PgSelect28
     Access24{{"Access[24∈3] ➊<br />ᐸ16.tᐳ"}}:::plan
     Access24 --> PgClassExpression23
     PgUpdateSingle16 --> Access24
@@ -77,13 +75,9 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle16,Object21 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access29,Access30,Object31 bucket2
+    class Bucket2 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,Access24,List25,Lambda26,PgClassExpression27,PgSelect28,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression35,PgClassExpression36 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression38,List39,Lambda40 bucket4
-
-    %% implicit side effects
-    PgUpdateSingle16 -.-o Access29
-    PgUpdateSingle16 -.-o Access30
 

@@ -18,11 +18,61 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
-import { jsonPgSmartTags, pgSmartTags } from "../src/index.ts";
+import { jsonPgSmartTags, pgSmartTags } from "../dist/index.js";
 import {
   type PgSmartTagRule,
   pgSmartTagRulesFromJSON,
-} from "../src/makePgSmartTagsPlugin.ts";
+} from "../dist/makePgSmartTagsPlugin.js";
+
+declare global {
+  /* eslint-disable @typescript-eslint/no-empty-object-type */
+  namespace GraphileBuild {
+    interface PluginScopes {
+      pgSmartTagsTypecheck: {
+        gather: {
+          pgIntrospection: {
+            main: {
+              schemas: {
+                graphile_utils: {
+                  classes: {
+                    users: { attributes: {}; constraints: {} };
+                  };
+                  functions: { search_users: {} };
+                  types: {};
+                };
+              };
+            };
+          };
+        };
+      };
+    }
+  }
+  /* eslint-enable @typescript-eslint/no-empty-object-type */
+}
+
+function _typecheckScopedJsonPgSmartTags(): void {
+  pgSmartTagRulesFromJSON<"pgSmartTagsTypecheck">({
+    version: 1,
+    config: {
+      class: {
+        "graphile_utils.users": { tags: { omit: "create" } },
+        // @ts-expect-error Generated gather types reject unknown classes.
+        "graphile_utils.missing": { tags: { omit: "create" } },
+      },
+    },
+  });
+
+  jsonPgSmartTags<"pgSmartTagsTypecheck">({
+    version: 1,
+    config: {
+      procedure: {
+        "graphile_utils.search_users": { tags: { filterable: true } },
+        // @ts-expect-error Generated gather types reject unknown procedures.
+        "graphile_utils.missing": { tags: { filterable: true } },
+      },
+    },
+  });
+}
 
 let pgPool: Pool | null = null;
 let connectionString = "";

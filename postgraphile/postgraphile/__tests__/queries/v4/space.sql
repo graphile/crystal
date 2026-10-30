@@ -17,6 +17,10 @@ select
     upper_inc("space"."spacecraft_eta"(
       __spacecraft__,
       $1::"space"."launch_pad"
+    )),
+    isempty("space"."spacecraft_eta"(
+      __spacecraft__,
+      $1::"space"."launch_pad"
     ))
   )::text as "2"
 from "space"."spacecraft" as __spacecraft__

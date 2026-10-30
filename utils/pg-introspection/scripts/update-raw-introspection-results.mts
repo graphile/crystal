@@ -13,8 +13,7 @@ process.once(
   "exit",
   () => void $.sync({ nothrow: true })`docker rm -f -v ${CONTAINER_NAME}`,
 );
-const docker =
-  await $`docker run --rm -d --name ${CONTAINER_NAME} -e POSTGRES_PASSWORD=${PASSWORD} -p ${PORT}:5432 postgres`;
+await $`docker run --rm -d --name ${CONTAINER_NAME} -e POSTGRES_PASSWORD=${PASSWORD} -p ${PORT}:5432 postgres`;
 
 const pool = new Pool({
   connectionString: `postgres://postgres:${PASSWORD}@127.0.0.1:${PORT}/postgres`,
@@ -34,7 +33,7 @@ for (let attempts = 0; attempts < 100; attempts++) {
   }
 }
 if (lastError) {
-  console.log(docker.output?.text());
+  await $({ nothrow: true, stdio: "inherit" })`docker logs ${CONTAINER_NAME}`;
   throw lastError;
 }
 

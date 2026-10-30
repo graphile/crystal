@@ -1,7 +1,6 @@
 import { withPgClient } from "@dataplan/pg";
 import type { Step } from "grafast";
 import {
-  access,
   constant,
   ExecutableStep,
   get,
@@ -12,7 +11,7 @@ import {
 import type { GraphQLObjectType } from "graphql";
 import { DatabaseError } from "pg";
 
-import { extendSchema, gql } from "../src/index.ts";
+import { extendSchema, gql } from "../dist/index.js";
 
 // Changes to this file should be reflected in `postgraphile/website/postgraphile/extend-schema.md`
 

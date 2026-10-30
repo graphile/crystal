@@ -12,10 +12,9 @@ import type {
   ExecutionEventEmitter,
   ExecutionEventMap,
   GrafastExecutionArgs,
-  GrafastInternalExecutionArgs,
 } from "./interfaces.ts";
-import { getGrafastMiddleware } from "./middleware.ts";
-import type { GrafastOperationOptions } from "./prepare.ts";
+import { establishMiddleware } from "./middleware.ts";
+import { establishInternalExecutionArgs } from "./plan.ts";
 import { grafastPrepare } from "./prepare.ts";
 import { isPromiseLike } from "./utils.ts";
 
@@ -28,11 +27,8 @@ export function withGrafastArgs(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  const args: GrafastInternalExecutionArgs = {
-    ...inArgs,
-  };
-  const options = args.resolvedPreset?.grafast;
-  const explain = options?.explain;
+  const args = establishInternalExecutionArgs(inArgs);
+  const explain = args.explain;
   const shouldExplain = !!explain;
 
   let unlisten: (() => void) | null = null;
@@ -58,15 +54,7 @@ export function withGrafastArgs(
     };
   }
 
-  // TODO: inline this into args
-  const operationOptions: RequireAllKeys<GrafastOperationOptions> = {
-    explain: options?.explain,
-    timeouts: options?.timeouts,
-    maxPlanningDepth: options?.maxPlanningDepth,
-    // TODO: Delete this
-    outputDataAsString: args.outputDataAsString,
-  };
-  const executionResult = grafastPrepare(args, operationOptions);
+  const executionResult = grafastPrepare(args);
   if (unlisten !== null) {
     Promise.resolve(executionResult).then(unlisten, unlisten);
   }
@@ -113,14 +101,7 @@ export function execute(
     args.outputDataAsString = legacyOutputDataAsString;
   }
 
-  const { resolvedPreset } = args;
-  const middleware =
-    args.middleware === undefined && resolvedPreset != null
-      ? getGrafastMiddleware(resolvedPreset)
-      : (args.middleware ?? null);
-  if (args.middleware === undefined) {
-    args.middleware = middleware;
-  }
+  const middleware = establishMiddleware(args);
   if (middleware !== null) {
     return middleware.run("execute", { args }, executeMiddlewareCallback);
   } else {
@@ -130,5 +111,3 @@ export function execute(
 
 const executeMiddlewareCallback = (event: ExecuteEvent) =>
   withGrafastArgs(event.args);
-
-type RequireAllKeys<T> = { [P in keyof Required<T>]: T[P] | undefined };

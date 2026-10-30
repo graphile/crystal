@@ -5,12 +5,11 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgCodecWithAttributes,
-  PgExecutor,
   PgRefDefinition,
   PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
-import type { GraphQLType } from "grafast/graphql";
+import type { GraphQLInputType, GraphQLOutputType } from "grafast/graphql";
 import { gatherConfig } from "graphile-build";
 import type { PgSQL, SQL } from "pg-sql2";
 
@@ -33,8 +32,9 @@ declare global {
     }
     type PgCodecTypeSituation = keyof GraphileBuild.PgCodecTypeSituations;
     interface PgCodecTypeSituations {
-      input: true;
+      // When extending, use 'true' for output situations and 'false' for input situations
       output: true;
+      input: false;
     }
     interface BehaviorStrings {
       select: true;
@@ -55,10 +55,17 @@ declare global {
       codec: PgCodec<any, any, any, any, any, any, any>,
       situation?: PgCodecTypeSituation,
     ) => boolean;
-    type GetGraphQLTypeByPgCodec = (
+    type GetGraphQLTypeByPgCodec = <TSituation extends PgCodecTypeSituation>(
       codec: PgCodec<any, any, any, any, any, any, any>,
-      situation: PgCodecTypeSituation,
-    ) => GraphQLType | null;
+      situation: TSituation,
+    ) =>
+      | (true extends GraphileBuild.PgCodecTypeSituations[TSituation]
+          ? GraphQLOutputType
+          : never)
+      | (false extends GraphileBuild.PgCodecTypeSituations[TSituation]
+          ? GraphQLInputType
+          : never)
+      | null;
     type GetGraphQLTypeNameByPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
       situation: PgCodecTypeSituation,
@@ -137,13 +144,17 @@ declare global {
         ReadonlyArray<PgResourceUnique>,
         undefined
       > | null;
-
       // DX shortcuts
       /**
        * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
        * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       *
+       * Note: the TypeScript type for this is an approximation, because
+       * TypeScript doesn't have a concept of "first key". For most people
+       * there will be just a single executor anyway, and the type of the
+       * executor doesn't tend to matter much.
        */
-      pgExecutor: PgExecutor;
+      pgExecutor: GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"][keyof GraphileBuild.Build["input"]["pgRegistry"]["pgExecutors"]];
       /** Shortcut to the resources in the registry */
       pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
       /** Shortcut to the codecs in the registry */
@@ -152,12 +163,32 @@ declare global {
       pgRelations: GraphileBuild.Build["input"]["pgRegistry"]["pgRelations"];
     }
 
+    interface BuildScopedExtensions<TScope extends keyof PluginScopes> {
+      // DX shortcuts
+      /**
+       * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
+       * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       *
+       * Note: the TypeScript type for this is an approximation, because
+       * TypeScript doesn't have a concept of "first key". For most people
+       * there will be just a single executor anyway, and the type of the
+       * executor doesn't tend to matter much.
+       */
+      pgExecutor: ScopedBuild<TScope>["input"]["pgRegistry"]["pgExecutors"][keyof ScopedBuild<TScope>["input"]["pgRegistry"]["pgExecutors"]];
+      /** Shortcut to the resources in the registry */
+      pgResources: ScopedBuild<TScope>["input"]["pgRegistry"]["pgResources"];
+      /** Shortcut to the codecs in the registry */
+      pgCodecs: ScopedBuild<TScope>["input"]["pgRegistry"]["pgCodecs"];
+      /** Shortcut to the relations in the registry */
+      pgRelations: ScopedBuild<TScope>["input"]["pgRegistry"]["pgRelations"];
+    }
+
     interface BehaviorEntities {
       pgCodec: PgCodec;
       pgCodecAttribute: [codec: PgCodecWithAttributes, attributeName: string];
-      pgResource: PgResource<any, any, any, any, any>;
+      pgResource: PgResource<any, any, any, any, any, any, any>;
       pgResourceUnique: [
-        resource: PgResource<any, any, any, any, any>,
+        resource: PgResource<any, any, any, any, any, any, any>,
         unique: PgResourceUnique,
       ];
       pgCodecRelation: PgCodecRelation;
@@ -444,9 +475,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             return typeName ?? null;
           };
 
-        const getGraphQLTypeByPgCodec: GraphileBuild.GetGraphQLTypeByPgCodec = (
-          codec,
-          situation,
+        const getGraphQLTypeByPgCodec: GraphileBuild.GetGraphQLTypeByPgCodec = <
+          TSituation extends GraphileBuild.PgCodecTypeSituation,
+        >(
+          codec: PgCodec<any, any, any, any, any, any, any>,
+          situation: TSituation,
         ) => {
           if (!build.status.isInitPhaseComplete) {
             throw new Error(
@@ -457,11 +490,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             const type = getGraphQLTypeByPgCodec(codec.arrayOfCodec, situation);
             const nonNull = codec.extensions?.listItemNonNull;
             return type
-              ? new GraphQLList(nonNull ? new GraphQLNonNull(type) : type)
+              ? (new GraphQLList(
+                  nonNull ? new GraphQLNonNull(type) : type,
+                ) as any)
               : null;
           }
           const typeName = getGraphQLTypeNameByPgCodec(codec, situation);
-          return typeName ? (build.getTypeByName(typeName) ?? null) : null;
+          return typeName
+            ? ((build.getTypeByName(typeName) as any) ?? null)
+            : null;
         };
 
         const hasGraphQLTypeForPgCodec: GraphileBuild.HasGraphQLTypeForPgCodec =
@@ -499,11 +536,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           };
         const resourceByCodecCacheUnstrict = new Map<
           PgCodecWithAttributes,
-          PgResource<any, any, any, any, any> | null
+          PgResource<any, any, any, any, any, any, any> | null
         >();
         const resourceByCodecCacheStrict = new Map<
           PgCodecWithAttributes,
-          PgResource<any, any, any, any, any> | null
+          PgResource<any, any, any, any, any, any, any> | null
         >();
         const pgTableResource = <TCodec extends PgCodecWithAttributes>(
           codec: TCodec,

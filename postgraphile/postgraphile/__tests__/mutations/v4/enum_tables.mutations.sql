@@ -9,6 +9,10 @@ insert into "enum_tables"."letter_descriptions" as __letter_descriptions__ ("let
   __letter_descriptions__."letter_via_view"::text as "2",
   __letter_descriptions__."description" as "3";
 
+begin; /*fake*/
+
 select
   __referencing_table_mutation__.v::text as "0"
 from "enum_tables"."referencing_table_mutation"($1::"enum_tables"."referencing_table") as __referencing_table_mutation__(v);
+
+commit; /*fake*/

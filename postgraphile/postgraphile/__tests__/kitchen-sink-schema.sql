@@ -103,6 +103,23 @@ end if;
 end;
 $_$ language plpgsql;
 
+create function c.read_pg_settings() returns json as $$
+  select json_build_object(
+    'statement_timeout', current_setting('statement_timeout', true),
+    'role', current_setting('role', true),
+    'jwt.claims.string', current_setting('jwt.claims.string', true),
+    'jwt.claims.number', current_setting('jwt.claims.number', true),
+    'jwt.claims.boolean_true', current_setting('jwt.claims.boolean_true', true),
+    'jwt.claims.other_string', current_setting('jwt.claims.other_string', true),
+    'jwt.claims.other_number', current_setting('jwt.claims.other_number', true),
+    'jwt.claims.boolean_false', current_setting('jwt.claims.boolean_false', true),
+    'jwt.claims.empty_string', current_setting('jwt.claims.empty_string', true),
+    'jwt.claims.escaped_string', current_setting('jwt.claims.escaped_string', true),
+    'jwt.claims.null', current_setting('jwt.claims.null', true),
+    'jwt.claims.undefined', current_setting('jwt.claims.undefined', true)
+  );
+$$ language sql stable;
+
 -- This is to test that "one-to-one" relationships work on primary keys
 create table c.person_secret (
   person_id int not null primary key references c.person on delete cascade,
@@ -485,6 +502,7 @@ create function a.mutation_interval_array() returns interval[] as $$ select ARRA
 create function a.mutation_interval_set() returns setof interval as $$ begin return next interval '12 seconds'; return next interval '3 hours'; return next interval '34567 seconds'; end; $$ language plpgsql volatile;
 
 -- Procs returning `type` record (to test JSON encoding)
+create function b.type_identity(input b.types) returns b.types as $$ select input $$ language sql stable;
 create function b.type_function(id int) returns b.types as $$ select * from b.types where types.id = $1; $$ language sql stable;
 create function b.type_function_list() returns b.types[] as $$ select array_agg(types order by id) from b.types $$ language sql stable;
 create function b.type_function_connection() returns setof b.types as $$ select * from b.types order by id asc $$ language sql stable;
@@ -1457,6 +1475,19 @@ create function polymorphic.all_single_tables ()
 returns setof polymorphic.single_table_items as $$
   select * from polymorphic.single_table_items
 $$ language sql stable;
+
+create function polymorphic.single_table_items_topics(
+  sti polymorphic.single_table_items
+)
+returns setof polymorphic.single_table_items as $$
+  select *
+  from polymorphic.single_table_items
+  where type = 'TOPIC'
+  order by id asc;
+$$ language sql stable;
+comment on function polymorphic.single_table_items_topics(
+  polymorphic.single_table_items
+) is '@returnType SingleTableTopic';
 
 comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
   @behavior -*

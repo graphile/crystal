@@ -1,8 +1,4 @@
-import {
-  assertObjectType,
-  GraphQLObjectType,
-  isObjectType,
-} from "grafast/graphql";
+import { isObjectType } from "grafast/graphql";
 
 import * as core from "./core.ts";
 

@@ -7272,6 +7272,21 @@ type SingleTableChecklist implements SingleTableItem {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
   title: String
+
+  """Reads and enables pagination through a set of `SingleTableTopic`."""
+  topics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableTopicConnection!
   type: ItemType!
   updatedAt: Datetime!
 }
@@ -7458,6 +7473,21 @@ type SingleTableChecklistItem implements SingleTableItem {
     """The method to use when ordering `SingleTableItem`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
+
+  """Reads and enables pagination through a set of `SingleTableTopic`."""
+  topics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableTopicConnection!
   type: ItemType!
   updatedAt: Datetime!
 }
@@ -7640,6 +7670,21 @@ type SingleTableDivider implements SingleTableItem {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
   title: String
+
+  """Reads and enables pagination through a set of `SingleTableTopic`."""
+  topics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableTopicConnection!
   type: ItemType!
   updatedAt: Datetime!
 }
@@ -8223,6 +8268,21 @@ type SingleTablePost implements SingleTableItem {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
   subject: String
+
+  """Reads and enables pagination through a set of `SingleTableTopic`."""
+  topics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableTopicConnection!
   type: ItemType!
   updatedAt: Datetime!
 }
@@ -8404,8 +8464,51 @@ type SingleTableTopic implements SingleTableItem {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
   title: String!
+
+  """Reads and enables pagination through a set of `SingleTableTopic`."""
+  topics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableTopicConnection!
   type: ItemType!
   updatedAt: Datetime!
+}
+
+"""A connection to a list of `SingleTableTopic` values."""
+type SingleTableTopicConnection {
+  """
+  A list of edges which contains the `SingleTableTopic` and cursor to aid in pagination.
+  """
+  edges: [SingleTableTopicEdge]!
+
+  """A list of `SingleTableTopic` objects."""
+  nodes: [SingleTableTopic]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableTopic` edge in the connection."""
+type SingleTableTopicEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableTopic` at the end of the edge."""
+  node: SingleTableTopic
 }
 
 type ThirdPartyVulnerability implements Vulnerability {

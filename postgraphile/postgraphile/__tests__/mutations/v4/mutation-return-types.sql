@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __mutation_in_inout__.v::text as "0"
 from "c"."mutation_in_inout"(
@@ -5,13 +7,25 @@ from "c"."mutation_in_inout"(
   $2::"int4"
 ) as __mutation_in_inout__(v);
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_in_out__.v::text as "0"
 from "c"."mutation_in_out"($1::"int4") as __mutation_in_out__(v);
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_out__.v::text as "0"
 from "c"."mutation_out"() as __mutation_out__(v);
+
+commit; /*fake*/
+
+begin; /*fake*/
 
 select
   __mutation_out_complex__."x"::text as "0",
@@ -46,6 +60,8 @@ from "c"."mutation_out_complex"(
   $2::"text"
 ) as __mutation_out_complex__;
 
+commit; /*fake*/
+
 select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."b" as "1",
@@ -67,6 +83,8 @@ select
     order by __post__."id" asc
   )::text as "2"
 from (select ($1::"c"."person").*) as __person__;
+
+begin; /*fake*/
 
 select
   __mutation_out_complex_setof__."x"::text as "0",
@@ -101,6 +119,8 @@ from "c"."mutation_out_complex_setof"(
   $2::"text"
 ) as __mutation_out_complex_setof__;
 
+commit; /*fake*/
+
 select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."b" as "1",
@@ -123,11 +143,17 @@ select
   )::text as "2"
 from (select ($1::"c"."person").*) as __person__;
 
+begin; /*fake*/
+
 select
   __mutation_out_out__."first_out"::text as "0",
   __mutation_out_out__."second_out" as "1",
   (not (__mutation_out_out__ is null))::text as "2"
 from "c"."mutation_out_out"() as __mutation_out_out__;
+
+commit; /*fake*/
+
+begin; /*fake*/
 
 select
   __mutation_out_out_compound_type__."o1"::text as "0",
@@ -144,6 +170,8 @@ select
   (not (__mutation_out_out_compound_type__ is null))::text as "2"
 from "c"."mutation_out_out_compound_type"($1::"int4") as __mutation_out_out_compound_type__;
 
+commit; /*fake*/
+
 select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."b" as "1",
@@ -151,11 +179,17 @@ select
   (not (__frmcdc_compound_type__ is null))::text as "3"
 from (select ($1::"c"."compound_type").*) as __frmcdc_compound_type__;
 
+begin; /*fake*/
+
 select
   __mutation_out_out_setof__."o1"::text as "0",
   __mutation_out_out_setof__."o2" as "1",
   (not (__mutation_out_out_setof__ is null))::text as "2"
 from "c"."mutation_out_out_setof"() as __mutation_out_out_setof__;
+
+commit; /*fake*/
+
+begin; /*fake*/
 
 select
   __mutation_out_out_unnamed__."column1"::text as "0",
@@ -163,21 +197,41 @@ select
   (not (__mutation_out_out_unnamed__ is null))::text as "2"
 from "c"."mutation_out_out_unnamed"() as __mutation_out_out_unnamed__;
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_out_setof__.v::text as "0"
 from "c"."mutation_out_setof"() as __mutation_out_setof__(v);
+
+commit; /*fake*/
+
+begin; /*fake*/
 
 select
   __mutation_out_table__."id"::text as "0"
 from "c"."mutation_out_table"() as __mutation_out_table__;
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_out_table_setof__."id"::text as "0"
 from "c"."mutation_out_table_setof"() as __mutation_out_table_setof__;
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_out_unnamed__.v::text as "0"
 from "c"."mutation_out_unnamed"() as __mutation_out_unnamed__(v);
+
+commit; /*fake*/
+
+begin; /*fake*/
 
 select
   __mutation_out_unnamed_out_out_unnamed__."column1"::text as "0",
@@ -186,12 +240,22 @@ select
   (not (__mutation_out_unnamed_out_out_unnamed__ is null))::text as "3"
 from "c"."mutation_out_unnamed_out_out_unnamed"() as __mutation_out_unnamed_out_out_unnamed__;
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_returns_table_multi_col__."col1"::text as "0",
   __mutation_returns_table_multi_col__."col2" as "1",
   (not (__mutation_returns_table_multi_col__ is null))::text as "2"
 from "c"."mutation_returns_table_multi_col"($1::"int4") as __mutation_returns_table_multi_col__;
 
+commit; /*fake*/
+
+begin; /*fake*/
+
 select
   __mutation_returns_table_one_col__.v::text as "0"
 from "c"."mutation_returns_table_one_col"($1::"int4") as __mutation_returns_table_one_col__(v);
+
+commit; /*fake*/

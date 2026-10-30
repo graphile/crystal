@@ -36,10 +36,10 @@ import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import { PgSubscriber } from "../src/adaptors/pg.ts";
-import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
+import { PgSubscriber } from "../dist/adaptors/pg.js";
 //import prettier from "prettier";
-import type { PgClientQuery } from "../src/index.ts";
+import type { PgClientQuery } from "../dist/index.js";
+import { makeExampleSchema } from "../examples/exampleSchema.mts";
 import {
   createTestDatabase,
   dropTestDatabase,
@@ -175,7 +175,7 @@ export async function runTestQuery(
   extensions?: any;
 }> {
   const { variableValues, checkErrorSnapshots, runTimes = 1 } = config;
-  const { path, outputDataAsString, deoptimize } = options;
+  const { outputDataAsString, deoptimize } = options;
   await resetSequences();
 
   const queries: PgClientQuery[] = [];
@@ -315,9 +315,8 @@ export async function runTestQuery(
           const sortPayloads = (
             payload1: ExecutionPatchResult,
             payload2: ExecutionPatchResult,
-          ) => {
+          ): number => {
             const ONE_AFTER_TWO = 1;
-            const ONE_BEFORE_TWO = -1;
             if (!payload1.path) {
               return 0;
             }
@@ -360,7 +359,7 @@ export async function runTestQuery(
           };
           const payloads = [
             originalPayloads[0],
-            ...originalPayloads.slice(1).sort(sortPayloads),
+            ...originalPayloads.slice(1).sort(sortPayloads as never),
           ];
 
           return {
@@ -474,7 +473,7 @@ function makeResultSnapshotSafe(
       ? replacements.uuid.get(data)
       : replacements.uuidCounter++;
     if (!replacements.uuid.has(data)) {
-      replacements.uuid.set(data, uuidNumber);
+      replacements.uuid.set(data, uuidNumber!);
     }
     return `<UUID ${uuidNumber}>`;
   } else {
@@ -541,7 +540,7 @@ export const assertSnapshotsMatch = async (
     const processedErrors = errors
       ? makeResultSnapshotSafe(errors, replacements).sort(
           (e1: GraphQLError, e2: GraphQLError) => {
-            return pathCompare(e1.path, e2.path);
+            return pathCompare(e1.path!, e2.path!);
           },
         )
       : null;
@@ -563,7 +562,7 @@ export const assertSnapshotsMatch = async (
     await snapshot(formattedQueries + "\n", sqlFileName);
   } else if (only === "mermaid") {
     const planOp = extensions?.explain?.operations?.find(
-      (op) => op.type === "plan",
+      (op: any) => op.type === "plan",
     );
     if (!planOp) {
       throw new Error("No plan was emitted for this test!");
@@ -605,7 +604,7 @@ export const assertErrorsMatch = async (
 ): Promise<void> => {
   const { errors: errors1 } = await result1;
   const { errors: errors2 } = await result2;
-  const toJSON = (obj) =>
+  const toJSON = (obj: any) =>
     typeof obj.toJSON === "function" ? obj.toJSON() : obj;
   const jsonified1 = errors1 ? errors1.map(toJSON) : errors1;
   const jsonified2 = errors2 ? errors2.map(toJSON) : errors2;

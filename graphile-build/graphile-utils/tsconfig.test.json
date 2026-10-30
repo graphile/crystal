@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.test.json",
+  "include": [
+    "__tests__/**/*",
+    "../../grafast/dataplan-pg/__tests__/sharedHelpers.ts",
+    "scripts/**/*"
+  ],
+  "references": [{ "path": "./tsconfig.build.json" }]
+}

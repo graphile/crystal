@@ -10,28 +10,8 @@ from "c"."person" as __person__
 order by __person__."id" asc;
 
 select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."config"::text as "3",
-  __person__."last_login_from_ip"::text as "4",
-  __person__."last_login_from_subnet"::text as "5",
-  __person__."user_mac"::text as "6"
-from "c"."person" as __person__
-order by __person__."id" asc
-limit 3;
-
-select
-  __person__."id"::text as "0",
-  __person__."person_full_name" as "1",
-  __person__."email" as "2",
-  __person__."config"::text as "3",
-  __person__."last_login_from_ip"::text as "4",
-  __person__."last_login_from_subnet"::text as "5",
-  __person__."user_mac"::text as "6"
-from "c"."person" as __person__
-order by __person__."id" desc
-limit 3;
+  (count(*))::text as "0"
+from "c"."person" as __person__;
 
 select
   __person__."id"::text as "0",
@@ -108,6 +88,20 @@ where (
   __post__."author_id" = $1::"int4"
 )
 order by __post__."id" asc;
+
+select
+  (count(*))::text as "0"
+from "a"."post" as __post__
+where (
+  __post__."author_id" = $1::"int4"
+);
+
+select
+  (count(*))::text as "0"
+from "a"."post" as __post__
+where (
+  __post__."author_id" = $1::"int4"
+);
 
 select
   __post__."headline" as "0",
@@ -212,12 +206,23 @@ where (
 order by __person__."id" asc;
 
 select
+  (count(*))::text as "0"
+from "c"."person" as __person__
+where (
+  __person__."about" is null
+);
+
+select
   __post__."headline" as "0",
   __post__."author_id"::text as "1",
   __post__."id"::text as "2"
 from "a"."post" as __post__
 order by __post__."author_id" desc, __post__."headline" desc, __post__."id" desc
 limit 4;
+
+select
+  (count(*))::text as "0"
+from "a"."post" as __post__;
 
 select
   __post__."headline" as "0",
@@ -255,6 +260,13 @@ where (
 order by __person__."id" asc;
 
 select
+  (count(*))::text as "0"
+from "c"."person" as __person__
+where (
+  __person__."last_login_from_ip" = $1::"inet"
+);
+
+select
   __post__."id"::text as "0",
   __post__."headline" as "1",
   __person__."person_full_name" as "2",
@@ -283,6 +295,13 @@ where (
 order by __person__."id" asc;
 
 select
+  (count(*))::text as "0"
+from "c"."person" as __person__
+where (
+  __person__."last_login_from_subnet" = $1::"cidr"
+);
+
+select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1",
   __person__."email" as "2",
@@ -295,6 +314,13 @@ where (
   __person__."user_mac" = $1::"macaddr"
 )
 order by __person__."id" asc;
+
+select
+  (count(*))::text as "0"
+from "c"."person" as __person__
+where (
+  __person__."user_mac" = $1::"macaddr"
+);
 
 select
   __post__."headline" as "0",
@@ -326,51 +352,25 @@ from "c"."null_test_record" as __null_test_record__
 order by __null_test_record__."id" asc;
 
 select
-  (count(*))::text as "0"
-from "c"."person" as __person__;
-
-select
-  (count(*))::text as "0"
-from "a"."post" as __post__
-where (
-  __post__."author_id" = $1::"int4"
-);
-
-select
-  (count(*))::text as "0"
-from "a"."post" as __post__
-where (
-  __post__."author_id" = $1::"int4"
-);
-
-select
-  (count(*))::text as "0"
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
 from "c"."person" as __person__
-where (
-  __person__."about" is null
-);
+order by __person__."id" asc
+limit 3;
 
 select
-  (count(*))::text as "0"
-from "a"."post" as __post__;
-
-select
-  (count(*))::text as "0"
+  __person__."id"::text as "0",
+  __person__."person_full_name" as "1",
+  __person__."email" as "2",
+  __person__."config"::text as "3",
+  __person__."last_login_from_ip"::text as "4",
+  __person__."last_login_from_subnet"::text as "5",
+  __person__."user_mac"::text as "6"
 from "c"."person" as __person__
-where (
-  __person__."last_login_from_ip" = $1::"inet"
-);
-
-select
-  (count(*))::text as "0"
-from "c"."person" as __person__
-where (
-  __person__."last_login_from_subnet" = $1::"cidr"
-);
-
-select
-  (count(*))::text as "0"
-from "c"."person" as __person__
-where (
-  __person__."user_mac" = $1::"macaddr"
-);
+order by __person__."id" desc
+limit 3;

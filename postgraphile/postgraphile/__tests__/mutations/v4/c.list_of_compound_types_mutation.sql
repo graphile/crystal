@@ -1,3 +1,5 @@
+begin; /*fake*/
+
 select
   __list_of_compound_types_mutation__."a"::text as "0",
   __list_of_compound_types_mutation__."b" as "1",
@@ -9,3 +11,5 @@ select
   __list_of_compound_types_mutation__."foo_bar"::text as "7",
   (not (__list_of_compound_types_mutation__ is null))::text as "8"
 from "c"."list_of_compound_types_mutation"($1::"c"."compound_type"[]) as __list_of_compound_types_mutation__;
+
+commit; /*fake*/

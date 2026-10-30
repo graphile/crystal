@@ -317,47 +317,6 @@ const book_editors_resourceOptionsConfig = {
   },
   uniques: book_editorsUniques
 };
-const peopleUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const people_resourceOptionsConfig = {
-  executor: executor,
-  name: "people",
-  identifier: "main.refs.people",
-  from: peopleIdentifier,
-  codec: peopleCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "refs",
-      name: "people"
-    }
-  },
-  uniques: peopleUniques
-};
-const postsUniques = [{
-  attributes: ["id"],
-  isPrimary: true
-}];
-const posts_resourceOptionsConfig = {
-  executor: executor,
-  name: "posts",
-  identifier: "main.refs.posts",
-  from: postsIdentifier,
-  codec: postsCodec,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "refs",
-      name: "posts"
-    },
-    tags: {
-      ref: "author via:(user_id)->people(id) singular"
-    }
-  },
-  uniques: postsUniques
-};
 const booksUniques = [{
   attributes: ["id"],
   isPrimary: true
@@ -401,6 +360,47 @@ const pen_names_resourceOptionsConfig = {
     }
   },
   uniques: pen_namesUniques
+};
+const peopleUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const people_resourceOptionsConfig = {
+  executor: executor,
+  name: "people",
+  identifier: "main.refs.people",
+  from: peopleIdentifier,
+  codec: peopleCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "people"
+    }
+  },
+  uniques: peopleUniques
+};
+const postsUniques = [{
+  attributes: ["id"],
+  isPrimary: true
+}];
+const posts_resourceOptionsConfig = {
+  executor: executor,
+  name: "posts",
+  identifier: "main.refs.posts",
+  from: postsIdentifier,
+  codec: postsCodec,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "posts"
+    },
+    tags: {
+      ref: "author via:(user_id)->people(id) singular"
+    }
+  },
+  uniques: postsUniques
 };
 const registry = makeRegistry({
   pgExecutors: {
@@ -763,10 +763,10 @@ const registry = makeRegistry({
     __proto__: null,
     book_authors: book_authors_resourceOptionsConfig,
     book_editors: book_editors_resourceOptionsConfig,
-    people: people_resourceOptionsConfig,
-    posts: posts_resourceOptionsConfig,
     books: books_resourceOptionsConfig,
-    pen_names: pen_names_resourceOptionsConfig
+    pen_names: pen_names_resourceOptionsConfig,
+    people: people_resourceOptionsConfig,
+    posts: posts_resourceOptionsConfig
   },
   pgRelations: {
     __proto__: null,
@@ -888,10 +888,10 @@ const registry = makeRegistry({
 });
 const resource_book_authorsPgResource = registry.pgResources["book_authors"];
 const resource_book_editorsPgResource = registry.pgResources["book_editors"];
-const resource_peoplePgResource = registry.pgResources["people"];
-const resource_postsPgResource = registry.pgResources["posts"];
 const resource_booksPgResource = registry.pgResources["books"];
 const resource_pen_namesPgResource = registry.pgResources["pen_names"];
+const resource_peoplePgResource = registry.pgResources["people"];
+const resource_postsPgResource = registry.pgResources["posts"];
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -966,28 +966,6 @@ const nodeFetcher_BookEditor = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_BookEditor));
   return nodeIdHandler_BookEditor.get(nodeIdHandler_BookEditor.getSpec($decoded));
 };
-const nodeIdHandler_Person = makeTableNodeIdHandler({
-  typeName: "Person",
-  identifier: "people",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_peoplePgResource,
-  pk: peopleUniques[0].attributes
-});
-const nodeFetcher_Person = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
-};
-const nodeIdHandler_Post = makeTableNodeIdHandler({
-  typeName: "Post",
-  identifier: "posts",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: resource_postsPgResource,
-  pk: postsUniques[0].attributes
-});
-const nodeFetcher_Post = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
-};
 const nodeIdHandler_Book = makeTableNodeIdHandler({
   typeName: "Book",
   identifier: "books",
@@ -1009,6 +987,28 @@ const nodeIdHandler_PenName = makeTableNodeIdHandler({
 const nodeFetcher_PenName = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PenName));
   return nodeIdHandler_PenName.get(nodeIdHandler_PenName.getSpec($decoded));
+};
+const nodeIdHandler_Person = makeTableNodeIdHandler({
+  typeName: "Person",
+  identifier: "people",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_peoplePgResource,
+  pk: peopleUniques[0].attributes
+});
+const nodeFetcher_Person = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+};
+const nodeIdHandler_Post = makeTableNodeIdHandler({
+  typeName: "Post",
+  identifier: "posts",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_postsPgResource,
+  pk: postsUniques[0].attributes
+});
+const nodeFetcher_Post = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
 function applyFirstArg(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
@@ -1041,10 +1041,10 @@ const nodeIdHandlerByTypeName = {
   Query: nodeIdHandler_Query,
   BookAuthor: nodeIdHandler_BookAuthor,
   BookEditor: nodeIdHandler_BookEditor,
-  Person: nodeIdHandler_Person,
-  Post: nodeIdHandler_Post,
   Book: nodeIdHandler_Book,
-  PenName: nodeIdHandler_PenName
+  PenName: nodeIdHandler_PenName,
+  Person: nodeIdHandler_Person,
+  Post: nodeIdHandler_Post
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -1150,12 +1150,6 @@ type Query implements Node {
   """Get a single \`BookEditor\`."""
   bookEditorByBookIdAndPersonId(bookId: Int!, personId: Int!): BookEditor
 
-  """Get a single \`Person\`."""
-  personById(id: Int!): Person
-
-  """Get a single \`Post\`."""
-  postById(id: Int!): Post
-
   """Get a single \`Book\`."""
   bookById(id: Int!): Book
 
@@ -1164,6 +1158,12 @@ type Query implements Node {
 
   """Get a single \`PenName\`."""
   penNameById(id: Int!): PenName
+
+  """Get a single \`Person\`."""
+  personById(id: Int!): Person
+
+  """Get a single \`Post\`."""
+  postById(id: Int!): Post
 
   """Reads a single \`BookAuthor\` using its globally unique \`ID\`."""
   bookAuthor(
@@ -1181,18 +1181,6 @@ type Query implements Node {
     nodeId: ID!
   ): BookEditor
 
-  """Reads a single \`Person\` using its globally unique \`ID\`."""
-  person(
-    """The globally unique \`ID\` to be used in selecting a single \`Person\`."""
-    nodeId: ID!
-  ): Person
-
-  """Reads a single \`Post\` using its globally unique \`ID\`."""
-  post(
-    """The globally unique \`ID\` to be used in selecting a single \`Post\`."""
-    nodeId: ID!
-  ): Post
-
   """Reads a single \`Book\` using its globally unique \`ID\`."""
   book(
     """The globally unique \`ID\` to be used in selecting a single \`Book\`."""
@@ -1204,6 +1192,18 @@ type Query implements Node {
     """The globally unique \`ID\` to be used in selecting a single \`PenName\`."""
     nodeId: ID!
   ): PenName
+
+  """Reads a single \`Person\` using its globally unique \`ID\`."""
+  person(
+    """The globally unique \`ID\` to be used in selecting a single \`Person\`."""
+    nodeId: ID!
+  ): Person
+
+  """Reads a single \`Post\` using its globally unique \`ID\`."""
+  post(
+    """The globally unique \`ID\` to be used in selecting a single \`Post\`."""
+    nodeId: ID!
+  ): Post
 
   """Reads and enables pagination through a set of \`BookAuthor\`."""
   allBookAuthors(
@@ -1263,64 +1263,6 @@ type Query implements Node {
     orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
   ): BookEditorsConnection
 
-  """Reads and enables pagination through a set of \`Person\`."""
-  allPeople(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PersonCondition
-
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PeopleConnection
-
-  """Reads and enables pagination through a set of \`Post\`."""
-  allPosts(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PostCondition
-
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): PostsConnection
-
   """Reads and enables pagination through a set of \`Book\`."""
   allBooks(
     """Only read the first \`n\` values of the set."""
@@ -1378,6 +1320,64 @@ type Query implements Node {
     """The method to use when ordering \`PenName\`."""
     orderBy: [PenNamesOrderBy!] = [PRIMARY_KEY_ASC]
   ): PenNamesConnection
+
+  """Reads and enables pagination through a set of \`Person\`."""
+  allPeople(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of \`Post\`."""
+  allPosts(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PostCondition
+
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PostsConnection
 }
 
 """An object with a globally unique \`ID\`."""
@@ -1881,49 +1881,6 @@ type Post implements Node {
   author: Person!
 }
 
-"""A connection to a list of \`Post\` values."""
-type PostsConnection {
-  """A list of \`Post\` objects."""
-  nodes: [Post]!
-
-  """
-  A list of edges which contains the \`Post\` and cursor to aid in pagination.
-  """
-  edges: [PostsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Post\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Post\` edge in the connection."""
-type PostsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Post\` at the end of the edge."""
-  node: Post
-}
-
-"""
-A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input PostCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-}
-
-"""Methods to use when ordering \`Post\`."""
-enum PostsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
 """A connection to a list of \`Book\` values."""
 type BooksConnection {
   """A list of \`Book\` objects."""
@@ -1975,6 +1932,49 @@ enum BooksOrderBy {
   TITLE_DESC
   ISBN_ASC
   ISBN_DESC
+}
+
+"""A connection to a list of \`Post\` values."""
+type PostsConnection {
+  """A list of \`Post\` objects."""
+  nodes: [Post]!
+
+  """
+  A list of edges which contains the \`Post\` and cursor to aid in pagination.
+  """
+  edges: [PostsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Post\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Post\` edge in the connection."""
+type PostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Post\` at the end of the edge."""
+  node: Post
+}
+
+"""
+A condition to be used against \`Post\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PostCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+}
+
+"""Methods to use when ordering \`Post\`."""
+enum PostsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
 }`;
 export const objects = {
   Query: {

@@ -466,7 +466,7 @@ Graphile Starter:
 Your test might look something like this:
 
 ```ts
-import type { PgClient } from "postgraphile/@dataplan/pg";
+import type {} from "postgraphile/@dataplan/pg";
 import { setup, teardown, runGraphQLQuery } from "../test_helper.js";
 
 beforeAll(setup);
@@ -497,7 +497,7 @@ test("GraphQL query nodeId", async () => {
       // `withPgClient` helper we put on the context
       await contextValue.withPgClient(
         contextValue.pgSettings ?? null,
-        async (pgClient: PgClient) => {
+        async (pgClient: GraphileConfig.DataplanPgClient) => {
           const { rows } = await pgClient.query({
             text: `select * from app_public.users where id = $1`,
             values: [17],

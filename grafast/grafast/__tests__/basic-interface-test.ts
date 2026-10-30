@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-plans, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import type { ExecutionResult, GraphQLObjectType } from "graphql";
+import type { ExecutionResult } from "graphql";
 import { GraphQLInterfaceType } from "graphql";
 import { it } from "mocha";
 

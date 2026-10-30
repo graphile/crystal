@@ -24,8 +24,8 @@ import type {
   PlanWrapperFilter,
   PlanWrapperFilterRule,
   PlanWrapperFn,
-} from "../src/index.ts";
-import { extendSchema, gql, makeWrapPlansPlugin } from "../src/index.ts";
+} from "../dist/index.js";
+import { extendSchema, gql, makeWrapPlansPlugin } from "../dist/index.js";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -101,7 +101,7 @@ describe("wrapping named plans", () => {
         contextValue: { test: true },
       })) as ExecutionResult;
       expect(result.errors).toBeFalsy();
-      expect(result.data.echo).toEqual("Hello");
+      expect(result.data!.echo).toEqual("Hello");
       expect(spy).toHaveBeenCalledTimes(1);
       const spyArgs = spy.mock.calls[0];
       const [$parent, args, info] = spyArgs;
@@ -133,7 +133,7 @@ describe("wrapping named plans", () => {
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
-    expect(result.data.echo).toEqual("Hello");
+    expect(result.data!.echo).toEqual("Hello");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
@@ -176,18 +176,21 @@ describe("wrapping named plans", () => {
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeTruthy();
-    expect(result.data.echo).toBe(null);
+    expect(result.data!.echo).toBe(null);
     expect(spy).toHaveBeenCalled();
     // But should NOT have called the lambda
     expect(spy2).not.toHaveBeenCalled();
     expect(result.errors).toHaveLength(1);
     expect(called).toBe(false);
-    expect(result.errors[0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
+    expect(result.errors![0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
   });
 
   it("can abort plan after", async () => {
     const wrapper: PlanWrapperFn = (plan) => {
       const $result = plan();
+      if ($result === null) {
+        return null;
+      }
       // eslint-disable-next-line no-constant-condition
       const $postCheck = lambda($result, async () => {
         await delay(10);
@@ -223,12 +226,12 @@ describe("wrapping named plans", () => {
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeTruthy();
-    expect(result.data.echo).toBe(null);
+    expect(result.data!.echo).toBe(null);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy2).toHaveBeenCalledTimes(1);
     expect(result.errors).toHaveLength(1);
     expect(called).toBe(true);
-    expect(result.errors[0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
+    expect(result.errors![0]).toMatchInlineSnapshot(`[GraphQLError: Abort]`);
   });
 
   it("can modify result of plan", async () => {
@@ -254,7 +257,7 @@ describe("wrapping named plans", () => {
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
-    expect(result.data.echo).toBe("hello");
+    expect(result.data!.echo).toBe("hello");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
@@ -269,7 +272,7 @@ describe("wrapping named plans", () => {
       return lambda(result, (str) => str.toLowerCase());
     };
     const spy = makeEchoSpy();
-    let options: GraphileBuild.SchemaOptions;
+    let options!: GraphileBuild.SchemaOptions;
     const schema = makeSchemaWithSpyAndPlugins(spy, [
       makeWrapPlansPlugin((build) => {
         options = build.options;
@@ -294,7 +297,7 @@ describe("wrapping named plans", () => {
     expect(options).toBeTruthy();
     expect(options.optionKey).toEqual("optionValue");
     expect(result.errors).toBeFalsy();
-    expect(result.data.echo).toBe("hello");
+    expect(result.data!.echo).toBe("hello");
     expect(spy).toHaveBeenCalledTimes(1);
     const spyArgs = spy.mock.calls[0];
     const [$parent, args, info] = spyArgs;
@@ -346,7 +349,7 @@ describe("wrapping plans matching a filter", () => {
         ],
         ([arg1, arg2]) => arg1 + arg2,
       );
-    const schema = makeSchemaWithSpyAndPlugins(null, [
+    const schema = makeSchemaWithSpyAndPlugins(null as never, [
       extendSchema({
         typeDefs: gql`
           extend type Mutation {
@@ -379,13 +382,13 @@ describe("wrapping plans matching a filter", () => {
       contextValue: { test: true },
     })) as ExecutionResult;
     if (result.errors) {
-      const firstError = result.errors[0];
+      const firstError = result.errors![0];
       console.error(firstError.originalError ?? firstError);
     }
     expect(result.errors).toBeFalsy();
-    expect(result.data.a).toBe(8);
-    expect(result.data.b).toBe("1ARG2");
-    expect(result.data.c).toBe("1NOWRAP");
+    expect(result.data!.a).toBe(8);
+    expect(result.data!.b).toBe("1ARG2");
+    expect(result.data!.c).toBe("1NOWRAP");
     expect(before.length).toEqual(2);
     expect(after.length).toEqual(2);
     expect(before).toMatchInlineSnapshot(`

@@ -1,0 +1,88 @@
+{
+  allHouses: {
+    nodes: [
+      {
+        nodeId: "WyJob3VzZXMiLDEsMV0=",
+        buildingByBuildingId: {
+          id: 4,
+          name: "Home sweet home",
+          namedAfterStreet: null,
+          propertyByPropertyId: {
+            id: 1,
+            nameOrNumber: "My House",
+            streetByStreetId: {
+              id: 1,
+              name: "My Street",
+            },
+          },
+        },
+        propertyByPropertyId: {
+          id: 1,
+          nameOrNumber: "My House",
+          streetByStreetId: {
+            id: 1,
+            name: "My Street",
+          },
+        },
+        streetByStreetId: {
+          id: 1,
+          name: "My Street",
+        },
+        streetPropertyByStreetIdAndPropertyId: {
+          currentOwner: "Me",
+          streetByStrId: {
+            id: 1,
+            name: "My Street",
+          },
+          propertyByPropId: {
+            id: 1,
+            nameOrNumber: "My House",
+            streetByStreetId: {
+              id: 1,
+              name: "My Street",
+            },
+          },
+          houseByStreetIdAndPropertyId: {
+            nodeId: "WyJob3VzZXMiLDEsMV0=",
+            buildingByBuildingId: {
+              id: 4,
+              name: "Home sweet home",
+              namedAfterStreet: null,
+              propertyByPropertyId: {
+                id: 1,
+                nameOrNumber: "My House",
+                streetByStreetId: {
+                  id: 1,
+                  name: "My Street",
+                },
+              },
+            },
+            propertyByPropertyId: {
+              id: 1,
+              nameOrNumber: "My House",
+              streetByStreetId: {
+                id: 1,
+                name: "My Street",
+              },
+            },
+            streetPropertyByStreetIdAndPropertyId: {
+              currentOwner: "Me",
+              streetByStrId: {
+                id: 1,
+                name: "My Street",
+              },
+              propertyByPropId: {
+                id: 1,
+                nameOrNumber: "My House",
+                streetByStreetId: {
+                  id: 1,
+                  name: "My Street",
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+}

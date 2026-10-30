@@ -8,7 +8,7 @@
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
     "pretest": "node dist/index.js",
-    "test": "jest",
+    "test": "tsc -b tsconfig.test.json && jest",
     "posttest": "yarn test:docs",
     "test:docs": "markdown-doctest",
     "build": "tsc -b"

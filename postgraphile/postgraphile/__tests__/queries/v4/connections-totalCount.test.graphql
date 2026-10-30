@@ -4,6 +4,12 @@ query {
   a: allPeople {
     totalCount
   }
+  a1: allPeople(first: 0) {
+    totalCount
+  }
+  a2: allPeople(first: 1) {
+    totalCount
+  }
   b: allPeople {
     nodes {
       friends {

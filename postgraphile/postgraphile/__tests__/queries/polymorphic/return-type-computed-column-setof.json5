@@ -1,0 +1,40 @@
+{
+  allSingleTableItems: {
+    nodes: [
+      {
+        id: 4,
+        type: "POST",
+        topics: {
+          nodes: [
+            {
+              id: 1,
+              title: "PostGraphile version 5",
+            },
+            {
+              id: 2,
+              title: "Temporary test topic",
+            },
+          ],
+        },
+        topicsList: [
+          {
+            id: 1,
+            title: "PostGraphile version 5",
+          },
+          {
+            id: 2,
+            title: "Temporary test topic",
+          },
+          {
+            id: 10,
+            title: "Notes",
+          },
+          {
+            id: 11,
+            title: "Other aims",
+          },
+        ],
+      },
+    ],
+  },
+}

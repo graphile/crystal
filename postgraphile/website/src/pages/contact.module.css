@@ -1,0 +1,152 @@
+.contactSection {
+  padding-top: 4rem;
+}
+
+.cardLayout {
+  composes: wide from global;
+  width: 100%;
+  max-width: none;
+}
+
+.contactCards {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .contactCards {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.contactCard {
+  --contact-accent: var(--ifm-color-primary);
+  --contact-button-color: white;
+  border: 3px solid var(--contact-accent);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-weight: normal;
+  font-size: 0.9rem;
+  padding: 1rem;
+}
+
+.contactCard:nth-child(2) {
+  --contact-accent: var(--ifm-color-primary-dark);
+  border-width: 2px;
+}
+
+[data-theme="dark"] .contactCard:nth-child(2) {
+  --contact-accent: var(--ifm-color-primary-light);
+  --contact-button-color: var(--ifm-color-primary-darkest);
+  border-width: 3px;
+}
+
+.contactCard > :last-child {
+  margin-top: auto;
+  text-align: center;
+}
+
+.contactCard .button {
+  --ifm-button-background-color: var(--contact-accent);
+  --ifm-button-border-color: var(--contact-accent);
+  --ifm-button-color: var(--contact-button-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 2.5rem;
+  line-height: 1.5;
+  border-radius: 7px;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.contactCard .button:hover {
+  --ifm-button-background-color: var(--ifm-color-primary-darkest);
+  --ifm-button-border-color: var(--ifm-color-primary-darkest);
+  --ifm-button-color: white;
+}
+
+[data-theme="dark"] .contactCard .button:hover {
+  --ifm-button-background-color: var(--ifm-color-primary-lightest);
+  --ifm-button-border-color: var(--ifm-color-primary-lightest);
+  --ifm-button-color: var(--ifm-color-primary-darkest);
+}
+
+.contactCards h2 {
+  color: var(--contact-accent);
+  margin-bottom: 0.75rem;
+}
+
+.icon {
+  margin-right: 0.35rem;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.person {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.profile {
+  flex: 0 0 auto;
+  width: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.person h4 {
+  margin-bottom: 0.5rem;
+}
+
+.person p {
+  margin-bottom: 0;
+}
+
+.socials > div {
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.socials a {
+  margin-right: 0;
+}
+
+@media screen and (max-width: 576px) {
+  .contactCards {
+    grid-template-columns: 1fr;
+  }
+
+  .person {
+    gap: 1rem;
+  }
+
+  .avatar {
+    width: 3rem;
+    height: 3rem;
+  }
+}
