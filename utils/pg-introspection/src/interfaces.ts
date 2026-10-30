@@ -29,6 +29,10 @@ export interface IntrospectOptions<
   /** @experimental */
   onlyEntities?: TEntities[];
   schemas?: string[];
+  /**
+   * Include extension-owned resources. When false (the default), selecting
+   * collections filtered by extension membership also requires `depends`.
+   */
   includeExtensionResources?: boolean;
 }
 
