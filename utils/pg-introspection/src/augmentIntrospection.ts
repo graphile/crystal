@@ -289,6 +289,16 @@ export function augmentIntrospectionData<
   introspectionData: IntrospectionDataForEntities<TEntities>,
 ): Introspection<TEntities> {
   const { includeExtensionResources } = options;
+  if (
+    !includeExtensionResources &&
+    (introspectionData.procs ||
+      introspectionData.classes ||
+      introspectionData.attributes ||
+      introspectionData.constraints ||
+      introspectionData.types)
+  ) {
+    assertExists(introspectionData.depends, "depends");
+  }
   // Lookups exist only when their corresponding collection was supplied.
 
   const lookups: IntrospectionLookups = {

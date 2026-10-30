@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
+import { introspect } from "../dist/incremental.js";
 import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
@@ -260,9 +261,37 @@ it("executes edge-case selections against PostgreSQL", async () => {
     await client.query(
       `comment on event trigger ${schema}_event is 'Event trigger test comment'`,
     );
-    // Extension membership supplies an 'e' dependency for this event trigger.
-    await client.query(
-      `alter extension plpgsql add event trigger ${schema}_event`,
+    // This extension installs both a relation and a function; rollback removes it.
+    await client.query(`create extension pg_buffercache with schema ${schema}`);
+    const queryCallback = async (text: string, values: any[]) =>
+      (await client.query(text, values)).rows[0].introspection;
+    const partialEntities = ["namespaces", "classes", "procs"] as const;
+    await assert.rejects(
+      introspect({ onlyEntities: [...partialEntities] }, queryCallback),
+      /Introspection collection 'depends' is required/,
+    );
+    const included = await introspect(
+      {
+        onlyEntities: [...partialEntities],
+        includeExtensionResources: true,
+      },
+      queryCallback,
+    );
+    assert.ok(
+      included.classes.some((entry) => entry.relname === "pg_buffercache"),
+    );
+    assert.ok(
+      included.procs.some((entry) => entry.proname === "pg_buffercache_pages"),
+    );
+    const excluded = await introspect(
+      { onlyEntities: [...partialEntities, "depends"] },
+      queryCallback,
+    );
+    assert.ok(
+      !excluded.classes.some((entry) => entry.relname === "pg_buffercache"),
+    );
+    assert.ok(
+      !excluded.procs.some((entry) => entry.proname === "pg_buffercache_pages"),
     );
     const events = await run(["event_triggers", "descriptions", "depends"]);
     const event = events.event_triggers.find(
@@ -278,14 +307,16 @@ it("executes edge-case selections against PostgreSQL", async () => {
           entry.description === "Event trigger test comment",
       ),
     );
-    assert.ok(
-      events.depends.some(
-        (entry: { objid: string; classid: string; deptype: string }) =>
-          entry.objid === event.oid &&
-          events.catalog_by_oid[entry.classid] === "pg_event_trigger" &&
-          entry.deptype === "e",
-      ),
+    // Exercise extension dependencies without attaching the trigger to an extension.
+    const dependency = await client.query(
+      `with event_triggers as (select $1::oid as oid)
+       select objid::text
+       from (values ('pg_catalog.pg_event_trigger'::regclass, $1::oid, 0, 'e'))
+         as depends(classid, objid, objsubid, deptype)
+       where ${dependencyWhere({ onlyEntities: ["event_triggers"] })}`,
+      [event.oid],
     );
+    assert.deepEqual(dependency.rows, [{ objid: event.oid }]);
   } finally {
     await client.query("rollback");
     await client.end();

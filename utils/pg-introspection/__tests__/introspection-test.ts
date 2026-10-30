@@ -57,7 +57,7 @@ it("requires the collections used by navigation helpers", () => {
     types: source.types,
   };
   const result = augmentIntrospectionData(
-    { onlyEntities: ["namespaces", "types"] },
+    { onlyEntities: ["namespaces", "types"], includeExtensionResources: true },
     data,
   );
   const namespace = result.getNamespace({ name: "public" });
@@ -76,7 +76,7 @@ it("requires the collections used by navigation helpers", () => {
   assert.throws(() => type.getRange(), /ranges/);
 
   const withEmptyProcs = augmentIntrospectionData(
-    { onlyEntities: ["namespaces", "procs"] },
+    { onlyEntities: ["namespaces", "procs"], includeExtensionResources: true },
     {
       ...metadata,
       namespaces: structuredClone(rawIntrospectionResults.namespaces),
@@ -137,6 +137,7 @@ it("reports missing collections for entity relationships and permissions", () =>
   };
   const result = augmentIntrospectionData(
     {
+      includeExtensionResources: true,
       onlyEntities: [
         "database",
         "namespaces",
