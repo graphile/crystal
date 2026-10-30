@@ -1,5 +1,111 @@
 # graphile-build-pg
 
+## 5.2.0
+
+### Minor Changes
+
+- [#3172](https://github.com/graphile/crystal/pull/3172)
+  [`ead97bc`](https://github.com/graphile/crystal/commit/ead97bc8071b2f4272ba8faf9ae86e302408359a)
+  Thanks [@benjie](https://github.com/benjie)! - `build.getGraphQLTypeByPgCodec`
+  now reflects input/output type based on variant; manual narrowing is no longer
+  required.
+
+- [#3192](https://github.com/graphile/crystal/pull/3192)
+  [`e8709d1`](https://github.com/graphile/crystal/commit/e8709d1ed9cf883d0a434d36915a1e1b82291f0a)
+  Thanks [@benjie](https://github.com/benjie)! - PgExecutor now groups similar
+  queries and runs them through the same connection, reducing the overhead from
+  multiple transaction handshakes and making better use of prepared statements
+  and similar optimizations. Reduces both parallelism and overhead, hopefully
+  netting an overall performance win with some potential per-request latency
+  trade-offs.
+
+- [#3173](https://github.com/graphile/crystal/pull/3173)
+  [`c7dfb07`](https://github.com/graphile/crystal/commit/c7dfb072592ac0a706b2a2b2d27307fe4db3fbbe)
+  Thanks [@benjie](https://github.com/benjie)! - Fixed @returnType for functions
+  returning setof (for lists and connections) - thanks @tsnobip!
+
+- [#3122](https://github.com/graphile/crystal/pull/3122)
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc)
+  Thanks [@benjie](https://github.com/benjie)! - Improves types in
+  `@dataplan/pg` around codecs, resources, nullability, range values, and
+  resource execution arguments. Adds support for PostGraphile Pro (V5) type
+  generation.
+
+  **NOTE**: `pgResource.execute(...)` no longer accepts `pgCodec` in the
+  arguments; it was always ignored internally because the parameter codec was
+  used, now we explicitly don't accept it. `{ step, name?, pgCodec }` &rarr;
+  `{ step, name? }`
+
+  The new PostGraphile Pro (V5) plugin can generate registry, plan resolver,
+  introspection (for smart tags) and other related types, and even supports
+  correct types across multiple PostGraphile schemas in the same TypeScript
+  environment. The generated-schema-aware types provide checked schema names,
+  tables, fields, arguments, nullability, and PostgreSQL resource types where
+  available, while preserving broad fallbacks when they are not.
+
+  With this plugin, many of the standard PostGraphile APIs can become more
+  strongly typed with minimal user input. If you only have one PostGraphile
+  instance then using the default generation should be picked up automatically
+  by most plugin helpers -- `extendSchema()`, `wrapPlans()` (for the
+  filter-based form of `wrapPlans()`, pass the `scope` property to options
+  rather than adding a generic, this allows the filter return type to still be
+  inferred automatically), `pgSmartTags()`, `changeNullability()`,
+  `addPgTableCondition()`, `addPgTableOrderBy()` -- and for manual plugins you
+  can use the `scopedPlugin(...)` helper to define your plugin. If you run
+  multiple schemas then you can pass a generic (e.g.
+  `extendSchema<"public-api">(...)`) to indicate the types to use.
+
+- [#3138](https://github.com/graphile/crystal/pull/3138)
+  [`3953e87`](https://github.com/graphile/crystal/commit/3953e87e72096281bb6b0edb8b3c96b6c05a8961)
+  Thanks [@benjie](https://github.com/benjie)! - Slightly more stable ordering
+  is used in schema construction, to make schemas ordering more stable. (Sadly,
+  introducing this is likely to change the order of your schema.)
+
+### Patch Changes
+
+- [#3109](https://github.com/graphile/crystal/pull/3109)
+  [`e991bd8`](https://github.com/graphile/crystal/commit/e991bd887243bb7cac6426e3e1c54e2ebb0ccc31)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add groundwork for modified
+  PostgreSQL codecs keyed by type modifier and constraints, including base-codec
+  relationships for GraphQL type resolution.
+
+- [#3173](https://github.com/graphile/crystal/pull/3173)
+  [`901c0d1`](https://github.com/graphile/crystal/commit/901c0d1e508f445b03bf848fdf38793aaff2194a)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug in "Reads and enables
+  pagination through a set of ..." message (Int4 -> Int, Int8 -> BigInt, honours
+  inflection for types, etc)
+
+- [#3193](https://github.com/graphile/crystal/pull/3193)
+  [`261078d`](https://github.com/graphile/crystal/commit/261078dc4839e00048e8bb6a8e27bb91374c56a0)
+  Thanks [@benjie](https://github.com/benjie)! - Don't pollute exports with a
+  new setting unless it's set
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+
+- [#3163](https://github.com/graphile/crystal/pull/3163)
+  [`92b3ddf`](https://github.com/graphile/crystal/commit/92b3ddfaac44b273757c263529b41fd7bd25aaeb)
+  Thanks [@benjie](https://github.com/benjie)! - `pgFieldResource` is now set on
+  the scope of more fields by PgCustomTypeFieldPlugin (making extension easier).
+
+- [#3172](https://github.com/graphile/crystal/pull/3172)
+  [`18bbd00`](https://github.com/graphile/crystal/commit/18bbd00b85dd32b248e5832bafa5d2202402c96c)
+  Thanks [@benjie](https://github.com/benjie)! - `build.getTypeMetaByName` now
+  returns a TypeScript union of TypeMeta that differentiates over
+  `{kind: "OBJECT" | "INTERFACE" | "UNION" | "SCALAR" | "ENUM" | "INPUT_OBJECT", ...}`,
+  allowing you to get a typed `scope` by simply asserting the `typeMeta.kind`
+  you're expecting.
+- Updated dependencies
+  [[`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)]:
+  - graphile-config@1.1.2
+  - pg-introspection@1.0.2
+  - pg-sql2@5.0.2
+
 ## 5.1.5
 
 ### Patch Changes
