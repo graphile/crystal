@@ -1,0 +1,10 @@
+## expect(errors).toBeFalsy()
+#> runTimes: 2
+{
+  forums {
+    name
+    firstFeaturedMessageAuthor {
+      username
+    }
+  }
+}
