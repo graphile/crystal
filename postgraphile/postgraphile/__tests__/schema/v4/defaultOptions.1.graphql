@@ -7877,7 +7877,21 @@ type Query implements Node {
     """
     offset: Int
   ): QueryIntervalSetConnection
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+
+  """Tests outputting two rows using in/out/inout parameters"""
+  queryOutputTwoRows(
+    """ID of the leftArm to be used as the first row"""
+    leftArmId: Int
+
+    """
+    ID of the post to be used as the second row.
+    (This description spans multiple lines.)
+    """
+    postId: Int
+
+    """This is an inout parameter"""
+    txt: String
+  ): QueryOutputTwoRowsRecord
   queryTextArray: [String]
   readPgSettings: JSON
 
