@@ -3,4 +3,4 @@
 ---
 
 Use the new `pg-introspection` raw introspection and augmentation APIs,
-preparing the integration for incremental introspection.
+preparing the integration for multipass introspection.

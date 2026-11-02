@@ -23,7 +23,7 @@ import type {
   PgRoles,
   PgType,
 } from "./interfaces.ts";
-export { introspect, introspectRaw } from "./incremental.ts";
+export { introspect, introspectRaw } from "./multipass.ts";
 import type { AclObject } from "./acl.ts";
 import {
   aclContainsRole,

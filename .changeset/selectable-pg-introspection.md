@@ -16,4 +16,4 @@ error will be reported when a required collection was not included.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of `introspect` or `introspectRaw`. These APIs prepare
-for incremental introspection.
+for multipass introspection.

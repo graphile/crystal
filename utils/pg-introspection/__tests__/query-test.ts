@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import { introspect } from "../dist/incremental.js";
+import { introspect } from "../dist/multipass.js";
 import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
