@@ -2774,6 +2774,28 @@ export function makeExampleSchema(
         ),
       },
 
+      firstFeaturedMessageAuthor: {
+        type: User,
+        plan: EXPORTABLE(
+          (constant, deoptimizeIfAppropriate, messageResource, userResource) =>
+            function plan($forum) {
+              const $messages = messageResource.find({
+                forum_id: $forum.get("id"),
+                featured: constant(true),
+              });
+              $messages.orderBy({ attribute: "created_at", direction: "ASC" });
+              $messages.setFirst(constant(1));
+              deoptimizeIfAppropriate($messages);
+              const $message = $messages.single();
+              const $user = userResource.get({ id: $message.get("author_id") });
+              $user.getClassStep().setInliningStrategy("preferSubquery");
+              deoptimizeIfAppropriate($user);
+              return $user;
+            },
+          [constant, deoptimizeIfAppropriate, messageResource, userResource],
+        ),
+      },
+
       featuredMessages: {
         type: new GraphQLList(Message),
         plan: EXPORTABLE(

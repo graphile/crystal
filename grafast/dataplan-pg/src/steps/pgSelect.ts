@@ -4447,8 +4447,11 @@ function pgInlineViaJoinTransform([details, item]: readonly [
 
 function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
-  any[],
+  Maybe<readonly string[]>,
 ]) {
+  if (item == null) {
+    return createSelectResult([], details);
+  }
   const result = item[details.selectIndex];
   const allVals = details.isSimpleUnique
     ? result == null
