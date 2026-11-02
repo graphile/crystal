@@ -361,8 +361,16 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
 
-            const tag = tags[`arg${i}variant`];
-            const variant = typeof tag === "string" ? tag : undefined;
+            const variantTag = tags[`arg${i}variant`];
+            const variant =
+              typeof variantTag === "string" ? variantTag : undefined;
+            const descriptionTag = tags[`arg${i}description`];
+            const description =
+              typeof descriptionTag === "string"
+                ? descriptionTag
+                : Array.isArray(descriptionTag)
+                  ? descriptionTag.join("\n")
+                  : undefined;
 
             // i for IN arguments, o for OUT arguments, b for INOUT arguments,
             // v for VARIADIC arguments, t for TABLE arguments
@@ -412,6 +420,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   codec: argCodec,
                   ...(optional ? { optional } : null),
                   ...(notNull ? { notNull } : null),
+                  ...(description ? { description } : null),
                   ...(variant ? { extensions: { variant } } : null),
                 }),
               );

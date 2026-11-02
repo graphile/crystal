@@ -6438,13 +6438,16 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "left_arm_id",
-        codec: TYPES.int
+        codec: TYPES.int,
+        description: "ID of the leftArm to be used as the first row"
       }, {
         name: "post_id",
-        codec: TYPES.int
+        codec: TYPES.int,
+        description: "ID of the post to be used as the second row.\n(This description spans multiple lines.)"
       }, {
         name: "txt",
-        codec: TYPES.text
+        codec: TYPES.text,
+        description: "This is an inout parameter"
       }],
       codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
       hasImplicitOrder: false,
@@ -6453,9 +6456,17 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "query_output_two_rows"
+        },
+        tags: {
+          arg0description: "ID of the leftArm to be used as the first row",
+          arg1description: ["ID of the post to be used as the second row.", "(This description spans multiple lines.)"],
+          arg2description: "This is an inout parameter",
+          arg3description: "Output only parameter",
+          arg4description: "Output only parameter (2)"
         }
       },
-      isUnique: true
+      isUnique: true,
+      description: "Tests outputting two rows using in/out/inout parameters"
     },
     read_pg_settings: {
       executor: executor,
@@ -9406,7 +9417,21 @@ type Query implements Node {
   jsonIdentity(json: JSON): JSON
   jsonbIdentity(json: JSON): JSON
   noArgsQuery: Int
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+
+  """Tests outputting two rows using in/out/inout parameters"""
+  queryOutputTwoRows(
+    """ID of the leftArm to be used as the first row"""
+    leftArmId: Int
+
+    """
+    ID of the post to be used as the second row.
+    (This description spans multiple lines.)
+    """
+    postId: Int
+
+    """This is an inout parameter"""
+    txt: String
+  ): QueryOutputTwoRowsRecord
   readPgSettings: JSON
   returnTableWithoutGrants: CompoundKey
   searchTestSummariesList(
