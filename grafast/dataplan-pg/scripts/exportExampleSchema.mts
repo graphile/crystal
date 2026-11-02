@@ -1,6 +1,7 @@
 #!/usr/bin/env -S node --experimental-strip-types
 
 import { writeFile } from "node:fs/promises";
+
 import { exportSchema } from "graphile-export";
 import { printSchema } from "graphql";
 
