@@ -103,13 +103,32 @@ export const PgRegistryReductionPlugin: GraphileConfig.Plugin = {
     "[EXPERIMENTAL] Strips extensions from pgRegistry to reduce export size",
   version,
 
+  // **IMPORTANT**: this is a _schema_ hook not a _gather_ hook because if we
+  // trim these things out during the gather phase before we build the schema,
+  // a different schema will be built. This is not the intention of this
+  // plugin, instead the intent is that when the registry and schema are output
+  // to be executed at runtime, unnecessary resources are removed.
   schema: {
     hooks: {
       finalize(schema, build) {
         const {
           input: { pgRegistry },
+          options: {
+            minifyDropsDescriptions = true,
+            // minifyDropsDeprecationReasons = true,
+          },
         } = build;
         const { pgCodecs, pgResources, pgRelations } = pgRegistry;
+
+        function delDesc<T extends { readonly description?: unknown }>(
+          obj: T,
+        ): T {
+          if (!minifyDropsDescriptions) return obj;
+          if ("description" in obj) {
+            delete (obj as { description?: unknown }).description;
+          }
+          return obj;
+        }
 
         pojoify(pgCodecs);
         for (const codec of Object.values(pgCodecs)) {
@@ -119,9 +138,11 @@ export const PgRegistryReductionPlugin: GraphileConfig.Plugin = {
               delete attr.extensions?.argIndex;
               delete attr.extensions?.argName;
               tidyExtensions(attr);
+              delDesc(attr);
             }
             pojoify(codec.attributes);
           }
+          delDesc(codec);
         }
 
         pojoify(pgResources);
@@ -135,8 +156,10 @@ export const PgRegistryReductionPlugin: GraphileConfig.Plugin = {
           if (resource.parameters) {
             for (const param of resource.parameters) {
               tidyExtensions(param);
+              delDesc(param);
             }
           }
+          delDesc(resource);
         }
 
         pojoify(pgRelations);
@@ -145,6 +168,7 @@ export const PgRegistryReductionPlugin: GraphileConfig.Plugin = {
           tidyExtensions(codecRelations);
           for (const relation of Object.values(codecRelations)) {
             tidyExtensions(relation);
+            delDesc(relation);
           }
         }
 
