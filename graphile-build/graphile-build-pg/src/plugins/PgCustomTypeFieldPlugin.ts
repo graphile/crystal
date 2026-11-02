@@ -638,7 +638,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 graphqlArgName: argName,
                 pgCodec: param.codec,
                 inputType,
-                ...(param.description !== undefined
+                ...(param.description != null
                   ? { description: param.description }
                   : null),
                 ...(param.name ? { postgresArgName: param.name } : null),
@@ -655,7 +655,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 (memo, { inputType, graphqlArgName, description }) => {
                   memo[graphqlArgName] = {
                     type: inputType,
-                    ...(description !== undefined ? { description } : null),
+                    ...(description != null ? { description } : null),
                   };
                   return memo;
                 },
