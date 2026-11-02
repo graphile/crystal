@@ -102,6 +102,7 @@ afterAll(async () => {
 
 const makePreset = (
   plugins: GraphileConfig.Plugin[],
+  schemas = ["graphile_utils"],
 ): GraphileConfig.Preset => ({
   extends: [
     PostGraphileAmberPreset,
@@ -113,7 +114,7 @@ const makePreset = (
   pgServices: [
     makePgService({
       pool: pgPool!,
-      schemas: ["graphile_utils"],
+      schemas,
     }),
   ],
 });
@@ -123,6 +124,7 @@ const getIntrospectionWithSmartTags = async (
   options?: {
     setupSql?: string[];
     teardownSql?: string[];
+    schemas?: string[];
   },
 ): Promise<Introspection> => {
   let captured: Introspection | null = null;
@@ -141,7 +143,12 @@ const getIntrospectionWithSmartTags = async (
     await pgPool!.query(options.setupSql.join("\n"));
   }
   try {
-    await makeSchema(makePreset([pgSmartTags(rules), InspectSmartTagsPlugin]));
+    await makeSchema(
+      makePreset(
+        [pgSmartTags(rules), InspectSmartTagsPlugin],
+        options?.schemas,
+      ),
+    );
   } finally {
     if (options?.teardownSql?.length) {
       await pgPool!.query(options.teardownSql.join("\n"));
@@ -376,26 +383,33 @@ it("pgSmartTags does not leak matches across types", async () => {
 
 it("pgSmartTags does not leak matches across namespaces", async () => {
   const GRAPHILE_UTILS_DESC = "Graphile utils namespace via pgSmartTags";
-  const GRAPHILE_UTILS_2_DESC = "Graphile utils 2 via pgSmartTags";
-  const introspection = await getIntrospectionWithSmartTags([
+  const EMPTY_DESC = "Empty namespace via pgSmartTags";
+  const introspection = await getIntrospectionWithSmartTags(
+    [
+      {
+        kind: "namespace",
+        match: "graphile_utils",
+        description: GRAPHILE_UTILS_DESC,
+      },
+      {
+        kind: "namespace",
+        match: "graphile_utils_empty",
+        description: EMPTY_DESC,
+      },
+    ],
     {
-      kind: "namespace",
-      match: "graphile_utils",
-      description: GRAPHILE_UTILS_DESC,
+      schemas: ["graphile_utils", "graphile_utils_empty"],
+      setupSql: ["create schema graphile_utils_empty;"],
+      teardownSql: ["drop schema graphile_utils_empty;"],
     },
-    {
-      kind: "namespace",
-      match: "graphile_utils_2",
-      description: GRAPHILE_UTILS_2_DESC,
-    },
-  ]);
+  );
   const graphileUtils = findNamespace(introspection, "graphile_utils");
-  const graphileUtils2 = findNamespace(introspection, "graphile_utils_2");
+  const emptyNamespace = findNamespace(introspection, "graphile_utils_empty");
   expect(graphileUtils.getTagsAndDescription().description).toEqual(
     GRAPHILE_UTILS_DESC,
   );
-  expect(graphileUtils2.getTagsAndDescription().description).toEqual(
-    GRAPHILE_UTILS_2_DESC,
+  expect(emptyNamespace.getTagsAndDescription().description).toEqual(
+    EMPTY_DESC,
   );
 });
 
