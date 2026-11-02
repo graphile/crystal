@@ -818,6 +818,8 @@ export interface PgDatabaseData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Database name */
   datname: string;
@@ -1008,6 +1010,8 @@ export interface PgSettingsData {
 export interface PgNamespaceData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the namespace */
   nspname: string;
@@ -1030,6 +1034,8 @@ export interface PgClassData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the table, index, view, etc. */
   relname: string;
@@ -1372,6 +1378,8 @@ export interface PgAttrdefData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** The table this column belongs to */
   adrelid: PgOid | null;
@@ -1405,6 +1413,8 @@ export interface PgConstraintData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Constraint name (not necessarily unique!) */
   conname: string;
@@ -1565,6 +1575,8 @@ export interface PgConstraintData {
 export interface PgProcSysData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the function */
   proname: string;
@@ -1583,6 +1595,8 @@ export interface PgProcData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the function */
   proname: string;
@@ -1901,6 +1915,8 @@ export interface PgRolesData {
 
   /** ID of role */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 }
 
 /**
@@ -1965,6 +1981,8 @@ export interface PgAuthMembersData {
 export interface PgDefaultAclData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** The OID of the role associated with this entry */
   defaclrole: PgOid | null;
@@ -1998,6 +2016,8 @@ export interface PgTypeData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Data type name */
   typname: string;
@@ -2177,6 +2197,8 @@ export interface PgTypeData {
 export interface PgEnumData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** The OID of the pg_type entry owning this enum value */
   enumtypid: PgOid;
@@ -2237,6 +2259,8 @@ export interface PgEventTriggerData {
 export interface PgExtensionData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the extension */
   extname: string;
@@ -2267,6 +2291,8 @@ export interface PgExtensionData {
 export interface PgForeignDataWrapperData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the foreign-data wrapper */
   fdwname: string | null;
@@ -2301,6 +2327,8 @@ export interface PgForeignDataWrapperData {
 export interface PgForeignServerData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the foreign server */
   srvname: string | null;
@@ -2491,6 +2519,8 @@ export interface PgInheritsData {
 export interface PgLanguageData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the language */
   lanname: string | null;
@@ -2612,6 +2642,8 @@ export interface PgRangeData {
 export interface PgRewriteData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Rule name */
   rulename: string | null;
@@ -2648,6 +2680,8 @@ export interface PgTriggerData {
 
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** The table this trigger is on */
   tgrelid: PgOid;
@@ -2924,6 +2958,8 @@ export interface PgStatUserTablesData {
 export interface PgAmData {
   /** Row identifier */
   _id: PgOid;
+  /** Original catalog OID; optional for older snapshots. */
+  oid?: PgOid | undefined;
 
   /** Name of the access method */
   amname: string | null;

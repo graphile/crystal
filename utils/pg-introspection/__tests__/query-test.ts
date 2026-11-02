@@ -24,10 +24,7 @@ it("requires an explicit policy for new catalog types", () => {
 
 it("uses docs-generated explicit projections and fallbacks for every entity", () => {
   for (const entity of Object.values(ENTITY_TYPES)) {
-    const { select, fallback } = catalogProjection(
-      entity.attributes,
-      entity.oids,
-    );
+    const { select, fallback } = catalogProjection(entity.attributes);
     assert.ok(Object.keys(entity.attributes).length > 0);
     assert.ok(select.length > 0);
     assert.ok(fallback.length > 0);
@@ -125,7 +122,7 @@ it("executes edge-case selections against PostgreSQL", async () => {
       assert.equal(namespace.nspowner, null);
       assert.equal(typeof namespace.nspname, "string");
       assert.match(namespace._id, /^\d+$/);
-      assert.equal(Object.hasOwn(namespace, "oid"), false);
+      assert.equal(namespace.oid, namespace._id);
     }
     const functions = await run(["namespaces", "types", "ranges", "am"]);
     for (const type of functions.types) assert.match(type.typinput, /^[0-9]+$/);

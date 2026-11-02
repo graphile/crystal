@@ -82,7 +82,6 @@ function sqlType(type: string): string {
 /** Keep inner references unqualified so real columns shadow the enclosing nulls. */
 export function catalogProjection(
   attributes: CatalogAttributes,
-  oids = false,
 ): CatalogProjection {
   const fields = Object.entries(attributes).map(([name, type]) => [
     identifier(name),
@@ -90,7 +89,6 @@ export function catalogProjection(
   ]);
   return {
     select: fields
-      .filter(([name]) => !oids || name !== identifier("oid"))
       .map(([name, type]) => `${name}::${type} as ${name}`)
       .join(",\n        "),
     fallback: fields

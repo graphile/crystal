@@ -63,7 +63,7 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
       wheres.push("prorettype operator(pg_catalog.<>) 2279");
     }
 
-    const { select, fallback } = catalogProjection(attributes, oids);
+    const { select, fallback } = catalogProjection(attributes);
     withs.push(`\
   ${alias} as (
     select projected.*
