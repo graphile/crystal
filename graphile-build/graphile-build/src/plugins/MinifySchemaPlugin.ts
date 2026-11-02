@@ -266,6 +266,12 @@ declare global {
       MinifySchemaPlugin: true;
     }
   }
+  namespace GraphileBuild {
+    interface SchemaOptions {
+      minifyDropsDeprecationReasons?: boolean;
+      minifyDropsDescriptions?: boolean;
+    }
+  }
 }
 
 export const MinifySchemaPlugin: GraphileConfig.Plugin = {
@@ -279,8 +285,8 @@ export const MinifySchemaPlugin: GraphileConfig.Plugin = {
       finalize(schema, build) {
         return transformSchema(schema, {
           graphql: build.graphql,
-          trimDeprecated: true,
-          trimDescriptions: true,
+          trimDeprecated: build.options.minifyDropsDeprecationReasons ?? true,
+          trimDescriptions: build.options.minifyDropsDescriptions ?? true,
         });
       },
     },

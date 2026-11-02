@@ -517,13 +517,11 @@ const personCodec = recordCodec({
     id: {
       codec: TYPES.int,
       notNull: true,
-      hasDefault: true,
-      description: "The primary unique identifier for the person"
+      hasDefault: true
     },
     person_full_name: {
       codec: TYPES.varchar,
-      notNull: true,
-      description: "The person\u2019s name"
+      notNull: true
     },
     aliases: {
       codec: LIST_TYPES.text,
@@ -985,8 +983,7 @@ const updatableViewCodec = recordCodec({
       codec: TYPES.text
     },
     constant: {
-      codec: TYPES.int,
-      description: "This is constantly 2"
+      codec: TYPES.int
     }
   },
   extensions: {},
@@ -1044,8 +1041,7 @@ const personSecretCodec = recordCodec({
       notNull: true
     },
     sekrit: {
-      codec: TYPES.text,
-      description: "A secret held by the associated Person"
+      codec: TYPES.text
     }
   },
   extensions: {},
@@ -4580,28 +4576,17 @@ const registry = makeRegistry({
       },
       parameters: [{
         name: "left_arm_id",
-        codec: TYPES.int,
-        description: "ID of the leftArm to be used as the first row"
+        codec: TYPES.int
       }, {
         name: "post_id",
-        codec: TYPES.int,
-        description: "ID of the post to be used as the second row.\n(This description spans multiple lines.)"
+        codec: TYPES.int
       }, {
         name: "txt",
-        codec: TYPES.text,
-        description: "This is an inout parameter"
+        codec: TYPES.text
       }],
       codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
       hasImplicitOrder: false,
-      extensions: {
-        tags: {
-          arg0description: "ID of the leftArm to be used as the first row",
-          arg1description: ["ID of the post to be used as the second row.", "(This description spans multiple lines.)"],
-          arg2description: "This is an inout parameter",
-          arg3description: "Output only parameter",
-          arg4description: "Output only parameter (2)"
-        }
-      },
+      extensions: {},
       isUnique: true,
       description: "Tests outputting two rows using in/out/inout parameters"
     },
