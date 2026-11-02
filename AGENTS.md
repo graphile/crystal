@@ -103,6 +103,12 @@ into 4 main categories based on the root folders, each of which have a
 - Modal verbs: avoid unnecessary language which suggests some is tentative or
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
   verbs.
+- Always use a block body for `if`, `for`, and `while` statements.
+- Prefer `if`/`else if`/`else` over early return in general, but not when
+  determining if a hook or middleware should apply, and not where it would cause
+  deep nesting. (In hooks/middleware we want to return ASAP if the hook isn't
+  appropriate to the current circumstance, and don't want the rest of the hook
+  body that does the work to need to be indented.)
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
