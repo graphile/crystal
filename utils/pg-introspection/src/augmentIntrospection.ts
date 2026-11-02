@@ -290,6 +290,10 @@ export function augmentIntrospectionData<
   options: IntrospectOptions<TEntities>,
   introspectionData: IntrospectionDataForEntities<TEntities>,
 ): Introspection<TEntities> {
+  if ("_lookups" in introspectionData) {
+    throw new Error("Introspection data should not be augmented twice");
+  }
+
   // Lookups exist only when their corresponding collection was supplied.
 
   const lookups: IntrospectionLookups = {
