@@ -343,10 +343,11 @@ export function createEntityMethods(
           const attribute = attributeByRelIdAndNum.get(
             attributeRelNumKey(owner._id, key),
           );
-          if (!attribute)
+          if (!attribute) {
             throw new Error(
               `Could not find attribute '${key}' for index '${this.indexrelid}'`,
             );
+          }
           return attribute;
         });
       }),
@@ -434,10 +435,11 @@ export function createEntityMethods(
           const attribute = attributeByRelIdAndNum.get(
             attributeRelNumKey(klass._id, key),
           );
-          if (!attribute)
+          if (!attribute) {
             throw new Error(
               `Could not find attribute '${key}' for constraint '${this.conname}'`,
             );
+          }
           return attribute;
         });
       }),
@@ -480,10 +482,11 @@ export function createEntityMethods(
           const attribute = attributeByRelIdAndNum.get(
             attributeRelNumKey(klass._id, key),
           );
-          if (!attribute)
+          if (!attribute) {
             throw new Error(
               `Could not find foreign attribute '${key}' for constraint '${this.conname}'`,
             );
+          }
           return attribute;
         });
       }),
