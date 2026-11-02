@@ -57,6 +57,10 @@ figure figcaption {
   text-align: center;
 }
 
+.blog-wrapper article .markdown .button {
+  margin-bottom: 1rem;
+}
+
 .featureSummary details {
   border: none;
   box-shadow: none;

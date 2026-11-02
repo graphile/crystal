@@ -187,6 +187,11 @@ const config = {
             position: "right",
           },
           {
+            to: "/contact",
+            label: "Contact",
+            position: "right",
+          },
+          {
             href: `https://github.com/${organizationName}/${projectName}`,
             label: "GitHub",
             position: "right",

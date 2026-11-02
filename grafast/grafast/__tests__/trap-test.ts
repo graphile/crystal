@@ -76,7 +76,7 @@ const implicitSideEffectErrorPlan = (
     context.beforeTrap = true;
     return a + 1;
   });
-  const $trapped =
+  const _$trapped =
     mode === "trap"
       ? trap($a, TRAP_ERROR, {
           if: $condition ?? undefined,

@@ -8,16 +8,16 @@ module.exports = (dir) => {
     testEnvironment: "node",
     transform: {
       "^.+\\.jsx?$": `${__dirname}/.jest-babel-transform.js`,
-      "^.+\\.tsx?$": `${__dirname}/.jest-babel-transform.js`,
+      "^.+\\.m?tsx?$": `${__dirname}/.jest-babel-transform.js`,
     },
     testMatch: ["<rootDir>/**/__tests__/**/*.test.[jt]s?(x)"],
-    moduleFileExtensions: ["js", "json", "jsx", "ts", "tsx", "node"],
+    moduleFileExtensions: ["js", "json", "jsx", "ts", "tsx", "mts", "node"],
     roots: [`<rootDir>`],
     snapshotSerializers: [
       `${__dirname}/utils/jest-serializer-graphql-schema`,
       `${__dirname}/utils/jest-serializer-simple`,
     ],
-    extensionsToTreatAsEsm: [".ts"],
+    extensionsToTreatAsEsm: [".ts", ".mts"],
     moduleNameMapper: {
       "^(\\.{1,2}/.*)\\.js$": "$1",
     },

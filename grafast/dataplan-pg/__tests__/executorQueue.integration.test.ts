@@ -5,22 +5,22 @@ import { resolvePreset } from "graphile-config";
 import { Pool } from "pg";
 import sql from "pg-sql2";
 
-import { makePgAdaptorWithPgClient } from "../src/adaptors/pg.ts";
-import { EXPORTABLE } from "../src/datasource.ts";
-import { makeExampleSchema } from "../src/examples/exampleSchema.ts";
-import { PgExecutor } from "../src/executor.ts";
+import { makePgAdaptorWithPgClient } from "../dist/adaptors/pg.js";
+import { EXPORTABLE } from "../dist/datasource.js";
+import { PgExecutor } from "../dist/executor.js";
 import type {
   PgClientQuery,
   PgExecutorContext,
   WithPgClient,
-} from "../src/index.ts";
+} from "../dist/index.js";
 import {
   makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
   pgSelect,
   TYPES,
-} from "../src/index.ts";
+} from "../dist/index.js";
+import { makeExampleSchema } from "../examples/exampleSchema.mts";
 import {
   createTestDatabase,
   dropTestDatabase,
@@ -107,7 +107,7 @@ test("concurrent identical reads with different pgSettings stay isolated", async
         source,
         variableValues,
         resolvedPreset,
-        requestContext: { userId },
+        requestContext: { userId } as never,
       });
 
     const [first, second] = await Promise.all([run("101"), run("202")]);

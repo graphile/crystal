@@ -103,7 +103,7 @@ import { validateParsedCursor } from "./pgValidateParsedCursor.ts";
 // Joins are a combinatorics problem, they're faster in small doses, but as
 // they add up they become more expensive. Let's cap it at something
 // reasonable.
-const AUTO_MAX_INLINE_LEFT_JOINS = 7;
+const AUTO_MAX_INLINE_LEFT_JOINS = 3;
 
 const ALWAYS_ALLOWED = true;
 
@@ -4447,8 +4447,11 @@ function pgInlineViaJoinTransform([details, item]: readonly [
 
 function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
-  any[],
+  Maybe<readonly string[]>,
 ]) {
+  if (item == null) {
+    return createSelectResult([], details);
+  }
   const result = item[details.selectIndex];
   const allVals = details.isSimpleUnique
     ? result == null

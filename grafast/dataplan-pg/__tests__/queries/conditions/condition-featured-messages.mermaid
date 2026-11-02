@@ -14,9 +14,9 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 27, 94, 90<br /><br />ROOT Connection{2}ᐸ90ᐳ[27]"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 50, 80, 84<br /><br />ROOT __Item{6}ᐸ33ᐳ[44]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 45, 80<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[45]<br />1: <br />ᐳ: 54, 81, 82<br />2: PgSelectRows[63]<br />ᐳ: First[62], PgSelectSingle[64]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 46, 45, 84, 56<br /><br />ROOT Edge{6}[46]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 84, 44, 46, 45, 56<br /><br />ROOT Edge{6}[46]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 64<br /><br />ROOT PgSelectSingle{7}ᐸusersᐳ[64]"):::bucket
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 45, 84<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[45]<br />1: <br />ᐳ: 67, 85, 86<br />2: PgSelectRows[75]<br />ᐳ: First[74], PgSelectSingle[76]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 45, 86<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[45]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 76<br /><br />ROOT PgSelectSingle{10}ᐸusersᐳ[76]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -99,7 +99,7 @@ graph TD
     ConnectionItems33 --> Last52
     Access80{{"Access[80∈3]<br />ᐸ90.m.joinDetailsFor58ᐳ"}}:::plan
     Lambda90 --> Access80
-    Access84{{"Access[84∈3]<br />ᐸ90.m.joinDetailsFor70ᐳ"}}:::plan
+    Access84{{"Access[84∈3]<br />ᐸ90.m.subqueryDetailsFor70ᐳ"}}:::plan
     Lambda90 --> Access84
     Edge46{{"Edge[46∈6]"}}:::plan
     __Item44[/"__Item[44∈6]<br />ᐸ33ᐳ"\]:::itemplan
@@ -121,22 +121,22 @@ graph TD
     PgSelectSingle64{{"PgSelectSingle[64∈7]<br />ᐸusersᐳ"}}:::plan
     First62 --> PgSelectSingle64
     List81 --> Lambda82
+    List85{{"List[85∈8]<br />ᐸ84,44ᐳ"}}:::plan
+    Access84 & __Item44 --> List85
+    Lambda86{{"Lambda[86∈8]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    List85 --> Lambda86
     PgClassExpression66{{"PgClassExpression[66∈9]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression66
     PgClassExpression68{{"PgClassExpression[68∈9]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgClassExpression66 o--o PgClassExpression68
-    List85{{"List[85∈10]<br />ᐸ84,45ᐳ"}}:::plan
-    Access84 & PgSelectSingle45 --> List85
     PgClassExpression67{{"PgClassExpression[67∈10]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgClassExpression54 o--o PgClassExpression67
     First74{{"First[74∈10]"}}:::plan
     PgSelectRows75[["PgSelectRows[75∈10]"]]:::plan
     PgSelectRows75 --> First74
-    Lambda86{{"Lambda[86∈10]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda86 --> PgSelectRows75
     PgSelectSingle76{{"PgSelectSingle[76∈10]<br />ᐸusersᐳ"}}:::plan
     First74 --> PgSelectSingle76
-    List85 --> Lambda86
     PgClassExpression77{{"PgClassExpression[77∈11]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle76 --> PgClassExpression77
     PgClassExpression78{{"PgClassExpression[78∈11]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -156,11 +156,11 @@ graph TD
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression54,First62,PgSelectRows63,PgSelectSingle64,List81,Lambda82 bucket7
     classDef bucket8 stroke:#dda0dd
-    class Bucket8 bucket8
+    class Bucket8,List85,Lambda86 bucket8
     classDef bucket9 stroke:#ff0000
     class Bucket9,PgClassExpression66,PgClassExpression68 bucket9
     classDef bucket10 stroke:#ffff00
-    class Bucket10,PgClassExpression67,First74,PgSelectRows75,PgSelectSingle76,List85,Lambda86 bucket10
+    class Bucket10,PgClassExpression67,First74,PgSelectRows75,PgSelectSingle76 bucket10
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgClassExpression77,PgClassExpression78 bucket11
 

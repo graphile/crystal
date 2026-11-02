@@ -1,5 +1,54 @@
 # graphile-build
 
+## 5.2.0
+
+### Minor Changes
+
+- [#3122](https://github.com/graphile/crystal/pull/3122)
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc)
+  Thanks [@benjie](https://github.com/benjie)! - Improves types in
+  `@dataplan/pg` around codecs, resources, nullability, range values, and
+  resource execution arguments. Adds support for PostGraphile Pro (V5) type
+  generation.
+
+  **NOTE**: `pgResource.execute(...)` no longer accepts `pgCodec` in the
+  arguments; it was always ignored internally because the parameter codec was
+  used, now we explicitly don't accept it. `{ step, name?, pgCodec }` &rarr;
+  `{ step, name? }`
+
+  The new PostGraphile Pro (V5) plugin can generate registry, plan resolver,
+  introspection (for smart tags) and other related types, and even supports
+  correct types across multiple PostGraphile schemas in the same TypeScript
+  environment. The generated-schema-aware types provide checked schema names,
+  tables, fields, arguments, nullability, and PostgreSQL resource types where
+  available, while preserving broad fallbacks when they are not.
+
+  With this plugin, many of the standard PostGraphile APIs can become more
+  strongly typed with minimal user input. If you only have one PostGraphile
+  instance then using the default generation should be picked up automatically
+  by most plugin helpers -- `extendSchema()`, `wrapPlans()` (for the
+  filter-based form of `wrapPlans()`, pass the `scope` property to options
+  rather than adding a generic, this allows the filter return type to still be
+  inferred automatically), `pgSmartTags()`, `changeNullability()`,
+  `addPgTableCondition()`, `addPgTableOrderBy()` -- and for manual plugins you
+  can use the `scopedPlugin(...)` helper to define your plugin. If you run
+  multiple schemas then you can pass a generic (e.g.
+  `extendSchema<"public-api">(...)`) to indicate the types to use.
+
+### Patch Changes
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+- Updated dependencies
+  [[`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)]:
+  - graphile-config@1.1.2
+  - tamedevil@0.1.2
+
 ## 5.1.1
 
 ### Patch Changes

@@ -1,5 +1,6 @@
 import "graphile-config";
 
+import type { FieldArgs } from "grafast";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
 const plugin = extendSchema((build) => {
@@ -16,7 +17,10 @@ const plugin = extendSchema((build) => {
       Query: {
         jsonIdentityBatch: EXPORTABLE(
           (each, jsonIdentity) =>
-            function jsonIdentityBatch(_$root, { $jsonArray }) {
+            function jsonIdentityBatch(
+              _$root: any,
+              { $jsonArray }: FieldArgs<{ jsonArray: any[] }>,
+            ) {
               return each($jsonArray, ($json) =>
                 jsonIdentity.executePositional($json),
               );

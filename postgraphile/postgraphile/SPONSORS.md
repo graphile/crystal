@@ -12,22 +12,16 @@ Graphile ecosystem. Find out
 
 ## Leaders
 
-- Robert Claypool
-- nigelrmtaylor
 - Principia Mentis
 - Axinom
 - Taiste
-- Trigger.dev
 - Apollo
-- Cintra
-- BairesDev
 - Two Bit Solutions
 - Dimply
 - Ndustrial
+- Cintra
 - Beacon
-- Ravio
 - prodready
-- Carvajal Consultants, Inc.
 - Seaber
 
 ## Supporters
@@ -35,24 +29,21 @@ Graphile ecosystem. Find out
 - HR-ON
 - stlbucket
 - Simon Elliott
+- nullachtvierzehn
 - Keith Layne
 - Alvin Ali Khaled
-- nullachtvierzehn
-- Zymego
 - garpulon
-- Ether
+- Zymego
 - Vizcom
-- The Outbound Collective
-- Kiron Open Higher Education
 - Andrew Joseph
+- Ether
+- WorkOS
 - Peter C. Romano
-- mateo
+- Jody Hoon-Starr
 - kontakto-fi
 - Tailos, Inc.
-- Jody Hoon-Starr
-- WorkOS
 - Justin Carrus
-- Malachi Bergman
-- ProbablyBrianBurgess
 - Keweiqu
 - jjcroftiv
+- Mobly
+- ChilliCream

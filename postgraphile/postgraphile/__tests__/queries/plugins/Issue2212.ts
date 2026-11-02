@@ -7,7 +7,6 @@ import { EXPORTABLE, extendSchema } from "graphile-utils";
 const plugin = extendSchema((build) => {
   const executor = build.input.pgRegistry.pgExecutors.main;
   const orders = build.input.pgRegistry.pgResources.orders;
-  const { sql } = build;
   const { connection } = build.grafast;
   const { loadOneWithPgClient, loadManyWithPgClient, TYPES, listOfCodec } =
     build.dataplanPg;

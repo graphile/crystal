@@ -1,5 +1,85 @@
 # graphile-utils
 
+## 5.1.0
+
+### Minor Changes
+
+- [#3122](https://github.com/graphile/crystal/pull/3122)
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc)
+  Thanks [@benjie](https://github.com/benjie)! - Improves types in
+  `@dataplan/pg` around codecs, resources, nullability, range values, and
+  resource execution arguments. Adds support for PostGraphile Pro (V5) type
+  generation.
+
+  **NOTE**: `pgResource.execute(...)` no longer accepts `pgCodec` in the
+  arguments; it was always ignored internally because the parameter codec was
+  used, now we explicitly don't accept it. `{ step, name?, pgCodec }` &rarr;
+  `{ step, name? }`
+
+  The new PostGraphile Pro (V5) plugin can generate registry, plan resolver,
+  introspection (for smart tags) and other related types, and even supports
+  correct types across multiple PostGraphile schemas in the same TypeScript
+  environment. The generated-schema-aware types provide checked schema names,
+  tables, fields, arguments, nullability, and PostgreSQL resource types where
+  available, while preserving broad fallbacks when they are not.
+
+  With this plugin, many of the standard PostGraphile APIs can become more
+  strongly typed with minimal user input. If you only have one PostGraphile
+  instance then using the default generation should be picked up automatically
+  by most plugin helpers -- `extendSchema()`, `wrapPlans()` (for the
+  filter-based form of `wrapPlans()`, pass the `scope` property to options
+  rather than adding a generic, this allows the filter return type to still be
+  inferred automatically), `pgSmartTags()`, `changeNullability()`,
+  `addPgTableCondition()`, `addPgTableOrderBy()` -- and for manual plugins you
+  can use the `scopedPlugin(...)` helper to define your plugin. If you run
+  multiple schemas then you can pass a generic (e.g.
+  `extendSchema<"public-api">(...)`) to indicate the types to use.
+
+- [#3144](https://github.com/graphile/crystal/pull/3144)
+  [`56ae052`](https://github.com/graphile/crystal/commit/56ae0524d74b9162b433afb4cc32b23e69a97bd7)
+  Thanks [@benjie](https://github.com/benjie)! - `addPgTableCondition()` and
+  `addPgTableOrderBy()` now support the match being specified as a string:
+  `my_schema.my_table` or `"my.weird.schema"."my""weird""table"` saving you
+  having to type out object definitions (previously:
+  `{schemaName:"my_schema",tableName:"my_table"}`)
+
+### Patch Changes
+
+- [#3155](https://github.com/graphile/crystal/pull/3155)
+  [`5e6bb5f`](https://github.com/graphile/crystal/commit/5e6bb5f173f97bf92ab1dd9324d8f3e0897812cb)
+  Thanks [@benjie](https://github.com/benjie)! - `extendSchema()` and
+  `wrapPlans()` now `provides: ['extendSchema']` and `['wrapPlans']`
+  respectively; this can help with plugin ordering concerns.
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+
+- [#3176](https://github.com/graphile/crystal/pull/3176)
+  [`0ea54a4`](https://github.com/graphile/crystal/commit/0ea54a423f7e2f3d802a2f98099427a7c24bd898)
+  Thanks [@benjaie](https://github.com/benjaie)! - Improve types for
+  `wrapPlans()`' SmartFieldPlanResolver.
+
+- [#3142](https://github.com/graphile/crystal/pull/3142)
+  [`582e349`](https://github.com/graphile/crystal/commit/582e3497e2cb665f73be581da775d0b5e4577473)
+  Thanks [@benjie](https://github.com/benjie)! - `addPgTableOrderBy`'s
+  `orderByAscDesc` helper can now handle a list of expressions via the callback
+  shape.
+
+- [#3187](https://github.com/graphile/crystal/pull/3187)
+  [`92dbe1b`](https://github.com/graphile/crystal/commit/92dbe1b1d9acf696df84322f31ab05c77d09c578)
+  Thanks [@benjie](https://github.com/benjie)! - `*WithPgClient()` steps can now
+  use full Multistep syntax, not just record syntax
+
+- [#3135](https://github.com/graphile/crystal/pull/3135)
+  [`f47ce6d`](https://github.com/graphile/crystal/commit/f47ce6d2a541e937713c930f69936d2ce66ff756)
+  Thanks [@benjie](https://github.com/benjie)! - `wrapPlans` can use full
+  `GraphileBuild.Build` object in callback, not partial type.
+
 ## 5.0.3
 
 ### Patch Changes

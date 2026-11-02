@@ -1,5 +1,219 @@
 # @dataplan/pg
 
+## 1.2.0
+
+### Minor Changes
+
+- [#3148](https://github.com/graphile/crystal/pull/3148)
+  [`854e98a`](https://github.com/graphile/crystal/commit/854e98aa7f81bf85a879d7ac85ae30c807cfc7c3)
+  Thanks [@benjie](https://github.com/benjie)! - Switch `PgSelectStep` and
+  `PgUnionStep` from a subquery lateral join to a **materialized** CTE lateral
+  join. This appears to fix some bad planning decisions that Postgres can make,
+  e.g. where it might attempt a full table scan hash join rather than a fast
+  loop with efficient index lookups.
+
+- [#3178](https://github.com/graphile/crystal/pull/3178)
+  [`80545aa`](https://github.com/graphile/crystal/commit/80545aa82b3c108f4738b61579bc5dbfbbd63917)
+  Thanks [@benjie](https://github.com/benjie)! - `pgResource.get(...)` now
+  allows steps representing null/undefined in each field - requiring the steps
+  be non-null does not guarantee the result will exist so it just adds burden
+  for plan writers without benefit.
+
+- [#3185](https://github.com/graphile/crystal/pull/3185)
+  [`fac3cd3`](https://github.com/graphile/crystal/commit/fac3cd3d10c1501fc7decf55c634ff1dd79d10a2)
+  Thanks [@benjie](https://github.com/benjie)! - `PgInsertSingleStep`,
+  `PgUpdateSingleStep` and `PgDeleteSingleStep` gain new experimental "wrap"
+  functionality allowing you to wrap a CRUD mutation with logic before and after
+  whilst retaining access to the database transaction (e.g. to allow
+  abort/rollback). Useful for data validation, coercion, result validation, and
+  auditing.
+
+- [#3192](https://github.com/graphile/crystal/pull/3192)
+  [`e8709d1`](https://github.com/graphile/crystal/commit/e8709d1ed9cf883d0a434d36915a1e1b82291f0a)
+  Thanks [@benjie](https://github.com/benjie)! - PgExecutor now groups similar
+  queries and runs them through the same connection, reducing the overhead from
+  multiple transaction handshakes and making better use of prepared statements
+  and similar optimizations. Reduces both parallelism and overhead, hopefully
+  netting an overall performance win with some potential per-request latency
+  trade-offs.
+
+- [#3146](https://github.com/graphile/crystal/pull/3146)
+  [`cfda9fa`](https://github.com/graphile/crystal/commit/cfda9fa6905a6f6eeca12e77bfb1f13024368283)
+  Thanks [@benjie](https://github.com/benjie)! - `PgSelectStep` now allows
+  influencing the inlining strategy used to inline one query into a parent with
+  `setInliningStrategy(...)`: `preferLeftJoin`, `preferSubquery`, `auto` or
+  `forbidden`. It also allows influencing how child queries inline into the
+  current query with `setChildInliningStrategy(...)`; this applies when the
+  child uses `auto`, unless set to `forbidden` in which case children are not
+  inlined.
+
+  The auto behavior (default) is now smarter: rather than always using a left
+  join where possible (as before), the system will now aim to have no more than
+  7 joins (to avoid combinatorics pressure in PostgreSQL query planning) and
+  will also not use a left join to inline a PgSelectStep that itself has joins,
+  inlined children, or `.apply()`s - instead a subquery will be used. This will
+  likely impact your query performances (hence semver minor) but hopefully in a
+  positive way - especially if you have large queries with lots of to-one
+  relations at many depths.
+
+- [#3125](https://github.com/graphile/crystal/pull/3125)
+  [`a531205`](https://github.com/graphile/crystal/commit/a531205c0022e45f39f16bc53018b6d0ee7fe1fa)
+  Thanks [@benjie](https://github.com/benjie)! - Empty ranges are now recognized
+  and represented both on input and output.
+
+- [#3180](https://github.com/graphile/crystal/pull/3180)
+  [`2ab53f8`](https://github.com/graphile/crystal/commit/2ab53f8e81e88206ee3f5d79f634d959bc4558d5)
+  Thanks [@benjie](https://github.com/benjie)! - Use `unnest()` rather than
+  `json_array_elements()` to feed pgSettings to Postgres.
+
+- [#3178](https://github.com/graphile/crystal/pull/3178)
+  [`753ee63`](https://github.com/graphile/crystal/commit/753ee63dbf96d9eb536a67eede6a9f09f0f12e24)
+  Thanks [@benjie](https://github.com/benjie)! - `pgResource.find(...)` is now
+  more precise about the requirements of the fields; previously `Step<any>` was
+  accepted, but now the Step must represent the datatype of the field (or
+  null/undefined).
+
+- [#3122](https://github.com/graphile/crystal/pull/3122)
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc)
+  Thanks [@benjie](https://github.com/benjie)! - Improves types in
+  `@dataplan/pg` around codecs, resources, nullability, range values, and
+  resource execution arguments. Adds support for PostGraphile Pro (V5) type
+  generation.
+
+  **NOTE**: `pgResource.execute(...)` no longer accepts `pgCodec` in the
+  arguments; it was always ignored internally because the parameter codec was
+  used, now we explicitly don't accept it. `{ step, name?, pgCodec }` &rarr;
+  `{ step, name? }`
+
+  The new PostGraphile Pro (V5) plugin can generate registry, plan resolver,
+  introspection (for smart tags) and other related types, and even supports
+  correct types across multiple PostGraphile schemas in the same TypeScript
+  environment. The generated-schema-aware types provide checked schema names,
+  tables, fields, arguments, nullability, and PostgreSQL resource types where
+  available, while preserving broad fallbacks when they are not.
+
+  With this plugin, many of the standard PostGraphile APIs can become more
+  strongly typed with minimal user input. If you only have one PostGraphile
+  instance then using the default generation should be picked up automatically
+  by most plugin helpers -- `extendSchema()`, `wrapPlans()` (for the
+  filter-based form of `wrapPlans()`, pass the `scope` property to options
+  rather than adding a generic, this allows the filter return type to still be
+  inferred automatically), `pgSmartTags()`, `changeNullability()`,
+  `addPgTableCondition()`, `addPgTableOrderBy()` -- and for manual plugins you
+  can use the `scopedPlugin(...)` helper to define your plugin. If you run
+  multiple schemas then you can pass a generic (e.g.
+  `extendSchema<"public-api">(...)`) to indicate the types to use.
+
+- [#3177](https://github.com/graphile/crystal/pull/3177)
+  [`23fe156`](https://github.com/graphile/crystal/commit/23fe156e14ac3971ac71d33b230b6340252aa5fa)
+  Thanks [@benjie](https://github.com/benjie)! - Automatically skip fetches when
+  we know no rows can be returned due to `WHERE some_column = null` (which is
+  always falsy).
+
+- [#3185](https://github.com/graphile/crystal/pull/3185)
+  [`e529f24`](https://github.com/graphile/crystal/commit/e529f2454f5f899f29ff156ecb7f242ea43b7753)
+  Thanks [@benjie](https://github.com/benjie)! - `PgUpdateSingleStep` no longer
+  throws an error if you don't provide any values to update; instead it simply
+  exits having changed no rows.
+
+### Patch Changes
+
+- [#3151](https://github.com/graphile/crystal/pull/3151)
+  [`f309fd7`](https://github.com/graphile/crystal/commit/f309fd716ebf1aaa21ef0b3c8ef0b25c7772953e)
+  Thanks [@benjie](https://github.com/benjie)! - Did you know the parent step
+  for a table type isn't necessarily a PgSelectSingleStep? It can also be a
+  PgInsertSingleStep, PgUpdateSingleStep or PgDeleteSingleStep. Normally this
+  doesn't matter to much - if all you're doing is `.get(attr)` then it should
+  work great (and makes the mutations better because they're only
+  `RETURNING ...` the attributes you need); but if you want to do
+  `$parent.select(...)` now you have an issue...
+
+  Introducing `PgClassSingleStep.toSelectSingle()`; now you can easily get a
+  PgSelectSingleStep to work with:
+
+  ```ts
+  const myPlan = ($parentClass: PgClassSingleStep, fieldArgs) => {
+    const $parent: PgSelectSingleStep = $parentClass.toSelectSingle();
+    $parent.select(/*...*/)
+  ```
+
+- [#3109](https://github.com/graphile/crystal/pull/3109)
+  [`e991bd8`](https://github.com/graphile/crystal/commit/e991bd887243bb7cac6426e3e1c54e2ebb0ccc31)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add groundwork for modified
+  PostgreSQL codecs keyed by type modifier and constraints, including base-codec
+  relationships for GraphQL type resolution.
+
+- [#3231](https://github.com/graphile/crystal/pull/3231)
+  [`e3bbac3`](https://github.com/graphile/crystal/commit/e3bbac34cb35274c45ed932a0ace174e16c16052)
+  Thanks [@benjie](https://github.com/benjie)! - Export `PgWrapCallback` type
+  (experimental)
+
+- [#3182](https://github.com/graphile/crystal/pull/3182)
+  [`061e9b2`](https://github.com/graphile/crystal/commit/061e9b22ed8bc4b514de6a1e670a131628a3f27c)
+  Thanks [@benjie](https://github.com/benjie)! - Performance: add deduplication
+  of queries directly to `pgSelect`.
+
+- [#3153](https://github.com/graphile/crystal/pull/3153)
+  [`90810f5`](https://github.com/graphile/crystal/commit/90810f52024bb2ab006864a5701b4df99be5e1a1)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `makeWithPgClientViaPgClientAlreadyInTransaction` is intended to be used in
+  tests for a PoolClient fresh from a `pg` connection pool, not in positions
+  where you've extracted the client from a `*WithPgClient(...)` step via the
+  `.rawClient` attribute. To help avoid users causing themselves deadlocks,
+  we've added a throw if you try to
+  `makeWithPgClientViaPgClientAlreadyInTransaction(nodePostgresPgClient.rawClient)`.
+
+- [#3186](https://github.com/graphile/crystal/pull/3186)
+  [`03251c3`](https://github.com/graphile/crystal/commit/03251c370f5b7fa1c6e1573aa771033d3d09cb16)
+  Thanks [@benjaie](https://github.com/benjaie)! - Add
+  `GraphileConfig.DataplanPgClient` in more places so you get your chosen
+  adaptor showing up in the types automatically.
+
+- [#3132](https://github.com/graphile/crystal/pull/3132)
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc)
+  Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! -
+  Remove `stripInternal` from the shared TypeScript compiler options.
+  Previously, symbols tagged with `/** @internal */` were stripped from the
+  generated `.d.ts` declaration files; they will now be included. This makes
+  internal APIs visible in TypeScript but does not change any runtime behaviour.
+
+- [#3152](https://github.com/graphile/crystal/pull/3152)
+  [`bd44c67`](https://github.com/graphile/crystal/commit/bd44c67fd675a16d5c96d71be20604d2fe0c5ab9)
+  Thanks [@benjie](https://github.com/benjie)! - Query builder gains
+  `.getOrderIsUnique()` with some big comments about how you probably shouldn't
+  use it...
+
+- [#3175](https://github.com/graphile/crystal/pull/3175)
+  [`6856d78`](https://github.com/graphile/crystal/commit/6856d7836d6b88d545b0f5b2b8c23bad2da937b1)
+  Thanks [@benjaie](https://github.com/benjaie)! - The `@dataplan/pg` adaptor
+  type is now guessed from which adaptors you have loaded into TypeScript (via
+  path imports), so casting `@dataplan/pg`'s `PgClient` to
+  `NodePostgresPgClient` (to indicate you're using `@dataplan/pg/adaptors/pg`)
+  should no longer be necessary in most cases.
+
+- [#3174](https://github.com/graphile/crystal/pull/3174)
+  [`f0efc90`](https://github.com/graphile/crystal/commit/f0efc90930ffb1c43e3dab63c21a5b244bf2f94c)
+  Thanks [@benjaie](https://github.com/benjaie)! - `PgResource.execute()` now
+  infers result type from underlying function signature. This has added two more
+  generics to `PgResource` and `PgResourceOptions`, so you may need to update
+  your code if you are explicitly stating these generics.
+- Updated dependencies
+  [[`8fc04f0`](https://github.com/graphile/crystal/commit/8fc04f0ecf8bfaac713992b494b94f61f942630b),
+  [`7c39592`](https://github.com/graphile/crystal/commit/7c39592b14290536d9db19ad811e89e7eef3388c),
+  [`85a3d1c`](https://github.com/graphile/crystal/commit/85a3d1c4610c4e74086d6cb1f05ed25e8904da02),
+  [`26a3fc4`](https://github.com/graphile/crystal/commit/26a3fc47952afe75eaafa647249f197ce06ee10e),
+  [`92978f3`](https://github.com/graphile/crystal/commit/92978f39316da4e18c619be255d775d0e29843f7),
+  [`631ed94`](https://github.com/graphile/crystal/commit/631ed94ec6a26c0016ef60fc561b612139b7460c),
+  [`0c73163`](https://github.com/graphile/crystal/commit/0c73163f8f543ec7ef709f177346341506d6daf7),
+  [`ce7a395`](https://github.com/graphile/crystal/commit/ce7a39548af4dfc830f63cdf00b7a669a01ccfcc),
+  [`7d10815`](https://github.com/graphile/crystal/commit/7d1081585f94f901cf05586fe06fc259618210fc),
+  [`4b948fc`](https://github.com/graphile/crystal/commit/4b948fc7a440887ee35f43e22fa0ae0f420ec3c1),
+  [`a38b59f`](https://github.com/graphile/crystal/commit/a38b59fecdfef010aab86ece61c64d42f152a166)]:
+  - grafast@1.2.0
+  - @dataplan/json@1.0.2
+  - @graphile/lru@5.0.1
+  - pg-sql2@5.0.2
+
 ## 1.1.2
 
 ### Patch Changes

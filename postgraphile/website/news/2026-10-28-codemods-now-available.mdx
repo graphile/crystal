@@ -1,0 +1,71 @@
+---
+title: "V4→V5 codemods early access"
+description: ""
+slug: 2026-10-28-codemods-early-access
+authors: [benjie, jem]
+tags: [releases, v5]
+date: 2026-10-28T01:00:00
+---
+
+import Link from "@docusaurus/Link";
+import styles from "@site/src/css/common.module.css";
+
+<div className={styles.intro}>
+
+One of the design goals of V5 was that you shouldn't have to adopt every new idea on day one.
+
+The [`makeV4Preset`](/postgraphile/5/migrating-from-v4#makev4preset) already allowed users to move onto the new engine while keeping much of their V4 behavior. Once using the preset and comfortable with V5, users could gradually adopt the new defaults and features at their own pace, or just stick with the V4 behaviors.
+For database-centric users this meant a near identical schema with minimal work; but there are deployments out there that use custom plugins… sometimes a lot of custom plugins.
+
+We're pleased to announce that codemods are now available to give those users a helping hand.
+
+</div>
+
+{/* truncate */}
+
+## Sponsor only early access to codemods
+
+Alongside the [release of V5.2](/news/2026-10-28-v5.2-published.mdx) we're giving sponsors early access to MIT-licensed codemods that automate some of the work involved in upgrading your codebase from V4 to V5. These codemods perform a lot of mechanical restructuring, but they also fix a number of bad patterns and N+1s that were common in V4 extend schema plugins (typically due to limitations of the V4 platform itself) by rewriting the logic into more efficient Gra*fast* plan resolvers which are always batched.
+
+These codemods will not normally result in full migration, but they will do the majority of the work for you in a deterministic way, reducing the amount of time you (or your agents) need to spend on updating significantly.
+
+This project is thanks primarily to one of our long-standing sponsors, Steelhead, who found the codemods were pivotal for the transition of their well-established production codebase to PostGraphile V5. We’d like to thank Steelhead for sponsoring this work and allowing us to turn tooling developed for a real migration into something the wider community can benefit from. Sponsors can have access to these codemods today in the Graphile sponsors-only GitHub repository, we plan to make them publicly available once we have had time to improve their documentation and smooth any rough edges.
+
+Normally we review every line of code, but the codemods being a one-time code transformer with almost no I/O (jscodeshift handles that, mostly) meant that we were not so concerned about security or performance ramifications (a quick scan could determine nothing funky was going on), allowing us to expand the codemods beyond what we could normally build limited by the time intensive act of code review. This is compensated for by the vast array of test cases, so when running the codemods against your own codebase we recommend extending the tests with any problematic patterns from your own codebase and having your agent update the codemods to match. You’ll then need to replay the codemods from clean again, they aren’t designed to run twice in a row.
+
+Once the codemods complete, commit the changes and an agent should be able to help you tidy up the rough edges and get your PR passing again. One reason to perform this transition with codemods rather than agents is that the codemods are deterministic, replayable (e.g. on rebase), and are governed by my own preferences and insights of how code should be transformed, allowing you to benefit from more of the V5 improvements such as batching and more straightforward code.
+
+Between the codemods, the migration guide, and six months of real-world experience behind the release, upgrading to V5 is even smoother today than it was on launch day. But, if you need help, guidance, a code pair, or even to outsource the work to the experts, we have a range of support options available: from a single call right up to a support and development contract. [Get in touch](/contact), we’d love to hear from you.
+
+<div className="text--center">
+  <Link className="button button--primary button--lg" to="/sponsor">
+    {"Sponsor Graphile to get started"}
+  </Link>
+</div>
+
+_If you already sponsor and want access to the sponsors-only repository, [get in contact via email or Discord](/contact)_.
+
+## Help us improve V5 DX and performance
+
+The codemods are one example of how sponsor-funded work can benefit the wider PostGraphile community. Our next focus is another: reducing the memory usage of PostGraphile V5 and Gra*fast*.
+
+With the launch of V5 we've successfully offloaded a lot of the work from the database to the JS layer, helping you scale further; but the JS layer is a lot more memory hungry than it needs to be, and we have plans to fix this.
+
+How much of an improvement we can make really depends on how much support we get. A couple of our sponsors have put forward an investment into this work, funding the reduction of memory usage by introspection, and reducing the memory usage of retained Grafast plans. With your help, we should be able to expand these improvements to cover related work including:
+
+- Improving startup time of the PostGraphile process, particularly relevant to development experience and CI duration/agent loop delays.
+- Improving the exported executable schema, particularly relevant to folks running PostGraphile in serverless environments
+- Further reducing memory usage and improving performance.
+- Enabling new capabilities, such as performing operation planning off of the main runloop to reduce runloop stalls and the related latency impact.
+
+<div className="text--center">
+  <Link className="button button--primary button--lg" to="/contact">
+    {"Get in contact to donate to the crowdfund"}
+  </Link>
+</div>
+
+<figure>
+
+![Thank you](../static/img/news/thank-you.svg)
+
+</figure>

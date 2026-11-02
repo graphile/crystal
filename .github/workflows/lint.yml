@@ -94,8 +94,5 @@ jobs:
 
       - run: yarn --immutable
 
-      - name: "Ensure SQL is lowercase"
-        run: node scripts/ensure-sql-is-lowercase.mjs
-
-      - name: "Ensure links don't end in /"
-        run: node scripts/ensure-no-slashes-on-internal-links.mjs
+      - name: "Run documentation checks"
+        run: yarn doccheck

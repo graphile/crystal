@@ -8010,33 +8010,6 @@ const makeArgs_current_user_id = () => [];
 const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
 const resource_read_pg_settingsPgResource = registry.pgResources["read_pg_settings"];
 const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
-const resource_table_set_query_volatilePgResource = registry.pgResources["table_set_query_volatile"];
-const table_set_query_volatile_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_current_user_id(args);
-  return resource_table_set_query_volatilePgResource.execute(selectArgs);
-};
-function applyFirstArg(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function applyLastArg(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function applyOffsetArg(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function applyBeforeArg(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function applyAfterArg(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function qbWhereBuilder(qb) {
-  return qb.whereBuilder();
-}
-const applyConditionArgToConnection = (_condition, $connection, arg) => {
-  const $select = $connection.getSubplan();
-  arg.apply($select, qbWhereBuilder);
-};
 const makeTableNodeIdHandler = ({
   typeName,
   nodeIdCodec,
@@ -8138,6 +8111,28 @@ const nodeFetcher_PersonSecret = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandler_PersonSecret);
+function applyFirstArg(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function applyLastArg(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function applyOffsetArg(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function applyBeforeArg(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function applyAfterArg(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const applyConditionArgToConnection = (_condition, $connection, arg) => {
+  const $select = $connection.getSubplan();
+  arg.apply($select, qbWhereBuilder);
+};
 function applyOrderByArgToConnection(parent, $connection, value) {
   const $select = $connection.getSubplan();
   value.apply($select);
@@ -8227,20 +8222,6 @@ function applyAttributeCondition(attributeName, attributeCodec, $condition, val)
   });
 }
 const PostCondition_idApply = ($condition, val) => applyAttributeCondition("id", TYPES.int, $condition, val);
-const pgFieldSource_post_computed_with_optional_argPgResource = registry.pgResources["post_computed_with_optional_arg"];
-const applyOrderByCustomField = (pgFieldSource, ascDesc, queryBuilder) => {
-  if (typeof pgFieldSource.from !== "function") {
-    throw new Error("Invalid computed attribute 'from'");
-  }
-  const expression = sql`${pgFieldSource.from({
-    placeholder: queryBuilder.alias
-  })}`;
-  queryBuilder.orderBy({
-    codec: pgFieldSource.codec,
-    fragment: expression,
-    direction: ascDesc.toUpperCase()
-  });
-};
 const PostsOrderBy_ID_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
     attribute: "id",
@@ -8262,7 +8243,6 @@ const PersonSecret_personByPersonIdPlan = $record => resource_personPgResource.g
   id: $record.get("person_id")
 });
 const resource_compound_keyPgResource = registry.pgResources["compound_key"];
-const pgFieldSource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const LeftArmCondition_personIdApply = ($condition, val) => applyAttributeCondition("person_id", TYPES.int, $condition, val);
 const LeftArmsOrderBy_PERSON_ID_ASCApply = queryBuilder => {
   queryBuilder.orderBy({
@@ -8278,7 +8258,6 @@ const LeftArmsOrderBy_PERSON_ID_DESCApply = queryBuilder => {
   });
   queryBuilder.setOrderIsUnique();
 };
-const pgFieldSource_person_first_namePgResource = registry.pgResources["person_first_name"];
 const argDetailsSimple_left_arm_identity = [{
   graphqlArgName: "leftArm",
   pgCodec: leftArmCodec,
@@ -8440,44 +8419,6 @@ type Query implements Node {
   currentUserId: Int
   readPgSettings: JSON
   returnTableWithoutGrants: CompoundKey
-
-  """Reads and enables pagination through a set of \`Person\`."""
-  tableSetQueryVolatile(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PersonCondition
-  ): PeopleConnection
-  tableSetQueryVolatileList(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Skip the first \`n\` values."""
-    offset: Int
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: PersonCondition
-  ): [Person]
 
   """Reads a single \`Post\` using its globally unique \`ID\`."""
   post(
@@ -8786,16 +8727,11 @@ input PostCondition {
 
   """Checks for equality with the object’s \`authorId\` field."""
   authorId: Int
-
-  """Checks for equality with the object’s \`computedWithOptionalArg\` field."""
-  computedWithOptionalArg: Int
 }
 
 """Methods to use when ordering \`Post\`."""
 enum PostsOrderBy {
   NATURAL
-  COMPUTED_WITH_OPTIONAL_ARG_ASC
-  COMPUTED_WITH_OPTIONAL_ARG_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
@@ -8853,6 +8789,64 @@ type CompoundKey {
 
   """Reads a single \`Person\` that is related to this \`CompoundKey\`."""
   personByPersonId2: Person
+}
+
+"""A connection to a list of \`LeftArm\` values."""
+type LeftArmsConnection {
+  """A list of \`LeftArm\` objects."""
+  nodes: [LeftArm]!
+
+  """
+  A list of edges which contains the \`LeftArm\` and cursor to aid in pagination.
+  """
+  edges: [LeftArmsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`LeftArm\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`LeftArm\` edge in the connection."""
+type LeftArmsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`LeftArm\` at the end of the edge."""
+  node: LeftArm
+}
+
+"""
+A condition to be used against \`LeftArm\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input LeftArmCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`personId\` field."""
+  personId: Int
+
+  """Checks for equality with the object’s \`lengthInMetres\` field."""
+  lengthInMetres: Float
+
+  """Checks for equality with the object’s \`mood\` field."""
+  mood: String
+}
+
+"""Methods to use when ordering \`LeftArm\`."""
+enum LeftArmsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  LENGTH_IN_METRES_ASC
+  LENGTH_IN_METRES_DESC
+  MOOD_ASC
+  MOOD_DESC
 }
 
 """A connection to a list of \`Person\` values."""
@@ -8917,9 +8911,6 @@ input PersonCondition {
 
   """Checks for equality with the object’s \`createdAt\` field."""
   createdAt: Datetime
-
-  """Checks for equality with the object’s \`computedOut\` field."""
-  computedOut: String
 }
 
 """An input for mutations affecting \`WrappedUrl\`"""
@@ -8927,71 +8918,9 @@ input WrappedUrlInput {
   url: NotNullUrl!
 }
 
-"""A connection to a list of \`LeftArm\` values."""
-type LeftArmsConnection {
-  """A list of \`LeftArm\` objects."""
-  nodes: [LeftArm]!
-
-  """
-  A list of edges which contains the \`LeftArm\` and cursor to aid in pagination.
-  """
-  edges: [LeftArmsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`LeftArm\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`LeftArm\` edge in the connection."""
-type LeftArmsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`LeftArm\` at the end of the edge."""
-  node: LeftArm
-}
-
-"""
-A condition to be used against \`LeftArm\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input LeftArmCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`personId\` field."""
-  personId: Int
-
-  """Checks for equality with the object’s \`lengthInMetres\` field."""
-  lengthInMetres: Float
-
-  """Checks for equality with the object’s \`mood\` field."""
-  mood: String
-}
-
-"""Methods to use when ordering \`LeftArm\`."""
-enum LeftArmsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  LENGTH_IN_METRES_ASC
-  LENGTH_IN_METRES_DESC
-  MOOD_ASC
-  MOOD_DESC
-}
-
 """Methods to use when ordering \`Person\`."""
 enum PeopleOrderBy {
   NATURAL
-  COMPUTED_OUT_ASC
-  COMPUTED_OUT_DESC
-  FIRST_NAME_ASC
-  FIRST_NAME_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
@@ -9867,30 +9796,6 @@ export const objects = {
       returnTableWithoutGrants($root, args, _info) {
         const selectArgs = makeArgs_current_user_id(args);
         return resource_return_table_without_grantsPgResource.execute(selectArgs);
-      },
-      tableSetQueryVolatile: {
-        plan($parent, args, info) {
-          const $select = table_set_query_volatile_getSelectPlanFromParentAndArgs($parent, args, info);
-          return connection($select);
-        },
-        args: {
-          first: applyFirstArg,
-          last: applyLastArg,
-          offset: applyOffsetArg,
-          before: applyBeforeArg,
-          after: applyAfterArg,
-          condition: applyConditionArgToConnection
-        }
-      },
-      tableSetQueryVolatileList: {
-        plan: table_set_query_volatile_getSelectPlanFromParentAndArgs,
-        args: {
-          first: applyFirstArg,
-          offset: applyOffsetArg,
-          condition(_condition, $select, arg) {
-            arg.apply($select, qbWhereBuilder);
-          }
-        }
       }
     }
   },
@@ -10557,16 +10462,6 @@ export const inputObjects = {
       aliases($condition, val) {
         return applyAttributeCondition("aliases", LIST_TYPES.text, $condition, val);
       },
-      computedOut($condition, val) {
-        if (val === undefined) return;
-        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-          placeholder: $condition.alias
-        })}`;
-        $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_person_computed_outPgResource.codec)}`);
-      },
       config($condition, val) {
         return applyAttributeCondition("config", TYPES.hstore, $condition, val);
       },
@@ -10637,16 +10532,6 @@ export const inputObjects = {
       },
       body($condition, val) {
         return applyAttributeCondition("body", TYPES.text, $condition, val);
-      },
-      computedWithOptionalArg($condition, val) {
-        if (val === undefined) return;
-        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-          throw new Error("Invalid computed attribute 'from'");
-        }
-        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-          placeholder: $condition.alias
-        })}`;
-        $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_post_computed_with_optional_argPgResource.codec)}`);
       },
       headline($condition, val) {
         return applyAttributeCondition("headline", TYPES.text, $condition, val);
@@ -10860,12 +10745,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      COMPUTED_OUT_ASC(queryBuilder) {
-        applyOrderByCustomField(pgFieldSource_person_computed_outPgResource, "asc", queryBuilder);
-      },
-      COMPUTED_OUT_DESC(queryBuilder) {
-        applyOrderByCustomField(pgFieldSource_person_computed_outPgResource, "desc", queryBuilder);
-      },
       CONFIG_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "config",
@@ -10903,12 +10782,6 @@ export const enums = {
           direction: "DESC"
         });
         queryBuilder.setOrderIsUnique();
-      },
-      FIRST_NAME_ASC(queryBuilder) {
-        applyOrderByCustomField(pgFieldSource_person_first_namePgResource, "asc", queryBuilder);
-      },
-      FIRST_NAME_DESC(queryBuilder) {
-        applyOrderByCustomField(pgFieldSource_person_first_namePgResource, "desc", queryBuilder);
       },
       ID_ASC: PostsOrderBy_ID_ASCApply,
       ID_DESC: PostsOrderBy_ID_DESCApply,
@@ -11053,12 +10926,6 @@ export const enums = {
           attribute: "body",
           direction: "DESC"
         });
-      },
-      COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-        applyOrderByCustomField(pgFieldSource_post_computed_with_optional_argPgResource, "asc", queryBuilder);
-      },
-      COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-        applyOrderByCustomField(pgFieldSource_post_computed_with_optional_argPgResource, "desc", queryBuilder);
       },
       HEADLINE_ASC(queryBuilder) {
         queryBuilder.orderBy({

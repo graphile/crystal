@@ -225,21 +225,27 @@ select
     left outer join lateral (select (__person_computed_first_arg_inout_out__."person").*) as __person_3
     on TRUE
   )::text as "7",
-  __person_computed_inout_out__."ino" as "8",
-  __person_computed_inout_out__."o" as "9",
-  (not (__person_computed_inout_out__ is null))::text as "10",
-  __person_computed_out_out__."o1" as "11",
-  __person_computed_out_out__."o2" as "12",
-  (not (__person_computed_out_out__ is null))::text as "13"
+  (
+    select array[
+      __person_computed_inout_out__."ino",
+      __person_computed_inout_out__."o",
+      (not (__person_computed_inout_out__ is null))::text
+    ]::text[]
+    from "c"."person_computed_inout_out"(
+      __person__,
+      $4::"text"
+    ) as __person_computed_inout_out__
+  )::text as "8",
+  (
+    select array[
+      __person_computed_out_out__."o1",
+      __person_computed_out_out__."o2",
+      (not (__person_computed_out_out__ is null))::text
+    ]::text[]
+    from "c"."person_computed_out_out"(__person__) as __person_computed_out_out__
+  )::text as "9"
 from "c"."person" as __person__
 left outer join "c"."person_computed_first_arg_inout"(__person__) as __person_computed_first_arg_inout__
-on TRUE
-left outer join "c"."person_computed_inout_out"(
-  __person__,
-  $4::"text"
-) as __person_computed_inout_out__
-on TRUE
-left outer join "c"."person_computed_out_out"(__person__) as __person_computed_out_out__
 on TRUE
 where (
   __person__."id" = $5::"int4"

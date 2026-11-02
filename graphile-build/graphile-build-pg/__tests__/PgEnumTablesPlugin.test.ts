@@ -1,7 +1,8 @@
 import { withPgClientFromPgService } from "@dataplan/pg";
+import type {} from "graphile-build";
 import sql from "pg-sql2";
 
-import { PgEnumTablesPlugin } from "../src/plugins/PgEnumTablesPlugin.ts";
+import { PgEnumTablesPlugin } from "../dist/plugins/PgEnumTablesPlugin.js";
 
 jest.mock("@dataplan/pg", () => ({
   ...jest.requireActual("@dataplan/pg"),

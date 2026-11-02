@@ -1,4 +1,3 @@
-import type { SQLQuery } from "../src/index.ts";
 import sql from "../src/index.ts";
 
 it("table.column::text 1", () => {

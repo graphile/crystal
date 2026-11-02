@@ -3,6 +3,7 @@
 import path from "node:path";
 
 import { createFsFromVolume, Volume } from "memfs";
+import type { Compiler } from "webpack";
 import webpack from "webpack";
 
 const bundleFilename = "bundle.js";
@@ -33,10 +34,11 @@ const compiler = webpack({
   externals: [],
 });
 
-const memfs = createFsFromVolume(new Volume());
-(memfs as any).join = path.join; // Required by Webpack
+const memfs = Object.assign(createFsFromVolume(new Volume()), {
+  join: path.join, // Required by Webpack
+});
 // Use memfs as the output filesystem
-compiler.outputFileSystem = memfs;
+compiler.outputFileSystem = memfs as unknown as Compiler["outputFileSystem"];
 
 await new Promise<void>((resolve, reject) => {
   compiler.run((err, stats) => {

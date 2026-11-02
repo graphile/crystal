@@ -1,6 +1,5 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["geometry"]
-#> graphileBuildOptions: { pgGeometricTypes: true }
 mutation {
   createGeom(
     input: {

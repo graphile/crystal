@@ -17,7 +17,7 @@ swap:
   "audio(?:-| )book": audiobook
   "back(?:-| )light": backlight
   "chat ?bots?": chatbot(s)
-  adaptor: adapter
+  adapter: adaptor
   administrate: administer
   afterwards: afterward
   alphabetic: alphabetical

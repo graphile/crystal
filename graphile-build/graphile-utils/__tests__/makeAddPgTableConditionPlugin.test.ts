@@ -13,27 +13,7 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
-import { makeAddPgTableConditionPlugin } from "../src/index.ts";
-
-const clean = (data: any): any => {
-  if (Array.isArray(data)) {
-    return data.map(clean);
-  } else if (data && typeof data === "object") {
-    return Object.keys(data).reduce((memo, key) => {
-      const value = data[key];
-      if (key === "id" && typeof value === "number") {
-        memo[key] = "[id]";
-      } else if (key === "nodeId" && typeof value === "string") {
-        memo[key] = "[nodeId]";
-      } else {
-        memo[key] = clean(value);
-      }
-      return memo;
-    }, {});
-  } else {
-    return data;
-  }
-};
+import { makeAddPgTableConditionPlugin } from "../dist/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";

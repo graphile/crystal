@@ -212,6 +212,11 @@ const config = {
             position: "right",
           },
           {
+            to: "/contact",
+            label: "Contact",
+            position: "right",
+          },
+          {
             href: "https://github.com/grafast/wg",
             label: "WG",
             position: "right",

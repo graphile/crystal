@@ -5,6 +5,7 @@ import "zx/globals";
 import { rm, cp, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+// @ts-ignore
 import sidebars from "../sidebars.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

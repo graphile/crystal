@@ -1,13 +1,17 @@
 import "graphile-config";
 
+import type { PgResource, PgWrapCallback } from "@dataplan/pg";
 import { pgDeleteSingle, pgInsertSingle, pgUpdateSingle } from "@dataplan/pg";
+import type { FieldArgs, Step } from "grafast";
 import { EXPORTABLE, extendSchema, gql } from "postgraphile/utils";
 
-const runMutation = EXPORTABLE(
+type WrapCallback = PgWrapCallback<any, { context: Step<any> }, any>;
+
+const runMutation: WrapCallback = EXPORTABLE(
   () =>
     async function runMutation(run, pgClient, { context }, queryBuilder) {
       const name = queryBuilder.getRaw("person_full_name");
-      const formattedName = name.replace(/\b\w/g, (letter) =>
+      const formattedName = name.replace(/\b\w/g, (letter: string) =>
         letter.toUpperCase(),
       );
       queryBuilder.set("person_full_name", formattedName, true);
@@ -19,7 +23,7 @@ const runMutation = EXPORTABLE(
   [],
 );
 
-const runDeleteMutation = EXPORTABLE(
+const runDeleteMutation: WrapCallback = EXPORTABLE(
   () =>
     async function runDeleteMutation(run, pgClient, { context }) {
       const result = await run(pgClient);
@@ -30,7 +34,7 @@ const runDeleteMutation = EXPORTABLE(
   [],
 );
 
-const throwAfterMutation = EXPORTABLE(
+const throwAfterMutation: WrapCallback = EXPORTABLE(
   () =>
     async function throwAfterMutation(run, pgClient) {
       await run(pgClient);
@@ -39,7 +43,7 @@ const throwAfterMutation = EXPORTABLE(
   [],
 );
 
-const runNestedWrap1 = EXPORTABLE(
+const runNestedWrap1: WrapCallback = EXPORTABLE(
   () =>
     async function runNestedWrap1(run, pgClient, { context }, queryBuilder) {
       queryBuilder.set(
@@ -54,7 +58,7 @@ const runNestedWrap1 = EXPORTABLE(
   [],
 );
 
-const runNestedWrap2 = EXPORTABLE(
+const runNestedWrap2: WrapCallback = EXPORTABLE(
   () =>
     async function runNestedWrap2(run, pgClient, { context }, queryBuilder) {
       queryBuilder.set(
@@ -69,7 +73,7 @@ const runNestedWrap2 = EXPORTABLE(
   [],
 );
 
-const runNestedWrap3 = EXPORTABLE(
+const runNestedWrap3: WrapCallback = EXPORTABLE(
   () =>
     async function runNestedWrap3(run, pgClient, { context }, queryBuilder) {
       queryBuilder.set(
@@ -85,7 +89,15 @@ const runNestedWrap3 = EXPORTABLE(
 );
 
 const plugin = extendSchema((build) => {
-  const { person: people } = build.input.pgRegistry.pgResources;
+  const people = build.input.pgRegistry.pgResources.person as PgResource<
+    any,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >;
   const { constant, context } = build.grafast;
 
   return {
@@ -104,14 +116,17 @@ const plugin = extendSchema((build) => {
       Mutation: {
         wrappedCreatePerson: EXPORTABLE(
           (constant, context, people, pgInsertSingle, runMutation) =>
-            function wrappedCreatePerson(_$root, { $name, $email }) {
+            function wrappedCreatePerson(
+              _$root: any,
+              { $name, $email }: FieldArgs<{ name: string; email: string }>,
+            ) {
               const $person = pgInsertSingle(people, {
                 id: constant(99999, false),
                 person_full_name: $name,
                 email: $email,
               });
               $person.wrap(
-                () => ({ context: context() }),
+                (() => ({ context: context() })) as never,
                 ["id", "person_full_name", "about"],
                 runMutation,
               );
@@ -121,14 +136,17 @@ const plugin = extendSchema((build) => {
         ),
         wrappedUpdatePerson: EXPORTABLE(
           (constant, context, people, pgUpdateSingle, runMutation) =>
-            function wrappedUpdatePerson(_$root, { $name }) {
+            function wrappedUpdatePerson(
+              _$root: any,
+              { $name }: FieldArgs<{ name: string }>,
+            ) {
               const $person = pgUpdateSingle(
                 people,
                 { id: constant(99999, false) },
                 { person_full_name: $name },
               );
               $person.wrap(
-                () => ({ context: context() }),
+                (() => ({ context: context() })) as never,
                 ["id", "person_full_name", "about"],
                 runMutation,
               );
@@ -143,7 +161,7 @@ const plugin = extendSchema((build) => {
                 id: constant(99999, false),
               });
               $person.wrap(
-                () => ({ context: context() }),
+                (() => ({ context: context() })) as never,
                 ["id", "person_full_name", "about"],
                 runDeleteMutation,
               );
@@ -170,7 +188,7 @@ const plugin = extendSchema((build) => {
                 email: constant("rollback-mutation-wrapper@example.com", false),
               });
               $person.wrap(
-                () => ({ context: context() }),
+                (() => ({ context: context() })) as never,
                 ["id", "person_full_name", "about"],
                 throwAfterMutation,
               );
@@ -226,7 +244,7 @@ const plugin = extendSchema((build) => {
         wrappedMutationResult: EXPORTABLE(
           (context) =>
             function wrappedMutationResult() {
-              return context().get("mutationResult");
+              return context().get("mutationResult" as never);
             },
           [context],
         ),

@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "5.0.3",
+  "version": "5.1.0",
   "description": "Utilities to help with building graphile-build plugins",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -14,7 +14,7 @@
   "scripts": {
     "prepack": "node ../../scripts/build-release.mts",
     "build-package": "yarn build",
-    "test": "jest",
+    "test": "tsc -b tsconfig.test.json && jest",
     "build": "tsc -b tsconfig.build.json"
   },
   "repository": {
