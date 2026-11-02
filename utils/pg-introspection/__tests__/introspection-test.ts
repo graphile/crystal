@@ -163,3 +163,15 @@ it("reports missing collections for entity relationships and permissions", () =>
   assert.ok(namespace);
   assert.throws(() => namespace.getACL(), /roles/);
 });
+
+it("rejects introspection data that has already been augmented", () => {
+  const data = structuredClone(rawIntrospectionResults);
+  const result = augmentIntrospectionData({}, data);
+  assert.throws(
+    () => augmentIntrospectionData({}, result),
+    /should not be augmented twice/,
+  );
+  const namespace = result.getNamespace({ name: "public" });
+  assert.ok(namespace);
+  assert.equal(namespace.nspname, "public");
+});
