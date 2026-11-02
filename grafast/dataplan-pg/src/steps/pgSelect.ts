@@ -4447,7 +4447,7 @@ function pgInlineViaJoinTransform([details, item]: readonly [
 
 function pgInlineViaSubqueryTransform([details, item]: readonly [
   PgSelectInlineViaSubqueryDetails,
-  any[] | null,
+  Maybe<readonly string[]>,
 ]) {
   if (item == null) {
     return createSelectResult([], details);

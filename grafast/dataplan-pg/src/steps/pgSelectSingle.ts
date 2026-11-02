@@ -1,4 +1,4 @@
-import type { Step, UnbatchedExecutionExtra } from "grafast";
+import type { Maybe, Step, UnbatchedExecutionExtra } from "grafast";
 import { exportAs, operationPlan, UnbatchedStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -155,7 +155,7 @@ export class PgSelectSingleStep<
   }
 
   /** @internal */
-  public getItemStep(): Step<unknown[]> {
+  public getItemStep(): Step<Maybe<readonly string[]>> {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }
