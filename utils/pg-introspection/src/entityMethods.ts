@@ -332,12 +332,23 @@ export function createEntityMethods(
       getKeys: memo(function (this: PgIndex) {
         assertExists(attributeByRelIdAndNum, "attributes");
         const owner = getClass(this.indrelid);
+        if (!owner) {
+          throw new Error(
+            `Could not find class '${this.indrelid}' for index '${this.indexrelid}'`,
+          );
+        }
         const keys = this.indkey;
-        return keys.map((key) =>
-          key === 0
-            ? null
-            : attributeByRelIdAndNum.get(attributeRelNumKey(owner!._id, key))!,
-        );
+        return keys.map((key) => {
+          if (key === 0) return null;
+          const attribute = attributeByRelIdAndNum.get(
+            attributeRelNumKey(owner._id, key),
+          );
+          if (!attribute)
+            throw new Error(
+              `Could not find attribute '${key}' for index '${this.indexrelid}'`,
+            );
+          return attribute;
+        });
       }),
       getDescription: memo(function (this: PgIndex) {
         return this.getIndexClass()?.getDescription();
@@ -375,10 +386,16 @@ export function createEntityMethods(
         return this.getTagsAndDescription().tags;
       }),
       getACL: memo(function (this: PgAttribute) {
+        const klass = this.getClass();
+        if (!klass) {
+          throw new Error(
+            `Could not find class '${this.attrelid}' for attribute '${this.attname}'`,
+          );
+        }
         return parseAcls(
           getIntrospection(),
           this.attacl,
-          this.getClass()!.relowner,
+          klass.relowner,
           OBJECT_COLUMN,
         );
       }),
@@ -413,10 +430,16 @@ export function createEntityMethods(
             return;
           }
         }
-        return this.conkey.map(
-          (key) =>
-            attributeByRelIdAndNum.get(attributeRelNumKey(klass._id, key))!,
-        );
+        return this.conkey.map((key) => {
+          const attribute = attributeByRelIdAndNum.get(
+            attributeRelNumKey(klass._id, key),
+          );
+          if (!attribute)
+            throw new Error(
+              `Could not find attribute '${key}' for constraint '${this.conname}'`,
+            );
+          return attribute;
+        });
       }),
       getType: memo(function (this: PgConstraint) {
         return getType(this.contypid);
@@ -453,10 +476,16 @@ export function createEntityMethods(
             return;
           }
         }
-        return this.confkey.map(
-          (key) =>
-            attributeByRelIdAndNum.get(attributeRelNumKey(klass._id, key))!,
-        );
+        return this.confkey.map((key) => {
+          const attribute = attributeByRelIdAndNum.get(
+            attributeRelNumKey(klass._id, key),
+          );
+          if (!attribute)
+            throw new Error(
+              `Could not find foreign attribute '${key}' for constraint '${this.conname}'`,
+            );
+          return attribute;
+        });
       }),
       getDescription: memo(function (this: PgConstraint) {
         return getDescription(PG_CONSTRAINT, this._id);
