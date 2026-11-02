@@ -1,5 +1,18 @@
 # postgraphile
 
+## 5.2.1
+
+### Patch Changes
+
+- [#3237](https://github.com/graphile/crystal/pull/3237)
+  [`d08b898`](https://github.com/graphile/crystal/commit/d08b898010ef6cbbdf2f365c62b9f5cc850b72fa)
+  Thanks [@hos](https://github.com/hos)! - Fix
+  `Cannot read properties of undefined (reading '0')` when a step is inlined via
+  subquery into a parent `.single()` that found no row.
+- Updated dependencies
+  [[`d08b898`](https://github.com/graphile/crystal/commit/d08b898010ef6cbbdf2f365c62b9f5cc850b72fa)]:
+  - @dataplan/pg@1.2.1
+
 ## 5.2.0
 
 ### Minor Changes
