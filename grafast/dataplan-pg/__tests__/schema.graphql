@@ -1,15 +1,4 @@
 """
-Directs the executor to defer this fragment when the `if` argument is true or undefined.
-"""
-directive @defer(
-  """Deferred when true or undefined."""
-  if: Boolean
-
-  """Unique name"""
-  label: String
-) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-
-"""
 Directs the executor to stream plural fields when the `if` argument is true or undefined.
 """
 directive @stream(
@@ -22,6 +11,17 @@ directive @stream(
   """Number of items to return immediately"""
   initialCount: Int = 0
 ) on FIELD
+
+"""
+Directs the executor to defer this fragment when the `if` argument is true or undefined.
+"""
+directive @defer(
+  """Deferred when true or undefined."""
+  if: Boolean
+
+  """Unique name"""
+  label: String
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 
 type SingleTableTopic implements SingleTableItem {
   id: Int
@@ -61,8 +61,8 @@ enum EnumTableItemType {
 type Person {
   personId: Int
   username: String
-  singleTableItemsList: [SingleTableItem]
-  relationalItemsList: [RelationalItem]
+  singleTableItemsList(first: Int, offset: Int): [SingleTableItem]
+  relationalItemsList(first: Int, offset: Int): [RelationalItem]
   personBookmarksList: [PersonBookmark]
 }
 
@@ -264,6 +264,8 @@ type Query {
   forum(id: String!): Forum
   message(id: String!): Message
   allMessagesConnection(condition: MessageCondition, filter: MessageFilter, includeArchived: IncludeArchived = INHERIT, first: Int, last: Int, after: String, before: String, orderBy: [MessagesOrderBy!]): MessagesConnection
+  trappedMessages(ids: [String!]!): [Message]
+  trappedMessagesConnection(ids: [String!]!, first: Int): MessagesConnection
   uniqueAuthorCount(featured: Boolean): Int
   forumNames: [String]
   forumNamesArray: [String]
@@ -275,13 +277,14 @@ type Query {
   randomUserArray: [User]
   randomUserArraySet: [[User]]
   featuredMessages: [Message]
-  people: [Person]
+  people(first: Int): [Person]
   singleTableItemById(id: Int!): SingleTableItem
   singleTableTopicById(id: Int!): SingleTableTopic
   relationalItemById(id: Int!): RelationalItem
   relationalTopicById(id: Int!): RelationalTopic
   allRelationalCommentablesList(first: Int): [RelationalCommentable!]
   unionItemById(id: Int!): UnionItem
+  unionItemByIdViaUnionAll(id: Int!): UnionItem
   unionTopicById(id: Int!): UnionTopic
   allUnionItemsList: [UnionItem!]
   searchEntities(query: String!): [Entity!]
@@ -305,10 +308,12 @@ type Forum {
   isArchived: Boolean
   archivedAtIsNotNull: Boolean
   self: Forum
+  message(id: String!): Message
   messagesList(first: Int, condition: MessageCondition, filter: MessageFilter, includeArchived: IncludeArchived = INHERIT): [Message]
   messagesConnection(first: Int, last: Int, condition: MessageCondition, filter: MessageFilter, includeArchived: IncludeArchived = INHERIT): MessagesConnection
   uniqueAuthorCount(featured: Boolean): Int
   randomUser: User
+  firstFeaturedMessageAuthor: User
   featuredMessages: [Message]
   messagesListSet: [[Message]]
   messagesWithManyTransforms: [[Message]]
@@ -326,9 +331,29 @@ type Message {
 type User {
   username: String
   gravatarUrl: String
+  visibleMessages: MessagesConnection
   mostRecentForum: Forum
   usernameHash(hashType: HashType!): String
   usernameHashes: Hashes
+}
+
+type MessagesConnection {
+  edges: [MessageEdge]
+  nodes: [Message]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type MessageEdge {
+  cursor: String
+  node: Message
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
 }
 
 enum HashType {
@@ -365,25 +390,6 @@ enum IncludeArchived {
   YES
   NO
   EXCLUSIVELY
-}
-
-type MessagesConnection {
-  edges: [MessageEdge]
-  nodes: [Message]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type MessageEdge {
-  cursor: String
-  node: Message
-}
-
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
 }
 
 input ForumCondition {
