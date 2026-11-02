@@ -13,8 +13,9 @@ import type {
 
 interface TransformOptions {
   graphql: typeof import("graphql");
-  trimDeprecated?: boolean;
-  trimDescriptions?: boolean;
+  dropDeprecationReasons?: boolean;
+  dropDeprecatedEntities?: boolean;
+  dropDescriptions?: boolean;
 }
 
 interface BaseArgs {
@@ -41,7 +42,12 @@ function transformSchema(
   schema: GraphQLSchema,
   options: TransformOptions,
 ): GraphQLSchema {
-  const { graphql, trimDeprecated = false, trimDescriptions = false } = options;
+  const {
+    graphql,
+    dropDeprecatedEntities = false,
+    dropDeprecationReasons = false,
+    dropDescriptions = false,
+  } = options;
   const schemaConfig = schema.toConfig();
 
   const typeMap = new Map<string, GraphQLNamedType>();
@@ -49,8 +55,18 @@ function transformSchema(
   function maybeTrimDescription<
     T extends { description?: string | null | undefined },
   >(obj: T): Omit<T, "description"> & Partial<Pick<T, "description">> {
-    if (!trimDescriptions) return obj;
+    if (!dropDescriptions) return obj;
     const { description, ...rest } = obj;
+    return rest;
+  }
+
+  function maybeTrimDeprecationReason<
+    T extends { deprecationReason?: string | null | undefined },
+  >(
+    obj: T,
+  ): Omit<T, "deprecationReason"> & Partial<Pick<T, "deprecationReason">> {
+    if (!dropDeprecationReasons) return obj;
+    const { deprecationReason, ...rest } = obj;
     return rest;
   }
 
@@ -91,11 +107,14 @@ function transformSchema(
       ? (Object.fromEntries(
           Object.entries(args)
             .filter(
-              ([_argName, arg]) => !trimDeprecated || !arg.deprecationReason,
+              ([_argName, arg]) =>
+                !dropDeprecatedEntities || !arg.deprecationReason,
             )
             .map(([argName, arg]) => [
               argName,
-              maybeTrimDescription(replaceType(arg)),
+              maybeTrimDescription(
+                maybeTrimDeprecationReason(replaceType(arg)),
+              ),
             ]),
         ) as T)
       : undefined;
@@ -116,8 +135,10 @@ function transformSchema(
   function remapFields<T extends BaseOutputFieldMap>(oldFields: T) {
     const fields: BaseOutputFieldMap = Object.create(null);
     for (const [fname, f] of Object.entries(oldFields)) {
-      if (trimDeprecated && f.deprecationReason != null) continue;
-      fields[fname] = maybeTrimDescription(replaceType(replaceArgs(f)));
+      if (dropDeprecatedEntities && f.deprecationReason != null) continue;
+      fields[fname] = maybeTrimDescription(
+        maybeTrimDeprecationReason(replaceType(replaceArgs(f))),
+      );
     }
     return fields as T;
   }
@@ -140,8 +161,10 @@ function transformSchema(
   function remapInputFields<T extends BaseFieldMap>(oldFields: T) {
     const fields: BaseFieldMap = Object.create(null);
     for (const [fname, f] of Object.entries(oldFields)) {
-      if (trimDeprecated && f.deprecationReason != null) continue;
-      fields[fname] = maybeTrimDescription(replaceType(f));
+      if (dropDeprecatedEntities && f.deprecationReason != null) continue;
+      fields[fname] = maybeTrimDescription(
+        maybeTrimDeprecationReason(replaceType(f)),
+      );
     }
     return fields as T;
   }
@@ -176,8 +199,11 @@ function transformSchema(
         const config = type.toConfig();
         const values: GraphQLEnumValueConfigMap = Object.fromEntries(
           Object.entries(config.values)
-            .filter(([, v]) => !trimDeprecated || !v.deprecationReason)
-            .map(([k, v]) => [k, maybeTrimDescription(v)]),
+            .filter(([, v]) => !dropDeprecatedEntities || !v.deprecationReason)
+            .map(([k, v]) => [
+              k,
+              maybeTrimDescription(maybeTrimDeprecationReason(v)),
+            ]),
         );
         return new graphql.GraphQLEnumType(
           maybeTrimDescription({
@@ -268,8 +294,12 @@ declare global {
   }
   namespace GraphileBuild {
     interface SchemaOptions {
-      minifyDropsDeprecationReasons?: boolean;
+      /** Should we drop descriptions from the schema */
       minifyDropsDescriptions?: boolean;
+      /** Should we drop the fact something was deprecated from the schema (i.e. the `@deprecated` directive, not the entity itself) */
+      minifyDropsDeprecationReasons?: boolean;
+      /** Should we **REMOVE DEPRECATED ENTITIES** from the schema entirely? This is a significantly breaking change. */
+      minifyDropsDeprecatedEntities?: boolean;
     }
   }
 }
@@ -285,8 +315,11 @@ export const MinifySchemaPlugin: GraphileConfig.Plugin = {
       finalize(schema, build) {
         return transformSchema(schema, {
           graphql: build.graphql,
-          trimDeprecated: build.options.minifyDropsDeprecationReasons ?? true,
-          trimDescriptions: build.options.minifyDropsDescriptions ?? true,
+          dropDescriptions: build.options.minifyDropsDescriptions ?? true,
+          dropDeprecationReasons:
+            build.options.minifyDropsDeprecationReasons ?? true,
+          dropDeprecatedEntities:
+            build.options.minifyDropsDeprecatedEntities ?? false,
         });
       },
     },

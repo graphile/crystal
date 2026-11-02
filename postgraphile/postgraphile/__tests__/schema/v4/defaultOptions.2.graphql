@@ -493,6 +493,8 @@ input CreatePersonSecretInput {
 type CreatePersonSecretPayload {
   clientMutationId: String
   personByPersonId: Person
+  personSecret: PersonSecret
+  personSecretEdge(orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]): PersonSecretsEdge
   query: Query
 }
 
@@ -908,6 +910,7 @@ type DeletePersonSecretPayload {
   deletedPersonSecretId: ID
   personByPersonId: Person
   personSecret: PersonSecret
+  personSecretEdge(orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]): PersonSecretsEdge
   query: Query
 }
 
@@ -1748,6 +1751,7 @@ type Mutation {
   createNullTestRecord(input: CreateNullTestRecordInput!): CreateNullTestRecordPayload
   createPatch(input: CreatePatchInput!): CreatePatchPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  createPersonSecret(input: CreatePersonSecretInput!): CreatePersonSecretPayload
   createPost(input: CreatePostInput!): CreatePostPayload
   createReserved(input: CreateReservedInput!): CreateReservedPayload
   createReservedInputRecord(input: CreateReservedInputRecordInput!): CreateReservedInputRecordPayload
@@ -1781,6 +1785,8 @@ type Mutation {
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
   deletePersonById(input: DeletePersonByIdInput!): DeletePersonPayload
+  deletePersonSecret(input: DeletePersonSecretInput!): DeletePersonSecretPayload
+  deletePersonSecretByPersonId(input: DeletePersonSecretByPersonIdInput!): DeletePersonSecretPayload
   deletePost(input: DeletePostInput!): DeletePostPayload
   deletePostById(input: DeletePostByIdInput!): DeletePostPayload
   deleteReserved(input: DeleteReservedInput!): DeleteReservedPayload
@@ -1834,6 +1840,7 @@ type Mutation {
   mutationTextArray(input: MutationTextArrayInput!): MutationTextArrayPayload
   noArgsMutation(input: NoArgsMutationInput!): NoArgsMutationPayload
   postMany(input: PostManyInput!): PostManyPayload
+  postWithSuffix(input: PostWithSuffixInput!): PostWithSuffixPayload
   returnVoidMutation(input: ReturnVoidMutationInput!): ReturnVoidMutationPayload
   tableMutation(input: TableMutationInput!): TableMutationPayload
   tableSetMutation(input: TableSetMutationInput!): TableSetMutationPayload
@@ -1864,6 +1871,8 @@ type Mutation {
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
   updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonPayload
+  updatePersonSecret(input: UpdatePersonSecretInput!): UpdatePersonSecretPayload
+  updatePersonSecretByPersonId(input: UpdatePersonSecretByPersonIdInput!): UpdatePersonSecretPayload
   updatePost(input: UpdatePostInput!): UpdatePostPayload
   updatePostById(input: UpdatePostByIdInput!): UpdatePostPayload
   updateReserved(input: UpdateReservedInput!): UpdateReservedPayload
@@ -2434,6 +2443,7 @@ type Person implements Node {
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
+  exists(email: Email): Boolean
   firstName: String
   firstPost: Post
   foreignKeysByPersonId(after: Cursor, before: Cursor, condition: ForeignKeyCondition, first: Int, last: Int, offset: Int, orderBy: [ForeignKeysOrderBy!] = [NATURAL]): ForeignKeysConnection!
@@ -2449,7 +2459,9 @@ type Person implements Node {
   optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
   optionalMissingMiddle4(arg0: Int!, arg2: Int, b: Int): Int
   optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
+  personSecretByPersonId: PersonSecret
   postsByAuthorId(after: Cursor, before: Cursor, condition: PostCondition, first: Int, last: Int, offset: Int, orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]): PostsConnection!
+  site: WrappedUrl
   typeFunction(id: Int): Type
   typeFunctionConnection(after: Cursor, before: Cursor, first: Int, last: Int, offset: Int): TypesConnection!
   typeFunctionList: [Type]
@@ -2708,6 +2720,7 @@ type Query implements Node {
   allNullTestRecords(after: Cursor, before: Cursor, condition: NullTestRecordCondition, first: Int, last: Int, offset: Int, orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]): NullTestRecordsConnection
   allPatches(after: Cursor, before: Cursor, condition: PatchCondition, first: Int, last: Int, offset: Int, orderBy: [PatchesOrderBy!] = [PRIMARY_KEY_ASC]): PatchesConnection
   allPeople(after: Cursor, before: Cursor, condition: PersonCondition, first: Int, last: Int, offset: Int, orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]): PeopleConnection
+  allPersonSecrets(after: Cursor, before: Cursor, condition: PersonSecretCondition, first: Int, last: Int, offset: Int, orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]): PersonSecretsConnection
   allPosts(after: Cursor, before: Cursor, condition: PostCondition, first: Int, last: Int, offset: Int, orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]): PostsConnection
   allReservedInputRecords(after: Cursor, before: Cursor, condition: ReservedInputRecordCondition, first: Int, last: Int, offset: Int, orderBy: [ReservedInputRecordsOrderBy!] = [PRIMARY_KEY_ASC]): ReservedInputRecordsConnection
   allReservedPatchRecords(after: Cursor, before: Cursor, condition: ReservedPatchRecordCondition, first: Int, last: Int, offset: Int, orderBy: [ReservedPatchRecordsOrderBy!] = [PRIMARY_KEY_ASC]): ReservedPatchRecordsConnection
@@ -2718,6 +2731,7 @@ type Query implements Node {
   allTypes(after: Cursor, before: Cursor, condition: TypeCondition, first: Int, last: Int, offset: Int, orderBy: [TypesOrderBy!] = [PRIMARY_KEY_ASC]): TypesConnection
   allUpdatableViews(after: Cursor, before: Cursor, condition: UpdatableViewCondition, first: Int, last: Int, offset: Int, orderBy: [UpdatableViewsOrderBy!] = [NATURAL]): UpdatableViewsConnection
   allViewTables(after: Cursor, before: Cursor, condition: ViewTableCondition, first: Int, last: Int, offset: Int, orderBy: [ViewTablesOrderBy!] = [PRIMARY_KEY_ASC]): ViewTablesConnection
+  badlyBehavedFunction(after: Cursor, before: Cursor, first: Int, last: Int, offset: Int): PeopleConnection
   compoundKey(nodeId: ID!): CompoundKey
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
@@ -2772,6 +2786,8 @@ type Query implements Node {
   person(nodeId: ID!): Person
   personByEmail(email: Email!): Person
   personById(id: Int!): Person
+  personSecret(nodeId: ID!): PersonSecret
+  personSecretByPersonId(personId: Int!): PersonSecret
   post(nodeId: ID!): Post
   postById(id: Int!): Post
   query: Query!
@@ -3806,6 +3822,7 @@ type UpdatePersonSecretPayload {
   clientMutationId: String
   personByPersonId: Person
   personSecret: PersonSecret
+  personSecretEdge(orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]): PersonSecretsEdge
   query: Query
 }
 
