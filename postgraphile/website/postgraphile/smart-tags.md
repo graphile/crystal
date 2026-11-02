@@ -321,17 +321,19 @@ comment on table users is
 
 ## @arg0description, @arg1description, ...
 
-The `PgArgumentDescriptionsPlugin`, loaded by default, adds descriptions to
-GraphQL arguments for [custom queries](./custom-queries.md) and
-[computed columns](./computed-columns.md), and to input fields for
-[custom mutations](./custom-mutations.md).
+Since PostgreSQL does not give us a way to attach comments to function
+arguments, we've added the `@arg#description` smart tag that you can use to do
+so, where `#` is the 0-indexed argument position in the database function
+definition.
+
+:::info
 
 Use `@arg0description` for the first SQL argument, `@arg1description` for the
-second, and so on. These positions refer to the SQL declaration, regardless of
-GraphQL argument inflection. For computed columns, the hidden row argument still
+second, and so on. For computed columns, the hidden row argument still
 occupies position zero, so the first exposed argument uses `@arg1description`.
-OUT and TABLE arguments count towards the positions but receive no input
-description; INOUT arguments receive descriptions on their inputs.
+`OUT` and `TABLE` arguments count towards the positions.
+
+:::
 
 ```sql
 create function public.greet(person_name text)
@@ -363,9 +365,6 @@ You can also set these tags in a [smart tags file](./smart-tags-file.md), using
   },
 }
 ```
-
-A tag without a value is ignored. Arguments without these tags retain their
-existing descriptions.
 
 ## @arg0variant, @arg1variant, ...
 

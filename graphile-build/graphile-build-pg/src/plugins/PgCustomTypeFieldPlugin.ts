@@ -859,7 +859,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                             ) => {
                               memo[graphqlArgName] = {
                                 type: inputType,
-                                ...(description !== undefined
+                                ...(description != null
                                   ? { description }
                                   : null),
                               };

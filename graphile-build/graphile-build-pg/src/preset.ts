@@ -6,7 +6,6 @@ import { PgContextPlugin } from "@dataplan/pg";
 import sql, { version as pgSql2Version } from "pg-sql2";
 
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.ts";
-import { PgArgumentDescriptionsPlugin } from "./plugins/PgArgumentDescriptionsPlugin.ts";
 import { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.ts";
 import { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.ts";
 import { PgBasicsPlugin } from "./plugins/PgBasicsPlugin.ts";
@@ -89,7 +88,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgTablesPlugin,
     PgMutationCreatePlugin,
     PgProceduresPlugin,
-    PgArgumentDescriptionsPlugin,
     PgAttributesPlugin,
     PgNodeIdAttributesPlugin,
     PgAllRowsPlugin,
