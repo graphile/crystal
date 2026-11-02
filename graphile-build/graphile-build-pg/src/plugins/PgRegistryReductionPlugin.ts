@@ -12,23 +12,54 @@ function pojoify(obj: Record<string, any> | null | undefined) {
   }
 }
 
+const TRIMMABLE = new Set<string>([
+  "omit",
+  "behavior",
+  "deprecated",
+  "name",
+  "resultFieldName",
+  "uniqueKey",
+  "unique",
+  "foreignKey",
+  "notNull",
+  "simpleCollections",
+  "forwardDescription",
+  "backwardDescription",
+  "sortable",
+  "filterable",
+  // For performance, we'll add these to the set too
+  "arg0description",
+  "arg1description",
+  "arg2description",
+  "arg3description",
+  "arg4description",
+  "arg5description",
+  "arg6description",
+  "arg7description",
+  "arg8description",
+  "arg9description",
+  "arg0variant",
+  "arg1variant",
+  "arg2variant",
+  "arg3variant",
+  "arg4variant",
+  "arg5variant",
+  "arg6variant",
+  "arg7variant",
+  "arg8variant",
+  "arg9variant",
+]);
+
+const ARG_DESC_OR_VARIANT = /^arg[0-9]+(description|variant)$/;
+
 function tidyTags(tags: Record<string, any> | null | undefined) {
   if (tags == null) return;
-  delete tags.omit;
-  delete tags.behavior;
-  delete tags.deprecated;
-  delete tags.name;
-  delete tags.resultFieldName;
-  delete tags.uniqueKey;
-  delete tags.unique;
-  delete tags.foreignKey;
-  delete tags.notNull;
-  delete tags.arg0variant;
-  delete tags.simpleCollections;
-  delete tags.forwardDescription;
-  delete tags.backwardDescription;
-  delete tags.sortable;
-  delete tags.filterable;
+  const keys = Object.keys(tags);
+  for (const key of keys) {
+    if (TRIMMABLE.has(key) || ARG_DESC_OR_VARIANT.test(key)) {
+      delete tags[key];
+    }
+  }
 }
 
 function tidyExtensions(obj: {
