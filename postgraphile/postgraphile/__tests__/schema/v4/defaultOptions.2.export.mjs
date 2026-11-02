@@ -4980,6 +4980,7 @@ const resource_left_armPgResource = registry.pgResources["left_arm"];
 const resource_my_tablePgResource = registry.pgResources["my_table"];
 const resource_null_test_recordPgResource = registry.pgResources["null_test_record"];
 const resource_personPgResource = registry.pgResources["person"];
+const resource_person_secretPgResource = registry.pgResources["person_secret"];
 const argDetailsSimple_add_1_query = [{
   graphqlArgName: "arg0",
   pgCodec: TYPES.int
@@ -5180,6 +5181,11 @@ const type_function_connection_getSelectPlanFromParentAndArgs = ($root, args, _i
   return resource_type_function_connectionPgResource.execute(selectArgs);
 };
 const resource_type_function_listPgResource = registry.pgResources["type_function_list"];
+const resource_badly_behaved_functionPgResource = registry.pgResources["badly_behaved_function"];
+const badly_behaved_function_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_compound_type_computed_field(args);
+  return resource_badly_behaved_functionPgResource.execute(selectArgs);
+};
 const resource_compound_type_set_queryPgResource = registry.pgResources["compound_type_set_query"];
 const compound_type_set_query_getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_compound_type_computed_field(args);
@@ -5652,20 +5658,27 @@ const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
   return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
+const nodeIdHandler_PersonSecret = makeTableNodeIdHandler({
+  typeName: "PersonSecret",
+  identifier: "person_secrets",
+  nodeIdCodec: base64JSONNodeIdCodec,
+  resource: resource_person_secretPgResource,
+  pk: person_secretUniques[0].attributes,
+  deprecationReason: "This is deprecated (comment on table c.person_secret)."
+});
+const nodeFetcher_PersonSecret = (handler => {
+  const fn = $nodeId => {
+    const $decoded = lambda($nodeId, specForHandler(handler));
+    return handler.get(handler.getSpec($decoded));
+  };
+  fn.deprecationReason = handler.deprecationReason;
+  return fn;
+})(nodeIdHandler_PersonSecret);
 const resource_foreign_keyPgResource = registry.pgResources["foreign_key"];
 const resource_non_updatable_viewPgResource = registry.pgResources["non_updatable_view"];
 const resource_testviewPgResource = registry.pgResources["testview"];
 const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
 const resource_edge_casePgResource = registry.pgResources["edge_case"];
-const spec_resource_person_secretPgResource = registry.pgResources["person_secret"];
-const nodeIdHandler_PersonSecret = makeTableNodeIdHandler({
-  typeName: "PersonSecret",
-  identifier: "person_secrets",
-  nodeIdCodec: base64JSONNodeIdCodec,
-  resource: spec_resource_person_secretPgResource,
-  pk: person_secretUniques[0].attributes,
-  deprecationReason: "This is deprecated (comment on table c.person_secret)."
-});
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: nodeIdHandler_Query,
@@ -5875,6 +5888,13 @@ const makeArgs_person_computed_inout_out = (args, path = []) => argDetailsSimple
 const resource_person_computed_inout_outPgResource = registry.pgResources["person_computed_inout_out"];
 const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const resource_person_computed_out_outPgResource = registry.pgResources["person_computed_out_out"];
+const argDetailsSimple_person_exists = [{
+  graphqlArgName: "email",
+  pgCodec: emailCodec,
+  postgresArgName: "email"
+}];
+const makeArgs_person_exists = (args, path = []) => argDetailsSimple_person_exists.map(details => makeArg(path, args, details));
+const resource_person_existsPgResource = registry.pgResources["person_exists"];
 const resource_person_first_namePgResource = registry.pgResources["person_first_name"];
 const resource_person_first_postPgResource = registry.pgResources["person_first_post"];
 const resource_person_friendsPgResource = registry.pgResources["person_friends"];
@@ -5974,6 +5994,7 @@ const person_type_function_connection_getSelectPlanFromParentAndArgs = ($in, arg
   return resource_person_type_function_connectionPgResource.execute(details.selectArgs);
 };
 const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
+const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
 const PersonComputedComplexRecord_yPlan = $record => {
   const $plan = $record.get("y");
@@ -6269,6 +6290,17 @@ const argDetailsSimple_post_many = [{
 }];
 const makeArgs_post_many = (args, path = []) => argDetailsSimple_post_many.map(details => makeArg(path, args, details));
 const resource_post_manyPgResource = registry.pgResources["post_many"];
+const argDetailsSimple_post_with_suffix = [{
+  graphqlArgName: "post",
+  pgCodec: postCodec,
+  postgresArgName: "post"
+}, {
+  graphqlArgName: "suffix",
+  pgCodec: TYPES.text,
+  postgresArgName: "suffix"
+}];
+const makeArgs_post_with_suffix = (args, path = []) => argDetailsSimple_post_with_suffix.map(details => makeArg(path, args, details));
+const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
 const resource_return_void_mutationPgResource = registry.pgResources["return_void_mutation"];
 const argDetailsSimple_authenticate = [{
   graphqlArgName: "a",
@@ -6648,6 +6680,10 @@ const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
+const specFromArgs_PersonSecret = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
+};
 function getClientMutationIdForCustomMutationPlan($object) {
   const $result = $object.getStepForKey("result");
   return $result.getMeta("clientMutationId");
@@ -7013,6 +7049,7 @@ function PersonInput_userMacApply(obj, val, info) {
 function PersonInput_createdAtApply(obj, val, info) {
   obj.set("created_at", bakedInputRuntime(info.schema, info.field.type, val));
 }
+const CreatePersonSecretPayload_personSecretEdgePlan = ($mutation, fieldArgs) => pgMutationPayloadEdge(resource_person_secretPgResource, person_secretUniques[0].attributes, $mutation, fieldArgs);
 function PersonSecretInput_secretApply(obj, val, info) {
   obj.set("sekrit", bakedInputRuntime(info.schema, info.field.type, val));
 }
@@ -7046,6 +7083,7 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   nullTestRecordById(id: Int!): NullTestRecord
   personById(id: Int!): Person
   personByEmail(email: Email!): Person
+  personSecretByPersonId(personId: Int!): PersonSecret
   add1Query(arg0: Int!, arg1: Int!): Int
   add2Query(a: Int!, b: Int): Int
   add3Query(a: Int, arg1: Int): Int
@@ -7065,6 +7103,7 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   typeFunction(id: Int): Type
   typeFunctionConnection(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor): TypesConnection
   typeFunctionList: [Type]
+  badlyBehavedFunction(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor): PeopleConnection
   compoundTypeSetQuery(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor): CompoundTypesConnection
   currentUserId: Int
   funcInInout(i: Int, ino: Int): Int
@@ -7115,6 +7154,7 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   myTable(nodeId: ID!): MyTable
   nullTestRecord(nodeId: ID!): NullTestRecord
   person(nodeId: ID!): Person
+  personSecret(nodeId: ID!): PersonSecret
   allDefaultValues(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: DefaultValueCondition, orderBy: [DefaultValuesOrderBy!] = [PRIMARY_KEY_ASC]): DefaultValuesConnection
   allForeignKeys(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ForeignKeyCondition, orderBy: [ForeignKeysOrderBy!] = [NATURAL]): ForeignKeysConnection
   allInputs(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: InputCondition, orderBy: [InputsOrderBy!] = [PRIMARY_KEY_ASC]): InputsConnection
@@ -7139,6 +7179,7 @@ export const typeDefs = /* GraphQL */`type Query implements Node {
   allMyTables(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: MyTableCondition, orderBy: [MyTablesOrderBy!] = [PRIMARY_KEY_ASC]): MyTablesConnection
   allNullTestRecords(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: NullTestRecordCondition, orderBy: [NullTestRecordsOrderBy!] = [PRIMARY_KEY_ASC]): NullTestRecordsConnection
   allPeople(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: PersonCondition, orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]): PeopleConnection
+  allPersonSecrets(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: PersonSecretCondition, orderBy: [PersonSecretsOrderBy!] = [PRIMARY_KEY_ASC]): PersonSecretsConnection
 }
 
 interface Node {
@@ -7308,6 +7349,7 @@ type Person implements Node {
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
   computedOut: String!
   computedOutOut: PersonComputedOutOutRecord
+  exists(email: Email): Boolean
   firstName: String
   firstPost: Post
   friends(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, orderBy: [PeopleOrderBy!]): PeopleConnection!
@@ -7324,6 +7366,7 @@ type Person implements Node {
   aliases: [String]!
   about: String
   email: Email!
+  site: WrappedUrl
   config: KeyValueHash
   lastLoginFromIp: InternetAddress
   lastLoginFromSubnet: String
@@ -7331,6 +7374,7 @@ type Person implements Node {
   createdAt: Datetime
   postsByAuthorId(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: PostCondition, orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]): PostsConnection!
   foreignKeysByPersonId(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: ForeignKeyCondition, orderBy: [ForeignKeysOrderBy!] = [NATURAL]): ForeignKeysConnection!
+  personSecretByPersonId: PersonSecret
   leftArmByPersonId: LeftArm
   compoundKeysByPersonId1(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: CompoundKeyCondition, orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]): CompoundKeysConnection!
   compoundKeysByPersonId2(first: Int, last: Int, offset: Int, before: Cursor, after: Cursor, condition: CompoundKeyCondition, orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]): CompoundKeysConnection!
@@ -8748,6 +8792,7 @@ type Mutation {
   mutationIntervalSet(input: MutationIntervalSetInput!): MutationIntervalSetPayload
   mutationTextArray(input: MutationTextArrayInput!): MutationTextArrayPayload
   postMany(input: PostManyInput!): PostManyPayload
+  postWithSuffix(input: PostWithSuffixInput!): PostWithSuffixPayload
   returnVoidMutation(input: ReturnVoidMutationInput!): ReturnVoidMutationPayload
   authenticate(input: AuthenticateInput!): AuthenticatePayload
   authenticateFail(input: AuthenticateFailInput!): AuthenticateFailPayload
@@ -8817,6 +8862,7 @@ type Mutation {
   createMyTable(input: CreateMyTableInput!): CreateMyTablePayload
   createNullTestRecord(input: CreateNullTestRecordInput!): CreateNullTestRecordPayload
   createPerson(input: CreatePersonInput!): CreatePersonPayload
+  createPersonSecret(input: CreatePersonSecretInput!): CreatePersonSecretPayload
   updateDefaultValue(input: UpdateDefaultValueInput!): UpdateDefaultValuePayload
   updateDefaultValueById(input: UpdateDefaultValueByIdInput!): UpdateDefaultValuePayload
   updateInput(input: UpdateInputInput!): UpdateInputPayload
@@ -8856,6 +8902,8 @@ type Mutation {
   updatePerson(input: UpdatePersonInput!): UpdatePersonPayload
   updatePersonById(input: UpdatePersonByIdInput!): UpdatePersonPayload
   updatePersonByEmail(input: UpdatePersonByEmailInput!): UpdatePersonPayload
+  updatePersonSecret(input: UpdatePersonSecretInput!): UpdatePersonSecretPayload
+  updatePersonSecretByPersonId(input: UpdatePersonSecretByPersonIdInput!): UpdatePersonSecretPayload
   deleteDefaultValue(input: DeleteDefaultValueInput!): DeleteDefaultValuePayload
   deleteDefaultValueById(input: DeleteDefaultValueByIdInput!): DeleteDefaultValuePayload
   deleteInput(input: DeleteInputInput!): DeleteInputPayload
@@ -8895,6 +8943,8 @@ type Mutation {
   deletePerson(input: DeletePersonInput!): DeletePersonPayload
   deletePersonById(input: DeletePersonByIdInput!): DeletePersonPayload
   deletePersonByEmail(input: DeletePersonByEmailInput!): DeletePersonPayload
+  deletePersonSecret(input: DeletePersonSecretInput!): DeletePersonSecretPayload
+  deletePersonSecretByPersonId(input: DeletePersonSecretByPersonIdInput!): DeletePersonSecretPayload
 }
 
 type Add1MutationPayload {
@@ -10089,7 +10139,9 @@ input PersonInput {
 
 type CreatePersonSecretPayload {
   clientMutationId: String
+  personSecret: PersonSecret
   query: Query
+  personSecretEdge(orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]): PersonSecretsEdge
   personByPersonId: Person
 }
 
@@ -10653,6 +10705,7 @@ type UpdatePersonSecretPayload {
   clientMutationId: String
   personSecret: PersonSecret
   query: Query
+  personSecretEdge(orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]): PersonSecretsEdge
   personByPersonId: Person
 }
 
@@ -11030,6 +11083,7 @@ type DeletePersonSecretPayload {
   personSecret: PersonSecret
   deletedPersonSecretId: ID
   query: Query
+  personSecretEdge(orderBy: [PersonSecretsOrderBy!]! = [PRIMARY_KEY_ASC]): PersonSecretsEdge
   personByPersonId: Person
 }
 
@@ -11260,6 +11314,20 @@ export const objects = {
           orderBy: applyOrderByArgToConnection
         }
       },
+      allPersonSecrets: {
+        plan() {
+          return connection(resource_person_secretPgResource.find());
+        },
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg,
+          condition: applyConditionArgToConnection,
+          orderBy: applyOrderByArgToConnection
+        }
+      },
       allPosts: {
         plan() {
           return connection(resource_postPgResource.find());
@@ -11398,6 +11466,19 @@ export const objects = {
           after: applyAfterArg,
           condition: applyConditionArgToConnection,
           orderBy: applyOrderByArgToConnection
+        }
+      },
+      badlyBehavedFunction: {
+        plan($parent, args, info) {
+          const $select = badly_behaved_function_getSelectPlanFromParentAndArgs($parent, args, info);
+          return connection($select);
+        },
+        args: {
+          first: applyFirstArg,
+          last: applyLastArg,
+          offset: applyOffsetArg,
+          before: applyBeforeArg,
+          after: applyAfterArg
         }
       },
       compoundKey(_$parent, args) {
@@ -11726,6 +11807,17 @@ export const objects = {
       }) {
         return resource_personPgResource.get({
           id: $id
+        });
+      },
+      personSecret(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_PersonSecret($nodeId);
+      },
+      personSecretByPersonId(_$root, {
+        $personId
+      }) {
+        return resource_person_secretPgResource.get({
+          person_id: $personId
         });
       },
       post(_$parent, args) {
@@ -12274,6 +12366,18 @@ export const objects = {
           input: applyInputToInsert
         }
       },
+      createPersonSecret: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_person_secretPgResource);
+          args.apply($insert);
+          return object({
+            result: $insert
+          });
+        },
+        args: {
+          input: applyInputToInsert
+        }
+      },
       createPost: {
         plan(_, args) {
           const $insert = pgInsertSingle(resource_postPgResource);
@@ -12687,6 +12791,32 @@ export const objects = {
         plan(_$root, args) {
           const $delete = pgDeleteSingle(resource_personPgResource, {
             id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input: applyInputToUpdateOrDelete
+        }
+      },
+      deletePersonSecret: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input: applyInputToUpdateOrDelete
+        }
+      },
+      deletePersonSecretByPersonId: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, {
+            person_id: args.getRaw(['input', "personId"])
           });
           args.apply($delete);
           return object({
@@ -13349,6 +13479,18 @@ export const objects = {
           input: applyInputArgViaPgSelect
         }
       },
+      postWithSuffix: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_post_with_suffix(args, ["input"]);
+          const $result = resource_post_with_suffixPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input: applyInputArgViaPgSelect
+        }
+      },
       returnVoidMutation: {
         plan($root, args, _info) {
           const selectArgs = makeArgs_compound_type_computed_field(args, ["input"]);
@@ -13726,6 +13868,32 @@ export const objects = {
         plan(_$root, args) {
           const $update = pgUpdateSingle(resource_personPgResource, {
             id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input: applyInputToUpdateOrDelete
+        }
+      },
+      updatePersonSecret: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input: applyInputToUpdateOrDelete
+        }
+      },
+      updatePersonSecretByPersonId: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_person_secretPgResource, {
+            person_id: args.getRaw(['input', "personId"])
           });
           args.apply($update);
           return object({
@@ -14279,6 +14447,8 @@ export const objects = {
     plans: {
       clientMutationId: getClientMutationIdForCreatePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
+      personSecret: planCreatePayloadResult,
+      personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -14560,6 +14730,7 @@ export const objects = {
       },
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       personSecret: planCreatePayloadResult,
+      personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
   },
@@ -15476,6 +15647,9 @@ export const objects = {
       createdAt($record) {
         return $record.get("created_at");
       },
+      exists($in, args, _info) {
+        return scalarComputed(resource_person_existsPgResource, $in, makeArgs_person_exists(args));
+      },
       firstName($in, args, _info) {
         return scalarComputed(resource_person_first_namePgResource, $in, makeArgs_compound_type_computed_field(args));
       },
@@ -15547,6 +15721,11 @@ export const objects = {
       optionalMissingMiddle5($in, args, _info) {
         return scalarComputed(resource_person_optional_missing_middle_5PgResource, $in, makeArgs_person_optional_missing_middle_5(args));
       },
+      personSecretByPersonId($record) {
+        return resource_person_secretPgResource.get({
+          person_id: $record.get("id")
+        });
+      },
       postsByAuthorId: {
         plan($record) {
           const $records = resource_postPgResource.find({
@@ -15563,6 +15742,12 @@ export const objects = {
           condition: applyConditionArgToConnection,
           orderBy: applyOrderByArgToConnection
         }
+      },
+      site($record) {
+        const $plan = $record.get("site");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_wrappedUrlPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
       },
       typeFunction($in, args, _info) {
         const details = pgFunctionArgumentsFromArgs($in, makeArgs_person_type_function(args));
@@ -15639,7 +15824,7 @@ export const objects = {
       for (const pkCol of person_secretUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return spec_resource_person_secretPgResource.get(spec);
+      return resource_person_secretPgResource.get(spec);
     }
   },
   PersonSecretsConnection: {
@@ -16203,6 +16388,7 @@ export const objects = {
       clientMutationId: getClientMutationIdForUpdateOrDeletePlan,
       personByPersonId: LeftArmIdentityPayload_personByPersonIdPlan,
       personSecret: planCreatePayloadResult,
+      personSecretEdge: CreatePersonSecretPayload_personSecretEdgePlan,
       query: queryPlan
     }
   },
