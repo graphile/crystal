@@ -365,7 +365,7 @@ const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaView
       schemaName: "enum_tables",
       tableName: "abcd_view",
       constraintType: "p",
-      constraintName: "FAKE_enum_tables_abcd_view_primaryKey_5"
+      constraintName: "FAKE_enum_tables_abcd_view_primaryKey_0"
     },
     tags: {
       name: "LetterAToDViaView"
@@ -738,117 +738,6 @@ const registry = makeRegistry({
         },
         tags: {
           name: "LotsOfEnumsEnum4"
-        }
-      }
-    }),
-    EntityKindsEnum: enumCodec({
-      name: "EntityKindsEnum",
-      identifier: TYPES.text.sqlType,
-      values: [{
-        value: "photos",
-        description: undefined
-      }, {
-        value: "locations",
-        description: undefined
-      }, {
-        value: "profiles",
-        description: undefined
-      }],
-      extensions: {
-        isEnumTableEnum: true,
-        enumTableEnumDetails: {
-          serviceName: "main",
-          schemaName: "partitions",
-          tableName: "entity_kinds",
-          constraintType: "p",
-          constraintName: "entity_kinds_pkey"
-        },
-        tags: {
-          name: "EntityKinds"
-        }
-      }
-    }),
-    EnumTableTransportationEnum: enumCodec({
-      name: "EnumTableTransportationEnum",
-      identifier: TYPES.text.sqlType,
-      values: [{
-        value: "CAR",
-        description: undefined
-      }, {
-        value: "BIKE",
-        description: undefined
-      }, {
-        value: "SUBWAY",
-        description: undefined
-      }],
-      extensions: {
-        isEnumTableEnum: true,
-        enumTableEnumDetails: {
-          serviceName: "main",
-          schemaName: "function_returning_enum",
-          tableName: "enum_table",
-          constraintType: "u",
-          constraintName: "transportation_enum"
-        },
-        tags: {
-          name: "EnumTableTransportation"
-        }
-      }
-    }),
-    LengthStatusEnum: enumCodec({
-      name: "LengthStatusEnum",
-      identifier: TYPES.text.sqlType,
-      values: [{
-        value: "ok",
-        description: undefined
-      }, {
-        value: "too_short",
-        description: undefined
-      }],
-      extensions: {
-        isEnumTableEnum: true,
-        enumTableEnumDetails: {
-          serviceName: "main",
-          schemaName: "function_returning_enum",
-          tableName: "length_status",
-          constraintType: "p",
-          constraintName: "length_status_pkey"
-        },
-        tags: {
-          name: "LengthStatus"
-        }
-      }
-    }),
-    StageOptionsEnum: enumCodec({
-      name: "StageOptionsEnum",
-      identifier: TYPES.text.sqlType,
-      values: [{
-        value: "pending",
-        description: undefined
-      }, {
-        value: "round 1",
-        description: undefined
-      }, {
-        value: "round 2",
-        description: undefined
-      }, {
-        value: "rejected",
-        description: undefined
-      }, {
-        value: "hired",
-        description: undefined
-      }],
-      extensions: {
-        isEnumTableEnum: true,
-        enumTableEnumDetails: {
-          serviceName: "main",
-          schemaName: "function_returning_enum",
-          tableName: "stage_options",
-          constraintType: "p",
-          constraintName: "stage_options_pkey"
-        },
-        tags: {
-          name: "StageOptions"
         }
       }
     })
