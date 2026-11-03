@@ -1404,8 +1404,8 @@ function sha256(value: string): string {
   return createHash("sha256").update(value).digest("base64url");
 }
 
-const factoryHashCache = new WeakMap<Function, string>();
-function factoryHash(factory: Function): string {
+const factoryHashCache = new WeakMap<AnyFunction, string>();
+function factoryHash(factory: AnyFunction): string {
   const existing = factoryHashCache.get(factory);
   if (existing !== undefined) {
     return existing;

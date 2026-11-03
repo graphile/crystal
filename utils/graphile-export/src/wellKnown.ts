@@ -1,10 +1,10 @@
 import * as cryptoStar from "crypto";
 import * as grafastStar from "grafast";
+import { arraysMatch } from "grafast";
 import * as graphqlStar from "grafast/graphql";
 import * as utilStar from "util";
 
 import type { ExportOptions } from "./interfaces.ts";
-import { arraysMatch } from "grafast";
 
 interface $$Export {
   moduleName: string;
