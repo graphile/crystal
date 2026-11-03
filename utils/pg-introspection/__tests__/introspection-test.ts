@@ -176,3 +176,32 @@ it("rejects introspection data that has already been augmented", () => {
   assert.ok(namespace);
   assert.equal(namespace.nspname, "public");
 });
+
+it("throws when an index refers to a missing required attribute", () => {
+  const source = structuredClone(rawIntrospectionResults);
+  const result = augmentIntrospectionData(
+    {
+      onlyEntities: ["classes", "attributes", "indexes"],
+      includeExtensionResources: true,
+    },
+    {
+      catalog_by_oid: source.catalog_by_oid,
+      current_user: source.current_user,
+      pg_version: source.pg_version,
+      introspection_version: source.introspection_version,
+      classes: [
+        {
+          ...source.classes[0],
+          _id: "1",
+          relnamespace: "1",
+          relname: "example",
+        },
+      ],
+      attributes: [],
+      indexes: [
+        { ...source.indexes[0], indexrelid: "2", indrelid: "1", indkey: [1] },
+      ],
+    },
+  );
+  assert.throws(() => result.indexes[0].getKeys(), /Could not find attribute/);
+});
