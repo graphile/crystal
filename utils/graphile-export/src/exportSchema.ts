@@ -1336,24 +1336,16 @@ function factoryAst<TTuple extends any[]>(
   });
 
   const isCacheable = typeof fn === "function";
+  if (isCacheable) {
+    const factoryKey = factoryHash(factory);
+    let factoryCache = file._factoryAstCache.get(factoryKey);
+    if (factoryCache === undefined) {
+      factoryCache = new Map();
+      file._factoryAstCache.set(factoryKey, factoryCache);
+    }
 
-  const factoryKey = isCacheable ? factoryHash(factory) : null;
-  let factoryCache =
-    factoryKey !== null ? file._factoryAstCache.get(factoryKey) : undefined;
-  if (factoryKey !== null && factoryCache === undefined) {
-    factoryCache = new Map();
-    file._factoryAstCache.set(factoryKey, factoryCache);
-  }
-
-  const cacheKey =
-    factoryCache !== undefined
-      ? JSON.stringify(depArgs.map(argShapeKey))
-      : null;
-  let cacheByKey =
-    factoryCache !== undefined && cacheKey !== null
-      ? factoryCache.get(cacheKey)
-      : undefined;
-  if (factoryCache !== undefined && cacheKey !== null) {
+    const cacheKey = JSON.stringify(depArgs.map(argShapeKey));
+    let cacheByKey = factoryCache.get(cacheKey);
     if (!cacheByKey) {
       cacheByKey = [];
       factoryCache.set(cacheKey, cacheByKey);
@@ -1376,11 +1368,13 @@ function factoryAst<TTuple extends any[]>(
         return existing.result;
       }
     }
-  }
 
-  const result = factoryASTInner(funcAST, depArgs);
-  cacheByKey?.push({ rawArgs, depArgs, result });
-  return result;
+    const result = factoryASTInner(funcAST, depArgs);
+    cacheByKey.push({ rawArgs, depArgs, result });
+    return result;
+  } else {
+    return factoryASTInner(funcAST, depArgs);
+  }
 }
 
 function sha256(value: string): string {
