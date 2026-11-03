@@ -263,7 +263,7 @@
     "@dataplan/json": "workspace:^",
     "@dataplan/pg": "workspace:^",
     "@graphile/lru": "workspace:^",
-    "@types/node": "^22.19.1",
+    "@types/node": "22.x || 24.x || 26.x",
     "@types/pg": "^8.15.6",
     "debug": "^4.4.3",
     "grafast": "workspace:^",
