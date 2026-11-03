@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import { introspect } from "../dist/multipass.js";
 import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
   dependencyWhere,
   descriptionWhere,
 } from "../dist/introspectionHelpers.js";
+import { introspect } from "../dist/multipass.js";
 import { makeIntrospectionQuery } from "../dist/query.js";
 
 it("uses shared predicate exports instead of copied function bodies", () => {
