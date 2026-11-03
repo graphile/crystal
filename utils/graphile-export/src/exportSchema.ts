@@ -1299,6 +1299,13 @@ interface FactoryASTCacheEntry {
   result: t.Expression;
 }
 
+const UNKNOWN = Object.freeze([{ unknown: true }, true] as const);
+const NULL = Object.freeze([{ literal: null }, false] as const);
+type CacheKeyValue =
+  | { identifier: string }
+  | { literal: string | number | boolean | null }
+  | { unknown: true };
+
 function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
@@ -1344,28 +1351,44 @@ function factoryAst<TTuple extends any[]>(
       file._factoryAstCache.set(factoryKey, factoryCache);
     }
 
-    const cacheKey = JSON.stringify(depArgs.map(argShapeKey));
+    const indexesToCheck: number[] = [];
+    const cacheKeyValues: Array<CacheKeyValue> = [];
+    for (let i = 0, l = depArgs.length; i < l; i++) {
+      const arg = depArgs[i];
+      const [cacheKeyValue, mustCheck] = cacheKeySpec(arg);
+      cacheKeyValues.push(cacheKeyValue);
+      if (mustCheck) {
+        indexesToCheck.push(i);
+      }
+    }
+
+    const cacheKey = JSON.stringify(cacheKeyValues);
     let cacheByKey = factoryCache.get(cacheKey);
     if (!cacheByKey) {
       cacheByKey = [];
       factoryCache.set(cacheKey, cacheByKey);
     }
 
-    for (const existing of cacheByKey) {
+    for (const {
+      depArgs: existingDepArgs,
+      rawArgs: existingRawArgs,
+      result: existingResult,
+    } of cacheByKey) {
       let matches = true;
-      for (let i = 0, l = depArgs.length; i < l; i++) {
+      // Only check the indices we need to
+      for (const i of indexesToCheck) {
         // Don't mind if the raw version or the AST-ified version match, but if
         // neither match we must abort.
         if (
-          existing.rawArgs[i] !== rawArgs[i] &&
-          !t.isNodesEquivalent(existing.depArgs[i], depArgs[i])
+          existingRawArgs[i] !== rawArgs[i] &&
+          !t.isNodesEquivalent(existingDepArgs[i], depArgs[i])
         ) {
           matches = false;
           break;
         }
       }
       if (matches) {
-        return existing.result;
+        return existingResult;
       }
     }
 
@@ -1400,20 +1423,34 @@ function hashOrPass(value: string): string {
   }
 }
 
-const UNKNOWN = Object.freeze({ unknown: true });
-const NULL = Object.freeze({ literal: null });
-function argShapeKey(arg: t.Expression) {
+function cacheKeySpec(
+  arg: t.Expression,
+): readonly [cacheKeyValue: CacheKeyValue, mustCheck: boolean] {
   switch (arg.type) {
-    case "Identifier": // Also includes 'undefined'
-      return { identifier: arg.name };
+    // Also includes 'undefined'
+    case "Identifier": {
+      // Same identifier, no need to check value
+      return [{ identifier: arg.name }, false];
+    }
+    case "NumericLiteral": {
+      if (Number.isFinite(arg.value)) {
+        // Finite values are equivalent, no need to check value
+        return [{ literal: arg.value }, false];
+      } else {
+        return UNKNOWN;
+      }
+    }
     case "StringLiteral":
-    case "NumericLiteral":
-    case "BooleanLiteral":
-      return { literal: arg.value };
-    case "NullLiteral":
+    case "BooleanLiteral": {
+      // Same value, no need to check later
+      return [{ literal: arg.value }, false];
+    }
+    case "NullLiteral": {
       return NULL;
-    default:
+    }
+    default: {
       return UNKNOWN;
+    }
   }
 }
 
