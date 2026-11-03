@@ -18,8 +18,16 @@ function isPojo(obj: any): obj is object {
   return proto === null || proto === Object.prototype;
 }
 
+interface NamespaceDetails<TNamespace extends Record<string, any> = any> {
+  moduleStar: TNamespace;
+  /** Object.keys(moduleStar) */
+  keys: readonly string[];
+  /** keys[0]; if keys.length === 0 this will be undefined for a faster check */
+  firstKey: string | undefined;
+}
+
 function makeWellKnownFromOptions(options: ExportOptions) {
-  const namespaces = Object.create(null);
+  const namespaces = Object.create(null) as Record<string, NamespaceDetails>;
   const wellKnownMap = new Map<unknown, $$Export>();
 
   function exportAll(
@@ -28,7 +36,8 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     preferViaDefault = false,
   ) {
     const keys = Object.keys(moduleStar);
-    namespaces[moduleName] = { moduleStar, keys };
+    const firstKey = keys[0];
+    namespaces[moduleName] = { moduleStar, keys, firstKey };
     for (const exportName of Object.keys(moduleStar)) {
       if (!wellKnownMap.has(moduleStar[exportName])) {
         /**
@@ -140,26 +149,27 @@ export function wellKnown(
 
 function isSameNamespace<TNamespace extends Record<string, any>>(
   rawThing: unknown,
-  namespaceDigest: { moduleStar: TNamespace; keys: readonly string[] },
+  { moduleStar, keys, firstKey }: NamespaceDetails<TNamespace>,
 ): rawThing is TNamespace {
-  const { moduleStar: namespace, keys: nspKeys } = namespaceDigest;
-  if (nspKeys.length === 0) return false;
-  if (
-    typeof rawThing !== "object" ||
-    rawThing == null ||
-    Array.isArray(rawThing)
-  ) {
-    return false;
-  }
+  if (rawThing == null || typeof rawThing !== "object") return false;
+  if (firstKey === undefined) return false;
+
+  // At this point, keys must have at least 1 value, and thing is an object
   const thing = rawThing as Record<string, unknown>;
 
+  // Early exit - most things fail on the first key
+  if (thing[firstKey] !== moduleStar[firstKey]) return false;
+
+  // In case values are undefined, we must ensure they keys actually match.
+  // This also avoids us dereferencing keys of an object that don't exist
+  // (other than the early exit above of course).
   const thingKeys = Object.keys(thing);
-  if (!arraysMatch(thingKeys, nspKeys)) {
+  if (!arraysMatch(thingKeys, keys)) {
     return false;
   }
 
-  for (const key of nspKeys) {
-    if (thing[key] !== namespace[key]) {
+  for (const key of keys) {
+    if (thing[key] !== moduleStar[key]) {
       return false;
     }
   }
