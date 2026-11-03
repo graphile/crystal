@@ -28,9 +28,30 @@ export const defaultEntities = Object.freeze([
 ] as const);
 
 export function makeIntrospectionQuery(rawOptions: Options = {}) {
+  return buildIntrospectionQuery(rawOptions);
+}
+
+/** Builds a query with per-collection predicates for multipass introspection. */
+export function buildIntrospectionQuery(
+  rawOptions: Options,
+  overrides: Partial<Record<string, string>> = {},
+  filters: Partial<Record<string, string>> = {},
+  prefix = "",
+  metadata = true,
+  validateRequires = true,
+  outputEntities?: ReadonlySet<string>,
+  includeTriggerFunctions?: boolean,
+) {
   const onlyEntities = rawOptions.onlyEntities ?? [...defaultEntities];
-  const options: Required<Options> = { onlyEntities };
+  const options: Required<Options> = {
+    onlyEntities: outputEntities
+      ? onlyEntities.filter((entity) => outputEntities.has(entity))
+      : onlyEntities,
+  };
   const withs: string[] = [];
+  if (prefix) {
+    withs.push(prefix);
+  }
   const jsons: string[] = [];
 
   function add(entityType: EntityTypeConfig) {
@@ -53,17 +74,27 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
     const wheres: string[] = [];
 
     const baseWhere =
-      typeof entityType.where === "function"
+      overrides[alias] ??
+      (typeof entityType.where === "function"
         ? entityType.where(options)
-        : entityType.where;
+        : entityType.where);
     if (baseWhere != null) wheres.push(baseWhere);
 
-    if (alias === "procs" && !onlyEntities.includes("triggers")) {
+    if (
+      alias === "procs" &&
+      !(includeTriggerFunctions ?? onlyEntities.includes("triggers"))
+    ) {
       // Exclude triggers
       wheres.push("prorettype operator(pg_catalog.<>) 2279");
     }
 
+    const filter = filters[alias];
+    if (filter) {
+      wheres.push(filter);
+    }
+
     const { select, fallback } = catalogProjection(attributes);
+
     withs.push(`\
   ${alias} as (
     select projected.*
@@ -82,10 +113,11 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
       }
     ) projected
   )`);
+    if (outputEntities && !outputEntities.has(alias)) return;
     const val = singular
       ? `(select row_to_json(${alias}) from ${alias})`
       : `(select coalesce((select json_agg(row_to_json(${alias}) ${
-          order ? `order by ${order}` : ""
+          order ? `order by ${order}${oids ? `, ${alias}._id` : ""}` : ""
         }) from ${alias}), '[]'::json))`;
     jsons.push(`\
   '${alias}',
@@ -95,6 +127,7 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
   for (const config of Object.values(ENTITY_TYPES)) {
     if (onlyEntities.includes(config.alias)) {
       if (
+        validateRequires &&
         config.requires &&
         !config.requires.every((alias) => onlyEntities.includes(alias))
       ) {
@@ -112,7 +145,9 @@ export function makeIntrospectionQuery(rawOptions: Options = {}) {
 
   return `${withs.length > 0 ? `with\n${withs.join(",\n\n")}\n` : ""}\
 select json_build_object(
-${jsons.length > 0 ? `${jsons.join(",\n\n")},\n\n` : ""}\
+${jsons.length > 0 ? `${jsons.join(",\n\n")}` : ""}${
+    metadata
+      ? `${jsons.length > 0 ? ",\n\n" : ""}\
   'catalog_by_oid',
   (
     select json_object_agg(oid::text, relname order by relname asc)
@@ -132,7 +167,9 @@ ${jsons.length > 0 ? `${jsons.join(",\n\n")},\n\n` : ""}\
   version(),
 
   'introspection_version',
-  1
+  1`
+      : ""
+  }
 )::text as introspection
 `;
 }
