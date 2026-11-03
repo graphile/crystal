@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import { introspect } from "../dist/multipass.js";
 import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
   dependencyWhere,
   descriptionWhere,
 } from "../dist/introspectionHelpers.js";
+import { introspect } from "../dist/multipass.js";
 import { makeIntrospectionQuery } from "../dist/query.js";
 
 it("uses shared predicate exports instead of copied function bodies", () => {
@@ -263,14 +263,9 @@ it("executes edge-case selections against PostgreSQL", async () => {
     const queryCallback = async (text: string, values: any[]) =>
       (await client.query(text, values)).rows[0].introspection;
     const partialEntities = ["namespaces", "classes", "procs"] as const;
-    await assert.rejects(
-      introspect({ onlyEntities: [...partialEntities] }, queryCallback),
-      /Introspection collection 'depends' is required/,
-    );
     const included = await introspect(
       {
         onlyEntities: [...partialEntities],
-        includeExtensionResources: true,
       },
       queryCallback,
     );
@@ -279,16 +274,6 @@ it("executes edge-case selections against PostgreSQL", async () => {
     );
     assert.ok(
       included.procs.some((entry) => entry.proname === "pg_buffercache_pages"),
-    );
-    const excluded = await introspect(
-      { onlyEntities: [...partialEntities, "depends"] },
-      queryCallback,
-    );
-    assert.ok(
-      !excluded.classes.some((entry) => entry.relname === "pg_buffercache"),
-    );
-    assert.ok(
-      !excluded.procs.some((entry) => entry.proname === "pg_buffercache_pages"),
     );
     const events = await run(["event_triggers", "descriptions", "depends"]);
     const event = events.event_triggers.find(

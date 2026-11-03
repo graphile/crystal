@@ -859,7 +859,6 @@ function introspectPgServices(
         seenPgSettingsKeys.set(pgSettingsKey, i);
       }
       const options: IntrospectOptions<DefaultEntities> = {
-        schemas: pgService.schemas ?? ["public"],
         onlyEntities: [
           "database",
           "namespaces",

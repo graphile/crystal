@@ -270,10 +270,12 @@ export function augmentIntrospection(
   const introspection: IntrospectionDataForEntities = JSON.parse(
     introspectionResultsString,
   );
-  return augmentIntrospectionData<DefaultEntities>(
-    { onlyEntities: [...defaultEntities], includeExtensionResources },
+  const result = augmentIntrospectionData<DefaultEntities>(
+    { onlyEntities: [...defaultEntities] },
     introspection,
   );
+  filterLegacyExtensionResources(result, includeExtensionResources);
+  return result;
 }
 
 /**
@@ -288,17 +290,6 @@ export function augmentIntrospectionData<
   options: IntrospectOptions<TEntities>,
   introspectionData: IntrospectionDataForEntities<TEntities>,
 ): Introspection<TEntities> {
-  const { includeExtensionResources } = options;
-  if (
-    !includeExtensionResources &&
-    (introspectionData.procs ||
-      introspectionData.classes ||
-      introspectionData.attributes ||
-      introspectionData.constraints ||
-      introspectionData.types)
-  ) {
-    assertExists(introspectionData.depends, "depends");
-  }
   // Lookups exist only when their corresponding collection was supplied.
 
   const lookups: IntrospectionLookups = {
@@ -486,7 +477,16 @@ export function augmentIntrospectionData<
   ) as Introspection<TEntities>;
   const introspection = result;
   populateLookups(introspection, lookups);
-  const { oidByCatalog } = lookups;
+
+  return introspection;
+}
+
+/** Preserve extension filtering for the deprecated API. */
+function filterLegacyExtensionResources(
+  introspection: Introspection<DefaultEntities>,
+  includeExtensionResources: boolean,
+) {
+  const { oidByCatalog } = introspection._lookups;
 
   if (!includeExtensionResources) {
     // Go through and delete things from the extensions
@@ -519,6 +519,4 @@ export function augmentIntrospectionData<
     del(extensionClassOids, introspection.constraints, "confrelid");
     del(extensionClassOids, introspection.types, "typrelid");
   }
-
-  return introspection;
 }
