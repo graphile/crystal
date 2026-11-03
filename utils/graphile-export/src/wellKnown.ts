@@ -4,6 +4,7 @@ import * as graphqlStar from "grafast/graphql";
 import * as utilStar from "util";
 
 import type { ExportOptions } from "./interfaces.ts";
+import { arraysMatch } from "grafast";
 
 interface $$Export {
   moduleName: string;
@@ -26,7 +27,8 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     moduleName: string,
     preferViaDefault = false,
   ) {
-    namespaces[moduleName] = moduleStar;
+    const keys = Object.keys(moduleStar);
+    namespaces[moduleName] = { moduleStar, keys };
     for (const exportName of Object.keys(moduleStar)) {
       if (!wellKnownMap.has(moduleStar[exportName])) {
         /**
@@ -136,32 +138,28 @@ export function wellKnown(
   return undefined;
 }
 
-const namespaceKeysCache = new WeakMap<object, string[]>();
-
 function isSameNamespace<TNamespace extends Record<string, any>>(
-  thing: unknown,
-  namespace: TNamespace,
-): thing is TNamespace {
-  if (typeof thing !== "object" || thing == null) {
-    return false;
-  }
-  let nspKeys = namespaceKeysCache.get(namespace);
-  if (!nspKeys) {
-    nspKeys = Object.keys(namespace);
-    namespaceKeysCache.set(namespace, nspKeys);
-  }
+  rawThing: unknown,
+  namespaceDigest: { moduleStar: TNamespace; keys: readonly string[] },
+): rawThing is TNamespace {
+  const { moduleStar: namespace, keys: nspKeys } = namespaceDigest;
+  if (nspKeys.length === 0) return false;
   if (
-    nspKeys.length > 0 &&
-    (thing as Record<string, any>)[nspKeys[0]] !== namespace[nspKeys[0]]
+    typeof rawThing !== "object" ||
+    rawThing == null ||
+    Array.isArray(rawThing)
   ) {
     return false;
   }
+  const thing = rawThing as Record<string, unknown>;
+
   const thingKeys = Object.keys(thing);
-  if (thingKeys.length !== nspKeys.length) {
+  if (!arraysMatch(thingKeys, nspKeys)) {
     return false;
   }
+
   for (const key of nspKeys) {
-    if ((thing as Record<string, any>)[key] !== namespace[key]) {
+    if (thing[key] !== namespace[key]) {
       return false;
     }
   }
