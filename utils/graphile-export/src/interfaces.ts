@@ -27,8 +27,6 @@ export interface ExportOptions {
    */
   prettier?: boolean;
 
-  lint?: boolean;
-
   /** @deprecated Use `optimizeRuns: 0` instead */
   disableOptimize?: boolean;
 
@@ -48,4 +46,13 @@ export interface ExportOptions {
    * @defaultValue `2`
    */
   optimizeLoops?: number;
+
+  /**
+   * Set to `true` to disable the checks that help ensure the exported code is
+   * consistent. With this disabled, inconsistent use of `EXPORTABLE` in your
+   * schema may result in failure to boot or unexpected production behavior, so
+   * it is highly recommended that you only disable the consistency checks when
+   * you have an alternative solution in place that is at least as strong.
+   */
+  dangerouslyDisableConsistencyChecks?: boolean;
 }

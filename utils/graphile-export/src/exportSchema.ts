@@ -2299,7 +2299,7 @@ export async function exportSchema(
   const toFormat = HEADER + code;
   const formatted = await format(toFormat, toPath, options);
   await writeFile(toPath, formatted);
-  if (options.lint !== false) {
+  if (options.dangerouslyDisableConsistencyChecks !== true) {
     await lint(formatted, toPath);
   }
 }
