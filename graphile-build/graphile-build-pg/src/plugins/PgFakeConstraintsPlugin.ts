@@ -318,6 +318,21 @@ async function processFk(
     foreignTable,
   );
   if (!foreignPgClass) {
+    if (info.resolvedPreset.gather?.pgIntrospection?.multipass !== false) {
+      const pgService = info.resolvedPreset.pgServices?.find(
+        (service) => service.name === serviceName,
+      );
+      if (!pgService) {
+        throw new Error(`Could not find '${serviceName}' in 'pgServices'`);
+      }
+      if (!(pgService.schemas ?? ["public"]).includes(foreignSchema)) {
+        return;
+      }
+      console.error(
+        `Invalid @foreignKey on '${identity()}'; table/view '${foreignSchema}.${foreignTable}' was not found in the introspection results. Check the database names and permissions. (${rawSpec})`,
+      );
+      return;
+    }
     throw new Error(
       `Invalid @foreignKey on '${identity()}'; referenced non-existent table/view '${foreignSchema}.${foreignTable}'. Note that this reference must use *database names* (i.e. it does not respect @name). (${rawSpec})`,
     );

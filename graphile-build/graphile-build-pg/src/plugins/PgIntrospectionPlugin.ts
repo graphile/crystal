@@ -28,6 +28,7 @@ import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
+import { postgraphileMultipass } from "./PgIntrospectionPolicies.ts";
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -51,6 +52,8 @@ export type PgEntityWithId =
 declare global {
   namespace GraphileBuild {
     interface GatherOptions {
+      /** Set multipass to false to introspect all database resources. */
+      pgIntrospection?: { multipass?: boolean };
       /**
        * Should we attempt to install the watch fixtures into the database?
        *
@@ -171,6 +174,10 @@ declare global {
     }
 
     interface GatherHooks {
+      pgIntrospection_options(event: {
+        serviceName: string;
+        options: IntrospectOptions<DefaultEntities>;
+      }): PromiseOrDirect<void>;
       pgIntrospection_introspection(event: {
         introspection: Introspection;
         serviceName: string;
@@ -880,7 +887,15 @@ function introspectPgServices(
           "policies",
           "am",
         ],
+        multipass:
+          info.resolvedPreset.gather?.pgIntrospection?.multipass === false
+            ? false
+            : postgraphileMultipass(pgService.schemas ?? ["public"]),
       };
+      await info.process("pgIntrospection_options", {
+        serviceName: name,
+        options,
+      });
 
       // Do the introspection
       const introspectionData = await withPgClientFromPgService(
