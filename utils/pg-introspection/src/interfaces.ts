@@ -23,6 +23,62 @@ import type {
 
 export type DefaultEntities = (typeof defaultEntities)[number];
 
+export type PurposeList = readonly [
+  PgIntrospection.Purpose,
+  ...PgIntrospection.Purpose[],
+];
+
+/** A parameterized equality selector and the reasons its rows are needed. */
+export interface IntrospectionRequest {
+  entity: EntityType;
+  match: Record<string, string | number>;
+  purposes: PurposeList;
+}
+
+export interface IntrospectionPolicyDetails {
+  /** Only purposes declared by this policy may be inspected. */
+  hasPurpose(purpose: PgIntrospection.Purpose): boolean;
+  /** Immutable metadata captured before dependency discovery begins. */
+  catalogByOid: Readonly<Record<string, string>>;
+}
+
+/** Policies must depend only on the row, declared purposes and fixed configuration. */
+export interface IntrospectionPolicy {
+  name: string;
+  entity: EntityType;
+  purposes: readonly PgIntrospection.Purpose[];
+  select: (
+    row: any,
+    details: IntrospectionPolicyDetails,
+  ) => readonly IntrospectionRequest[] | undefined;
+}
+
+/** Infer a policy's row type from its source collection. */
+export function defineIntrospectionPolicy<T extends EntityType>(policy: {
+  name: string;
+  entity: T;
+  purposes: readonly PgIntrospection.Purpose[];
+  select: (
+    row: IntrospectionData[T] extends readonly (infer R)[]
+      ? R
+      : IntrospectionData[T],
+    details: IntrospectionPolicyDetails,
+  ) => readonly IntrospectionRequest[] | undefined;
+}): IntrospectionPolicy {
+  return policy as IntrospectionPolicy;
+}
+
+export interface MultipassOptions {
+  onlyAccessible?: { role?: string; includeNoInherit?: boolean };
+  policies?: readonly IntrospectionPolicy[];
+  /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
+  entrypointFilters?: Partial<Record<EntityType, string>>;
+  /** Additional trusted SQL predicates applied to discovery and dependencies. */
+  filters?: Partial<Record<EntityType, string>>;
+  /** Mutate the discovered data to remove unwanted or incomplete objects. */
+  prune?: (data: Partial<IntrospectionData>) => void;
+}
+
 export interface IntrospectOptions<
   TEntities extends EntityType = DefaultEntities,
 > {
@@ -34,6 +90,7 @@ export interface IntrospectOptions<
    * collections filtered by extension membership also requires `depends`.
    */
   includeExtensionResources?: boolean;
+  multipass?: false | MultipassOptions;
 }
 
 export type IntrospectionDataForEntities<
