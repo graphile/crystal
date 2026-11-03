@@ -3,6 +3,7 @@ import { it } from "node:test";
 
 import { expandRoles } from "../dist/acl.js";
 import { augmentIntrospectionData } from "../dist/augmentIntrospection.js";
+import type { DefaultEntities } from "../dist/index.js";
 import { parseIntrospectionResults } from "../dist/index.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
@@ -162,4 +163,16 @@ it("reports missing collections for entity relationships and permissions", () =>
   const namespace = result.getNamespace({ name: "pg_toast" });
   assert.ok(namespace);
   assert.throws(() => namespace.getACL(), /roles/);
+});
+
+it("rejects introspection data that has already been augmented", () => {
+  const data = structuredClone(rawIntrospectionResults);
+  const result = augmentIntrospectionData({}, data);
+  assert.throws(
+    () => augmentIntrospectionData<DefaultEntities>({}, result),
+    /should not be augmented twice/,
+  );
+  const namespace = result.getNamespace({ name: "public" });
+  assert.ok(namespace);
+  assert.equal(namespace.nspname, "public");
 });

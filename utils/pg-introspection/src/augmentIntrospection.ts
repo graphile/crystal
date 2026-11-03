@@ -288,6 +288,9 @@ export function augmentIntrospectionData<
   options: IntrospectOptions<TEntities>,
   introspectionData: IntrospectionDataForEntities<TEntities>,
 ): Introspection<TEntities> {
+  if ("_lookups" in introspectionData) {
+    throw new Error("Introspection data should not be augmented twice");
+  }
   const { includeExtensionResources } = options;
   if (
     !includeExtensionResources &&
