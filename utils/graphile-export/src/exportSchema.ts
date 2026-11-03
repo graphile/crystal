@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import type { URL } from "node:url";
 import { inspect } from "node:util";
@@ -285,7 +286,7 @@ class CodegenFile {
   _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
     new Map();
 
-  _factoryAstCache = new Map<string, FactoryASTCacheEntry[]>();
+  _factoryAstCache = new Map<string, Map<string, FactoryASTCacheEntry[]>>();
 
   _convertToIdentifierViaASTCache = new Map<t.Expression, t.Identifier>();
 
@@ -1298,6 +1299,13 @@ interface FactoryASTCacheEntry {
   result: t.Expression;
 }
 
+const UNKNOWN = Object.freeze([{ unknown: true }, true] as const);
+const NULL = Object.freeze([{ literal: null }, false] as const);
+type CacheKeyValue =
+  | { identifier: string }
+  | { literal: string | number | boolean | null }
+  | { unknown: true };
+
 function factoryAst<TTuple extends any[]>(
   file: CodegenFile,
   fn: ExportedFromFactory<unknown, TTuple>,
@@ -1335,39 +1343,115 @@ function factoryAst<TTuple extends any[]>(
   });
 
   const isCacheable = typeof fn === "function";
-
-  const cacheKey = isCacheable
-    ? `${factory.toString().trim()}|${depArgs.length}`
-    : null;
-  let cacheByKey = cacheKey ? file._factoryAstCache.get(cacheKey) : null;
-  if (cacheKey) {
-    if (!cacheByKey) {
-      cacheByKey = [];
-      file._factoryAstCache.set(cacheKey, cacheByKey);
+  if (isCacheable) {
+    const factoryKey = factoryHash(factory);
+    let factoryCache = file._factoryAstCache.get(factoryKey);
+    if (factoryCache === undefined) {
+      factoryCache = new Map();
+      file._factoryAstCache.set(factoryKey, factoryCache);
     }
 
-    for (const existing of cacheByKey) {
+    const indexesToCheck: number[] = [];
+    const cacheKeyValues: Array<CacheKeyValue> = [];
+    for (let i = 0, l = depArgs.length; i < l; i++) {
+      const arg = depArgs[i];
+      const [cacheKeyValue, mustCheck] = cacheKeySpec(arg);
+      cacheKeyValues.push(cacheKeyValue);
+      if (mustCheck) {
+        indexesToCheck.push(i);
+      }
+    }
+
+    const cacheKey = JSON.stringify(cacheKeyValues);
+    let cacheByKey = factoryCache.get(cacheKey);
+    if (!cacheByKey) {
+      cacheByKey = [];
+      factoryCache.set(cacheKey, cacheByKey);
+    }
+
+    for (const {
+      depArgs: existingDepArgs,
+      rawArgs: existingRawArgs,
+      result: existingResult,
+    } of cacheByKey) {
       let matches = true;
-      for (let i = 0, l = depArgs.length; i < l; i++) {
+      // Only check the indices we need to
+      for (const i of indexesToCheck) {
         // Don't mind if the raw version or the AST-ified version match, but if
         // neither match we must abort.
         if (
-          existing.rawArgs[i] !== rawArgs[i] &&
-          !t.isNodesEquivalent(existing.depArgs[i], depArgs[i])
+          existingRawArgs[i] !== rawArgs[i] &&
+          !t.isNodesEquivalent(existingDepArgs[i], depArgs[i])
         ) {
           matches = false;
           break;
         }
       }
       if (matches) {
-        return existing.result;
+        return existingResult;
       }
     }
-  }
 
-  const result = factoryASTInner(funcAST, depArgs);
-  cacheByKey?.push({ rawArgs, depArgs, result });
-  return result;
+    const result = factoryASTInner(funcAST, depArgs);
+    cacheByKey.push({ rawArgs, depArgs, result });
+    return result;
+  } else {
+    return factoryASTInner(funcAST, depArgs);
+  }
+}
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("base64url");
+}
+
+const factoryHashCache = new WeakMap<AnyFunction, string>();
+function factoryHash(factory: AnyFunction): string {
+  const existing = factoryHashCache.get(factory);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const hash = hashOrPass(factory.toString());
+  factoryHashCache.set(factory, hash);
+  return hash;
+}
+
+function hashOrPass(value: string): string {
+  if (value.length < 256) {
+    return value;
+  } else {
+    return sha256(value);
+  }
+}
+
+function cacheKeySpec(
+  arg: t.Expression,
+): readonly [cacheKeyValue: CacheKeyValue, mustCheck: boolean] {
+  switch (arg.type) {
+    // Also includes 'undefined'
+    case "Identifier": {
+      // Same identifier, no need to check value
+      return [{ identifier: arg.name }, false];
+    }
+    case "NumericLiteral": {
+      if (Number.isFinite(arg.value)) {
+        // Finite values are equivalent, no need to check value
+        return [{ literal: arg.value }, false];
+      } else {
+        return UNKNOWN;
+      }
+    }
+    case "StringLiteral":
+    case "BooleanLiteral": {
+      // Same value, no need to check later
+      return [{ literal: arg.value }, false];
+    }
+    case "NullLiteral": {
+      return NULL;
+    }
+    default: {
+      return UNKNOWN;
+    }
+  }
 }
 
 function factoryASTInner(
