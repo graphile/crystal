@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import type { URL } from "node:url";
 import { inspect } from "node:util";
@@ -285,7 +286,7 @@ class CodegenFile {
   _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
     new Map();
 
-  _factoryAstCache = new Map<string, FactoryASTCacheEntry[]>();
+  _factoryAstCache = new Map<string, Map<string, FactoryASTCacheEntry[]>>();
 
   _convertToIdentifierViaASTCache = new Map<t.Expression, t.Identifier>();
 
@@ -1336,16 +1337,26 @@ function factoryAst<TTuple extends any[]>(
 
   const isCacheable = typeof fn === "function";
 
-  const cacheKey = isCacheable
-    ? `${factory.toString().trim()}|${depArgs.length}|${depArgs
-        .map(argShapeKey)
-        .join("\u0001")}`
-    : null;
-  let cacheByKey = cacheKey ? file._factoryAstCache.get(cacheKey) : null;
-  if (cacheKey) {
+  const factoryKey = isCacheable ? factoryHash(factory) : null;
+  let factoryCache =
+    factoryKey !== null ? file._factoryAstCache.get(factoryKey) : undefined;
+  if (factoryKey !== null && factoryCache === undefined) {
+    factoryCache = new Map();
+    file._factoryAstCache.set(factoryKey, factoryCache);
+  }
+
+  const cacheKey =
+    factoryCache !== undefined
+      ? JSON.stringify(depArgs.map(argShapeKey))
+      : null;
+  let cacheByKey =
+    factoryCache !== undefined && cacheKey !== null
+      ? factoryCache.get(cacheKey)
+      : undefined;
+  if (factoryCache !== undefined && cacheKey !== null) {
     if (!cacheByKey) {
       cacheByKey = [];
-      file._factoryAstCache.set(cacheKey, cacheByKey);
+      factoryCache.set(cacheKey, cacheByKey);
     }
 
     for (const existing of cacheByKey) {
@@ -1372,18 +1383,43 @@ function factoryAst<TTuple extends any[]>(
   return result;
 }
 
-function argShapeKey(arg: t.Expression): string {
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("base64url");
+}
+
+const factoryHashCache = new WeakMap<Function, string>();
+function factoryHash(factory: Function): string {
+  const existing = factoryHashCache.get(factory);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const hash = hashOrPass(factory.toString());
+  factoryHashCache.set(factory, hash);
+  return hash;
+}
+
+function hashOrPass(value: string): string {
+  if (value.length < 256) {
+    return value;
+  } else {
+    return sha256(value);
+  }
+}
+
+const UNKNOWN = Object.freeze({ unknown: true });
+const NULL = Object.freeze({ literal: null });
+function argShapeKey(arg: t.Expression) {
   switch (arg.type) {
-    case "Identifier":
-      return "I" + arg.name;
+    case "Identifier": // Also includes 'undefined'
+      return { identifier: arg.name };
     case "StringLiteral":
     case "NumericLiteral":
     case "BooleanLiteral":
-      return "L" + JSON.stringify(arg.value);
+      return { literal: arg.value };
     case "NullLiteral":
-      return "N";
+      return NULL;
     default:
-      return "?";
+      return UNKNOWN;
   }
 }
 
