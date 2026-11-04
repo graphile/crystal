@@ -179,8 +179,8 @@ does not require fetching it again.
 
 ### Extension-owned resources
 
-`pg-introspection` retains extension-owned resources. Applications that exclude
-them from initial discovery can supply entrypoint filters while allowing
+The new introspection APIs retain extension-owned resources. Applications that
+exclude them from initial discovery can supply entrypoint filters while allowing
 policies to fetch extension objects needed by user resources:
 
 ```js
@@ -218,6 +218,12 @@ dependencies must remain available.
 Filtering initial discovery does not distinguish exposed resources from
 dependencies in the returned collections. Consumers must decide which fetched
 objects to expose.
+
+The deprecated `parseIntrospectionResults(value, includeExtensionResources)`
+API retains its legacy behaviour: it removes extension-owned resources from
+the result arrays by default, after building navigation lookups. Pass `true`
+to retain them. This compatibility filtering differs from SQL filters, which
+exclude rows before navigation lookups are built.
 
 ## Privilege filtering
 

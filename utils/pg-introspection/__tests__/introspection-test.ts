@@ -46,40 +46,47 @@ it("supports the legacy parser and entity helpers", () => {
 });
 
 for (const parse of [parseIntrospectionResults, augmentIntrospection]) {
-  it(`${parse.name} retains extension-owned resources`, () => {
-    const result = parse(
-      JSON.stringify({
-        ...rawIntrospectionResults,
-        classes: [{ _id: "1", relnamespace: "2200", relname: "example" }],
-        procs: [{ _id: "2", pronamespace: "2200", proname: "example" }],
-        attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
-        constraints: [{ _id: "3", conrelid: "1", confrelid: "1" }],
-        types: [{ _id: "4", typrelid: "1" }],
-        depends: [
-          {
-            classid: "1259",
-            objid: "1",
-            refclassid: "3079",
-            deptype: "e",
-          },
-          {
-            classid: "1255",
-            objid: "2",
-            refclassid: "3079",
-            deptype: "e",
-          },
-        ],
-      }),
-    );
-    assert.equal(result.classes.length, 1);
-    assert.equal(result.procs.length, 1);
-    assert.equal(result.attributes.length, 1);
-    assert.equal(result.constraints.length, 1);
-    assert.equal(result.types.length, 1);
-    assert.equal(result.getClass({ id: "1" }), result.classes[0]);
-    assert.equal(result.getProc({ id: "2" }), result.procs[0]);
-    assert.equal(result.classes[0].getAttributes()[0], result.attributes[0]);
-  });
+  for (const includeExtensionResources of [undefined, false, true]) {
+    it(`${parse.name} preserves extension filtering (${includeExtensionResources})`, () => {
+      const result = parse(
+        JSON.stringify({
+          ...rawIntrospectionResults,
+          classes: [{ _id: "1", relnamespace: "2200", relname: "example" }],
+          procs: [{ _id: "2", pronamespace: "2200", proname: "example" }],
+          attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
+          constraints: [{ _id: "3", conrelid: "1", confrelid: "1" }],
+          types: [{ _id: "4", typrelid: "1" }],
+          depends: [
+            {
+              classid: "1259",
+              objid: "1",
+              refclassid: "3079",
+              deptype: "e",
+            },
+            {
+              classid: "1255",
+              objid: "2",
+              refclassid: "3079",
+              deptype: "e",
+            },
+          ],
+        }),
+        includeExtensionResources,
+      );
+      const expectedCount = includeExtensionResources ? 1 : 0;
+      assert.equal(result.classes.length, expectedCount);
+      assert.equal(result.procs.length, expectedCount);
+      assert.equal(result.attributes.length, expectedCount);
+      assert.equal(result.constraints.length, expectedCount);
+      assert.equal(result.types.length, expectedCount);
+      const table = result.getClass({ id: "1" });
+      assert.ok(table);
+      assert.equal(table.relname, "example");
+      assert.equal(table.getAttributes()[0].attname, "id");
+      assert.equal(result.getProc({ id: "2" })?.proname, "example");
+      assert.equal(result.getType({ id: "4" })?.getClass(), table);
+    });
+  }
 }
 
 it("requires the collections used by navigation helpers", () => {

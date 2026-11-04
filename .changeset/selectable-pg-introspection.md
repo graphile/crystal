@@ -1,5 +1,5 @@
 ---
-"pg-introspection": major
+"pg-introspection": minor
 ---
 
 NEW! Use `introspect` and `introspectRaw` to run introspection using a supplied
@@ -50,3 +50,6 @@ Import `introspect` from `pg-introspection`. To retain raw data for caching, use
 `augmentIntrospectionData(options, structuredClone(data))` when helpers are
 needed. Use this augmentation API for selected collections too; the legacy
 parser assumes the default collections.
+
+The deprecated parsing APIs retain their existing boolean flag and default
+behaviour for compatibility.
