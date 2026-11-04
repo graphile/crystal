@@ -20,6 +20,7 @@ import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
 import { arraysMatch, connection } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
+import { isUnionType } from "grafast/graphql";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
 import sql from "pg-sql2";
@@ -1094,8 +1095,14 @@ function addRelations(
         sharedFinalResource = null;
       }
 
-      // TEST: previously `sharedCodec?.polymorphism?.mode === "union" || paths.length > 1`
-      const needsPgUnionAll = !sharedFinalResource;
+      // A ref whose target is a polymorphic union must be planned via
+      // `pgUnionAll` even when only a single path leads to it: planned as a
+      // plain relation the result carries no `__typename`, so it cannot be
+      // resolved to a member type.
+      const needsPgUnionAll =
+        !sharedFinalResource ||
+        sharedCodec?.polymorphism?.mode === "union" ||
+        isUnionType(type);
 
       // If we're pulling from a shared codec into a PgUnionAllStep then we can
       // use that codec's attributes as shared attributes; otherwise there are not
