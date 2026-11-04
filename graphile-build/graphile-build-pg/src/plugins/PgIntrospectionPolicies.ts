@@ -1,3 +1,4 @@
+import { Maybe } from "grafast";
 import type {
   IntrospectionPolicy,
   IntrospectionRequest,
@@ -6,6 +7,7 @@ import type {
 } from "pg-introspection";
 import { pruneExtensionResources } from "pg-introspection";
 import sql from "pg-sql2";
+import { invertKeyAndValue } from "../utils";
 
 declare global {
   namespace PgIntrospection {
@@ -43,30 +45,10 @@ const request = (
   field: string,
   value: string | number | null | undefined,
   purpose: PgIntrospection.Purpose,
-): IntrospectionRequest[] =>
+): Maybe<IntrospectionRequest> =>
   value == null || value === "0" || value === 0
-    ? []
-    : [{ entity, match: { [field]: value }, purposes: [purpose] }];
-
-const classRequests = (row: any, constraints: IntrospectionRequest[]) => [
-  ...request("namespaces", "_id", row.relnamespace, "catalogNavigation"),
-  ...request("types", "_id", row.reltype, "completeTypeNavigation"),
-  ...request("types", "_id", row.reloftype, "completeTypeNavigation"),
-  ...(!["i", "I"].includes(row.relkind)
-    ? [
-        ...request("attributes", "attrelid", row._id, "registryCodec"),
-        ...constraints,
-        ...request("indexes", "indrelid", row._id, "catalogNavigation"),
-        ...request("inherits", "inhrelid", row._id, "registryCodec"),
-        ...request(
-          "policies",
-          "polrelid",
-          row._id,
-          "inferRowSecurityBehaviour",
-        ),
-      ]
-    : []),
-];
+    ? null
+    : { entity, match: { [field]: value }, purposes: [purpose] };
 
 /**
  * The policies PostGraphile needs to satisfy its builtin plugins. More
@@ -91,20 +73,17 @@ const policies = (() => {
     );
   }
 
-  rule(
-    "attributesDependencies",
-    "attributes",
-    ["registryCodec"],
-    (row) => request("types", "_id", row.atttypid, "registryCodec"),
+  rule("attributesDependencies", "attributes", ["registryCodec"], (row) =>
+    request("types", "_id", row.atttypid, "registryCodec"),
   );
   rule(
     "procsDependencies",
     "procs",
     ["registryCodec", "catalogNavigation"],
     (row) => [
-      ...request("namespaces", "_id", row.pronamespace, "catalogNavigation"),
-      ...request("types", "_id", row.prorettype, "registryCodec"),
-      ...(row.proallargtypes ?? row.proargtypes ?? []).flatMap((id: string) =>
+      request("namespaces", "_id", row.pronamespace, "catalogNavigation"),
+      request("types", "_id", row.prorettype, "registryCodec"),
+      ...(row.proallargtypes ?? row.proargtypes ?? []).map((id: string) =>
         request("types", "_id", id, "registryCodec"),
       ),
     ],
@@ -127,22 +106,22 @@ const policies = (() => {
         ? "registryCodec"
         : "completeTypeNavigation";
       return [
-        ...request("namespaces", "_id", row.typnamespace, "catalogNavigation"),
-        ...request("types", "_id", row.typelem, purpose),
-        ...request("types", "_id", row.typarray, purpose),
-        ...request("types", "_id", row.typbasetype, purpose),
-        ...(purpose === "registryCodec"
+        request("namespaces", "_id", row.typnamespace, "catalogNavigation"),
+        request("types", "_id", row.typelem, purpose),
+        request("types", "_id", row.typarray, purpose),
+        request("types", "_id", row.typbasetype, purpose),
+        purpose === "registryCodec"
           ? request("classes", "_id", row.typrelid, purpose)
-          : []),
-        ...(row.typtype === "e"
+          : null,
+        row.typtype === "e"
           ? request("enums", "enumtypid", row._id, "registryEnumCodec")
-          : []),
-        ...(row.typtype === "r"
+          : null,
+        row.typtype === "r"
           ? request("ranges", "rngtypid", row._id, purpose)
-          : []),
-        ...(row.typtype === "d"
+          : null,
+        row.typtype === "d"
           ? request("constraints", "contypid", row._id, "catalogNavigation")
-          : []),
+          : null,
       ];
     },
   );
@@ -184,10 +163,8 @@ const policies = (() => {
       entity,
       ["smartTagsAndDescriptions", "pruneExtensionResources"],
       (row, data) => {
-        const catalogId = Object.entries(data.catalogByOid ?? {}).find(
-          ([, name]) => name === catalog,
-        )?.[0];
-        if (!catalogId || !row._id) return [];
+        const catalogId = invertKeyAndValue(data.catalogByOid)[catalog];
+        if (catalogId == null || !row._id) return null;
         const requests: IntrospectionRequest[] = [
           {
             entity: "descriptions",
@@ -210,17 +187,21 @@ const policies = (() => {
 // Exclude extension resources from initial discovery, but retain dependencies
 // referenced by user resources.
 const notExtension = (catalog: string, oid: string) =>
-  `not exists (select 1 from pg_catalog.pg_depend d where d.classid = 'pg_catalog.${catalog}'::regclass and d.objid = ${oid} and d.refclassid = 'pg_catalog.pg_extension'::regclass and d.deptype = 'e')`;
+  `not exists (select 1 from pg_catalog.pg_depend d where d.classid = 'pg_catalog.${
+    catalog
+  }'::regclass and d.objid = ${
+    oid
+  } and d.refclassid = 'pg_catalog.pg_extension'::regclass and d.deptype = 'e')`;
 
 export function postgraphileMultipass(
   schemas: readonly string[] = ["public"],
 ): MultipassOptions {
   return {
     policies: [
-      ...policies.map((policy) => ({
+      ...(policies.map((policy) => ({
         ...policy,
         purposes: [...policy.purposes],
-      })),
+      })) as IntrospectionPolicy[]),
       {
         name: "classDependencies",
         entity: "classes",
@@ -252,14 +233,33 @@ export function postgraphileMultipass(
           const purpose = exposed
             ? "discoverResourceRelations"
             : "registryResourceUnique";
-          const constraints: IntrospectionRequest[] = full
-            ? request("constraints", "conrelid", row._id, purpose)
-            : ["c", "n", "p", "u", "t", "x"].map((contype) => ({
-                entity: "constraints",
-                match: { conrelid: row._id, contype },
-                purposes: [purpose],
-              }));
-          return classRequests(row, constraints);
+          return [
+            request("namespaces", "_id", row.relnamespace, "catalogNavigation"),
+            request("types", "_id", row.reltype, "completeTypeNavigation"),
+            request("types", "_id", row.reloftype, "completeTypeNavigation"),
+            ...(!["i", "I"].includes(row.relkind)
+              ? [
+                  request("attributes", "attrelid", row._id, "registryCodec"),
+                  ...(full
+                    ? [request("constraints", "conrelid", row._id, purpose)]
+                    : ["c", "n", "p", "u", "t", "x"].map(
+                        (contype): IntrospectionRequest => ({
+                          entity: "constraints",
+                          match: { conrelid: row._id, contype },
+                          purposes: [purpose],
+                        }),
+                      )),
+                  request("indexes", "indrelid", row._id, "catalogNavigation"),
+                  request("inherits", "inhrelid", row._id, "registryCodec"),
+                  request(
+                    "policies",
+                    "polrelid",
+                    row._id,
+                    "inferRowSecurityBehaviour",
+                  ),
+                ]
+              : []),
+          ];
         },
       },
       {
@@ -274,25 +274,17 @@ export function postgraphileMultipass(
           "enumTables",
         ],
         select(row, details) {
-          const requests = request(
-            "namespaces",
-            "_id",
-            row.connamespace,
-            "catalogNavigation",
-          );
+          const requests = [
+            request("namespaces", "_id", row.connamespace, "catalogNavigation"),
+          ];
           if (
             row.contype === "f" &&
             (details.hasPurpose("initial") ||
               details.hasPurpose("discoverResourceRelations"))
           ) {
             requests.push(
-              ...request(
-                "classes",
-                "_id",
-                row.confrelid,
-                "registryRelation",
-              ),
-              ...request("classes", "_id", row.confrelid, "enumTables"),
+              request("classes", "_id", row.confrelid, "registryRelation"),
+              request("classes", "_id", row.confrelid, "enumTables"),
             );
           }
           return requests;

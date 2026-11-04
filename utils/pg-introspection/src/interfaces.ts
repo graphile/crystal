@@ -42,6 +42,9 @@ export interface IntrospectionPolicyDetails {
   catalogByOid: Readonly<Record<string, string>>;
 }
 
+export type Maybe<T> = T | null | undefined;
+export type ReadonlyArrayOrDirect<T> = T | readonly T[];
+
 /** Policies must depend only on the row, declared purposes and fixed configuration. */
 export interface IntrospectionPolicy {
   name: string;
@@ -50,7 +53,7 @@ export interface IntrospectionPolicy {
   select: (
     row: any,
     details: IntrospectionPolicyDetails,
-  ) => readonly IntrospectionRequest[] | undefined;
+  ) => ReadonlyArrayOrDirect<Maybe<IntrospectionRequest>>;
 }
 
 /** Infer a policy's row type from its source collection. */
@@ -63,7 +66,7 @@ export function defineIntrospectionPolicy<T extends EntityType>(policy: {
       ? R
       : IntrospectionData[T],
     details: IntrospectionPolicyDetails,
-  ) => readonly IntrospectionRequest[] | undefined;
+  ) => ReadonlyArrayOrDirect<Maybe<IntrospectionRequest>>;
 }): IntrospectionPolicy {
   return policy as IntrospectionPolicy;
 }

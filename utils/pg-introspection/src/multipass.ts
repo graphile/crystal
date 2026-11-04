@@ -424,19 +424,20 @@ export async function introspectRaw<
           if (revisions.get(policy) === revision) {
             continue;
           }
-          const requests =
-            policy.select(row, {
-              catalogByOid,
-              hasPurpose(purpose) {
-                if (!declared.has(purpose)) {
-                  throw new Error(
-                    `Introspection policy '${policy.name}' on '${entity}' read undeclared purpose '${purpose}'`,
-                  );
-                }
-                return snapshot.has(purpose);
-              },
-            }) ?? [];
+          const rawRequests = policy.select(row, {
+            catalogByOid,
+            hasPurpose(purpose) {
+              if (!declared.has(purpose)) {
+                throw new Error(
+                  `Introspection policy '${policy.name}' on '${entity}' read undeclared purpose '${purpose}'`,
+                );
+              }
+              return snapshot.has(purpose);
+            },
+          });
+          const requests = isArray(rawRequests) ? rawRequests : [rawRequests];
           for (const request of requests) {
+            if (request == null) continue;
             if (
               !Array.isArray(request.purposes) ||
               request.purposes.length === 0
@@ -467,6 +468,7 @@ export async function introspectRaw<
           }
           revisions.set(policy, revision);
           for (const request of requests) {
+            if (request == null) continue;
             if (!selected.has(request.entity)) {
               continue;
             }
@@ -553,4 +555,8 @@ export async function introspect<
 ): Promise<Introspection<TEntities>> {
   const result = await introspectRaw(options, runQuery);
   return augmentIntrospectionData<TEntities>(options, result);
+}
+
+function isArray<T>(o: unknown): o is ReadonlyArray<T> {
+  return Array.isArray(o);
 }

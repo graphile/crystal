@@ -509,3 +509,22 @@ export function forbidRequired<T>(t: T): T {
   });
   return t;
 }
+
+const invertKeyAndValueCache = new WeakMap<
+  Readonly<Record<string, string>>,
+  Readonly<Record<string, string>>
+>();
+export function invertKeyAndValue(
+  obj: Readonly<Record<string, string>>,
+): Readonly<Record<string, string>> {
+  let existing = invertKeyAndValueCache.get(obj);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const inverted: Record<string, string> = Object.create(null);
+  for (const [k, v] of Object.entries(obj)) {
+    inverted[v] = k;
+  }
+  invertKeyAndValueCache.set(obj, inverted);
+  return inverted;
+}
