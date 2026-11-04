@@ -62,6 +62,8 @@ declare global {
       nodeIdCodec: string;
       /** For functions returning polymorphic type, which type to choose? */
       returnType: string;
+      /** For computed attribute functions, which GraphQL type(s) should receive this field? */
+      applyToType: string | string[];
 
       /** For enum tables; we shouldn't expose these through GraphQL */
       enum: string | true;
@@ -80,6 +82,10 @@ declare global {
       behavior: string | string[];
       deprecated: string | string[];
       notNull: true;
+      /** For forward relations against polymorphic types, which type to choose? */
+      returnType: string;
+      /** For backward relations against polymorphic types, which type to choose? */
+      foreignReturnType: string;
     }
 
     interface PgCodecRefTags extends PgSmartTagsDict {
