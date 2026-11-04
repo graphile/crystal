@@ -35,10 +35,10 @@
   "homepage": "https://github.com/graphile/graphile-engine/tree/master/packages/lds#readme",
   "dependencies": {
     "@types/pg": "^8.15.6",
-    "@types/ws": "^8.18.1",
+    "@types/ws": "^8.18.2",
     "pg": "^8.16.3",
     "tslib": "^2.8.1",
-    "ws": "^8.21.1"
+    "ws": "^8.22.0"
   },
   "files": [
     "dist"
