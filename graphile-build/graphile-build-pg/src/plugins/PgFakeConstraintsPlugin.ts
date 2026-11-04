@@ -318,7 +318,7 @@ async function processFk(
     foreignTable,
   );
   if (!foreignPgClass) {
-    if (info.resolvedPreset.gather?.pgIntrospection?.multipass !== false) {
+    if (info.resolvedPreset.gather?.pgMultipassIntrospection !== false) {
       const pgService = info.resolvedPreset.pgServices?.find(
         (service) => service.name === serviceName,
       );

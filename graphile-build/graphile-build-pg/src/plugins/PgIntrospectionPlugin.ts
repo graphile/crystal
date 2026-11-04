@@ -55,8 +55,8 @@ export type PgEntityWithId =
 declare global {
   namespace GraphileBuild {
     interface GatherOptions {
-      /** Set multipass to false to introspect all database resources. */
-      pgIntrospection?: { multipass?: boolean };
+      /** Set to false to introspect all database resources in a single pass. */
+      pgMultipassIntrospection?: boolean;
       /**
        * Should we attempt to install the watch fixtures into the database?
        *
@@ -897,7 +897,7 @@ function introspectPgServices(
           "am",
         ],
         multipass:
-          info.resolvedPreset.gather?.pgIntrospection?.multipass === false
+          info.resolvedPreset.gather?.pgMultipassIntrospection === false
             ? false
             : postgraphileMultipass(pgService.schemas ?? ["public"]),
       };

@@ -11,5 +11,5 @@ or in databases that use an identical schema for each tenant where we've
 observed a 97% (!!) reduction in heapTotal usage from building a schema).
 
 If you have any issues with this new feature, set
-`preset.gather.pgIntrospection.multipass` to `false` to use single-pass
+`preset.gather.pgMultipassIntrospection` to `false` to use single-pass
 introspection, and please report the issue with a minimal reproduction.

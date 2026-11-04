@@ -23,7 +23,7 @@ test("referencing non-existent table in single-pass mode throws an error", async
 @foreignKey (post_id) references posts`),
       undefined,
       true,
-      { gather: { pgIntrospection: { multipass: false } } },
+      { gather: { pgMultipassIntrospection: false } },
     )();
   } catch (e) {
     error = e;

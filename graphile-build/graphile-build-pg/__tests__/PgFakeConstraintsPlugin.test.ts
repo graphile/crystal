@@ -54,7 +54,7 @@ function makeContext(
       gather:
         options.multipass === undefined
           ? {}
-          : { pgIntrospection: { multipass: options.multipass } },
+          : { pgMultipassIntrospection: options.multipass },
     },
     helpers: {
       pgIntrospection: {
