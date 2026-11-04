@@ -11,7 +11,7 @@ const offerViewComment = (comment: string) => (pgClient: PoolClient) =>
     )}';`,
   );
 
-test("referencing non-existent table (throws error)", async () => {
+test("referencing non-existent table in single-pass mode throws an error", async () => {
   let error: any;
   try {
     await core.test(
@@ -21,6 +21,9 @@ test("referencing non-existent table (throws error)", async () => {
       offerViewComment(`@name offers
 @primaryKey id
 @foreignKey (post_id) references posts`),
+      undefined,
+      true,
+      { gather: { pgIntrospection: { multipass: false } } },
     )();
   } catch (e) {
     error = e;

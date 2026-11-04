@@ -1,0 +1,246 @@
+import { Client } from "pg";
+import { introspect, type MultipassOptions } from "pg-introspection";
+
+import { postgraphileMultipass } from "../src/plugins/PgIntrospectionPolicies.ts";
+
+test.each([false, true])(
+  "preserves extension row type references (multipass: %s)",
+  async (multipass) => {
+    const client = new Client({
+      database: "graphilecrystaltest",
+      user: "graphilecrystaltest",
+      password: "test",
+      host: process.env.PGHOST ?? "localhost",
+    });
+    await client.connect();
+    try {
+      await client.query("begin");
+      await client.query("create schema extension_row_type_test");
+      await client.query(
+        "create extension pg_buffercache with schema extension_row_type_test",
+      );
+      await client.query(`
+        create function extension_row_type_test.buffer_id(
+          entry extension_row_type_test.pg_buffercache
+        ) returns integer language sql stable as $$ select entry.bufferid $$
+      `);
+      const result = await introspect(
+        {
+          schemas: ["extension_row_type_test"],
+          multipass: multipass ? postgraphileMultipass() : false,
+        },
+        async (text, values) =>
+          (await client.query(text, values)).rows[0].introspection,
+      );
+      const proc = result.procs.find((p) => p.proname === "buffer_id");
+      expect(proc).toBeDefined();
+      const args = proc!.getArguments();
+      expect(args[0].type.typname).toBe("pg_buffercache");
+      const row = args[0].type.getClass()!;
+      expect(row.relname).toBe("pg_buffercache");
+      expect(row.getAttributes().map((a) => a.attname)).toContain("bufferid");
+      expect(result.classes.some((c) => c.relname === "pg_buffercache")).toBe(
+        false,
+      );
+      expect(result.types.some((t) => t.typname === "pg_buffercache")).toBe(
+        false,
+      );
+      expect(
+        result.procs.some((p) => p.proname === "pg_buffercache_pages"),
+      ).toBe(false);
+    } finally {
+      await client.query("rollback");
+      await client.end();
+    }
+  },
+);
+
+test.each([false, true])(
+  "accumulates FK target requirements regardless of arrival order (%s)",
+  async (upgrade) => {
+    const client = new Client({
+      database: "graphilecrystaltest",
+      user: "graphilecrystaltest",
+      password: "test",
+      host: process.env.PGHOST ?? "localhost",
+    });
+    await client.connect();
+    try {
+      await client.query("begin");
+      await client.query(`
+      create schema purpose_public;
+      create schema purpose_private;
+      create table purpose_private.target (id integer primary key, parent_id integer references purpose_private.target(id));
+      create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
+    `);
+      const multipass = postgraphileMultipass();
+      multipass.policies = [
+        ...multipass.policies!,
+        {
+          name: "testResourcePath",
+          entity: "classes",
+          purposes: ["registryResourceRelation", "registryResourceCodec"],
+          select(row, details) {
+            if (
+              row.relname !== "target" ||
+              (upgrade && !details.hasPurpose("registryResourceRelation"))
+            ) {
+              return [];
+            }
+            return [
+              {
+                entity: "classes",
+                match: { _id: row._id },
+                purposes: ["registryResourceCodec"],
+              },
+            ];
+          },
+        },
+      ];
+      const result = await introspect(
+        {
+          schemas: upgrade
+            ? ["purpose_public"]
+            : ["purpose_private", "purpose_public"],
+          multipass,
+        },
+        async (text, values) =>
+          (await client.query(text, values)).rows[0].introspection,
+      );
+      const target = result.classes.find((row) => row.relname === "target")!;
+      expect(
+        target
+          .getConstraints()
+          .map((row) => row.contype)
+          .filter((type) => type !== "n")
+          .sort(),
+      ).toEqual(["f", "p"]);
+    } finally {
+      await client.query("rollback");
+      await client.end();
+    }
+  },
+);
+
+test("does not traverse outgoing FKs of a target-only table", async () => {
+  const client = new Client({
+    database: "graphilecrystaltest",
+    user: "graphilecrystaltest",
+    password: "test",
+    host: process.env.PGHOST ?? "localhost",
+  });
+  await client.connect();
+  try {
+    await client.query("begin");
+    await client.query(`
+      create schema purpose_public;
+      create schema purpose_private;
+      create table purpose_private.unneeded (id integer primary key);
+      create table purpose_private.target (id integer primary key, parent_id integer references purpose_private.unneeded(id));
+      create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
+    `);
+    const result = await introspect(
+      { schemas: ["purpose_public"], multipass: postgraphileMultipass() },
+      async (text, values) =>
+        (await client.query(text, values)).rows[0].introspection,
+    );
+    expect(result.classes.some((row) => row.relname === "unneeded")).toBe(
+      false,
+    );
+    const target = result.classes.find((row) => row.relname === "target")!;
+    expect(
+      target
+        .getConstraints()
+        .map((row) => row.contype)
+        .filter((type) => type !== "n"),
+    ).toEqual(["p"]);
+  } finally {
+    await client.query("rollback");
+    await client.end();
+  }
+});
+
+test("only expands inaccessible row types when required by a resource", async () => {
+  const client = new Client({
+    database: "graphilecrystaltest",
+    user: "graphilecrystaltest",
+    password: "test",
+    host: process.env.PGHOST ?? "localhost",
+  });
+  await client.connect();
+  try {
+    await client.query("begin");
+    await client.query(`
+      create role purpose_reader;
+      create schema purpose_access;
+      grant usage on schema purpose_access to purpose_reader;
+      create table purpose_access.hidden (id integer primary key);
+      create table purpose_access.required (id integer primary key);
+      create table purpose_access.visible (id integer primary key);
+      grant select on purpose_access.visible to purpose_reader;
+      create function purpose_access.required_row()
+        returns purpose_access.required language sql stable
+        as $$ select null::purpose_access.required $$;
+      grant execute on function purpose_access.required_row() to purpose_reader;
+    `);
+    const multipass = postgraphileMultipass();
+    multipass.onlyAccessible = { role: "purpose_reader" };
+    const result = await introspect(
+      { schemas: ["purpose_access"], multipass },
+      async (text, values) =>
+        (await client.query(text, values)).rows[0].introspection,
+    );
+    expect(result.types.some((row) => row.typname === "hidden")).toBe(true);
+    expect(result.classes.some((row) => row.relname === "hidden")).toBe(false);
+    expect(result.classes.some((row) => row.relname === "visible")).toBe(true);
+    const proc = result.procs.find((row) => row.proname === "required_row")!;
+    expect(
+      proc
+        .getReturnType()!
+        .getClass()!
+        .getAttributes()
+        .map((a) => a.attname),
+    ).toEqual(["id"]);
+  } finally {
+    await client.query("rollback");
+    await client.end();
+  }
+});
+
+test.each(["sys_procs", "event_triggers"] as const)(
+  "preserves descriptions and dependencies selected with %s",
+  async (entity) => {
+    const client = new Client({
+      database: "graphilecrystaltest",
+      user: "graphilecrystaltest",
+      password: "test",
+      host: process.env.PGHOST ?? "localhost",
+    });
+    await client.connect();
+    try {
+      await client.query("begin");
+      await client.query(`
+        create schema purpose_metadata;
+        create function purpose_metadata.on_ddl() returns event_trigger
+          language plpgsql as $$ begin end $$;
+        create event trigger purpose_metadata_trigger on ddl_command_end
+          execute function purpose_metadata.on_ddl();
+        comment on event trigger purpose_metadata_trigger is 'Event description';
+      `);
+      const run = (multipass: false | MultipassOptions) =>
+        introspect(
+          { onlyEntities: [entity, "descriptions", "depends"], multipass },
+          async (text, values) =>
+            (await client.query(text, values)).rows[0].introspection,
+        );
+      const single = await run(false);
+      const multi = await run({});
+      expect(single.descriptions.length).toBeGreaterThan(0);
+      expect(multi.descriptions).toEqual(single.descriptions);
+      expect(multi.depends).toEqual(single.depends);
+    } finally {
+      await client.query("rollback");
+      await client.end();
+    }
+  },
+);
