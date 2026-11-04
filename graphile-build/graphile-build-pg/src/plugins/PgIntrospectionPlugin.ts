@@ -285,6 +285,39 @@ async function getDb(
   return relevant;
 }
 
+// Key caches by the exposed collection so hidden dependency rows stay hidden.
+const entityIndexes = new WeakMap<
+  PgEntityWithId[],
+  Map<string, PgEntityWithId>
+>();
+const inheritanceIndexes = new WeakMap<
+  Introspection["inherits"],
+  Record<"inhrelid" | "inhparent", Map<string, Introspection["inherits"]>>
+>();
+
+function getInheritanceRows(
+  list: Introspection["inherits"],
+  column: "inhrelid" | "inhparent",
+  classId: string,
+) {
+  let indexes = inheritanceIndexes.get(list);
+  if (!indexes) {
+    indexes = { inhrelid: new Map(), inhparent: new Map() };
+    for (const row of list) {
+      for (const key of ["inhrelid", "inhparent"] as const) {
+        const group = indexes[key].get(row[key]);
+        if (group) {
+          group.push(row);
+        } else {
+          indexes[key].set(row[key], [row]);
+        }
+      }
+    }
+    inheritanceIndexes.set(list, indexes);
+  }
+  return indexes[column].get(classId)?.slice() ?? [];
+}
+
 function makeGetEntity<
   TKey extends KeysOfType<Introspection, Array<PgEntityWithId>> &
     keyof Introspection,
@@ -301,13 +334,23 @@ function makeGetEntity<
         `Could not find database '${serviceName}''s introspection results for '${loc}'`,
       );
     }
-    return (list as PgEntityWithId[]).find((entity: PgEntityWithId) =>
-      "_id" in entity
-        ? entity._id === id
-        : "indexrelid" in entity
-          ? entity.indexrelid === id
-          : false,
-    );
+    let index = entityIndexes.get(list);
+    if (!index) {
+      index = new Map();
+      for (const entity of list as PgEntityWithId[]) {
+        const key =
+          "_id" in entity
+            ? entity._id
+            : "indexrelid" in entity
+              ? entity.indexrelid
+              : undefined;
+        if (key !== undefined && !index.has(key)) {
+          index.set(key, entity);
+        }
+      }
+      entityIndexes.set(list, index);
+    }
+    return index.get(id) as Introspection[TKey][number] | undefined;
   };
 }
 
@@ -476,18 +519,15 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       },
 
       async getInheritedForClass(info, serviceName, classId) {
-        // const pgClass = await info.helpers.pgIntrospection.getClass(serviceName, classId);
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.inherits;
-        // PERF: cache
-        return list.filter((entity) => entity.inhrelid === classId);
+        return getInheritanceRows(list, "inhrelid", classId);
       },
 
       async getInheritanceChildrenForClass(info, serviceName, classId) {
         const relevant = await getDb(info, serviceName);
         const list = relevant.introspection.inherits;
-        // PERF: cache
-        return list.filter((entity) => entity.inhparent === classId);
+        return getInheritanceRows(list, "inhparent", classId);
       },
 
       async getNamespaceByName(info, serviceName, name) {

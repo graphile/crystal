@@ -21,13 +21,21 @@ export function pruneIntrospectionData<TEntities extends EntityType>(
           return;
         }
         const moved = [];
+        const hiddenIndexes = new Set<number>();
         for (let i = collection.length - 1; i >= 0; i--) {
           if (matches(collection[i])) {
             moved.push(collection[i]);
-            collection.splice(i, 1);
+            hiddenIndexes.add(i);
           }
         }
         if (moved.length > 0) {
+          let write = 0;
+          for (let read = 0; read < collection.length; read++) {
+            if (!hiddenIndexes.has(read)) {
+              collection[write++] = collection[read];
+            }
+          }
+          collection.length = write;
           const retained = (result.hidden ??= {}) as Record<string, any[]>;
           const target = (retained[entity] ??= []);
           for (const row of moved.reverse()) {
