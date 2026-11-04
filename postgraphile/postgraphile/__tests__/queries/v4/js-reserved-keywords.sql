@@ -42,7 +42,7 @@ from "js_reserved"."relational_items" as __relational_items__
 order by __relational_items__."id" asc;
 
 with __relational_topics_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __relational_topics_result__.*
 from __relational_topics_identifiers__,
@@ -57,7 +57,7 @@ lateral (
 ) as __relational_topics_result__;
 
 with __relational_status_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __relational_status_result__.*
 from __relational_status_identifiers__,

@@ -8,7 +8,7 @@ where (
 order by __relational_commentables__.id asc;
 
 with __relational_posts_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __relational_posts_result__.*
 from __relational_posts_identifiers__,
@@ -64,7 +64,7 @@ where
   );
 
 with __relational_checklist_items_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "int4")) with ordinality as ids
 )
 select __relational_checklist_items_result__.*
 from __relational_checklist_items_identifiers__,
