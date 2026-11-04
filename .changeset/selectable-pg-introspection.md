@@ -26,28 +26,29 @@ These apply to the single introspection query or, with multipass enabled, to
 every discovery and dependency query.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
-are deprecated in favour of `introspect` or `introspectRaw`. Replace the old
-manual query/parse pattern:
+are deprecated in favour of either `introspect` or the
+`introspectRaw`/`augmentIntrospectionData` combo; the deprecated methods to not
+gain any of this new functionality. Replace the old manual query/parse pattern:
 
 ```js
-const { rows } = await client.query(makeIntrospectionQuery());
-const introspection = parseIntrospectionResults(rows[0].introspection);
+import {
+  makeIntrospectionQuery,
+  parseIntrospectionResults,
+} from "pg-introspection";
+
+const text = makeIntrospectionQuery();
+const { rows } = await client.query(text);
+const result = rows[0].introspection;
+const introspection = parseIntrospectionResults(result);
 ```
 
 with:
 
 ```js
+import { introspect } from "pg-introspection";
+
 const introspection = await introspect({}, async (text, values) => {
   const { rows } = await client.query(text, values);
   return rows[0].introspection;
 });
 ```
-
-Import `introspect` from `pg-introspection`. To retain raw data for caching, use
-`introspectRaw` with the same arguments, then call
-`augmentIntrospectionData(options, structuredClone(data))` when helpers are
-needed. Use this augmentation API for selected collections too; the legacy
-parser assumes the default collections.
-
-The deprecated parsing APIs retain their existing boolean flag and default
-behaviour for compatibility.
