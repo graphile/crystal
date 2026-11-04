@@ -40,22 +40,22 @@ const request = (
   entity: Entity,
   field: string,
   value: string | number | null | undefined,
-  purpose: PgIntrospection.Purpose = "registryResourceCodec",
+  purpose: PgIntrospection.Purpose,
 ): IntrospectionRequest[] =>
   value == null || value === "0" || value === 0
     ? []
     : [{ entity, match: { [field]: value }, purposes: [purpose] }];
 
 const classRequests = (row: any, constraints: IntrospectionRequest[]) => [
-  ...request("namespaces", "_id", row.relnamespace),
+  ...request("namespaces", "_id", row.relnamespace, "registryResourceCodec"),
   ...request("types", "_id", row.reltype, "completeTypeNavigation"),
   ...request("types", "_id", row.reloftype, "completeTypeNavigation"),
   ...(!["i", "I"].includes(row.relkind)
     ? [
-        ...request("attributes", "attrelid", row._id),
+        ...request("attributes", "attrelid", row._id, "registryResourceCodec"),
         ...constraints,
-        ...request("indexes", "indrelid", row._id),
-        ...request("inherits", "inhrelid", row._id),
+        ...request("indexes", "indrelid", row._id, "registryResourceCodec"),
+        ...request("inherits", "inhrelid", row._id, "registryResourceCodec"),
         ...request(
           "policies",
           "polrelid",
@@ -93,13 +93,13 @@ const policies = (() => {
     "attributesDependencies",
     "attributes",
     ["registryResourceCodec"],
-    (row) => request("types", "_id", row.atttypid),
+    (row) => request("types", "_id", row.atttypid, "registryResourceCodec"),
   );
   rule("procsDependencies", "procs", ["registryResourceCodec"], (row) => [
-    ...request("namespaces", "_id", row.pronamespace),
-    ...request("types", "_id", row.prorettype),
+    ...request("namespaces", "_id", row.pronamespace, "registryResourceCodec"),
+    ...request("types", "_id", row.prorettype, "registryResourceCodec"),
     ...(row.proallargtypes ?? row.proargtypes ?? []).flatMap((id: string) =>
-      request("types", "_id", id),
+      request("types", "_id", id, "registryResourceCodec"),
     ),
   ]);
   rule(
@@ -119,7 +119,12 @@ const policies = (() => {
         ? "registryResourceCodec"
         : "completeTypeNavigation";
       return [
-        ...request("namespaces", "_id", row.typnamespace),
+        ...request(
+          "namespaces",
+          "_id",
+          row.typnamespace,
+          "registryResourceCodec",
+        ),
         ...request("types", "_id", row.typelem, purpose),
         ...request("types", "_id", row.typarray, purpose),
         ...request("types", "_id", row.typbasetype, purpose),
@@ -129,21 +134,23 @@ const policies = (() => {
         ...(row.typtype === "e"
           ? request("enums", "enumtypid", row._id, "registryEnumCodec")
           : []),
-        ...(row.typtype === "r" ? request("ranges", "rngtypid", row._id) : []),
+        ...(row.typtype === "r"
+          ? request("ranges", "rngtypid", row._id, "registryResourceCodec")
+          : []),
         ...(row.typtype === "d"
-          ? request("constraints", "contypid", row._id)
+          ? request("constraints", "contypid", row._id, "registryResourceCodec")
           : []),
       ];
     },
   );
   rule("rangesDependencies", "ranges", ["registryResourceCodec"], (row) =>
-    request("types", "_id", row.rngsubtype),
+    request("types", "_id", row.rngsubtype, "registryResourceCodec"),
   );
   rule("indexesDependencies", "indexes", ["registryResourceCodec"], (row) =>
-    request("classes", "_id", row.indexrelid),
+    request("classes", "_id", row.indexrelid, "registryResourceCodec"),
   );
   rule("inheritsDependencies", "inherits", ["registryResourceCodec"], (row) =>
-    request("classes", "_id", row.inhparent),
+    request("classes", "_id", row.inhparent, "registryResourceCodec"),
   );
 
   const catalogs: Partial<Record<Entity, string>> = {
@@ -246,7 +253,12 @@ export function postgraphileMultipass(
           "enumTables",
         ],
         select(row, details) {
-          const requests = request("namespaces", "_id", row.connamespace);
+          const requests = request(
+            "namespaces",
+            "_id",
+            row.connamespace,
+            "registryResourceCodec",
+          );
           if (
             row.contype === "f" &&
             (details.hasPurpose("initial") ||
