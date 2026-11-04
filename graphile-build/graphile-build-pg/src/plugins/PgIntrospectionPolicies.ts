@@ -34,10 +34,8 @@ declare global {
   }
 }
 
-/** PostGraphile's catalog graph. The library itself does not impose these rules. */
-const policies: IntrospectionPolicy[] = [];
-
 type Entity = IntrospectionPolicy["entity"];
+
 const request = (
   entity: Entity,
   field: string,
@@ -47,15 +45,6 @@ const request = (
   value == null || value === "0" || value === 0
     ? []
     : [{ entity, match: { [field]: value }, purposes: [purpose] }];
-
-function rule(
-  name: string,
-  entity: Entity,
-  purposes: readonly PgIntrospection.Purpose[],
-  select: IntrospectionPolicy["select"],
-) {
-  policies.push({ name, entity, purposes, select });
-}
 
 const classRequests = (row: any, constraints: IntrospectionRequest[]) => [
   ...request("namespaces", "_id", row.relnamespace),
@@ -76,97 +65,126 @@ const classRequests = (row: any, constraints: IntrospectionRequest[]) => [
       ]
     : []),
 ];
-rule("attributesDependencies", "attributes", ["registryResourceCodec"], (row) =>
-  request("types", "_id", row.atttypid),
-);
-rule("procsDependencies", "procs", ["registryResourceCodec"], (row) => [
-  ...request("namespaces", "_id", row.pronamespace),
-  ...request("types", "_id", row.prorettype),
-  ...(row.proallargtypes ?? row.proargtypes ?? []).flatMap((id: string) =>
-    request("types", "_id", id),
-  ),
-]);
-rule(
-  "typeDependencies",
-  "types",
-  [
-    "initial",
-    "registryResourceCodec",
-    "completeTypeNavigation",
-    "registryEnumCodec",
-  ],
-  (row, details) => {
-    // Only types reached as resources expand their related types as resources.
-    // Initial type USAGE does not imply access to its table: PostgreSQL grants
-    // PUBLIC usage of table row types by default.
-    const purpose = details.hasPurpose("registryResourceCodec")
-      ? "registryResourceCodec"
-      : "completeTypeNavigation";
-    return [
-      ...request("namespaces", "_id", row.typnamespace),
-      ...request("types", "_id", row.typelem, purpose),
-      ...request("types", "_id", row.typarray, purpose),
-      ...request("types", "_id", row.typbasetype, purpose),
-      ...(purpose === "registryResourceCodec"
-        ? request("classes", "_id", row.typrelid, purpose)
-        : []),
-      ...(row.typtype === "e"
-        ? request("enums", "enumtypid", row._id, "registryEnumCodec")
-        : []),
-      ...(row.typtype === "r" ? request("ranges", "rngtypid", row._id) : []),
-      ...(row.typtype === "d"
-        ? request("constraints", "contypid", row._id)
-        : []),
-    ];
-  },
-);
-rule("rangesDependencies", "ranges", ["registryResourceCodec"], (row) =>
-  request("types", "_id", row.rngsubtype),
-);
-rule("indexesDependencies", "indexes", ["registryResourceCodec"], (row) =>
-  request("classes", "_id", row.indexrelid),
-);
-rule("inheritsDependencies", "inherits", ["registryResourceCodec"], (row) =>
-  request("classes", "_id", row.inhparent),
-);
 
-const catalogs: Partial<Record<Entity, string>> = {
-  namespaces: "pg_namespace",
-  classes: "pg_class",
-  procs: "pg_proc",
-  types: "pg_type",
-  constraints: "pg_constraint",
-  enums: "pg_enum",
-  extensions: "pg_extension",
-};
-for (const [entity, catalog] of Object.entries(catalogs) as Array<
-  [Entity, string]
->) {
+/**
+ * The policies PostGraphile needs to satisfy its builtin plugins. More
+ * policies can be added via the `pgIntrospection_options` gather hook
+ */
+const policies = (() => {
+  const policies: Readonly<IntrospectionPolicy>[] = [];
+
+  function rule(
+    name: string,
+    entity: Entity,
+    purposes: readonly PgIntrospection.Purpose[],
+    select: IntrospectionPolicy["select"],
+  ) {
+    policies.push(
+      Object.freeze({
+        name,
+        entity,
+        purposes: Object.freeze([...purposes]),
+        select,
+      }),
+    );
+  }
+
   rule(
-    `${entity}DescriptionsAndOwnership`,
-    entity,
-    ["smartTagsAndDescriptions", "pruneExtensionResources"],
-    (row, data) => {
-      const catalogId = Object.entries(data.catalogByOid ?? {}).find(
-        ([, name]) => name === catalog,
-      )?.[0];
-      if (!catalogId || !row._id) return [];
-      const requests: IntrospectionRequest[] = [
-        {
-          entity: "descriptions",
-          match: { classoid: catalogId, objoid: row._id },
-          purposes: ["smartTagsAndDescriptions"],
-        },
-        {
-          entity: "depends",
-          match: { classid: catalogId, objid: row._id },
-          purposes: ["pruneExtensionResources"],
-        },
+    "attributesDependencies",
+    "attributes",
+    ["registryResourceCodec"],
+    (row) => request("types", "_id", row.atttypid),
+  );
+  rule("procsDependencies", "procs", ["registryResourceCodec"], (row) => [
+    ...request("namespaces", "_id", row.pronamespace),
+    ...request("types", "_id", row.prorettype),
+    ...(row.proallargtypes ?? row.proargtypes ?? []).flatMap((id: string) =>
+      request("types", "_id", id),
+    ),
+  ]);
+  rule(
+    "typeDependencies",
+    "types",
+    [
+      "initial",
+      "registryResourceCodec",
+      "completeTypeNavigation",
+      "registryEnumCodec",
+    ],
+    (row, details) => {
+      // Only types reached as resources expand their related types as resources.
+      // Initial type USAGE does not imply access to its table: PostgreSQL grants
+      // PUBLIC usage of table row types by default.
+      const purpose = details.hasPurpose("registryResourceCodec")
+        ? "registryResourceCodec"
+        : "completeTypeNavigation";
+      return [
+        ...request("namespaces", "_id", row.typnamespace),
+        ...request("types", "_id", row.typelem, purpose),
+        ...request("types", "_id", row.typarray, purpose),
+        ...request("types", "_id", row.typbasetype, purpose),
+        ...(purpose === "registryResourceCodec"
+          ? request("classes", "_id", row.typrelid, purpose)
+          : []),
+        ...(row.typtype === "e"
+          ? request("enums", "enumtypid", row._id, "registryEnumCodec")
+          : []),
+        ...(row.typtype === "r" ? request("ranges", "rngtypid", row._id) : []),
+        ...(row.typtype === "d"
+          ? request("constraints", "contypid", row._id)
+          : []),
       ];
-      return requests;
     },
   );
-}
+  rule("rangesDependencies", "ranges", ["registryResourceCodec"], (row) =>
+    request("types", "_id", row.rngsubtype),
+  );
+  rule("indexesDependencies", "indexes", ["registryResourceCodec"], (row) =>
+    request("classes", "_id", row.indexrelid),
+  );
+  rule("inheritsDependencies", "inherits", ["registryResourceCodec"], (row) =>
+    request("classes", "_id", row.inhparent),
+  );
+
+  const catalogs: Partial<Record<Entity, string>> = {
+    namespaces: "pg_namespace",
+    classes: "pg_class",
+    procs: "pg_proc",
+    types: "pg_type",
+    constraints: "pg_constraint",
+    enums: "pg_enum",
+    extensions: "pg_extension",
+  };
+  for (const [entity, catalog] of Object.entries(catalogs) as Array<
+    [Entity, string]
+  >) {
+    rule(
+      `${entity}DescriptionsAndOwnership`,
+      entity,
+      ["smartTagsAndDescriptions", "pruneExtensionResources"],
+      (row, data) => {
+        const catalogId = Object.entries(data.catalogByOid ?? {}).find(
+          ([, name]) => name === catalog,
+        )?.[0];
+        if (!catalogId || !row._id) return [];
+        const requests: IntrospectionRequest[] = [
+          {
+            entity: "descriptions",
+            match: { classoid: catalogId, objoid: row._id },
+            purposes: ["smartTagsAndDescriptions"],
+          },
+          {
+            entity: "depends",
+            match: { classid: catalogId, objid: row._id },
+            purposes: ["pruneExtensionResources"],
+          },
+        ];
+        return requests;
+      },
+    );
+  }
+  return Object.freeze(policies);
+})();
 
 // Exclude extension resources from initial discovery, but retain dependencies
 // referenced by user resources.
@@ -178,7 +196,10 @@ export function postgraphileMultipass(
 ): MultipassOptions {
   return {
     policies: [
-      ...policies,
+      ...policies.map((policy) => ({
+        ...policy,
+        purposes: [...policy.purposes],
+      })),
       {
         name: "classDependencies",
         entity: "classes",
