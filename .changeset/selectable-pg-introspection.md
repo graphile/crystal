@@ -6,19 +6,13 @@ NEW! Use `introspect` and `introspectRaw` to run introspection using a supplied
 database query callback, rather than building the query and running it yourself.
 `introspect` returns full introspection results (including navigation helpers);
 `introspectRaw` returns plain introspection data, which can be passed to
-`augmentIntrospectionData` separately. This is useful when caching results:
-clone cached data before augmentation and pass the same options used to fetch
-it.
+`augmentIntrospectionData` separately (passing the same options). The latter is
+useful when caching results: clone cached data before augmentation.
 
 NEW! The `onlyEntities` option (experimental) allows you to select catalog
 collections, including additional PostgreSQL collections such as settings,
 triggers and foreign servers. Some collections require others to be selected; an
 error will be reported when a required collection was not included.
-
-NEW! Top-level `filters` accepts trusted SQL predicates keyed by collection.
-These apply to the single introspection query or, with multipass enabled, to
-every discovery and dependency query. `makeIntrospectionQuery` also accepts
-`onlyEntities` and `filters`.
 
 NEW! Multipass introspection (opt-in with `multipass: { policies: [...] }`)
 allows pg-introspection to minimize the amount of data it pulls from the
@@ -26,6 +20,11 @@ database to just the parts you're interested in, significantly reducing memory
 usage. Supports configurable discovery policies, role-based filtering,
 entrypoint filters and pruning. See the
 [multipass guide](https://star.graphile.org/pg-introspection/multipass).
+
+NEW! Top-level `filters` accepts trusted SQL predicates keyed by collection.
+These apply to the single introspection query or, with multipass enabled, to
+every discovery and dependency query. `makeIntrospectionQuery` also accepts
+`onlyEntities` and `filters`.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of `introspect` or `introspectRaw`. Replace the old
