@@ -19,12 +19,9 @@ import { defaultEntities } from "./query.ts";
 
 function del<T extends Record<string, any>, TKey extends keyof T>(
   toDelete: Set<string>,
-  collection: T[] | undefined,
+  collection: T[],
   attr: TKey,
 ) {
-  if (collection == null) {
-    return;
-  }
   for (let i = collection.length - 1; i >= 0; i--) {
     const entry = collection[i];
     if (entry[attr] != null && toDelete.has(entry[attr])) {
@@ -269,15 +266,46 @@ export function augmentIntrospection(
   introspectionResultsString: string,
   includeExtensionResources = false,
 ): Introspection<DefaultEntities> {
-  const introspection: IntrospectionDataForEntities = JSON.parse(
+  const introspectionData: IntrospectionDataForEntities = JSON.parse(
     introspectionResultsString,
   );
-  const result = augmentIntrospectionData<DefaultEntities>(
+  const introspection = augmentIntrospectionData<DefaultEntities>(
     { onlyEntities: [...defaultEntities] },
-    introspection,
+    introspectionData,
   );
-  filterLegacyExtensionResources(result, includeExtensionResources);
-  return result;
+  const { oidByCatalog } = introspection._lookups;
+
+  if (!includeExtensionResources) {
+    // Go through and delete things from the extensions
+    const extensionProcOids = new Set<string>();
+    const extensionClassOids = new Set<string>();
+    for (const pg_depend of introspection.depends) {
+      if (
+        pg_depend.refclassid === oidByCatalog["pg_extension"] &&
+        pg_depend.deptype === "e" &&
+        pg_depend.classid === oidByCatalog["pg_proc"]
+      ) {
+        extensionProcOids.add(pg_depend.objid);
+      }
+
+      if (
+        pg_depend.refclassid === oidByCatalog["pg_extension"] &&
+        pg_depend.deptype === "e" &&
+        pg_depend.classid === oidByCatalog["pg_class"]
+      ) {
+        extensionClassOids.add(pg_depend.objid);
+      }
+    }
+
+    del(extensionProcOids, introspection.procs, "_id");
+    del(extensionClassOids, introspection.classes, "_id");
+    del(extensionClassOids, introspection.attributes, "attrelid");
+    del(extensionClassOids, introspection.constraints, "conrelid");
+    del(extensionClassOids, introspection.constraints, "confrelid");
+    del(extensionClassOids, introspection.types, "typrelid");
+  }
+
+  return introspection;
 }
 
 /**
@@ -485,45 +513,4 @@ export function augmentIntrospectionData<
   populateLookups(introspection, lookups);
 
   return introspection;
-}
-
-/** Preserve extension filtering for the deprecated API. */
-function filterLegacyExtensionResources(
-  introspection: Introspection<DefaultEntities>,
-  includeExtensionResources: boolean,
-) {
-  const { oidByCatalog } = introspection._lookups;
-
-  if (!includeExtensionResources) {
-    // Filter the exposed arrays after building lookups so navigation retains
-    // access to extension objects referenced by user resources.
-    const extensionProcOids = new Set<string>();
-    const extensionClassOids = new Set<string>();
-    if (introspection.depends) {
-      for (const pg_depend of introspection.depends) {
-        if (
-          pg_depend.refclassid === oidByCatalog["pg_extension"] &&
-          pg_depend.deptype === "e" &&
-          pg_depend.classid === oidByCatalog["pg_proc"]
-        ) {
-          extensionProcOids.add(pg_depend.objid);
-        }
-
-        if (
-          pg_depend.refclassid === oidByCatalog["pg_extension"] &&
-          pg_depend.deptype === "e" &&
-          pg_depend.classid === oidByCatalog["pg_class"]
-        ) {
-          extensionClassOids.add(pg_depend.objid);
-        }
-      }
-    }
-
-    del(extensionProcOids, introspection.procs, "_id");
-    del(extensionClassOids, introspection.classes, "_id");
-    del(extensionClassOids, introspection.attributes, "attrelid");
-    del(extensionClassOids, introspection.constraints, "conrelid");
-    del(extensionClassOids, introspection.constraints, "confrelid");
-    del(extensionClassOids, introspection.types, "typrelid");
-  }
 }
