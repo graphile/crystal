@@ -282,3 +282,68 @@ test.each(["sys_procs", "event_triggers"] as const)(
     }
   },
 );
+
+test.each([false, true])(
+  "preserves range subtype purposes (required by codec: %s)",
+  async (codec) => {
+    const client = new Client({
+      database: "graphilecrystaltest",
+      user: "graphilecrystaltest",
+      password: "test",
+      host: process.env.PGHOST ?? "localhost",
+    });
+    await client.connect();
+    try {
+      await client.query("begin");
+      await client.query(`
+        create schema purpose_range;
+        create type purpose_range.my_range as range (subtype = integer);
+      `);
+      if (codec) {
+        await client.query(`
+          create function purpose_range.range_value()
+            returns purpose_range.my_range language sql stable
+            as $$ select null::purpose_range.my_range $$;
+        `);
+      }
+      const multipass = postgraphileMultipass(["purpose_range"]);
+      // PostgreSQL also creates range constructor functions; exclude those
+      // so only the explicit function supplies a codec requirement.
+      multipass.entrypointFilters = {
+        ...multipass.entrypointFilters,
+        procs: "proname = 'range_value'",
+      };
+      let subtypeCodec = false;
+      let subtypeNavigation = false;
+      multipass.policies = [
+        ...multipass.policies!,
+        {
+          name: "observeRangeSubtype",
+          entity: "types",
+          purposes: ["registryResourceCodec", "completeTypeNavigation"],
+          select(row, details) {
+            if (row.typname === "int4") {
+              subtypeCodec ||= details.hasPurpose("registryResourceCodec");
+              subtypeNavigation ||= details.hasPurpose(
+                "completeTypeNavigation",
+              );
+            }
+            return [];
+          },
+        },
+      ];
+      await introspectRaw(
+        { multipass },
+        async (text, values) =>
+          (await client.query(text, values)).rows[0].introspection,
+      );
+      expect(subtypeCodec).toBe(codec);
+      if (!codec) {
+        expect(subtypeNavigation).toBe(true);
+      }
+    } finally {
+      await client.query("rollback");
+      await client.end();
+    }
+  },
+);
