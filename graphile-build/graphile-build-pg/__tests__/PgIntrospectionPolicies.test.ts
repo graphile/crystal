@@ -1,7 +1,9 @@
 import { Client } from "pg";
 import {
-  filterExtensionResources,
+  augmentIntrospectionData,
   introspect,
+  type IntrospectOptions,
+  introspectRaw,
   type MultipassOptions,
 } from "pg-introspection";
 
@@ -34,17 +36,36 @@ test.each([false, true])(
           entry extension_row_type_test.pg_buffercache
         ) returns integer language sql stable as $$ select entry.bufferid $$
       `);
-      const result = await introspect(
-        {
-          prune: postgraphilePrune,
-          multipass: multipass
-            ? postgraphileMultipass(["extension_row_type_test"])
-            : false,
-        },
+      const options: IntrospectOptions = {
+        prune: postgraphilePrune,
+        multipass: multipass
+          ? postgraphileMultipass(["extension_row_type_test"])
+          : false,
+      };
+      const raw = await introspectRaw(
+        options,
         async (text, values) =>
           (await client.query(text, values)).rows[0].introspection,
       );
-      filterExtensionResources(result);
+      expect(raw.classes.some((row) => row.relname === "pg_buffercache")).toBe(
+        false,
+      );
+      expect(
+        raw.lookupOnly?.classes?.some(
+          (row) => row.relname === "pg_buffercache",
+        ),
+      ).toBe(true);
+      expect(
+        Boolean(
+          raw.lookupOnly?.procs?.some(
+            (row) => row.proname === "pg_buffercache_pages",
+          ),
+        ),
+      ).toBe(!multipass);
+      const result = augmentIntrospectionData(
+        options,
+        JSON.parse(JSON.stringify(raw)),
+      );
       const table = result.classes.find((row) => row.relname === "user_table");
       expect(table).toBeDefined();
       expect(table!.getAttributes().map((row) => row.attname)).toEqual(["id"]);

@@ -24,11 +24,7 @@ import type {
   PgRoles,
   PgType,
 } from "pg-introspection";
-import {
-  augmentIntrospectionData,
-  filterExtensionResources,
-  introspectRaw,
-} from "pg-introspection";
+import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
@@ -583,7 +579,6 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   options,
                   clonedData,
                 );
-                filterExtensionResources(introspection);
                 return {
                   pgService,
                   introspection,

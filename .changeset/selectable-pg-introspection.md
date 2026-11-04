@@ -26,13 +26,15 @@ These apply to the single introspection query or, with multipass enabled, to
 every discovery and dependency query.
 
 NEW! Top-level `prune` removes unwanted raw objects after fetching in either
-single-pass or multipass mode, before augmentation. It runs until the retained
-row count stabilizes and must not add objects.
+single-pass or multipass mode, before augmentation. Its `details.hide` helper
+moves objects into a serializable `lookupOnly` collection for navigation without
+exposing them as resources. Pruning runs until the exposed row count stabilizes
+and must not add objects.
 
-NEW! `filterExtensionResources` is a shared post-augmentation utility used by
-the legacy parser and PostGraphile. It hides extension-owned resources from
-exposed arrays while preserving navigation lookups for dependencies. This
-differs from raw-data pruning, which removes objects before lookups are built.
+NEW! Use `prune: filterExtensionResources` to preserve the legacy extension
+resource exclusions. This callback is shared by the legacy parser and
+PostGraphile; it hides extension-owned functions and relations while retaining
+their dependency data. Standalone extension types are unaffected.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of either `introspect` or the
@@ -48,16 +50,26 @@ import {
 const text = makeIntrospectionQuery();
 const { rows } = await client.query(text);
 const result = rows[0].introspection;
-const introspection = parseIntrospectionResults(result);
+const includeExtensionResources = false;
+const introspection = parseIntrospectionResults(
+  result,
+  includeExtensionResources,
+);
 ```
 
 with:
 
 ```js
-import { introspect } from "pg-introspection";
+import { filterExtensionResources, introspect } from "pg-introspection";
 
-const introspection = await introspect({}, async (text, values) => {
-  const { rows } = await client.query(text, values);
-  return rows[0].introspection;
-});
+const introspection = await introspect(
+  { prune: filterExtensionResources },
+  async (text, values) => {
+    const { rows } = await client.query(text, values);
+    return rows[0].introspection;
+  },
+);
 ```
+
+Omit `prune` (or pass `null`) to match the legacy
+`parseIntrospectionResults(result, true)` behaviour instead.

@@ -73,7 +73,7 @@ Set `multipass` to an options object to enable incremental dependency discovery.
 `multipass.onlyAccessible` filters initial resources by role privileges, and
 `multipass.policies` describes which relationships to follow. There are no
 default relationship policies. Top-level `prune` can remove unwanted raw objects
-after fetching in either mode, before navigation lookups are built.
+or hide resources while retaining their dependency data, in either mode.
 
 See the [multipass introspection guide](./multipass.md)
 for a complete policy example, purposes, permission filtering and pruning.
@@ -126,6 +126,13 @@ const introspection = await introspect({}, async (text, values) => {
 For selected collections, use
 `augmentIntrospectionData(options, JSON.parse(value))` to add helpers rather
 than the legacy parser, which assumes the default collections.
+
+To preserve the legacy parser's default extension exclusions, import
+`filterExtensionResources` and set `prune: filterExtensionResources` in the
+options. Omit `prune` or set it to `null` to match
+`parseIntrospectionResults(value, true)`. With raw caching, pass the same options
+to `introspectRaw` and `augmentIntrospectionData`; the retained dependency data
+survives both JSON serialization and `structuredClone`.
 
 See [Accessors](./accessors.md) for navigation helpers and
 [Naming](./naming.md) for the relationship to PostgreSQL catalog names.

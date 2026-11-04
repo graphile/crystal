@@ -4,6 +4,7 @@ import type {
   IntrospectionDataForEntities,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
+  IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectOptions,
   MultipassOptions,
@@ -26,6 +27,7 @@ import type {
   PgRange,
   PgRoles,
   PgType,
+  PrunableIntrospectionData,
   PurposeList,
 } from "./interfaces.ts";
 export { defineIntrospectionPolicy } from "./interfaces.ts";
@@ -64,6 +66,7 @@ export type {
   IntrospectionDataForEntities,
   IntrospectionPolicy,
   IntrospectionPolicyDetails,
+  IntrospectionPruneDetails,
   IntrospectionRequest,
   IntrospectOptions,
   MultipassOptions,
@@ -86,6 +89,7 @@ export type {
   PgRange,
   PgRoles,
   PgType,
+  PrunableIntrospectionData,
   PurposeList,
 };
 

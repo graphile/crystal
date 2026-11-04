@@ -93,7 +93,7 @@ Set `multipass` to an options object to enable incremental dependency discovery.
 `multipass.onlyAccessible` filters initial resources by role privileges, and
 `multipass.policies` describes which relationships to follow. There are no
 default relationship policies. Top-level `prune` can remove unwanted raw objects
-after fetching in either mode, before navigation lookups are built.
+or hide resources while retaining their dependency data, in either mode.
 
 See the
 [multipass introspection guide](https://star.graphile.org/pg-introspection/multipass)
@@ -106,6 +106,11 @@ are deprecated. Replace the manual query/parse sequence with the `introspect`
 callback shown above. The legacy query builder retains its zero-argument
 signature. Use the new APIs for `onlyEntities` and `filters`, and
 `augmentIntrospectionData` when working with selected collections.
+
+To preserve the legacy parser's default extension exclusions, import
+`filterExtensionResources` and pass `{ prune: filterExtensionResources }` to
+`introspect`, or to both `introspectRaw` and `augmentIntrospectionData`. Omit
+`prune` or set it to `null` to match `parseIntrospectionResults(value, true)`.
 
 ## Accessors
 

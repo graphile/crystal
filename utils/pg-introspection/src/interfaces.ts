@@ -82,14 +82,38 @@ export interface IntrospectOptions<
   onlyEntities?: TEntities[];
   /** Additional trusted SQL predicates applied to every query in either mode. */
   filters?: Partial<Record<EntityType, string>>;
-  /** Remove raw objects before augmentation, in either mode, until stable. */
-  prune?: (data: Partial<IntrospectionData>) => void;
+  /** Remove or hide raw objects before augmentation, in either mode, until stable. */
+  prune?:
+    | null
+    | ((
+        data: PrunableIntrospectionData,
+        details: IntrospectionPruneDetails,
+      ) => void);
   multipass?: false | MultipassOptions;
+}
+
+type CollectionEntity = {
+  [T in EntityType]: IntrospectionData[T] extends readonly unknown[]
+    ? T
+    : never;
+}[EntityType];
+
+/** Raw collections, including objects retained solely for navigation. */
+export type PrunableIntrospectionData = Partial<IntrospectionData> & {
+  lookupOnly?: Partial<Pick<IntrospectionData, CollectionEntity>>;
+};
+
+export interface IntrospectionPruneDetails {
+  /** Move matching rows out of exposed collections, retaining them for lookups. */
+  hide<T extends CollectionEntity>(
+    entity: T,
+    matches: (row: IntrospectionData[T][number]) => boolean,
+  ): void;
 }
 
 export type IntrospectionDataForEntities<
   TEntities extends EntityType = DefaultEntities,
-> = Partial<IntrospectionData> &
+> = PrunableIntrospectionData &
   Pick<IntrospectionData, TEntities | FixedIntrospectionKeys>;
 
 type FixedIntrospectionKeys =

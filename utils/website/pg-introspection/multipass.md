@@ -219,26 +219,33 @@ Filtering initial discovery does not distinguish exposed resources from
 dependencies in the returned collections. Consumers must decide which fetched
 objects to expose.
 
-For the legacy distinction between exposed arrays and dependency lookups, use
-the shared utility after augmentation:
+Use the shared pruning callback to preserve the legacy distinction between
+exposed resources and dependency metadata:
 
 ```js
 import { filterExtensionResources } from "pg-introspection";
 
-filterExtensionResources(introspection);
+const options = {
+  prune: filterExtensionResources,
+};
 ```
 
-This removes extension-owned resources from the exposed arrays while retaining
-the navigation lookups built from them. It requires the default collections.
-Both the legacy parser and PostGraphile use this utility. Do not use it as a
-raw-data `prune` callback: pruning runs before lookup construction and would
-remove the objects from navigation too.
+Pass these options to `introspect`, or to both `introspectRaw` and
+`augmentIntrospectionData` when caching raw data. The callback hides
+extension-owned functions, tables and views, together with their attributes,
+constraints and row types. It does not hide standalone extension types such as
+`citext` or `geometry`. It uses the `depends` collection to identify extension
+ownership.
+
+Hidden rows move into the raw result's `lookupOnly` section. They survive JSON
+serialization and `structuredClone`. Augmentation uses both sections to build
+navigation helpers, but only the exposed collections appear in the augmented
+result's arrays. There is no extra post-augmentation filtering step.
 
 The deprecated `parseIntrospectionResults(value, includeExtensionResources)`
-API retains its legacy behaviour: it removes extension-owned resources from
-the result arrays by default, after building navigation lookups. Pass `true`
-to retain them. This compatibility filtering differs from SQL filters, which
-exclude rows before navigation lookups are built.
+API uses this same callback by default. Passing `true` corresponds to omitting
+`prune` or setting it to `null`. Its existing exposed arrays and navigation
+behaviour are preserved.
 
 ## Privilege filtering
 
@@ -269,22 +276,41 @@ restrictions that must also hold during dependency fetching.
 
 ## Pruning and navigation
 
-Top-level `prune(data)` receives raw data after fetching: after the single
-query, or after dependency expansion in multipass mode. It can remove objects
-that are incomplete or unwanted. It runs repeatedly until the
-number of retained objects stops decreasing, so it must only remove objects,
-must not add or replace them, and must terminate.
+Top-level `prune(data, details)` runs after fetching in either mode. A callback
+can remove raw rows entirely, or use `details.hide(collection, predicate)` to
+retain matching rows only for navigation:
+
+```js
+const options = {
+  prune(data, { hide }) {
+    hide("classes", (row) => row.relname === "internal_helper");
+  },
+};
+```
+
+| Operation                | Exposed collection | Available through navigation | Cached data           |
+| ------------------------ | ------------------ | ---------------------------- | --------------------- |
+| Remove a row from `data` | Removed            | Removed                      | Discarded             |
+| `details.hide`           | Removed            | Retained                     | Moved to `lookupOnly` |
+
+Hiding is an exposure decision; it does not reclaim the hidden objects' memory.
+Multipass reduces memory by avoiding discovery of unrelated extension helpers.
+Removing unwanted rows entirely during pruning also reduces the cached data.
+Rows needed as dependencies must still be retained.
+
+Pruning runs repeatedly until the exposed row count stops decreasing. Callbacks
+must only remove or hide objects, must not add or replace them, and must
+terminate. Augmentation also applies the callback before building navigation
+lookups, so the same options work with fresh raw input and previously pruned
+cached data. Callbacks must tolerate rows already being hidden or removed.
 
 Neither pruning nor augmentation automatically makes your application's
 relationships complete. Supply policies for the relationships you need, and
-ensure pruning preserves the dependencies your navigation code uses.
+retain the dependencies your navigation code uses.
 
 `introspect` adds navigation helpers after discovery and pruning.
-`introspectRaw` returns plain data; call `augmentIntrospectionData` separately.
-Helpers navigate only the fetched and retained data: `table.getConstraints()`
-therefore returns the discovered constraints, not necessarily every constraint
-on the table. Helpers that require an omitted collection throw when called.
-
-Raw pruning controls which objects remain available for navigation. To hide
-extension resources from exposed arrays while retaining dependency lookups,
-apply `filterExtensionResources` after augmentation instead.
+`introspectRaw` returns plain data, including any `lookupOnly` section; call
+`augmentIntrospectionData` separately to build navigation from it. Helpers
+navigate only the fetched and retained data: `table.getConstraints()` therefore
+returns the discovered constraints, not necessarily every constraint on the
+table. Helpers that require an omitted collection throw when called.

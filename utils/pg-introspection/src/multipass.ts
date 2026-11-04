@@ -8,6 +8,7 @@ import type {
   IntrospectOptions,
 } from "./interfaces.ts";
 import { ENTITY_TYPES, type EntityType } from "./introspection.ts";
+import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
   buildIntrospectionQuery,
   defaultEntities,
@@ -231,39 +232,6 @@ function makeFetchQuery(
     ),
     values,
   };
-}
-
-function pruneIntrospectionData<TEntities extends EntityType>(
-  options: IntrospectOptions<TEntities>,
-  result: IntrospectionDataForEntities<TEntities>,
-): IntrospectionDataForEntities<TEntities> {
-  const { prune } = options;
-  const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
-  const data = result as Record<string, any>;
-  if (prune) {
-    const countRows = () =>
-      [...selected].reduce(
-        (count, entity) =>
-          count +
-          (Array.isArray(data[entity])
-            ? data[entity].length
-            : ENTITY_TYPES[entity].singular && data[entity]
-              ? 1
-              : 0),
-        0,
-      );
-    let before: number;
-    let after = countRows();
-    do {
-      before = after;
-      prune(result);
-      after = countRows();
-      if (after > before) {
-        throw new Error("Introspection pruning must not add entities");
-      }
-    } while (after < before);
-  }
-  return result;
 }
 
 export async function introspectRaw<

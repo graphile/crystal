@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import type { IntrospectionRequest } from "../dist/index.js";
+import {
+  augmentIntrospectionData,
+  type IntrospectionRequest,
+  type IntrospectOptions,
+} from "../dist/index.js";
 import { introspectRaw } from "../src/multipass.ts";
+import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 declare global {
   namespace PgIntrospection {
@@ -23,6 +28,51 @@ const metadata = {
 };
 
 for (const multipass of [undefined, false, {}]) {
+  it(`caches hidden dependencies while discarding pruned rows (multipass: ${JSON.stringify(multipass)})`, async () => {
+    const options: IntrospectOptions<"namespaces" | "classes"> = {
+      onlyEntities: ["namespaces", "classes"],
+      multipass,
+      prune(data, { hide }) {
+        hide("classes", (row) => row._id === "hidden");
+        data.classes = data.classes?.filter((row) => row._id !== "discarded");
+      },
+    };
+    const raw = await introspectRaw(options, async () =>
+      JSON.stringify({
+        ...metadata,
+        catalog_by_oid: rawIntrospectionResults.catalog_by_oid,
+        namespaces: [],
+        classes: [
+          { _id: "visible", relname: "visible" },
+          { _id: "hidden", relname: "hidden" },
+          { _id: "discarded", relname: "discarded" },
+        ],
+      }),
+    );
+    assert.deepEqual(
+      raw.classes.map((row) => row._id),
+      ["visible"],
+    );
+    assert.deepEqual(
+      raw.lookupOnly?.classes?.map((row) => row._id),
+      ["hidden"],
+    );
+    const serialized = JSON.stringify(raw);
+    assert.doesNotMatch(serialized, /discarded/);
+    for (const cached of [structuredClone(raw), JSON.parse(serialized)]) {
+      const result = augmentIntrospectionData(options, cached);
+      assert.deepEqual(
+        result.classes.map((row) => row._id),
+        ["visible"],
+      );
+      assert.equal(result.getClass({ id: "hidden" })?.relname, "hidden");
+      assert.equal(result.getClass({ id: "hidden" })?._type, "PgClass");
+      assert.equal(result.getClass({ id: "discarded" }), undefined);
+      assert.equal("lookupOnly" in result, false);
+    }
+    assert.equal(JSON.stringify(raw), serialized);
+  });
+
   it(`prunes raw data to a fixed point (multipass: ${JSON.stringify(multipass)})`, async () => {
     let queries = 0;
     let prunes = 0;

@@ -52,10 +52,16 @@ for (const parse of [parseIntrospectionResults, augmentIntrospection]) {
         JSON.stringify({
           ...rawIntrospectionResults,
           classes: [{ _id: "1", relnamespace: "2200", relname: "example" }],
-          procs: [{ _id: "2", pronamespace: "2200", proname: "example" }],
+          procs: [
+            { _id: "2", pronamespace: "2200", proname: "example" },
+            { _id: "6", pronamespace: "2200", proname: "example" },
+          ],
           attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
           constraints: [{ _id: "3", conrelid: "1", confrelid: "1" }],
-          types: [{ _id: "4", typrelid: "1" }],
+          types: [
+            { _id: "4", typrelid: "1" },
+            { _id: "5", typrelid: "0", typname: "citext" },
+          ],
           depends: [
             {
               classid: "1259",
@@ -69,21 +75,35 @@ for (const parse of [parseIntrospectionResults, augmentIntrospection]) {
               refclassid: "3079",
               deptype: "e",
             },
+            {
+              classid: "1247",
+              objid: "5",
+              refclassid: "3079",
+              deptype: "e",
+            },
           ],
         }),
         includeExtensionResources,
       );
       const expectedCount = includeExtensionResources ? 1 : 0;
       assert.equal(result.classes.length, expectedCount);
-      assert.equal(result.procs.length, expectedCount);
+      assert.equal(result.procs.length, expectedCount + 1);
       assert.equal(result.attributes.length, expectedCount);
       assert.equal(result.constraints.length, expectedCount);
-      assert.equal(result.types.length, expectedCount);
+      assert.equal(result.types.length, expectedCount + 1);
+      assert.ok(result.types.some((type) => type.typname === "citext"));
       const table = result.getClass({ id: "1" });
       assert.ok(table);
       assert.equal(table.relname, "example");
       assert.equal(table.getAttributes()[0].attname, "id");
       assert.equal(result.getProc({ id: "2" })?.proname, "example");
+      assert.deepEqual(
+        result
+          .getNamespace({ name: "public" })!
+          .getProcs({ name: "example" })
+          ?.map((proc) => proc._id),
+        ["2", "6"],
+      );
       assert.equal(result.getType({ id: "4" })?.getClass(), table);
     });
   }

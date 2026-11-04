@@ -16,6 +16,7 @@ import type {
   IntrospectOptions,
 } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
+import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import { defaultEntities } from "./query.ts";
 
 function populateLookups<TEntities extends EntityType = DefaultEntities>(
@@ -258,10 +259,12 @@ export function augmentIntrospection(
     introspectionResultsString,
   );
   const introspection = augmentIntrospectionData<DefaultEntities>(
-    { onlyEntities: [...defaultEntities] },
+    {
+      onlyEntities: [...defaultEntities],
+      prune: includeExtensionResources ? null : filterExtensionResources,
+    },
     introspectionData,
   );
-  filterExtensionResources(introspection, includeExtensionResources);
 
   return introspection;
 }
@@ -280,6 +283,21 @@ export function augmentIntrospectionData<
 ): Introspection<TEntities> {
   if ("_lookups" in introspectionData) {
     throw new Error("Introspection data should not be augmented twice");
+  }
+
+  pruneIntrospectionData(options, introspectionData);
+
+  // Merge lookup-only rows temporarily so they receive methods and lookup entries.
+  const collections = introspectionData as Record<string, unknown>;
+  const exposedCollections = new Map<string, unknown[]>();
+  for (const [entity, retained] of Object.entries(
+    introspectionData.lookupOnly ?? {},
+  )) {
+    const exposed = collections[entity];
+    if (Array.isArray(exposed) && Array.isArray(retained)) {
+      exposedCollections.set(entity, exposed);
+      collections[entity] = [...exposed, ...retained];
+    }
   }
 
   // Lookups exist only when their corresponding collection was supplied.
@@ -469,6 +487,16 @@ export function augmentIntrospectionData<
   ) as Introspection<TEntities>;
   const introspection = result;
   populateLookups(introspection, lookups);
+  if (introspectionData.lookupOnly?.procs && lookups.procsByNamespaceName) {
+    // Restore the SQL query's OID ordering within each set of overloads.
+    for (const procs of lookups.procsByNamespaceName.values()) {
+      procs.sort((a, b) => Number(a._id) - Number(b._id));
+    }
+  }
+  for (const [entity, exposed] of exposedCollections) {
+    collections[entity] = exposed;
+  }
+  delete introspectionData.lookupOnly;
 
   return introspection;
 }

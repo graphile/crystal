@@ -4,6 +4,7 @@ import type {
   IntrospectOptions,
   MultipassOptions,
 } from "pg-introspection";
+import { filterExtensionResources } from "pg-introspection";
 import sql from "pg-sql2";
 
 declare global {
@@ -255,10 +256,17 @@ export function postgraphileMultipass(
 
 export const postgraphilePrune: NonNullable<IntrospectOptions["prune"]> = (
   data,
+  details,
 ) => {
-  const classes = new Set(data.classes?.map((row) => row._id));
+  const classes = new Set(
+    [...(data.classes ?? []), ...(data.lookupOnly?.classes ?? [])].map(
+      (row) => row._id,
+    ),
+  );
   const attributes = new Set(
-    data.attributes?.map((row) => `${row.attrelid}:${row.attnum}`),
+    [...(data.attributes ?? []), ...(data.lookupOnly?.attributes ?? [])].map(
+      (row) => `${row.attrelid}:${row.attnum}`,
+    ),
   );
   if (data.constraints) {
     data.constraints = data.constraints.filter((constraint) => {
@@ -291,4 +299,5 @@ export const postgraphilePrune: NonNullable<IntrospectOptions["prune"]> = (
         ),
     );
   }
+  filterExtensionResources(data, details);
 };
