@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
+import {
+  makeIntrospectionQuery as legacyMakeIntrospectionQuery,
+  parseIntrospectionResults,
+} from "../dist/index.js";
 import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
@@ -92,6 +96,40 @@ it("executes edge-case selections against PostgreSQL", async () => {
     );
     await client.query(
       `create function ${schema}.starter_fn() returns int language sql as $$ select 1 $$`,
+    );
+    await client.query(
+      `create function ${schema}.excluded_fn() returns int language sql as $$ select 2 $$`,
+    );
+    const filters = {
+      namespaces: `nspname = '${schema}'`,
+      procs: "proname = 'starter_fn'",
+    };
+    for (const multipass of [undefined, false, {}] as const) {
+      const filtered = await introspect(
+        { onlyEntities: ["namespaces", "procs"], filters, multipass },
+        async (text, values) =>
+          (await client.query(text, values)).rows[0].introspection,
+      );
+      assert.deepEqual(
+        filtered.namespaces.map((n) => n.nspname),
+        [schema],
+      );
+      assert.deepEqual(
+        filtered.procs.map((p) => p.proname),
+        ["starter_fn"],
+      );
+    }
+    const legacy = parseIntrospectionResults(
+      (await client.query(legacyMakeIntrospectionQuery({ filters }))).rows[0]
+        .introspection,
+    );
+    assert.deepEqual(
+      legacy.namespaces.map((n) => n.nspname),
+      [schema],
+    );
+    assert.deepEqual(
+      legacy.procs.map((p) => p.proname),
+      ["starter_fn"],
     );
     const otherSchema = `${schema}_other`;
     await client.query(`create schema ${otherSchema}`);

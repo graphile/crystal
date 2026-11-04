@@ -866,6 +866,7 @@ function introspectPgServices(
         seenPgSettingsKeys.set(pgSettingsKey, i);
       }
       const options: IntrospectOptions<DefaultEntities> = {
+        filters: { depends: "deptype in ('a', 'e')" },
         onlyEntities: [
           "database",
           "namespaces",

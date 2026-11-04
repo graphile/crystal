@@ -1,5 +1,7 @@
+import type { IntrospectOptions } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
+  type EntityType,
   type EntityTypeConfig,
   type Options,
 } from "./introspection.ts";
@@ -27,11 +29,16 @@ export const defaultEntities = Object.freeze([
   "am",
 ] as const);
 
-export function makeIntrospectionQuery(rawOptions: Options = {}) {
-  return buildIntrospectionQuery(rawOptions);
+export function makeIntrospectionQuery(
+  rawOptions: Pick<
+    IntrospectOptions<EntityType>,
+    "onlyEntities" | "filters"
+  > = {},
+) {
+  return buildIntrospectionQuery(rawOptions, {}, rawOptions.filters);
 }
 
-/** Builds a query with per-collection predicates for multipass introspection. */
+/** Builds a query with per-collection predicates. */
 export function buildIntrospectionQuery(
   rawOptions: Options,
   overrides: Partial<Record<string, string>> = {},

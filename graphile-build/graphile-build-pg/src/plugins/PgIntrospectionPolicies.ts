@@ -1,9 +1,9 @@
-import sql from "pg-sql2";
 import type {
   IntrospectionPolicy,
   IntrospectionRequest,
   MultipassOptions,
 } from "pg-introspection";
+import sql from "pg-sql2";
 
 declare global {
   namespace PgIntrospection {
@@ -248,9 +248,6 @@ export function postgraphileMultipass(
       classes: notExtension("pg_class", "pg_class.oid"),
       procs: notExtension("pg_proc", "pg_proc.oid"),
       types: `(typrelid = 0 or ${notExtension("pg_class", "typrelid")})`,
-    },
-    filters: {
-      depends: "deptype in ('a', 'e')",
     },
     prune(data) {
       const classes = new Set(data.classes?.map((row) => row._id));

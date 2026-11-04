@@ -73,8 +73,6 @@ export interface MultipassOptions {
   policies?: readonly IntrospectionPolicy[];
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
-  /** Additional trusted SQL predicates applied to discovery and dependencies. */
-  filters?: Partial<Record<EntityType, string>>;
   /** Mutate the discovered data to remove unwanted or incomplete objects. */
   prune?: (data: Partial<IntrospectionData>) => void;
 }
@@ -84,6 +82,8 @@ export interface IntrospectOptions<
 > {
   /** @experimental */
   onlyEntities?: TEntities[];
+  /** Additional trusted SQL predicates applied to every query in either mode. */
+  filters?: Partial<Record<EntityType, string>>;
   multipass?: false | MultipassOptions;
 }
 

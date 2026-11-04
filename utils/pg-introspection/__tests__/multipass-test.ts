@@ -374,9 +374,9 @@ it("applies entrypoint filters only to discovery and retains global filters", as
   await introspectRaw(
     {
       onlyEntities: ["namespaces", "types"],
+      filters: { types: "typname <> 'excluded'" },
       multipass: {
         entrypointFilters: { types: "typname <> 'dependency'" },
-        filters: { types: "typname <> 'excluded'" },
         policies: [
           {
             name: "testPolicy7",

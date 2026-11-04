@@ -128,7 +128,7 @@ function entrypointQuery<TEntities extends EntityType>(
     overrides.procs += ` and ${accessible("pronamespace", "pg_catalog.has_function_privilege(ar.oid, pg_proc.oid, 'EXECUTE')")}`;
     overrides.types += ` and ${accessible("typnamespace", "pg_catalog.has_type_privilege(ar.oid, pg_type.oid, 'USAGE')")}`;
   }
-  const filters = { ...multipass.filters };
+  const filters = { ...options.filters };
   for (const entity of Object.keys(
     multipass.entrypointFilters ?? {},
   ) as EntityType[]) {
@@ -242,12 +242,8 @@ export async function introspectRaw<
   if (!options.multipass) {
     return JSON.parse(await runQuery(makeIntrospectionQuery(options), []));
   }
-  const {
-    policies = [],
-    filters,
-    entrypointFilters,
-    prune,
-  } = options.multipass;
+  const { policies = [], entrypointFilters, prune } = options.multipass;
+  const { filters } = options;
   const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
   const rules = new Map<EntityType, IntrospectionPolicy[]>();
   const names = new Set<string>();

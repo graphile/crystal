@@ -33,17 +33,11 @@ And please give some love to our featured sponsors 🤩:
 
 ## Usage
 
-Issue the `makeIntrospectionQuery()` SQL query to your database, then feed the
-first row's `introspection` field into `parseIntrospectionResults()` to get your
-strongly typed introspection results.
-
-Example usage with `pg` module:
+Use `introspect` with a query callback returning the first row's `introspection`
+string. The library does not depend on a particular PostgreSQL client.
 
 ```js
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
+import { introspect } from "pg-introspection";
 import { Pool } from "pg";
 
 const pool = new Pool({
@@ -51,98 +45,73 @@ const pool = new Pool({
 });
 
 async function main() {
-  const sql = makeIntrospectionQuery();
-  const { rows } = await pool.query(sql);
-  const introspection = parseIntrospectionResults(rows[0].introspection);
-
-  console.log(
-    `The ${introspection.database.datname} DBA is ${
-      introspection.database.getDba()?.rolname ?? "-"
-    }`,
-  );
+  try {
+    const introspection = await introspect({}, async (text, values) => {
+      const { rows } = await pool.query(text, values);
+      return rows[0].introspection;
+    });
+    console.log(introspection.database.getDba()?.rolname);
+  } finally {
+    await pool.end();
+  }
 }
 
 main();
 ```
 
-## Multipass introspection
+The result includes navigation helpers for following catalog relationships. For
+raw, cacheable data, use `introspectRaw` with the same arguments, then call
+`augmentIntrospectionData(options, data)` to add navigation helpers. Pass the
+same options used for introspection and clone cached data before augmentation:
+augmentation mutates its input and rejects already-augmented data.
 
-`introspect` and `introspectRaw` accept an optional `multipass` configuration.
-When enabled, `schemas` selects the initial schemas, and `onlyAccessible`
-restricts initial resources to those accessible to a role. The role defaults to
-the current database role. Set `includeNoInherit` to include roles reachable
-through memberships that do not inherit privileges.
+### Collections and filters
 
-Consumers supply relationship `policies` to discover additional objects. A
-policy receives a raw source row and returns requests with a target collection
-and a `match` object containing catalog column values. Every request must carry
-non-empty `purposes`, explaining why its matching rows are needed. Policies have
-unique names and declare every purpose they read or emit. Purposes accumulate;
-adding a declared purpose reruns the affected policy, even on an already-fetched
-row. Repeating a purpose does not repeat expansion or fetching. For example:
+The experimental `onlyEntities` option selects which collections are returned.
+It supports additional catalogs such as `settings`, `triggers` and
+`foreign_servers`. Required collections must also be selected; for example,
+`classes` requires `namespaces`, and `attributes` requires `classes`.
 
-```ts
-import { defineIntrospectionPolicy, introspectRaw } from "pg-introspection";
-import { Pool } from "pg";
+Top-level `filters` apply to the single introspection query by default, or to
+every query when multipass is enabled:
 
-const client = new Pool({
-  connectionString: "postgres://localhost/my_database",
-});
-
-declare global {
-  namespace PgIntrospection {
-    interface PurposeRegistry {
-      returnType: true;
-    }
-  }
-}
-
-const returnTypes = defineIntrospectionPolicy({
-  name: "procedureReturnTypes",
-  purposes: ["returnType"],
-  entity: "procs",
-  select(proc) {
-    return [
-      {
-        entity: "types",
-        match: { _id: proc.prorettype },
-        purposes: ["returnType"],
-      },
-    ];
-  },
-});
-
-const data = await introspectRaw(
-  {
-    schemas: ["app_public"],
-    multipass: { onlyAccessible: {}, policies: [returnTypes] },
-  },
-  async (text, values) => {
-    const { rows } = await client.query({ text, values });
-    return rows[0].introspection;
-  },
-);
-console.log(data.procs.length);
-await client.end();
+```js
+const options = {
+  onlyEntities: ["namespaces", "classes", "attributes"],
+  filters: { namespaces: "nspname in ('app_public', 'app_private')" },
+};
 ```
 
-There are no default relationship policies. `onlyEntities` limits both returned
-collections and the collections that policies can follow. Multipass results are
-a filtered representation of the database: for example, the constraints of a
-table contain only those fetched and retained, not necessarily every database
-constraint. Optional consumer-supplied filters and pruning can further restrict
-the result. Filters are trusted SQL predicates keyed by collection; do not
-construct them from untrusted input. A `prune` callback receives the raw result
-and removes unwanted objects. It is called until no further objects are removed,
-so it must not add objects.
+Filters are trusted SQL predicates keyed by collection name and combined with
+the library's catalog predicates using AND. Never interpolate untrusted input.
+
+### Multipass introspection
+
+Set `multipass` to an options object to enable incremental dependency discovery.
+`multipass.entrypointFilters` restrict initial discovery; unlike top-level
+`filters`, they allow policies to fetch dependencies outside that selection.
+`multipass.onlyAccessible` filters initial resources by role privileges, and
+`multipass.policies` describes which relationships to follow. There are no
+default relationship policies. `multipass.prune` can remove unwanted objects
+after discovery.
+
+See the
+[multipass introspection guide](https://star.graphile.org/pg-introspection/multipass)
+for a complete policy example, purposes, permission filtering and pruning.
+
+### Migrating existing code
+
+`makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
+are deprecated. Replace the manual query/parse sequence with the `introspect`
+callback shown above. The query builder also accepts `onlyEntities` and
+`filters` for consumers that continue to execute a single query themselves. Use
+`augmentIntrospectionData` when working with selected collections.
 
 ## Accessors
 
-Into the introspection results we mix "accessor" functions to make following
-relationships easier. Note that these functions are typically evaluated lazily -
-the first time you call them they may need to do an expensive lookup (e.g.
-finding the relevant record from the list of records) but they cache the result
-so that the next call will be near-instant.
+Navigation helpers make following catalog relationships easier. Augmentation
+builds indexes for looking up related objects; some derived values are computed
+lazily and cached for subsequent calls.
 
 Examples:
 
@@ -164,20 +133,3 @@ read if you're not familiar with the system catalog.
 We use `_id` rather than `oid` because older versions of PostgreSQL did not
 explicitly list the `oid` columns when you `select * from` so we explicitly list
 them among the selection set.
-
-Initial rows receive the built-in `initial` purpose. A policy can inspect its
-row's purposes using `details.hasPurpose("initial")`, provided it declares
-`initial`. Reading or emitting undeclared purposes throws an error identifying
-the policy. `details.catalogByOid` contains immutable catalog metadata.
-
-Policy output must depend only on its row, declared purposes and immutable
-configuration. Do not use mutable closure state or interpret new purposes as
-revoking earlier requirements. A policy runs once initially and subsequently
-only when one of its declared purposes is added. To make a request terminal, use
-a purpose that does not activate further requests in the target policies.
-
-`filters` apply to every query. `entrypointFilters` apply only to initial
-discovery, allowing dependency requests beyond the initial selection. An
-entrypoint-filtered collection is not assumed complete; other collections keep
-their completeness optimisation. A satisfied selector still propagates newly
-requested purposes to its matching rows without issuing another query.
