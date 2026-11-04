@@ -23,8 +23,7 @@ entrypoint filters and pruning. See the
 
 NEW! Top-level `filters` accepts trusted SQL predicates keyed by collection.
 These apply to the single introspection query or, with multipass enabled, to
-every discovery and dependency query. `makeIntrospectionQuery` also accepts
-`onlyEntities` and `filters`.
+every discovery and dependency query.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of `introspect` or `introspectRaw`. Replace the old

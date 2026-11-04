@@ -167,7 +167,7 @@ underlying catalog's column names; use `oid` in SQL and `_id` in request
 selectors. Never interpolate untrusted input into SQL predicates.
 
 Use top-level `filters` for restrictions that must hold for every fetched row.
-They also work in single-pass mode and with `makeIntrospectionQuery`. Use
+They also work in single-pass mode with `introspect` and `introspectRaw`. Use
 `entrypointFilters` for the initial scope, such as selecting schemas, while
 allowing policies to request dependencies outside it. When both specify the
 same collection, the initial query combines their predicates with AND.

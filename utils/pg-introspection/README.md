@@ -103,8 +103,8 @@ for a complete policy example, purposes, permission filtering and pruning.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated. Replace the manual query/parse sequence with the `introspect`
-callback shown above. The query builder also accepts `onlyEntities` and
-`filters` for consumers that continue to execute a single query themselves. Use
+callback shown above. The legacy query builder retains its zero-argument
+signature. Use the new APIs for `onlyEntities` and `filters`, and
 `augmentIntrospectionData` when working with selected collections.
 
 ## Accessors

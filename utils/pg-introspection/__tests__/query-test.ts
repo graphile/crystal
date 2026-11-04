@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import {
-  makeIntrospectionQuery as legacyMakeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "../dist/index.js";
 import { ENTITY_TYPES } from "../dist/introspection.js";
 import {
   catalogProjection,
@@ -119,18 +115,6 @@ it("executes edge-case selections against PostgreSQL", async () => {
         ["starter_fn"],
       );
     }
-    const legacy = parseIntrospectionResults(
-      (await client.query(legacyMakeIntrospectionQuery({ filters }))).rows[0]
-        .introspection,
-    );
-    assert.deepEqual(
-      legacy.namespaces.map((n) => n.nspname),
-      [schema],
-    );
-    assert.deepEqual(
-      legacy.procs.map((p) => p.proname),
-      ["starter_fn"],
-    );
     const otherSchema = `${schema}_other`;
     await client.query(`create schema ${otherSchema}`);
     await client.query(

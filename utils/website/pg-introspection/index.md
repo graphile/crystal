@@ -103,9 +103,9 @@ the supplied data and cannot be applied twice to the same object.
 ## Migrating the manual query pattern
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
-are deprecated in favour of `introspect` or `introspectRaw`. The query builder
-also accepts `onlyEntities` and `filters` for consumers that continue to
-execute a single query themselves.
+are deprecated in favour of `introspect` or `introspectRaw`. The legacy query
+builder retains its zero-argument signature. Use the new APIs for
+`onlyEntities` and `filters`.
 
 Replace:
 

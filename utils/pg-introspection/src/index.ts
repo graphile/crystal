@@ -41,7 +41,6 @@ import {
   augmentIntrospection,
   augmentIntrospectionData,
 } from "./augmentIntrospection.ts";
-import type { EntityType } from "./introspection.ts";
 import { makeIntrospectionQuery as internalMakeIntrospectionQuery } from "./query.ts";
 import type {
   PgSmartTagsAndDescription,
@@ -49,10 +48,8 @@ import type {
 } from "./smartComments.ts";
 
 /** @deprecated Use introspect or introspectRaw */
-export function makeIntrospectionQuery(
-  options: Pick<IntrospectOptions<EntityType>, "onlyEntities" | "filters"> = {},
-) {
-  return internalMakeIntrospectionQuery(options);
+export function makeIntrospectionQuery() {
+  return internalMakeIntrospectionQuery();
 }
 
 export { default as reservedWords } from "./reservedWords.ts";
