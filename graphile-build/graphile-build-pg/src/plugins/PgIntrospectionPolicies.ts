@@ -4,7 +4,7 @@ import type {
   IntrospectOptions,
   MultipassOptions,
 } from "pg-introspection";
-import { filterExtensionResources } from "pg-introspection";
+import { pruneExtensionResources } from "pg-introspection";
 import sql from "pg-sql2";
 
 declare global {
@@ -27,7 +27,7 @@ declare global {
       /** Apply smart tags and GraphQL descriptions. */
       smartTagsAndDescriptions: true;
       /** Exclude extension-owned resources and identify automatic dependencies. */
-      filterExtensionResources: true;
+      pruneExtensionResources: true;
       /** Detect and build codecs from tables or unique constraints tagged `@enum`. */
       enumTables: true;
     }
@@ -145,7 +145,7 @@ for (const [entity, catalog] of Object.entries(catalogs) as Array<
   rule(
     `${entity}DescriptionsAndOwnership`,
     entity,
-    ["smartTagsAndDescriptions", "filterExtensionResources"],
+    ["smartTagsAndDescriptions", "pruneExtensionResources"],
     (row, data) => {
       const catalogId = Object.entries(data.catalogByOid ?? {}).find(
         ([, name]) => name === catalog,
@@ -160,7 +160,7 @@ for (const [entity, catalog] of Object.entries(catalogs) as Array<
         {
           entity: "depends",
           match: { classid: catalogId, objid: row._id },
-          purposes: ["filterExtensionResources"],
+          purposes: ["pruneExtensionResources"],
         },
       ];
       return requests;
@@ -259,12 +259,12 @@ export const postgraphilePrune: NonNullable<IntrospectOptions["prune"]> = (
   details,
 ) => {
   const classes = new Set(
-    [...(data.classes ?? []), ...(data.lookupOnly?.classes ?? [])].map(
+    [...(data.classes ?? []), ...(data.hidden?.classes ?? [])].map(
       (row) => row._id,
     ),
   );
   const attributes = new Set(
-    [...(data.attributes ?? []), ...(data.lookupOnly?.attributes ?? [])].map(
+    [...(data.attributes ?? []), ...(data.hidden?.attributes ?? [])].map(
       (row) => `${row.attrelid}:${row.attnum}`,
     ),
   );
@@ -299,5 +299,5 @@ export const postgraphilePrune: NonNullable<IntrospectOptions["prune"]> = (
         ),
     );
   }
-  filterExtensionResources(data, details);
+  pruneExtensionResources(data, details);
 };

@@ -7,7 +7,6 @@ import {
   memo,
   namespaceNameKey,
 } from "./entityMethods.ts";
-import { filterExtensionResources } from "./filterExtensionResources.ts";
 import type {
   DefaultEntities,
   Introspection,
@@ -16,6 +15,7 @@ import type {
   IntrospectOptions,
 } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
+import { pruneExtensionResources } from "./pruneExtensionResources.ts";
 import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import { defaultEntities } from "./query.ts";
 
@@ -261,7 +261,7 @@ export function augmentIntrospection(
   const introspection = augmentIntrospectionData<DefaultEntities>(
     {
       onlyEntities: [...defaultEntities],
-      prune: includeExtensionResources ? null : filterExtensionResources,
+      prune: includeExtensionResources ? null : pruneExtensionResources,
     },
     introspectionData,
   );
@@ -291,7 +291,7 @@ export function augmentIntrospectionData<
   const collections = introspectionData as Record<string, unknown>;
   const exposedCollections = new Map<string, unknown[]>();
   for (const [entity, retained] of Object.entries(
-    introspectionData.lookupOnly ?? {},
+    introspectionData.hidden ?? {},
   )) {
     const exposed = collections[entity];
     if (Array.isArray(exposed) && Array.isArray(retained)) {
@@ -487,7 +487,7 @@ export function augmentIntrospectionData<
   ) as Introspection<TEntities>;
   const introspection = result;
   populateLookups(introspection, lookups);
-  if (introspectionData.lookupOnly?.procs && lookups.procsByNamespaceName) {
+  if (introspectionData.hidden?.procs && lookups.procsByNamespaceName) {
     // Restore the SQL query's OID ordering within each set of overloads.
     for (const procs of lookups.procsByNamespaceName.values()) {
       procs.sort((a, b) => Number(a._id) - Number(b._id));
@@ -496,7 +496,7 @@ export function augmentIntrospectionData<
   for (const [entity, exposed] of exposedCollections) {
     collections[entity] = exposed;
   }
-  delete introspectionData.lookupOnly;
+  delete introspectionData.hidden;
 
   return introspection;
 }

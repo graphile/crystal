@@ -27,11 +27,11 @@ every discovery and dependency query.
 
 NEW! Top-level `prune` removes unwanted raw objects after fetching in either
 single-pass or multipass mode, before augmentation. Its `details.hide` helper
-moves objects into a serializable `lookupOnly` collection for navigation without
+moves objects into a serializable `hidden` collection for navigation without
 exposing them as resources. Pruning runs until the exposed row count stabilizes
 and must not add objects.
 
-NEW! Use `prune: filterExtensionResources` to preserve the legacy extension
+NEW! Use `prune: pruneExtensionResources` to preserve the legacy extension
 resource exclusions. This callback is shared by the legacy parser and
 PostGraphile; it hides extension-owned functions and relations while retaining
 their dependency data. Standalone extension types are unaffected.
@@ -60,10 +60,10 @@ const introspection = parseIntrospectionResults(
 with:
 
 ```js
-import { filterExtensionResources, introspect } from "pg-introspection";
+import { pruneExtensionResources, introspect } from "pg-introspection";
 
 const introspection = await introspect(
-  { prune: filterExtensionResources },
+  { prune: pruneExtensionResources },
   async (text, values) => {
     const { rows } = await client.query(text, values);
     return rows[0].introspection;

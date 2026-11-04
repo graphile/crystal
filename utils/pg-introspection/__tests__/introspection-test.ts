@@ -6,8 +6,12 @@ import {
   augmentIntrospection,
   augmentIntrospectionData,
 } from "../dist/augmentIntrospection.js";
-import type { DefaultEntities } from "../dist/index.js";
-import { parseIntrospectionResults } from "../dist/index.js";
+import type { DefaultEntities, IntrospectOptions } from "../dist/index.js";
+import {
+  introspectRaw,
+  parseIntrospectionResults,
+  pruneExtensionResources,
+} from "../dist/index.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 it("provides navigation helpers for selected entities", () => {
@@ -43,6 +47,57 @@ it("supports the legacy parser and entity helpers", () => {
   assert.equal(namespace.getOwner()?.rolname, "pg_database_owner");
   assert.deepEqual(namespace.getTags(), Object.create(null));
   assert.equal(result.database.getDba(), result.database.getOwner());
+});
+
+it("composes extension pruning with additional callbacks", async () => {
+  const pruneTemporaryProcedures: NonNullable<IntrospectOptions["prune"]> = (
+    data,
+  ) => {
+    data.procs = data.procs?.filter((proc) => proc.proname !== "temporary");
+  };
+  const pruneInternalProcedures: NonNullable<IntrospectOptions["prune"]> = (
+    _data,
+    { hide },
+  ) => {
+    hide("procs", (proc) => proc.proname === "internal");
+  };
+  const options: IntrospectOptions = {
+    prune(data, details) {
+      pruneExtensionResources(data, details);
+      pruneTemporaryProcedures(data, details);
+      pruneInternalProcedures(data, details);
+    },
+  };
+  const raw = await introspectRaw(options, async () =>
+    JSON.stringify({
+      ...rawIntrospectionResults,
+      procs: [
+        { _id: "1", pronamespace: "2200", proname: "extension_helper" },
+        { _id: "2", pronamespace: "2200", proname: "temporary" },
+        { _id: "3", pronamespace: "2200", proname: "internal" },
+        { _id: "4", pronamespace: "2200", proname: "public_function" },
+      ],
+      depends: [
+        { classid: "1255", objid: "1", refclassid: "3079", deptype: "e" },
+      ],
+    }),
+  );
+  assert.deepEqual(
+    raw.procs.map((proc) => proc._id),
+    ["4"],
+  );
+  assert.deepEqual(
+    raw.hidden?.procs?.map((proc) => proc._id),
+    ["1", "3"],
+  );
+  const result = augmentIntrospectionData(options, structuredClone(raw));
+  assert.deepEqual(
+    result.procs.map((proc) => proc._id),
+    ["4"],
+  );
+  assert.equal(result.getProc({ id: "1" })?.proname, "extension_helper");
+  assert.equal(result.getProc({ id: "2" }), undefined);
+  assert.equal(result.getProc({ id: "3" })?.proname, "internal");
 });
 
 for (const parse of [parseIntrospectionResults, augmentIntrospection]) {

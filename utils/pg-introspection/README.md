@@ -108,7 +108,7 @@ signature. Use the new APIs for `onlyEntities` and `filters`, and
 `augmentIntrospectionData` when working with selected collections.
 
 To preserve the legacy parser's default extension exclusions, import
-`filterExtensionResources` and pass `{ prune: filterExtensionResources }` to
+`pruneExtensionResources` and pass `{ prune: pruneExtensionResources }` to
 `introspect`, or to both `introspectRaw` and `augmentIntrospectionData`. Omit
 `prune` or set it to `null` to match `parseIntrospectionResults(value, true)`.
 

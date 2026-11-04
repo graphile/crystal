@@ -128,7 +128,7 @@ For selected collections, use
 than the legacy parser, which assumes the default collections.
 
 To preserve the legacy parser's default extension exclusions, import
-`filterExtensionResources` and set `prune: filterExtensionResources` in the
+`pruneExtensionResources` and set `prune: pruneExtensionResources` in the
 options. Omit `prune` or set it to `null` to match
 `parseIntrospectionResults(value, true)`. With raw caching, pass the same options
 to `introspectRaw` and `augmentIntrospectionData`; the retained dependency data

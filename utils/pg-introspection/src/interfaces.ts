@@ -100,11 +100,11 @@ type CollectionEntity = {
 
 /** Raw collections, including objects retained solely for navigation. */
 export type PrunableIntrospectionData = Partial<IntrospectionData> & {
-  lookupOnly?: Partial<Pick<IntrospectionData, CollectionEntity>>;
+  hidden?: Partial<Pick<IntrospectionData, CollectionEntity>>;
 };
 
 export interface IntrospectionPruneDetails {
-  /** Move matching rows out of exposed collections, retaining them for lookups. */
+  /** Move matching rows out of exposed collections, retaining them for navigation. */
   hide<T extends CollectionEntity>(
     entity: T,
     matches: (row: IntrospectionData[T][number]) => boolean,

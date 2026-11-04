@@ -51,13 +51,11 @@ test.each([false, true])(
         false,
       );
       expect(
-        raw.lookupOnly?.classes?.some(
-          (row) => row.relname === "pg_buffercache",
-        ),
+        raw.hidden?.classes?.some((row) => row.relname === "pg_buffercache"),
       ).toBe(true);
       expect(
         Boolean(
-          raw.lookupOnly?.procs?.some(
+          raw.hidden?.procs?.some(
             (row) => row.proname === "pg_buffercache_pages",
           ),
         ),

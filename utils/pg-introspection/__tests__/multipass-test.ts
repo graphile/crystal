@@ -54,7 +54,7 @@ for (const multipass of [undefined, false, {}]) {
       ["visible"],
     );
     assert.deepEqual(
-      raw.lookupOnly?.classes?.map((row) => row._id),
+      raw.hidden?.classes?.map((row) => row._id),
       ["hidden"],
     );
     const serialized = JSON.stringify(raw);
@@ -68,7 +68,7 @@ for (const multipass of [undefined, false, {}]) {
       assert.equal(result.getClass({ id: "hidden" })?.relname, "hidden");
       assert.equal(result.getClass({ id: "hidden" })?._type, "PgClass");
       assert.equal(result.getClass({ id: "discarded" }), undefined);
-      assert.equal("lookupOnly" in result, false);
+      assert.equal("hidden" in result, false);
     }
     assert.equal(JSON.stringify(raw), serialized);
   });

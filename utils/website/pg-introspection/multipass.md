@@ -223,10 +223,10 @@ Use the shared pruning callback to preserve the legacy distinction between
 exposed resources and dependency metadata:
 
 ```js
-import { filterExtensionResources } from "pg-introspection";
+import { pruneExtensionResources } from "pg-introspection";
 
 const options = {
-  prune: filterExtensionResources,
+  prune: pruneExtensionResources,
 };
 ```
 
@@ -237,7 +237,7 @@ constraints and row types. It does not hide standalone extension types such as
 `citext` or `geometry`. It uses the `depends` collection to identify extension
 ownership.
 
-Hidden rows move into the raw result's `lookupOnly` section. They survive JSON
+Hidden rows move into the raw result's `hidden` section. They survive JSON
 serialization and `structuredClone`. Augmentation uses both sections to build
 navigation helpers, but only the exposed collections appear in the augmented
 result's arrays. There is no extra post-augmentation filtering step.
@@ -288,15 +288,38 @@ const options = {
 };
 ```
 
-| Operation                | Exposed collection | Available through navigation | Cached data           |
-| ------------------------ | ------------------ | ---------------------------- | --------------------- |
-| Remove a row from `data` | Removed            | Removed                      | Discarded             |
-| `details.hide`           | Removed            | Retained                     | Moved to `lookupOnly` |
+| Operation                | Exposed collection | Available through navigation | Cached data       |
+| ------------------------ | ------------------ | ---------------------------- | ----------------- |
+| Remove a row from `data` | Removed            | Removed                      | Discarded         |
+| `details.hide`           | Removed            | Retained                     | Moved to `hidden` |
 
 Hiding is an exposure decision; it does not reclaim the hidden objects' memory.
 Multipass reduces memory by avoiding discovery of unrelated extension helpers.
 Removing unwanted rows entirely during pruning also reduces the cached data.
 Rows needed as dependencies must still be retained.
+
+### Combining prune callbacks
+
+Use a wrapper callback to apply extension pruning and your own pruning rules:
+
+```js
+import { pruneExtensionResources } from "pg-introspection";
+
+function pruneInternalProcedures(_data, { hide }) {
+  hide("procs", (proc) => proc.proname.startsWith("internal_"));
+}
+
+const options = {
+  prune(data, details) {
+    pruneExtensionResources(data, details);
+    pruneInternalProcedures(data, details);
+  },
+};
+```
+
+Each callback receives the same data and helpers. You can call additional
+callbacks in the same way, including callbacks that remove unwanted rows
+entirely. All callbacks in the wrapper run on each pruning pass.
 
 Pruning runs repeatedly until the exposed row count stops decreasing. Callbacks
 must only remove or hide objects, must not add or replace them, and must
@@ -309,7 +332,7 @@ relationships complete. Supply policies for the relationships you need, and
 retain the dependencies your navigation code uses.
 
 `introspect` adds navigation helpers after discovery and pruning.
-`introspectRaw` returns plain data, including any `lookupOnly` section; call
+`introspectRaw` returns plain data, including any `hidden` section; call
 `augmentIntrospectionData` separately to build navigation from it. Helpers
 navigate only the fetched and retained data: `table.getConstraints()` therefore
 returns the discovered constraints, not necessarily every constraint on the
