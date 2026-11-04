@@ -1,5 +1,5 @@
 ---
-"pg-introspection": minor
+"pg-introspection": major
 ---
 
 NEW! Use `introspect` and `introspectRaw` to run introspection using a supplied
