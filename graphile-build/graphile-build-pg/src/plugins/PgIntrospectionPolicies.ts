@@ -8,7 +8,7 @@ import type {
 import { pruneExtensionResources } from "pg-introspection";
 import sql from "pg-sql2";
 
-import { invertKeyAndValue } from "../utils";
+import { invertKeyAndValue } from "../utils.ts";
 
 declare global {
   namespace PgIntrospection {
