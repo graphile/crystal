@@ -116,11 +116,11 @@ test.each([false, true])(
         {
           name: "testResourcePath",
           entity: "classes",
-          purposes: ["registryResourceRelation", "registryResourceCodec"],
+          purposes: ["registryRelation", "registryCodec"],
           select(row, details) {
             if (
               row.relname !== "target" ||
-              (upgrade && !details.hasPurpose("registryResourceRelation"))
+              (upgrade && !details.hasPurpose("registryRelation"))
             ) {
               return [];
             }
@@ -128,7 +128,7 @@ test.each([false, true])(
               {
                 entity: "classes",
                 match: { _id: row._id },
-                purposes: ["registryResourceCodec"],
+                purposes: ["registryCodec"],
               },
             ];
           },
@@ -320,10 +320,10 @@ test.each([false, true])(
         {
           name: "observeRangeSubtype",
           entity: "types",
-          purposes: ["registryResourceCodec", "completeTypeNavigation"],
+          purposes: ["registryCodec", "completeTypeNavigation"],
           select(row, details) {
             if (row.typname === "int4") {
-              subtypeCodec ||= details.hasPurpose("registryResourceCodec");
+              subtypeCodec ||= details.hasPurpose("registryCodec");
               subtypeNavigation ||= details.hasPurpose(
                 "completeTypeNavigation",
               );

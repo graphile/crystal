@@ -11,9 +11,9 @@ declare global {
   namespace PgIntrospection {
     interface PurposeRegistry {
       /** Build codecs for column, function, array, domain and composite values. */
-      registryResourceCodec: true;
+      registryCodec: true;
       /** Build relations from foreign keys on exposed resources. */
-      registryResourceRelation: true;
+      registryRelation: true;
       /** Discover foreign keys from the initially exposed resources. */
       discoverResourceRelations: true;
       /** Populate catalog metadata navigation without requesting a codec. */
@@ -54,10 +54,10 @@ const classRequests = (row: any, constraints: IntrospectionRequest[]) => [
   ...request("types", "_id", row.reloftype, "completeTypeNavigation"),
   ...(!["i", "I"].includes(row.relkind)
     ? [
-        ...request("attributes", "attrelid", row._id, "registryResourceCodec"),
+        ...request("attributes", "attrelid", row._id, "registryCodec"),
         ...constraints,
         ...request("indexes", "indrelid", row._id, "catalogNavigation"),
-        ...request("inherits", "inhrelid", row._id, "registryResourceCodec"),
+        ...request("inherits", "inhrelid", row._id, "registryCodec"),
         ...request(
           "policies",
           "polrelid",
@@ -94,18 +94,18 @@ const policies = (() => {
   rule(
     "attributesDependencies",
     "attributes",
-    ["registryResourceCodec"],
-    (row) => request("types", "_id", row.atttypid, "registryResourceCodec"),
+    ["registryCodec"],
+    (row) => request("types", "_id", row.atttypid, "registryCodec"),
   );
   rule(
     "procsDependencies",
     "procs",
-    ["registryResourceCodec", "catalogNavigation"],
+    ["registryCodec", "catalogNavigation"],
     (row) => [
       ...request("namespaces", "_id", row.pronamespace, "catalogNavigation"),
-      ...request("types", "_id", row.prorettype, "registryResourceCodec"),
+      ...request("types", "_id", row.prorettype, "registryCodec"),
       ...(row.proallargtypes ?? row.proargtypes ?? []).flatMap((id: string) =>
-        request("types", "_id", id, "registryResourceCodec"),
+        request("types", "_id", id, "registryCodec"),
       ),
     ],
   );
@@ -114,7 +114,7 @@ const policies = (() => {
     "types",
     [
       "initial",
-      "registryResourceCodec",
+      "registryCodec",
       "completeTypeNavigation",
       "registryEnumCodec",
       "catalogNavigation",
@@ -123,15 +123,15 @@ const policies = (() => {
       // Only types reached as resources expand their related types as resources.
       // Initial type USAGE does not imply access to its table: PostgreSQL grants
       // PUBLIC usage of table row types by default.
-      const purpose = details.hasPurpose("registryResourceCodec")
-        ? "registryResourceCodec"
+      const purpose = details.hasPurpose("registryCodec")
+        ? "registryCodec"
         : "completeTypeNavigation";
       return [
         ...request("namespaces", "_id", row.typnamespace, "catalogNavigation"),
         ...request("types", "_id", row.typelem, purpose),
         ...request("types", "_id", row.typarray, purpose),
         ...request("types", "_id", row.typbasetype, purpose),
-        ...(purpose === "registryResourceCodec"
+        ...(purpose === "registryCodec"
           ? request("classes", "_id", row.typrelid, purpose)
           : []),
         ...(row.typtype === "e"
@@ -149,22 +149,22 @@ const policies = (() => {
   rule(
     "rangesDependencies",
     "ranges",
-    ["registryResourceCodec", "completeTypeNavigation"],
+    ["registryCodec", "completeTypeNavigation"],
     (row, details) =>
       request(
         "types",
         "_id",
         row.rngsubtype,
-        details.hasPurpose("registryResourceCodec")
-          ? "registryResourceCodec"
+        details.hasPurpose("registryCodec")
+          ? "registryCodec"
           : "completeTypeNavigation",
       ),
   );
   rule("indexesDependencies", "indexes", ["catalogNavigation"], (row) =>
     request("classes", "_id", row.indexrelid, "catalogNavigation"),
   );
-  rule("inheritsDependencies", "inherits", ["registryResourceCodec"], (row) =>
-    request("classes", "_id", row.inhparent, "registryResourceCodec"),
+  rule("inheritsDependencies", "inherits", ["registryCodec"], (row) =>
+    request("classes", "_id", row.inhparent, "registryCodec"),
   );
 
   const catalogs: Partial<Record<Entity, string>> = {
@@ -227,8 +227,8 @@ export function postgraphileMultipass(
         purposes: [
           "initial",
           "catalogNavigation",
-          "registryResourceCodec",
-          "registryResourceRelation",
+          "registryCodec",
+          "registryRelation",
           "enumTables",
           "discoverResourceRelations",
           "completeTypeNavigation",
@@ -237,9 +237,9 @@ export function postgraphileMultipass(
         ],
         select(row, details) {
           const exposed = details.hasPurpose("initial");
-          const full = exposed || details.hasPurpose("registryResourceCodec");
+          const full = exposed || details.hasPurpose("registryCodec");
           const target =
-            details.hasPurpose("registryResourceRelation") ||
+            details.hasPurpose("registryRelation") ||
             details.hasPurpose("enumTables");
           if (!full && !target) {
             return request(
@@ -269,8 +269,8 @@ export function postgraphileMultipass(
           "initial",
           "catalogNavigation",
           "discoverResourceRelations",
-          "registryResourceCodec",
-          "registryResourceRelation",
+          "registryCodec",
+          "registryRelation",
           "enumTables",
         ],
         select(row, details) {
@@ -290,7 +290,7 @@ export function postgraphileMultipass(
                 "classes",
                 "_id",
                 row.confrelid,
-                "registryResourceRelation",
+                "registryRelation",
               ),
               ...request("classes", "_id", row.confrelid, "enumTables"),
             );
