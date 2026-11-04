@@ -1,0 +1,54 @@
+{
+  allItems: {
+    nodes: [
+      {
+        __typename: "Book",
+        name: "A book",
+        reviewList: {
+          nodes: [
+            {
+              body: "A good book",
+            },
+            {
+              body: "An ok book",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "Film",
+        name: "A film",
+        reviewList: {
+          nodes: [
+            {
+              body: "A nice film",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  allBooks: {
+    nodes: [
+      {
+        name: "A book",
+        reviewList: {
+          totalCount: 2,
+        },
+      },
+    ],
+  },
+  allFilms: {
+    nodes: [
+      {
+        reviewList: {
+          nodes: [
+            {
+              body: "A nice film",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
