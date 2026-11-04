@@ -357,26 +357,49 @@ export async function introspectRaw<
       }
     }
   }
-  const groupMatches = new Map<string, { size: number; rows: Row[] }>();
+  // Build each selector shape once, sharing the scan across all selector values.
+  const groupIndexes = new Map<
+    EntityType,
+    Map<string, { columns: string[]; groups: Map<string, Row[]> }>
+  >();
+  const groupKey = (columns: string[], row: Row) =>
+    JSON.stringify(columns.map((column) => String(row[column])));
+  const addToGroup = (
+    shape: { columns: string[]; groups: Map<string, Row[]> },
+    row: Row,
+  ) => {
+    const key = groupKey(shape.columns, row);
+    const group = shape.groups.get(key);
+    if (group) {
+      group.push(row);
+    } else {
+      shape.groups.set(key, [row]);
+    }
+  };
   const matchingRows = (
     request: Pick<IntrospectionRequest, "entity" | "match">,
   ) => {
     const index = rows.get(request.entity);
-    const entries = Object.entries(request.match);
-    if (entries.length === 1 && entries[0][0] === "_id") {
-      const row = index?.get(JSON.stringify([String(entries[0][1])]));
+    const columns = Object.keys(request.match).sort();
+    if (columns.length === 1 && columns[0] === "_id") {
+      const row = index?.get(JSON.stringify([String(request.match._id)]));
       return row ? [row] : [];
     }
-    const key = selectorKey(request);
-    const cached = groupMatches.get(key);
-    if (cached && cached.size === (index?.size ?? 0)) {
-      return cached.rows;
+    let shapes = groupIndexes.get(request.entity);
+    if (!shapes) {
+      shapes = new Map();
+      groupIndexes.set(request.entity, shapes);
     }
-    const matches = [...(index?.values() ?? [])].filter((row) =>
-      entries.every(([field, value]) => String(row[field]) === String(value)),
-    );
-    groupMatches.set(key, { size: index?.size ?? 0, rows: matches });
-    return matches;
+    const shapeKey = JSON.stringify(columns);
+    let shape = shapes.get(shapeKey);
+    if (!shape) {
+      shape = { columns, groups: new Map() };
+      for (const row of index?.values() ?? []) {
+        addToGroup(shape, row);
+      }
+      shapes.set(shapeKey, shape);
+    }
+    return shape.groups.get(groupKey(columns, request.match)) ?? [];
   };
   const pending = new Map<string, IntrospectionRequest>();
   while (frontier.length || pending.size) {
@@ -501,6 +524,9 @@ export async function introspectRaw<
         const id = identity(entity, row);
         if (!index.has(id)) {
           index.set(id, row);
+          for (const shape of groupIndexes.get(entity)?.values() ?? []) {
+            addToGroup(shape, row);
+          }
           if (collection) {
             collection.push(row);
           } else {
