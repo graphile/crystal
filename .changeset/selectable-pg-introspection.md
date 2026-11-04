@@ -1,5 +1,5 @@
 ---
-"pg-introspection": minor
+"pg-introspection": major
 ---
 
 NEW! Use `introspect` and `introspectRaw` to run introspection using a supplied
@@ -14,10 +14,20 @@ collections, including additional PostgreSQL collections such as settings,
 triggers and foreign servers. Some collections require others to be selected; an
 error will be reported when a required collection was not included.
 
-NEW! Multipass introspection (opt-in with `multipass: true`) allows
-pg-introspection to minimize the amount of data it pulls from the database to
-just the parts you're interested in, significantly reducing memory usage.
-Supports configurable discovery policies, role-based filtering and pruning.
+NEW! Multipass introspection (opt-in with `multipass: { policies: [...] }`)
+allows pg-introspection to minimize the amount of data it pulls from the
+database to just the parts you're interested in, significantly reducing memory
+usage. Supports configurable discovery policies, role-based filtering and
+pruning.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of `introspect` or `introspectRaw`.
+
+BREAKING: `parseIntrospectionResults` and `augmentIntrospection` now retain
+extension-owned resources, matching `introspect` and `augmentIntrospectionData`.
+The `includeExtensionResources` argument has been removed. Resource exclusion is
+an application policy rather than a responsibility of `pg-introspection`;
+PostGraphile applies its extension resource discovery filters through
+`graphile-build-pg` introspection policies. Other consumers should use multipass
+entrypoint filters to exclude extension-owned resources from initial discovery
+whilst retaining dependencies required by user resources.

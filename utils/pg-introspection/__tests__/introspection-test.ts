@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { it } from "node:test";
 
 import { expandRoles } from "../dist/acl.js";
-import { augmentIntrospectionData } from "../dist/augmentIntrospection.js";
+import {
+  augmentIntrospection,
+  augmentIntrospectionData,
+} from "../dist/augmentIntrospection.js";
 import type { DefaultEntities } from "../dist/index.js";
 import { parseIntrospectionResults } from "../dist/index.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
@@ -41,6 +44,43 @@ it("supports the legacy parser and entity helpers", () => {
   assert.deepEqual(namespace.getTags(), Object.create(null));
   assert.equal(result.database.getDba(), result.database.getOwner());
 });
+
+for (const parse of [parseIntrospectionResults, augmentIntrospection]) {
+  it(`${parse.name} retains extension-owned resources`, () => {
+    const result = parse(
+      JSON.stringify({
+        ...rawIntrospectionResults,
+        classes: [{ _id: "1", relnamespace: "2200", relname: "example" }],
+        procs: [{ _id: "2", pronamespace: "2200", proname: "example" }],
+        attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
+        constraints: [{ _id: "3", conrelid: "1", confrelid: "1" }],
+        types: [{ _id: "4", typrelid: "1" }],
+        depends: [
+          {
+            classid: "1259",
+            objid: "1",
+            refclassid: "3079",
+            deptype: "e",
+          },
+          {
+            classid: "1255",
+            objid: "2",
+            refclassid: "3079",
+            deptype: "e",
+          },
+        ],
+      }),
+    );
+    assert.equal(result.classes.length, 1);
+    assert.equal(result.procs.length, 1);
+    assert.equal(result.attributes.length, 1);
+    assert.equal(result.constraints.length, 1);
+    assert.equal(result.types.length, 1);
+    assert.equal(result.getClass({ id: "1" }), result.classes[0]);
+    assert.equal(result.getProc({ id: "2" }), result.procs[0]);
+    assert.equal(result.classes[0].getAttributes()[0], result.attributes[0]);
+  });
+}
 
 it("requires the collections used by navigation helpers", () => {
   const source = structuredClone(rawIntrospectionResults);

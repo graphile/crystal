@@ -99,9 +99,8 @@ export { aclContainsRole, entityPermissions, expandRoles, resolvePermissions };
 /** @deprecated Use introspect or introspectRaw */
 export function parseIntrospectionResults(
   introspectionResults: string,
-  includeExtensionResources = false,
 ): Introspection<DefaultEntities> {
-  return augmentIntrospection(introspectionResults, includeExtensionResources);
+  return augmentIntrospection(introspectionResults);
 }
 
 export type { PgSmartTagsAndDescription, PgSmartTagsDict };

@@ -167,8 +167,7 @@ for (const [entity, catalog] of Object.entries(catalogs) as Array<
 }
 
 // Exclude extension resources from initial discovery, but retain dependencies
-// referenced by user resources. Augmentation removes extension resources from
-// the exposed collections after populating the navigation lookups.
+// referenced by user resources.
 const notExtension = (catalog: string, oid: string) =>
   `not exists (select 1 from pg_catalog.pg_depend d where d.classid = 'pg_catalog.${catalog}'::regclass and d.objid = ${oid} and d.refclassid = 'pg_catalog.pg_extension'::regclass and d.deptype = 'e')`;
 
