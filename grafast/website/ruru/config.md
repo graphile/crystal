@@ -30,7 +30,7 @@ export default preset;
     titleTag?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
     ... 5 more ...;
     bodyInitScript?: string | ... 1 more ... | undefined;
-};
+  };
   port?: number;
   staticPath?: string;
   subscriptionEndpoint?: string;
@@ -56,12 +56,16 @@ The URL to the GraphQL endpoint. (http:// or https://)
 
 ### ruru.htmlParts
 
-Type: `{
-    metaTags?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
-    titleTag?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
-    ... 5 more ...;
-    bodyInitScript?: string | ... 1 more ... | undefined;
-} | undefined`
+Type: 
+```ts
+{
+  metaTags?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
+  titleTag?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
+  ... 5 more ...;
+  bodyInitScript?: string | ... 1 more ... | undefined;
+} | undefined
+```
+
 
 Override the HTML parts that are used to build the Ruru
 

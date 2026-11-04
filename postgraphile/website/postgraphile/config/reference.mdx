@@ -43,9 +43,10 @@ _No options at this time_
 {
   installWatchFixtures?: boolean;
   muteWarnings?: boolean;
+  pgExecutorMaxClientQueues?: number;
   pgIdentifiers?: "qualified" | "unqualified";
-  pgMultipassIntrospection?: boolean;
   pgJwtTypes?: string | string[];
+  pgMultipassIntrospection?: boolean;
   pgStrictFunctions?: boolean;
 
   // Deprecated
@@ -73,21 +74,11 @@ Type: `boolean | undefined`
 Used in tests to mute expected warnings. Likely to be replaced when
 we add a diagnostics system.
 
-### gather.pgIntrospection
+### gather.pgExecutorMaxClientQueues
 
-Type: `{ multipass?: boolean } | undefined`
+Type: `number | undefined`
 
-PostGraphile uses multipass introspection by default to fetch the configured
-schemas and their relevant dependencies. Set `multipass` to `false` to use
-single-pass introspection.
-
-When `PgRBACPlugin` is disabled (including by the v4 `ignoreRBAC` option),
-multipass introspection includes resources regardless of the introspection
-role's privileges.
-
-Multipass introspection produces a filtered view of the database. For example,
-a table's introspected constraints do not necessarily include every constraint
-in PostgreSQL.
+The `maxClientQueues` option to be passed to PgExecutor
 
 ### gather.pgIdentifiers
 
@@ -116,6 +107,29 @@ lower-cased unless they are escaped via double quotes.
 
 You can alternatively supply a comma-separated list if you prefer:
 `pgJwtTypes: 'my_schema.my_jwt_type,my_schema."myOtherJwtType"'`
+
+### gather.pgMultipassIntrospection
+
+Type: `boolean | undefined`
+
+Multipass introspection (enabled by default) helps to minimize the
+amount of data fetched from the database for introspection, and in
+doing so reduces memory usage and schema build times. It starts by
+looking just at the resources in your chosen schemas (and only those
+you have access to) and then spiders out from there based on runtime
+discovery of dependencies.
+
+However, this optimization might omit things from your pgRegistry that
+you want for your plans but are not using in your generated schema (or
+maybe you're using a plugin it's not compatible with). In this case
+you may set `pgMultipassIntrospection: false` to disable this
+optimization, and instead the entire database will be introspected at
+once in a single SQL query. This might significantly increase memory
+usage and the size of the pgRegistry that is generated.
+
+Multipass introspection produces a filtered view of the database. For
+example, a table's introspected constraints do not necessarily include
+every constraint in PostgreSQL.        *
 
 ### gather.pgStrictFunctions
 
@@ -161,6 +175,9 @@ Type: `string | [string, string] | undefined`
   exportSchemaIntrospectionResultPath?: string;
   exportSchemaSDLPath?: string;
   jsonScalarAsString?: boolean;
+  minifyDropsDeprecatedEntities?: boolean;
+  minifyDropsDeprecationReasons?: boolean;
+  minifyDropsDescriptions?: boolean;
   muteWarnings?: boolean;
   nodeIdFieldName?: string;
   pgDefaultPartitionedTableExpose?: "both" | "child" | "parent";
@@ -217,6 +234,27 @@ Type: `string | undefined`
 Type: `boolean | undefined`
 
 Set 'true' if you want JSON values to be stringified.
+
+### schema.minifyDropsDeprecatedEntities
+
+Type: `boolean | undefined`  
+Default value: `false`
+
+Should the minify preset **remove deprecated entities** from the schema entirely? This is a significantly breaking change.
+
+### schema.minifyDropsDeprecationReasons
+
+Type: `boolean | undefined`  
+Default value: `true`
+
+Should the minify preset drop the fact something was deprecated from the schema (i.e. the `@deprecated` directive, not the entity itself).
+
+### schema.minifyDropsDescriptions
+
+Type: `boolean | undefined`  
+Default value: `true`
+
+Should the minify preset drop descriptions from the schema?
 
 ### schema.muteWarnings
 
@@ -605,7 +643,7 @@ you.
     titleTag?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
     ... 5 more ...;
     bodyInitScript?: string | ... 1 more ... | undefined;
-};
+  };
   port?: number;
   staticPath?: string;
   subscriptionEndpoint?: string;
@@ -631,12 +669,16 @@ The URL to the GraphQL endpoint. (http:// or https://)
 
 ### ruru.htmlParts
 
-Type: `{
-    metaTags?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
-    titleTag?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
-    ... 5 more ...;
-    bodyInitScript?: string | ... 1 more ... | undefined;
-} | undefined`
+Type: 
+```ts
+{
+  metaTags?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
+  titleTag?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
+  ... 5 more ...;
+  bodyInitScript?: string | ... 1 more ... | undefined;
+} | undefined
+```
+
 
 Override the HTML parts that are used to build the Ruru
 
