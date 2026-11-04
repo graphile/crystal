@@ -26,8 +26,9 @@ test.each([false, true])(
       `);
       const result = await introspect(
         {
-          schemas: ["extension_row_type_test"],
-          multipass: multipass ? postgraphileMultipass() : false,
+          multipass: multipass
+            ? postgraphileMultipass(["extension_row_type_test"])
+            : false,
         },
         async (text, values) =>
           (await client.query(text, values)).rows[0].introspection,
@@ -40,14 +41,14 @@ test.each([false, true])(
       expect(row.relname).toBe("pg_buffercache");
       expect(row.getAttributes().map((a) => a.attname)).toContain("bufferid");
       expect(result.classes.some((c) => c.relname === "pg_buffercache")).toBe(
-        false,
+        true,
       );
       expect(result.types.some((t) => t.typname === "pg_buffercache")).toBe(
-        false,
+        true,
       );
       expect(
         result.procs.some((p) => p.proname === "pg_buffercache_pages"),
-      ).toBe(false);
+      ).toBe(!multipass);
     } finally {
       await client.query("rollback");
       await client.end();
@@ -73,7 +74,9 @@ test.each([false, true])(
       create table purpose_private.target (id integer primary key, parent_id integer references purpose_private.target(id));
       create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
     `);
-      const multipass = postgraphileMultipass();
+      const multipass = postgraphileMultipass(
+        upgrade ? ["purpose_public"] : ["purpose_private", "purpose_public"],
+      );
       multipass.policies = [
         ...multipass.policies!,
         {
@@ -99,9 +102,6 @@ test.each([false, true])(
       ];
       const result = await introspect(
         {
-          schemas: upgrade
-            ? ["purpose_public"]
-            : ["purpose_private", "purpose_public"],
           multipass,
         },
         async (text, values) =>
@@ -140,7 +140,7 @@ test("does not traverse outgoing FKs of a target-only table", async () => {
       create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
     `);
     const result = await introspect(
-      { schemas: ["purpose_public"], multipass: postgraphileMultipass() },
+      { multipass: postgraphileMultipass(["purpose_public"]) },
       async (text, values) =>
         (await client.query(text, values)).rows[0].introspection,
     );
@@ -183,10 +183,10 @@ test("only expands inaccessible row types when required by a resource", async ()
         as $$ select null::purpose_access.required $$;
       grant execute on function purpose_access.required_row() to purpose_reader;
     `);
-    const multipass = postgraphileMultipass();
+    const multipass = postgraphileMultipass(["purpose_access"]);
     multipass.onlyAccessible = { role: "purpose_reader" };
     const result = await introspect(
-      { schemas: ["purpose_access"], multipass },
+      { multipass },
       async (text, values) =>
         (await client.query(text, values)).rows[0].introspection,
     );
