@@ -1,4 +1,4 @@
-import { Maybe } from "grafast";
+import type { Maybe } from "grafast";
 import type {
   IntrospectionPolicy,
   IntrospectionRequest,
@@ -7,6 +7,7 @@ import type {
 } from "pg-introspection";
 import { pruneExtensionResources } from "pg-introspection";
 import sql from "pg-sql2";
+
 import { invertKeyAndValue } from "../utils";
 
 declare global {

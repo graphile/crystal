@@ -150,6 +150,10 @@ the query shape.
 - Prefer **incremental** tests: cover public APIs and critical paths first.
 - Use existing test utilities and patterns; mirror nearby tests.
 - Keep tests deterministic.
+- Do not add relative imports across package boundaries, including in tests.
+  Add package-local test helpers where needed.
+- Use PostgreSQL pools in tests rather than standalone `Client` connections.
+  Prefer package-local test helpers that handle transactions and client release.
 
 Note: many of the integration tests work by writing `*.test.graphql` files,
 which the system will run and capture snapshots of data, plans, errors and

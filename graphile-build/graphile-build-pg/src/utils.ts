@@ -517,7 +517,7 @@ const invertKeyAndValueCache = new WeakMap<
 export function invertKeyAndValue(
   obj: Readonly<Record<string, string>>,
 ): Readonly<Record<string, string>> {
-  let existing = invertKeyAndValueCache.get(obj);
+  const existing = invertKeyAndValueCache.get(obj);
   if (existing !== undefined) {
     return existing;
   }
