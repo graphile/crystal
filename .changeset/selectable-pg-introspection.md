@@ -38,38 +38,43 @@ their dependency data. Standalone extension types are unaffected.
 
 `makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
 are deprecated in favour of either `introspect` or the
-`introspectRaw`/`augmentIntrospectionData` combo; the deprecated methods to not
-gain any of this new functionality. Replace the old manual query/parse pattern:
+`introspectRaw`/`augmentIntrospectionData` combo; the deprecated methods do not
+gain any of this new functionality. To move to the new APIs, replace the old
+query/parse pattern:
 
 ```js
 import {
   makeIntrospectionQuery,
   parseIntrospectionResults,
 } from "pg-introspection";
+const includeExtensionResources = false;
 
 const text = makeIntrospectionQuery();
-const { rows } = await client.query(text);
-const result = rows[0].introspection;
-const includeExtensionResources = false;
+const result = await runSql(text);
 const introspection = parseIntrospectionResults(
   result,
   includeExtensionResources,
 );
 ```
 
-with:
+with the new `introspect` method:
 
-```js
+```ts
 import { pruneExtensionResources, introspect } from "pg-introspection";
+const includeExtensionResources = false;
 
 const introspection = await introspect(
-  { prune: pruneExtensionResources },
-  async (text, values) => {
-    const { rows } = await client.query(text, values);
-    return rows[0].introspection;
-  },
+  includeExtensionResources ? {} : { prune: pruneExtensionResources },
+  runSql,
 );
 ```
 
-Omit `prune` (or pass `null`) to match the legacy
-`parseIntrospectionResults(result, true)` behaviour instead.
+Where `runSql` abstracts away the client you use to issue SQL to the database;
+for example using the `pg` module it might be:
+
+```ts
+async function runSql(sql: string, placeholders: any[]) {
+  const { rows } = await client.query(sql, placeholders);
+  return rows[0].introspection;
+}
+```
