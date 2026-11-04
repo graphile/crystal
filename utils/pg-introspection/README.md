@@ -92,8 +92,8 @@ Set `multipass` to an options object to enable incremental dependency discovery.
 `filters`, they allow policies to fetch dependencies outside that selection.
 `multipass.onlyAccessible` filters initial resources by role privileges, and
 `multipass.policies` describes which relationships to follow. There are no
-default relationship policies. `multipass.prune` can remove unwanted objects
-after discovery.
+default relationship policies. Top-level `prune` can remove unwanted raw objects
+after fetching in either mode, before navigation lookups are built.
 
 See the
 [multipass introspection guide](https://star.graphile.org/pg-introspection/multipass)

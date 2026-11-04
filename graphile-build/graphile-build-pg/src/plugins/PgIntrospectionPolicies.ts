@@ -1,6 +1,7 @@
 import type {
   IntrospectionPolicy,
   IntrospectionRequest,
+  IntrospectOptions,
   MultipassOptions,
 } from "pg-introspection";
 import sql from "pg-sql2";
@@ -249,40 +250,45 @@ export function postgraphileMultipass(
       procs: notExtension("pg_proc", "pg_proc.oid"),
       types: `(typrelid = 0 or ${notExtension("pg_class", "typrelid")})`,
     },
-    prune(data) {
-      const classes = new Set(data.classes?.map((row) => row._id));
-      const attributes = new Set(
-        data.attributes?.map((row) => `${row.attrelid}:${row.attnum}`),
-      );
-      if (data.constraints) {
-        data.constraints = data.constraints.filter((constraint) => {
-          if (constraint.contype !== "f") return true;
-          return (
-            classes.has(constraint.conrelid) &&
-            classes.has(constraint.confrelid) &&
-            constraint.conkey != null &&
-            constraint.confkey != null &&
-            constraint.conkey.length > 0 &&
-            constraint.conkey.length === constraint.confkey.length &&
-            constraint.conkey.every((n) =>
-              attributes.has(`${constraint.conrelid}:${n}`),
-            ) &&
-            constraint.confkey.every((n) =>
-              attributes.has(`${constraint.confrelid}:${n}`),
-            )
-          );
-        });
-      }
-      if (data.indexes) {
-        data.indexes = data.indexes.filter(
-          (index) =>
-            classes.has(index.indrelid) &&
-            index.indkey.every(
-              (number) =>
-                number === 0 || attributes.has(`${index.indrelid}:${number}`),
-            ),
-        );
-      }
-    },
   };
 }
+
+export const postgraphilePrune: NonNullable<IntrospectOptions["prune"]> = (
+  data,
+) => {
+  const classes = new Set(data.classes?.map((row) => row._id));
+  const attributes = new Set(
+    data.attributes?.map((row) => `${row.attrelid}:${row.attnum}`),
+  );
+  if (data.constraints) {
+    data.constraints = data.constraints.filter((constraint) => {
+      if (constraint.contype !== "f") {
+        return true;
+      }
+      return (
+        classes.has(constraint.conrelid) &&
+        classes.has(constraint.confrelid) &&
+        constraint.conkey != null &&
+        constraint.confkey != null &&
+        constraint.conkey.length > 0 &&
+        constraint.conkey.length === constraint.confkey.length &&
+        constraint.conkey.every((n) =>
+          attributes.has(`${constraint.conrelid}:${n}`),
+        ) &&
+        constraint.confkey.every((n) =>
+          attributes.has(`${constraint.confrelid}:${n}`),
+        )
+      );
+    });
+  }
+  if (data.indexes) {
+    data.indexes = data.indexes.filter(
+      (index) =>
+        classes.has(index.indrelid) &&
+        index.indkey.every(
+          (number) =>
+            number === 0 || attributes.has(`${index.indrelid}:${number}`),
+        ),
+    );
+  }
+};

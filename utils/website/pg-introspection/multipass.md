@@ -219,6 +219,21 @@ Filtering initial discovery does not distinguish exposed resources from
 dependencies in the returned collections. Consumers must decide which fetched
 objects to expose.
 
+For the legacy distinction between exposed arrays and dependency lookups, use
+the shared utility after augmentation:
+
+```js
+import { filterExtensionResources } from "pg-introspection";
+
+filterExtensionResources(introspection);
+```
+
+This removes extension-owned resources from the exposed arrays while retaining
+the navigation lookups built from them. It requires the default collections.
+Both the legacy parser and PostGraphile use this utility. Do not use it as a
+raw-data `prune` callback: pruning runs before lookup construction and would
+remove the objects from navigation too.
+
 The deprecated `parseIntrospectionResults(value, includeExtensionResources)`
 API retains its legacy behaviour: it removes extension-owned resources from
 the result arrays by default, after building navigation lookups. Pass `true`
@@ -254,8 +269,9 @@ restrictions that must also hold during dependency fetching.
 
 ## Pruning and navigation
 
-`multipass.prune(data)` receives raw discovered data after expansion. It can
-remove objects that are incomplete or unwanted. It runs repeatedly until the
+Top-level `prune(data)` receives raw data after fetching: after the single
+query, or after dependency expansion in multipass mode. It can remove objects
+that are incomplete or unwanted. It runs repeatedly until the
 number of retained objects stops decreasing, so it must only remove objects,
 must not add or replace them, and must terminate.
 
@@ -268,3 +284,7 @@ ensure pruning preserves the dependencies your navigation code uses.
 Helpers navigate only the fetched and retained data: `table.getConstraints()`
 therefore returns the discovered constraints, not necessarily every constraint
 on the table. Helpers that require an omitted collection throw when called.
+
+Raw pruning controls which objects remain available for navigation. To hide
+extension resources from exposed arrays while retaining dependency lookups,
+apply `filterExtensionResources` after augmentation instead.

@@ -52,3 +52,12 @@ const introspection = await introspect({}, async (text, values) => {
   return rows[0].introspection;
 });
 ```
+
+NEW! Top-level `prune` removes unwanted raw objects after fetching in either
+single-pass or multipass mode, before augmentation. It runs until the retained
+row count stabilizes and must not add objects.
+
+NEW! `filterExtensionResources` is a shared post-augmentation utility used by
+the legacy parser and PostGraphile. It hides extension-owned resources from
+exposed arrays while preserving navigation lookups for dependencies. This
+differs from raw-data pruning, which removes objects before lookups are built.

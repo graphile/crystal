@@ -7,6 +7,7 @@ import {
   memo,
   namespaceNameKey,
 } from "./entityMethods.ts";
+import { filterExtensionResources } from "./filterExtensionResources.ts";
 import type {
   DefaultEntities,
   Introspection,
@@ -16,19 +17,6 @@ import type {
 } from "./interfaces.ts";
 import type { EntityType } from "./introspection.ts";
 import { defaultEntities } from "./query.ts";
-
-function del<T extends Record<string, any>, TKey extends keyof T>(
-  toDelete: Set<string>,
-  collection: T[],
-  attr: TKey,
-) {
-  for (let i = collection.length - 1; i >= 0; i--) {
-    const entry = collection[i];
-    if (entry[attr] != null && toDelete.has(entry[attr])) {
-      collection.splice(i, 1);
-    }
-  }
-}
 
 function populateLookups<TEntities extends EntityType = DefaultEntities>(
   introspection: Introspection<TEntities>,
@@ -273,37 +261,7 @@ export function augmentIntrospection(
     { onlyEntities: [...defaultEntities] },
     introspectionData,
   );
-  const { oidByCatalog } = introspection._lookups;
-
-  if (!includeExtensionResources) {
-    // Go through and delete things from the extensions
-    const extensionProcOids = new Set<string>();
-    const extensionClassOids = new Set<string>();
-    for (const pg_depend of introspection.depends) {
-      if (
-        pg_depend.refclassid === oidByCatalog["pg_extension"] &&
-        pg_depend.deptype === "e" &&
-        pg_depend.classid === oidByCatalog["pg_proc"]
-      ) {
-        extensionProcOids.add(pg_depend.objid);
-      }
-
-      if (
-        pg_depend.refclassid === oidByCatalog["pg_extension"] &&
-        pg_depend.deptype === "e" &&
-        pg_depend.classid === oidByCatalog["pg_class"]
-      ) {
-        extensionClassOids.add(pg_depend.objid);
-      }
-    }
-
-    del(extensionProcOids, introspection.procs, "_id");
-    del(extensionClassOids, introspection.classes, "_id");
-    del(extensionClassOids, introspection.attributes, "attrelid");
-    del(extensionClassOids, introspection.constraints, "conrelid");
-    del(extensionClassOids, introspection.constraints, "confrelid");
-    del(extensionClassOids, introspection.types, "typrelid");
-  }
+  filterExtensionResources(introspection, includeExtensionResources);
 
   return introspection;
 }

@@ -233,6 +233,39 @@ function makeFetchQuery(
   };
 }
 
+function pruneIntrospectionData<TEntities extends EntityType>(
+  options: IntrospectOptions<TEntities>,
+  result: IntrospectionDataForEntities<TEntities>,
+): IntrospectionDataForEntities<TEntities> {
+  const { prune } = options;
+  const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
+  const data = result as Record<string, any>;
+  if (prune) {
+    const countRows = () =>
+      [...selected].reduce(
+        (count, entity) =>
+          count +
+          (Array.isArray(data[entity])
+            ? data[entity].length
+            : ENTITY_TYPES[entity].singular && data[entity]
+              ? 1
+              : 0),
+        0,
+      );
+    let before: number;
+    let after = countRows();
+    do {
+      before = after;
+      prune(result);
+      after = countRows();
+      if (after > before) {
+        throw new Error("Introspection pruning must not add entities");
+      }
+    } while (after < before);
+  }
+  return result;
+}
+
 export async function introspectRaw<
   TEntities extends EntityType = DefaultEntities,
 >(
@@ -240,9 +273,12 @@ export async function introspectRaw<
   runQuery: RunQuery,
 ): Promise<IntrospectionDataForEntities<TEntities>> {
   if (!options.multipass) {
-    return JSON.parse(await runQuery(makeIntrospectionQuery(options), []));
+    return pruneIntrospectionData(
+      options,
+      JSON.parse(await runQuery(makeIntrospectionQuery(options), [])),
+    );
   }
-  const { policies = [], entrypointFilters, prune } = options.multipass;
+  const { policies = [], entrypointFilters } = options.multipass;
   const { filters } = options;
   const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
   const rules = new Map<EntityType, IntrospectionPolicy[]>();
@@ -512,29 +548,7 @@ export async function introspectRaw<
       }
     }
   }
-  if (prune) {
-    const countRows = () =>
-      [...selected].reduce(
-        (count, entity) =>
-          count +
-          (Array.isArray(data[entity])
-            ? data[entity].length
-            : ENTITY_TYPES[entity].singular && data[entity]
-              ? 1
-              : 0),
-        0,
-      );
-    let before: number;
-    let after = countRows();
-    do {
-      before = after;
-      prune(result);
-      after = countRows();
-      if (after > before)
-        throw new Error("Multipass pruning must not add entities");
-    } while (after < before);
-  }
-  return result;
+  return pruneIntrospectionData(options, result);
 }
 
 export async function introspect<

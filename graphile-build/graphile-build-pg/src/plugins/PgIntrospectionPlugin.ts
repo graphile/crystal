@@ -24,11 +24,18 @@ import type {
   PgRoles,
   PgType,
 } from "pg-introspection";
-import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
+import {
+  augmentIntrospectionData,
+  filterExtensionResources,
+  introspectRaw,
+} from "pg-introspection";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
-import { postgraphileMultipass } from "./PgIntrospectionPolicies.ts";
+import {
+  postgraphileMultipass,
+  postgraphilePrune,
+} from "./PgIntrospectionPolicies.ts";
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -571,10 +578,15 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             const introspections: IntrospectionResults = rawIntrospections.map(
               ({ pgService, introspectionData, options }) => {
                 const clonedData = structuredClone(introspectionData);
+                // IMPORTANT: augmentation must NOT be cached, because other plugins mutate it.
+                const introspection = augmentIntrospectionData(
+                  options,
+                  clonedData,
+                );
+                filterExtensionResources(introspection);
                 return {
                   pgService,
-                  // IMPORTANT: augmentIntrospectionData must NOT be cached, because other plugins mutate it.
-                  introspection: augmentIntrospectionData(options, clonedData),
+                  introspection,
                 };
               },
             );
@@ -867,6 +879,7 @@ function introspectPgServices(
       }
       const options: IntrospectOptions<DefaultEntities> = {
         filters: { depends: "deptype in ('a', 'e')" },
+        prune: postgraphilePrune,
         onlyEntities: [
           "database",
           "namespaces",

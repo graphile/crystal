@@ -1,7 +1,14 @@
 import { Client } from "pg";
-import { introspect, type MultipassOptions } from "pg-introspection";
+import {
+  filterExtensionResources,
+  introspect,
+  type MultipassOptions,
+} from "pg-introspection";
 
-import { postgraphileMultipass } from "../src/plugins/PgIntrospectionPolicies.ts";
+import {
+  postgraphileMultipass,
+  postgraphilePrune,
+} from "../src/plugins/PgIntrospectionPolicies.ts";
 
 test.each([false, true])(
   "preserves extension row type references (multipass: %s)",
@@ -19,6 +26,9 @@ test.each([false, true])(
       await client.query(
         "create extension pg_buffercache with schema extension_row_type_test",
       );
+      await client.query(
+        "create table extension_row_type_test.user_table (id integer)",
+      );
       await client.query(`
         create function extension_row_type_test.buffer_id(
           entry extension_row_type_test.pg_buffercache
@@ -26,6 +36,7 @@ test.each([false, true])(
       `);
       const result = await introspect(
         {
+          prune: postgraphilePrune,
           multipass: multipass
             ? postgraphileMultipass(["extension_row_type_test"])
             : false,
@@ -33,6 +44,10 @@ test.each([false, true])(
         async (text, values) =>
           (await client.query(text, values)).rows[0].introspection,
       );
+      filterExtensionResources(result);
+      const table = result.classes.find((row) => row.relname === "user_table");
+      expect(table).toBeDefined();
+      expect(table!.getAttributes().map((row) => row.attname)).toEqual(["id"]);
       const proc = result.procs.find((p) => p.proname === "buffer_id");
       expect(proc).toBeDefined();
       const args = proc!.getArguments();
@@ -41,14 +56,14 @@ test.each([false, true])(
       expect(row.relname).toBe("pg_buffercache");
       expect(row.getAttributes().map((a) => a.attname)).toContain("bufferid");
       expect(result.classes.some((c) => c.relname === "pg_buffercache")).toBe(
-        true,
+        false,
       );
       expect(result.types.some((t) => t.typname === "pg_buffercache")).toBe(
-        true,
+        false,
       );
       expect(
         result.procs.some((p) => p.proname === "pg_buffercache_pages"),
-      ).toBe(!multipass);
+      ).toBe(false);
     } finally {
       await client.query("rollback");
       await client.end();
@@ -102,6 +117,7 @@ test.each([false, true])(
       ];
       const result = await introspect(
         {
+          prune: postgraphilePrune,
           multipass,
         },
         async (text, values) =>
@@ -140,7 +156,10 @@ test("does not traverse outgoing FKs of a target-only table", async () => {
       create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
     `);
     const result = await introspect(
-      { multipass: postgraphileMultipass(["purpose_public"]) },
+      {
+        multipass: postgraphileMultipass(["purpose_public"]),
+        prune: postgraphilePrune,
+      },
       async (text, values) =>
         (await client.query(text, values)).rows[0].introspection,
     );
@@ -186,7 +205,7 @@ test("only expands inaccessible row types when required by a resource", async ()
     const multipass = postgraphileMultipass(["purpose_access"]);
     multipass.onlyAccessible = { role: "purpose_reader" };
     const result = await introspect(
-      { multipass },
+      { multipass, prune: postgraphilePrune },
       async (text, values) =>
         (await client.query(text, values)).rows[0].introspection,
     );

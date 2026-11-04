@@ -22,6 +22,56 @@ const metadata = {
   introspection_version: 1,
 };
 
+for (const multipass of [undefined, false, {}]) {
+  it(`prunes raw data to a fixed point (multipass: ${JSON.stringify(multipass)})`, async () => {
+    let queries = 0;
+    let prunes = 0;
+    const result = await introspectRaw(
+      {
+        onlyEntities: ["namespaces", "classes"],
+        multipass,
+        prune(data) {
+          prunes++;
+          assert.equal("_lookups" in data, false);
+          data.classes?.pop();
+        },
+      },
+      async () => {
+        queries++;
+        return JSON.stringify({
+          ...metadata,
+          namespaces: [],
+          classes: [{ _id: "1" }, { _id: "2" }],
+        });
+      },
+    );
+    assert.equal(queries, 1);
+    assert.equal(prunes, 3);
+    assert.deepEqual(result.classes, []);
+  });
+
+  it(`rejects pruning that adds rows (multipass: ${JSON.stringify(multipass)})`, async () => {
+    await assert.rejects(
+      introspectRaw(
+        {
+          onlyEntities: ["namespaces", "classes"],
+          multipass,
+          prune(data) {
+            data.classes!.push(data.classes![0]);
+          },
+        },
+        async () =>
+          JSON.stringify({
+            ...metadata,
+            namespaces: [],
+            classes: [{ _id: "1" }],
+          }),
+      ),
+      /Introspection pruning must not add entities/,
+    );
+  });
+}
+
 it("expands terminal objects reached later, deduplicates requests and terminates cycles", async () => {
   let calls = 0;
   const expanded: string[] = [];
@@ -223,6 +273,12 @@ it("preserves attribute filters in follow-up queries and prunes to a fixed point
   const result = await introspectRaw(
     {
       onlyEntities: ["namespaces", "classes", "attributes"],
+      prune(data) {
+        prunes++;
+        if (data.attributes?.length) {
+          data.attributes.pop();
+        }
+      },
       multipass: {
         policies: [
           {
@@ -240,10 +296,6 @@ it("preserves attribute filters in follow-up queries and prunes to a fixed point
             },
           },
         ],
-        prune(data) {
-          prunes++;
-          if (data.attributes?.length) data.attributes.pop();
-        },
       },
     },
     async (text) => {

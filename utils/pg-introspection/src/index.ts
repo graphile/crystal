@@ -56,6 +56,7 @@ export { default as reservedWords } from "./reservedWords.ts";
 export { parseSmartComment } from "./smartComments.ts";
 
 export { augmentIntrospectionData };
+export { filterExtensionResources } from "./filterExtensionResources.ts";
 
 export type {
   DefaultEntities,
