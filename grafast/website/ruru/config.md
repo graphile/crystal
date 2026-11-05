@@ -56,7 +56,8 @@ The URL to the GraphQL endpoint. (http:// or https://)
 
 ### ruru.htmlParts
 
-Type: 
+Type:
+
 ```ts
 {
   metaTags?: string | ((original: string, clientConfig: BakedRuruClientConfig, serverConfig: RuruConfig, htmlParts: RuruHTMLParts, key: keyof RuruHTMLParts) => string) | undefined;
@@ -65,7 +66,6 @@ Type:
   bodyInitScript?: string | ... 1 more ... | undefined;
 } | undefined
 ```
-
 
 Override the HTML parts that are used to build the Ruru
 
