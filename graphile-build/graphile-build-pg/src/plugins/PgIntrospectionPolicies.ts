@@ -6,7 +6,6 @@ import type {
   MultipassOptions,
 } from "pg-introspection";
 import { pruneExtensionResources } from "pg-introspection";
-import sql from "pg-sql2";
 
 import { invertKeyAndValue } from "../utils.ts";
 
@@ -288,6 +287,38 @@ function clonePolicy(policy: ReadonlyIntrospectionPolicy): IntrospectionPolicy {
   return { ...policy, purposes: [...policy.purposes] };
 }
 
+/**
+ * Escapes a string literal for inclusion in SQL without enabling SQL injection.
+ *
+ * @remarks
+ * Due to the "standard_conforming_strings" setting (which could be
+ * `false`), we can't just use simple `.replace(/'/g, "''")`; instead we
+ * need to look out for backslashes which force us into using `E`-strings.
+ *
+ * This function is optimized for usage with database identifiers: using
+ * String.prototype.replace is _generally_ faster than character-by-character
+ * processing because in most cases for our database identifiers there will be
+ * no matches at all, so the happy path does no additional function calls
+ * (our callback never gets called). For general
+ * arbitrary text you should probably use a character-by-character loop though,
+ * otherwise a string like `\\\\\\\\\\` will cause a LOT of function calls.
+ */
+const escapeLiteral = (str: string) => {
+  let hasBackslashes = false;
+  const result = str.replace(/[\\'\0]/g, (char) => {
+    switch (char) {
+      case "\\":
+        hasBackslashes = true;
+        return "\\\\";
+      case "'":
+        return "''";
+      default:
+        throw new Error(`Forbidden character`);
+    }
+  });
+  return hasBackslashes ? ` E'${result}'` : `'${result}'`;
+};
+
 export function postgraphileMultipass(options: {
   schemas?: readonly string[];
 }): MultipassOptions {
@@ -295,7 +326,10 @@ export function postgraphileMultipass(options: {
   return {
     policies: DEFAULT_POLICIES.map(clonePolicy),
     entrypointFilters: {
-      namespaces: `nspname in (${schemas.length ? schemas.map((schema) => sql.compile(sql.literal(schema)).text).join(", ") : "null"})`,
+      namespaces:
+        schemas.length > 0
+          ? `nspname in (${schemas.map(escapeLiteral).join(", ")})`
+          : `false`,
       classes: notExtension("pg_class", "pg_class.oid"),
       procs: notExtension("pg_proc", "pg_proc.oid"),
       types: `(typrelid = 0 or ${notExtension("pg_class", "typrelid")})`,
