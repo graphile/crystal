@@ -474,31 +474,12 @@ for (const filtered of ["attributes", "descriptions"] as const) {
             {
               name: "testPolicy8",
               entity: "classes",
-              select: (row, details) => {
-                const requests: IntrospectionRequest[] = [
-                  {
-                    purposes: ["initial"],
-                    entity: "attributes",
-                    match: { attrelid: row._id },
-                  },
-                  {
-                    purposes: ["initial"],
-                    entity: "constraints",
-                    match: { conrelid: row._id },
-                  },
-                  {
-                    purposes: ["initial"],
-                    entity: "descriptions",
-                    match: { classoid: "1259", objoid: row._id },
-                  },
-                ];
-                for (const request of requests) {
-                  details.request(
-                    request.entity,
-                    request.match,
-                    request.purposes,
-                  );
-                }
+              select: (row, { request }) => {
+                request("attributes", { attrelid: row._id }, ["initial"]);
+                request("constraints", { conrelid: row._id }, ["initial"]);
+                request("descriptions", { classoid: "1259", objoid: row._id }, [
+                  "initial",
+                ]);
               },
             },
           ],
