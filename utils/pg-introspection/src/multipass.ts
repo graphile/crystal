@@ -303,20 +303,10 @@ function makeFetchQuery(
         );
         return `$${values.length}::text[]`;
       });
-      if (columns.length === 1) {
-        const column =
-          columns[0] === "_id"
-            ? `${ENTITY_TYPES[entity].tableName}.oid`
-            : columns[0];
-        return `${column}::text = any(${params[0]})`;
-      }
-      const names = columns.map((_, index) => `v${index}`);
-      const comparisons = columns.map((column, index) => {
-        const sqlColumn =
-          column === "_id" ? `${ENTITY_TYPES[entity].tableName}.oid` : column;
-        return `${sqlColumn}::text = selector.${names[index]}`;
-      });
-      return `exists (select 1 from unnest(${params.join(", ")}) as selector(${names.join(", ")}) where ${comparisons.join(" and ")})`;
+      const sqlColumns = columns.map(
+        (column) => `${column === "_id" ? "oid" : column}::text`,
+      );
+      return `(${sqlColumns.join(", ")}) in (select * from unnest(${params.join(", ")}))`;
     });
     addOverride(
       overrides,
