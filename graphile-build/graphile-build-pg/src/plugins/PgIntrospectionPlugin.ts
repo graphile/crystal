@@ -953,7 +953,7 @@ function introspectPgServices(
           multipass:
             info.resolvedPreset.gather?.pgMultipassIntrospection === false
               ? false
-              : postgraphileMultipass(pgService.schemas ?? ["public"]),
+              : postgraphileMultipass({ schemas: pgService.schemas }),
         };
       await info.process("pgIntrospection_options", {
         serviceName: name,

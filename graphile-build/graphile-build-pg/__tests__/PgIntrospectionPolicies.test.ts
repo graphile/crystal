@@ -33,7 +33,7 @@ test.each([false, true])(
       const options: IntrospectOptions = {
         prune: postgraphilePrune,
         multipass: multipass
-          ? postgraphileMultipass(["extension_row_type_test"])
+          ? postgraphileMultipass({ schemas: ["extension_row_type_test"] })
           : false,
       };
       const raw = await introspectRaw(
@@ -94,9 +94,11 @@ test.each([false, true])(
       create table purpose_public.source (id integer primary key, target_id integer references purpose_private.target(id));
     `,
       });
-      const multipass = postgraphileMultipass(
-        upgrade ? ["purpose_public"] : ["purpose_private", "purpose_public"],
-      );
+      const multipass = postgraphileMultipass({
+        schemas: upgrade
+          ? ["purpose_public"]
+          : ["purpose_private", "purpose_public"],
+      });
       multipass.policies = [
         ...multipass.policies!,
         {
@@ -154,7 +156,7 @@ test("does not traverse outgoing FKs of a target-only table", async () => {
     });
     const result = await introspect(
       {
-        multipass: postgraphileMultipass(["purpose_public"]),
+        multipass: postgraphileMultipass({ schemas: ["purpose_public"] }),
         prune: postgraphilePrune,
       },
       async (text, values) =>
@@ -191,7 +193,7 @@ test("only expands inaccessible row types when required by a resource", async ()
       grant execute on function purpose_access.required_row() to purpose_reader;
     `,
     });
-    const multipass = postgraphileMultipass(["purpose_access"]);
+    const multipass = postgraphileMultipass({ schemas: ["purpose_access"] });
     multipass.onlyAccessible = { role: "purpose_reader" };
     const result = await introspect(
       { multipass, prune: postgraphilePrune },
@@ -262,7 +264,7 @@ test.each([false, true])(
         `,
         });
       }
-      const multipass = postgraphileMultipass(["purpose_range"]);
+      const multipass = postgraphileMultipass({ schemas: ["purpose_range"] });
       // PostgreSQL also creates range constructor functions; exclude those
       // so only the explicit function supplies a codec requirement.
       multipass.entrypointFilters = {

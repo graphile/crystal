@@ -194,9 +194,10 @@ const notExtension = (catalog: string, oid: string) =>
     oid
   } and d.refclassid = 'pg_catalog.pg_extension'::regclass and d.deptype = 'e')`;
 
-export function postgraphileMultipass(
-  schemas: readonly string[] = ["public"],
-): MultipassOptions {
+export function postgraphileMultipass(options: {
+  schemas?: readonly string[];
+}): MultipassOptions {
+  const { schemas = ["public"] } = options;
   return {
     policies: [
       ...(policies.map((policy) => ({
