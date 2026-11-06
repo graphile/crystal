@@ -102,6 +102,7 @@ export interface SharedIntrospectionOptions {
   onlyEntities?: readonly string[];
 }
 
+/** Restrict object metadata to the catalogue objects selected for output. */
 export function catalogObjectIsRelevant(
   options: SharedIntrospectionOptions,
   catalogOidColumn: string,

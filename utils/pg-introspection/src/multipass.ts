@@ -75,7 +75,7 @@ const nonzeroColumns: Partial<Record<EntityType, readonly string[]>> = {
   enums: ["enumtypid"],
 };
 
-// Catalogs whose objects can own descriptions and dependency records.
+// Collections whose descriptions are fetched with their initial rows.
 const describedEntities = [
   "namespaces",
   "classes",
@@ -154,10 +154,6 @@ function entrypointQuery<TEntities extends EntityType>(
     }
   };
   for (const entity of output) addRequirements(entity);
-  if (!describedEntities.some((entity) => output.has(entity))) {
-    overrides.depends = "false";
-    overrides.descriptions = "false";
-  }
   const namespace = (column: string) =>
     `${column} in (select _id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')`;
   overrides.classes = namespace("relnamespace");
