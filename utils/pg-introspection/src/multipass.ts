@@ -177,10 +177,36 @@ function entrypointQuery<TEntities extends EntityType>(
   if (multipass.onlyAccessible) {
     values.push(multipass.onlyAccessible.role ?? null);
     const roleParam = `$${values.length}::text`;
-    const membership = multipass.onlyAccessible.includeNoInherit
-      ? ` or pg_catalog.pg_has_role(selected.role_oid, r.oid, 'MEMBER')`
-      : "";
-    prefix = `selected_role as (select pg_catalog.quote_ident(coalesce(${roleParam}, current_user))::regrole::oid as role_oid),\n  accessible_roles as (select r.oid from pg_catalog.pg_roles r, selected_role selected where r.oid = selected.role_oid${membership})`;
+    // A superuser already passes the privilege checks without expanding roles.
+    prefix = `selected_role as (select pg_catalog.quote_ident(coalesce(${roleParam}, current_user))::regrole::oid as role_oid),
+  accessible_roles as (${
+    multipass.onlyAccessible.includeNoInherit
+      ? `with recursive
+    selected as (
+      select r.oid, r.rolsuper from pg_catalog.pg_roles r
+      where r.oid = (select role_oid from selected_role)
+    ),
+    database_owner_membership as (
+      select d.datdba as member, r.oid as roleid
+      from pg_catalog.pg_database d, pg_catalog.pg_roles r
+      where d.datname = current_database() and r.rolname = 'pg_database_owner'
+    ),
+    memberships(oid) as (
+      select oid from selected where not rolsuper
+      union
+      select parent.roleid
+      from memberships child
+      cross join lateral (
+        select roleid from pg_catalog.pg_auth_members where member = child.oid
+        union
+        select roleid from database_owner_membership where member = child.oid
+      ) parent
+    )
+    select oid from selected where rolsuper
+    union
+    select oid from memberships`
+      : `select role_oid as oid from selected_role`
+  })`;
     const accessible = (schema: string, privilege: string) =>
       `exists (select 1 from accessible_roles ar where pg_catalog.has_schema_privilege(ar.oid, ${schema}, 'USAGE') and (${privilege}))`;
     const tablePrivilege = `case when relkind in ('r','p','v','m','f') then (pg_catalog.has_table_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') or pg_catalog.has_any_column_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,REFERENCES')) when relkind = 'S' then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE') else false end`;

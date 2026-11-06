@@ -260,7 +260,8 @@ it("passes role as a parameter and applies access checks to entrypoints", async 
     async (text, values) => {
       assert.deepEqual(values, ["a' role"]);
       assert.doesNotMatch(text, /a' (?:schema|role)/);
-      assert.match(text, /pg_has_role/);
+      assert.doesNotMatch(text, /pg_has_role/);
+      assert.match(text, /with recursive/);
       assert.match(text, /pg_catalog\.quote_ident/);
       assert.match(text, /has_any_column_privilege/);
       return JSON.stringify({ ...metadata, classes: [] });

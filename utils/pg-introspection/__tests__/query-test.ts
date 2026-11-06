@@ -561,3 +561,88 @@ it("supports catalogue names that match Object.prototype properties", async () =
     assert.equal(namespace.getClass({ name: "toString" }), undefined);
   });
 });
+
+it("expands accessible memberships only for non-superusers", async () => {
+  await withPgClientTransaction(async (client) => {
+    await client.query(`
+      create schema introspection_private;
+      revoke all on schema introspection_private from public;
+      create table introspection_private.secret (id integer);
+      create role introspection_member noinherit;
+      create role introspection_left;
+      create role introspection_right;
+      create role introspection_parent;
+      create role introspection_isolated;
+      create role introspection_super superuser;
+      grant introspection_left, introspection_right to introspection_member;
+      grant introspection_parent to introspection_left, introspection_right;
+    `);
+    const {
+      rows: [database],
+    } = await client.query(
+      "select datname from pg_catalog.pg_database where datname = current_database()",
+    );
+    await client.query(
+      `alter database "${database.datname.replaceAll('"', '""')}" owner to introspection_parent`,
+    );
+    for (const role of [
+      "introspection_member",
+      "introspection_parent",
+      "introspection_isolated",
+      "introspection_super",
+      null,
+    ]) {
+      for (const includeNoInherit of [false, true]) {
+        await introspectRaw(
+          {
+            onlyEntities: [],
+            multipass: {
+              onlyAccessible: { role: role ?? undefined, includeNoInherit },
+            },
+          },
+          async (text, values) => {
+            // Inspect the actual entrypoint CTE independently of entity filtering.
+            const prefix = text.slice(
+              0,
+              text.lastIndexOf("select json_build_object("),
+            );
+            const actual = await client.query(
+              `${prefix}select oid from accessible_roles order by oid`,
+              values,
+            );
+            const {
+              rows: [selected],
+            } = await client.query(
+              "select oid, rolsuper from pg_catalog.pg_roles where oid = pg_catalog.quote_ident(coalesce($1::text, current_user))::regrole::oid",
+              [role],
+            );
+            if (selected.rolsuper) {
+              assert.deepEqual(actual.rows, [{ oid: selected.oid }]);
+              const {
+                rows: [privileges],
+              } = await client.query(
+                `${prefix}select
+                  pg_catalog.has_schema_privilege(oid, 'introspection_private', 'USAGE') as schema,
+                  pg_catalog.has_table_privilege(oid, 'introspection_private.secret', 'SELECT') as table
+                from accessible_roles`,
+                values,
+              );
+              assert.deepEqual(privileges, { schema: true, table: true });
+            }
+            const expected = await client.query(
+              `
+            select oid from pg_catalog.pg_roles
+            where oid = pg_catalog.quote_ident(coalesce($1::text, current_user))::regrole::oid
+            ${includeNoInherit && !selected.rolsuper ? "or pg_catalog.pg_has_role(pg_catalog.quote_ident(coalesce($1::text, current_user))::regrole::oid, oid, 'MEMBER')" : ""}
+            order by oid
+          `,
+              [role],
+            );
+            assert.deepEqual(actual.rows, expected.rows);
+            return (await client.query(text, values)).rows[0].introspection;
+          },
+        );
+      }
+    }
+  });
+});
