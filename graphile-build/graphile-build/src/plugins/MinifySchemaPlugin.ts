@@ -301,14 +301,15 @@ declare global {
        */
       minifyDropsDescriptions?: boolean;
       /**
-       *
-       * Should the minify preset drop the fact something was deprecated from the schema (i.e. the `@deprecated` directive, not the entity itself).
+       * Should the minify preset drop the fact something was deprecated from
+       * the schema (i.e. the `@deprecated` directive, not the entity itself).
        *
        * @defaultValue `true`
        */
       minifyDropsDeprecationReasons?: boolean;
       /**
-       * Should the minify preset **remove deprecated entities** from the schema entirely? This is a significantly breaking change.
+       * Should the minify preset **remove deprecated entities** from the
+       * schema entirely? This is a significantly breaking change.
        *
        * @defaultValue `false`
        */
