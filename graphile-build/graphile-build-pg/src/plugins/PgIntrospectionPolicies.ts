@@ -40,6 +40,7 @@ declare global {
 }
 
 type Entity = IntrospectionPolicy["entity"];
+type ReadonlyIntrospectionPolicy = Readonly<IntrospectionPolicy>;
 
 const request = (
   entity: Entity,
@@ -55,8 +56,8 @@ const request = (
  * The policies PostGraphile needs to satisfy its builtin plugins. More
  * policies can be added via the `pgIntrospection_options` gather hook
  */
-const policies = (() => {
-  const policies: Readonly<IntrospectionPolicy>[] = [];
+const DEFAULT_POLICIES = (() => {
+  const policies: ReadonlyIntrospectionPolicy[] = [];
 
   function rule(
     name: string,
@@ -182,6 +183,94 @@ const policies = (() => {
       },
     );
   }
+  policies.push({
+    name: "classDependencies",
+    entity: "classes",
+    purposes: [
+      "initial",
+      "catalogNavigation",
+      "registryCodec",
+      "registryRelation",
+      "enumTables",
+      "discoverResourceRelations",
+      "completeTypeNavigation",
+      "inferRowSecurityBehaviour",
+      "registryResourceUnique",
+    ],
+    select(row, details) {
+      const exposed = details.hasPurpose("initial");
+      const full = exposed || details.hasPurpose("registryCodec");
+      const target =
+        details.hasPurpose("registryRelation") ||
+        details.hasPurpose("enumTables");
+      if (!full && !target) {
+        return request(
+          "namespaces",
+          "_id",
+          row.relnamespace,
+          "catalogNavigation",
+        );
+      }
+      const purpose = exposed
+        ? "discoverResourceRelations"
+        : "registryResourceUnique";
+      return [
+        request("namespaces", "_id", row.relnamespace, "catalogNavigation"),
+        request("types", "_id", row.reltype, "completeTypeNavigation"),
+        request("types", "_id", row.reloftype, "completeTypeNavigation"),
+        ...(!["i", "I"].includes(row.relkind)
+          ? [
+              request("attributes", "attrelid", row._id, "registryCodec"),
+              ...(full
+                ? [request("constraints", "conrelid", row._id, purpose)]
+                : ["c", "n", "p", "u", "t", "x"].map(
+                    (contype): IntrospectionRequest => ({
+                      entity: "constraints",
+                      match: { conrelid: row._id, contype },
+                      purposes: [purpose],
+                    }),
+                  )),
+              request("indexes", "indrelid", row._id, "catalogNavigation"),
+              request("inherits", "inhrelid", row._id, "registryCodec"),
+              request(
+                "policies",
+                "polrelid",
+                row._id,
+                "inferRowSecurityBehaviour",
+              ),
+            ]
+          : []),
+      ];
+    },
+  });
+  policies.push({
+    name: "constraintDependencies",
+    entity: "constraints",
+    purposes: [
+      "initial",
+      "catalogNavigation",
+      "discoverResourceRelations",
+      "registryCodec",
+      "registryRelation",
+      "enumTables",
+    ],
+    select(row, details) {
+      const requests = [
+        request("namespaces", "_id", row.connamespace, "catalogNavigation"),
+      ];
+      if (
+        row.contype === "f" &&
+        (details.hasPurpose("initial") ||
+          details.hasPurpose("discoverResourceRelations"))
+      ) {
+        requests.push(
+          request("classes", "_id", row.confrelid, "registryRelation"),
+          request("classes", "_id", row.confrelid, "enumTables"),
+        );
+      }
+      return requests;
+    },
+  });
   return Object.freeze(policies);
 })();
 
@@ -194,105 +283,17 @@ const notExtension = (catalog: string, oid: string) =>
     oid
   } and d.refclassid = 'pg_catalog.pg_extension'::regclass and d.deptype = 'e')`;
 
+// Takes a template policy and returns a read/write clone.
+function clonePolicy(policy: ReadonlyIntrospectionPolicy): IntrospectionPolicy {
+  return { ...policy, purposes: [...policy.purposes] };
+}
+
 export function postgraphileMultipass(options: {
   schemas?: readonly string[];
 }): MultipassOptions {
   const { schemas = ["public"] } = options;
   return {
-    policies: [
-      ...(policies.map((policy) => ({
-        ...policy,
-        purposes: [...policy.purposes],
-      })) as IntrospectionPolicy[]),
-      {
-        name: "classDependencies",
-        entity: "classes",
-        purposes: [
-          "initial",
-          "catalogNavigation",
-          "registryCodec",
-          "registryRelation",
-          "enumTables",
-          "discoverResourceRelations",
-          "completeTypeNavigation",
-          "inferRowSecurityBehaviour",
-          "registryResourceUnique",
-        ],
-        select(row, details) {
-          const exposed = details.hasPurpose("initial");
-          const full = exposed || details.hasPurpose("registryCodec");
-          const target =
-            details.hasPurpose("registryRelation") ||
-            details.hasPurpose("enumTables");
-          if (!full && !target) {
-            return request(
-              "namespaces",
-              "_id",
-              row.relnamespace,
-              "catalogNavigation",
-            );
-          }
-          const purpose = exposed
-            ? "discoverResourceRelations"
-            : "registryResourceUnique";
-          return [
-            request("namespaces", "_id", row.relnamespace, "catalogNavigation"),
-            request("types", "_id", row.reltype, "completeTypeNavigation"),
-            request("types", "_id", row.reloftype, "completeTypeNavigation"),
-            ...(!["i", "I"].includes(row.relkind)
-              ? [
-                  request("attributes", "attrelid", row._id, "registryCodec"),
-                  ...(full
-                    ? [request("constraints", "conrelid", row._id, purpose)]
-                    : ["c", "n", "p", "u", "t", "x"].map(
-                        (contype): IntrospectionRequest => ({
-                          entity: "constraints",
-                          match: { conrelid: row._id, contype },
-                          purposes: [purpose],
-                        }),
-                      )),
-                  request("indexes", "indrelid", row._id, "catalogNavigation"),
-                  request("inherits", "inhrelid", row._id, "registryCodec"),
-                  request(
-                    "policies",
-                    "polrelid",
-                    row._id,
-                    "inferRowSecurityBehaviour",
-                  ),
-                ]
-              : []),
-          ];
-        },
-      },
-      {
-        name: "constraintDependencies",
-        entity: "constraints",
-        purposes: [
-          "initial",
-          "catalogNavigation",
-          "discoverResourceRelations",
-          "registryCodec",
-          "registryRelation",
-          "enumTables",
-        ],
-        select(row, details) {
-          const requests = [
-            request("namespaces", "_id", row.connamespace, "catalogNavigation"),
-          ];
-          if (
-            row.contype === "f" &&
-            (details.hasPurpose("initial") ||
-              details.hasPurpose("discoverResourceRelations"))
-          ) {
-            requests.push(
-              request("classes", "_id", row.confrelid, "registryRelation"),
-              request("classes", "_id", row.confrelid, "enumTables"),
-            );
-          }
-          return requests;
-        },
-      },
-    ],
+    policies: DEFAULT_POLICIES.map(clonePolicy),
     entrypointFilters: {
       namespaces: `nspname in (${schemas.length ? schemas.map((schema) => sql.compile(sql.literal(schema)).text).join(", ") : "null"})`,
       classes: notExtension("pg_class", "pg_class.oid"),
