@@ -140,7 +140,7 @@ it("expands terminal objects reached later, deduplicates requests and terminates
               }
               expanded.push(row._id);
               if (row._id === "1") {
-                details.request("types", { _id: 2 }, ["terminal"]);
+                details.request("types", { _id: "2" }, ["terminal"]);
                 details.request("types", { _id: "3" }, ["initial"]);
                 details.request("classes", { _id: "99" }, ["initial"]);
               } else if (row._id === "3") {
@@ -762,3 +762,37 @@ for (const value of [0, "0"]) {
     });
   }
 }
+
+it("types request selectors according to the selected entity", () => {
+  const check = (details: IntrospectionPolicyDetails) => {
+    details.request("attributes", { attrelid: "1", attnum: 2 }, ["keys"]);
+    details.request("database", { datname: "example" }, ["keys"]);
+    details.request("attributes", { attnotnull: true }, ["keys"]);
+    // @ts-expect-error Attribute numbers require numbers.
+    details.request("attributes", { attnum: "2" }, ["keys"]);
+    // @ts-expect-error OIDs require strings.
+    details.request("attributes", { attrelid: 1 }, ["keys"]);
+    // @ts-expect-error Null does not express an equality selector.
+    details.request("attributes", { attrelid: null }, ["keys"]);
+    // @ts-expect-error attrelid belongs to attributes, not namespaces.
+    details.request("namespaces", { attrelid: "1" }, ["keys"]);
+    // @ts-expect-error Unknown catalogue columns must not be accepted.
+    details.request("attributes", { missing: "1" }, ["keys"]);
+    // @ts-expect-error OID selectors require strings.
+    details.request("attributes", { attrelid: true }, ["keys"]);
+  };
+  const request: IntrospectionRequest<"attributes"> = {
+    entity: "attributes",
+    match: { attrelid: "1" },
+    purposes: ["keys"],
+  };
+  const invalid: IntrospectionRequest<"attributes"> = {
+    entity: "attributes",
+    // @ts-expect-error relname belongs to classes, not attributes.
+    match: { relname: "example" },
+    purposes: ["keys"],
+  };
+  void check;
+  void request;
+  void invalid;
+});

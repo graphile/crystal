@@ -29,9 +29,22 @@ export type PurposeList = readonly [
 ];
 
 /** A parameterized equality selector and the reasons its rows are needed. */
-export interface IntrospectionRequest {
-  entity: EntityType;
-  match: Record<string, string | number>;
+type IntrospectionRow<TEntity extends EntityType> =
+  IntrospectionData[TEntity] extends readonly (infer TRow)[]
+    ? TRow
+    : IntrospectionData[TEntity];
+
+type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
+  ? Partial<{
+      [TColumn in keyof IntrospectionRow<TEntity>]: NonNullable<
+        IntrospectionRow<TEntity>[TColumn]
+      >;
+    }>
+  : never;
+
+export interface IntrospectionRequest<TEntity extends EntityType = EntityType> {
+  entity: TEntity;
+  match: IntrospectionMatch<TEntity>;
   purposes: PurposeList;
 }
 
@@ -40,9 +53,9 @@ export interface IntrospectionPolicyDetails {
    * Queue a dependency immediately; repeated selectors are merged.
    * Zero selectors for columns that always identify an object are ignored.
    */
-  request(
-    entity: EntityType,
-    match: IntrospectionRequest["match"],
+  request<TEntity extends EntityType>(
+    entity: TEntity,
+    match: IntrospectionRequest<NoInfer<TEntity>>["match"],
     purposes: PurposeList,
   ): void;
   /** False results subscribe this policy to run again when the purpose is added. */

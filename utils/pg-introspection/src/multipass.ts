@@ -217,7 +217,11 @@ function makeFetchQuery(
       const params = columns.map((column) => {
         if (!/^[a-z_][a-z0-9_]*$/.test(column))
           throw new Error(`Invalid catalog column '${column}'`);
-        values.push(requests.map((request) => String(request.match[column])));
+        values.push(
+          requests.map((request) =>
+            String((request.match as Record<string, unknown>)[column]),
+          ),
+        );
         return `$${values.length}::text[]`;
       });
       if (columns.length === 1) {
@@ -399,7 +403,9 @@ export async function introspectRaw<
     const index = rows.get(request.entity);
     const columns = Object.keys(request.match).sort();
     if (columns.length === 1 && columns[0] === "_id") {
-      const row = index?.get(JSON.stringify([String(request.match._id)]));
+      const row = index?.get(
+        JSON.stringify([String((request.match as { _id: string })._id)]),
+      );
       return row ? [row] : [];
     }
     let shapes = groupIndexes.get(request.entity);
@@ -448,7 +454,11 @@ export async function introspectRaw<
               return snapshot.has(purpose);
             },
             request(entity, match, purposes) {
-              const request: IntrospectionRequest = { entity, match, purposes };
+              const request: IntrospectionRequest = {
+                entity,
+                match,
+                purposes,
+              };
               if (
                 !Array.isArray(request.purposes) ||
                 request.purposes.length === 0
@@ -490,7 +500,7 @@ export async function introspectRaw<
               if (
                 requested.has(key) ||
                 (Object.keys(request.match).length === 1 &&
-                  request.match._id != null &&
+                  (request.match as { _id?: string })._id != null &&
                   matches.length)
               ) {
                 return;
