@@ -43,11 +43,15 @@ type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
     }>
   : never;
 
-export interface IntrospectionRequest<TEntity extends EntityType = EntityType> {
-  entity: TEntity;
-  match: IntrospectionMatch<TEntity>;
-  purposes: PurposeList;
-}
+/** Keep each entity paired with its own selector when entities form a union. */
+export type IntrospectionRequest<TEntity extends EntityType = EntityType> =
+  TEntity extends EntityType
+    ? {
+        entity: TEntity;
+        match: IntrospectionMatch<TEntity>;
+        purposes: PurposeList;
+      }
+    : never;
 
 export interface IntrospectionPolicyDetails {
   /**

@@ -746,9 +746,33 @@ it("types request selectors according to the selected entity", () => {
     match: { relname: "example" },
     purposes: ["keys"],
   };
+  const requests: IntrospectionRequest[] = [
+    request,
+    {
+      entity: "namespaces",
+      match: { nspname: "public" },
+      purposes: ["keys"],
+    },
+    {
+      entity: "namespaces",
+      // @ts-expect-error Namespace requests cannot select attribute columns.
+      match: { attrelid: "1" },
+      purposes: ["keys"],
+    },
+  ];
+  const checkNarrowing = (request: IntrospectionRequest) => {
+    if (request.entity === "attributes") {
+      const attnum: number | undefined = request.match.attnum;
+      // @ts-expect-error relname belongs to class selectors.
+      request.match.relname;
+      void attnum;
+    }
+  };
   void check;
   void request;
   void invalid;
+  void requests;
+  void checkNarrowing;
 });
 
 it("types policy rows according to their entity", () => {

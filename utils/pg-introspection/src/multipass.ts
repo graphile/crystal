@@ -87,7 +87,7 @@ function identity(entity: EntityType, row: Row): string {
 }
 
 function selectorKey(
-  request: Pick<IntrospectionRequest, "entity" | "match">,
+  request: Pick<IntrospectionRequest<any>, "entity" | "match">,
 ): string {
   return JSON.stringify([
     request.entity,
@@ -173,11 +173,11 @@ function entrypointQuery<TEntities extends EntityType>(
 }
 
 function makeFetchQuery(
-  requests: readonly IntrospectionRequest[],
+  requests: readonly IntrospectionRequest<any>[],
   filters: Partial<Record<EntityType, string>> | undefined,
   selected: ReadonlySet<EntityType>,
 ) {
-  const groups = new Map<EntityType, IntrospectionRequest[]>();
+  const groups = new Map<EntityType, IntrospectionRequest<any>[]>();
   for (const request of requests) {
     const group = groups.get(request.entity) ?? [];
     group.push(request);
@@ -203,7 +203,7 @@ function makeFetchQuery(
   for (const [entity, group] of groups) {
     const shapes = new Map<
       string,
-      { columns: string[]; requests: IntrospectionRequest[] }
+      { columns: string[]; requests: IntrospectionRequest<any>[] }
     >();
     for (const request of group) {
       const columns = Object.keys(request.match).sort();
@@ -398,7 +398,7 @@ export async function introspectRaw<
     }
   };
   const matchingRows = (
-    request: Pick<IntrospectionRequest, "entity" | "match">,
+    request: Pick<IntrospectionRequest<any>, "entity" | "match">,
   ) => {
     const index = rows.get(request.entity);
     const columns = Object.keys(request.match).sort();
@@ -424,7 +424,7 @@ export async function introspectRaw<
     }
     return shape.groups.get(groupKey(columns, request.match)) ?? [];
   };
-  const pending = new Map<string, IntrospectionRequest>();
+  const pending = new Map<string, IntrospectionRequest<any>>();
   while (frontier.length || pending.size) {
     // Drain purpose propagation before querying, batching all reasons for a selector.
     while (frontier.length) {
@@ -454,7 +454,7 @@ export async function introspectRaw<
               return snapshot.has(purpose);
             },
             request(entity, match, purposes) {
-              const request: IntrospectionRequest = {
+              const request: IntrospectionRequest<any> = {
                 entity,
                 match,
                 purposes,
