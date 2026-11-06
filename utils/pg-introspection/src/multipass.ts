@@ -92,9 +92,14 @@ const describedEntities = [
   "event_triggers",
 ] as const satisfies EntityType[];
 
-/** Read a dynamically selected catalogue column without weakening the row type. */
-function columnValue(row: object, column: string): unknown {
-  return (row as Record<string, unknown>)[column];
+/** Preserve known column types; dynamically selected columns yield unknown. */
+function columnValue<TRow extends object, TColumn extends string>(
+  row: TRow,
+  column: TColumn,
+): TColumn extends keyof TRow ? TRow[TColumn] : unknown {
+  return (row as Record<string, unknown>)[column] as TColumn extends keyof TRow
+    ? TRow[TColumn]
+    : unknown;
 }
 
 function identity<TEntity extends EntityType>(
