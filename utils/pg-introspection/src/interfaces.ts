@@ -36,6 +36,15 @@ export interface IntrospectionRequest {
 }
 
 export interface IntrospectionPolicyDetails {
+  /**
+   * Queue a dependency immediately; repeated selectors are merged.
+   * Zero selectors for columns that always identify an object are ignored.
+   */
+  request(
+    entity: EntityType,
+    match: IntrospectionRequest["match"],
+    purposes: PurposeList,
+  ): void;
   /** False results subscribe this policy to run again when the purpose is added. */
   hasPurpose(purpose: PgIntrospection.Purpose): boolean;
   /** Immutable metadata captured before dependency discovery begins. */
@@ -45,14 +54,14 @@ export interface IntrospectionPolicyDetails {
 export type Maybe<T> = T | null | undefined;
 export type ReadonlyArrayOrDirect<T> = T | readonly T[];
 
-/** Policies must depend only on the row, inspected purposes and fixed configuration. */
+/**
+ * Policies must depend only on the row, inspected purposes and fixed configuration.
+ * Requests are additive: later purposes cannot retract requests already issued.
+ */
 export interface IntrospectionPolicy {
   name: string;
   entity: EntityType;
-  select: (
-    row: any,
-    details: IntrospectionPolicyDetails,
-  ) => ReadonlyArrayOrDirect<Maybe<IntrospectionRequest>>;
+  select: (row: any, details: IntrospectionPolicyDetails) => void;
 }
 
 /** Infer a policy's row type from its source collection. */
@@ -64,7 +73,7 @@ export function defineIntrospectionPolicy<T extends EntityType>(policy: {
       ? R
       : IntrospectionData[T],
     details: IntrospectionPolicyDetails,
-  ) => ReadonlyArrayOrDirect<Maybe<IntrospectionRequest>>;
+  ) => void;
 }): IntrospectionPolicy {
   return policy as IntrospectionPolicy;
 }

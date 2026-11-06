@@ -134,56 +134,22 @@ it("expands terminal objects reached later, deduplicates requests and terminates
           {
             name: "testPolicy0",
             entity: "types",
-            select(row, details): IntrospectionRequest[] {
+            select(row, details) {
               if (!details.hasPurpose("initial")) {
-                return [];
+                return;
               }
               expanded.push(row._id);
-              if (row._id === "1")
-                return [
-                  {
-                    purposes: ["terminal"],
-                    entity: "types",
-                    match: { _id: 2 },
-                  },
-                  {
-                    entity: "types",
-                    match: { _id: "3" },
-                    purposes: ["initial"],
-                  },
-                  {
-                    entity: "classes",
-                    match: { _id: "99" },
-                    purposes: ["initial"],
-                  },
-                ];
-              if (row._id === "3")
-                return [
-                  {
-                    entity: "types",
-                    match: { _id: "2" },
-                    purposes: ["initial"],
-                  },
-                  {
-                    entity: "types",
-                    match: { _id: "4" },
-                    purposes: ["initial"],
-                  },
-                ];
-              if (row._id === "2")
-                return [
-                  {
-                    entity: "types",
-                    match: { _id: "1" },
-                    purposes: ["initial"],
-                  },
-                  {
-                    entity: "types",
-                    match: { _id: "4" },
-                    purposes: ["initial"],
-                  },
-                ];
-              return [];
+              if (row._id === "1") {
+                details.request("types", { _id: 2 }, ["terminal"]);
+                details.request("types", { _id: "3" }, ["initial"]);
+                details.request("classes", { _id: "99" }, ["initial"]);
+              } else if (row._id === "3") {
+                details.request("types", { _id: "2" }, ["initial"]);
+                details.request("types", { _id: "4" }, ["initial"]);
+              } else if (row._id === "2") {
+                details.request("types", { _id: "1" }, ["initial"]);
+                details.request("types", { _id: "4" }, ["initial"]);
+              }
             },
           },
         ],
@@ -227,37 +193,20 @@ it("deduplicates repeated collection requests without fetching them again", asyn
           {
             name: "testPolicy1",
             entity: "classes",
-            select(row): IntrospectionRequest[] {
-              if (row._id === "1")
-                return [
-                  {
-                    purposes: ["initial"],
-                    entity: "attributes",
-                    match: { attrelid: "2" },
-                  },
-                  {
-                    entity: "classes",
-                    match: { _id: "3" },
-                    purposes: ["initial"],
-                  },
-                ];
-              if (row._id === "3")
-                return [
-                  {
-                    entity: "attributes",
-                    match: { attrelid: "2" },
-                    purposes: ["initial"],
-                  },
-                ];
-              return [];
+            select(row, details) {
+              if (row._id === "1") {
+                details.request("attributes", { attrelid: "2" }, ["initial"]);
+                details.request("classes", { _id: "3" }, ["initial"]);
+              } else if (row._id === "3") {
+                details.request("attributes", { attrelid: "2" }, ["initial"]);
+              }
             },
           },
           {
             name: "testPolicy2",
             entity: "attributes",
-            select(row) {
+            select(row, details) {
               expanded.push(row.attname);
-              return [];
             },
           },
         ],
@@ -332,14 +281,8 @@ it("preserves attribute filters in follow-up queries and prunes to a fixed point
           {
             name: "testPolicy3",
             entity: "classes",
-            select(row) {
-              return [
-                {
-                  entity: "attributes",
-                  match: { attrelid: "2" },
-                  purposes: ["initial"],
-                },
-              ];
+            select(row, details) {
+              details.request("attributes", { attrelid: "2" }, ["initial"]);
             },
           },
         ],
@@ -379,22 +322,15 @@ it("does not refetch a complete collection from the initial query", async () => 
           {
             name: "testPolicy4",
             entity: "classes",
-            select(row) {
-              return [
-                {
-                  entity: "attributes",
-                  match: { attrelid: row._id },
-                  purposes: ["initial"],
-                },
-              ];
+            select(row, details) {
+              details.request("attributes", { attrelid: row._id }, ["initial"]);
             },
           },
           {
             name: "testPolicy5",
             entity: "attributes",
-            select(row) {
+            select(row, details) {
               expanded.push(row.attname);
-              return [];
             },
           },
         ],
@@ -436,14 +372,8 @@ it("applies policies to singular collections", async () => {
           {
             name: "testPolicy6",
             entity: "database",
-            select(row) {
-              return [
-                {
-                  entity: "roles",
-                  match: { _id: row.datdba },
-                  purposes: ["initial"],
-                },
-              ];
+            select(row, details) {
+              details.request("roles", { _id: row.datdba }, ["initial"]);
             },
           },
         ],
@@ -477,16 +407,25 @@ it("applies entrypoint filters only to discovery and retains global filters", as
           {
             name: "testPolicy7",
             entity: "types",
-            select: (row) =>
-              row._id === "1"
-                ? [
-                    {
-                      purposes: ["initial"],
-                      entity: "types",
-                      match: { _id: "2" },
-                    },
-                  ]
-                : [],
+            select: (row, details) => {
+              const requests: IntrospectionRequest[] =
+                row._id === "1"
+                  ? [
+                      {
+                        purposes: ["initial"],
+                        entity: "types",
+                        match: { _id: "2" },
+                      },
+                    ]
+                  : [];
+              for (const request of requests) {
+                details.request(
+                  request.entity,
+                  request.match,
+                  request.purposes,
+                );
+              }
+            },
           },
         ],
       },
@@ -535,23 +474,32 @@ for (const filtered of ["attributes", "descriptions"] as const) {
             {
               name: "testPolicy8",
               entity: "classes",
-              select: (row): IntrospectionRequest[] => [
-                {
-                  purposes: ["initial"],
-                  entity: "attributes",
-                  match: { attrelid: row._id },
-                },
-                {
-                  purposes: ["initial"],
-                  entity: "constraints",
-                  match: { conrelid: row._id },
-                },
-                {
-                  purposes: ["initial"],
-                  entity: "descriptions",
-                  match: { classoid: "1259", objoid: row._id },
-                },
-              ],
+              select: (row, details) => {
+                const requests: IntrospectionRequest[] = [
+                  {
+                    purposes: ["initial"],
+                    entity: "attributes",
+                    match: { attrelid: row._id },
+                  },
+                  {
+                    purposes: ["initial"],
+                    entity: "constraints",
+                    match: { conrelid: row._id },
+                  },
+                  {
+                    purposes: ["initial"],
+                    entity: "descriptions",
+                    match: { classoid: "1259", objoid: row._id },
+                  },
+                ];
+                for (const request of requests) {
+                  details.request(
+                    request.entity,
+                    request.match,
+                    request.purposes,
+                  );
+                }
+              },
             },
           ],
         },
@@ -597,30 +545,22 @@ it("propagates new purposes through satisfied group selectors and only reruns af
           {
             name: "classKeys",
             entity: "classes",
-            select(row): IntrospectionRequest[] {
-              return [
-                {
-                  entity: "attributes",
-                  match: { attrelid: row._id },
-                  purposes: ["keys"],
-                },
-              ];
+            select(row, details) {
+              details.request("attributes", { attrelid: row._id }, ["keys"]);
             },
           },
           {
             name: "upgrade",
             entity: "attributes",
-            select(row, details): IntrospectionRequest[] {
+            select(row, details) {
               if (!details.hasPurpose("keys")) {
-                return [];
+                return;
               }
-              return [
-                {
-                  entity: "attributes",
-                  match: { attrelid: row.attrelid },
-                  purposes: ["all", "unrelated"],
-                },
-              ];
+
+              details.request("attributes", { attrelid: row.attrelid }, [
+                "all",
+                "unrelated",
+              ]);
             },
           },
           {
@@ -630,15 +570,13 @@ it("propagates new purposes through satisfied group selectors and only reruns af
               visits.push(
                 `${row.attnum}:${details.hasPurpose("keys")}:${details.hasPurpose("all")}`,
               );
-              return [];
             },
           },
           {
             name: "unconditional",
             entity: "attributes",
-            select(row) {
+            select(row, details) {
               visits.push(`once:${row.attnum}`);
-              return [];
             },
           },
         ],
@@ -668,20 +606,14 @@ for (const invalid of ["empty", "duplicate"] as const) {
     const policy = {
       name: "badPolicy",
       entity: "namespaces" as const,
-      select(
-        _row: any,
-        details: IntrospectionPolicyDetails,
-      ): IntrospectionRequest[] {
+      select(_row: any, details: IntrospectionPolicyDetails) {
         if (invalid === "empty") {
-          return [
-            {
-              entity: "namespaces",
-              match: { _id: "2" },
-              purposes: [] as unknown as IntrospectionRequest["purposes"],
-            },
-          ];
+          details.request(
+            "namespaces",
+            { _id: "2" },
+            [] as unknown as IntrospectionRequest["purposes"],
+          );
         }
-        return [];
       },
     };
     await assert.rejects(
@@ -717,24 +649,34 @@ it("merges overlapping requests independently of policy order", async () => {
       {
         name: "keysPath",
         entity: "classes",
-        select: (row) => [
-          {
-            entity: "attributes",
-            match: { attrelid: row._id, attnum: 1 },
-            purposes: ["keys"],
-          },
-        ],
+        select: (row, details) => {
+          const requests: IntrospectionRequest[] = [
+            {
+              entity: "attributes",
+              match: { attrelid: row._id, attnum: 1 },
+              purposes: ["keys"],
+            },
+          ];
+          for (const request of requests) {
+            details.request(request.entity, request.match, request.purposes);
+          }
+        },
       },
       {
         name: "allPath",
         entity: "classes",
-        select: (row) => [
-          {
-            entity: "attributes",
-            match: { attrelid: row._id },
-            purposes: ["all"],
-          },
-        ],
+        select: (row, details) => {
+          const requests: IntrospectionRequest[] = [
+            {
+              entity: "attributes",
+              match: { attrelid: row._id },
+              purposes: ["all"],
+            },
+          ];
+          for (const request of requests) {
+            details.request(request.entity, request.match, request.purposes);
+          }
+        },
       },
     ];
     const observed: Record<string, boolean[]> = {};
@@ -753,7 +695,6 @@ it("merges overlapping requests independently of policy order", async () => {
                   details.hasPurpose("keys"),
                   details.hasPurpose("all"),
                 ];
-                return [];
               },
             },
           ],
@@ -783,3 +724,41 @@ it("merges overlapping requests independently of policy order", async () => {
   assert.deepEqual(await run(false), expected);
   assert.deepEqual(await run(true), expected);
 });
+
+for (const value of [0, "0"]) {
+  for (const [entity, column, skipped] of [
+    ["namespaces", "_id", true],
+    ["attributes", "attrelid", true],
+    ["descriptions", "objoid", true],
+    ["descriptions", "objsubid", false],
+    ["constraints", "contypid", false],
+    ["db_role_settings", "setrole", false],
+  ] as const) {
+    it(`${skipped ? "skips" : "retains"} ${entity}.${column} = ${JSON.stringify(value)} requests`, async () => {
+      let calls = 0;
+      await introspectRaw(
+        {
+          onlyEntities: ["namespaces", entity],
+          multipass: {
+            policies: [
+              {
+                name: "zeroSelector",
+                entity: "namespaces",
+                select(_row, details) {
+                  details.request(entity, { [column]: value }, ["keys"]);
+                },
+              },
+            ],
+          },
+        },
+        async () => {
+          calls++;
+          return JSON.stringify(
+            calls === 1 ? { ...metadata, namespaces: [{ _id: "1" }] } : {},
+          );
+        },
+      );
+      assert.equal(calls, skipped ? 1 : 2);
+    });
+  }
+}

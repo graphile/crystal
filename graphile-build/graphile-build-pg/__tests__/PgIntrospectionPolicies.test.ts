@@ -109,15 +109,10 @@ test.each([false, true])(
               row.relname !== "target" ||
               (upgrade && !details.hasPurpose("registryRelation"))
             ) {
-              return [];
+              return;
             }
-            return [
-              {
-                entity: "classes",
-                match: { _id: row._id },
-                purposes: ["registryCodec"],
-              },
-            ];
+
+            details.request("classes", { _id: row._id }, ["registryCodec"]);
           },
         },
       ];
@@ -284,7 +279,6 @@ test.each([false, true])(
                 "completeTypeNavigation",
               );
             }
-            return [];
           },
         },
       ];

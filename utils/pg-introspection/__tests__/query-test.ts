@@ -197,16 +197,12 @@ it("executes edge-case selections against PostgreSQL", async () => {
             {
               name: "testPolicy0",
               entity: "procs",
-              select(proc) {
-                return proc.proname === "trigger_fn"
-                  ? [
-                      {
-                        purposes: ["initial"],
-                        entity: "procs",
-                        match: { _id: remoteTriggerId },
-                      },
-                    ]
-                  : [];
+              select(proc, details) {
+                if (proc.proname === "trigger_fn") {
+                  details.request("procs", { _id: remoteTriggerId }, [
+                    "initial",
+                  ]);
+                }
               },
             },
           ],
@@ -234,16 +230,12 @@ it("executes edge-case selections against PostgreSQL", async () => {
             {
               name: "testPolicy1",
               entity: "procs",
-              select(proc) {
-                return proc.proname === "starter_fn"
-                  ? [
-                      {
-                        purposes: ["initial"],
-                        entity: "procs",
-                        match: { _id: remoteTriggerId },
-                      },
-                    ]
-                  : [];
+              select(proc, details) {
+                if (proc.proname === "starter_fn") {
+                  details.request("procs", { _id: remoteTriggerId }, [
+                    "initial",
+                  ]);
+                }
               },
             },
           ],

@@ -43,6 +43,26 @@ const keys: Partial<Record<EntityType, string[]>> = {
   db_role_settings: ["setdatabase", "setrole"],
 };
 
+/**
+ * These columns always identify an existing catalogue object. Other OID columns
+ * can use zero as a meaningful sentinel (e.g. constraints.contypid and
+ * db_role_settings.setrole), so must not be skipped indiscriminately.
+ */
+const nonzeroColumns: Partial<Record<EntityType, readonly string[]>> = {
+  attributes: ["attrelid"],
+  indexes: ["indexrelid", "indrelid"],
+  inherits: ["inhrelid", "inhparent"],
+  ranges: ["rngtypid", "rngsubtype"],
+  auth_members: ["roleid", "member", "grantor"],
+  depends: ["classid", "objid", "refclassid", "refobjid"],
+  descriptions: ["classoid", "objoid"],
+  policies: ["polrelid"],
+  foreign_tables: ["ftrelid", "ftserver"],
+  aggregates: ["aggfnoid"],
+  stat_user_tables: ["relid"],
+  enums: ["enumtypid"],
+};
+
 // Catalogs whose objects can own descriptions and dependency records.
 const describedEntities: EntityType[] = [
   "namespaces",
@@ -419,7 +439,7 @@ export async function introspectRaw<
             continue;
           }
           const missing = new Set<PgIntrospection.Purpose>();
-          const rawRequests = policy.select(row, {
+          policy.select(row, {
             catalogByOid,
             hasPurpose(purpose) {
               if (!snapshot.has(purpose)) {
@@ -427,61 +447,67 @@ export async function introspectRaw<
               }
               return snapshot.has(purpose);
             },
+            request(entity, match, purposes) {
+              const request: IntrospectionRequest = { entity, match, purposes };
+              if (
+                !Array.isArray(request.purposes) ||
+                request.purposes.length === 0
+              ) {
+                throw new Error(
+                  `Introspection policy '${policy.name}' requested '${request.entity}' without purposes`,
+                );
+              }
+              const entries = Object.entries(request.match);
+              if (
+                !entries.length ||
+                entries.some(
+                  ([field, value]) =>
+                    !/^[a-z_][a-z0-9_]*$/.test(field) || value == null,
+                )
+              ) {
+                throw new Error(
+                  `Invalid selector from introspection policy '${policy.name}' for '${request.entity}'`,
+                );
+              }
+              if (
+                entries.some(
+                  ([column, value]) =>
+                    (value === 0 || value === "0") &&
+                    ((column === "_id" && ENTITY_TYPES[entity].oids) ||
+                      nonzeroColumns[entity]?.includes(column)),
+                )
+              ) {
+                return;
+              }
+              if (!selected.has(request.entity)) {
+                return;
+              }
+              const key = selectorKey(request);
+              const matches = matchingRows(request);
+              for (const match of matches) {
+                addPurposes(request.entity, match, request.purposes);
+              }
+              if (
+                requested.has(key) ||
+                (Object.keys(request.match).length === 1 &&
+                  request.match._id != null &&
+                  matches.length)
+              ) {
+                return;
+              }
+              const previous = pending.get(key);
+              pending.set(key, {
+                ...request,
+                purposes: [
+                  ...new Set([
+                    ...(previous?.purposes ?? []),
+                    ...request.purposes,
+                  ]),
+                ] as unknown as IntrospectionRequest["purposes"],
+              });
+            },
           });
-          const requests = isArray(rawRequests) ? rawRequests : [rawRequests];
-          for (const request of requests) {
-            if (request == null) continue;
-            if (
-              !Array.isArray(request.purposes) ||
-              request.purposes.length === 0
-            ) {
-              throw new Error(
-                `Introspection policy '${policy.name}' requested '${request.entity}' without purposes`,
-              );
-            }
-            const entries = Object.entries(request.match);
-            if (
-              !entries.length ||
-              entries.some(
-                ([field, value]) =>
-                  !/^[a-z_][a-z0-9_]*$/.test(field) || value == null,
-              )
-            ) {
-              throw new Error(
-                `Invalid selector from introspection policy '${policy.name}' for '${request.entity}'`,
-              );
-            }
-          }
           revisions.set(policy, missing);
-          for (const request of requests) {
-            if (request == null) continue;
-            if (!selected.has(request.entity)) {
-              continue;
-            }
-            const key = selectorKey(request);
-            const matches = matchingRows(request);
-            for (const match of matches) {
-              addPurposes(request.entity, match, request.purposes);
-            }
-            if (
-              requested.has(key) ||
-              (Object.keys(request.match).length === 1 &&
-                request.match._id != null &&
-                matches.length)
-            ) {
-              continue;
-            }
-            const previous = pending.get(key);
-            pending.set(key, {
-              ...request,
-              purposes: [
-                ...new Set([
-                  ...(previous?.purposes ?? []),
-                  ...request.purposes,
-                ]),
-              ] as unknown as IntrospectionRequest["purposes"],
-            });
-          }
         }
       }
     }
@@ -542,8 +568,4 @@ export async function introspect<
 ): Promise<Introspection<TEntities>> {
   const result = await introspectRaw(options, runQuery);
   return augmentIntrospectionData<TEntities>(options, result);
-}
-
-function isArray<T>(o: unknown): o is ReadonlyArray<T> {
-  return Array.isArray(o);
 }
