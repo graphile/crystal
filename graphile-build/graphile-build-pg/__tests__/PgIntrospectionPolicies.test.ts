@@ -104,7 +104,6 @@ test.each([false, true])(
         {
           name: "testResourcePath",
           entity: "classes",
-          purposes: ["registryRelation", "registryCodec"],
           select(row, details) {
             if (
               row.relname !== "target" ||
@@ -278,7 +277,6 @@ test.each([false, true])(
         {
           name: "observeRangeSubtype",
           entity: "types",
-          purposes: ["registryCodec", "completeTypeNavigation"],
           select(row, details) {
             if (row.typname === "int4") {
               subtypeCodec ||= details.hasPurpose("registryCodec");

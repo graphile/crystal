@@ -61,89 +61,67 @@ const DEFAULT_POLICIES = (() => {
   function rule(
     name: string,
     entity: Entity,
-    purposes: readonly PgIntrospection.Purpose[],
     select: IntrospectionPolicy["select"],
   ) {
     policies.push(
       Object.freeze({
         name,
         entity,
-        purposes: Object.freeze([...purposes]),
         select,
       }),
     );
   }
 
-  rule("attributesDependencies", "attributes", ["registryCodec"], (row) =>
+  rule("attributesDependencies", "attributes", (row) =>
     request("types", "_id", row.atttypid, "registryCodec"),
   );
-  rule(
-    "procsDependencies",
-    "procs",
-    ["registryCodec", "catalogNavigation"],
-    (row) => [
-      request("namespaces", "_id", row.pronamespace, "catalogNavigation"),
-      request("types", "_id", row.prorettype, "registryCodec"),
-      ...(row.proallargtypes ?? row.proargtypes ?? []).map((id: string) =>
-        request("types", "_id", id, "registryCodec"),
-      ),
-    ],
-  );
-  rule(
-    "typeDependencies",
-    "types",
-    [
-      "initial",
-      "registryCodec",
-      "completeTypeNavigation",
-      "registryEnumCodec",
-      "catalogNavigation",
-    ],
-    (row, details) => {
-      // Only types reached as resources expand their related types as resources.
-      // Initial type USAGE does not imply access to its table: PostgreSQL grants
-      // PUBLIC usage of table row types by default.
-      const purpose = details.hasPurpose("registryCodec")
+  rule("procsDependencies", "procs", (row) => [
+    request("namespaces", "_id", row.pronamespace, "catalogNavigation"),
+    request("types", "_id", row.prorettype, "registryCodec"),
+    ...(row.proallargtypes ?? row.proargtypes ?? []).map((id: string) =>
+      request("types", "_id", id, "registryCodec"),
+    ),
+  ]);
+  rule("typeDependencies", "types", (row, details) => {
+    // Only types reached as resources expand their related types as resources.
+    // Initial type USAGE does not imply access to its table: PostgreSQL grants
+    // PUBLIC usage of table row types by default.
+    const purpose = details.hasPurpose("registryCodec")
+      ? "registryCodec"
+      : "completeTypeNavigation";
+    return [
+      request("namespaces", "_id", row.typnamespace, "catalogNavigation"),
+      request("types", "_id", row.typelem, purpose),
+      request("types", "_id", row.typarray, purpose),
+      request("types", "_id", row.typbasetype, purpose),
+      purpose === "registryCodec"
+        ? request("classes", "_id", row.typrelid, purpose)
+        : null,
+      row.typtype === "e"
+        ? request("enums", "enumtypid", row._id, "registryEnumCodec")
+        : null,
+      row.typtype === "r"
+        ? request("ranges", "rngtypid", row._id, purpose)
+        : null,
+      row.typtype === "d"
+        ? request("constraints", "contypid", row._id, "catalogNavigation")
+        : null,
+    ];
+  });
+  rule("rangesDependencies", "ranges", (row, details) =>
+    request(
+      "types",
+      "_id",
+      row.rngsubtype,
+      details.hasPurpose("registryCodec")
         ? "registryCodec"
-        : "completeTypeNavigation";
-      return [
-        request("namespaces", "_id", row.typnamespace, "catalogNavigation"),
-        request("types", "_id", row.typelem, purpose),
-        request("types", "_id", row.typarray, purpose),
-        request("types", "_id", row.typbasetype, purpose),
-        purpose === "registryCodec"
-          ? request("classes", "_id", row.typrelid, purpose)
-          : null,
-        row.typtype === "e"
-          ? request("enums", "enumtypid", row._id, "registryEnumCodec")
-          : null,
-        row.typtype === "r"
-          ? request("ranges", "rngtypid", row._id, purpose)
-          : null,
-        row.typtype === "d"
-          ? request("constraints", "contypid", row._id, "catalogNavigation")
-          : null,
-      ];
-    },
+        : "completeTypeNavigation",
+    ),
   );
-  rule(
-    "rangesDependencies",
-    "ranges",
-    ["registryCodec", "completeTypeNavigation"],
-    (row, details) =>
-      request(
-        "types",
-        "_id",
-        row.rngsubtype,
-        details.hasPurpose("registryCodec")
-          ? "registryCodec"
-          : "completeTypeNavigation",
-      ),
-  );
-  rule("indexesDependencies", "indexes", ["catalogNavigation"], (row) =>
+  rule("indexesDependencies", "indexes", (row) =>
     request("classes", "_id", row.indexrelid, "catalogNavigation"),
   );
-  rule("inheritsDependencies", "inherits", ["registryCodec"], (row) =>
+  rule("inheritsDependencies", "inherits", (row) =>
     request("classes", "_id", row.inhparent, "registryCodec"),
   );
 
@@ -159,43 +137,27 @@ const DEFAULT_POLICIES = (() => {
   for (const [entity, catalog] of Object.entries(catalogs) as Array<
     [Entity, string]
   >) {
-    rule(
-      `${entity}DescriptionsAndOwnership`,
-      entity,
-      ["smartTagsAndDescriptions", "pruneExtensionResources"],
-      (row, data) => {
-        const catalogId = invertKeyAndValue(data.catalogByOid)[catalog];
-        if (catalogId == null || !row._id) return null;
-        const requests: IntrospectionRequest[] = [
-          {
-            entity: "descriptions",
-            match: { classoid: catalogId, objoid: row._id },
-            purposes: ["smartTagsAndDescriptions"],
-          },
-          {
-            entity: "depends",
-            match: { classid: catalogId, objid: row._id },
-            purposes: ["pruneExtensionResources"],
-          },
-        ];
-        return requests;
-      },
-    );
+    rule(`${entity}DescriptionsAndOwnership`, entity, (row, data) => {
+      const catalogId = invertKeyAndValue(data.catalogByOid)[catalog];
+      if (catalogId == null || !row._id) return null;
+      const requests: IntrospectionRequest[] = [
+        {
+          entity: "descriptions",
+          match: { classoid: catalogId, objoid: row._id },
+          purposes: ["smartTagsAndDescriptions"],
+        },
+        {
+          entity: "depends",
+          match: { classid: catalogId, objid: row._id },
+          purposes: ["pruneExtensionResources"],
+        },
+      ];
+      return requests;
+    });
   }
   policies.push({
     name: "classDependencies",
     entity: "classes",
-    purposes: [
-      "initial",
-      "catalogNavigation",
-      "registryCodec",
-      "registryRelation",
-      "enumTables",
-      "discoverResourceRelations",
-      "completeTypeNavigation",
-      "inferRowSecurityBehaviour",
-      "registryResourceUnique",
-    ],
     select(row, details) {
       const exposed = details.hasPurpose("initial");
       const full = exposed || details.hasPurpose("registryCodec");
@@ -245,14 +207,6 @@ const DEFAULT_POLICIES = (() => {
   policies.push({
     name: "constraintDependencies",
     entity: "constraints",
-    purposes: [
-      "initial",
-      "catalogNavigation",
-      "discoverResourceRelations",
-      "registryCodec",
-      "registryRelation",
-      "enumTables",
-    ],
     select(row, details) {
       const requests = [
         request("namespaces", "_id", row.connamespace, "catalogNavigation"),
@@ -284,7 +238,7 @@ const notExtension = (catalog: string, oid: string) =>
 
 // Takes a template policy and returns a read/write clone.
 function clonePolicy(policy: ReadonlyIntrospectionPolicy): IntrospectionPolicy {
-  return { ...policy, purposes: [...policy.purposes] };
+  return { ...policy };
 }
 
 /**

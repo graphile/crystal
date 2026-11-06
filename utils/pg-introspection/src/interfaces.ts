@@ -36,7 +36,7 @@ export interface IntrospectionRequest {
 }
 
 export interface IntrospectionPolicyDetails {
-  /** Only purposes declared by this policy may be inspected. */
+  /** False results subscribe this policy to run again when the purpose is added. */
   hasPurpose(purpose: PgIntrospection.Purpose): boolean;
   /** Immutable metadata captured before dependency discovery begins. */
   catalogByOid: Readonly<Record<string, string>>;
@@ -45,11 +45,10 @@ export interface IntrospectionPolicyDetails {
 export type Maybe<T> = T | null | undefined;
 export type ReadonlyArrayOrDirect<T> = T | readonly T[];
 
-/** Policies must depend only on the row, declared purposes and fixed configuration. */
+/** Policies must depend only on the row, inspected purposes and fixed configuration. */
 export interface IntrospectionPolicy {
   name: string;
   entity: EntityType;
-  purposes: readonly PgIntrospection.Purpose[];
   select: (
     row: any,
     details: IntrospectionPolicyDetails,
@@ -60,7 +59,6 @@ export interface IntrospectionPolicy {
 export function defineIntrospectionPolicy<T extends EntityType>(policy: {
   name: string;
   entity: T;
-  purposes: readonly PgIntrospection.Purpose[];
   select: (
     row: IntrospectionData[T] extends readonly (infer R)[]
       ? R

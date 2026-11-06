@@ -3,6 +3,7 @@ import { it } from "node:test";
 
 import {
   augmentIntrospectionData,
+  type IntrospectionPolicyDetails,
   type IntrospectionRequest,
   type IntrospectOptions,
 } from "../dist/index.js";
@@ -132,7 +133,6 @@ it("expands terminal objects reached later, deduplicates requests and terminates
         policies: [
           {
             name: "testPolicy0",
-            purposes: ["initial", "terminal"],
             entity: "types",
             select(row, details): IntrospectionRequest[] {
               if (!details.hasPurpose("initial")) {
@@ -226,7 +226,6 @@ it("deduplicates repeated collection requests without fetching them again", asyn
         policies: [
           {
             name: "testPolicy1",
-            purposes: ["initial"],
             entity: "classes",
             select(row): IntrospectionRequest[] {
               if (row._id === "1")
@@ -255,7 +254,6 @@ it("deduplicates repeated collection requests without fetching them again", asyn
           },
           {
             name: "testPolicy2",
-            purposes: ["initial"],
             entity: "attributes",
             select(row) {
               expanded.push(row.attname);
@@ -333,7 +331,6 @@ it("preserves attribute filters in follow-up queries and prunes to a fixed point
         policies: [
           {
             name: "testPolicy3",
-            purposes: ["initial"],
             entity: "classes",
             select(row) {
               return [
@@ -381,7 +378,6 @@ it("does not refetch a complete collection from the initial query", async () => 
         policies: [
           {
             name: "testPolicy4",
-            purposes: ["initial"],
             entity: "classes",
             select(row) {
               return [
@@ -395,7 +391,6 @@ it("does not refetch a complete collection from the initial query", async () => 
           },
           {
             name: "testPolicy5",
-            purposes: ["initial"],
             entity: "attributes",
             select(row) {
               expanded.push(row.attname);
@@ -440,7 +435,6 @@ it("applies policies to singular collections", async () => {
         policies: [
           {
             name: "testPolicy6",
-            purposes: ["initial"],
             entity: "database",
             select(row) {
               return [
@@ -482,7 +476,6 @@ it("applies entrypoint filters only to discovery and retains global filters", as
         policies: [
           {
             name: "testPolicy7",
-            purposes: ["initial"],
             entity: "types",
             select: (row) =>
               row._id === "1"
@@ -541,7 +534,6 @@ for (const filtered of ["attributes", "descriptions"] as const) {
           policies: [
             {
               name: "testPolicy8",
-              purposes: ["initial"],
               entity: "classes",
               select: (row): IntrospectionRequest[] => [
                 {
@@ -605,7 +597,6 @@ it("propagates new purposes through satisfied group selectors and only reruns af
           {
             name: "classKeys",
             entity: "classes",
-            purposes: ["initial", "keys", "all"],
             select(row): IntrospectionRequest[] {
               return [
                 {
@@ -619,7 +610,6 @@ it("propagates new purposes through satisfied group selectors and only reruns af
           {
             name: "upgrade",
             entity: "attributes",
-            purposes: ["keys", "all", "unrelated"],
             select(row, details): IntrospectionRequest[] {
               if (!details.hasPurpose("keys")) {
                 return [];
@@ -636,7 +626,6 @@ it("propagates new purposes through satisfied group selectors and only reruns af
           {
             name: "consumer",
             entity: "attributes",
-            purposes: ["keys", "all"],
             select(row, details) {
               visits.push(
                 `${row.attnum}:${details.hasPurpose("keys")}:${details.hasPurpose("all")}`,
@@ -647,7 +636,6 @@ it("propagates new purposes through satisfied group selectors and only reruns af
           {
             name: "unconditional",
             entity: "attributes",
-            purposes: [],
             select(row) {
               visits.push(`once:${row.attnum}`);
               return [];
@@ -675,24 +663,15 @@ it("propagates new purposes through satisfied group selectors and only reruns af
   assert.ok(visits.includes("2:true:true"));
 });
 
-for (const invalid of ["read", "emit", "empty", "duplicate"] as const) {
+for (const invalid of ["empty", "duplicate"] as const) {
   it(`rejects ${invalid} purpose policy misuse`, async () => {
     const policy = {
       name: "badPolicy",
       entity: "namespaces" as const,
-      purposes: ["initial"] as const,
       select(
         _row: any,
-        details: import("../dist/index.js").IntrospectionPolicyDetails,
+        details: IntrospectionPolicyDetails,
       ): IntrospectionRequest[] {
-        if (invalid === "read") {
-          details.hasPurpose("keys");
-        }
-        if (invalid === "emit") {
-          return [
-            { entity: "namespaces", match: { _id: "2" }, purposes: ["keys"] },
-          ];
-        }
         if (invalid === "empty") {
           return [
             {
@@ -738,7 +717,6 @@ it("merges overlapping requests independently of policy order", async () => {
       {
         name: "keysPath",
         entity: "classes",
-        purposes: ["keys"],
         select: (row) => [
           {
             entity: "attributes",
@@ -750,7 +728,6 @@ it("merges overlapping requests independently of policy order", async () => {
       {
         name: "allPath",
         entity: "classes",
-        purposes: ["all"],
         select: (row) => [
           {
             entity: "attributes",
@@ -771,7 +748,6 @@ it("merges overlapping requests independently of policy order", async () => {
             {
               name: "observe",
               entity: "attributes",
-              purposes: ["keys", "all"],
               select(row, details) {
                 observed[row.attnum] = [
                   details.hasPurpose("keys"),

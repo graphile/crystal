@@ -196,7 +196,6 @@ it("executes edge-case selections against PostgreSQL", async () => {
           policies: [
             {
               name: "testPolicy0",
-              purposes: ["initial"],
               entity: "procs",
               select(proc) {
                 return proc.proname === "trigger_fn"
@@ -234,7 +233,6 @@ it("executes edge-case selections against PostgreSQL", async () => {
           policies: [
             {
               name: "testPolicy1",
-              purposes: ["initial"],
               entity: "procs",
               select(proc) {
                 return proc.proname === "starter_fn"

@@ -258,14 +258,6 @@ export async function introspectRaw<
       );
     }
     names.add(policy.name);
-    if (
-      !Array.isArray(policy.purposes) ||
-      policy.purposes.some((p) => typeof p !== "string" || !p.trim())
-    ) {
-      throw new Error(
-        `Invalid purposes for introspection policy '${policy.name}'`,
-      );
-    }
     if (!selected.has(policy.entity)) continue;
     const list = rules.get(policy.entity) ?? [];
     list.push(policy);
@@ -278,7 +270,10 @@ export async function introspectRaw<
   const data = result as Record<string, any>;
   const rows = new Map<EntityType, Map<string, Row>>();
   const purposes = new WeakMap<Row, Set<PgIntrospection.Purpose>>();
-  const expanded = new WeakMap<Row, Map<IntrospectionPolicy, string>>();
+  const expanded = new WeakMap<
+    Row,
+    Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
+  >();
   const catalogByOid = Object.freeze({ ...result.catalog_by_oid });
   const requested = new Set<string>();
 
@@ -417,20 +412,16 @@ export async function introspectRaw<
         }
         const snapshot = snapshots.get(row)!;
         for (const policy of rules.get(entity) ?? []) {
-          const declared = new Set(policy.purposes);
-          const revision = JSON.stringify(
-            [...declared].filter((p) => snapshot.has(p)),
-          );
-          if (revisions.get(policy) === revision) {
+          const waiting = revisions.get(policy);
+          if (waiting && ![...waiting].some((p) => snapshot.has(p))) {
             continue;
           }
+          const missing = new Set<PgIntrospection.Purpose>();
           const rawRequests = policy.select(row, {
             catalogByOid,
             hasPurpose(purpose) {
-              if (!declared.has(purpose)) {
-                throw new Error(
-                  `Introspection policy '${policy.name}' on '${entity}' read undeclared purpose '${purpose}'`,
-                );
+              if (!snapshot.has(purpose)) {
+                missing.add(purpose);
               }
               return snapshot.has(purpose);
             },
@@ -446,13 +437,6 @@ export async function introspectRaw<
                 `Introspection policy '${policy.name}' requested '${request.entity}' without purposes`,
               );
             }
-            for (const purpose of request.purposes) {
-              if (!declared.has(purpose)) {
-                throw new Error(
-                  `Introspection policy '${policy.name}' requested '${request.entity}' with undeclared purpose '${purpose}'`,
-                );
-              }
-            }
             const entries = Object.entries(request.match);
             if (
               !entries.length ||
@@ -466,7 +450,7 @@ export async function introspectRaw<
               );
             }
           }
-          revisions.set(policy, revision);
+          revisions.set(policy, missing);
           for (const request of requests) {
             if (request == null) continue;
             if (!selected.has(request.entity)) {
