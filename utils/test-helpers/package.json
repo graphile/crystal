@@ -1,0 +1,19 @@
+{
+  "name": "@localrepo/test-helpers",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "build-package": "yarn build"
+  },
+  "dependencies": {
+    "pg": "^8.16.3",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "@types/pg": "^8.15.6",
+    "typescript": "^5.9.3"
+  }
+}

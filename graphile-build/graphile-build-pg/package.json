@@ -102,6 +102,7 @@
     "@envelop/parser-cache": "^10.0.0",
     "@envelop/validation-cache": "^10.0.0",
     "@fastify/static": "^10.1.2",
+    "@localrepo/test-helpers": "workspace:*",
     "@types/debug": "^4.1.12",
     "@types/express": "^4.17.25",
     "@types/jest": "^30.0.0",

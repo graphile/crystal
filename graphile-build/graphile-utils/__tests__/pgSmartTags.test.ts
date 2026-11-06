@@ -1,4 +1,5 @@
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import { GraphQLObjectType } from "grafast/graphql";
 import type { Pool } from "pg";
 import pg from "pg";
@@ -14,10 +15,6 @@ import { makeSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { jsonPgSmartTags, pgSmartTags } from "../dist/index.js";
 import {
   type PgSmartTagRule,

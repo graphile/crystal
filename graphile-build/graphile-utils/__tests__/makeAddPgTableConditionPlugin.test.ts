@@ -1,5 +1,6 @@
 import { TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 import { grafast } from "grafast";
 import type { ExecutionResult } from "grafast/graphql";
 import { lexicographicSortSchema } from "grafast/graphql";
@@ -9,10 +10,6 @@ import { makeSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import {
-  createTestDatabase,
-  dropTestDatabase,
-} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.ts";
 import { makeAddPgTableConditionPlugin } from "../dist/index.js";
 
 let pgPool: Pool | null = null;

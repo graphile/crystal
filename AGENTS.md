@@ -155,13 +155,16 @@ the query shape.
 - Use PostgreSQL pools in tests rather than standalone `Client` connections. Use
   a package-local helper for database setup, transactions, client release, and
   teardown; do not create clients or pools in individual test cases.
+- Use `@localrepo/test-helpers` for shared database provisioning and transaction
+  handling. Package-local helpers should supply the test runner's lifecycle
+  hooks; do not duplicate database setup or import another package's tests.
 - Follow the existing database isolation pattern: create a temporary
   `gctestdb_*` database from `graphilecrystaltest_template`, connect through a
   shared test pool, and drop the database after closing the pool. Use
   `OWNER_DATABASE` for the administrative connection and respect `PGHOST`. Do
   not connect tests directly to the shared `graphilecrystaltest` database.
-- If the package lacks a helper, add one locally rather than importing a helper
-  across package boundaries. Follow the relevant runner's lifecycle hooks
+- If the package lacks a lifecycle helper, add a local wrapper around
+  `@localrepo/test-helpers`. Follow the relevant runner's lifecycle hooks
   (`before`/`after` for `node:test`, `beforeAll`/`afterAll` for Jest).
 
 Note: many of the integration tests work by writing `*.test.graphql` files,
