@@ -122,6 +122,16 @@ function selectorKey(
   ]);
 }
 
+/** Combine override predicates without losing earlier conditions. */
+function addOverride(
+  overrides: Partial<Record<EntityType, string>>,
+  entity: EntityType,
+  predicate: string,
+) {
+  const previous = overrides[entity];
+  overrides[entity] = previous ? `(${previous}) and (${predicate})` : predicate;
+}
+
 function entrypointQuery<TEntities extends EntityType>(
   options: IntrospectOptions<TEntities>,
 ) {
@@ -149,11 +159,15 @@ function entrypointQuery<TEntities extends EntityType>(
   for (const entity of output) addRequirements(entity);
   const namespace = (column: string) =>
     `${column} in (select _id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')`;
-  overrides.classes = namespace("relnamespace");
-  overrides.procs = namespace("pronamespace");
-  overrides.types = namespace("typnamespace");
+  addOverride(overrides, "classes", namespace("relnamespace"));
+  addOverride(overrides, "procs", namespace("pronamespace"));
+  addOverride(overrides, "types", namespace("typnamespace"));
   if (ctes.has("classes")) {
-    overrides.constraints = "conrelid in (select _id from classes)";
+    addOverride(
+      overrides,
+      "constraints",
+      "conrelid in (select _id from classes)",
+    );
   }
   let prefix = "";
   if (multipass.onlyAccessible) {
@@ -166,9 +180,27 @@ function entrypointQuery<TEntities extends EntityType>(
     const accessible = (schema: string, privilege: string) =>
       `exists (select 1 from accessible_roles ar where pg_catalog.has_schema_privilege(ar.oid, ${schema}, 'USAGE') and (${privilege}))`;
     const tablePrivilege = `case when relkind in ('r','p','v','m','f') then (pg_catalog.has_table_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') or pg_catalog.has_any_column_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,REFERENCES')) when relkind = 'S' then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE') else false end`;
-    overrides.classes += ` and ${accessible("relnamespace", tablePrivilege)}`;
-    overrides.procs += ` and ${accessible("pronamespace", "pg_catalog.has_function_privilege(ar.oid, pg_proc.oid, 'EXECUTE')")}`;
-    overrides.types += ` and ${accessible("typnamespace", "pg_catalog.has_type_privilege(ar.oid, pg_type.oid, 'USAGE')")}`;
+    addOverride(
+      overrides,
+      "classes",
+      accessible("relnamespace", tablePrivilege),
+    );
+    addOverride(
+      overrides,
+      "procs",
+      accessible(
+        "pronamespace",
+        "pg_catalog.has_function_privilege(ar.oid, pg_proc.oid, 'EXECUTE')",
+      ),
+    );
+    addOverride(
+      overrides,
+      "types",
+      accessible(
+        "typnamespace",
+        "pg_catalog.has_type_privilege(ar.oid, pg_type.oid, 'USAGE')",
+      ),
+    );
   }
   const filters = { ...options.filters };
   for (const entity of Object.keys(
@@ -255,9 +287,11 @@ function makeFetchQuery(
       });
       return `exists (select 1 from unnest(${params.join(", ")}) as selector(${names.join(", ")}) where ${comparisons.join(" and ")})`;
     });
-    overrides[entity] = expressions
-      .map((expression) => `(${expression})`)
-      .join(" or ");
+    addOverride(
+      overrides,
+      entity,
+      expressions.map((expression) => `(${expression})`).join(" or "),
+    );
   }
   return {
     text: buildIntrospectionQuery(
