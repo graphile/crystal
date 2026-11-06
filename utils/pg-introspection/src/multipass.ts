@@ -15,6 +15,7 @@ import {
 } from "./introspection.ts";
 import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
+  assertEntityType,
   buildIntrospectionQuery,
   defaultEntities,
   makeIntrospectionQuery,
@@ -98,9 +99,11 @@ function columnValue<TRow extends object, TColumn extends string>(
   row: TRow,
   column: TColumn,
 ): TColumn extends keyof TRow ? TRow[TColumn] : unknown {
-  return (row as Record<string, unknown>)[column] as TColumn extends keyof TRow
-    ? TRow[TColumn]
-    : unknown;
+  return (
+    Object.hasOwn(row, column)
+      ? (row as Record<string, unknown>)[column]
+      : undefined
+  ) as TColumn extends keyof TRow ? TRow[TColumn] : unknown;
 }
 
 function identity<TEntity extends EntityType>(
@@ -146,6 +149,7 @@ function entrypointQuery<TEntities extends EntityType>(
     ...(multipass.onlyAccessible ? { constraints: ["classes"] } : {}),
   };
   const addRequirements = (entity: EntityType) => {
+    assertEntityType(entity);
     for (const required of [
       ...(ENTITY_TYPES[entity].requires ?? []),
       ...(implicitRequirements[entity] ?? []),
@@ -248,8 +252,9 @@ function makeFetchQuery(
   for (const entity of groups.keys()) {
     const invariant = invariantFilters[entity];
     if (invariant) {
-      effectiveFilters[entity] = filters?.[entity]
-        ? `(${invariant}) and (${filters[entity]})`
+      const filter = effectiveFilters[entity];
+      effectiveFilters[entity] = filter
+        ? `(${invariant}) and (${filter})`
         : invariant;
     }
   }
@@ -321,7 +326,8 @@ export async function introspectRaw<
     result.introspectionPasses = 1;
     return pruneIntrospectionData(options, result);
   }
-  const { policies = [], entrypointFilters } = options.multipass;
+  const { policies = [] } = options.multipass;
+  const entrypointFilters = { ...options.multipass.entrypointFilters };
   const { filters } = options;
   const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
   const rules = new Map<EntityType, IntrospectionPolicy[]>();
@@ -353,7 +359,9 @@ export async function introspectRaw<
     IntrospectionRow,
     Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
   >();
-  const catalogByOid = Object.freeze({ ...result.catalog_by_oid });
+  const catalogByOid: Record<string, string> = Object.create(null);
+  Object.assign(catalogByOid, result.catalog_by_oid);
+  Object.freeze(catalogByOid);
   const requested = new Set<string>();
 
   const frontier: Array<[EntityType, IntrospectionRow]> = [];
@@ -405,13 +413,13 @@ export async function introspectRaw<
   if (selected.has("classes")) {
     for (const row of result.classes ?? []) {
       for (const [entity, column] of initialClassCollections) {
-        if (selected.has(entity) && !entrypointFilters?.[entity]) {
+        if (selected.has(entity) && !entrypointFilters[entity]) {
           requested.add(selectorKey({ entity, match: { [column]: row._id } }));
         }
       }
     }
   }
-  if (selected.has("descriptions") && !entrypointFilters?.descriptions) {
+  if (selected.has("descriptions") && !entrypointFilters.descriptions) {
     const catalogOids = new Map(
       Object.entries(result.catalog_by_oid).map(([oid, name]) => [name, oid]),
     );
@@ -508,6 +516,7 @@ export async function introspectRaw<
               return snapshot.has(purpose);
             },
             request(entity, match, purposes) {
+              assertEntityType(entity);
               // The generic request API keeps these parameters correlated.
               const request = {
                 entity,

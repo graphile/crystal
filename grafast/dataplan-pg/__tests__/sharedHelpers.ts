@@ -5,11 +5,7 @@ import type { Pool } from "pg";
 import { createWithPgClient } from "../dist/adaptors/pg.js";
 import type { PgClientQuery, WithPgClient } from "../dist/index.js";
 
-export {
-  createTestDatabase,
-  dropTestDatabase,
-  runSqlAsRoot,
-} from "@localrepo/test-helpers";
+export { createTestDatabase, dropTestDatabase } from "@localrepo/test-helpers";
 
 function noop() {}
 

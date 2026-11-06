@@ -242,7 +242,6 @@ const ACL_MAP = {
   [ACL_CREATE_TEMP]: "temporary",
   [ACL_MAINTAIN]: "maintain",
 } as const;
-Object.setPrototypeOf(ACL_MAP, null);
 
 type AclCharacter = keyof typeof ACL_MAP;
 

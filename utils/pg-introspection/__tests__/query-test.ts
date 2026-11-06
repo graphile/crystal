@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { it } from "node:test";
 
-import { ENTITY_TYPES } from "../dist/introspection.js";
+import type { IntrospectOptions } from "../dist/index.js";
+import { ENTITY_TYPES, type EntityType } from "../dist/introspection.js";
 import {
   catalogProjection,
   dependencyWhere,
@@ -21,6 +22,12 @@ it("requires an explicit policy for new catalog types", () => {
     () => catalogProjection({ future_ref: "regfuture[]" }),
     /Unsupported PostgreSQL catalog type 'regfuture' for attribute 'future_ref'.*ALLOWED_TYPES or TYPE_CASTS/,
   );
+  for (const type of ["__proto__", "constructor", "toString"]) {
+    assert.throws(
+      () => catalogProjection({ future_ref: type }),
+      /Unsupported PostgreSQL catalog type/,
+    );
+  }
 });
 
 it("uses docs-generated explicit projections and fallbacks for every entity", () => {
@@ -448,5 +455,109 @@ it("fetches the current database after excluding it from initial discovery", asy
     assert.equal(result.database.datname, name);
     assert.equal(Array.isArray(result.database), false);
     assert.deepEqual(visited, [name]);
+  });
+});
+
+it("rejects inherited property names as collection names", async () => {
+  for (const entity of ["__proto__", "constructor", "toString"]) {
+    const options = { onlyEntities: [entity as EntityType] };
+    assert.throws(
+      () => makeIntrospectionQuery(options),
+      /Unknown introspection entity/,
+    );
+    await assert.rejects(
+      introspectRaw({ ...options, multipass: {} }, async () =>
+        assert.fail("Invalid collections must be rejected before querying"),
+      ),
+      /Unknown introspection entity/,
+    );
+  }
+});
+
+it("ignores inherited filters and exposes a null-prototype catalogue dictionary", async () => {
+  await withPgClientTransaction(async (client) => {
+    const filters: NonNullable<IntrospectOptions["filters"]> = Object.create({
+      namespaces: "false",
+      attributes: "false",
+    });
+    const relation = await client.query<{ id: string }>(
+      "select 'pg_catalog.pg_class'::regclass::oid::text as id",
+    );
+    const relationId = relation.rows[0].id;
+    for (const multipass of [false, true]) {
+      let visits = 0;
+      const options: IntrospectOptions<
+        "namespaces" | "classes" | "attributes"
+      > = {
+        onlyEntities: ["namespaces", "classes", "attributes"],
+        filters,
+        multipass: multipass
+          ? {
+              policies: [
+                {
+                  name: "checkCatalog",
+                  entity: "namespaces",
+                  select(_row, details) {
+                    visits++;
+                    details.request("attributes", { attrelid: relationId }, [
+                      "initial",
+                    ]);
+                    assert.equal(
+                      Object.getPrototypeOf(details.catalogByOid),
+                      null,
+                    );
+                    assert.equal(details.catalogByOid["__proto__"], undefined);
+                    assert.equal(
+                      details.catalogByOid["constructor"],
+                      undefined,
+                    );
+                  },
+                },
+              ],
+            }
+          : false,
+      };
+      const result = await introspectRaw(
+        options,
+        async (text, values) =>
+          (await client.query<{ introspection: string }>(text, values)).rows[0]
+            .introspection,
+      );
+      assert.ok(result.namespaces.some((row) => row.nspname === "pg_catalog"));
+      assert.equal(visits, multipass ? result.namespaces.length : 0);
+      if (multipass) {
+        assert.ok(result.attributes.some((row) => row.attrelid === relationId));
+      }
+    }
+  });
+});
+
+it("supports catalogue names that match Object.prototype properties", async () => {
+  await withPgClientTransaction(async (client) => {
+    await client.query('create schema "__proto__"');
+    await client.query(
+      'create table "__proto__"."constructor" ("toString" text)',
+    );
+    await client.query(
+      `comment on table "__proto__"."constructor" is '@constructor safe'`,
+    );
+    const result = await introspect(
+      {
+        onlyEntities: ["namespaces", "classes", "attributes", "descriptions"],
+        filters: { namespaces: "nspname = '__proto__'" },
+        multipass: {},
+      },
+      async (text, values) =>
+        (await client.query<{ introspection: string }>(text, values)).rows[0]
+          .introspection,
+    );
+    const namespace = result.getNamespace({ name: "__proto__" });
+    assert.ok(namespace);
+    const table = namespace.getClass({ name: "constructor" });
+    assert.ok(table);
+    assert.equal(table.getAttribute({ name: "toString" })?.getClass(), table);
+    assert.equal(table.getTags()["constructor"], "safe");
+    assert.equal(Object.getPrototypeOf(table.getTags()), null);
+    assert.equal(namespace.getClass({ name: "toString" }), undefined);
   });
 });

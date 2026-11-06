@@ -29,13 +29,20 @@ export const defaultEntities = Object.freeze([
   "am",
 ] as const);
 
+/** Check runtime inputs before indexing catalogue metadata. */
+export function assertEntityType(entity: string): asserts entity is EntityType {
+  if (!Object.hasOwn(ENTITY_TYPES, entity)) {
+    throw new Error(`Unknown introspection entity '${entity}'`);
+  }
+}
+
 export function makeIntrospectionQuery(
   rawOptions: Pick<
     IntrospectOptions<EntityType>,
     "onlyEntities" | "filters"
   > = {},
 ) {
-  return buildIntrospectionQuery(rawOptions, {}, rawOptions.filters);
+  return buildIntrospectionQuery(rawOptions, undefined, rawOptions.filters);
 }
 
 /** Builds a query with per-collection predicates. */
@@ -50,6 +57,9 @@ export function buildIntrospectionQuery(
   includeTriggerFunctions?: boolean,
 ) {
   const onlyEntities = rawOptions.onlyEntities ?? [...defaultEntities];
+  for (const entity of onlyEntities) {
+    assertEntityType(entity);
+  }
   const options: Required<Options> = {
     onlyEntities: outputEntities
       ? onlyEntities.filter((entity) => outputEntities.has(entity))
@@ -73,15 +83,14 @@ export function buildIntrospectionQuery(
     } = entityType;
     let additionalSelect = "";
     if (extraColumns != null) {
-      for (const colName in extraColumns) {
-        const { sql } = extraColumns[colName];
+      for (const [colName, { sql }] of Object.entries(extraColumns)) {
         additionalSelect += `,\n      ${sql} as "${colName}"`;
       }
     }
     const wheres: string[] = [];
 
     const baseWhere =
-      overrides[alias] ??
+      (Object.hasOwn(overrides, alias) ? overrides[alias] : undefined) ??
       (typeof entityType.where === "function"
         ? entityType.where(options)
         : entityType.where);
@@ -95,7 +104,7 @@ export function buildIntrospectionQuery(
       wheres.push("prorettype operator(pg_catalog.<>) 2279");
     }
 
-    const filter = filters[alias];
+    const filter = Object.hasOwn(filters, alias) ? filters[alias] : undefined;
     if (filter) {
       wheres.push(filter);
     }
