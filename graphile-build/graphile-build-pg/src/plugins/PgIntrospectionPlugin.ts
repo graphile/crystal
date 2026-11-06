@@ -3,7 +3,6 @@ import type { PromiseOrDirect, Step } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
-  DefaultEntities,
   Introspection,
   IntrospectionDataForEntities,
   IntrospectOptions,
@@ -32,6 +31,60 @@ import {
   postgraphileMultipass,
   postgraphilePrune,
 } from "./PgIntrospectionPolicies.ts";
+
+declare global {
+  namespace GraphileBuild {
+    interface PgIntrospectionEntitySelection {
+      // If you add more pg-introspection entities e.g. via the
+      // pgIntrospection_options hook, expand this selection so the types know
+      // about it.
+      database: true;
+      namespaces: true;
+      classes: true;
+      attributes: true;
+      constraints: true;
+      procs: true;
+      roles: true;
+      auth_members: true;
+      types: true;
+      enums: true;
+      extensions: true;
+      indexes: true;
+      languages: true;
+      ranges: true;
+      depends: true;
+      descriptions: true;
+      inherits: true;
+      policies: true;
+      am: true;
+    }
+    type PgIntrospectionEntities =
+      keyof GraphileBuild.PgIntrospectionEntitySelection & string;
+  }
+}
+
+const DEFAULT_ENTITIES: readonly GraphileBuild.PgIntrospectionEntities[] =
+  Object.freeze([
+    "database",
+    "namespaces",
+    "classes",
+    "attributes",
+    "constraints",
+    "procs",
+    "roles",
+    "auth_members",
+    "types",
+    "enums",
+    "extensions",
+    "indexes",
+    "languages",
+    "ranges",
+    "depends",
+    "descriptions",
+    "inherits",
+    "policies",
+    "am",
+  ]);
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -199,7 +252,7 @@ declare global {
     interface GatherHooks {
       pgIntrospection_options(event: {
         serviceName: string;
-        options: IntrospectOptions<DefaultEntities>;
+        options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities>;
       }): PromiseOrDirect<void>;
       pgIntrospection_introspection(event: {
         introspection: Introspection;
@@ -271,12 +324,12 @@ declare global {
 
 type RawIntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  options: IntrospectOptions<DefaultEntities>;
-  introspectionData: IntrospectionDataForEntities<DefaultEntities>;
+  options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities>;
+  introspectionData: IntrospectionDataForEntities<GraphileBuild.PgIntrospectionEntities>;
 }>;
 type IntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspection: Introspection<DefaultEntities>;
+  introspection: Introspection<GraphileBuild.PgIntrospectionEntities>;
 }>;
 
 interface Cache {
@@ -892,35 +945,16 @@ function introspectPgServices(
         }
         seenPgSettingsKeys.set(pgSettingsKey, i);
       }
-      const options: IntrospectOptions<DefaultEntities> = {
-        filters: { depends: "deptype in ('a', 'e')" },
-        prune: postgraphilePrune,
-        onlyEntities: [
-          "database",
-          "namespaces",
-          "classes",
-          "attributes",
-          "constraints",
-          "procs",
-          "roles",
-          "auth_members",
-          "types",
-          "enums",
-          "extensions",
-          "indexes",
-          "languages",
-          "ranges",
-          "depends",
-          "descriptions",
-          "inherits",
-          "policies",
-          "am",
-        ],
-        multipass:
-          info.resolvedPreset.gather?.pgMultipassIntrospection === false
-            ? false
-            : postgraphileMultipass(pgService.schemas ?? ["public"]),
-      };
+      const options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities> =
+        {
+          filters: { depends: "deptype in ('a', 'e')" },
+          prune: postgraphilePrune,
+          onlyEntities: [...DEFAULT_ENTITIES],
+          multipass:
+            info.resolvedPreset.gather?.pgMultipassIntrospection === false
+              ? false
+              : postgraphileMultipass(pgService.schemas ?? ["public"]),
+        };
       await info.process("pgIntrospection_options", {
         serviceName: name,
         options,
