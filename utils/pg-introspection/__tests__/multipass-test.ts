@@ -408,22 +408,8 @@ it("applies entrypoint filters only to discovery and retains global filters", as
             name: "testPolicy7",
             entity: "types",
             select: (row, details) => {
-              const requests: IntrospectionRequest[] =
-                row._id === "1"
-                  ? [
-                      {
-                        purposes: ["initial"],
-                        entity: "types",
-                        match: { _id: "2" },
-                      },
-                    ]
-                  : [];
-              for (const request of requests) {
-                details.request(
-                  request.entity,
-                  request.match,
-                  request.purposes,
-                );
+              if (row._id === "1") {
+                details.request("types", { _id: "2" }, ["initial"]);
               }
             },
           },
@@ -631,32 +617,16 @@ it("merges overlapping requests independently of policy order", async () => {
         name: "keysPath",
         entity: "classes",
         select: (row, details) => {
-          const requests: IntrospectionRequest[] = [
-            {
-              entity: "attributes",
-              match: { attrelid: row._id, attnum: 1 },
-              purposes: ["keys"],
-            },
-          ];
-          for (const request of requests) {
-            details.request(request.entity, request.match, request.purposes);
-          }
+          details.request("attributes", { attrelid: row._id, attnum: 1 }, [
+            "keys",
+          ]);
         },
       },
       {
         name: "allPath",
         entity: "classes",
         select: (row, details) => {
-          const requests: IntrospectionRequest[] = [
-            {
-              entity: "attributes",
-              match: { attrelid: row._id },
-              purposes: ["all"],
-            },
-          ];
-          for (const request of requests) {
-            details.request(request.entity, request.match, request.purposes);
-          }
+          details.request("attributes", { attrelid: row._id }, ["all"]);
         },
       },
     ];
