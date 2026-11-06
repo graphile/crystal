@@ -16,7 +16,6 @@ import {
   SwallowAllErrorsPlugin,
   withPoolClientTransaction,
 } from "../../helpers.ts";
-
 import { assertIntrospectionPasses } from "../introspectionPasses.ts";
 
 jest.setTimeout(60000);
