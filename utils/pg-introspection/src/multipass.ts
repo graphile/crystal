@@ -25,7 +25,7 @@ type RunQuery = (
   values: Array<string | string[] | null>,
 ) => Promise<string>;
 
-/** Stable identities for catalogs which do not have an OID. */
+/** Stable identity columns for collections without the legacy _id alias. */
 const keys: {
   [TEntity in EntityType]?: readonly Extract<
     keyof IntrospectionRow<TEntity>,
@@ -52,6 +52,7 @@ const keys: {
   aggregates: ["aggfnoid"],
   stat_user_tables: ["relid"],
   settings: ["name"],
+  event_triggers: ["oid"],
   db_role_settings: ["setdatabase", "setrole"],
 };
 
@@ -106,16 +107,8 @@ function identity<TEntity extends EntityType>(
   entity: TEntity,
   row: IntrospectionRow<TEntity>,
 ): string {
-  const fields =
-    keys[entity] ??
-    (ENTITY_TYPES[entity].oids
-      ? ["_id"]
-      : "oid" in row && row.oid
-        ? ["oid"]
-        : undefined);
-  return JSON.stringify(
-    fields ? fields.map((field) => columnValue(row, field)) : row,
-  );
+  const fields = keys[entity] ?? ["_id"];
+  return JSON.stringify(fields.map((field) => columnValue(row, field)));
 }
 
 function selectorKey(
@@ -135,7 +128,7 @@ function entrypointQuery<TEntities extends EntityType>(
   const { multipass } = options;
   if (!multipass) throw new Error("Multipass options required");
   const values: Array<string | string[] | null> = [];
-  const overrides: Record<string, string> = {};
+  const overrides: Partial<Record<EntityType, string>> = {};
   const output = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
   const ctes = new Set(output);
   // Permission-filtered constraints must belong to an accessible class.
@@ -212,7 +205,7 @@ function makeFetchQuery(
     groups.set(request.entity, group);
   }
   const values: Array<string | string[] | null> = [];
-  const overrides: Record<string, string> = {};
+  const overrides: Partial<Record<EntityType, string>> = {};
   // These catalog predicates are independent of the scope-defining CTEs in
   // ENTITY_TYPES and must also apply when an object is fetched by identity.
   const invariantFilters: Partial<Record<EntityType, string>> = {
@@ -235,7 +228,6 @@ function makeFetchQuery(
     >();
     for (const request of group) {
       const columns = Object.keys(request.match).sort();
-      if (!columns.length) throw new Error(`Empty selector for '${entity}'`);
       const shapeKey = JSON.stringify(columns);
       const shape = shapes.get(shapeKey) ?? { columns, requests: [] };
       shape.requests.push(request);
@@ -243,8 +235,6 @@ function makeFetchQuery(
     }
     const expressions = [...shapes.values()].map(({ columns, requests }) => {
       const params = columns.map((column) => {
-        if (!/^[a-z_][a-z0-9_]*$/.test(column))
-          throw new Error(`Invalid catalog column '${column}'`);
         values.push(
           requests.map((request) => String(columnValue(request.match, column))),
         );
@@ -320,7 +310,6 @@ export async function introspectRaw<
     await runQuery(query.text, query.values),
   );
   result.introspectionPasses = 1;
-  const data = result;
   const rows = new Map<EntityType, Map<string, IntrospectionRow>>();
   const purposes = new WeakMap<
     IntrospectionRow,
@@ -354,7 +343,7 @@ export async function introspectRaw<
     }
   }
   for (const entity of selected) {
-    const collection = data[entity];
+    const collection = result[entity];
     if (collection && !Array.isArray(collection)) {
       rows.set(entity, new Map([[identity(entity, collection), collection]]));
       addPurposes(entity, collection, ["initial"]);
@@ -380,7 +369,7 @@ export async function introspectRaw<
     ["policies", "polrelid"],
   ];
   if (selected.has("classes")) {
-    for (const row of data.classes ?? []) {
+    for (const row of result.classes ?? []) {
       for (const [entity, column] of initialClassCollections) {
         if (selected.has(entity) && !entrypointFilters?.[entity]) {
           requested.add(selectorKey({ entity, match: { [column]: row._id } }));
@@ -396,7 +385,7 @@ export async function introspectRaw<
       if (!selected.has(entity)) continue;
       const catalogId = catalogOids.get(ENTITY_TYPES[entity].tableName);
       if (!catalogId) continue;
-      for (const row of data[entity] ?? []) {
+      for (const row of result[entity] ?? []) {
         const id = "_id" in row ? row._id : "oid" in row ? row.oid : undefined;
         if (id != null) {
           requested.add(
@@ -456,7 +445,7 @@ export async function introspectRaw<
     return shape.groups.get(groupKey(columns, request.match)) ?? [];
   };
   const pending = new Map<string, IntrospectionRequest>();
-  while (frontier.length || pending.size) {
+  while (frontier.length) {
     // Drain purpose propagation before querying, batching all reasons for a selector.
     while (frontier.length) {
       const batch = frontier.splice(0);
@@ -531,9 +520,8 @@ export async function introspectRaw<
               }
               if (
                 requested.has(key) ||
-                (Object.keys(request.match).length === 1 &&
-                  "_id" in request.match &&
-                  request.match._id != null &&
+                (entries.length === 1 &&
+                  entries[0][0] === "_id" &&
                   matches.length)
               ) {
                 return;
@@ -553,7 +541,7 @@ export async function introspectRaw<
       }
     }
     if (!pending.size) {
-      continue;
+      break;
     }
     const requests = [...pending.values()];
     pending.clear();
@@ -577,7 +565,7 @@ export async function introspectRaw<
       const collection: IntrospectionRow[] | undefined =
         entity === "database"
           ? undefined
-          : (data[entity] ?? (data[entity] = []));
+          : (result[entity] ?? (result[entity] = []));
       for (const row of fetchedRows) {
         const id = identity(entity, row);
         if (!index.has(id)) {
@@ -588,7 +576,7 @@ export async function introspectRaw<
           if (collection) {
             collection.push(row);
           } else if (entity === "database" && fetched.database) {
-            data.database = fetched.database;
+            result.database = fetched.database;
           }
         }
       }
