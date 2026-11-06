@@ -3,9 +3,12 @@ import { it } from "node:test";
 
 import {
   augmentIntrospectionData,
+  defineIntrospectionPolicy,
+  type IntrospectionPolicy,
   type IntrospectionPolicyDetails,
   type IntrospectionRequest,
   type IntrospectOptions,
+  type MultipassOptions,
 } from "../dist/index.js";
 import { introspectRaw } from "../dist/multipass.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
@@ -612,7 +615,7 @@ it("types purpose registry augmentation and non-empty request purposes", () => {
 it("merges overlapping requests independently of policy order", async () => {
   const run = async (reverse: boolean) => {
     let calls = 0;
-    const policies: import("../dist/index.js").IntrospectionPolicy[] = [
+    const policies: IntrospectionPolicy<"classes">[] = [
       {
         name: "keysPath",
         entity: "classes",
@@ -745,5 +748,63 @@ it("types request selectors according to the selected entity", () => {
   };
   void check;
   void request;
+  void invalid;
+});
+
+it("types policy rows according to their entity", () => {
+  const policy = defineIntrospectionPolicy({
+    name: "attributeTypes",
+    entity: "attributes",
+    select(row, details) {
+      const attnum: number = row.attnum;
+      details.request("types", { _id: row.atttypid }, ["keys"]);
+      // @ts-expect-error Attribute numbers are numbers.
+      const wrong: string = row.attnum;
+      // @ts-expect-error relname belongs to classes.
+      row.relname;
+      void attnum;
+      void wrong;
+    },
+  });
+  const typed: IntrospectionPolicy<"attributes"> = policy;
+  const checkUnionRow = (
+    row: Parameters<IntrospectionPolicy<"attributes" | "classes">["select"]>[0],
+  ) => {
+    if ("attnum" in row) {
+      const attnum: number = row.attnum;
+      void attnum;
+    } else {
+      const relname: string = row.relname;
+      void relname;
+    }
+  };
+  void checkUnionRow;
+  const policies: NonNullable<MultipassOptions["policies"]> = [
+    policy,
+    {
+      name: "database",
+      entity: "database",
+      select(row) {
+        const name: string = row.datname;
+        // @ts-expect-error The database is a singular row, not a collection.
+        row[0].datname;
+        // @ts-expect-error attnum belongs to attributes.
+        row.attnum;
+        void name;
+      },
+    },
+  ];
+  const explicit = defineIntrospectionPolicy<"classes">({
+    name: "classes",
+    entity: "classes",
+    select(row) {
+      const name: string = row.relname;
+      void name;
+    },
+  });
+  // @ts-expect-error A class policy cannot be used as an attribute policy.
+  const invalid: IntrospectionPolicy<"attributes"> = explicit;
+  void typed;
+  void policies;
   void invalid;
 });

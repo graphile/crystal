@@ -274,7 +274,7 @@ export async function introspectRaw<
   const { policies = [], entrypointFilters } = options.multipass;
   const { filters } = options;
   const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
-  const rules = new Map<EntityType, IntrospectionPolicy[]>();
+  const rules = new Map<EntityType, IntrospectionPolicy<any>[]>();
   const names = new Set<string>();
   for (const policy of policies) {
     if (!policy.name?.trim() || names.has(policy.name)) {
@@ -298,7 +298,7 @@ export async function introspectRaw<
   const purposes = new WeakMap<Row, Set<PgIntrospection.Purpose>>();
   const expanded = new WeakMap<
     Row,
-    Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
+    Map<IntrospectionPolicy<any>, Set<PgIntrospection.Purpose>>
   >();
   const catalogByOid = Object.freeze({ ...result.catalog_by_oid });
   const requested = new Set<string>();

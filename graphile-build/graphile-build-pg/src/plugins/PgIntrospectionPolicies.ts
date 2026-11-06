@@ -1,5 +1,6 @@
 import type {
   IntrospectionPolicy,
+  IntrospectionPolicyDetails,
   IntrospectOptions,
   MultipassOptions,
 } from "pg-introspection";
@@ -37,19 +38,19 @@ declare global {
 }
 
 type Entity = IntrospectionPolicy["entity"];
-type ReadonlyIntrospectionPolicy = Readonly<IntrospectionPolicy>;
+type TemplateIntrospectionPolicy = Readonly<IntrospectionPolicy<any>>;
 
 /**
  * The policies PostGraphile needs to satisfy its builtin plugins. More
  * policies can be added via the `pgIntrospection_options` gather hook
  */
 const DEFAULT_POLICIES = (() => {
-  const policies: ReadonlyIntrospectionPolicy[] = [];
+  const policies: TemplateIntrospectionPolicy[] = [];
 
-  function rule(
+  function rule<TEntity extends Entity>(
     name: string,
-    entity: Entity,
-    select: IntrospectionPolicy["select"],
+    entity: TEntity,
+    select: IntrospectionPolicy<TEntity>["select"],
   ) {
     policies.push(
       Object.freeze({
@@ -79,9 +80,11 @@ const DEFAULT_POLICIES = (() => {
     const codec = details.hasPurpose("registryCodec");
     const purpose = codec ? "registryCodec" : "completeTypeNavigation";
     for (const id of [row.typelem, row.typarray, row.typbasetype]) {
-      details.request("types", { _id: id }, [purpose]);
+      if (id != null) {
+        details.request("types", { _id: id }, [purpose]);
+      }
     }
-    if (codec) {
+    if (codec && row.typrelid != null) {
       details.request("classes", { _id: row.typrelid }, [purpose]);
     }
     if (row.typtype === "e") {
@@ -95,11 +98,13 @@ const DEFAULT_POLICIES = (() => {
     }
   });
   rule("rangesDependencies", "ranges", (row, details) => {
-    details.request("types", { _id: row.rngsubtype }, [
-      details.hasPurpose("registryCodec")
-        ? "registryCodec"
-        : "completeTypeNavigation",
-    ]);
+    if (row.rngsubtype != null) {
+      details.request("types", { _id: row.rngsubtype }, [
+        details.hasPurpose("registryCodec")
+          ? "registryCodec"
+          : "completeTypeNavigation",
+      ]);
+    }
   });
   rule("indexesDependencies", "indexes", (row, details) => {
     details.request("classes", { _id: row.indexrelid }, ["catalogNavigation"]);
@@ -107,7 +112,7 @@ const DEFAULT_POLICIES = (() => {
   rule("inheritsDependencies", "inherits", (row, details) => {
     details.request("classes", { _id: row.inhparent }, ["registryCodec"]);
   });
-  const catalogs: Partial<Record<Entity, string>> = {
+  const catalogs = {
     namespaces: "pg_namespace",
     classes: "pg_class",
     procs: "pg_proc",
@@ -115,24 +120,28 @@ const DEFAULT_POLICIES = (() => {
     constraints: "pg_constraint",
     enums: "pg_enum",
     extensions: "pg_extension",
-  };
+  } satisfies Partial<Record<Entity, string>>;
   for (const [entity, catalog] of Object.entries(catalogs) as Array<
-    [Entity, string]
+    [keyof typeof catalogs, string]
   >) {
-    rule(`${entity}DescriptionsAndOwnership`, entity, (row, details) => {
-      const catalogId = invertKeyAndValue(details.catalogByOid)[catalog];
-      if (catalogId == null || !row._id) {
-        return;
-      }
-      details.request(
-        "descriptions",
-        { classoid: catalogId, objoid: row._id },
-        ["smartTagsAndDescriptions"],
-      );
-      details.request("depends", { classid: catalogId, objid: row._id }, [
-        "pruneExtensionResources",
-      ]);
-    });
+    rule(
+      `${entity}DescriptionsAndOwnership`,
+      entity,
+      (row: { _id: string }, details: IntrospectionPolicyDetails) => {
+        const catalogId = invertKeyAndValue(details.catalogByOid)[catalog];
+        if (catalogId == null || !row._id) {
+          return;
+        }
+        details.request(
+          "descriptions",
+          { classoid: catalogId, objoid: row._id },
+          ["smartTagsAndDescriptions"],
+        );
+        details.request("depends", { classid: catalogId, objid: row._id }, [
+          "pruneExtensionResources",
+        ]);
+      },
+    );
   }
   rule("classDependencies", "classes", (row, details) => {
     details.request("namespaces", { _id: row.relnamespace }, [
@@ -150,9 +159,11 @@ const DEFAULT_POLICIES = (() => {
       details.request("types", { _id: row.reltype }, [
         "completeTypeNavigation",
       ]);
-      details.request("types", { _id: row.reloftype }, [
-        "completeTypeNavigation",
-      ]);
+      if (row.reloftype != null) {
+        details.request("types", { _id: row.reloftype }, [
+          "completeTypeNavigation",
+        ]);
+      }
       if (!["i", "I"].includes(row.relkind)) {
         details.request("attributes", { attrelid: row._id }, ["registryCodec"]);
         if (full) {
@@ -200,7 +211,9 @@ const notExtension = (catalog: string, oid: string) =>
   } and d.refclassid = 'pg_catalog.pg_extension'::regclass and d.deptype = 'e')`;
 
 // Takes a template policy and returns a read/write clone.
-function clonePolicy(policy: ReadonlyIntrospectionPolicy): IntrospectionPolicy {
+function clonePolicy<TEntity extends Entity>(
+  policy: Readonly<IntrospectionPolicy<TEntity>>,
+): IntrospectionPolicy<TEntity> {
   return { ...policy };
 }
 

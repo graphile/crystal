@@ -29,10 +29,11 @@ export type PurposeList = readonly [
 ];
 
 /** A parameterized equality selector and the reasons its rows are needed. */
-type IntrospectionRow<TEntity extends EntityType> =
-  IntrospectionData[TEntity] extends readonly (infer TRow)[]
+type IntrospectionRow<TEntity extends EntityType> = TEntity extends EntityType
+  ? IntrospectionData[TEntity] extends readonly (infer TRow)[]
     ? TRow
-    : IntrospectionData[TEntity];
+    : IntrospectionData[TEntity]
+  : never;
 
 type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
   ? Partial<{
@@ -71,29 +72,27 @@ export type ReadonlyArrayOrDirect<T> = T | readonly T[];
  * Policies must depend only on the row, inspected purposes and fixed configuration.
  * Requests are additive: later purposes cannot retract requests already issued.
  */
-export interface IntrospectionPolicy {
+export interface IntrospectionPolicy<TEntity extends EntityType = EntityType> {
   name: string;
-  entity: EntityType;
-  select: (row: any, details: IntrospectionPolicyDetails) => void;
+  entity: TEntity;
+  select: (
+    row: IntrospectionRow<TEntity>,
+    details: IntrospectionPolicyDetails,
+  ) => void;
 }
 
 /** Infer a policy's row type from its source collection. */
-export function defineIntrospectionPolicy<T extends EntityType>(policy: {
-  name: string;
-  entity: T;
-  select: (
-    row: IntrospectionData[T] extends readonly (infer R)[]
-      ? R
-      : IntrospectionData[T],
-    details: IntrospectionPolicyDetails,
-  ) => void;
-}): IntrospectionPolicy {
-  return policy as IntrospectionPolicy;
+export function defineIntrospectionPolicy<TEntity extends EntityType>(
+  policy: IntrospectionPolicy<TEntity>,
+): IntrospectionPolicy<TEntity> {
+  return policy;
 }
 
 export interface MultipassOptions {
   onlyAccessible?: { role?: string; includeNoInherit?: boolean };
-  policies?: readonly IntrospectionPolicy[];
+  policies?: readonly {
+    [TEntity in EntityType]: IntrospectionPolicy<TEntity>;
+  }[EntityType][];
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
 }
