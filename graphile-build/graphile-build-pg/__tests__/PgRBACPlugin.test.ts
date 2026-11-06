@@ -1,5 +1,5 @@
 import type {} from "../dist/plugins/PgIntrospectionPlugin.js";
-import { PgRBACPlugin } from "../src/plugins/PgRBACPlugin.ts";
+import { PgRBACPlugin } from "../dist/plugins/PgRBACPlugin.js";
 
 const hook = PgRBACPlugin.gather?.hooks?.pgIntrospection_options;
 if (typeof hook !== "function") {

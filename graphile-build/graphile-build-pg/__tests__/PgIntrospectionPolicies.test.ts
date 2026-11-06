@@ -9,7 +9,7 @@ import {
 import {
   postgraphileMultipass,
   postgraphilePrune,
-} from "../src/plugins/PgIntrospectionPolicies.ts";
+} from "../dist/plugins/PgIntrospectionPolicies.js";
 import { withPgClientTransaction } from "./helpers.ts";
 
 test.each([false, true])(

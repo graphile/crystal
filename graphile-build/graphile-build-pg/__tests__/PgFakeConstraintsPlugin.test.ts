@@ -1,5 +1,5 @@
+import { PgFakeConstraintsPlugin } from "../dist/plugins/PgFakeConstraintsPlugin.js";
 import type {} from "../dist/plugins/PgIntrospectionPlugin.js";
-import { PgFakeConstraintsPlugin } from "../src/plugins/PgFakeConstraintsPlugin.ts";
 
 const hook =
   PgFakeConstraintsPlugin.gather?.hooks?.pgIntrospection_introspection;

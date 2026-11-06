@@ -7,7 +7,7 @@ import {
   type IntrospectionRequest,
   type IntrospectOptions,
 } from "../dist/index.js";
-import { introspectRaw } from "../src/multipass.ts";
+import { introspectRaw } from "../dist/multipass.js";
 import { rawIntrospectionResults } from "./rawIntrospectionResults.mts";
 
 declare global {
