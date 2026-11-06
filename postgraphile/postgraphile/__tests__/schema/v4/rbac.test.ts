@@ -29,5 +29,8 @@ test(
       ]);
       await client.query("set role postgraphile_test_authenticator");
     },
+    (_schema, introspectionPasses) => {
+      expect(introspectionPasses).toBeLessThanOrEqual(5);
+    },
   ),
 );

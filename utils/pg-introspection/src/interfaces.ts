@@ -115,7 +115,10 @@ export interface IntrospectionPruneDetails {
 export type IntrospectionDataForEntities<
   TEntities extends EntityType = DefaultEntities,
 > = PrunableIntrospectionData &
-  Pick<IntrospectionData, TEntities | FixedIntrospectionKeys>;
+  Pick<IntrospectionData, TEntities | FixedIntrospectionKeys> & {
+    /** Number of database queries used to obtain this introspection. */
+    introspectionPasses?: number;
+  };
 
 type FixedIntrospectionKeys =
   | "catalog_by_oid"
@@ -126,6 +129,8 @@ type FixedIntrospectionKeys =
 export type Introspection<TEntities extends EntityType = DefaultEntities> =
   Partial<AugmentedIntrospectionData> &
     Pick<AugmentedIntrospectionData, TEntities | FixedIntrospectionKeys> & {
+      /** Number of database queries used to obtain this introspection. */
+      introspectionPasses?: number;
       /**
        * Use Record/Map to turn O(N) lookups into O(1) lookups. Populated at
        * startup.

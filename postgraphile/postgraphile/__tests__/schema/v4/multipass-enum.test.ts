@@ -27,6 +27,7 @@ test("follows one foreign key to an enum table outside the exposed schema", () =
     `);
     let classNames: string[] = [];
     let foreignKeys: string[] = [];
+    let introspectionPasses: number | undefined;
     const { schema } = await makeSchema({
       extends: [AmberPreset],
       plugins: [
@@ -41,6 +42,7 @@ test("follows one foreign key to an enum table outside the exposed schema", () =
           gather: {
             hooks: {
               pgIntrospection_introspection(_info, { introspection }) {
+                introspectionPasses = introspection.introspectionPasses;
                 classNames = introspection.classes.map(
                   (c) => `${c.getNamespace()?.nspname}.${c.relname}`,
                 );
@@ -80,4 +82,6 @@ test("follows one foreign key to an enum table outside the exposed schema", () =
     expect(schema.getType("MultipassEnumOtherUnrelated")).toBeUndefined();
     expect(foreignKeys).toContain("tasks_priority_fkey");
     expect(foreignKeys).not.toContain("priority_unrelated_id_fkey");
+    expect(introspectionPasses).toBeGreaterThan(0);
+    expect(introspectionPasses).toBeLessThanOrEqual(5);
   }));

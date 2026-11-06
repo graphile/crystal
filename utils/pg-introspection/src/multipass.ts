@@ -241,10 +241,11 @@ export async function introspectRaw<
   runQuery: RunQuery,
 ): Promise<IntrospectionDataForEntities<TEntities>> {
   if (!options.multipass) {
-    return pruneIntrospectionData(
-      options,
-      JSON.parse(await runQuery(makeIntrospectionQuery(options), [])),
+    const result = JSON.parse(
+      await runQuery(makeIntrospectionQuery(options), []),
     );
+    result.introspectionPasses = 1;
+    return pruneIntrospectionData(options, result);
   }
   const { policies = [], entrypointFilters } = options.multipass;
   const { filters } = options;
@@ -267,6 +268,7 @@ export async function introspectRaw<
   const result: IntrospectionDataForEntities<TEntities> = JSON.parse(
     await runQuery(query.text, query.values),
   );
+  result.introspectionPasses = 1;
   const data = result as Record<string, any>;
   const rows = new Map<EntityType, Map<string, Row>>();
   const purposes = new WeakMap<Row, Set<PgIntrospection.Purpose>>();
@@ -492,6 +494,7 @@ export async function introspectRaw<
     const fetched: Record<string, Row[] | Row | null> = JSON.parse(
       await runQuery(fetch.text, fetch.values),
     );
+    result.introspectionPasses++;
     for (const entity of Object.keys(fetched) as EntityType[]) {
       let index = rows.get(entity);
       if (!index) {
