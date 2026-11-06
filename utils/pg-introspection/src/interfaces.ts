@@ -29,11 +29,12 @@ export type PurposeList = readonly [
 ];
 
 /** A parameterized equality selector and the reasons its rows are needed. */
-type IntrospectionRow<TEntity extends EntityType> = TEntity extends EntityType
-  ? IntrospectionData[TEntity] extends readonly (infer TRow)[]
-    ? TRow
-    : IntrospectionData[TEntity]
-  : never;
+export type IntrospectionRow<TEntity extends EntityType = EntityType> =
+  TEntity extends EntityType
+    ? IntrospectionData[TEntity] extends readonly (infer TRow)[]
+      ? TRow
+      : IntrospectionData[TEntity]
+    : never;
 
 type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
   ? Partial<{

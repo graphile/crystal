@@ -5,6 +5,7 @@ import type {
   IntrospectionDataForEntities,
   IntrospectionPolicy,
   IntrospectionRequest,
+  IntrospectionRow,
   IntrospectOptions,
 } from "./interfaces.ts";
 import { ENTITY_TYPES, type EntityType } from "./introspection.ts";
@@ -15,8 +16,10 @@ import {
   makeIntrospectionQuery,
 } from "./query.ts";
 
-type RunQuery = (text: string, values: any[]) => Promise<string>;
-type Row = Record<string, any>;
+type RunQuery = (
+  text: string,
+  values: Array<string | string[] | null>,
+) => Promise<string>;
 
 /** Stable identities for catalogs which do not have an OID. */
 const keys: Partial<Record<EntityType, string[]>> = {
@@ -64,7 +67,7 @@ const nonzeroColumns: Partial<Record<EntityType, readonly string[]>> = {
 };
 
 // Catalogs whose objects can own descriptions and dependency records.
-const describedEntities: EntityType[] = [
+const describedEntities = [
   "namespaces",
   "classes",
   "constraints",
@@ -78,12 +81,22 @@ const describedEntities: EntityType[] = [
   "rewrites",
   "triggers",
   "event_triggers",
-];
+] as const satisfies EntityType[];
 
-function identity(entity: EntityType, row: Row): string {
+function identity<TEntity extends EntityType>(
+  entity: TEntity,
+  row: IntrospectionRow<TEntity>,
+): string {
   const fields =
-    keys[entity] ?? (ENTITY_TYPES[entity].oids ? ["_id"] : undefined);
-  return JSON.stringify(fields ? fields.map((field) => row[field]) : row);
+    keys[entity] ??
+    (ENTITY_TYPES[entity].oids
+      ? ["_id"]
+      : "oid" in row && row.oid
+        ? ["oid"]
+        : undefined);
+  return JSON.stringify(
+    fields ? fields.map((field) => (row as Record<string, any>)[field]) : row,
+  );
 }
 
 function selectorKey(
@@ -102,7 +115,7 @@ function entrypointQuery<TEntities extends EntityType>(
 ) {
   const { multipass } = options;
   if (!multipass) throw new Error("Multipass options required");
-  const values: any[] = [];
+  const values: Array<string | string[] | null> = [];
   const overrides: Record<string, string> = {};
   const output = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
   const ctes = new Set(output);
@@ -137,11 +150,11 @@ function entrypointQuery<TEntities extends EntityType>(
   let prefix = "";
   if (multipass.onlyAccessible) {
     values.push(multipass.onlyAccessible.role ?? null);
-    const roleParam = `$${values.length}`;
+    const roleParam = `$${values.length}::text`;
     const membership = multipass.onlyAccessible.includeNoInherit
       ? ` or pg_catalog.pg_has_role(selected.role_oid, r.oid, 'MEMBER')`
       : "";
-    prefix = `selected_role as (select pg_catalog.quote_ident(coalesce(${roleParam}::text, current_user))::regrole::oid as role_oid),\n  accessible_roles as (select r.oid from pg_catalog.pg_roles r, selected_role selected where r.oid = selected.role_oid${membership})`;
+    prefix = `selected_role as (select pg_catalog.quote_ident(coalesce(${roleParam}, current_user))::regrole::oid as role_oid),\n  accessible_roles as (select r.oid from pg_catalog.pg_roles r, selected_role selected where r.oid = selected.role_oid${membership})`;
     const accessible = (schema: string, privilege: string) =>
       `exists (select 1 from accessible_roles ar where pg_catalog.has_schema_privilege(ar.oid, ${schema}, 'USAGE') and (${privilege}))`;
     const tablePrivilege = `case when relkind in ('r','p','v','m','f') then (pg_catalog.has_table_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') or pg_catalog.has_any_column_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,REFERENCES')) when relkind = 'S' then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE') else false end`;
@@ -183,7 +196,7 @@ function makeFetchQuery(
     group.push(request);
     groups.set(request.entity, group);
   }
-  const values: any[] = [];
+  const values: Array<string | string[] | null> = [];
   const overrides: Record<string, string> = {};
   // These catalog predicates are independent of the scope-defining CTEs in
   // ENTITY_TYPES and must also apply when an object is fetched by identity.
@@ -293,22 +306,25 @@ export async function introspectRaw<
     await runQuery(query.text, query.values),
   );
   result.introspectionPasses = 1;
-  const data = result as Record<string, any>;
-  const rows = new Map<EntityType, Map<string, Row>>();
-  const purposes = new WeakMap<Row, Set<PgIntrospection.Purpose>>();
+  const data = result;
+  const rows = new Map<EntityType, Map<string, IntrospectionRow>>();
+  const purposes = new WeakMap<
+    IntrospectionRow,
+    Set<PgIntrospection.Purpose>
+  >();
   const expanded = new WeakMap<
-    Row,
+    IntrospectionRow,
     Map<IntrospectionPolicy<any>, Set<PgIntrospection.Purpose>>
   >();
   const catalogByOid = Object.freeze({ ...result.catalog_by_oid });
   const requested = new Set<string>();
 
-  const frontier: Array<[EntityType, Row]> = [];
-  const addPurposes = (
-    entity: EntityType,
-    row: Row,
+  const frontier: Array<[EntityType, IntrospectionRow]> = [];
+  function addPurposes<TEntity extends EntityType>(
+    entity: TEntity,
+    row: IntrospectionRow<TEntity>,
     additions: readonly PgIntrospection.Purpose[],
-  ) => {
+  ) {
     let current = purposes.get(row);
     const fresh = !current;
     if (!current) {
@@ -322,7 +338,7 @@ export async function introspectRaw<
     if (fresh || current.size !== before) {
       frontier.push([entity, row]);
     }
-  };
+  }
   for (const entity of selected) {
     const collection = data[entity];
     if (ENTITY_TYPES[entity].singular && collection) {
@@ -331,7 +347,7 @@ export async function introspectRaw<
       continue;
     }
     if (!Array.isArray(collection)) continue;
-    const index = new Map<string, Row>();
+    const index = new Map<string, IntrospectionRow>();
     rows.set(entity, index);
     for (const row of collection) {
       index.set(identity(entity, row), row);
@@ -367,11 +383,12 @@ export async function introspectRaw<
       const catalogId = catalogOids.get(ENTITY_TYPES[entity].tableName);
       if (!catalogId) continue;
       for (const row of data[entity] ?? []) {
-        if (row._id != null) {
+        const id = "_id" in row ? row._id : "oid" in row ? row.oid : undefined;
+        if (id != null) {
           requested.add(
             selectorKey({
               entity: "descriptions",
-              match: { classoid: catalogId, objoid: row._id },
+              match: { classoid: catalogId, objoid: id },
             }),
           );
         }
@@ -381,13 +398,13 @@ export async function introspectRaw<
   // Build each selector shape once, sharing the scan across all selector values.
   const groupIndexes = new Map<
     EntityType,
-    Map<string, { columns: string[]; groups: Map<string, Row[]> }>
+    Map<string, { columns: string[]; groups: Map<string, IntrospectionRow[]> }>
   >();
-  const groupKey = (columns: string[], row: Row) =>
+  const groupKey = (columns: string[], row: IntrospectionRow) =>
     JSON.stringify(columns.map((column) => String(row[column])));
   const addToGroup = (
-    shape: { columns: string[]; groups: Map<string, Row[]> },
-    row: Row,
+    shape: { columns: string[]; groups: Map<string, IntrospectionRow[]> },
+    row: IntrospectionRow,
   ) => {
     const key = groupKey(shape.columns, row);
     const group = shape.groups.get(key);
@@ -527,9 +544,10 @@ export async function introspectRaw<
     const requests = [...pending.values()];
     pending.clear();
     const fetch = makeFetchQuery(requests, filters, selected);
-    const fetched: Record<string, Row[] | Row | null> = JSON.parse(
-      await runQuery(fetch.text, fetch.values),
-    );
+    const fetched: Record<
+      string,
+      IntrospectionRow[] | IntrospectionRow | null
+    > = JSON.parse(await runQuery(fetch.text, fetch.values));
     result.introspectionPasses++;
     for (const entity of Object.keys(fetched) as EntityType[]) {
       let index = rows.get(entity);
@@ -537,9 +555,10 @@ export async function introspectRaw<
         index = new Map();
         rows.set(entity, index);
       }
-      const collection: Row[] | undefined = ENTITY_TYPES[entity].singular
-        ? undefined
-        : (data[entity] ?? (data[entity] = []));
+      const collection: IntrospectionRow[] | undefined =
+        entity === "database" // Singular
+          ? undefined
+          : (data[entity] ?? (data[entity] = []));
       const fetchedRows = fetched[entity];
       for (const row of Array.isArray(fetchedRows)
         ? fetchedRows
