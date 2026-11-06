@@ -9,6 +9,7 @@ import {
 } from "../dist/introspectionHelpers.js";
 import { introspect, introspectRaw } from "../dist/multipass.js";
 import { makeIntrospectionQuery } from "../dist/query.js";
+import { withPgClientTransaction } from "./helpers.ts";
 
 it("uses shared predicate exports instead of copied function bodies", () => {
   assert.equal(ENTITY_TYPES.depends.where, dependencyWhere);
@@ -75,16 +76,7 @@ it("uses a false predicate when no relevant catalog objects are selected", () =>
 });
 
 it("executes edge-case selections against PostgreSQL", async () => {
-  const { Client } = await import("pg");
-  const client = new Client({
-    database: "graphilecrystaltest",
-    user: "graphilecrystaltest",
-    password: "test",
-    host: process.env.PGHOST ?? "localhost",
-  });
-  await client.connect();
-  try {
-    await client.query("begin");
+  await withPgClientTransaction(async (client) => {
     const schema = `introspection_test_${process.pid}`;
     await client.query(`create schema ${schema}`);
     await client.query(
@@ -402,22 +394,12 @@ it("executes edge-case selections against PostgreSQL", async () => {
       [event.oid],
     );
     assert.deepEqual(dependency.rows, [{ objid: event.oid }]);
-  } finally {
-    await client.query("rollback");
-    await client.end();
-  }
+  });
 });
 
 it("fetches the current database after excluding it from initial discovery", async () => {
-  const { Pool } = await import("pg");
-  const pool = new Pool({
-    database: "graphilecrystaltest",
-    user: "graphilecrystaltest",
-    password: "test",
-    host: process.env.PGHOST ?? "localhost",
-  });
-  try {
-    const database = await pool.query<{ name: string }>(
+  await withPgClientTransaction(async (client) => {
+    const database = await client.query<{ name: string }>(
       "select current_database() as name",
     );
     const name = database.rows[0].name;
@@ -450,7 +432,7 @@ it("fetches the current database after excluding it from initial discovery", asy
         },
       },
       async (text, values) => {
-        const response = await pool.query<{ introspection: string }>(
+        const response = await client.query<{ introspection: string }>(
           text,
           values,
         );
@@ -466,7 +448,5 @@ it("fetches the current database after excluding it from initial discovery", asy
     assert.equal(result.database.datname, name);
     assert.equal(Array.isArray(result.database), false);
     assert.deepEqual(visited, [name]);
-  } finally {
-    await pool.end();
-  }
+  });
 });
