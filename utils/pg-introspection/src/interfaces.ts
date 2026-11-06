@@ -28,7 +28,7 @@ export type PurposeList = readonly [
   ...PgIntrospection.Purpose[],
 ];
 
-/** A parameterized equality selector and the reasons its rows are needed. */
+/** A catalogue row, including rows from singular collections. */
 export type IntrospectionRow<TEntity extends EntityType = EntityType> =
   TEntity extends EntityType
     ? IntrospectionData[TEntity] extends readonly (infer TRow)[]

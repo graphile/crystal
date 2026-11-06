@@ -8,7 +8,11 @@ import type {
   IntrospectionRow,
   IntrospectOptions,
 } from "./interfaces.ts";
-import { ENTITY_TYPES, type EntityType } from "./introspection.ts";
+import {
+  ENTITY_TYPES,
+  type EntityType,
+  type IntrospectionData,
+} from "./introspection.ts";
 import { pruneIntrospectionData } from "./pruneIntrospectionData.ts";
 import {
   buildIntrospectionQuery,
@@ -22,7 +26,12 @@ type RunQuery = (
 ) => Promise<string>;
 
 /** Stable identities for catalogs which do not have an OID. */
-const keys: Partial<Record<EntityType, string[]>> = {
+const keys: {
+  [TEntity in EntityType]?: readonly Extract<
+    keyof IntrospectionRow<TEntity>,
+    string
+  >[];
+} = {
   attributes: ["attrelid", "attnum"],
   indexes: ["indexrelid"],
   inherits: ["inhrelid", "inhparent", "inhseqno"],
@@ -83,6 +92,11 @@ const describedEntities = [
   "event_triggers",
 ] as const satisfies EntityType[];
 
+/** Read a dynamically selected catalogue column without weakening the row type. */
+function columnValue(row: object, column: string): unknown {
+  return (row as Record<string, unknown>)[column];
+}
+
 function identity<TEntity extends EntityType>(
   entity: TEntity,
   row: IntrospectionRow<TEntity>,
@@ -95,12 +109,12 @@ function identity<TEntity extends EntityType>(
         ? ["oid"]
         : undefined);
   return JSON.stringify(
-    fields ? fields.map((field) => (row as Record<string, any>)[field]) : row,
+    fields ? fields.map((field) => columnValue(row, field)) : row,
   );
 }
 
 function selectorKey(
-  request: Pick<IntrospectionRequest<any>, "entity" | "match">,
+  request: Pick<IntrospectionRequest, "entity" | "match">,
 ): string {
   return JSON.stringify([
     request.entity,
@@ -186,11 +200,11 @@ function entrypointQuery<TEntities extends EntityType>(
 }
 
 function makeFetchQuery(
-  requests: readonly IntrospectionRequest<any>[],
+  requests: readonly IntrospectionRequest[],
   filters: Partial<Record<EntityType, string>> | undefined,
   selected: ReadonlySet<EntityType>,
 ) {
-  const groups = new Map<EntityType, IntrospectionRequest<any>[]>();
+  const groups = new Map<EntityType, IntrospectionRequest[]>();
   for (const request of requests) {
     const group = groups.get(request.entity) ?? [];
     group.push(request);
@@ -216,7 +230,7 @@ function makeFetchQuery(
   for (const [entity, group] of groups) {
     const shapes = new Map<
       string,
-      { columns: string[]; requests: IntrospectionRequest<any>[] }
+      { columns: string[]; requests: IntrospectionRequest[] }
     >();
     for (const request of group) {
       const columns = Object.keys(request.match).sort();
@@ -231,9 +245,7 @@ function makeFetchQuery(
         if (!/^[a-z_][a-z0-9_]*$/.test(column))
           throw new Error(`Invalid catalog column '${column}'`);
         values.push(
-          requests.map((request) =>
-            String((request.match as Record<string, unknown>)[column]),
-          ),
+          requests.map((request) => String(columnValue(request.match, column))),
         );
         return `$${values.length}::text[]`;
       });
@@ -278,7 +290,7 @@ export async function introspectRaw<
   runQuery: RunQuery,
 ): Promise<IntrospectionDataForEntities<TEntities>> {
   if (!options.multipass) {
-    const result = JSON.parse(
+    const result: IntrospectionDataForEntities<TEntities> = JSON.parse(
       await runQuery(makeIntrospectionQuery(options), []),
     );
     result.introspectionPasses = 1;
@@ -287,7 +299,7 @@ export async function introspectRaw<
   const { policies = [], entrypointFilters } = options.multipass;
   const { filters } = options;
   const selected = new Set<EntityType>(options.onlyEntities ?? defaultEntities);
-  const rules = new Map<EntityType, IntrospectionPolicy<any>[]>();
+  const rules = new Map<EntityType, IntrospectionPolicy[]>();
   const names = new Set<string>();
   for (const policy of policies) {
     if (!policy.name?.trim() || names.has(policy.name)) {
@@ -298,7 +310,8 @@ export async function introspectRaw<
     names.add(policy.name);
     if (!selected.has(policy.entity)) continue;
     const list = rules.get(policy.entity) ?? [];
-    list.push(policy);
+    // The map groups policies by entity; dispatch supplies a row from that entity.
+    list.push(policy as IntrospectionPolicy);
     rules.set(policy.entity, list);
   }
   const query = entrypointQuery(options);
@@ -314,7 +327,7 @@ export async function introspectRaw<
   >();
   const expanded = new WeakMap<
     IntrospectionRow,
-    Map<IntrospectionPolicy<any>, Set<PgIntrospection.Purpose>>
+    Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
   >();
   const catalogByOid = Object.freeze({ ...result.catalog_by_oid });
   const requested = new Set<string>();
@@ -341,7 +354,7 @@ export async function introspectRaw<
   }
   for (const entity of selected) {
     const collection = data[entity];
-    if (ENTITY_TYPES[entity].singular && collection) {
+    if (collection && !Array.isArray(collection)) {
       rows.set(entity, new Map([[identity(entity, collection), collection]]));
       addPurposes(entity, collection, ["initial"]);
       continue;
@@ -400,8 +413,8 @@ export async function introspectRaw<
     EntityType,
     Map<string, { columns: string[]; groups: Map<string, IntrospectionRow[]> }>
   >();
-  const groupKey = (columns: string[], row: IntrospectionRow) =>
-    JSON.stringify(columns.map((column) => String(row[column])));
+  const groupKey = (columns: string[], row: object) =>
+    JSON.stringify(columns.map((column) => String(columnValue(row, column))));
   const addToGroup = (
     shape: { columns: string[]; groups: Map<string, IntrospectionRow[]> },
     row: IntrospectionRow,
@@ -415,13 +428,13 @@ export async function introspectRaw<
     }
   };
   const matchingRows = (
-    request: Pick<IntrospectionRequest<any>, "entity" | "match">,
+    request: Pick<IntrospectionRequest, "entity" | "match">,
   ) => {
     const index = rows.get(request.entity);
     const columns = Object.keys(request.match).sort();
     if (columns.length === 1 && columns[0] === "_id") {
       const row = index?.get(
-        JSON.stringify([String((request.match as { _id: string })._id)]),
+        JSON.stringify([String(columnValue(request.match, "_id"))]),
       );
       return row ? [row] : [];
     }
@@ -441,7 +454,7 @@ export async function introspectRaw<
     }
     return shape.groups.get(groupKey(columns, request.match)) ?? [];
   };
-  const pending = new Map<string, IntrospectionRequest<any>>();
+  const pending = new Map<string, IntrospectionRequest>();
   while (frontier.length || pending.size) {
     // Drain purpose propagation before querying, batching all reasons for a selector.
     while (frontier.length) {
@@ -471,11 +484,12 @@ export async function introspectRaw<
               return snapshot.has(purpose);
             },
             request(entity, match, purposes) {
-              const request: IntrospectionRequest<any> = {
+              // The generic request API keeps these parameters correlated.
+              const request = {
                 entity,
                 match,
                 purposes,
-              };
+              } as IntrospectionRequest;
               if (
                 !Array.isArray(request.purposes) ||
                 request.purposes.length === 0
@@ -517,20 +531,19 @@ export async function introspectRaw<
               if (
                 requested.has(key) ||
                 (Object.keys(request.match).length === 1 &&
-                  (request.match as { _id?: string })._id != null &&
+                  "_id" in request.match &&
+                  request.match._id != null &&
                   matches.length)
               ) {
                 return;
               }
               const previous = pending.get(key);
+              const [first, ...rest] = previous?.purposes ?? request.purposes;
+              const remaining = new Set([...rest, ...request.purposes]);
+              remaining.delete(first);
               pending.set(key, {
                 ...request,
-                purposes: [
-                  ...new Set([
-                    ...(previous?.purposes ?? []),
-                    ...request.purposes,
-                  ]),
-                ] as unknown as IntrospectionRequest["purposes"],
+                purposes: [first, ...remaining],
               });
             },
           });
@@ -544,10 +557,9 @@ export async function introspectRaw<
     const requests = [...pending.values()];
     pending.clear();
     const fetch = makeFetchQuery(requests, filters, selected);
-    const fetched: Record<
-      string,
-      IntrospectionRow[] | IntrospectionRow | null
-    > = JSON.parse(await runQuery(fetch.text, fetch.values));
+    const fetched: {
+      [TEntity in EntityType]?: IntrospectionData[TEntity] | null;
+    } = JSON.parse(await runQuery(fetch.text, fetch.values));
     result.introspectionPasses++;
     for (const entity of Object.keys(fetched) as EntityType[]) {
       let index = rows.get(entity);
@@ -555,16 +567,17 @@ export async function introspectRaw<
         index = new Map();
         rows.set(entity, index);
       }
+      const fetchedCollection = fetched[entity];
+      const fetchedRows: IntrospectionRow[] = Array.isArray(fetchedCollection)
+        ? fetchedCollection
+        : fetchedCollection
+          ? [fetchedCollection]
+          : [];
       const collection: IntrospectionRow[] | undefined =
-        entity === "database" // Singular
+        entity === "database"
           ? undefined
           : (data[entity] ?? (data[entity] = []));
-      const fetchedRows = fetched[entity];
-      for (const row of Array.isArray(fetchedRows)
-        ? fetchedRows
-        : fetchedRows
-          ? [fetchedRows]
-          : []) {
+      for (const row of fetchedRows) {
         const id = identity(entity, row);
         if (!index.has(id)) {
           index.set(id, row);
@@ -573,8 +586,8 @@ export async function introspectRaw<
           }
           if (collection) {
             collection.push(row);
-          } else {
-            data[entity] = row;
+          } else if (entity === "database" && fetched.database) {
+            data.database = fetched.database;
           }
         }
       }

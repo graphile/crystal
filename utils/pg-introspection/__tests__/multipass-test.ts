@@ -7,6 +7,7 @@ import {
   type IntrospectionPolicy,
   type IntrospectionPolicyDetails,
   type IntrospectionRequest,
+  type IntrospectionRow,
   type IntrospectOptions,
   type MultipassOptions,
 } from "../dist/index.js";
@@ -791,9 +792,7 @@ it("types policy rows according to their entity", () => {
     },
   });
   const typed: IntrospectionPolicy<"attributes"> = policy;
-  const checkUnionRow = (
-    row: Parameters<IntrospectionPolicy<"attributes" | "classes">["select"]>[0],
-  ) => {
+  const checkUnionRow = (row: IntrospectionRow<"attributes" | "classes">) => {
     if ("attnum" in row) {
       const attnum: number = row.attnum;
       void attnum;
@@ -831,4 +830,44 @@ it("types policy rows according to their entity", () => {
   void typed;
   void policies;
   void invalid;
+});
+
+it("merges a singular database discovered by a policy", async () => {
+  let calls = 0;
+  const visited: string[] = [];
+  const result = await introspectRaw(
+    {
+      onlyEntities: ["namespaces", "database"],
+      multipass: {
+        entrypointFilters: { database: "false" },
+        policies: [
+          {
+            name: "requestDatabase",
+            entity: "namespaces",
+            select(_row, details) {
+              details.request("database", { datname: "test" }, ["keys"]);
+            },
+          },
+          {
+            name: "observeDatabase",
+            entity: "database",
+            select(row) {
+              visited.push(row.datname);
+            },
+          },
+        ],
+      },
+    },
+    async () => {
+      calls++;
+      return JSON.stringify(
+        calls === 1
+          ? { ...metadata, namespaces: [{ _id: "1" }], database: null }
+          : { database: { _id: "2", datname: "test" } },
+      );
+    },
+  );
+  assert.equal(calls, 2);
+  assert.equal(result.database.datname, "test");
+  assert.deepEqual(visited, ["test"]);
 });
