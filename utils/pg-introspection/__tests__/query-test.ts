@@ -407,3 +407,66 @@ it("executes edge-case selections against PostgreSQL", async () => {
     await client.end();
   }
 });
+
+it("fetches the current database after excluding it from initial discovery", async () => {
+  const { Pool } = await import("pg");
+  const pool = new Pool({
+    database: "graphilecrystaltest",
+    user: "graphilecrystaltest",
+    password: "test",
+    host: process.env.PGHOST ?? "localhost",
+  });
+  try {
+    const database = await pool.query<{ name: string }>(
+      "select current_database() as name",
+    );
+    const name = database.rows[0].name;
+    let calls = 0;
+    const visited: string[] = [];
+    const result = await introspectRaw(
+      {
+        onlyEntities: ["namespaces", "database"],
+        multipass: {
+          entrypointFilters: {
+            database: "false",
+            namespaces: "nspname = 'pg_catalog'",
+          },
+          policies: [
+            {
+              name: "requestDatabase",
+              entity: "namespaces",
+              select(_row, details) {
+                details.request("database", { datname: name }, ["initial"]);
+              },
+            },
+            {
+              name: "observeDatabase",
+              entity: "database",
+              select(row) {
+                visited.push(row.datname);
+              },
+            },
+          ],
+        },
+      },
+      async (text, values) => {
+        const response = await pool.query<{ introspection: string }>(
+          text,
+          values,
+        );
+        const json = response.rows[0].introspection;
+        calls++;
+        if (calls === 1) {
+          assert.equal(JSON.parse(json).database, null);
+        }
+        return json;
+      },
+    );
+    assert.equal(calls, 2);
+    assert.equal(result.database.datname, name);
+    assert.equal(Array.isArray(result.database), false);
+    assert.deepEqual(visited, [name]);
+  } finally {
+    await pool.end();
+  }
+});
