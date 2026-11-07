@@ -575,12 +575,24 @@ it("propagates new purposes through satisfied group selectors and only reruns af
 
 for (const [name, match, expectedCalls] of [
   ["complete identity", { attrelid: "1", attnum: 1 }, 1],
+  ["identity in reverse column order", { attnum: 1, attrelid: "1" }, 1],
+  [
+    "identity with a boolean condition",
+    { attrelid: "1", attnum: 1, attnotnull: false },
+    1,
+  ],
+  [
+    "identity with an unmatched boolean condition",
+    { attrelid: "1", attnum: 1, attnotnull: true },
+    2,
+  ],
   [
     "identity with extra columns",
     { attrelid: "1", attnum: 1, attname: "id" },
     1,
   ],
   ["partial identity", { attrelid: "1" }, 2],
+  ["numeric partial identity", { attnum: 1 }, 2],
   ["unmatched identity", { attrelid: "1", attnum: 2 }, 2],
   [
     "identity with unmatched extra columns",
@@ -611,7 +623,14 @@ for (const [name, match, expectedCalls] of [
           calls === 1
             ? {
                 ...metadata,
-                attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
+                attributes: [
+                  {
+                    attrelid: "1",
+                    attnum: 1,
+                    attname: "id",
+                    attnotnull: false,
+                  },
+                ],
               }
             : { attributes: [] },
         );

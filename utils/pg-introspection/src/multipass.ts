@@ -58,9 +58,7 @@ function selectorKey(
 ): string {
   return JSON.stringify([
     request.entity,
-    Object.entries(request.match)
-      .map(([column, value]) => [column, String(value)])
-      .sort(([a], [b]) => a.localeCompare(b)),
+    Object.entries(request.match).sort(([a], [b]) => a.localeCompare(b)),
   ]);
 }
 
@@ -428,9 +426,15 @@ function initializeMultipassContext<TEntities extends EntityType>(
   }
 }
 
-function groupKey(columns: string[], row: object) {
-  return JSON.stringify(
-    columns.map((column) => String(columnValue(row, column))),
+function groupKey(columns: readonly string[], row: object) {
+  return JSON.stringify(columns.map((column) => columnValue(row, column)));
+}
+
+function selectsUniqueRow(
+  request: Pick<IntrospectionRequest, "entity" | "match">,
+): boolean {
+  return UNIQUE_KEYS[request.entity].every((column) =>
+    Object.hasOwn(request.match, column),
   );
 }
 
@@ -452,11 +456,14 @@ function matchingRows(
   const { rows, groupIndexes } = context;
   const index = rows.get(request.entity);
   const columns = Object.keys(request.match).sort();
-  if (columns.length === 1 && columns[0] === "_id") {
+  if (selectsUniqueRow(request)) {
     const row = index?.get(
-      JSON.stringify([String(columnValue(request.match, "_id"))]),
+      groupKey(UNIQUE_KEYS[request.entity], request.match),
     );
-    return row ? [row] : [];
+    // The selector can include conditions beyond the unique key.
+    return row && groupKey(columns, row) === groupKey(columns, request.match)
+      ? [row]
+      : [];
   }
   let shapes = groupIndexes.get(request.entity);
   if (!shapes) {
@@ -618,7 +625,7 @@ function requestDependency<TEntity extends EntityType>(
   request: IntrospectionRequest,
 ) {
   const { selected, completedSelectors } = context;
-  const { entity, match, purposes } = request;
+  const { entity, purposes } = request;
   assertValidRequest(policy, request);
 
   if (!selected.has(entity)) {
@@ -635,15 +642,8 @@ function requestDependency<TEntity extends EntityType>(
   if (completedSelectors.has(key)) {
     return;
   }
-  if (matches.length > 0) {
-    const identityColumns = UNIQUE_KEYS[entity];
-    const selectsUniqueRow = identityColumns.every((column) =>
-      Object.hasOwn(match, column),
-    );
-    if (selectsUniqueRow) {
-      // Already matched (matches[0]); no need to re-fetch
-      return;
-    }
+  if (matches.length > 0 && selectsUniqueRow(request)) {
+    return;
   }
   const previous = pending.get(key);
   const [first, ...rest] = previous?.purposes ?? purposes;
@@ -678,10 +678,12 @@ function assertValidRequest(
 }
 
 function canShortcutRequest({ entity, match }: IntrospectionRequest) {
+  const nonzeroColumns: Partial<Record<EntityType, readonly string[]>> =
+    NONZERO_COLUMNS;
   for (const [column, value] of Object.entries(match)) {
     if (value === 0 || value === "0") {
       if (column === "_id" && ENTITY_TYPES[entity].oids) return true;
-      if (NONZERO_COLUMNS[entity]?.includes(column)) return true;
+      if (nonzeroColumns[entity]?.includes(column)) return true;
     }
   }
   return false;
