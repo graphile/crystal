@@ -573,6 +573,54 @@ it("propagates new purposes through satisfied group selectors and only reruns af
   assert.ok(visits.includes("2:true:true"));
 });
 
+for (const [name, match, expectedCalls] of [
+  ["complete identity", { attrelid: "1", attnum: 1 }, 1],
+  [
+    "identity with extra columns",
+    { attrelid: "1", attnum: 1, attname: "id" },
+    1,
+  ],
+  ["partial identity", { attrelid: "1" }, 2],
+  ["unmatched identity", { attrelid: "1", attnum: 2 }, 2],
+  [
+    "identity with unmatched extra columns",
+    { attrelid: "1", attnum: 1, attname: "other" },
+    2,
+  ],
+] as const) {
+  it(`only skips fetching an existing unique match: ${name}`, async () => {
+    let calls = 0;
+    await introspectRaw(
+      {
+        onlyEntities: ["attributes"],
+        multipass: {
+          policies: [
+            defineIntrospectionPolicy({
+              name: "requestAttribute",
+              entity: "attributes",
+              select(_row, details) {
+                details.request("attributes", match, ["keys"]);
+              },
+            }),
+          ],
+        },
+      },
+      async () => {
+        calls++;
+        return JSON.stringify(
+          calls === 1
+            ? {
+                ...metadata,
+                attributes: [{ attrelid: "1", attnum: 1, attname: "id" }],
+              }
+            : { attributes: [] },
+        );
+      },
+    );
+    assert.equal(calls, expectedCalls);
+  });
+}
+
 for (const invalid of ["empty", "duplicate"] as const) {
   it(`rejects ${invalid} purpose policy misuse`, async () => {
     const policy = {

@@ -680,8 +680,12 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
             if (requested.has(key)) {
               return;
             }
-            const keys = Object.keys(request.match);
-            if (keys.length === 1 && keys[0] === "_id" && matches.length) {
+            const identityColumns = keys[request.entity] ?? ["_id"];
+            const selectsUniqueRow = identityColumns.every((column) =>
+              Object.hasOwn(request.match, column),
+            );
+            const hasMatch = matches.length > 0;
+            if (selectsUniqueRow && hasMatch) {
               return;
             }
             const previous = pending.get(key);
