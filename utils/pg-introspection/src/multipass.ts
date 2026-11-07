@@ -24,81 +24,14 @@ import {
   defaultEntities,
   makeIntrospectionQuery,
 } from "./query.ts";
+import {
+  DESCRIBED_ENTITIES,
+  UNIQUE_KEYS,
+  NONZERO_COLUMNS,
+} from "./introspectionConstants.ts";
 
-type RunQuery = (
-  text: string,
-  values: Array<string | string[] | null>,
-) => Promise<string>;
-
-/** Stable identity columns for collections without the legacy _id alias. */
-const keys: {
-  [TEntity in EntityType]?: readonly Extract<
-    keyof IntrospectionRow<TEntity>,
-    string
-  >[];
-} = {
-  attributes: ["attrelid", "attnum"],
-  indexes: ["indexrelid"],
-  inherits: ["inhrelid", "inhparent", "inhseqno"],
-  ranges: ["rngtypid"],
-  auth_members: ["roleid", "member", "grantor"],
-  depends: [
-    "classid",
-    "objid",
-    "objsubid",
-    "refclassid",
-    "refobjid",
-    "refobjsubid",
-    "deptype",
-  ],
-  descriptions: ["classoid", "objoid", "objsubid"],
-  policies: ["polrelid", "polname"],
-  foreign_tables: ["ftrelid"],
-  aggregates: ["aggfnoid"],
-  stat_user_tables: ["relid"],
-  settings: ["name"],
-  event_triggers: ["oid"],
-  db_role_settings: ["setdatabase", "setrole"],
-};
-
-const FALLBACK_KEYS = ["_id"] as const;
-
-/**
- * These columns always identify an existing catalogue object. Other OID columns
- * can use zero as a meaningful sentinel (e.g. constraints.contypid and
- * db_role_settings.setrole), so must not be skipped indiscriminately.
- */
-const nonzeroColumns: Partial<Record<EntityType, readonly string[]>> = {
-  attributes: ["attrelid"],
-  indexes: ["indexrelid", "indrelid"],
-  inherits: ["inhrelid", "inhparent"],
-  ranges: ["rngtypid", "rngsubtype"],
-  auth_members: ["roleid", "member", "grantor"],
-  depends: ["classid", "objid", "refclassid", "refobjid"],
-  descriptions: ["classoid", "objoid"],
-  policies: ["polrelid"],
-  foreign_tables: ["ftrelid", "ftserver"],
-  aggregates: ["aggfnoid"],
-  stat_user_tables: ["relid"],
-  enums: ["enumtypid"],
-};
-
-// Collections whose descriptions are fetched with their initial rows.
-const describedEntities = [
-  "namespaces",
-  "classes",
-  "constraints",
-  "procs",
-  "sys_procs",
-  "types",
-  "enums",
-  "extensions",
-  "foreign_data_wrappers",
-  "foreign_servers",
-  "rewrites",
-  "triggers",
-  "event_triggers",
-] as const satisfies EntityType[];
+type SQLVal = string | string[] | null;
+type RunQuery = (text: string, values: Array<SQLVal>) => Promise<string>;
 
 /** Preserve known column types; dynamically selected columns yield unknown. */
 function columnValue<TRow extends object, TColumn extends string>(
@@ -116,7 +49,7 @@ function identity<TEntity extends EntityType>(
   entity: TEntity,
   row: IntrospectionRow<TEntity>,
 ): string {
-  const fields = keys[entity] ?? ["_id"];
+  const fields = UNIQUE_KEYS[entity];
   return JSON.stringify(fields.map((field) => columnValue(row, field)));
 }
 
@@ -132,13 +65,15 @@ function selectorKey(
 }
 
 /** Combine override predicates without losing earlier conditions. */
-function addOverride(
-  overrides: Partial<Record<EntityType, string>>,
+function addPredicate(
+  predicatesByEntity: Partial<Record<EntityType, string>>,
   entity: EntityType,
   predicate: string,
-) {
-  const previous = overrides[entity];
-  overrides[entity] = previous ? `(${previous}) and (${predicate})` : predicate;
+): void {
+  const previous = predicatesByEntity[entity];
+  predicatesByEntity[entity] = previous
+    ? `(${previous}) and (${predicate})`
+    : predicate;
 }
 
 function entrypointQuery<TEntities extends EntityType>(
@@ -169,11 +104,11 @@ function entrypointQuery<TEntities extends EntityType>(
   for (const entity of output) addRequirements(entity);
   const namespace = (column: string) =>
     `${column} in (select _id from namespaces where nspname <> 'information_schema' and nspname not like 'pg\\_%')`;
-  addOverride(overrides, "classes", namespace("relnamespace"));
-  addOverride(overrides, "procs", namespace("pronamespace"));
-  addOverride(overrides, "types", namespace("typnamespace"));
+  addPredicate(overrides, "classes", namespace("relnamespace"));
+  addPredicate(overrides, "procs", namespace("pronamespace"));
+  addPredicate(overrides, "types", namespace("typnamespace"));
   if (ctes.has("classes")) {
-    addOverride(
+    addPredicate(
       overrides,
       "constraints",
       "conrelid in (select _id from classes)",
@@ -216,12 +151,12 @@ function entrypointQuery<TEntities extends EntityType>(
     const accessible = (schema: string, privilege: string) =>
       `exists (select 1 from accessible_roles ar where pg_catalog.has_schema_privilege(ar.oid, ${schema}, 'USAGE') and (${privilege}))`;
     const tablePrivilege = `case when relkind in ('r','p','v','m','f') then (pg_catalog.has_table_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') or pg_catalog.has_any_column_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,REFERENCES')) when relkind = 'S' then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE') else false end`;
-    addOverride(
+    addPredicate(
       overrides,
       "classes",
       accessible("relnamespace", tablePrivilege),
     );
-    addOverride(
+    addPredicate(
       overrides,
       "procs",
       accessible(
@@ -229,7 +164,7 @@ function entrypointQuery<TEntities extends EntityType>(
         "pg_catalog.has_function_privilege(ar.oid, pg_proc.oid, 'EXECUTE')",
       ),
     );
-    addOverride(
+    addPredicate(
       overrides,
       "types",
       accessible(
@@ -242,9 +177,8 @@ function entrypointQuery<TEntities extends EntityType>(
   const entrypointFilters = multipass.entrypointFilters ?? {};
   for (const entity of Object.keys(entrypointFilters) as EntityType[]) {
     const predicate = entrypointFilters[entity];
-    filters[entity] = filters[entity]
-      ? `(${filters[entity]}) and (${predicate})`
-      : predicate;
+    if (predicate == null) continue;
+    addPredicate(filters, entity, predicate);
   }
   return {
     entrypointFilters,
@@ -265,33 +199,28 @@ function makeFetchQuery<TEntities extends EntityType>(
   context: MultipassContext<TEntities>,
   requests: readonly IntrospectionRequest[],
 ) {
-  const {
-    options: { filters },
-    selected,
-  } = context;
   const groups = new Map<EntityType, IntrospectionRequest[]>();
   for (const request of requests) {
-    const group = groups.get(request.entity) ?? [];
-    group.push(request);
-    groups.set(request.entity, group);
+    const group = groups.get(request.entity);
+    if (group) {
+      group.push(request);
+    } else {
+      groups.set(request.entity, [request]);
+    }
   }
-  const values: Array<string | string[] | null> = [];
-  const overrides: Partial<Record<EntityType, string>> = {};
+  const sqlValues: Array<SQLVal> = [];
+  const overrides: Partial<Record<EntityType, string>> = Object.create(null);
   // These catalog predicates are independent of the scope-defining CTEs in
   // ENTITY_TYPES and must also apply when an object is fetched by identity.
   const invariantFilters: Partial<Record<EntityType, string>> = {
     database: "datname = current_database()",
     attributes: "attnum > 0",
   };
-  const effectiveFilters = { ...filters };
+  const effectiveFilters = { ...context.options.filters };
   for (const entity of groups.keys()) {
     const invariant = invariantFilters[entity];
-    if (invariant) {
-      const filter = effectiveFilters[entity];
-      effectiveFilters[entity] = filter
-        ? `(${invariant}) and (${filter})`
-        : invariant;
-    }
+    if (invariant == null) continue;
+    addPredicate(effectiveFilters, entity, invariant);
   }
   for (const [entity, group] of groups) {
     const shapes = new Map<
@@ -301,23 +230,26 @@ function makeFetchQuery<TEntities extends EntityType>(
     for (const request of group) {
       const columns = Object.keys(request.match).sort();
       const shapeKey = JSON.stringify(columns);
-      const shape = shapes.get(shapeKey) ?? { columns, requests: [] };
-      shape.requests.push(request);
-      shapes.set(shapeKey, shape);
+      const shape = shapes.get(shapeKey);
+      if (shape !== undefined) {
+        shape.requests.push(request);
+      } else {
+        shapes.set(shapeKey, { columns, requests: [request] });
+      }
     }
     const expressions = [...shapes.values()].map(({ columns, requests }) => {
       const params = columns.map((column) => {
-        values.push(
+        const placeholderNumber = sqlValues.push(
           requests.map((request) => String(columnValue(request.match, column))),
         );
-        return `$${values.length}::text[]`;
+        return `$${placeholderNumber}::text[]`;
       });
       const sqlColumns = columns.map(
         (column) => `${column === "_id" ? "oid" : column}::text`,
       );
       return `(${sqlColumns.join(", ")}) in (select * from unnest(${params.join(", ")}))`;
     });
-    addOverride(
+    addPredicate(
       overrides,
       entity,
       expressions.map((expression) => `(${expression})`).join(" or "),
@@ -332,9 +264,9 @@ function makeFetchQuery<TEntities extends EntityType>(
       false,
       false,
       undefined,
-      selected.has("triggers"),
+      context.selected.has("triggers"),
     ),
-    values,
+    values: sqlValues,
   };
 }
 
@@ -477,7 +409,7 @@ function initializeMultipassContext<TEntities extends EntityType>(
         oid,
       ]),
     );
-    for (const entity of describedEntities) {
+    for (const entity of DESCRIBED_ENTITIES) {
       if (!selected.has(entity)) continue;
       const catalogId = catalogOids.get(ENTITY_TYPES[entity].tableName);
       if (!catalogId) continue;
@@ -506,7 +438,7 @@ function groupKey(columns: string[], row: object) {
 function addToGroup(shape: Shape, row: IntrospectionRow): void {
   const key = groupKey(shape.columns, row);
   const group = shape.groups.get(key);
-  if (group) {
+  if (group !== undefined) {
     group.push(row);
   } else {
     shape.groups.set(key, [row]);
@@ -704,7 +636,7 @@ function requestDependency<TEntity extends EntityType>(
     return;
   }
   if (matches.length > 0) {
-    const identityColumns = keys[entity] ?? FALLBACK_KEYS;
+    const identityColumns = UNIQUE_KEYS[entity];
     const selectsUniqueRow = identityColumns.every((column) =>
       Object.hasOwn(match, column),
     );
@@ -749,7 +681,7 @@ function canShortcutRequest({ entity, match }: IntrospectionRequest) {
   for (const [column, value] of Object.entries(match)) {
     if (value === 0 || value === "0") {
       if (column === "_id" && ENTITY_TYPES[entity].oids) return true;
-      if (nonzeroColumns[entity]?.includes(column)) return true;
+      if (NONZERO_COLUMNS[entity]?.includes(column)) return true;
     }
   }
   return false;
