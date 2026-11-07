@@ -28,13 +28,18 @@ export type PurposeList = readonly [
   ...PgIntrospection.Purpose[],
 ];
 
+type IntrospectionRowType = {
+  [K in keyof Omit<
+    IntrospectionData,
+    FixedIntrospectionKeys
+  >]: IntrospectionData[K] extends readonly (infer U)[]
+    ? U
+    : IntrospectionData[K];
+};
+
 /** A catalogue row, including rows from singular collections. */
 export type IntrospectionRow<TEntity extends EntityType = EntityType> =
-  TEntity extends EntityType
-    ? IntrospectionData[TEntity] extends readonly (infer TRow)[]
-      ? TRow
-      : IntrospectionData[TEntity]
-    : never;
+  IntrospectionRowType[TEntity];
 
 type IntrospectionMatch<TEntity extends EntityType> = TEntity extends EntityType
   ? Partial<{
@@ -101,6 +106,10 @@ export interface MultipassOptions {
   /** Trusted SQL predicates applied only to initial discovery, not dependencies. */
   entrypointFilters?: Partial<Record<EntityType, string>>;
 }
+export type PruneCallback = (
+  data: PrunableIntrospectionData,
+  details: IntrospectionPruneDetails,
+) => void;
 
 export interface IntrospectOptions<
   TEntities extends EntityType = DefaultEntities,
@@ -110,12 +119,7 @@ export interface IntrospectOptions<
   /** Additional trusted SQL predicates applied to every query in either mode. */
   filters?: Partial<Record<EntityType, string>>;
   /** Remove or hide raw objects before augmentation, in either mode, until stable. */
-  prune?:
-    | null
-    | ((
-        data: PrunableIntrospectionData,
-        details: IntrospectionPruneDetails,
-      ) => void);
+  prune?: null | PruneCallback;
   multipass?: false | MultipassOptions;
 }
 

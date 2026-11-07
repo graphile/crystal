@@ -10,9 +10,8 @@ export function pruneIntrospectionData<TEntities extends EntityType>(
   options: IntrospectOptions<TEntities>,
   result: IntrospectionDataForEntities<TEntities>,
 ): IntrospectionDataForEntities<TEntities> {
-  const { prune } = options;
+  const { prune, onlyEntities = defaultEntities } = options;
   if (prune) {
-    const selected = options.onlyEntities ?? defaultEntities;
     const data = result as Record<string, any>;
     const details: IntrospectionPruneDetails = {
       hide(entity, matches) {
@@ -45,7 +44,7 @@ export function pruneIntrospectionData<TEntities extends EntityType>(
       },
     };
     const countRows = (includeHidden: boolean) =>
-      selected.reduce(
+      onlyEntities.reduce(
         (count, entity) =>
           count +
           (Array.isArray(data[entity])
