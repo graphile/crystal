@@ -61,6 +61,8 @@ const keys: {
   db_role_settings: ["setdatabase", "setrole"],
 };
 
+const FALLBACK_KEYS = ["_id"] as const;
+
 /**
  * These columns always identify an existing catalogue object. Other OID columns
  * can use zero as a meaningful sentinel (e.g. constraints.contypid and
@@ -666,7 +668,7 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
 
             assertValidRequest(policy, request);
 
-            if (!selected.has(request.entity)) {
+            if (!selected.has(entity)) {
               return;
             }
             if (canShortcutRequest(request)) {
@@ -675,22 +677,24 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
             const key = selectorKey(request);
             const matches = matchingRows(context, request);
             for (const match of matches) {
-              addPurposes(context, request.entity, match, request.purposes);
+              addPurposes(context, entity, match, purposes);
             }
             if (requested.has(key)) {
               return;
             }
-            const identityColumns = keys[request.entity] ?? ["_id"];
-            const selectsUniqueRow = identityColumns.every((column) =>
-              Object.hasOwn(request.match, column),
-            );
-            const hasMatch = matches.length > 0;
-            if (selectsUniqueRow && hasMatch) {
-              return;
+            if (matches.length > 0) {
+              const identityColumns = keys[entity] ?? FALLBACK_KEYS;
+              const selectsUniqueRow = identityColumns.every((column) =>
+                Object.hasOwn(match, column),
+              );
+              if (selectsUniqueRow) {
+                // Already matched (matches[0]); no need to re-fetch
+                return;
+              }
             }
             const previous = pending.get(key);
-            const [first, ...rest] = previous?.purposes ?? request.purposes;
-            const remaining = new Set([...rest, ...request.purposes]);
+            const [first, ...rest] = previous?.purposes ?? purposes;
+            const remaining = new Set([...rest, ...purposes]);
             remaining.delete(first);
             pending.set(key, {
               ...request,
