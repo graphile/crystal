@@ -19,7 +19,8 @@ comment on function c.query_output_two_rows is '
 @arg4description Output only parameter (2)
 Tests outputting two rows using in/out/inout parameters';
 `,
-    (schema) => {
+    (schema, introspectionPasses) => {
+      expect(introspectionPasses).toBeLessThanOrEqual(4);
       const Query = assertObjectType(schema.getType("Query"));
       const field = Query.getFields().queryOutputTwoRows;
       const leftArmId = field.args.find((f) => f.name === "leftArmId")!;

@@ -2797,6 +2797,7 @@ __metadata:
     "@dataplan/json": "workspace:^"
     "@graphile/lru": "workspace:^"
     "@graphql-codegen/cli": "npm:^6.1.0"
+    "@localrepo/test-helpers": "workspace:*"
     "@mermaid-js/mermaid-cli": "npm:^11.12.0"
     "@types/jest": "npm:^30.0.0"
     "@types/json5": "npm:^2.2.0"
@@ -6006,6 +6007,18 @@ __metadata:
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.2.0"
     react-dom: "npm:^19.2.0"
+  languageName: unknown
+  linkType: soft
+
+"@localrepo/test-helpers@workspace:*, @localrepo/test-helpers@workspace:utils/test-helpers":
+  version: 0.0.0-use.local
+  resolution: "@localrepo/test-helpers@workspace:utils/test-helpers"
+  dependencies:
+    "@types/node": "npm:^22.19.1"
+    "@types/pg": "npm:^8.15.6"
+    pg: "npm:^8.16.3"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.9.3"
   languageName: unknown
   linkType: soft
 
@@ -14941,6 +14954,7 @@ __metadata:
     "@envelop/parser-cache": "npm:^10.0.0"
     "@envelop/validation-cache": "npm:^10.0.0"
     "@fastify/static": "npm:^10.1.2"
+    "@localrepo/test-helpers": "workspace:*"
     "@types/debug": "npm:^4.1.12"
     "@types/express": "npm:^4.17.25"
     "@types/jest": "npm:^30.0.0"
@@ -15071,6 +15085,7 @@ __metadata:
   resolution: "graphile-utils@workspace:graphile-build/graphile-utils"
   dependencies:
     "@dataplan/pg": "workspace:^"
+    "@localrepo/test-helpers": "workspace:*"
     "@types/node": "npm:^22.19.1"
     debug: "npm:^4.4.3"
     grafast: "workspace:^"
@@ -20685,6 +20700,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "pg-introspection@workspace:utils/pg-introspection"
   dependencies:
+    "@localrepo/test-helpers": "workspace:*"
     "@types/debug": "npm:^4.1.12"
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^22.19.1"

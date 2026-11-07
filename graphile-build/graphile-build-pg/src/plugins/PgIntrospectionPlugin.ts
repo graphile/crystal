@@ -4,6 +4,8 @@ import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type {
   Introspection,
+  IntrospectionDataForEntities,
+  IntrospectOptions,
   PgAttribute,
   PgAuthMembers,
   PgClass,
@@ -21,13 +23,68 @@ import type {
   PgRoles,
   PgType,
 } from "pg-introspection";
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
+import { augmentIntrospectionData, introspectRaw } from "pg-introspection";
 
 import { version } from "../version.ts";
 import { watchFixtures } from "../watchFixtures.ts";
+import {
+  postgraphileMultipass,
+  postgraphilePrune,
+} from "./PgIntrospectionPolicies.ts";
+
+declare global {
+  namespace GraphileBuild {
+    interface PgIntrospectionEntitySelection {
+      // If you add more pg-introspection entities e.g. via the
+      // pgIntrospection_options hook, expand this selection so the types know
+      // about it.
+      database: true;
+      namespaces: true;
+      classes: true;
+      attributes: true;
+      constraints: true;
+      procs: true;
+      roles: true;
+      auth_members: true;
+      types: true;
+      enums: true;
+      extensions: true;
+      indexes: true;
+      languages: true;
+      ranges: true;
+      depends: true;
+      descriptions: true;
+      inherits: true;
+      policies: true;
+      am: true;
+    }
+    type PgIntrospectionEntities =
+      keyof GraphileBuild.PgIntrospectionEntitySelection & string;
+  }
+}
+
+const DEFAULT_ENTITIES: readonly GraphileBuild.PgIntrospectionEntities[] =
+  Object.freeze([
+    "database",
+    "namespaces",
+    "classes",
+    "attributes",
+    "constraints",
+    "procs",
+    "roles",
+    "auth_members",
+    "types",
+    "enums",
+    "extensions",
+    "indexes",
+    "languages",
+    "ranges",
+    "depends",
+    "descriptions",
+    "inherits",
+    "policies",
+    "am",
+  ]);
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -51,6 +108,28 @@ export type PgEntityWithId =
 declare global {
   namespace GraphileBuild {
     interface GatherOptions {
+      /**
+       * Multipass introspection (enabled by default) helps to minimize the
+       * amount of data fetched from the database for introspection, and in
+       * doing so reduces memory usage and schema build times. It starts by
+       * looking just at the resources in your chosen schemas (and only those
+       * you have access to) and then spiders out from there based on runtime
+       * discovery of dependencies.
+       *
+       * However, this optimization might omit things from your pgRegistry that
+       * you want for your plans but are not using in your generated schema (or
+       * maybe you're using a plugin it's not compatible with). In this case
+       * you may set `pgMultipassIntrospection: false` to disable this
+       * optimization, and instead the entire database will be introspected at
+       * once in a single SQL query. This might significantly increase memory
+       * usage and the size of the pgRegistry that is generated.
+       *
+       * Multipass introspection produces a filtered view of the database. For
+       * example, a table's introspected constraints do not necessarily include
+       * every constraint in PostgreSQL.        *
+       */
+      pgMultipassIntrospection?: boolean;
+
       /**
        * Should we attempt to install the watch fixtures into the database?
        *
@@ -171,6 +250,10 @@ declare global {
     }
 
     interface GatherHooks {
+      pgIntrospection_options(event: {
+        serviceName: string;
+        options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities>;
+      }): PromiseOrDirect<void>;
       pgIntrospection_introspection(event: {
         introspection: Introspection;
         serviceName: string;
@@ -241,11 +324,12 @@ declare global {
 
 type RawIntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspectionText: string;
+  options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities>;
+  introspectionData: IntrospectionDataForEntities<GraphileBuild.PgIntrospectionEntities>;
 }>;
 type IntrospectionResults = Array<{
   pgService: GraphileConfig.PgServiceConfiguration;
-  introspection: Introspection;
+  introspection: Introspection<GraphileBuild.PgIntrospectionEntities>;
 }>;
 
 interface Cache {
@@ -275,7 +359,8 @@ async function getDb(
 }
 
 function makeGetEntity<
-  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
+  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>> &
+    keyof Introspection,
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
@@ -300,7 +385,8 @@ function makeGetEntity<
 }
 
 function makeGetEntities<
-  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>>,
+  TKey extends KeysOfType<Introspection, Array<PgEntityWithId>> &
+    keyof Introspection,
 >(loc: TKey) {
   return async (
     info: GatherPluginContext<State, Cache>,
@@ -559,11 +645,18 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             const rawIntrospections = await introspectionPromise;
 
             const introspections: IntrospectionResults = rawIntrospections.map(
-              ({ pgService, introspectionText }) => ({
-                pgService,
-                // IMPORTANT: parseIntrospectionResults must NOT be cached, because other plugins mutate it.
-                introspection: parseIntrospectionResults(introspectionText),
-              }),
+              ({ pgService, introspectionData, options }) => {
+                const clonedData = structuredClone(introspectionData);
+                // IMPORTANT: augmentation must NOT be cached, because other plugins mutate it.
+                const introspection = augmentIntrospectionData(
+                  options,
+                  clonedData,
+                );
+                return {
+                  pgService,
+                  introspection,
+                };
+              },
             );
 
             // Store the resolved state, so access during announcements doesn't cause the system to hang
@@ -852,23 +945,38 @@ function introspectPgServices(
         }
         seenPgSettingsKeys.set(pgSettingsKey, i);
       }
+      const options: IntrospectOptions<GraphileBuild.PgIntrospectionEntities> =
+        {
+          filters: { depends: "deptype in ('a', 'e')" },
+          prune: postgraphilePrune,
+          onlyEntities: [...DEFAULT_ENTITIES],
+          multipass:
+            info.resolvedPreset.gather?.pgMultipassIntrospection === false
+              ? false
+              : postgraphileMultipass({ schemas: pgService.schemas }),
+        };
+      await info.process("pgIntrospection_options", {
+        serviceName: name,
+        options,
+      });
 
       // Do the introspection
-      const introspectionQuery = makeIntrospectionQuery();
-      const {
-        rows: [row],
-      } = await withPgClientFromPgService(
+      const introspectionData = await withPgClientFromPgService(
         pgService,
         pgService.pgSettingsForIntrospection ?? null,
         (client) =>
-          client.query<{ introspection: string }>({
-            text: introspectionQuery,
+          introspectRaw(options, async (text, values) => {
+            const {
+              rows: [row],
+            } = await client.query<[string]>({
+              text,
+              values,
+              arrayMode: true,
+            });
+            return row?.[0];
           }),
       );
-      if (!row) {
-        throw new Error("Introspection failed");
-      }
-      return { pgService, introspectionText: row.introspection };
+      return { pgService, introspectionData, options };
     }),
   );
 }

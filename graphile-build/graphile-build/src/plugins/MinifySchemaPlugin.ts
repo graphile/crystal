@@ -294,11 +294,25 @@ declare global {
   }
   namespace GraphileBuild {
     interface SchemaOptions {
-      /** Should we drop descriptions from the schema */
+      /**
+       * Should the minify preset drop descriptions from the schema?
+       *
+       * @defaultValue `true`
+       */
       minifyDropsDescriptions?: boolean;
-      /** Should we drop the fact something was deprecated from the schema (i.e. the `@deprecated` directive, not the entity itself) */
+      /**
+       * Should the minify preset drop the fact something was deprecated from
+       * the schema (i.e. the `@deprecated` directive, not the entity itself).
+       *
+       * @defaultValue `true`
+       */
       minifyDropsDeprecationReasons?: boolean;
-      /** Should we **REMOVE DEPRECATED ENTITIES** from the schema entirely? This is a significantly breaking change. */
+      /**
+       * Should the minify preset **remove deprecated entities** from the
+       * schema entirely? This is a significantly breaking change.
+       *
+       * @defaultValue `false`
+       */
       minifyDropsDeprecatedEntities?: boolean;
     }
   }

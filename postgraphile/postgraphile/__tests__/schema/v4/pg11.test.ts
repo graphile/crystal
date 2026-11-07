@@ -2,5 +2,13 @@ import * as core from "./core.ts";
 
 test(
   "prints a schema to test PG11-specific features with default options",
-  core.test(__filename, ["pg11"]),
+  core.test(
+    __filename,
+    ["pg11"],
+    {},
+    undefined,
+    (_schema, introspectionPasses) => {
+      expect(introspectionPasses).toBeLessThanOrEqual(7);
+    },
+  ),
 );

@@ -4,11 +4,9 @@ sidebar_position: 2
 
 # Accessors
 
-Into the introspection results we mix "accessor" functions to make following
-relationships easier. Note that these functions are typically evaluated lazily -
-the first time you call them they may need to do an expensive lookup (e.g.
-finding the relevant record from the list of records) but they cache the result
-so that the next call will be near-instant.
+Navigation helpers make following catalog relationships easier. Augmentation
+builds indexes for looking up related objects; some derived values are computed
+lazily and cached for subsequent calls.
 
 Examples:
 
@@ -21,3 +19,13 @@ const myColumnDescription = myColumn.getDescription();
 
 You can use the TypeScript autocompletion to see what accessors are available,
 or look in the `index.ts` file.
+
+`introspect` adds these helpers automatically. For data from `introspectRaw`,
+call `augmentIntrospectionData` first, as described in [Usage](./index.md).
+
+Helpers require their corresponding collections. For example,
+`table.getAttributes()` throws if `attributes` was omitted from `onlyEntities`.
+In [multipass introspection](./multipass.md), helpers navigate only the data
+fetched and retained by the configured policies and filters. A table's
+constraints therefore contain only the discovered constraints, not necessarily
+every constraint in the database.

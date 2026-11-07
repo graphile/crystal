@@ -33,17 +33,11 @@ And please give some love to our featured sponsors 🤩:
 
 ## Usage
 
-Issue the `makeIntrospectionQuery()` SQL query to your database, then feed the
-first row's `introspection` field into `parseIntrospectionResults()` to get your
-strongly typed introspection results.
-
-Example usage with `pg` module:
+Use `introspect` with a query callback returning the first row's `introspection`
+string. The library does not depend on a particular PostgreSQL client.
 
 ```js
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
+import { introspect } from "pg-introspection";
 import { Pool } from "pg";
 
 const pool = new Pool({
@@ -51,27 +45,78 @@ const pool = new Pool({
 });
 
 async function main() {
-  const sql = makeIntrospectionQuery();
-  const { rows } = await pool.query(sql);
-  const introspection = parseIntrospectionResults(rows[0].introspection);
-
-  console.log(
-    `The ${introspection.database.datname} DBA is ${
-      introspection.database.getDba()?.rolname ?? "-"
-    }`,
-  );
+  try {
+    const introspection = await introspect({}, async (text, values) => {
+      const { rows } = await pool.query(text, values);
+      return rows[0].introspection;
+    });
+    console.log(introspection.database.getDba()?.rolname);
+  } finally {
+    await pool.end();
+  }
 }
 
 main();
 ```
 
+The result includes navigation helpers for following catalog relationships. For
+raw, cacheable data, use `introspectRaw` with the same arguments, then call
+`augmentIntrospectionData(options, data)` to add navigation helpers. Pass the
+same options used for introspection and clone cached data before augmentation:
+augmentation mutates its input and rejects already-augmented data.
+
+### Collections and filters
+
+The experimental `onlyEntities` option selects which collections are returned.
+It supports additional catalogs such as `settings`, `triggers` and
+`foreign_servers`. Required collections must also be selected; for example,
+`classes` requires `namespaces`, and `attributes` requires `classes`.
+
+Top-level `filters` apply to the single introspection query by default, or to
+every query when multipass is enabled:
+
+```js
+const options = {
+  onlyEntities: ["namespaces", "classes", "attributes"],
+  filters: { namespaces: "nspname in ('app_public', 'app_private')" },
+};
+```
+
+Filters are trusted SQL predicates keyed by collection name and combined with
+the library's catalog predicates using AND. Never interpolate untrusted input.
+
+### Multipass introspection
+
+Set `multipass` to an options object to enable incremental dependency discovery.
+`multipass.entrypointFilters` restrict initial discovery; unlike top-level
+`filters`, they allow policies to fetch dependencies outside that selection.
+`multipass.onlyAccessible` filters initial resources by role privileges, and
+`multipass.policies` describes which relationships to follow. There are no
+default relationship policies. Top-level `prune` can remove unwanted raw objects
+or hide resources while retaining their dependency data, in either mode.
+
+See the
+[multipass introspection guide](https://star.graphile.org/pg-introspection/multipass)
+for a complete policy example, purposes, permission filtering and pruning.
+
+### Migrating existing code
+
+`makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
+are deprecated. Replace the manual query/parse sequence with the `introspect`
+callback shown above. The legacy query builder retains its zero-argument
+signature. Use the new APIs for `onlyEntities` and `filters`, and
+`augmentIntrospectionData` when working with selected collections.
+
+To preserve the legacy parser's default extension exclusions, import
+`pruneExtensionResources` and pass `{ prune: pruneExtensionResources }` to
+`introspect`, or to both `introspectRaw` and `augmentIntrospectionData`. Omit
+`prune` or set it to `null` to match `parseIntrospectionResults(value, true)`.
+
 ## Accessors
 
-Into the introspection results we mix "accessor" functions to make following
-relationships easier. Note that these functions are typically evaluated lazily -
-the first time you call them they may need to do an expensive lookup (e.g.
-finding the relevant record from the list of records) but they cache the result
-so that the next call will be near-instant.
+Navigation helpers make following catalog relationships easier. Augmentation
+builds indexes for looking up related objects; some derived values are computed
+lazily and cached for subsequent calls.
 
 Examples:
 
