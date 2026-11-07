@@ -369,16 +369,15 @@ interface Shape {
 interface MultipassContext<TEntities extends EntityType> {
   options: MultipassIntrospectOptions<TEntities>;
   purposes: Map<IntrospectionRow, Set<PgIntrospection.Purpose>>;
-  expanded: Map<
+  policySubscriptions: Map<
     IntrospectionRow,
     Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
   >;
   frontier: Array<[EntityType, IntrospectionRow]>;
   selected: Set<EntityType>;
   rules: Map<EntityType, IntrospectionPolicy[]>;
-  names: Set<string>;
   rows: Map<EntityType, Map<string, IntrospectionRow>>;
-  requested: Set<string>;
+  completedSelectors: Set<string>;
   catalogByOid: Record<string, string>;
   groupIndexes: Map<EntityType, Map<string, Shape>>;
 }
@@ -394,18 +393,18 @@ function buildMultipassContext<TEntities extends EntityType>(
   const context: MultipassContext<TEntities> = {
     options,
     purposes: new Map(),
-    expanded: new Map(),
+    policySubscriptions: new Map(),
     frontier: [],
     selected: new Set([...onlyEntities]),
     rules: new Map(),
-    names: new Set(),
     rows: new Map(),
-    requested: new Set(),
+    completedSelectors: new Set(),
     catalogByOid: Object.create(null),
     groupIndexes: new Map(),
   };
 
-  const { names, selected, rules } = context;
+  const { selected, rules } = context;
+  const names = new Set<string>();
   for (const policy of policies) {
     if (names.has(policy.name)) {
       throw new Error(`Duplicate introspection policy name '${policy.name}'`);
@@ -430,7 +429,7 @@ function initializeMultipassContext<TEntities extends EntityType>(
   initialResult: IntrospectionDataForEntities<TEntities>,
 ) {
   const { entrypointFilters } = query;
-  const { catalogByOid, selected, rows, requested } = context;
+  const { catalogByOid, selected, rows, completedSelectors } = context;
   Object.assign(catalogByOid, initialResult.catalog_by_oid);
 
   for (const entity of selected) {
@@ -464,7 +463,9 @@ function initializeMultipassContext<TEntities extends EntityType>(
     for (const row of initialResult.classes ?? []) {
       for (const [entity, column] of initialClassCollections) {
         if (selected.has(entity) && !entrypointFilters[entity]) {
-          requested.add(selectorKey({ entity, match: { [column]: row._id } }));
+          completedSelectors.add(
+            selectorKey({ entity, match: { [column]: row._id } }),
+          );
         }
       }
     }
@@ -483,7 +484,7 @@ function initializeMultipassContext<TEntities extends EntityType>(
       for (const row of initialResult[entity] ?? []) {
         const id = "_id" in row ? row._id : "oid" in row ? row.oid : undefined;
         if (id != null) {
-          requested.add(
+          completedSelectors.add(
             selectorKey({
               entity: "descriptions",
               match: { classoid: catalogId, objoid: id },
@@ -556,7 +557,7 @@ async function introspectRawMultipass<TEntities extends EntityType>(
   // Apply our initial result to the context
   initializeMultipassContext(context, query, result);
 
-  const { frontier, rows, groupIndexes, requested } = context;
+  const { frontier, completedSelectors } = context;
 
   while (frontier.length > 0) {
     const requests = pendingRequestsFromFrontier(context);
@@ -571,35 +572,9 @@ async function introspectRawMultipass<TEntities extends EntityType>(
     } = JSON.parse(await runQuery(fetch.text, fetch.values));
     result.introspectionPasses++;
 
-    const fetchedEntities = Object.keys(fetched) as EntityType[];
-    for (const entity of fetchedEntities) {
-      let index = rows.get(entity);
-      if (!index) {
-        index = new Map();
-        rows.set(entity, index);
-      }
-      const fetchedRows = coerceToRows(fetched[entity]);
-      const collection: IntrospectionRow[] | undefined =
-        entity === "database"
-          ? undefined
-          : (result[entity] ?? (result[entity] = []));
-      for (const row of fetchedRows) {
-        const id = identity(entity, row);
-        if (!index.has(id)) {
-          index.set(id, row);
-          for (const shape of groupIndexes.get(entity)?.values() ?? []) {
-            addToGroup(shape, row);
-          }
-          if (collection) {
-            collection.push(row);
-          } else if (entity === "database" && fetched.database != null) {
-            result.database = fetched.database;
-          }
-        }
-      }
-    }
+    mergeFetchedRows(context, result, fetched);
     for (const request of requests) {
-      requested.add(selectorKey(request));
+      completedSelectors.add(selectorKey(request));
       for (const row of matchingRows(context, request)) {
         addPurposes(context, request.entity, row, request.purposes);
       }
@@ -607,6 +582,41 @@ async function introspectRawMultipass<TEntities extends EntityType>(
   }
 
   return pruneIntrospectionData(context.options, result);
+}
+
+function mergeFetchedRows<TEntities extends EntityType>(
+  context: MultipassContext<TEntities>,
+  result: IntrospectionDataForEntities<TEntities>,
+  fetched: { [TEntity in EntityType]?: IntrospectionData[TEntity] | null },
+) {
+  const { rows, groupIndexes } = context;
+  const fetchedEntities = Object.keys(fetched) as EntityType[];
+  for (const entity of fetchedEntities) {
+    let index = rows.get(entity);
+    if (!index) {
+      index = new Map();
+      rows.set(entity, index);
+    }
+    const fetchedRows = coerceToRows(fetched[entity]);
+    const collection: IntrospectionRow[] | undefined =
+      entity === "database"
+        ? undefined
+        : (result[entity] ?? (result[entity] = []));
+    for (const row of fetchedRows) {
+      const id = identity(entity, row);
+      if (!index.has(id)) {
+        index.set(id, row);
+        for (const shape of groupIndexes.get(entity)?.values() ?? []) {
+          addToGroup(shape, row);
+        }
+        if (collection) {
+          collection.push(row);
+        } else if (entity === "database" && fetched.database != null) {
+          result.database = fetched.database;
+        }
+      }
+    }
+  }
 }
 
 function coerceToRows<TEntity extends EntityType>(
@@ -619,15 +629,8 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
   const pending = new Map<string, IntrospectionRequest>();
-  const {
-    frontier,
-    purposes,
-    expanded,
-    rules,
-    catalogByOid,
-    selected,
-    requested,
-  } = context;
+  const { frontier, purposes, policySubscriptions, rules, catalogByOid } =
+    context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length) {
     const batch = frontier.splice(0);
@@ -635,14 +638,14 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
       batch.map(([, row]) => [row, new Set(purposes.get(row))]),
     );
     for (const [entity, row] of batch) {
-      let revisions = expanded.get(row);
-      if (!revisions) {
-        revisions = new Map();
-        expanded.set(row, revisions);
+      let subscriptions = policySubscriptions.get(row);
+      if (!subscriptions) {
+        subscriptions = new Map();
+        policySubscriptions.set(row, subscriptions);
       }
       const snapshot = snapshots.get(row)!;
       for (const policy of rules.get(entity) ?? []) {
-        const waiting = revisions.get(policy);
+        const waiting = subscriptions.get(policy);
         if (waiting && ![...waiting].some((p) => snapshot.has(p))) {
           continue;
         }
@@ -666,47 +669,58 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
               purposes,
             } as IntrospectionRequest;
 
-            assertValidRequest(policy, request);
-
-            if (!selected.has(entity)) {
-              return;
-            }
-            if (canShortcutRequest(request)) {
-              return;
-            }
-            const key = selectorKey(request);
-            const matches = matchingRows(context, request);
-            for (const match of matches) {
-              addPurposes(context, entity, match, purposes);
-            }
-            if (requested.has(key)) {
-              return;
-            }
-            if (matches.length > 0) {
-              const identityColumns = keys[entity] ?? FALLBACK_KEYS;
-              const selectsUniqueRow = identityColumns.every((column) =>
-                Object.hasOwn(match, column),
-              );
-              if (selectsUniqueRow) {
-                // Already matched (matches[0]); no need to re-fetch
-                return;
-              }
-            }
-            const previous = pending.get(key);
-            const [first, ...rest] = previous?.purposes ?? purposes;
-            const remaining = new Set([...rest, ...purposes]);
-            remaining.delete(first);
-            pending.set(key, {
-              ...request,
-              purposes: [first, ...remaining],
-            });
+            requestDependency(context, pending, policy, request);
           },
         });
-        revisions.set(policy, missing);
+        subscriptions.set(policy, missing);
       }
     }
   }
   return [...pending.values()];
+}
+
+function requestDependency<TEntity extends EntityType>(
+  context: MultipassContext<TEntity>,
+  pending: Map<string, IntrospectionRequest>,
+  policy: IntrospectionPolicy,
+  request: IntrospectionRequest,
+) {
+  const { selected, completedSelectors } = context;
+  const { entity, match, purposes } = request;
+  assertValidRequest(policy, request);
+
+  if (!selected.has(entity)) {
+    return;
+  }
+  if (canShortcutRequest(request)) {
+    return;
+  }
+  const key = selectorKey(request);
+  const matches = matchingRows(context, request);
+  for (const match of matches) {
+    addPurposes(context, entity, match, purposes);
+  }
+  if (completedSelectors.has(key)) {
+    return;
+  }
+  if (matches.length > 0) {
+    const identityColumns = keys[entity] ?? FALLBACK_KEYS;
+    const selectsUniqueRow = identityColumns.every((column) =>
+      Object.hasOwn(match, column),
+    );
+    if (selectsUniqueRow) {
+      // Already matched (matches[0]); no need to re-fetch
+      return;
+    }
+  }
+  const previous = pending.get(key);
+  const [first, ...rest] = previous?.purposes ?? purposes;
+  const remaining = new Set([...rest, ...purposes]);
+  remaining.delete(first);
+  pending.set(key, {
+    ...request,
+    purposes: [first, ...remaining],
+  });
 }
 
 function assertValidRequest(
