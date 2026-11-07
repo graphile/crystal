@@ -7,6 +7,7 @@ import type {
   IntrospectionRequest,
   IntrospectionRow,
   IntrospectOptions,
+  MultipassIntrospectOptions,
 } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
@@ -329,19 +330,32 @@ function makeFetchQuery(
   };
 }
 
+function isMultipassOptions<TEntities extends EntityType>(
+  options: IntrospectOptions<TEntities>,
+): options is MultipassIntrospectOptions<TEntities> {
+  return !!options.multipass;
+}
+
 export async function introspectRaw<
   TEntities extends EntityType = DefaultEntities,
 >(
   options: IntrospectOptions<TEntities>,
   runQuery: RunQuery,
 ): Promise<IntrospectionDataForEntities<TEntities>> {
-  if (!options.multipass) {
-    const result: IntrospectionDataForEntities<TEntities> = JSON.parse(
-      await runQuery(makeIntrospectionQuery(options), []),
-    );
+  if (isMultipassOptions(options)) {
+    return introspectRawMultipass(options, runQuery);
+  } else {
+    const string = await runQuery(makeIntrospectionQuery(options), []);
+    const result: IntrospectionDataForEntities<TEntities> = JSON.parse(string);
     result.introspectionPasses = 1;
     return pruneIntrospectionData(options, result);
   }
+}
+
+async function introspectRawMultipass<TEntities extends EntityType>(
+  options: MultipassIntrospectOptions<TEntities>,
+  runQuery: RunQuery,
+): Promise<IntrospectionDataForEntities<TEntities>> {
   const { policies = [] } = options.multipass;
   const entrypointFilters = { ...options.multipass.entrypointFilters };
   const { filters } = options;
