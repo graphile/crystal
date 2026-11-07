@@ -68,7 +68,27 @@ export const NONZERO_COLUMNS = {
   aggregates: ["aggfnoid"],
   stat_user_tables: ["relid"],
   enums: ["enumtypid"],
-} as const satisfies Partial<Record<EntityType, readonly string[]>>;
+  namespaces: [],
+  classes: [],
+  constraints: [],
+  procs: [],
+  am: [],
+  attribute_defaults: [],
+  database: [],
+  db_role_settings: [],
+  default_acls: [],
+  event_triggers: [],
+  extensions: [],
+  foreign_data_wrappers: [],
+  foreign_servers: [],
+  languages: [],
+  rewrites: [],
+  roles: [],
+  settings: [],
+  sys_procs: [],
+  triggers: [],
+  types: [],
+} as const satisfies Record<EntityType, readonly string[]>;
 
 /**
  * Collections whose descriptions are fetched with their initial rows.

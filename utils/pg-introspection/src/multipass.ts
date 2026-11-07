@@ -678,12 +678,11 @@ function assertValidRequest(
 }
 
 function canShortcutRequest({ entity, match }: IntrospectionRequest) {
-  const nonzeroColumns: Partial<Record<EntityType, readonly string[]>> =
-    NONZERO_COLUMNS;
   for (const [column, value] of Object.entries(match)) {
     if (value === 0 || value === "0") {
       if (column === "_id" && ENTITY_TYPES[entity].oids) return true;
-      if (nonzeroColumns[entity]?.includes(column)) return true;
+      const nonzeros = NONZERO_COLUMNS[entity] as readonly string[];
+      if (nonzeros.includes(column)) return true;
     }
   }
   return false;
