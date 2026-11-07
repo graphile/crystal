@@ -617,7 +617,15 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
   const pending = new Map<string, IntrospectionRequest>();
-  const { frontier, purposes, expanded, rules } = context;
+  const {
+    frontier,
+    purposes,
+    expanded,
+    rules,
+    catalogByOid,
+    selected,
+    requested,
+  } = context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length) {
     const batch = frontier.splice(0);
@@ -636,7 +644,56 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
         if (waiting && ![...waiting].some((p) => snapshot.has(p))) {
           continue;
         }
-        const missing = runPolicy(context, snapshot, pending, policy, row);
+        const missing = new Set<PgIntrospection.Purpose>();
+        policy.select(row, {
+          catalogByOid,
+          hasPurpose(purpose) {
+            if (!snapshot.has(purpose)) {
+              missing.add(purpose);
+              return false;
+            } else {
+              return true;
+            }
+          },
+          request(entity, match, purposes) {
+            assertEntityType(entity);
+            // The generic request API keeps these parameters correlated.
+            const request = {
+              entity,
+              match,
+              purposes,
+            } as IntrospectionRequest;
+
+            assertValidRequest(policy, request);
+
+            if (!selected.has(request.entity)) {
+              return;
+            }
+            if (canShortcutRequest(request)) {
+              return;
+            }
+            const key = selectorKey(request);
+            const matches = matchingRows(context, request);
+            for (const match of matches) {
+              addPurposes(context, request.entity, match, request.purposes);
+            }
+            if (requested.has(key)) {
+              return;
+            }
+            const keys = Object.keys(request.match);
+            if (keys.length === 1 && keys[0] === "_id" && matches.length) {
+              return;
+            }
+            const previous = pending.get(key);
+            const [first, ...rest] = previous?.purposes ?? request.purposes;
+            const remaining = new Set([...rest, ...request.purposes]);
+            remaining.delete(first);
+            pending.set(key, {
+              ...request,
+              purposes: [first, ...remaining],
+            });
+          },
+        });
         revisions.set(policy, missing);
       }
     }
@@ -644,85 +701,36 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
   return [...pending.values()];
 }
 
-function runPolicy<TEntities extends EntityType>(
-  context: MultipassContext<TEntities>,
-  snapshot: Set<PgIntrospection.Purpose>,
-  pending: Map<string, IntrospectionRequest>,
+function assertValidRequest(
   policy: IntrospectionPolicy,
-  row: IntrospectionRow,
+  request: IntrospectionRequest,
 ) {
-  const { catalogByOid, selected, requested } = context;
-  const missing = new Set<PgIntrospection.Purpose>();
-  policy.select(row, {
-    catalogByOid,
-    hasPurpose(purpose) {
-      if (!snapshot.has(purpose)) {
-        missing.add(purpose);
-        return false;
-      } else {
-        return true;
-      }
-    },
-    request(entity, match, purposes) {
-      assertEntityType(entity);
-      // The generic request API keeps these parameters correlated.
-      const request = {
-        entity,
-        match,
-        purposes,
-      } as IntrospectionRequest;
-      if (!Array.isArray(request.purposes) || request.purposes.length === 0) {
-        throw new Error(
-          `Introspection policy '${policy.name}' requested '${request.entity}' without purposes`,
-        );
-      }
-      const entries = Object.entries(request.match);
-      if (
-        !entries.length ||
-        entries.some(
-          ([field, value]) =>
-            !/^[a-z_][a-z0-9_]*$/.test(field) || value == null,
-        )
-      ) {
-        throw new Error(
-          `Invalid selector from introspection policy '${policy.name}' for '${request.entity}'`,
-        );
-      }
-      if (
-        entries.some(
-          ([column, value]) =>
-            (value === 0 || value === "0") &&
-            ((column === "_id" && ENTITY_TYPES[entity].oids) ||
-              nonzeroColumns[entity]?.includes(column)),
-        )
-      ) {
-        return;
-      }
-      if (!selected.has(request.entity)) {
-        return;
-      }
-      const key = selectorKey(request);
-      const matches = matchingRows(context, request);
-      for (const match of matches) {
-        addPurposes(context, request.entity, match, request.purposes);
-      }
-      if (
-        requested.has(key) ||
-        (entries.length === 1 && entries[0][0] === "_id" && matches.length)
-      ) {
-        return;
-      }
-      const previous = pending.get(key);
-      const [first, ...rest] = previous?.purposes ?? request.purposes;
-      const remaining = new Set([...rest, ...request.purposes]);
-      remaining.delete(first);
-      pending.set(key, {
-        ...request,
-        purposes: [first, ...remaining],
-      });
-    },
-  });
-  return missing;
+  if (!Array.isArray(request.purposes) || request.purposes.length === 0) {
+    throw new Error(
+      `Introspection policy '${policy.name}' requested '${request.entity}' without purposes`,
+    );
+  }
+  const entries = Object.entries(request.match);
+  if (
+    !entries.length ||
+    entries.some(
+      ([field, value]) => !/^[a-z_][a-z0-9_]*$/.test(field) || value == null,
+    )
+  ) {
+    throw new Error(
+      `Invalid selector from introspection policy '${policy.name}' for '${request.entity}'`,
+    );
+  }
+}
+
+function canShortcutRequest({ entity, match }: IntrospectionRequest) {
+  for (const [column, value] of Object.entries(match)) {
+    if (value === 0 || value === "0") {
+      if (column === "_id" && ENTITY_TYPES[entity].oids) return true;
+      if (nonzeroColumns[entity]?.includes(column)) return true;
+    }
+  }
+  return false;
 }
 
 function addPurposes<TEntity extends EntityType>(
