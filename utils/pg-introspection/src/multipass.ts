@@ -238,10 +238,7 @@ function makeFetchQuery<TEntities extends EntityType>(
     addPredicate(effectiveFilters, entity, invariant);
   }
   for (const [entity, group] of groups) {
-    const shapes = new Map<
-      string,
-      { columns: string[]; requests: IntrospectionRequest[] }
-    >();
+    const shapes = new Map<string, ShapeRequests>();
     for (const request of group) {
       const columns = Object.keys(request.match).sort();
       const shapeKey = JSON.stringify(columns);
@@ -308,9 +305,13 @@ export async function introspectRaw<
   }
 }
 
-interface Shape {
+interface ShapeGroups {
   columns: string[];
   groups: Map<string, IntrospectionRow[]>;
+}
+interface ShapeRequests {
+  columns: string[];
+  requests: IntrospectionRequest[];
 }
 
 interface MultipassContext<TEntities extends EntityType> {
@@ -326,7 +327,7 @@ interface MultipassContext<TEntities extends EntityType> {
   rows: Map<EntityType, Map<string, IntrospectionRow>>;
   completedSelectors: Set<string>;
   catalogByOid: Record<string, string>;
-  groupIndexes: Map<EntityType, Map<string, Shape>>;
+  groupIndexes: Map<EntityType, Map<string, ShapeGroups>>;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -456,7 +457,7 @@ function selectsUniqueRow(
 }
 
 // Build each selector shape once, sharing the scan across all selector values.
-function addToGroup(shape: Shape, row: IntrospectionRow): void {
+function addToGroup(shape: ShapeGroups, row: IntrospectionRow): void {
   const key = groupKey(shape.columns, row);
   const group = shape.groups.get(key);
   if (group !== undefined) {
