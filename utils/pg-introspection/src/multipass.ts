@@ -661,7 +661,6 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
             }
           },
           request(entity, match, purposes) {
-            assertEntityType(entity);
             // The generic request API keeps these parameters correlated.
             const request = {
               entity,
@@ -720,6 +719,7 @@ function assertValidRequest(
   policy: IntrospectionPolicy,
   request: IntrospectionRequest,
 ) {
+  assertEntityType(request.entity);
   if (!Array.isArray(request.purposes) || request.purposes.length === 0) {
     throw new Error(
       `Introspection policy '${policy.name}' requested '${request.entity}' without purposes`,
