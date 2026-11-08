@@ -254,18 +254,18 @@ function makeFetchQuery<TEntities extends EntityType>(
     addPredicate(effectiveFilters, entity, invariant);
   }
   for (const [entity, group] of groups) {
-    const shapes = new Map<string, ShapeRequests>();
+    const batches = new Map<string, SelectorBatch>();
     for (const request of group) {
       const columns = Object.keys(request.match).sort();
-      const shapeKey = JSON.stringify(columns);
-      const shape = shapes.get(shapeKey);
-      if (shape !== undefined) {
-        shape.requests.push(request);
+      const columnsKey = JSON.stringify(columns);
+      const batch = batches.get(columnsKey);
+      if (batch !== undefined) {
+        batch.requests.push(request);
       } else {
-        shapes.set(shapeKey, { columns, requests: [request] });
+        batches.set(columnsKey, { columns, requests: [request] });
       }
     }
-    const expressions = [...shapes.values()].map(({ columns, requests }) => {
+    const expressions = [...batches.values()].map(({ columns, requests }) => {
       const params = columns.map((column) => {
         const placeholderNumber = sqlValues.push(
           requests.map((request) => String(columnValue(request.match, column))),
@@ -321,11 +321,14 @@ export async function introspectRaw<
   }
 }
 
-interface ShapeGroups {
+/** Rows indexed by the values of a fixed set of selector columns. */
+interface SelectorIndex {
   columns: string[];
   groups: Map<string, IntrospectionRow[]>;
 }
-interface ShapeRequests {
+
+/** Requests sharing the same selector columns for a batched query. */
+interface SelectorBatch {
   columns: string[];
   requests: IntrospectionRequest[];
 }
@@ -343,7 +346,7 @@ interface MultipassContext<TEntities extends EntityType> {
   rows: Map<EntityType, Map<string, IntrospectionRow>>;
   completedSelectors: Set<string>;
   catalogByOid: Record<string, string>;
-  groupIndexes: Map<EntityType, Map<string, ShapeGroups>>;
+  groupIndexes: Map<EntityType, Map<string, SelectorIndex>>;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
@@ -472,14 +475,13 @@ function selectsUniqueRow(
   );
 }
 
-// Build each selector shape once, sharing the scan across all selector values.
-function addToGroup(shape: ShapeGroups, row: IntrospectionRow): void {
-  const key = groupKey(shape.columns, row);
-  const group = shape.groups.get(key);
+function addToGroup(index: SelectorIndex, row: IntrospectionRow): void {
+  const key = groupKey(index.columns, row);
+  const group = index.groups.get(key);
   if (group !== undefined) {
     group.push(row);
   } else {
-    shape.groups.set(key, [row]);
+    index.groups.set(key, [row]);
   }
 }
 
@@ -488,10 +490,10 @@ function matchingRows(
   request: Pick<IntrospectionRequest, "entity" | "match">,
 ): IntrospectionRow[] {
   const { rows, groupIndexes } = context;
-  const index = rows.get(request.entity);
+  const identityIndex = rows.get(request.entity);
   const columns = Object.keys(request.match).sort();
   if (selectsUniqueRow(request)) {
-    const row = index?.get(
+    const row = identityIndex?.get(
       groupKey(UNIQUE_KEYS[request.entity], request.match),
     );
     // The selector can include conditions beyond the unique key.
@@ -499,21 +501,21 @@ function matchingRows(
       ? [row]
       : [];
   }
-  let shapes = groupIndexes.get(request.entity);
-  if (!shapes) {
-    shapes = new Map();
-    groupIndexes.set(request.entity, shapes);
+  let indexes = groupIndexes.get(request.entity);
+  if (!indexes) {
+    indexes = new Map();
+    groupIndexes.set(request.entity, indexes);
   }
-  const shapeKey = JSON.stringify(columns);
-  let shape = shapes.get(shapeKey);
-  if (!shape) {
-    shape = { columns, groups: new Map() };
-    for (const row of index?.values() ?? []) {
-      addToGroup(shape, row);
+  const columnsKey = JSON.stringify(columns);
+  let index = indexes.get(columnsKey);
+  if (!index) {
+    index = { columns, groups: new Map() };
+    for (const row of identityIndex?.values() ?? []) {
+      addToGroup(index, row);
     }
-    shapes.set(shapeKey, shape);
+    indexes.set(columnsKey, index);
   }
-  return shape.groups.get(groupKey(columns, request.match)) ?? [];
+  return index.groups.get(groupKey(columns, request.match)) ?? [];
 }
 
 async function introspectRawMultipass<TEntities extends EntityType>(
@@ -579,8 +581,8 @@ function mergeFetchedRows<TEntities extends EntityType>(
       const id = identity(entity, row);
       if (!index.has(id)) {
         index.set(id, row);
-        for (const shape of groupIndexes.get(entity)?.values() ?? []) {
-          addToGroup(shape, row);
+        for (const selectorIndex of groupIndexes.get(entity)?.values() ?? []) {
+          addToGroup(selectorIndex, row);
         }
         if (collection) {
           collection.push(row);
