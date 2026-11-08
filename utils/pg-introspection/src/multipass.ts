@@ -334,19 +334,29 @@ interface SelectorBatch {
 }
 
 interface MultipassContext<TEntities extends EntityType> {
+  /** Configuration shared by query construction and final result pruning. */
   options: MultipassIntrospectOptions<TEntities>;
+  /** Limits discovery and policy execution to the requested entity types. */
+  selected: Set<EntityType>;
+  /** Policies grouped by entity so each row runs only applicable policies. */
+  rules: Map<EntityType, IntrospectionPolicy[]>;
+  /** Lets policies translate catalogue OIDs into catalogue names. */
+  catalogByOid: Record<string, string>;
+  /** Rows indexed by entity and identity to deduplicate and reuse discoveries. */
+  rows: Map<EntityType, Map<string, IntrospectionRow>>;
+  /** Cached selector indexes avoid rescanning rows for each dependency request. */
+  groupIndexes: Map<EntityType, Map<string, SelectorIndex>>;
+  /** Selectors with complete results, including empty results, need no refetch. */
+  completedSelectors: Set<string>;
+  /** Accumulated reasons for including each row, used to guide its policies. */
   purposes: Map<IntrospectionRow, Set<PgIntrospection.Purpose>>;
+  /** Missing purposes that would trigger each policy to run again for a row. */
   policySubscriptions: Map<
     IntrospectionRow,
     Map<IntrospectionPolicy, Set<PgIntrospection.Purpose>>
   >;
+  /** New rows or rows with added purposes awaiting policy execution. */
   frontier: Array<[EntityType, IntrospectionRow]>;
-  selected: Set<EntityType>;
-  rules: Map<EntityType, IntrospectionPolicy[]>;
-  rows: Map<EntityType, Map<string, IntrospectionRow>>;
-  completedSelectors: Set<string>;
-  catalogByOid: Record<string, string>;
-  groupIndexes: Map<EntityType, Map<string, SelectorIndex>>;
 }
 
 function buildMultipassContext<TEntities extends EntityType>(
