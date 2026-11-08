@@ -339,13 +339,13 @@ interface MultipassContext<TEntities extends EntityType> {
   /** Limits discovery and policy execution to the requested entity types. */
   selected: Set<EntityType>;
   /** Policies grouped by entity so each row runs only applicable policies. */
-  rules: Map<EntityType, IntrospectionPolicy[]>;
+  policiesByEntity: Map<EntityType, IntrospectionPolicy[]>;
   /** Lets policies translate catalogue OIDs into catalogue names. */
   catalogByOid: Record<string, string>;
   /** Rows indexed by entity and identity to deduplicate and reuse discoveries. */
-  rows: Map<EntityType, Map<string, IntrospectionRow>>;
+  rowsByIdentity: Map<EntityType, Map<string, IntrospectionRow>>;
   /** Cached selector indexes avoid rescanning rows for each dependency request. */
-  groupIndexes: Map<EntityType, Map<string, SelectorIndex>>;
+  selectorIndexes: Map<EntityType, Map<string, SelectorIndex>>;
   /** Selectors with complete results, including empty results, need no refetch. */
   completedSelectors: Set<string>;
   /** Accumulated reasons for including each row, used to guide its policies. */
@@ -373,14 +373,14 @@ function buildMultipassContext<TEntities extends EntityType>(
     policySubscriptions: new Map(),
     frontier: [],
     selected: new Set([...onlyEntities]),
-    rules: new Map(),
-    rows: new Map(),
+    policiesByEntity: new Map(),
+    rowsByIdentity: new Map(),
     completedSelectors: new Set(),
     catalogByOid: Object.create(null),
-    groupIndexes: new Map(),
+    selectorIndexes: new Map(),
   };
 
-  const { selected, rules } = context;
+  const { selected, policiesByEntity } = context;
   const names = new Set<string>();
   for (const policy of policies) {
     if (names.has(policy.name)) {
@@ -391,10 +391,10 @@ function buildMultipassContext<TEntities extends EntityType>(
       throw new Error(`Invalid introspection policy name '${policy.name}'`);
     }
     if (!selected.has(policy.entity)) continue;
-    const list = rules.get(policy.entity) ?? [];
+    const list = policiesByEntity.get(policy.entity) ?? [];
     // The map groups policies by entity; dispatch supplies a row from that entity.
     list.push(policy as IntrospectionPolicy);
-    rules.set(policy.entity, list);
+    policiesByEntity.set(policy.entity, list);
   }
 
   return context;
@@ -406,19 +406,23 @@ function initializeMultipassContext<TEntities extends EntityType>(
   initialResult: IntrospectionDataForEntities<TEntities>,
 ) {
   const { entrypointFilters } = query;
-  const { catalogByOid, selected, rows, completedSelectors } = context;
+  const { catalogByOid, selected, rowsByIdentity, completedSelectors } =
+    context;
   Object.assign(catalogByOid, initialResult.catalog_by_oid);
 
   for (const entity of selected) {
     const collection = initialResult[entity];
     if (collection && !Array.isArray(collection)) {
-      rows.set(entity, new Map([[identity(entity, collection), collection]]));
+      rowsByIdentity.set(
+        entity,
+        new Map([[identity(entity, collection), collection]]),
+      );
       addPurposes(context, entity, collection, ["initial"]);
       continue;
     }
     if (!Array.isArray(collection)) continue;
     const index = new Map<string, IntrospectionRow>();
-    rows.set(entity, index);
+    rowsByIdentity.set(entity, index);
     for (const row of collection) {
       index.set(identity(entity, row), row);
       addPurposes(context, entity, row, ["initial"]);
@@ -499,8 +503,8 @@ function matchingRows(
   context: MultipassContext<EntityType>,
   request: Pick<IntrospectionRequest, "entity" | "match">,
 ): IntrospectionRow[] {
-  const { rows, groupIndexes } = context;
-  const identityIndex = rows.get(request.entity);
+  const { rowsByIdentity, selectorIndexes } = context;
+  const identityIndex = rowsByIdentity.get(request.entity);
   const columns = Object.keys(request.match).sort();
   if (selectsUniqueRow(request)) {
     const row = identityIndex?.get(
@@ -511,10 +515,10 @@ function matchingRows(
       ? [row]
       : [];
   }
-  let indexes = groupIndexes.get(request.entity);
+  let indexes = selectorIndexes.get(request.entity);
   if (!indexes) {
     indexes = new Map();
-    groupIndexes.set(request.entity, indexes);
+    selectorIndexes.set(request.entity, indexes);
   }
   const columnsKey = JSON.stringify(columns);
   let index = indexes.get(columnsKey);
@@ -574,13 +578,13 @@ function mergeFetchedRows<TEntities extends EntityType>(
   result: IntrospectionDataForEntities<TEntities>,
   fetched: { [TEntity in EntityType]?: IntrospectionData[TEntity] | null },
 ) {
-  const { rows, groupIndexes } = context;
+  const { rowsByIdentity, selectorIndexes } = context;
   const fetchedEntities = Object.keys(fetched) as EntityType[];
   for (const entity of fetchedEntities) {
-    let index = rows.get(entity);
+    let index = rowsByIdentity.get(entity);
     if (!index) {
       index = new Map();
-      rows.set(entity, index);
+      rowsByIdentity.set(entity, index);
     }
     const fetchedRows = coerceToRows(fetched[entity]);
     const collection: IntrospectionRow[] | undefined =
@@ -591,7 +595,8 @@ function mergeFetchedRows<TEntities extends EntityType>(
       const id = identity(entity, row);
       if (!index.has(id)) {
         index.set(id, row);
-        for (const selectorIndex of groupIndexes.get(entity)?.values() ?? []) {
+        for (const selectorIndex of selectorIndexes.get(entity)?.values() ??
+          []) {
           addToGroup(selectorIndex, row);
         }
         if (collection) {
@@ -614,8 +619,13 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
   context: MultipassContext<TEntity>,
 ) {
   const pending = new Map<string, IntrospectionRequest>();
-  const { frontier, purposes, policySubscriptions, rules, catalogByOid } =
-    context;
+  const {
+    frontier,
+    purposes,
+    policySubscriptions,
+    policiesByEntity,
+    catalogByOid,
+  } = context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
   while (frontier.length) {
     const batch = frontier.splice(0);
@@ -629,7 +639,7 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
         policySubscriptions.set(row, subscriptions);
       }
       const snapshot = snapshots.get(row)!;
-      for (const policy of rules.get(entity) ?? []) {
+      for (const policy of policiesByEntity.get(entity) ?? []) {
         const waiting = subscriptions.get(policy);
         if (waiting && ![...waiting].some((p) => snapshot.has(p))) {
           continue;
