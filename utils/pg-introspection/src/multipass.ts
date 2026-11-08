@@ -147,8 +147,25 @@ function entrypointQuery<TEntities extends EntityType>(
       : `select role_oid as oid from selected_role`
   })`;
     const accessible = (schema: string, privilege: string) =>
-      `exists (select 1 from accessible_roles ar where pg_catalog.has_schema_privilege(ar.oid, ${schema}, 'USAGE') and (${privilege}))`;
-    const tablePrivilege = `case when relkind in ('r','p','v','m','f') then (pg_catalog.has_table_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER') or pg_catalog.has_any_column_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,REFERENCES')) when relkind = 'S' then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE') else false end`;
+      `exists (
+        select 1
+        from accessible_roles ar
+        where pg_catalog.has_schema_privilege(ar.oid, ${schema}, 'USAGE')
+        and (${privilege})
+      )`;
+    const tablePrivilege = `(
+      case
+        when relkind in ('r','p','v','m','f')
+        then (
+          pg_catalog.has_table_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+        or
+          pg_catalog.has_any_column_privilege(ar.oid, pg_class.oid, 'SELECT,INSERT,UPDATE,REFERENCES')
+        )
+        when relkind = 'S'
+        then pg_catalog.has_sequence_privilege(ar.oid, pg_class.oid, 'USAGE,SELECT,UPDATE')
+        else false
+      end
+    )`;
     addPredicate(
       overrides,
       "classes",
