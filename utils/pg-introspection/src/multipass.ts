@@ -646,7 +646,7 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
       const snapshot = snapshots.get(row)!;
       for (const policy of policiesByEntity.get(entity) ?? []) {
         const waiting = subscriptions.get(policy);
-        if (waiting && ![...waiting].some((p) => snapshot.has(p))) {
+        if (waiting && waiting.isDisjointFrom(snapshot)) {
           continue;
         }
         const subscribeTo = new Set<PgIntrospection.Purpose>();
