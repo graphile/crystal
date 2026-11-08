@@ -632,7 +632,7 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
     catalogByOid,
   } = context;
   // Drain purpose propagation before querying, batching all reasons for a selector.
-  while (frontier.length) {
+  while (frontier.length > 0) {
     const batch = frontier.splice(0);
     const snapshots = new Map(
       batch.map(([, row]) => [row, new Set(purposes.get(row))]),
