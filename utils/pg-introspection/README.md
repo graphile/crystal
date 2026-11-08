@@ -33,84 +33,29 @@ And please give some love to our featured sponsors 🤩:
 
 ## Usage
 
-Use `introspect` with a query callback returning the first row's `introspection`
-string. The library does not depend on a particular PostgreSQL client.
+Call `introspect` passing options and a `runQuery` callback that should run the
+given text/values using a database adaptor of your choice and return the value
+of the `introspection` column of the first (and only) row returned.
 
-```js
+```ts
+const introspection = await introspect({}, runQuery);
+console.log(introspection.database.getDba()?.rolname);
+```
+
+Here's an example of a `runQuery` function for the `pg` module:
+
+```ts
 import { introspect } from "pg-introspection";
 import { Pool } from "pg";
 
-const pool = new Pool({
-  connectionString: "postgres://localhost:5432/my_database",
-});
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
 
-async function main() {
-  try {
-    const introspection = await introspect({}, async (text, values) => {
-      const { rows } = await pool.query(text, values);
-      return rows[0].introspection;
-    });
-    console.log(introspection.database.getDba()?.rolname);
-  } finally {
-    await pool.end();
-  }
-}
-
-main();
-```
-
-The result includes navigation helpers for following catalog relationships. For
-raw, cacheable data, use `introspectRaw` with the same arguments, then call
-`augmentIntrospectionData(options, data)` to add navigation helpers. Pass the
-same options used for introspection and clone cached data before augmentation:
-augmentation mutates its input and rejects already-augmented data.
-
-### Collections and filters
-
-The experimental `onlyEntities` option selects which collections are returned.
-It supports additional catalogs such as `settings`, `triggers` and
-`foreign_servers`. Required collections must also be selected; for example,
-`classes` requires `namespaces`, and `attributes` requires `classes`.
-
-Top-level `filters` apply to the single introspection query by default, or to
-every query when multipass is enabled:
-
-```js
-const options = {
-  onlyEntities: ["namespaces", "classes", "attributes"],
-  filters: { namespaces: "nspname in ('app_public', 'app_private')" },
+const runQuery = async (text, values) => {
+  const { rows } = await pool.query(text, values);
+  return rows[0].introspection;
 };
 ```
-
-Filters are trusted SQL predicates keyed by collection name and combined with
-the library's catalog predicates using AND. Never interpolate untrusted input.
-
-### Multipass introspection
-
-Set `multipass` to an options object to enable incremental dependency discovery.
-`multipass.entrypointFilters` restrict initial discovery; unlike top-level
-`filters`, they allow policies to fetch dependencies outside that selection.
-`multipass.onlyAccessible` filters initial resources by role privileges, and
-`multipass.policies` describes which relationships to follow. There are no
-default relationship policies. Top-level `prune` can remove unwanted raw objects
-or hide resources while retaining their dependency data, in either mode.
-
-See the
-[multipass introspection guide](https://star.graphile.org/pg-introspection/multipass)
-for a complete policy example, purposes, permission filtering and pruning.
-
-### Migrating existing code
-
-`makeIntrospectionQuery` and `parseIntrospectionResults` remain available but
-are deprecated. Replace the manual query/parse sequence with the `introspect`
-callback shown above. The legacy query builder retains its zero-argument
-signature. Use the new APIs for `onlyEntities` and `filters`, and
-`augmentIntrospectionData` when working with selected collections.
-
-To preserve the legacy parser's default extension exclusions, import
-`pruneExtensionResources` and pass `{ prune: pruneExtensionResources }` to
-`introspect`, or to both `introspectRaw` and `augmentIntrospectionData`. Omit
-`prune` or set it to `null` to match `parseIntrospectionResults(value, true)`.
 
 ## Accessors
 
@@ -138,3 +83,10 @@ read if you're not familiar with the system catalog.
 We use `_id` rather than `oid` because older versions of PostgreSQL did not
 explicitly list the `oid` columns when you `select * from` so we explicitly list
 them among the selection set.
+
+## View the docs
+
+For details of the options and advanced usage instructions (including how to
+cache the results), see the full documentation:
+
+https://star.graphile.org/pg-introspection/
