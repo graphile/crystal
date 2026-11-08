@@ -549,6 +549,8 @@ async function introspectRawMultipass<TEntities extends EntityType>(
   const { frontier, completedSelectors } = context;
 
   while (frontier.length > 0) {
+    // Drains the frontier, calling select for applicable policies (using
+    // policySubscriptions to determine which policies need to run again).
     const requests = pendingRequestsFromFrontier(context);
     assert.equal(frontier.length, 0);
     if (requests.length === 0) {
@@ -566,6 +568,8 @@ async function introspectRawMultipass<TEntities extends EntityType>(
     for (const request of requests) {
       completedSelectors.add(selectorKey(request));
       for (const row of matchingRows(context, request)) {
+        // Adds the purposes for which each fetched row was fetched, adding
+        // impacted rows to the frontier ready for policy selection.
         addPurposes(context, request.entity, row, request.purposes);
       }
     }
