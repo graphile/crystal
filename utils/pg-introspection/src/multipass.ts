@@ -649,12 +649,12 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
         if (waiting && ![...waiting].some((p) => snapshot.has(p))) {
           continue;
         }
-        const missing = new Set<PgIntrospection.Purpose>();
+        const subscribeTo = new Set<PgIntrospection.Purpose>();
         policy.select(row, {
           catalogByOid,
           hasPurpose(purpose) {
             if (!snapshot.has(purpose)) {
-              missing.add(purpose);
+              subscribeTo.add(purpose);
               return false;
             } else {
               return true;
@@ -672,7 +672,7 @@ function pendingRequestsFromFrontier<TEntity extends EntityType>(
             requestDependency(context, pending, policy, request);
           },
         });
-        subscriptions.set(policy, missing);
+        subscriptions.set(policy, subscribeTo);
       }
     }
   }
