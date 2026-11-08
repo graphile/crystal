@@ -11,6 +11,7 @@ import type {
   IntrospectOptions,
   Maybe,
   MultipassIntrospectOptions,
+  PurposeList,
 } from "./interfaces.ts";
 import {
   ENTITY_TYPES,
@@ -706,13 +707,11 @@ function requestDependency<TEntity extends EntityType>(
     return;
   }
   const previous = pending.get(key);
-  const [first, ...rest] = previous?.purposes ?? purposes;
-  const remaining = new Set([...rest, ...purposes]);
-  remaining.delete(first);
-  pending.set(key, {
-    ...request,
-    purposes: [first, ...remaining],
-  });
+  /** Definitely contains at least one element */
+  const allPurposes = new Set([...(previous?.purposes ?? []), ...purposes]);
+  const [first, ...rest] = allPurposes;
+  const newPurposes: PurposeList = [first, ...rest];
+  pending.set(key, { ...request, purposes: newPurposes });
 }
 
 function assertValidRequest(
