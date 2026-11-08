@@ -53,18 +53,11 @@ declare global {
 const returnTypes = defineIntrospectionPolicy({
   name: "procedureReturnTypes",
   entity: "procs",
-  purposes: ["initial", "procedureReturnType"],
   select(proc, details) {
     if (!details.hasPurpose("initial")) {
-      return [];
+      return;
     }
-    return [
-      {
-        entity: "types",
-        match: { _id: proc.prorettype },
-        purposes: ["procedureReturnType"],
-      },
-    ];
+    details.request("types", { _id: proc.prorettype }, ["procedureReturnType"]);
   },
 });
 
@@ -97,28 +90,22 @@ main();
 ```
 
 `defineIntrospectionPolicy` infers the source row's type from `entity`. Every
-policy has a unique, non-empty `name`, a source collection, a list of declared
-purposes and a synchronous `select` function. Return an array of requests,
-`[]` or `undefined`.
+policy has a unique, non-empty `name`, a source collection and a synchronous
+`select` function. Call `details.request(entity, match, purposes)` to request
+dependencies; the return value of `select` is ignored.
 
 Each request specifies a target `entity`, a non-empty `match` object of catalog
-column equalities, and a non-empty `purposes` list. Values in `match` are
-strings or numbers and are sent as query parameters. Use `_id` to request an
-object by OID, or a catalog column such as `attrelid` to request a group of rows:
+column equalities, and a non-empty `purposes` list. Values in `match` must match
+the selected columns' types, must not be null, and are sent as query parameters.
+Use `_id` to request an object whose OID has that alias, or a catalog column such
+as `attrelid` to request a group of rows:
 
 ```ts
 const tableAttributes = defineIntrospectionPolicy({
   name: "tableAttributes",
   entity: "classes",
-  purposes: ["initial"],
-  select(table) {
-    return [
-      {
-        entity: "attributes",
-        match: { attrelid: table._id },
-        purposes: ["initial"],
-      },
-    ];
+  select(table, details) {
+    details.request("attributes", { attrelid: table._id }, ["initial"]);
   },
 });
 ```
@@ -134,19 +121,20 @@ needs objects. A row can be needed for several reasons: for example, a table
 used as a procedure's return type can require different information from a table
 exposed as a queryable resource.
 
-A policy must declare every purpose it reads through `details.hasPurpose` or
-emits in requests. Reading or emitting an undeclared purpose throws an error
-identifying the policy. The built-in `initial` purpose must also be declared
-when used.
+Custom purposes must be registered in `PgIntrospection.PurposeRegistry` for
+TypeScript to accept them. The built-in `initial` purpose is already registered.
+Policies do not declare a list of purposes: calls to `details.hasPurpose` track
+which missing purposes would cause a policy to run again.
 
-Policies run once when a row is first discovered, even if none of their declared
-purposes is present. Use `hasPurpose` guards when behaviour depends on a reason
-for discovery. Subsequently, a policy reruns only when one of its declared
-purposes is added. Requests for already fetched rows still propagate new
-purposes without fetching those rows again.
+Policies run once when a row is first discovered. Use `hasPurpose` guards when
+behaviour depends on a reason for discovery. Whenever `hasPurpose` returns
+`false`, the policy subscribes to that missing purpose for the row. Subsequently,
+the policy reruns only when a subscribed purpose becomes available. Requests for
+already fetched rows still propagate new purposes without fetching those rows
+again.
 
 Purposes only accumulate. A new purpose must add requirements rather than revoke
-earlier ones. Policy output must depend only on its row, declared purposes and
+earlier ones. Policy output must depend only on its row, inspected purposes and
 fixed configuration. Do not mutate rows or use mutable closure state to decide
 what to request. `details.catalogByOid` contains immutable catalog metadata for
 policies that need catalog OIDs.
