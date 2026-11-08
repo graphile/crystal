@@ -751,6 +751,7 @@ it("merges overlapping requests independently of policy order", async () => {
 for (const value of [0, "0"]) {
   for (const [entity, column, skipped] of [
     ["namespaces", "_id", true],
+    ["event_triggers", "oid", true],
     ["attributes", "attrelid", true],
     ["descriptions", "objoid", true],
     ["descriptions", "objsubid", false],

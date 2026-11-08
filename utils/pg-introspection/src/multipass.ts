@@ -53,6 +53,22 @@ function identity<TEntity extends EntityType>(
   return JSON.stringify(fields.map((field) => columnValue(row, field)));
 }
 
+function rowOid<TEntity extends EntityType>(
+  _entity: TEntity,
+  row: IntrospectionRow<TEntity>,
+): string | undefined {
+  const catalogRow: IntrospectionRow = row;
+  return "_id" in catalogRow
+    ? catalogRow._id
+    : "oid" in catalogRow
+      ? catalogRow.oid
+      : undefined;
+}
+
+function sqlColumnName(column: string): string {
+  return column === "_id" ? "oid" : column;
+}
+
 function selectorKey(
   request: Pick<IntrospectionRequest, "entity" | "match">,
 ): string {
@@ -257,7 +273,7 @@ function makeFetchQuery<TEntities extends EntityType>(
         return `$${placeholderNumber}::text[]`;
       });
       const sqlColumns = columns.map(
-        (column) => `${column === "_id" ? "oid" : column}::text`,
+        (column) => `${sqlColumnName(column)}::text`,
       );
       return `(${sqlColumns.join(", ")}) in (select * from unnest(${params.join(", ")}))`;
     });
@@ -430,7 +446,7 @@ function initializeMultipassContext<TEntities extends EntityType>(
       const catalogId = catalogOids.get(ENTITY_TYPES[entity].tableName);
       if (!catalogId) continue;
       for (const row of initialResult[entity] ?? []) {
-        const id = "_id" in row ? row._id : "oid" in row ? row.oid : undefined;
+        const id = rowOid(entity, row);
         if (id != null) {
           completedSelectors.add(
             selectorKey({
@@ -698,9 +714,13 @@ function assertValidRequest(
 function canShortcutRequest({ entity, match }: IntrospectionRequest) {
   for (const [column, value] of Object.entries(match)) {
     if (value === 0 || value === "0") {
-      if (column === "_id" && ENTITY_TYPES[entity].oids) return true;
+      if (sqlColumnName(column) === "oid") {
+        return true;
+      }
       const nonzeros = NONZERO_COLUMNS[entity] as readonly string[];
-      if (nonzeros.includes(column)) return true;
+      if (nonzeros.includes(column)) {
+        return true;
+      }
     }
   }
   return false;
