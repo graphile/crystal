@@ -314,8 +314,8 @@ export async function introspectRaw<
     const context = buildMultipassContext(options);
     return introspectRawMultipass(context, runQuery);
   } else {
-    const string = await runQuery(makeIntrospectionQuery(options), []);
-    const result: IntrospectionDataForEntities<TEntities> = JSON.parse(string);
+    const json = await runQuery(makeIntrospectionQuery(options), []);
+    const result: IntrospectionDataForEntities<TEntities> = JSON.parse(json);
     result.introspectionPasses = 1;
     return pruneIntrospectionData(options, result);
   }
@@ -556,9 +556,10 @@ async function introspectRawMultipass<TEntities extends EntityType>(
     }
 
     const fetch = makeFetchQuery(context, requests);
+    const json = await runQuery(fetch.text, fetch.values);
     const fetched: {
       [TEntity in EntityType]?: IntrospectionData[TEntity] | null;
-    } = JSON.parse(await runQuery(fetch.text, fetch.values));
+    } = JSON.parse(json);
     result.introspectionPasses++;
 
     mergeFetchedRows(context, result, fetched);
