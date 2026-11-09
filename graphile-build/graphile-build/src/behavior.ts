@@ -749,15 +749,25 @@ export class Behavior {
   }
 }
 
+// If this ever becomes a memory issue we can turn it into an LRU.
+const PARSE_SCOPE_CACHE = new Map<string, BehaviorScope>();
 /**
  * Parses a scope like `query:resource:connection:filter` into it's constituent parts.
  *
  * @internal
  */
 function parseScope(scopeString: string): BehaviorScope {
-  return scopeString.split(":");
+  const existing = PARSE_SCOPE_CACHE.get(scopeString);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const scope = scopeString.split(":");
+  PARSE_SCOPE_CACHE.set(scopeString, scope);
+  return scope;
 }
 
+// If this ever becomes a memory issue we can turn it into an LRU.
+const PARSE_SPECS_CACHE = new Map<string, BehaviorSpec[]>();
 /**
  * Parses a behaviorSpecs string like `+list -connection -list:filter` into a
  * list of BehaviorSpecs.
@@ -765,6 +775,15 @@ function parseScope(scopeString: string): BehaviorScope {
  * @internal
  */
 function parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
+  const existing = PARSE_SPECS_CACHE.get(behaviorSpecsString);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const specs = _parseSpecs(behaviorSpecsString);
+  PARSE_SPECS_CACHE.set(behaviorSpecsString, specs);
+  return specs;
+}
+function _parseSpecs(behaviorSpecsString: string): BehaviorSpec[] {
   const fragments = behaviorSpecsString.split(/\s+/);
   const specs: BehaviorSpec[] = [];
   for (const fragment of fragments) {
@@ -913,23 +932,12 @@ function getCachedEntity<T extends any[]>(listCache: EntityTrie, entity: T): T {
 
 const warned = new Set<string>();
 
-const specsCache = new Map<string, BehaviorSpec[]>();
-const scopeCache = new Map<string, BehaviorScope>();
-
 function stringMatches(
   behaviorString: string,
   filter: string,
 ): boolean | undefined {
-  let specs = specsCache.get(behaviorString);
-  if (!specs) {
-    specs = parseSpecs(behaviorString);
-    specsCache.set(behaviorString, specs);
-  }
-  let filterScope = scopeCache.get(filter);
-  if (!filterScope) {
-    filterScope = parseScope(filter);
-    scopeCache.set(filter, filterScope);
-  }
+  const specs = parseSpecs(behaviorString);
+  const filterScope = parseScope(filter);
   if (filterScope[filterScope.length - 1] === "create") {
     throw new Error(
       `'create' filter scope is forbidden; did you mean 'insert'?`,
