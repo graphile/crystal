@@ -44,7 +44,7 @@ where
   );
 
 with __users_identifiers__ as materialized (
-  select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids
+  select ids.ordinality - 1 as idx, ids.id0 from rows from (json_to_recordset($1::json) as (id0 "uuid")) with ordinality as ids
 )
 select __users_result__.*
 from __users_identifiers__,

@@ -3,10 +3,12 @@ import type {
   ConnectionHandlingResult,
   ConnectionHandlingStep,
   ExecutionDetails,
+  ExecutionValue,
   Maybe,
 } from "grafast";
 import {
   applyTransforms,
+  isDev,
   lambda,
   markSyncAndSafe,
   SafeError,
@@ -14,6 +16,7 @@ import {
 } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
+import { isJsony } from "../codecs.ts";
 import type {
   PgCodec,
   PgGroupSpec,
@@ -30,6 +33,47 @@ export interface QueryValue {
   dependencyIndex: number;
   codec: PgCodec;
   alreadyEncoded: boolean;
+  /**
+   * True if the codec is TYPES.json, TYPES.jsonb, or (potentially nested)
+   * domains over these. Needed specifically so we can escape the values
+   * correctly for json_to_recordset.
+   * @internal
+   */
+  codecIsJsony: boolean;
+}
+
+/**
+ * Encodes a value for inclusion in the JSON record passed to a batched query.
+ *
+ * JSON and JSONB values must remain JavaScript values so that serializing the
+ * enclosing record produces JSON values rather than JSON strings. Domains over
+ * JSON/JSONB behave the same way; arrays of either type do not.
+ */
+export const encodeQueryValueForJsonToRecordset = isDev
+  ? function encodeQueryValueForJsonToRecordset(
+      qv: QueryValue,
+      value: unknown,
+    ): unknown {
+      if (qv.codecIsJsony == undefined) {
+        throw new Error(
+          `DataplanPgInternalError<9c7f1742-8fe1-4da1-aa69-658450b26d1d>: expected QueryValue to have internal 'codecIsJsony' property`,
+        );
+      }
+      return _encodeQueryValueForJsonToRecordset(qv, value);
+    }
+  : _encodeQueryValueForJsonToRecordset;
+
+// NOTE: Any edits to this function must also be reflected in
+// makeMakeQueryValues in pgSelect.ts
+function _encodeQueryValueForJsonToRecordset(
+  qv: QueryValue,
+  value: unknown,
+): unknown {
+  if (qv.codecIsJsony) {
+    return qv.alreadyEncoded ? JSON.parse(value as string) : value;
+  } else {
+    return qv.alreadyEncoded ? value : qv.codec.toPg(value);
+  }
 }
 
 /**
@@ -188,7 +232,12 @@ export abstract class PgStmtBaseStep<T>
         const idx =
           existingIndex >= 0
             ? existingIndex
-            : queryValues.push(placeholder) - 1;
+            : queryValues.push({
+                dependencyIndex,
+                codec,
+                alreadyEncoded,
+                codecIsJsony: isJsony(codec),
+              }) - 1;
 
         // Finally alias this symbol to a reference to this placeholder
         placeholderValues.set(
@@ -611,7 +660,14 @@ export function makeValues(
 
       // If none exists, add one to our query values
       const idx =
-        existingIndex >= 0 ? existingIndex : queryValues.push(placeholder) - 1;
+        existingIndex >= 0
+          ? existingIndex
+          : queryValues.push({
+              dependencyIndex,
+              codec,
+              alreadyEncoded,
+              codecIsJsony: isJsony(codec),
+            }) - 1;
 
       // Finally alias this symbol to a reference to this placeholder
       placeholderValues.set(
@@ -639,4 +695,124 @@ export function makeValues(
     identifiersAlias,
     handlePlaceholder,
   };
+}
+
+export const EMPTY_OBJECT: Readonly<Record<string, never>> = Object.freeze(
+  Object.create(null),
+);
+
+export function makeMakeQueryValues(
+  rawQueryValues: readonly QueryValue[],
+  values: readonly ExecutionValue[],
+): (i: number) => object {
+  const length = rawQueryValues.length;
+  switch (length) {
+    case 0: {
+      return function makeQueryValues0(_i: number) {
+        return EMPTY_OBJECT;
+      };
+    }
+    case 1: {
+      // This is by far the most common call, so we're going to go further to
+      // fully optimize it by inlining the logic in encodeQueryValueForJsonToRecordset
+      const qv0 = rawQueryValues[0];
+      const values0 = values[qv0.dependencyIndex];
+      if (qv0.codecIsJsony) {
+        if (qv0.alreadyEncoded) {
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 == null ? null : JSON.parse(val0) };
+          };
+        } else {
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 ?? null };
+          };
+        }
+      } else {
+        if (qv0.alreadyEncoded) {
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 ?? null };
+          };
+        } else {
+          const codec0 = qv0.codec;
+          return function makeQueryValues1(i: number) {
+            const val0 = values0.at(i);
+            return { id0: val0 == null ? null : codec0.toPg(val0) };
+          };
+        }
+      }
+    }
+    case 2: {
+      const qv0 = rawQueryValues[0];
+      const values0 = values[qv0.dependencyIndex];
+      const qv1 = rawQueryValues[1];
+      const values1 = values[qv1.dependencyIndex];
+
+      if (
+        !qv0.codecIsJsony &&
+        !qv1.codecIsJsony &&
+        !qv0.alreadyEncoded &&
+        !qv1.alreadyEncoded
+      ) {
+        // This is the most common case for length = 2, so inline the encodeQueryValueForJsonToRecordset logic
+        const codec0 = qv0.codec;
+        const codec1 = qv1.codec;
+        return function makeQueryValues2(i: number) {
+          const val0 = values0.at(i);
+          const val1 = values1.at(i);
+          return {
+            id0: val0 == null ? null : codec0.toPg(val0),
+            id1: val1 == null ? null : codec1.toPg(val1),
+          };
+        };
+      }
+
+      return function makeQueryValues2(i: number) {
+        const val0 = values0.at(i);
+        const val1 = values1.at(i);
+        return {
+          id0:
+            val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
+          id1:
+            val1 == null ? null : encodeQueryValueForJsonToRecordset(qv1, val1),
+        };
+      };
+    }
+    case 3: {
+      const qv0 = rawQueryValues[0];
+      const values0 = values[qv0.dependencyIndex];
+      const qv1 = rawQueryValues[1];
+      const values1 = values[qv1.dependencyIndex];
+      const qv2 = rawQueryValues[2];
+      const values2 = values[qv2.dependencyIndex];
+
+      return function makeQueryValues3(i: number) {
+        const val0 = values0.at(i);
+        const val1 = values1.at(i);
+        const val2 = values2.at(i);
+        return {
+          id0:
+            val0 == null ? null : encodeQueryValueForJsonToRecordset(qv0, val0),
+          id1:
+            val1 == null ? null : encodeQueryValueForJsonToRecordset(qv1, val1),
+          id2:
+            val2 == null ? null : encodeQueryValueForJsonToRecordset(qv2, val2),
+        };
+      };
+    }
+
+    default:
+      return function makeQueryValues(i: number) {
+        const queryValues: Record<string, unknown> = Object.create(null);
+        for (let idx = 0; idx < length; idx++) {
+          const qv = rawQueryValues[idx];
+          const val = values[qv.dependencyIndex].at(i);
+          queryValues[`id${idx}`] =
+            val == null ? null : encodeQueryValueForJsonToRecordset(qv, val);
+        }
+        return queryValues;
+      };
+  }
 }
