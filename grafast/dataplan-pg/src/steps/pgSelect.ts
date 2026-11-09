@@ -1311,9 +1311,6 @@ export class PgSelectStep<
           return specIdx;
         });
       }
-      const executeMethod = isMutation
-        ? "executeWithoutCache"
-        : "executeWithCache";
       const common = {
         text,
         rawSqlValues,
@@ -1325,8 +1322,9 @@ export class PgSelectStep<
       };
       const executionResult =
         specs.length > 0
-          ? executeMethod === "executeWithCache" && !isMutation
-            ? {
+          ? isMutation
+            ? await this.resource.executeWithoutCache(specs, common)
+            : {
                 values: await executionDetails.batch(
                   executePgStepBatch,
                   [
@@ -1341,7 +1339,6 @@ export class PgSelectStep<
                   "tuple",
                 ),
               }
-            : await this.resource[executeMethod](specs, common)
           : null;
       // debugExecute("%s; result: %c", this, executionResult);
 

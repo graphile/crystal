@@ -1049,9 +1049,6 @@ on (${sql.indent(
             : EMPTY_ARRAY,
       };
     });
-    const executeMethod = this.hasSideEffects
-      ? "executeWithoutCache"
-      : "executeWithCache";
     const common = {
       text,
       rawSqlValues,
@@ -1061,17 +1058,16 @@ on (${sql.indent(
       eventEmitter,
       useTransaction: this.hasSideEffects,
     };
-    const executionResult =
-      executeMethod === "executeWithCache"
-        ? {
-            values: await executionDetails.batch(
-              executePgStepBatch,
-              [getPgStepBatchInfo(extra.meta!, this.executor, context, common)],
-              specs.map(({ queryValues }) => queryValues),
-              "tuple",
-            ),
-          }
-        : await this.executor[executeMethod](specs, common);
+    const executionResult = this.hasSideEffects
+      ? await this.executor.executeWithoutCache(specs, common)
+      : {
+          values: await executionDetails.batch(
+            executePgStepBatch,
+            [getPgStepBatchInfo(extra.meta!, this.executor, context, common)],
+            specs.map(({ queryValues }) => queryValues),
+            "tuple",
+          ),
+        };
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
