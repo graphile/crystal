@@ -1,5 +1,13 @@
 # graphile-build-pg
 
+## 5.2.1
+
+### Patch Changes
+
+- [#3236](https://github.com/graphile/crystal/pull/3236)
+  [`5c60b56`](https://github.com/graphile/crystal/commit/5c60b565d3d49e1c96557ec5261638f8c31fa88a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix index lookup.
+
 ## 5.2.0
 
 ### Minor Changes
