@@ -30,6 +30,12 @@ augmentation mutates its input and rejects already-augmented data.
 See [Accessors](./accessors.md) for navigation helpers and
 [Naming](./naming.md) for the relationship to PostgreSQL catalog names.
 
+### V2 migration
+
+If you were using the deprecated `makeIntrospectionQuery` and
+`parseIntrospectionResults` functions, see [Migrating v1 to v2](./v1-to-v2.md)
+for a migration guide.
+
 ## runQuery
 
 This library does not make connections to PostgreSQL on its own, to do so you
@@ -181,53 +187,3 @@ async function introspectForCache(options) {
 
 Pass the same options to augmentation as to introspection. Augmentation mutates
 the supplied data and cannot be applied twice to the same object.
-
-## Migrating the legacy query pattern
-
-pg-introspection v2 introduced the `introspect` and
-`introspectRaw`/`augmentIntrospectionData` patterns to replace the legacy
-`makeIntrospectionQuery` and `parseIntrospectionResults` functions. These legacy
-functions are deprecated, but remain available; you must migrate to the new APIs
-to use `onlyEntities`, `filters` and `multipass`.
-
-To upgrade, replace:
-
-```js
-import {
-  makeIntrospectionQuery,
-  parseIntrospectionResults,
-} from "pg-introspection";
-
-const includeFromExtensions = false;
-const text = makeIntrospectionQuery();
-const { rows } = await pool.query(text);
-const introspectionResults = rows[0].introspection;
-const introspection = parseIntrospectionResults(
-  introspectionResults,
-  includeFromExtensions,
-);
-```
-
-with:
-
-```ts
-import { introspection, pruneExtensionResources } from "pg-introspection";
-
-const includeFromExtensions = false;
-const options = includeFromExtensions ? {} : { prune: pruneExtensionResources };
-const introspection = await introspect(options, runQuery);
-```
-
-Where `runQuery` is the function used to execute the SQL using your chosen
-driver:
-
-```ts
-async function runQuery(text, values) {
-  const { rows } = await pool.query(text, values);
-  return rows[0].introspection;
-}
-```
-
-If you were caching the result of running `makeIntrospectionQuery` then use
-the `introspectRaw`/`augmentIntrospectionData` pattern documented above instead
-of just `introspect`.
