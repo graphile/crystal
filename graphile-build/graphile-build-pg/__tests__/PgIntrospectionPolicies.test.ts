@@ -291,3 +291,45 @@ test.each([false, true])(
     });
   },
 );
+
+test.each([false, true])(
+  "discovers standalone composite types usable by the role (multipass: %s)",
+  async (multipass) => {
+    return withPgClientTransaction(async (client) => {
+      const runQuery = makeRunQuery(client);
+      await client.query(
+        `
+        create role purpose_composite_reader;
+        create schema purpose_composite;
+        grant usage on schema purpose_composite to purpose_composite_reader;
+        create type purpose_composite.visible_pair as (a integer, b text);
+        create type purpose_composite.hidden_pair as (c integer);
+        revoke usage on type purpose_composite.hidden_pair from public;
+      `,
+      );
+      const options: IntrospectOptions = {
+        runQuery,
+        prune: postgraphilePrune,
+        multipass: false,
+      };
+      if (multipass) {
+        options.multipass = postgraphileMultipass({
+          schemas: ["purpose_composite"],
+        });
+        options.multipass.onlyAccessible = { role: "purpose_composite_reader" };
+      }
+      const result = await introspect(options);
+      const visible = result.classes.find(
+        (row) => row.relname === "visible_pair",
+      );
+      expect(visible?.relkind).toBe("c");
+      expect(visible!.getAttributes().map((row) => row.attname)).toEqual([
+        "a",
+        "b",
+      ]);
+      expect(result.classes.some((row) => row.relname === "hidden_pair")).toBe(
+        !multipass,
+      );
+    });
+  },
+);
