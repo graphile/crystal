@@ -132,7 +132,7 @@ export class Behavior {
           ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
-      listCache: ListTrie;
+      listCache: ListCache;
       inferredCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
@@ -302,7 +302,10 @@ export class Behavior {
       behaviorStrings: Object.create(null),
       inferredBehaviorCallbacks: [],
       overrideBehaviorCallbacks: [],
-      listCache: newListTrie(),
+      listCache: {
+        lists: new Set(),
+        root: newListTrie(),
+      },
       inferredCache: new Map(),
       overrideCache: new Map(),
       fullCache: new Map(),
@@ -893,6 +896,12 @@ interface ResolvedBehavior {
   toString(): string;
 }
 
+interface ListCache {
+  /** Allows us to shortcut looking up a list that is already deduped */
+  lists: Set<any[]>;
+  /** Trie to look up the lists by its element values */
+  root: ListTrie;
+}
 interface ListTrie {
   children: Map<unknown, ListTrie>;
   list: any[] | null;
@@ -915,8 +924,9 @@ function trieChild<TKey>(parent: ListTrie, key: TKey): ListTrie {
  * Returns an array equivalent to T, but deduplicated vs all other arrays
  * equivalent to T.
  */
-function getCachedList<T extends any[]>(listCache: ListTrie, list: T): T {
-  let node = trieChild(listCache, list.length);
+function getCachedList<T extends any[]>(listCache: ListCache, list: T): T {
+  if (listCache.lists.has(list)) return list;
+  let node = trieChild(listCache.root, list.length);
   for (let i = 0, l = list.length; i < l; i++) {
     node = trieChild(node, list[i]);
   }
@@ -925,6 +935,7 @@ function getCachedList<T extends any[]>(listCache: ListTrie, list: T): T {
     return existing as T;
   }
   node.list = list;
+  listCache.lists.add(list);
   return list;
 }
 
